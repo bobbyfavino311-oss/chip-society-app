@@ -59,6 +59,7 @@
     "@expo-google-fonts/bebas-neue": "^0.4.1",
     "@expo-google-fonts/faster-one": "^0.4.1",
     "@expo-google-fonts/orbitron": "^0.4.2",
-    "@expo-google-fonts/pacifico": "^0.4.1"
+    "@expo-google-fonts/pacifico": "^0.4.1",
+    "@expo-google-fonts/righteous": "^0.4.1"
   }
 }
