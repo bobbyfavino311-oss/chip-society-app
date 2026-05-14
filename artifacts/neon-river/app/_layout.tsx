@@ -4,6 +4,7 @@ import {
   Orbitron_900Black,
   useFonts,
 } from '@expo-google-fonts/orbitron';
+import { FasterOne_400Regular } from '@expo-google-fonts/faster-one';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -40,6 +41,7 @@ export default function RootLayout() {
     Orbitron_400Regular,
     Orbitron_700Bold,
     Orbitron_900Black,
+    FasterOne_400Regular,
   });
 
   useEffect(() => {

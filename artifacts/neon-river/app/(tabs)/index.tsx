@@ -83,13 +83,34 @@ function AceSocialLogo() {
 
   return (
     <View style={logo.wrap}>
-      <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
+      {/* Crisp foreground letters with inline textShadow for neon glow */}
+      <Animated.Text
+        style={[
+          logo.word,
+          {
+            color: aceColor,
+            opacity: Animated.multiply(aceOpacity, aceGlow),
+            textShadowColor: aceColor,
+          },
+        ]}
+        allowFontScaling={false}
+      >
         ACE
       </Animated.Text>
-      <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
+      <Animated.Text
+        style={[
+          logo.word,
+          {
+            color: socialColor,
+            opacity: Animated.multiply(socialOpacity, socialGlow),
+            textShadowColor: socialColor,
+          },
+        ]}
+        allowFontScaling={false}
+      >
         SOCIAL
       </Animated.Text>
-      <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
+      <Text style={logo.sub} allowFontScaling={false}>✦  TEXAS HOLD'EM POKER  ✦</Text>
     </View>
   );
 }
@@ -343,19 +364,49 @@ export default function HomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const logo = StyleSheet.create({
-  wrap: { alignItems: 'center', paddingVertical: 8 },
+  wrap: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    // Stack glow + crisp layers on top of each other
+    position: 'relative',
+  },
+  // Absolute-positioned glow stack behind the real letters
+  glowStack: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Blurred/spread glow duplicate
+  wordGlow: {
+    fontFamily: 'FasterOne_400Regular',
+    fontSize: 72,
+    lineHeight: 76,
+    letterSpacing: 2,
+    // Simulate a wide neon tube glow with textShadow
+    textShadowRadius: 28,
+    textShadowOffset: { width: 0, height: 0 },
+    transform: [{ skewX: '-4deg' }],
+  },
+  // Crisp foreground word
   word: {
-    fontFamily: 'Orbitron_900Black',
-    fontSize: 48,
-    letterSpacing: 8,
-    lineHeight: 54,
+    fontFamily: 'FasterOne_400Regular',
+    fontSize: 72,
+    lineHeight: 76,
+    letterSpacing: 2,
+    textShadowRadius: 10,
+    textShadowOffset: { width: 0, height: 0 },
+    transform: [{ skewX: '-4deg' }],
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 9,
     color: colors.textMuted,
-    letterSpacing: 4,
-    marginTop: 4,
+    letterSpacing: 5,
+    marginTop: 8,
   },
 });
 
