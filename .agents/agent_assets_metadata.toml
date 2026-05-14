@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "ufvp0-h4NM_hcrGugQnfx"
+uri = "file://artifacts/neon-river/assets/images/icon.png"
+type = "image"
+title = "neon-river-icon"
+
+[[generated]]
+id = "uJVOrFgF8OgdKYcwFfM9_"
+uri = "file://artifacts/neon-river/assets/images/splash.png"
+type = "image"
+title = "neon-table-splash"
+
+[[generated]]
+id = "n9o6lAysP6hKpBCGW1HkF"
+uri = "file://artifacts/neon-river/assets/images/menu-bg.png"
+type = "image"
+title = "neon-menu-bg"

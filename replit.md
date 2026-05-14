@@ -1,6 +1,6 @@
-# [Project name]
+# NEON RIVER — Texas Hold'em Poker
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A premium iOS multiplayer Texas Hold'em poker app with a retro 1980s synthwave / neon-casino aesthetic. Virtual chips only, no real-money gambling.
 
 ## Run & Operate
 
@@ -14,31 +14,52 @@ _Replace the heading above with the project's name, and this line with one sente
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- **Mobile**: Expo (React Native) — `artifacts/neon-river/`
+- **API**: Express 5 (stubbed, ready for multiplayer)
+- **DB**: PostgreSQL + Drizzle ORM (not yet provisioned)
+- **Fonts**: Orbitron (neon display), Inter (body)
+- **Libraries**: expo-linear-gradient, react-native-svg, @react-native-async-storage/async-storage
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/neon-river/` — the full Expo mobile app
+- `artifacts/neon-river/lib/pokerEngine.ts` — server-authoritative poker hand evaluator (all rankings, getBestHand, determineWinners)
+- `artifacts/neon-river/lib/aiBot.ts` — AI decision engine (5 difficulty levels)
+- `artifacts/neon-river/hooks/usePokerGame.ts` — full game state machine (betting rounds, phase progression, showdown)
+- `artifacts/neon-river/context/UserContext.tsx` — player profile persistence (AsyncStorage)
+- `artifacts/neon-river/constants/colors.ts` — neon design tokens
+- `lib/api-spec/openapi.yaml` — OpenAPI spec (health check only; extend for multiplayer)
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Poker engine runs client-side for AI Practice mode (zero latency, fully offline)
+- Server-authoritative design is the intent for multiplayer — hook up Socket.IO to `api-server` when needed
+- AsyncStorage for all profile/progression persistence on the first build (no DB required)
+- Game state managed via `usePokerGame` hook (useReducer-style pure state transitions)
+- Orbitron font gives the neon casino identity; falls back gracefully if loading fails
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **AI Practice**: Full Texas Hold'em vs 4 AI bots (5 difficulty levels: Beginner → Elite Pro)
+- **Lobby**: Game mode grid, player stats, quick chat phrases
+- **Profile**: Username editing, XP/rank progression (7 ranks: Neon Bronze → Neon Legend), win rate, chip balance
+- **Daily Rewards**: Streak tracking, day-by-day chip rewards, daily missions
+- **Poker Engine**: Royal Flush → High Card, kickers, side pots, all-in, blinds, dealer rotation, 30s turn timer with auto-fold
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Neon-synthwave 1980s Miami aesthetic
+- Dark background (#050010), electric blue (#00d4ff), neon pink (#ff0090), purple (#bf5fff)
+- Virtual chips only — NO real money
+- Max 5 players per table, min 2
+- Orbitron font for display text
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- textShadow* and shadow* props produce web deprecation warnings — harmless on native iOS
+- useNativeDriver is not available in Expo Go web preview — normal for development
+- Always add new screens to the Stack in `app/_layout.tsx` before linking from other screens
+- Install new packages with `pnpm add` from the `artifacts/neon-river/` directory
 
 ## Pointers
 

@@ -1,0 +1,356 @@
+Build a complete iOS multiplayer Texas Hold’em poker app called “NEON RIVER”.
+
+CORE THEME:
+The app must have a premium 1980s neon casino aesthetic inspired by:
+- Miami nightlife
+- synthwave visuals
+- retro-futuristic luxury
+- neon Vegas
+- pink and blue neon lighting
+- chrome reflections
+- dark glossy surfaces
+
+The visual identity should feel:
+- cinematic
+- stylish
+- addictive
+- modern
+- premium
+- highly polished
+
+PRIMARY COLORS:
+- electric blue
+- neon pink
+- deep black
+- purple gradients
+- chrome silver accents
+
+VISUAL STYLE:
+- glowing UI elements
+- neon table edges
+- soft ambient lighting
+- realistic poker chips
+- smooth animations
+- retro synthwave atmosphere
+- subtle VHS-inspired effects
+- luxury casino vibe
+
+TARGET PLATFORM:
+- Apple App Store (iOS first)
+
+GAME TYPE:
+- Multiplayer Texas Hold’em Poker
+- Social casino app
+- Virtual chips only
+- NO real-money gambling
+
+TABLE RULES:
+- Maximum 5 players per table
+- Minimum 2 players
+- No-Limit Texas Hold’em rules
+- Real-time multiplayer gameplay
+
+VERY IMPORTANT:
+Every player must receive exactly:
+- 2 private hole cards
+
+The poker engine must fully understand:
+- all Texas Hold’em rules
+- betting rounds
+- blinds
+- side pots
+- hand rankings
+- kickers
+- ties
+- all-in scenarios
+- showdown logic
+- folding
+- turn order
+- dealer rotation
+
+The AI poker engine must ALWAYS correctly evaluate:
+- Royal Flush
+- Straight Flush
+- Four of a Kind
+- Full House
+- Flush
+- Straight
+- Three of a Kind
+- Two Pair
+- One Pair
+- High Card
+
+The backend poker logic must be 100% server-authoritative.
+
+NEVER trust client-side hand calculations.
+
+--------------------------------------------------
+AI PRACTICE MODE (VERY IMPORTANT)
+--------------------------------------------------
+
+Include a complete AI Practice Mode.
+
+Players must be able to:
+- play offline against AI bots
+- practice poker strategies
+- learn rules
+- improve skills
+
+AI BOT REQUIREMENTS:
+- realistic poker behavior
+- bluffing logic
+- folding logic
+- betting patterns
+- adjustable difficulty levels
+
+DIFFICULTY LEVELS:
+- Beginner
+- Casual
+- Competitive
+- Shark
+- Elite Pro
+
+AI PLAYERS SHOULD:
+- understand poker odds
+- make realistic decisions
+- occasionally bluff
+- react to board texture
+- protect strong hands
+- fold weak hands intelligently
+
+The AI should feel human-like.
+
+--------------------------------------------------
+TURN TIMER SYSTEM
+--------------------------------------------------
+
+Every player must have:
+- a visible 30-second countdown timer beside their avatar during their turn
+
+TIMER REQUIREMENTS:
+- circular countdown animation
+- neon glow effect
+- visual urgency near expiration
+- automatic fold when timer reaches zero
+- smooth synchronized multiplayer timing
+
+When timer reaches:
+- 10 seconds remaining:
+UI glows red/pink
+- 5 seconds remaining:
+timer pulses dramatically
+
+Timer synchronization must work perfectly online.
+
+--------------------------------------------------
+GAME MODES
+--------------------------------------------------
+
+Include:
+- Quick Match
+- Ranked Match
+- AI Practice
+- Private Friend Tables
+- Neon Tournament Mode
+
+--------------------------------------------------
+MATCHMAKING
+--------------------------------------------------
+
+Features:
+- fast matchmaking
+- reconnect support
+- low-latency multiplayer
+- dynamic table creation
+- skill-based ranking
+
+--------------------------------------------------
+SOCIAL FEATURES
+--------------------------------------------------
+
+Include:
+- friends list
+- invite friends
+- emoji reactions
+- quick chat system
+- spectate mode
+
+Quick Chat Examples:
+- “Good hand.”
+- “All in.”
+- “Crazy bluff.”
+- “No way.”
+- “Good game.”
+
+--------------------------------------------------
+PLAYER PROFILES
+--------------------------------------------------
+
+Each player profile should include:
+- username
+- neon avatar
+- chip balance
+- level
+- rank
+- win rate
+- total hands played
+
+--------------------------------------------------
+RANKING SYSTEM
+--------------------------------------------------
+
+Ranks:
+- Neon Bronze
+- Neon Silver
+- Neon Gold
+- Neon Platinum
+- Neon Diamond
+- Neon Elite
+- Neon Legend
+
+--------------------------------------------------
+DAILY REWARDS
+--------------------------------------------------
+
+Include:
+- login rewards
+- free chips
+- daily missions
+- streak bonuses
+- spin wheel
+
+--------------------------------------------------
+MONETIZATION
+--------------------------------------------------
+
+Monetization must be App Store safe.
+
+Use:
+- virtual chips only
+- cosmetic purchases
+- premium neon themes
+- VIP membership
+- exclusive animations
+- custom card backs
+- premium table skins
+
+NO real-money gambling.
+
+--------------------------------------------------
+UI / UX DESIGN
+--------------------------------------------------
+
+The UI must feel:
+- ultra smooth
+- modern iOS
+- visually premium
+- easy to use
+- cinematic
+
+MAIN MENU:
+- animated neon casino background
+- glowing buttons
+- live player count
+- featured tournaments
+- quick play button
+
+POKER TABLE DESIGN:
+- futuristic neon poker table
+- glowing chip stacks
+- realistic cards
+- soft reflections
+- synthwave ambience
+- smooth betting animations
+
+BUTTONS:
+- Fold
+- Check
+- Call
+- Raise
+- All In
+
+Raise slider should feel highly responsive.
+
+--------------------------------------------------
+AUDIO DESIGN
+--------------------------------------------------
+
+Audio style:
+- synthwave music
+- casino ambience
+- poker chip sounds
+- smooth electronic tones
+- dramatic all-in sound effects
+
+The app should feel immersive and stylish.
+
+--------------------------------------------------
+TECH STACK
+--------------------------------------------------
+
+FRONTEND:
+Use either:
+- Flutter
+OR
+- React Native
+
+BACKEND:
+- Node.js
+- Socket.IO
+- Redis
+- PostgreSQL
+
+MULTIPLAYER:
+- WebSockets
+- real-time synchronization
+- reconnect handling
+- anti-cheat validation
+
+--------------------------------------------------
+DATABASE STRUCTURE
+--------------------------------------------------
+
+Include:
+Users table
+Matches table
+Player stats
+Rankings
+Cosmetics inventory
+Friend system
+Tournament history
+
+--------------------------------------------------
+SECURITY
+--------------------------------------------------
+
+Must include:
+- anti-cheat protection
+- encrypted connections
+- bot prevention
+- duplicate login prevention
+- server-side validation
+
+--------------------------------------------------
+APP STORE GOAL
+--------------------------------------------------
+
+The app should feel like:
+- a premium modern social poker experience
+- an addictive neon casino world
+- a top-grossing App Store game
+
+The final result should combine:
+- luxury Vegas energy
+- retro 80s synthwave aesthetics
+- smooth multiplayer gameplay
+- social competition
+- highly polished iOS design
+
+PRIORITIES:
+1. Smooth multiplayer
+2. Beautiful neon visuals
+3. Fast gameplay
+4. Addictive progression
+5. Stable poker engine
+6. Responsive 30-second timer system
+7. Intelligent AI practice mode
