@@ -24,6 +24,7 @@ export interface GamePlayer {
   isSmallBlind: boolean;
   isBigBlind: boolean;
   avatarIndex: number;
+  chipDelta: number; // chips won/lost this hand (shown at handover)
 }
 
 export interface GameState {
@@ -43,7 +44,8 @@ export interface GameState {
   showCards: boolean;
   winnerIds: string[];
   winnerHand: string;
-  isProcessing: boolean;
+  winnerPot: number; // pot size at time of win (for display)
+  allInRunout: boolean; // true when we are running out the board with all players all-in
 }
 
 const INITIAL_STATE: GameState = {
@@ -63,7 +65,8 @@ const INITIAL_STATE: GameState = {
   showCards: false,
   winnerIds: [],
   winnerHand: '',
-  isProcessing: false,
+  winnerPot: 0,
+  allInRunout: false,
 };
 
 function getActivePlayers(players: GamePlayer[]): GamePlayer[] {
@@ -72,45 +75,73 @@ function getActivePlayers(players: GamePlayer[]): GamePlayer[] {
 
 function nextActiveIndex(players: GamePlayer[], from: number): number {
   let next = (from + 1) % players.length;
-  let tries = 0;
-  while (players[next].status !== 'active' && tries < players.length) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[next].status === 'active') return next;
     next = (next + 1) % players.length;
-    tries++;
   }
-  return next;
+  return from; // fallback – should never happen if numToAct > 0
+}
+
+// Deal any missing community cards (flop / turn / river runout)
+function runOutBoard(state: GameState): GameState {
+  let { communityCards, deck } = state;
+  if (communityCards.length < 3 && deck.length >= 3) {
+    communityCards = [deck[0], deck[1], deck[2]];
+    deck = deck.slice(3);
+  }
+  if (communityCards.length < 4 && deck.length >= 1) {
+    communityCards = [...communityCards, deck[0]];
+    deck = deck.slice(1);
+  }
+  if (communityCards.length < 5 && deck.length >= 1) {
+    communityCards = [...communityCards, deck[0]];
+    deck = deck.slice(1);
+  }
+  return { ...state, communityCards, deck };
 }
 
 function doShowdown(state: GameState): GameState {
-  const eligible = state.players.filter(p => p.status === 'active' || p.status === 'allIn');
-  if (eligible.length === 0) return { ...state, phase: 'handover' };
+  // Always complete the board before evaluating
+  const s = runOutBoard(state);
+
+  const eligible = s.players.filter(p => p.status === 'active' || p.status === 'allIn');
+  if (eligible.length === 0) return { ...s, phase: 'handover' };
+
+  const potSize = s.pot;
 
   if (eligible.length === 1) {
     const winner = eligible[0];
-    const players = state.players.map(p =>
-      p.id === winner.id ? { ...p, chips: p.chips + state.pot } : p
+    const players = s.players.map(p =>
+      p.id === winner.id
+        ? { ...p, chips: p.chips + potSize, chipDelta: p.chipDelta + potSize }
+        : p
     );
     return {
-      ...state,
+      ...s,
       players,
       phase: 'handover',
       showCards: true,
+      allInRunout: false,
       winnerIds: [winner.id],
       winnerHand: '',
-      message: `${winner.name} wins ${state.pot} chips!`,
+      winnerPot: potSize,
+      message: `${winner.name} wins!`,
       pot: 0,
     };
   }
 
   const winners = determineWinners(
     eligible.map(p => ({ id: p.id, holeCards: p.holeCards })),
-    state.communityCards
+    s.communityCards
   );
   const winnerIds = winners.map(w => w.winnerId);
-  const share = Math.floor(state.pot / winnerIds.length);
+  const share = Math.floor(potSize / winnerIds.length);
   const winnerHand = winners[0]?.handResult.name ?? '';
 
-  const players = state.players.map(p =>
-    winnerIds.includes(p.id) ? { ...p, chips: p.chips + share } : p
+  const players = s.players.map(p =>
+    winnerIds.includes(p.id)
+      ? { ...p, chips: p.chips + share, chipDelta: p.chipDelta + share }
+      : p
   );
 
   const winnerNames = players
@@ -119,12 +150,14 @@ function doShowdown(state: GameState): GameState {
     .join(' & ');
 
   return {
-    ...state,
+    ...s,
     players,
     phase: 'handover',
     showCards: true,
+    allInRunout: false,
     winnerIds,
     winnerHand,
+    winnerPot: potSize,
     message: `${winnerNames} wins with ${winnerHand}!`,
     pot: 0,
   };
@@ -132,29 +165,32 @@ function doShowdown(state: GameState): GameState {
 
 function advancePhase(state: GameState): GameState {
   const active = getActivePlayers(state.players);
-  if (active.length <= 1) return doShowdown(state);
+
+  // No active players → everyone is all-in or folded → run board and showdown
+  if (active.length === 0) return doShowdown(state);
+  // Only one active → they win (others folded)
+  if (active.length === 1) return doShowdown(state);
 
   const players = state.players.map(p => ({ ...p, betInRound: 0 }));
   const base = { ...state, players, currentBet: 0, minRaise: BIG_BLIND };
 
   let firstActor = (state.dealerIndex + 1) % players.length;
-  let tries = 0;
-  while (players[firstActor].status !== 'active' && tries < players.length) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[firstActor].status === 'active') break;
     firstActor = (firstActor + 1) % players.length;
-    tries++;
   }
 
   const numToAct = active.length;
 
   if (state.phase === 'preflop') {
     const flop = [state.deck[0], state.deck[1], state.deck[2]];
-    return { ...base, phase: 'flop', communityCards: flop, deck: state.deck.slice(3), currentPlayerIndex: firstActor, numToAct, timer: TIMER_SECONDS, lastAggressorIndex: firstActor, isProcessing: false };
+    return { ...base, phase: 'flop', communityCards: flop, deck: state.deck.slice(3), currentPlayerIndex: firstActor, numToAct, timer: TIMER_SECONDS, lastAggressorIndex: firstActor };
   }
   if (state.phase === 'flop') {
-    return { ...base, phase: 'turn', communityCards: [...state.communityCards, state.deck[0]], deck: state.deck.slice(1), currentPlayerIndex: firstActor, numToAct, timer: TIMER_SECONDS, lastAggressorIndex: firstActor, isProcessing: false };
+    return { ...base, phase: 'turn', communityCards: [...state.communityCards, state.deck[0]], deck: state.deck.slice(1), currentPlayerIndex: firstActor, numToAct, timer: TIMER_SECONDS, lastAggressorIndex: firstActor };
   }
   if (state.phase === 'turn') {
-    return { ...base, phase: 'river', communityCards: [...state.communityCards, state.deck[0]], deck: state.deck.slice(1), currentPlayerIndex: firstActor, numToAct, timer: TIMER_SECONDS, lastAggressorIndex: firstActor, isProcessing: false };
+    return { ...base, phase: 'river', communityCards: [...state.communityCards, state.deck[0]], deck: state.deck.slice(1), currentPlayerIndex: firstActor, numToAct, timer: TIMER_SECONDS, lastAggressorIndex: firstActor };
   }
   if (state.phase === 'river') {
     return doShowdown({ ...base, phase: 'showdown' });
@@ -184,6 +220,7 @@ function applyAction(state: GameState, action: AIAction, raiseAmount?: number): 
     case 'call': {
       const callAmt = Math.min(currentBet - player.betInRound, player.chips);
       player.chips -= callAmt;
+      player.chipDelta -= callAmt;
       player.betInRound += callAmt;
       pot += callAmt;
       if (player.chips === 0) player.status = 'allIn';
@@ -194,6 +231,7 @@ function applyAction(state: GameState, action: AIAction, raiseAmount?: number): 
       const toCall = currentBet - player.betInRound;
       const total = Math.min(toCall + rAmt, player.chips);
       player.chips -= total;
+      player.chipDelta -= total;
       pot += total;
       const newBet = player.betInRound + total;
       if (newBet > currentBet) {
@@ -209,6 +247,7 @@ function applyAction(state: GameState, action: AIAction, raiseAmount?: number): 
     case 'allin': {
       const allInAmt = player.chips;
       pot += allInAmt;
+      player.chipDelta -= allInAmt;
       player.betInRound += allInAmt;
       if (player.betInRound > currentBet) {
         minRaise = player.betInRound - currentBet;
@@ -222,8 +261,8 @@ function applyAction(state: GameState, action: AIAction, raiseAmount?: number): 
     }
   }
 
-  const next = nextActiveIndex(players, state.currentPlayerIndex);
-  const msg = getActionMsg(player.name, action, raiseAmount ?? minRaise);
+  const active = players.filter(p => p.status === 'active');
+  const next = active.length > 0 ? nextActiveIndex(players, state.currentPlayerIndex) : state.currentPlayerIndex;
 
   const nextState: GameState = {
     ...state,
@@ -235,27 +274,34 @@ function applyAction(state: GameState, action: AIAction, raiseAmount?: number): 
     numToAct: Math.max(0, numToAct),
     currentPlayerIndex: next,
     timer: TIMER_SECONDS,
-    isProcessing: false,
-    message: msg,
+    message: getActionMsg(player.name, action, raiseAmount ?? minRaise),
   };
 
   return checkRoundOver(nextState);
 }
 
 function getActionMsg(name: string, action: AIAction, amount: number): string {
-  const msgs: Record<AIAction, string> = {
+  return {
     fold: `${name} folds`,
     check: `${name} checks`,
     call: `${name} calls`,
-    raise: `${name} raises to ${amount}`,
+    raise: `${name} raises ${amount}`,
     allin: `${name} goes ALL IN!`,
-  };
-  return msgs[action];
+  }[action];
 }
 
 function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number): GameState {
   const deck = shuffleDeck(createDeck());
-  const ps = players.map(p => ({ ...p, holeCards: [] as Card[], betInRound: 0, status: 'active' as PlayerStatus, isDealer: false, isSmallBlind: false, isBigBlind: false }));
+  const ps = players.map(p => ({
+    ...p,
+    holeCards: [] as Card[],
+    betInRound: 0,
+    chipDelta: 0,
+    status: 'active' as PlayerStatus,
+    isDealer: false,
+    isSmallBlind: false,
+    isBigBlind: false,
+  }));
   ps[dealerIdx].isDealer = true;
 
   let deckCursor = 0;
@@ -269,20 +315,21 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number): GameState 
   const sbAmt = Math.min(SMALL_BLIND, ps[sbIdx].chips);
   ps[sbIdx].chips -= sbAmt;
   ps[sbIdx].betInRound = sbAmt;
+  ps[sbIdx].chipDelta = -sbAmt;
   ps[sbIdx].isSmallBlind = true;
   if (ps[sbIdx].chips === 0) ps[sbIdx].status = 'allIn';
 
   const bbAmt = Math.min(BIG_BLIND, ps[bbIdx].chips);
   ps[bbIdx].chips -= bbAmt;
   ps[bbIdx].betInRound = bbAmt;
+  ps[bbIdx].chipDelta = -bbAmt;
   ps[bbIdx].isBigBlind = true;
   if (ps[bbIdx].chips === 0) ps[bbIdx].status = 'allIn';
 
   let firstActor = (bbIdx + 1) % ps.length;
-  let tries = 0;
-  while (ps[firstActor].status !== 'active' && tries < ps.length) {
+  for (let i = 0; i < ps.length; i++) {
+    if (ps[firstActor].status === 'active') break;
     firstActor = (firstActor + 1) % ps.length;
-    tries++;
   }
 
   const active = ps.filter(p => p.status === 'active');
@@ -299,14 +346,44 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number): GameState 
     dealerIndex: dealerIdx,
     numToAct: active.length,
     timer: TIMER_SECONDS,
-    message: 'Cards dealt. Your turn...',
+    message: 'Cards dealt!',
   };
 }
+
+function executeAIAction(prev: GameState): GameState {
+  const player = prev.players[prev.currentPlayerIndex];
+  if (!player || player.isHuman) return prev;
+  if (player.status !== 'active') return prev;
+
+  const decision = getAIDecision({
+    holeCards: player.holeCards,
+    communityCards: prev.communityCards,
+    myChips: player.chips,
+    pot: prev.pot,
+    currentBet: prev.currentBet,
+    myBetInRound: player.betInRound,
+    minRaise: prev.minRaise,
+    difficulty: player.difficulty,
+    phase: prev.phase as 'preflop' | 'flop' | 'turn' | 'river',
+    numActivePlayers: getActivePlayers(prev.players).length,
+  });
+
+  let raiseAmt: number | undefined;
+  if (decision === 'raise') {
+    raiseAmt = getRaiseAmount(player.difficulty, prev.pot, player.chips, prev.minRaise, 0.5);
+  }
+
+  return applyAction(prev, decision, raiseAmt);
+}
+
+// ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanChips: number) {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const aiRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Track which player+phase we already scheduled AI for (prevents double-fire)
+  const aiKeyRef = useRef<string>('');
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
@@ -314,65 +391,59 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
 
   const clearAI = useCallback(() => {
     if (aiRef.current) { clearTimeout(aiRef.current); aiRef.current = null; }
+    aiKeyRef.current = '';
   }, []);
 
+  // ── Countdown timer (runs for ALL players; only auto-folds the human) ──────
   useEffect(() => {
     clearTimer();
     const s = state;
-    if (s.phase === 'idle' || s.phase === 'handover' || s.phase === 'showdown' || s.isProcessing) return;
-    const currentPlayer = s.players[s.currentPlayerIndex];
-    if (!currentPlayer?.isHuman) return;
+    if (s.phase === 'idle' || s.phase === 'handover' || s.phase === 'showdown') return;
+    if (s.allInRunout) return;
 
     timerRef.current = setInterval(() => {
       setState(prev => {
-        if (!prev.players[prev.currentPlayerIndex]?.isHuman) return prev;
-        if (prev.timer <= 1) return applyAction(prev, 'fold');
+        if (prev.phase === 'idle' || prev.phase === 'handover' || prev.phase === 'showdown') return prev;
+        if (prev.allInRunout) return prev;
+        if (prev.timer <= 1) {
+          const cur = prev.players[prev.currentPlayerIndex];
+          if (cur?.isHuman && cur.status === 'active') return applyAction(prev, 'fold');
+          return { ...prev, timer: 1 }; // freeze at 1 for AI (they fire via their own timeout)
+        }
         return { ...prev, timer: prev.timer - 1 };
       });
     }, 1000);
 
     return clearTimer;
-  }, [state.currentPlayerIndex, state.phase, state.isProcessing]);
+  // Re-run whenever the active player or phase changes (not on isProcessing)
+  }, [state.currentPlayerIndex, state.phase, state.allInRunout]); // eslint-disable-line
 
+  // ── AI turn handler ───────────────────────────────────────────────────────
   useEffect(() => {
-    clearAI();
     const s = state;
-    if (s.phase === 'idle' || s.phase === 'handover' || s.phase === 'showdown' || s.isProcessing) return;
+    if (s.phase === 'idle' || s.phase === 'handover' || s.phase === 'showdown') return;
+    if (s.allInRunout) return;
+
     const currentPlayer = s.players[s.currentPlayerIndex];
     if (!currentPlayer || currentPlayer.isHuman) return;
+    if (currentPlayer.status !== 'active') return;
 
-    setState(prev => ({ ...prev, isProcessing: true }));
+    const key = `${s.currentPlayerIndex}-${s.phase}-${s.numToAct}`;
+    if (aiKeyRef.current === key) return; // already scheduled
+    aiKeyRef.current = key;
 
+    clearAI();
     const delay = getAIDelay(currentPlayer.difficulty);
     aiRef.current = setTimeout(() => {
       setState(prev => {
-        const player = prev.players[prev.currentPlayerIndex];
-        if (!player || player.isHuman) return { ...prev, isProcessing: false };
-
-        const decision = getAIDecision({
-          holeCards: player.holeCards,
-          communityCards: prev.communityCards,
-          myChips: player.chips,
-          pot: prev.pot,
-          currentBet: prev.currentBet,
-          myBetInRound: player.betInRound,
-          minRaise: prev.minRaise,
-          difficulty: player.difficulty,
-          phase: prev.phase as 'preflop' | 'flop' | 'turn' | 'river',
-          numActivePlayers: getActivePlayers(prev.players).length,
-        });
-
-        let raiseAmt: number | undefined;
-        if (decision === 'raise') {
-          raiseAmt = getRaiseAmount(player.difficulty, prev.pot, player.chips, prev.minRaise, 0.5);
-        }
-
-        return applyAction({ ...prev, isProcessing: false }, decision, raiseAmt);
+        const p = prev.players[prev.currentPlayerIndex];
+        if (!p || p.isHuman || p.status !== 'active') return prev;
+        return executeAIAction(prev);
       });
     }, delay);
-
-    return clearAI;
-  }, [state.currentPlayerIndex, state.phase, state.isProcessing]);
+    // Note: intentionally NOT returning clearAI here so state changes don't
+    // cancel the already-scheduled timeout. aiKeyRef prevents duplicates.
+  }, [state.currentPlayerIndex, state.phase, state.numToAct, state.allInRunout]); // eslint-disable-line
 
   const startNewHand = useCallback((dealerIdx: number = 0) => {
     clearTimer();
@@ -385,6 +456,7 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
         chips: humanChips,
         holeCards: [],
         betInRound: 0,
+        chipDelta: 0,
         status: 'active',
         isHuman: true,
         difficulty,
@@ -400,6 +472,7 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
         chips: 1200 + i * 150,
         holeCards: [] as Card[],
         betInRound: 0,
+        chipDelta: 0,
         status: 'active' as PlayerStatus,
         isHuman: false,
         difficulty,
@@ -416,37 +489,33 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
 
   const handleAction = useCallback((action: AIAction, raiseAmount?: number) => {
     clearTimer();
+    clearAI();
     setState(prev => {
       const current = prev.players[prev.currentPlayerIndex];
-      if (!current?.isHuman) return prev;
+      if (!current?.isHuman || current.status !== 'active') return prev;
       return applyAction(prev, action, raiseAmount);
     });
-  }, [clearTimer]);
+  }, [clearTimer, clearAI]);
 
+  // Skip a single bot turn immediately
   const skipBotTurn = useCallback(() => {
     clearAI();
     setState(prev => {
       const player = prev.players[prev.currentPlayerIndex];
-      if (!player || player.isHuman) return prev;
-      const decision = getAIDecision({
-        holeCards: player.holeCards,
-        communityCards: prev.communityCards,
-        myChips: player.chips,
-        pot: prev.pot,
-        currentBet: prev.currentBet,
-        myBetInRound: player.betInRound,
-        minRaise: prev.minRaise,
-        difficulty: player.difficulty,
-        phase: prev.phase as 'preflop' | 'flop' | 'turn' | 'river',
-        numActivePlayers: getActivePlayers(prev.players).length,
-      });
-      let raiseAmt: number | undefined;
-      if (decision === 'raise') {
-        raiseAmt = getRaiseAmount(player.difficulty, prev.pot, player.chips, prev.minRaise, 0.5);
-      }
-      return applyAction({ ...prev, isProcessing: false }, decision, raiseAmt);
+      if (!player || player.isHuman || player.status !== 'active') return prev;
+      return executeAIAction(prev);
     });
   }, [clearAI]);
+
+  // Run out all remaining streets and go straight to showdown
+  const skipToShowdown = useCallback(() => {
+    clearTimer();
+    clearAI();
+    setState(prev => {
+      if (prev.phase === 'idle' || prev.phase === 'handover' || prev.phase === 'showdown') return prev;
+      return doShowdown({ ...prev, allInRunout: false });
+    });
+  }, [clearTimer, clearAI]);
 
   const continueAfterHand = useCallback(() => {
     clearTimer();
@@ -460,6 +529,7 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
         ...p,
         holeCards: [],
         betInRound: 0,
+        chipDelta: 0,
         status: 'active',
         isDealer: false,
         isSmallBlind: false,
@@ -470,5 +540,5 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
     });
   }, [clearTimer, clearAI]);
 
-  return { state, startNewHand, handleAction, skipBotTurn, continueAfterHand };
+  return { state, startNewHand, handleAction, skipBotTurn, skipToShowdown, continueAfterHand };
 }
