@@ -3,7 +3,6 @@ import React, { useState, useRef } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -207,17 +206,17 @@ const ME_SUBTABS = [
   { id: 'likes', label: 'Likes', icon: 'heart-outline' as const },
 ];
 
-// ─── Compose Modal ────────────────────────────────────────────────────────────
+// ─── Compose Sheet (inline overlay — works on web & native) ──────────────────
 
-interface ComposeModalProps {
+interface ComposeSheetProps {
   visible: boolean;
   onClose: () => void;
   onPost: (post: MePost) => void;
+  bottomInset: number;
 }
 
-function ComposeModal({ visible, onClose, onPost }: ComposeModalProps) {
+function ComposeSheet({ visible, onClose, onPost, bottomInset }: ComposeSheetProps) {
   const { profile } = useUser();
-  const insets = useSafeAreaInsets();
   const [text, setText] = useState('');
   const [postType, setPostType] = useState<PostType>('WIN');
   const [pot, setPot] = useState('');
@@ -263,22 +262,18 @@ function ComposeModal({ visible, onClose, onPost }: ComposeModalProps) {
     onClose();
   }
 
+  if (!visible) return null;
+
   const typeColor = POST_TYPE_COLORS[postType];
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent
-      onRequestClose={handleClose}
-    >
-      <KeyboardAvoidingView
-        style={compose.overlay}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <TouchableOpacity style={compose.backdrop} activeOpacity={1} onPress={handleClose} />
+    <View style={compose.overlay}>
+      {/* Dim backdrop */}
+      <TouchableOpacity style={compose.backdrop} activeOpacity={1} onPress={handleClose} />
 
-        <View style={[compose.sheet, { paddingBottom: insets.bottom + 12 }]}>
+      {/* Sheet */}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={compose.kvSheet}>
+        <View style={[compose.sheet, { paddingBottom: bottomInset + 12 }]}>
           <LinearGradient colors={['#160030', '#080018']} style={StyleSheet.absoluteFill} />
 
           {/* Handle bar */}
@@ -293,7 +288,6 @@ function ComposeModal({ visible, onClose, onPost }: ComposeModalProps) {
             <TouchableOpacity
               style={[compose.postBtn, !canPost && compose.postBtnDisabled]}
               onPress={handlePost}
-              disabled={!canPost}
             >
               <Text style={[compose.postBtnText, !canPost && compose.postBtnTextDisabled]}>Post</Text>
             </TouchableOpacity>
@@ -320,8 +314,8 @@ function ComposeModal({ visible, onClose, onPost }: ComposeModalProps) {
             maxLength={MAX_CHARS + 10}
             value={text}
             onChangeText={setText}
-            autoFocus
             selectionColor={colors.primary}
+            autoFocus={Platform.OS !== 'web'}
           />
 
           {/* Post type chips */}
@@ -360,7 +354,6 @@ function ComposeModal({ visible, onClose, onPost }: ComposeModalProps) {
                   placeholderTextColor={colors.textDim}
                   value={pot}
                   onChangeText={setPot}
-                  keyboardType="default"
                   selectionColor={colors.primary}
                 />
               </View>
@@ -390,7 +383,7 @@ function ComposeModal({ visible, onClose, onPost }: ComposeModalProps) {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </Modal>
+    </View>
   );
 }
 
@@ -716,11 +709,12 @@ export default function FeedScreen() {
         />
       )}
 
-      {/* Compose modal */}
-      <ComposeModal
+      {/* Compose sheet */}
+      <ComposeSheet
         visible={composeVisible}
         onClose={() => setComposeVisible(false)}
         onPost={handleNewPost}
+        bottomInset={insets.bottom}
       />
     </View>
   );
@@ -758,8 +752,15 @@ const card = StyleSheet.create({
 });
 
 const compose = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' },
+  overlay: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    zIndex: 999, justifyContent: 'flex-end',
+  },
+  backdrop: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  kvSheet: { width: '100%' },
   sheet: {
     borderTopLeftRadius: 20, borderTopRightRadius: 20,
     borderWidth: 1, borderBottomWidth: 0, borderColor: colors.border,
