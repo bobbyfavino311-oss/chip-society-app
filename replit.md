@@ -23,11 +23,17 @@ A premium iOS multiplayer Texas Hold'em poker app with a retro 1980s synthwave /
 ## Where things live
 
 - `artifacts/neon-river/` — the full Expo mobile app
+- `artifacts/neon-river/app/(tabs)/index.tsx` — Home screen (logo, quick play, trending, featured tournament)
+- `artifacts/neon-river/app/(tabs)/play.tsx` — Play screen (game mode selection)
+- `artifacts/neon-river/app/(tabs)/feed.tsx` — Social feed (poker posts, reactions)
+- `artifacts/neon-river/app/(tabs)/tournaments.tsx` — Tournaments listing
+- `artifacts/neon-river/app/(tabs)/profile.tsx` — Player profile & stats
 - `artifacts/neon-river/lib/pokerEngine.ts` — server-authoritative poker hand evaluator (all rankings, getBestHand, determineWinners)
 - `artifacts/neon-river/lib/aiBot.ts` — AI decision engine (5 difficulty levels)
-- `artifacts/neon-river/hooks/usePokerGame.ts` — full game state machine (betting rounds, phase progression, showdown)
+- `artifacts/neon-river/hooks/usePokerGame.ts` — full game state machine (betting rounds, phase progression, showdown, skipBotTurn)
 - `artifacts/neon-river/context/UserContext.tsx` — player profile persistence (AsyncStorage)
 - `artifacts/neon-river/constants/colors.ts` — neon design tokens
+- `artifacts/neon-river/components/DotTimer.tsx` — animated dot-based turn timer
 - `lib/api-spec/openapi.yaml` — OpenAPI spec (health check only; extend for multiplayer)
 
 ## Architecture decisions
@@ -40,11 +46,15 @@ A premium iOS multiplayer Texas Hold'em poker app with a retro 1980s synthwave /
 
 ## Product
 
-- **AI Practice**: Full Texas Hold'em vs 4 AI bots (5 difficulty levels: Beginner → Elite Pro)
-- **Lobby**: Game mode grid, player stats, quick chat phrases
+**5-tab navigation**: Home · Play · Feed · Tournaments · Profile
+
+- **Home**: Compact profile bar, ACE SOCIAL neon logo, Quick Play CTA, Trending Now horizontal feed preview, Featured Tournament card, stat snapshot
+- **Play**: AI Practice (primary CTA) + coming-soon game modes (Ranked, Friends, Quick Match, Tournament)
+- **Feed**: Social poker feed with tabs (Trending / Following / Biggest Pots / Highlights), like/repost/comment actions, hand stats per post
+- **Tournaments**: Featured tournament with registration + progress bar; filterable list (Open / Live / Upcoming); prize pools up to 2M
 - **Profile**: Username editing, XP/rank progression (7 ranks: Neon Bronze → Neon Legend), win rate, chip balance
-- **Daily Rewards**: Streak tracking, day-by-day chip rewards, daily missions
-- **Poker Engine**: Royal Flush → High Card, kickers, side pots, all-in, blinds, dealer rotation, 30s turn timer with auto-fold
+- **AI Practice**: Full Texas Hold'em vs 4 AI bots (5 difficulty levels), dot-based turn timer, Skip Turn button
+- **Poker Engine**: Royal Flush → High Card, kickers, side pots, all-in, blinds, dealer rotation, 30s dot timer with auto-fold
 
 ## User preferences
 

@@ -1,10 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
-  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -29,43 +28,43 @@ const RANK_COLORS: Record<string, string> = {
   'Neon Legend': colors.accent,
 };
 
-function NeonTitle() {
+// ─── Animated logo ───────────────────────────────────────────────────────────
+
+function AceSocialLogo() {
   const aceOpacity = useRef(new Animated.Value(1)).current;
   const socialOpacity = useRef(new Animated.Value(1)).current;
   const aceGlow = useRef(new Animated.Value(1)).current;
   const socialGlow = useRef(new Animated.Value(0.82)).current;
-  const [acePink, setAcePink] = React.useState(false);
+  const [acePink, setAcePink] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    // Slow ambient breathing — offset so they pulse opposite each other
     Animated.loop(
       Animated.sequence([
-        Animated.timing(aceGlow, { toValue: 0.82, duration: 2000, useNativeDriver: true }),
-        Animated.timing(aceGlow, { toValue: 1, duration: 2000, useNativeDriver: true }),
+        Animated.timing(aceGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
+        Animated.timing(aceGlow, { toValue: 1, duration: 2200, useNativeDriver: true }),
       ])
     ).start();
     Animated.loop(
       Animated.sequence([
-        Animated.timing(socialGlow, { toValue: 1, duration: 2000, useNativeDriver: true }),
-        Animated.timing(socialGlow, { toValue: 0.82, duration: 2000, useNativeDriver: true }),
+        Animated.timing(socialGlow, { toValue: 1, duration: 2200, useNativeDriver: true }),
+        Animated.timing(socialGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
       ])
     ).start();
 
-    // Realistic neon-tube flicker then color swap
     function flicker(anim: Animated.Value, cb: () => void) {
       Animated.sequence([
         Animated.timing(anim, { toValue: 0.08, duration: 35, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0.9,  duration: 55, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0.9, duration: 55, useNativeDriver: true }),
         Animated.timing(anim, { toValue: 0.15, duration: 25, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 1,    duration: 70, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0,    duration: 30, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 1,    duration: 90, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1, duration: 70, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0, duration: 30, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1, duration: 90, useNativeDriver: true }),
       ]).start(() => cb());
     }
 
     function scheduleNext() {
-      const delay = 2200 + Math.random() * 3500;
+      const delay = 2500 + Math.random() * 4000;
       timeoutRef.current = setTimeout(() => {
         const doAce = Math.random() > 0.5;
         flicker(doAce ? aceOpacity : socialOpacity, () => {
@@ -79,427 +78,378 @@ function NeonTitle() {
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, []);
 
-  const aceColor   = acePink ? colors.secondary : colors.primary;
-  const socialColor = acePink ? colors.primary   : colors.secondary;
+  const aceColor = acePink ? colors.secondary : colors.primary;
+  const socialColor = acePink ? colors.primary : colors.secondary;
 
   return (
-    <View style={{ alignItems: 'center' }}>
-      <Animated.Text
-        style={[styles.titleWord, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]}
-        allowFontScaling={false}
-      >
+    <View style={logo.wrap}>
+      <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
         ACE
       </Animated.Text>
-      <Animated.Text
-        style={[styles.titleWord, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]}
-        allowFontScaling={false}
-      >
+      <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
         SOCIAL
       </Animated.Text>
-      <Text style={styles.titleSub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
+      <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
   );
 }
 
-interface GameModeCardProps {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  subtitle: string;
-  color: string;
-  onPress: () => void;
-  badge?: string;
-  locked?: boolean;
+// ─── Trending post card (horizontal scroll) ──────────────────────────────────
+
+interface TrendPost {
+  id: string;
+  user: string;
+  avatar: string;
+  avatarColor: string;
+  type: string;
+  typeColor: string;
+  content: string;
+  likes: number;
+  pot?: string;
 }
 
-function GameModeCard({ icon, title, subtitle, color, onPress, badge, locked }: GameModeCardProps) {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+const TRENDING_POSTS: TrendPost[] = [
+  {
+    id: '1',
+    user: 'NightShark99',
+    avatar: '♠',
+    avatarColor: colors.primary,
+    type: 'BIG WIN',
+    typeColor: colors.success,
+    content: 'Turned ♠A♠K into a Royal Flush on the river. 42K pot! 🔥',
+    likes: 1240,
+    pot: '42K',
+  },
+  {
+    id: '2',
+    user: 'VegasMirage',
+    avatar: '♥',
+    avatarColor: colors.secondary,
+    type: 'BLUFF',
+    typeColor: colors.accent,
+    content: 'Triple-barrel bluff with 7-2 off on a paired board. They folded a set. 😈',
+    likes: 887,
+    pot: '18K',
+  },
+  {
+    id: '3',
+    user: 'NeonAce_',
+    avatar: '♦',
+    avatarColor: colors.gold,
+    type: 'BAD BEAT',
+    typeColor: colors.warning,
+    content: 'Quad Aces cracked by a straight flush. The universe hates me.',
+    likes: 2103,
+    pot: '91K',
+  },
+];
 
-  const onPressIn = () =>
-    Animated.spring(scaleAnim, { toValue: 0.96, useNativeDriver: true }).start();
-  const onPressOut = () =>
-    Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start();
-
+function TrendCard({ post }: { post: TrendPost }) {
+  const [liked, setLiked] = useState(false);
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }], flex: 1 }}>
-      <TouchableOpacity
-        onPress={locked ? undefined : onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        activeOpacity={0.9}
-        style={[styles.modeCard, { borderColor: color, opacity: locked ? 0.5 : 1 }]}
-      >
-        <LinearGradient
-          colors={[`${color}22`, 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-        <View style={[styles.modeIcon, { backgroundColor: `${color}20`, borderColor: `${color}40` }]}>
-          <Ionicons name={icon} size={26} color={color} />
+    <View style={trend.card}>
+      <LinearGradient
+        colors={['#1a0035', '#0d0020']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      <View style={trend.header}>
+        <View style={[trend.avatar, { borderColor: post.avatarColor }]}>
+          <Text style={[trend.avatarText, { color: post.avatarColor }]}>{post.avatar}</Text>
         </View>
-        <Text style={[styles.modeTitle, { color }]}>{title}</Text>
-        <Text style={styles.modeSub}>{subtitle}</Text>
-        {badge && (
-          <View style={[styles.badge, { backgroundColor: color }]}>
-            <Text style={styles.badgeText}>{badge}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={trend.username}>{post.user}</Text>
+          <View style={[trend.typeBadge, { backgroundColor: `${post.typeColor}22`, borderColor: `${post.typeColor}44` }]}>
+            <Text style={[trend.typeText, { color: post.typeColor }]}>{post.type}</Text>
+          </View>
+        </View>
+        {post.pot && (
+          <View style={trend.potBadge}>
+            <Text style={trend.potLabel}>POT</Text>
+            <Text style={trend.potAmt}>{post.pot}</Text>
           </View>
         )}
-        {locked && (
-          <View style={styles.lockOverlay}>
-            <Ionicons name="lock-closed" size={16} color={colors.textMuted} />
-          </View>
-        )}
-      </TouchableOpacity>
-    </Animated.View>
+      </View>
+      <Text style={trend.content} numberOfLines={3}>{post.content}</Text>
+      <View style={trend.footer}>
+        <TouchableOpacity style={trend.likeBtn} onPress={() => setLiked(l => !l)}>
+          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={14} color={liked ? colors.secondary : colors.textMuted} />
+          <Text style={[trend.likeCount, liked && { color: colors.secondary }]}>
+            {liked ? post.likes + 1 : post.likes}
+          </Text>
+        </TouchableOpacity>
+        <Text style={trend.timeAgo}>2h ago</Text>
+      </View>
+    </View>
   );
 }
 
-export default function LobbyScreen() {
+// ─── Featured tournament card ─────────────────────────────────────────────────
+
+function FeaturedTournament() {
+  return (
+    <View style={feat.card}>
+      <LinearGradient
+        colors={['#3a006a', '#1a0035', '#050010']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      <View style={feat.top}>
+        <View style={feat.liveBadge}>
+          <View style={feat.liveDot} />
+          <Text style={feat.liveText}>REGISTERING</Text>
+        </View>
+        <Text style={feat.prizeLabel}>PRIZE POOL</Text>
+        <Text style={feat.prize}>500K</Text>
+      </View>
+      <Text style={feat.name}>NEON CHAMPIONSHIP</Text>
+      <Text style={feat.sub}>Sunday Night Special · No Limit Hold'em</Text>
+      <View style={feat.meta}>
+        <View style={feat.metaItem}>
+          <Ionicons name="people" size={12} color={colors.textMuted} />
+          <Text style={feat.metaText}>128 / 256</Text>
+        </View>
+        <View style={feat.metaItem}>
+          <Ionicons name="time-outline" size={12} color={colors.textMuted} />
+          <Text style={feat.metaText}>Starts in 3h 20m</Text>
+        </View>
+        <View style={feat.metaItem}>
+          <Ionicons name="ticket" size={12} color={colors.textMuted} />
+          <Text style={feat.metaText}>1,000 chips</Text>
+        </View>
+      </View>
+      <TouchableOpacity style={feat.registerBtn} onPress={() => router.push('/tournaments' as any)} activeOpacity={0.85}>
+        <Text style={feat.registerText}>VIEW TOURNAMENT</Text>
+        <Ionicons name="chevron-forward" size={14} color={colors.background} />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ─── Main screen ─────────────────────────────────────────────────────────────
+
+export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
 
   const formatChips = (n: number) => {
-    if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
     return n.toLocaleString();
   };
 
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[colors.background, '#0a0025', colors.background]}
+        colors={[colors.background, '#080020', colors.background]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
 
+      {/* Compact top profile bar */}
+      <View style={[styles.topBar, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
+        <View style={[styles.topAvatar, { borderColor: rankColor }]}>
+          <Text style={styles.topAvatarText}>♠</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.topName}>{profile.username}</Text>
+          <Text style={[styles.topRank, { color: rankColor }]}>{profile.rank}</Text>
+        </View>
+        <View style={styles.topChips}>
+          <MaterialCommunityIcons name="poker-chip" size={14} color={colors.gold} />
+          <Text style={styles.topChipsText}>{formatChips(profile.chips)}</Text>
+        </View>
+        <TouchableOpacity style={styles.settingsBtn} onPress={() => router.push('/(tabs)/profile')}>
+          <Ionicons name="settings-outline" size={20} color={colors.textMuted} />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
-        contentContainerStyle={[
-          styles.scroll,
-          { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 16), paddingBottom: insets.bottom + 20 },
-        ]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 80 }]}
         showsVerticalScrollIndicator={false}
       >
-        <NeonTitle />
+        <AceSocialLogo />
 
-        <View style={styles.playerCard}>
-          <LinearGradient
-            colors={[colors.surface, colors.surfaceElevated]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          />
-          <View style={styles.playerInfo}>
-            <View style={[styles.playerAvatar, { borderColor: rankColor }]}>
-              <Text style={styles.playerAvatarText}>♠</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.playerName}>{profile.username}</Text>
-              <Text style={[styles.playerRank, { color: rankColor }]}>{profile.rank}</Text>
-            </View>
-            <View style={styles.chipBadge}>
-              <MaterialCommunityIcons name="poker-chip" size={18} color={colors.gold} />
-              <Text style={styles.chipCount}>{formatChips(profile.chips)}</Text>
-            </View>
-          </View>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>Lv.{profile.level}</Text>
-              <Text style={styles.statLabel}>LEVEL</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{profile.wins}</Text>
-              <Text style={styles.statLabel}>WINS</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{profile.handsPlayed}</Text>
-              <Text style={styles.statLabel}>HANDS</Text>
-            </View>
-          </View>
-        </View>
-
-        <Text style={styles.sectionTitle}>GAME MODES</Text>
-
+        {/* Quick Play CTA */}
         <TouchableOpacity
-          style={styles.quickPlayBtn}
+          style={styles.quickPlay}
           onPress={() => router.push('/game/practice')}
-          activeOpacity={0.85}
+          activeOpacity={0.88}
         >
           <LinearGradient
-            colors={[colors.primary, '#0088bb']}
+            colors={[colors.primary, '#0055cc', '#8800ff']}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           />
-          <Ionicons name="flash" size={24} color={colors.background} style={{ marginRight: 10 }} />
-          <View>
-            <Text style={styles.quickPlayTitle}>AI PRACTICE</Text>
-            <Text style={styles.quickPlaySub}>Play vs intelligent bots</Text>
+          <Ionicons name="flash" size={26} color="#fff" />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.quickPlayTitle}>QUICK PLAY</Text>
+            <Text style={styles.quickPlaySub}>AI Practice — Jump in instantly</Text>
           </View>
-          <Ionicons name="chevron-forward" size={22} color={colors.background} style={{ marginLeft: 'auto' }} />
+          <Ionicons name="chevron-forward" size={22} color="rgba(255,255,255,0.6)" />
         </TouchableOpacity>
 
-        <View style={styles.modesGrid}>
-          <GameModeCard
-            icon="trophy"
-            title="Ranked"
-            subtitle="Climb the leaderboard"
-            color={colors.gold}
-            onPress={() => {}}
-            badge="SOON"
-            locked
-          />
-          <GameModeCard
-            icon="people"
-            title="Friends"
-            subtitle="Private table"
-            color={colors.secondary}
-            onPress={() => {}}
-            badge="SOON"
-            locked
-          />
+        {/* Trending now */}
+        <View style={styles.sectionRow}>
+          <Text style={styles.sectionTitle}>TRENDING NOW</Text>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/feed')}>
+            <Text style={styles.seeAll}>See all</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.modesGrid}>
-          <GameModeCard
-            icon="flash"
-            title="Quick Match"
-            subtitle="Jump into a game"
-            color={colors.accent}
-            onPress={() => {}}
-            badge="SOON"
-            locked
-          />
-          <GameModeCard
-            icon="ribbon"
-            title="Tournament"
-            subtitle="Neon championship"
-            color={colors.success}
-            onPress={() => {}}
-            badge="SOON"
-            locked
-          />
-        </View>
-
-        <View style={styles.chatRow}>
-          <Text style={styles.sectionTitle}>QUICK CHAT</Text>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chatScroll}>
-          {['Good hand.', 'All in!', 'Nice bluff.', 'No way!', 'Good game.', 'Lucky!'].map(msg => (
-            <TouchableOpacity key={msg} style={styles.chatChip}>
-              <Text style={styles.chatChipText}>{msg}</Text>
-            </TouchableOpacity>
-          ))}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+        >
+          {TRENDING_POSTS.map(post => <TrendCard key={post.id} post={post} />)}
         </ScrollView>
+
+        {/* Featured Tournament */}
+        <View style={styles.sectionRow}>
+          <Text style={styles.sectionTitle}>FEATURED TOURNAMENT</Text>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/tournaments')}>
+            <Text style={styles.seeAll}>See all</Text>
+          </TouchableOpacity>
+        </View>
+
+        <FeaturedTournament />
+
+        {/* Stats snapshot */}
+        <View style={styles.statsRow}>
+          <View style={styles.statCard}>
+            <Text style={[styles.statVal, { color: colors.success }]}>{profile.wins}</Text>
+            <Text style={styles.statLbl}>WINS</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statVal, { color: colors.primary }]}>{profile.handsPlayed}</Text>
+            <Text style={styles.statLbl}>HANDS</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statVal, { color: colors.gold }]}>Lv.{profile.level}</Text>
+            <Text style={styles.statLbl}>LEVEL</Text>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    paddingHorizontal: 16,
-    gap: 16,
-  },
-  titleWord: {
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const logo = StyleSheet.create({
+  wrap: { alignItems: 'center', paddingVertical: 8 },
+  word: {
     fontFamily: 'Orbitron_900Black',
-    fontSize: 56,
-    letterSpacing: 10,
-    lineHeight: 62,
+    fontSize: 48,
+    letterSpacing: 8,
+    lineHeight: 54,
   },
-  titleSub: {
+  sub: {
     fontFamily: 'Orbitron_400Regular',
-    fontSize: 10,
+    fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 4,
     marginTop: 4,
-    marginBottom: 8,
   },
-  playerCard: {
+});
+
+const trend = StyleSheet.create({
+  card: {
+    width: width * 0.72,
     borderRadius: colors.radiusLg,
     borderWidth: 1,
     borderColor: colors.border,
-    overflow: 'hidden',
-    padding: 16,
-  },
-  playerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 12,
-  },
-  playerAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  playerAvatarText: {
-    fontSize: 22,
-    color: colors.primary,
-  },
-  playerName: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
-    fontFamily: 'Orbitron_700Bold',
-  },
-  playerRank: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 1,
-    marginTop: 2,
-  },
-  chipBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255,215,0,0.1)',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.3)',
-  },
-  chipCount: {
-    color: colors.gold,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: 12,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '700',
-    fontFamily: 'Orbitron_700Bold',
-  },
-  statLabel: {
-    color: colors.textDim,
-    fontSize: 9,
-    letterSpacing: 1,
-    marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: colors.border,
-  },
-  sectionTitle: {
-    color: colors.textMuted,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 2,
-    fontFamily: 'Orbitron_400Regular',
-  },
-  quickPlayBtn: {
-    borderRadius: colors.radius,
-    overflow: 'hidden',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-  },
-  quickPlayTitle: {
-    color: colors.background,
-    fontSize: 16,
-    fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 1,
-  },
-  quickPlaySub: {
-    color: 'rgba(5,0,16,0.6)',
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  modesGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  modeCard: {
-    borderRadius: colors.radius,
-    borderWidth: 1,
     padding: 14,
-    minHeight: 110,
     overflow: 'hidden',
-    position: 'relative',
+    gap: 8,
   },
-  modeIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
+  header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  avatar: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: colors.surface, borderWidth: 2,
+    alignItems: 'center', justifyContent: 'center',
   },
-  modeTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 0.5,
+  avatarText: { fontSize: 16, fontWeight: '700' },
+  username: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  typeBadge: {
+    alignSelf: 'flex-start', borderRadius: 4, borderWidth: 1,
+    paddingHorizontal: 5, paddingVertical: 1, marginTop: 2,
   },
-  modeSub: {
-    color: colors.textMuted,
-    fontSize: 10,
-    marginTop: 3,
+  typeText: { fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  potBadge: { alignItems: 'center' },
+  potLabel: { color: colors.textDim, fontSize: 8, letterSpacing: 1 },
+  potAmt: { color: colors.gold, fontSize: 15, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  content: { color: colors.textMuted, fontSize: 12, lineHeight: 18 },
+  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  likeBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  likeCount: { color: colors.textMuted, fontSize: 12 },
+  timeAgo: { color: colors.textDim, fontSize: 11 },
+});
+
+const feat = StyleSheet.create({
+  card: {
+    borderRadius: colors.radiusLg, borderWidth: 1,
+    borderColor: colors.borderBright, overflow: 'hidden', padding: 16, gap: 6,
   },
-  badge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
+  top: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
+  liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(0,255,136,0.1)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 3, borderWidth: 1, borderColor: 'rgba(0,255,136,0.3)' },
+  liveDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: colors.success },
+  liveText: { color: colors.success, fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  prizeLabel: { color: colors.textDim, fontSize: 9, marginLeft: 'auto' },
+  prize: { color: colors.gold, fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  name: { color: colors.text, fontSize: 18, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  sub: { color: colors.textMuted, fontSize: 11 },
+  meta: { flexDirection: 'row', gap: 14, marginTop: 4 },
+  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  metaText: { color: colors.textMuted, fontSize: 11 },
+  registerBtn: {
+    marginTop: 8, borderRadius: colors.radius, overflow: 'hidden',
+    backgroundColor: colors.accent, flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'center', paddingVertical: 12, gap: 6,
   },
-  badgeText: {
-    color: colors.background,
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+  registerText: { color: colors.background, fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+});
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  topBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingHorizontal: 16, paddingBottom: 12,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  lockOverlay: {
-    position: 'absolute',
-    bottom: 10,
-    right: 10,
+  topAvatar: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: colors.surface, borderWidth: 2,
+    alignItems: 'center', justifyContent: 'center',
   },
-  chatRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  topAvatarText: { fontSize: 16, color: colors.primary },
+  topName: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  topRank: { fontSize: 9, fontWeight: '600', letterSpacing: 0.5 },
+  topChips: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,215,0,0.1)', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,215,0,0.2)' },
+  topChipsText: { color: colors.gold, fontSize: 12, fontWeight: '700' },
+  settingsBtn: { padding: 4 },
+  scroll: { paddingHorizontal: 16, gap: 16 },
+  quickPlay: {
+    borderRadius: colors.radiusLg, overflow: 'hidden',
+    flexDirection: 'row', alignItems: 'center',
+    paddingVertical: 18, paddingHorizontal: 20, gap: 14,
   },
-  chatScroll: {
-    marginBottom: 4,
+  quickPlayTitle: { color: '#fff', fontSize: 16, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  quickPlaySub: { color: 'rgba(255,255,255,0.65)', fontSize: 11, marginTop: 2 },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  sectionTitle: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
+  seeAll: { color: colors.primary, fontSize: 11, fontWeight: '600' },
+  statsRow: { flexDirection: 'row', gap: 10 },
+  statCard: {
+    flex: 1, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, padding: 12, alignItems: 'center',
   },
-  chatChip: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    marginRight: 8,
-    backgroundColor: colors.surface,
-  },
-  chatChipText: {
-    color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '500',
-  },
+  statVal: { fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  statLbl: { color: colors.textMuted, fontSize: 9, letterSpacing: 1.5, marginTop: 3, fontFamily: 'Orbitron_400Regular' },
 });

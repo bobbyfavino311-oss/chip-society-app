@@ -1,0 +1,385 @@
+UPDATE THE EXISTING “NEON RIVER” POKER APP WITH THE FOLLOWING MAJOR CHANGES AND IMPROVEMENTS.
+
+--------------------------------------------------
+NEW CORE DIRECTION
+--------------------------------------------------
+
+Transform the app into:
+- a multiplayer Texas Hold’em poker app
+PLUS
+- a social media platform for poker players
+
+The app should feel like:
+- Instagram + PokerStars + 1980s Miami neon casino culture
+
+The experience should revolve around:
+- social poker identity
+- community
+- clips
+- highlights
+- poker flex culture
+- viral poker moments
+- luxury neon nightlife atmosphere
+
+--------------------------------------------------
+VISUAL STYLE UPDATE
+--------------------------------------------------
+
+Maintain the neon 80s Miami aesthetic.
+
+Style inspiration:
+- GTA Vice City
+- Miami Vice
+- synthwave nightlife
+- retro luxury casinos
+- neon palm trees
+- chrome reflections
+- 1980s sports cars
+- glowing city lights
+
+COLORS:
+- neon pink
+- electric blue
+- purple gradients
+- black glossy surfaces
+- chrome accents
+
+UI should feel:
+- smooth
+- cinematic
+- modern
+- social
+- premium
+- highly animated
+
+--------------------------------------------------
+LOGO FONT UPDATE
+--------------------------------------------------
+
+IMPORTANT:
+
+Change the logo typography completely.
+
+The “NEON RIVER” logo should now use:
+- smooth retro Miami typography
+- elegant 1980s cursive/synthwave style
+- Vice City inspired lettering
+- neon glow effects
+- chrome pink-and-blue gradients
+
+The logo should feel:
+- iconic
+- stylish
+- luxury retro
+- instantly recognizable
+
+LOGO DESIGN PROMPT:
+
+“Create a premium 1980s Miami neon logo for a poker social media app called NEON RIVER.
+
+Style:
+- Vice City inspired typography
+- retro cursive neon lettering
+- pink and blue gradients
+- chrome highlights
+- glowing edges
+- synthwave aesthetic
+- cinematic lighting
+- elegant luxury casino branding
+- black background
+- minimal but iconic
+
+The logo should feel like a legendary retro Miami nightlife brand.”
+
+--------------------------------------------------
+SOCIAL MEDIA FEED FEATURE
+--------------------------------------------------
+
+ADD A NEW SOCIAL FEED SECTION.
+
+This is now a MAJOR FEATURE.
+
+The app should include a scrolling social media feed for poker players.
+
+The feed should feel like:
+- Instagram
+- TikTok
+- X/Twitter
+- poker culture social media
+
+--------------------------------------------------
+SOCIAL FEED FEATURES
+--------------------------------------------------
+
+Users can post:
+- poker hand wins
+- bad beat clips
+- tournament victories
+- chip stack screenshots
+- table highlights
+- bluff moments
+- reactions
+- poker lifestyle photos
+- casino moments
+
+POST TYPES:
+- image posts
+- short clips
+- text posts
+- poker hand replays
+- AI-generated hand summaries
+
+--------------------------------------------------
+SOCIAL INTERACTIONS
+--------------------------------------------------
+
+Users can:
+- like posts
+- comment
+- follow players
+- share clips
+- repost highlights
+- react with poker emojis
+
+--------------------------------------------------
+SOCIAL FEED UI
+--------------------------------------------------
+
+Design:
+- dark neon background
+- glowing UI borders
+- smooth scrolling
+- cinematic cards
+- modern iOS social app feel
+
+Tabs:
+- Following
+- Trending
+- Tournament Highlights
+- Biggest Pots
+- AI Highlights
+
+--------------------------------------------------
+PLAYER PROFILE UI UPDATE
+--------------------------------------------------
+
+MOVE THE PLAYER PROFILE SECTION TO THE TOP LEFT CORNER.
+
+Top-left profile section should include:
+- profile picture
+- level
+- chip count
+- rank badge
+- settings shortcut
+
+The design should feel:
+- compact
+- elegant
+- modern
+- social-first
+
+--------------------------------------------------
+REMOVE QUICK CHAT FEATURE
+--------------------------------------------------
+
+IMPORTANT:
+REMOVE the quick chat bar from the bottom of the poker table entirely.
+
+DO NOT include:
+- preset chat buttons
+- quick reactions at the bottom
+- cluttered messaging UI
+
+Keep the table clean and cinematic.
+
+Communication should happen primarily through:
+- social feed
+- profile interactions
+- reactions
+- post comments
+
+--------------------------------------------------
+POKER TABLE LAYOUT FIX
+--------------------------------------------------
+
+IMPORTANT:
+All 5 table players must be perfectly evenly spaced around the poker table.
+
+The table should look:
+- symmetrical
+- balanced
+- professional
+- clean
+
+PLAYER POSITIONING:
+- smooth curved seating alignment
+- equal spacing
+- centered chip stacks
+- balanced avatar sizing
+
+No overlapping UI.
+
+No awkward spacing.
+
+The table should feel:
+- premium
+- realistic
+- visually polished
+
+--------------------------------------------------
+CRITICAL GAMEPLAY FIX
+--------------------------------------------------
+
+VERY IMPORTANT:
+The AI poker gameplay logic is currently broken.
+
+FIX THE ENTIRE HAND FLOW SYSTEM.
+
+Currently:
+- the AI is NOT completing hands correctly
+- rounds stop prematurely
+- betting phases are skipped
+- hands do not fully progress
+
+THIS MUST BE FIXED COMPLETELY.
+
+--------------------------------------------------
+FULL HAND FLOW REQUIREMENTS
+--------------------------------------------------
+
+Every poker hand MUST ALWAYS fully progress through:
+
+1. Pre-Flop
+2. Flop
+3. Turn
+4. River
+5. Showdown
+
+unless:
+- all but one player folds
+OR
+- all remaining players are all-in
+
+The poker engine MUST correctly:
+- rotate action
+- track betting rounds
+- validate player turns
+- complete all phases
+- advance community cards properly
+- determine winner correctly
+
+--------------------------------------------------
+BETTING ROUND LOGIC
+--------------------------------------------------
+
+Each betting round must continue UNTIL:
+- all active players have acted
+AND
+- all bets are equalized
+
+The engine MUST:
+- correctly manage folds
+- handle raises
+- continue action after raises
+- handle all-in side pots
+- skip folded players
+- prevent premature round termination
+
+--------------------------------------------------
+AI PLAYER FIXES
+--------------------------------------------------
+
+AI bots MUST:
+- finish hands correctly
+- continue action logically
+- react during all streets
+- properly evaluate flop/turn/river
+- complete showdown behavior
+
+AI should NEVER:
+- freeze
+- stop action early
+- skip betting phases
+- break turn order
+
+--------------------------------------------------
+TURN TIMER SYSTEM
+--------------------------------------------------
+
+Keep:
+- 30-second timer beside each player
+
+BUT improve synchronization.
+
+Requirements:
+- timer must reset every action
+- timer must stay synchronized online
+- timer must trigger auto-fold correctly
+- timer animations must remain smooth
+
+When time is low:
+- neon red glow
+- pulsing animation
+- dramatic urgency effects
+
+--------------------------------------------------
+SOCIAL FEED + POKER INTEGRATION
+--------------------------------------------------
+
+Integrate gameplay into the social system.
+
+Examples:
+- “Huge bluff by Alex”
+- “$250K pot won”
+- “Royal Flush highlight”
+- “Tournament victory clip”
+
+The system should automatically generate:
+- replay posts
+- highlight moments
+- trending poker clips
+
+--------------------------------------------------
+HOME SCREEN REDESIGN
+--------------------------------------------------
+
+New Home Screen Layout:
+
+TOP LEFT:
+- compact player profile
+
+CENTER:
+- social feed preview
+
+BOTTOM NAVIGATION:
+- Home
+- Play
+- Feed
+- Tournaments
+- Profile
+
+The app should now feel:
+- community-driven
+- addictive
+- modern
+- social-first
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The final app should feel like:
+- a premium social network for poker players
+- a neon 80s casino universe
+- modern multiplayer poker
+- luxury Miami nightlife
+- highly polished App Store experience
+
+MOST IMPORTANT PRIORITIES:
+1. Fully functioning poker hand flow
+2. Stable multiplayer synchronization
+3. Beautiful neon social UI
+4. Smooth social media feed
+5. Evenly spaced player layout
+6. Proper AI poker behavior
+7. Cinematic Vice City-inspired branding

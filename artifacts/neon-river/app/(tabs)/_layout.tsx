@@ -2,7 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
+import { BlurView } from 'expo-blur';
 import colors from '@/constants/colors';
+
+function TabBarBg() {
+  if (Platform.OS === 'ios') {
+    return <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />;
+  }
+  return <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,0,16,0.97)' }]} />;
+}
 
 export default function TabLayout() {
   return (
@@ -11,25 +19,58 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textDim,
+        tabBarLabelStyle: {
+          fontSize: 9,
+          fontWeight: '600',
+          letterSpacing: 0.5,
+          marginBottom: 2,
+        },
         tabBarStyle: {
-          backgroundColor: colors.surface,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: Platform.OS === 'web' ? 84 : 60,
-          paddingBottom: Platform.OS === 'web' ? 34 : 8,
-          paddingTop: 4,
+          height: Platform.OS === 'web' ? 88 : 64,
+          paddingBottom: Platform.OS === 'web' ? 34 : 10,
+          paddingTop: 6,
+          backgroundColor: 'transparent',
+          position: 'absolute',
+          elevation: 0,
         },
-        tabBarBackground: () => (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.surface }]} />
-        ),
+        tabBarBackground: () => <TabBarBg />,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Lobby',
+          title: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="game-controller" size={size} color={color} />
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="play"
+        options={{
+          title: 'Play',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="card" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="feed"
+        options={{
+          title: 'Feed',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="images" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="tournaments"
+        options={{
+          title: 'Tournaments',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trophy" size={size} color={color} />
           ),
         }}
       />
@@ -44,13 +85,10 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="rewards"
-        options={{
-          title: 'Rewards',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="gift" size={size} color={color} />
-          ),
-        }}
+        options={{ href: null }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({});

@@ -1,0 +1,500 @@
+Build a complete iOS multiplayer Texas Hold’em poker and social media app called “ACE SOCIAL”.
+
+IMPORTANT:
+The app MUST be fully optimized for:
+- iPhone screens
+- modern iOS devices
+- vertical mobile layouts
+- responsive UI scaling
+- smooth touch interactions
+
+The interface must fit naturally on:
+- iPhone 16 Pro Max
+- iPhone 15
+- iPhone 14
+- smaller iPhones
+
+Everything should feel:
+- clean
+- balanced
+- uncluttered
+- premium
+- mobile-first
+
+--------------------------------------------------
+CORE CONCEPT
+--------------------------------------------------
+
+ACE SOCIAL is:
+- a multiplayer Texas Hold’em poker app
+PLUS
+- a social media platform for poker players
+
+The app combines:
+- poker gameplay
+- social networking
+- poker highlights
+- tournament culture
+- viral poker moments
+- neon luxury aesthetics
+
+The experience should feel like:
+Instagram + PokerStars + 1980s Miami nightlife.
+
+--------------------------------------------------
+VISUAL STYLE
+--------------------------------------------------
+
+The app theme should be:
+- 1980s Miami Vice aesthetic
+- synthwave luxury casino atmosphere
+- neon nightlife
+- retro futuristic poker culture
+
+PRIMARY COLORS:
+- neon pink
+- electric blue
+- purple gradients
+- black glossy backgrounds
+- chrome silver highlights
+
+STYLE:
+- cinematic neon glow
+- smooth animations
+- glowing edges
+- soft reflections
+- premium iOS visuals
+- polished App Store quality UI
+
+The app should feel:
+- luxurious
+- addictive
+- stylish
+- social
+- highly modern
+
+--------------------------------------------------
+LOGO DESIGN
+--------------------------------------------------
+
+IMPORTANT:
+The ACE SOCIAL logo should use:
+- smooth Vice City-inspired typography
+- elegant 1980s Miami cursive font
+- retro neon styling
+- pink and blue chrome gradients
+- cinematic neon glow
+
+The logo should feel:
+- iconic
+- stylish
+- premium
+- luxury retro nightlife
+
+LOGO PROMPT:
+
+“Create a premium neon 1980s Miami logo for an iOS poker social media app called ACE SOCIAL.
+
+Style:
+- Vice City inspired cursive typography
+- neon pink and electric blue gradients
+- chrome reflections
+- glowing edges
+- retro Miami nightlife aesthetic
+- synthwave luxury branding
+- cinematic lighting
+- black background
+
+The logo should feel like a legendary 1980s luxury casino brand.”
+
+--------------------------------------------------
+MOBILE UI LAYOUT (VERY IMPORTANT)
+--------------------------------------------------
+
+The UI MUST be designed specifically for vertical iPhone screens.
+
+DO NOT overcrowd the screen.
+
+The app must use:
+- smooth spacing
+- balanced layouts
+- modern iOS safe margins
+- compact but readable UI
+- optimized touch controls
+
+All elements must fit naturally without:
+- overlap
+- cramped buttons
+- oversized text
+- cluttered layouts
+
+--------------------------------------------------
+BOTTOM NAVIGATION BAR
+--------------------------------------------------
+
+Use a clean modern bottom navigation system.
+
+Tabs:
+- Home
+- Play
+- Feed
+- Tournaments
+- Profile
+
+Style:
+- glowing neon icons
+- compact iOS tab bar
+- subtle animations
+- responsive touch feedback
+
+--------------------------------------------------
+HOME SCREEN
+--------------------------------------------------
+
+The Home screen should prioritize:
+1. Social feed preview
+2. Quick Play button
+3. Featured tournaments
+4. Trending poker moments
+
+TOP LEFT:
+- compact player profile section
+
+The profile section should include:
+- avatar
+- username
+- chip balance
+- rank badge
+- settings icon
+
+Keep it compact and elegant.
+
+--------------------------------------------------
+SOCIAL MEDIA FEED
+--------------------------------------------------
+
+Create a fully integrated poker social feed.
+
+The feed should feel like:
+- Instagram
+- TikTok
+- X/Twitter
+- modern social media
+
+Users can post:
+- poker hand wins
+- tournament victories
+- bluff clips
+- bad beats
+- chip stack screenshots
+- poker lifestyle photos
+- hand replay highlights
+
+POST TYPES:
+- images
+- short clips
+- text posts
+- AI-generated poker summaries
+- replay animations
+
+--------------------------------------------------
+SOCIAL INTERACTIONS
+--------------------------------------------------
+
+Users can:
+- follow players
+- like posts
+- comment
+- repost highlights
+- share clips
+- react with poker emojis
+
+--------------------------------------------------
+FEED UI DESIGN
+--------------------------------------------------
+
+The feed should use:
+- dark neon backgrounds
+- glowing borders
+- cinematic cards
+- smooth scrolling
+- polished animations
+
+Tabs inside feed:
+- Following
+- Trending
+- Biggest Pots
+- Tournament Highlights
+- AI Highlights
+
+--------------------------------------------------
+POKER TABLE DESIGN
+--------------------------------------------------
+
+IMPORTANT:
+The poker table MUST fully fit vertically on iPhone screens.
+
+The table should:
+- scale responsively
+- remain centered
+- keep all player seats visible
+- avoid clipping UI elements
+
+TABLE REQUIREMENTS:
+- maximum 5 players only
+- evenly spaced seats
+- symmetrical curved layout
+- clean chip placement
+- realistic card positioning
+
+All 5 players must be:
+- equally spaced
+- perfectly aligned
+- visually balanced
+
+No overlap.
+No awkward spacing.
+No hidden UI.
+
+--------------------------------------------------
+PLAYER HUD DESIGN
+--------------------------------------------------
+
+Each player seat should include:
+- avatar
+- username
+- chip count
+- dealer indicator
+- 30-second turn timer
+
+The HUD should remain:
+- compact
+- readable
+- optimized for mobile
+
+--------------------------------------------------
+TURN TIMER SYSTEM
+--------------------------------------------------
+
+VERY IMPORTANT:
+
+Each player must have:
+- a visible 30-second countdown timer beside their avatar
+
+The timer should:
+- glow neon blue normally
+- glow red under 10 seconds
+- pulse dramatically under 5 seconds
+
+Timer requirements:
+- synchronized online
+- smooth animations
+- automatic fold at zero
+- resets every turn
+
+--------------------------------------------------
+REMOVE QUICK CHAT FEATURE
+--------------------------------------------------
+
+IMPORTANT:
+DO NOT include:
+- quick chat buttons
+- bottom chat bar
+- cluttered communication controls
+
+Keep the poker table:
+- cinematic
+- clean
+- minimal
+
+Communication should happen mainly through:
+- social feed
+- reactions
+- comments
+- profiles
+
+--------------------------------------------------
+POKER GAMEPLAY ENGINE
+--------------------------------------------------
+
+The poker engine MUST fully understand:
+- No-Limit Texas Hold’em
+- hand rankings
+- betting rounds
+- side pots
+- folds
+- raises
+- all-ins
+- kickers
+- showdown logic
+
+Each player receives:
+- exactly 2 hole cards
+
+--------------------------------------------------
+CRITICAL GAMEPLAY REQUIREMENT
+--------------------------------------------------
+
+FIX THE HAND FLOW SYSTEM COMPLETELY.
+
+The poker engine MUST ALWAYS fully complete:
+1. Pre-Flop
+2. Flop
+3. Turn
+4. River
+5. Showdown
+
+UNLESS:
+- all players fold except one
+OR
+- all remaining players are all-in
+
+--------------------------------------------------
+BETTING ROUND LOGIC
+--------------------------------------------------
+
+Every betting round must continue UNTIL:
+- all active players act
+AND
+- all bets are equalized
+
+The engine MUST:
+- continue action after raises
+- skip folded players correctly
+- manage all-ins correctly
+- calculate side pots correctly
+- rotate turns properly
+- prevent broken game states
+
+--------------------------------------------------
+AI PRACTICE MODE
+--------------------------------------------------
+
+Include a complete offline AI practice mode.
+
+AI difficulty levels:
+- Beginner
+- Casual
+- Competitive
+- Shark
+- Elite Pro
+
+AI players must:
+- bluff realistically
+- fold weak hands
+- protect strong hands
+- understand odds
+- react to board texture
+- complete every betting street correctly
+
+AI should feel:
+- intelligent
+- human-like
+- realistic
+
+The AI must NEVER:
+- freeze
+- skip streets
+- stop action early
+- break turn order
+
+--------------------------------------------------
+MATCHMAKING
+--------------------------------------------------
+
+Features:
+- fast matchmaking
+- reconnect support
+- low latency multiplayer
+- dynamic table creation
+- skill-based ranking
+
+--------------------------------------------------
+RANKING SYSTEM
+--------------------------------------------------
+
+Ranks:
+- Neon Bronze
+- Neon Silver
+- Neon Gold
+- Neon Platinum
+- Neon Diamond
+- Neon Elite
+- Neon Legend
+
+--------------------------------------------------
+MONETIZATION
+--------------------------------------------------
+
+App Store safe monetization only.
+
+Use:
+- virtual chips
+- cosmetic purchases
+- neon table skins
+- premium card decks
+- VIP memberships
+- profile cosmetics
+- exclusive animations
+
+NO real-money gambling.
+
+--------------------------------------------------
+AUDIO DESIGN
+--------------------------------------------------
+
+Audio style:
+- synthwave music
+- soft casino ambience
+- poker chips
+- card shuffle sounds
+- dramatic all-in effects
+- luxury nightlife atmosphere
+
+--------------------------------------------------
+TECH STACK
+--------------------------------------------------
+
+Frontend:
+- Flutter
+OR
+- React Native
+
+Backend:
+- Node.js
+- Socket.IO
+- PostgreSQL
+- Redis
+
+Networking:
+- WebSockets
+- real-time synchronization
+- reconnect handling
+- server-authoritative gameplay
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+ACE SOCIAL should feel like:
+- the ultimate poker social network
+- a luxury neon Miami casino universe
+- a viral social poker platform
+- a premium App Store experience
+
+The app should combine:
+- addictive poker gameplay
+- social media engagement
+- cinematic 80s visuals
+- smooth iOS performance
+- modern multiplayer systems
+
+TOP PRIORITIES:
+1. Fully functioning poker engine
+2. Smooth mobile UI on iPhone
+3. Beautiful neon 80s visuals
+4. Stable multiplayer gameplay
+5. Social media feed integration
+6. Proper AI behavior
+7. Perfectly spaced player layout
+8. Clean uncluttered mobile experience
