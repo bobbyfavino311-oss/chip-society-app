@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from './PlayingCard';
-import TurnTimer from './TurnTimer';
+import DotTimer from './DotTimer';
 import { Card } from '../lib/pokerEngine';
 import colors from '../constants/colors';
 
@@ -62,6 +62,12 @@ export default function PlayerSeat({
         <View style={[styles.turnGlow, { shadowColor: glowColor }]} />
       )}
 
+      {isCurrentTurn && !isHuman && (
+        <View style={styles.dotTimerRow}>
+          <DotTimer seconds={timer} maxSeconds={30} isActive size={6} gap={3} />
+        </View>
+      )}
+
       <View style={[styles.avatarRow]}>
         <View
           style={[
@@ -78,12 +84,6 @@ export default function PlayerSeat({
             </View>
           )}
         </View>
-
-        {isCurrentTurn && !isHuman && (
-          <View style={styles.timerWrapper}>
-            <TurnTimer seconds={timer} maxSeconds={30} size={36} isActive />
-          </View>
-        )}
       </View>
 
       <Text style={[styles.name, isFolded && styles.foldedText]} numberOfLines={1}>
@@ -185,9 +185,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timerWrapper: {
-    position: 'absolute',
-    right: -20,
+  dotTimerRow: {
+    marginBottom: 4,
+    alignItems: 'center',
   },
   name: {
     color: colors.text,

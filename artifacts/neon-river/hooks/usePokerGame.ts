@@ -423,6 +423,31 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
     });
   }, [clearTimer]);
 
+  const skipBotTurn = useCallback(() => {
+    clearAI();
+    setState(prev => {
+      const player = prev.players[prev.currentPlayerIndex];
+      if (!player || player.isHuman) return prev;
+      const decision = getAIDecision({
+        holeCards: player.holeCards,
+        communityCards: prev.communityCards,
+        myChips: player.chips,
+        pot: prev.pot,
+        currentBet: prev.currentBet,
+        myBetInRound: player.betInRound,
+        minRaise: prev.minRaise,
+        difficulty: player.difficulty,
+        phase: prev.phase as 'preflop' | 'flop' | 'turn' | 'river',
+        numActivePlayers: getActivePlayers(prev.players).length,
+      });
+      let raiseAmt: number | undefined;
+      if (decision === 'raise') {
+        raiseAmt = getRaiseAmount(player.difficulty, prev.pot, player.chips, prev.minRaise, 0.5);
+      }
+      return applyAction({ ...prev, isProcessing: false }, decision, raiseAmt);
+    });
+  }, [clearAI]);
+
   const continueAfterHand = useCallback(() => {
     clearTimer();
     clearAI();
@@ -445,5 +470,5 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
     });
   }, [clearTimer, clearAI]);
 
-  return { state, startNewHand, handleAction, continueAfterHand };
+  return { state, startNewHand, handleAction, skipBotTurn, continueAfterHand };
 }

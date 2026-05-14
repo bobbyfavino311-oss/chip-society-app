@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import BettingPanel from '@/components/BettingPanel';
 import PlayingCard from '@/components/PlayingCard';
 import PlayerSeat from '@/components/PlayerSeat';
-import TurnTimer from '@/components/TurnTimer';
+import DotTimer from '@/components/DotTimer';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { AIDifficulty } from '@/lib/aiBot';
@@ -154,7 +154,7 @@ export default function PracticeScreen() {
   const [gameStarted, setGameStarted] = useState(false);
   const [handCount, setHandCount] = useState(0);
 
-  const { state, startNewHand, handleAction, continueAfterHand } = usePokerGame(
+  const { state, startNewHand, handleAction, skipBotTurn, continueAfterHand } = usePokerGame(
     difficulty,
     profile.username,
     profile.chips
@@ -297,7 +297,7 @@ export default function PracticeScreen() {
                 </View>
                 {isHumanTurn && (
                   <View style={{ marginLeft: 'auto' }}>
-                    <TurnTimer seconds={state.timer} maxSeconds={30} size={44} isActive />
+                    <DotTimer seconds={state.timer} maxSeconds={30} isActive size={9} gap={5} />
                   </View>
                 )}
               </View>
@@ -388,9 +388,27 @@ export default function PracticeScreen() {
             {humanPlayer?.status === 'folded'
               ? 'You folded — watching others play...'
               : humanPlayer?.status === 'allIn'
-              ? 'You\'re ALL IN — watching the board...'
+              ? "You're ALL IN — watching the board..."
               : `${currentPlayer?.name ?? 'Opponent'} is thinking...`}
           </Text>
+          {!isHumanTurn
+            && humanPlayer?.status === 'active'
+            && state.phase !== 'handover'
+            && state.phase !== 'showdown'
+            && state.phase !== 'idle'
+            && (
+            <TouchableOpacity
+              style={styles.skipBtn}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                skipBotTurn();
+              }}
+              activeOpacity={0.75}
+            >
+              <Ionicons name="play-skip-forward" size={14} color={colors.textMuted} />
+              <Text style={styles.skipText}>SKIP TURN</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </View>
@@ -559,4 +577,23 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   waitingText: { color: colors.textMuted, fontSize: 13, fontStyle: 'italic' },
+  skipBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  skipText: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    fontFamily: 'Orbitron_400Regular',
+  },
 });
