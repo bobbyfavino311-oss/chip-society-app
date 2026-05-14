@@ -346,10 +346,12 @@ export default function HomeScreen() {
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 8 },
   word: {
-    fontFamily: 'Orbitron_900Black',
-    fontSize: 48,
-    letterSpacing: 8,
-    lineHeight: 54,
+    fontFamily: 'BebasNeue_400Regular',
+    fontSize: 86,
+    letterSpacing: 12,
+    lineHeight: 90,
+    textShadowRadius: 14,
+    textShadowOffset: { width: 0, height: 0 },
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',

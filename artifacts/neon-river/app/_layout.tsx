@@ -5,6 +5,7 @@ import {
   useFonts,
 } from '@expo-google-fonts/orbitron';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -42,6 +43,7 @@ export default function RootLayout() {
     Orbitron_700Bold,
     Orbitron_900Black,
     Pacifico_400Regular,
+    BebasNeue_400Regular,
   });
 
   useEffect(() => {

@@ -398,6 +398,9 @@ importers:
 
   artifacts/neon-river:
     dependencies:
+      '@expo-google-fonts/bebas-neue':
+        specifier: ^0.4.1
+        version: 0.4.1
       '@expo-google-fonts/faster-one':
         specifier: ^0.4.1
         version: 0.4.1
@@ -1126,6 +1129,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [linux]
+
+  '@expo-google-fonts/bebas-neue@0.4.1':
+    resolution: {integrity: sha512-Ibnf0EQgMUj01tT/ws64RlsMQmOvDP+UDFW93bld0C/WwaOaCGWKgNnqxNkKxmL73y2kpT8EB4dkSNUOyAOEJA==}
 
   '@expo-google-fonts/faster-one@0.4.1':
     resolution: {integrity: sha512-UdFvJ0UfiOUs4e5qHx8xb9igOQroggZ9ddOf9ZbhYXm6GzfuqVExIKaReFjXIi1ik7aRc3s7zJzNvk0ckdl92w==}
@@ -6313,6 +6319,8 @@ snapshots:
 
   '@esbuild/linux-x64@0.27.3':
     optional: true
+
+  '@expo-google-fonts/bebas-neue@0.4.1': {}
 
   '@expo-google-fonts/faster-one@0.4.1': {}
 
