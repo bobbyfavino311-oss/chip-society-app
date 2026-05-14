@@ -30,25 +30,74 @@ const RANK_COLORS: Record<string, string> = {
 };
 
 function NeonTitle() {
-  const glow = useRef(new Animated.Value(0)).current;
+  const aceOpacity = useRef(new Animated.Value(1)).current;
+  const socialOpacity = useRef(new Animated.Value(1)).current;
+  const aceGlow = useRef(new Animated.Value(1)).current;
+  const socialGlow = useRef(new Animated.Value(0.82)).current;
+  const [acePink, setAcePink] = React.useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // Slow ambient breathing — offset so they pulse opposite each other
     Animated.loop(
       Animated.sequence([
-        Animated.timing(glow, { toValue: 1, duration: 1500, useNativeDriver: true }),
-        Animated.timing(glow, { toValue: 0.4, duration: 1500, useNativeDriver: true }),
+        Animated.timing(aceGlow, { toValue: 0.82, duration: 2000, useNativeDriver: true }),
+        Animated.timing(aceGlow, { toValue: 1, duration: 2000, useNativeDriver: true }),
       ])
     ).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(socialGlow, { toValue: 1, duration: 2000, useNativeDriver: true }),
+        Animated.timing(socialGlow, { toValue: 0.82, duration: 2000, useNativeDriver: true }),
+      ])
+    ).start();
+
+    // Realistic neon-tube flicker then color swap
+    function flicker(anim: Animated.Value, cb: () => void) {
+      Animated.sequence([
+        Animated.timing(anim, { toValue: 0.08, duration: 35, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0.9,  duration: 55, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0.15, duration: 25, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1,    duration: 70, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0,    duration: 30, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1,    duration: 90, useNativeDriver: true }),
+      ]).start(() => cb());
+    }
+
+    function scheduleNext() {
+      const delay = 2200 + Math.random() * 3500;
+      timeoutRef.current = setTimeout(() => {
+        const doAce = Math.random() > 0.5;
+        flicker(doAce ? aceOpacity : socialOpacity, () => {
+          setAcePink(p => !p);
+          scheduleNext();
+        });
+      }, delay);
+    }
+
+    scheduleNext();
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, []);
 
-  const opacity = glow.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] });
+  const aceColor   = acePink ? colors.secondary : colors.primary;
+  const socialColor = acePink ? colors.primary   : colors.secondary;
 
   return (
-    <Animated.View style={{ opacity, alignItems: 'center' }}>
-      <Text style={styles.titleNeon} allowFontScaling={false}>NEON</Text>
-      <Text style={styles.titleRiver} allowFontScaling={false}>RIVER</Text>
+    <View style={{ alignItems: 'center' }}>
+      <Animated.Text
+        style={[styles.titleWord, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]}
+        allowFontScaling={false}
+      >
+        ACE
+      </Animated.Text>
+      <Animated.Text
+        style={[styles.titleWord, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]}
+        allowFontScaling={false}
+      >
+        SOCIAL
+      </Animated.Text>
       <Text style={styles.titleSub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -259,25 +308,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 16,
   },
-  titleNeon: {
+  titleWord: {
     fontFamily: 'Orbitron_900Black',
-    fontSize: 52,
-    color: colors.primary,
-    letterSpacing: 8,
-    textShadowColor: colors.primary,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
-    lineHeight: 56,
-  },
-  titleRiver: {
-    fontFamily: 'Orbitron_900Black',
-    fontSize: 52,
-    color: colors.secondary,
-    letterSpacing: 8,
-    textShadowColor: colors.secondary,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
-    lineHeight: 56,
+    fontSize: 56,
+    letterSpacing: 10,
+    lineHeight: 62,
   },
   titleSub: {
     fontFamily: 'Orbitron_400Regular',

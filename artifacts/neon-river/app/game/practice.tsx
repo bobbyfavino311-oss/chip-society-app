@@ -223,7 +223,7 @@ export default function PracticeScreen() {
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>NEON RIVER</Text>
+          <Text style={styles.headerTitle}>ACE SOCIAL</Text>
           <Text style={styles.headerDiff}>{DIFFICULTY_LABELS[difficulty].toUpperCase()}</Text>
         </View>
 
