@@ -1,11 +1,14 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   FlatList,
+  KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -26,6 +29,17 @@ const POST_TYPE_COLORS: Record<PostType, string> = {
   HIGHLIGHT: colors.primary,
 };
 
+const POST_TYPE_ICONS: Record<PostType, React.ComponentProps<typeof Ionicons>['name']> = {
+  WIN: 'trophy-outline',
+  BLUFF: 'glasses-outline',
+  'BAD BEAT': 'sad-outline',
+  'ALL-IN': 'flame-outline',
+  HIGHLIGHT: 'star-outline',
+};
+
+const ALL_POST_TYPES: PostType[] = ['WIN', 'BLUFF', 'BAD BEAT', 'ALL-IN', 'HIGHLIGHT'];
+const MAX_CHARS = 280;
+
 interface FeedPost {
   id: string;
   user: string;
@@ -40,6 +54,18 @@ interface FeedPost {
   comments: number;
   timeAgo: string;
   tab: 'following' | 'trending' | 'pots' | 'highlights';
+}
+
+interface MePost {
+  id: string;
+  type: PostType;
+  content: string;
+  pot?: string;
+  handRank?: string;
+  likes: number;
+  comments: number;
+  timeAgo: string;
+  repostedFrom?: string;
 }
 
 const ALL_POSTS: FeedPost[] = [
@@ -101,35 +127,7 @@ const ALL_POSTS: FeedPost[] = [
   },
 ];
 
-const FEED_TABS = [
-  { id: 'trending', label: 'Trending' },
-  { id: 'following', label: 'Following' },
-  { id: 'pots', label: 'Biggest Pots' },
-  { id: 'highlights', label: 'Highlights' },
-  { id: 'me', label: 'Me' },
-];
-
-const ME_SUBTABS = [
-  { id: 'posts', label: 'Posts', icon: 'create-outline' as const },
-  { id: 'reposts', label: 'Reposts', icon: 'repeat' as const },
-  { id: 'likes', label: 'Likes', icon: 'heart-outline' as const },
-];
-
-// ─── Mock "Me" data ───────────────────────────────────────────────────────────
-
-interface MePost {
-  id: string;
-  type: PostType;
-  content: string;
-  pot?: string;
-  handRank?: string;
-  likes: number;
-  comments: number;
-  timeAgo: string;
-  repostedFrom?: string;
-}
-
-const MY_POSTS: MePost[] = [
+const INITIAL_MY_POSTS: MePost[] = [
   {
     id: 'mp1', type: 'WIN',
     content: 'Picked up Aces UTG, ran it up to a 3-way all-in and held. First Royal Flush of my career tonight. 🃏',
@@ -195,6 +193,207 @@ const MY_LIKES: MePost[] = [
   },
 ];
 
+const FEED_TABS = [
+  { id: 'trending', label: 'Trending' },
+  { id: 'following', label: 'Following' },
+  { id: 'pots', label: 'Biggest Pots' },
+  { id: 'highlights', label: 'Highlights' },
+  { id: 'me', label: 'Me' },
+];
+
+const ME_SUBTABS = [
+  { id: 'posts', label: 'Posts', icon: 'create-outline' as const },
+  { id: 'reposts', label: 'Reposts', icon: 'repeat' as const },
+  { id: 'likes', label: 'Likes', icon: 'heart-outline' as const },
+];
+
+// ─── Compose Modal ────────────────────────────────────────────────────────────
+
+interface ComposeModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onPost: (post: MePost) => void;
+}
+
+function ComposeModal({ visible, onClose, onPost }: ComposeModalProps) {
+  const { profile } = useUser();
+  const insets = useSafeAreaInsets();
+  const [text, setText] = useState('');
+  const [postType, setPostType] = useState<PostType>('WIN');
+  const [pot, setPot] = useState('');
+  const [handRank, setHandRank] = useState('');
+  const [showOptionals, setShowOptionals] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+
+  const AVATAR_SYMBOLS = ['♠', '♥', '♦', '♣', '★'];
+  const AVATAR_COLORS = [colors.primary, colors.secondary, colors.gold, colors.accent, colors.success];
+  const avatarSymbol = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
+  const avatarColor = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
+
+  const remaining = MAX_CHARS - text.length;
+  const canPost = text.trim().length > 0 && remaining >= 0;
+
+  function handlePost() {
+    if (!canPost) return;
+    const newPost: MePost = {
+      id: `up_${Date.now()}`,
+      type: postType,
+      content: text.trim(),
+      pot: pot.trim() || undefined,
+      handRank: handRank.trim() || undefined,
+      likes: 0,
+      comments: 0,
+      timeAgo: 'just now',
+    };
+    onPost(newPost);
+    setText('');
+    setPot('');
+    setHandRank('');
+    setPostType('WIN');
+    setShowOptionals(false);
+    onClose();
+  }
+
+  function handleClose() {
+    setText('');
+    setPot('');
+    setHandRank('');
+    setPostType('WIN');
+    setShowOptionals(false);
+    onClose();
+  }
+
+  const typeColor = POST_TYPE_COLORS[postType];
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={handleClose}
+    >
+      <KeyboardAvoidingView
+        style={compose.overlay}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <TouchableOpacity style={compose.backdrop} activeOpacity={1} onPress={handleClose} />
+
+        <View style={[compose.sheet, { paddingBottom: insets.bottom + 12 }]}>
+          <LinearGradient colors={['#160030', '#080018']} style={StyleSheet.absoluteFill} />
+
+          {/* Handle bar */}
+          <View style={compose.handle} />
+
+          {/* Top bar */}
+          <View style={compose.topBar}>
+            <TouchableOpacity style={compose.cancelBtn} onPress={handleClose}>
+              <Text style={compose.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <Text style={compose.sheetTitle}>New Post</Text>
+            <TouchableOpacity
+              style={[compose.postBtn, !canPost && compose.postBtnDisabled]}
+              onPress={handlePost}
+              disabled={!canPost}
+            >
+              <Text style={[compose.postBtnText, !canPost && compose.postBtnTextDisabled]}>Post</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Author row */}
+          <View style={compose.authorRow}>
+            <View style={[compose.avatar, { borderColor: avatarColor }]}>
+              <Text style={[compose.avatarText, { color: avatarColor }]}>{avatarSymbol}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={compose.authorName}>{profile.username}</Text>
+              <Text style={compose.authorHandle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
+            </View>
+          </View>
+
+          {/* Text input */}
+          <TextInput
+            ref={inputRef}
+            style={compose.input}
+            placeholder="What happened at the table?"
+            placeholderTextColor={colors.textDim}
+            multiline
+            maxLength={MAX_CHARS + 10}
+            value={text}
+            onChangeText={setText}
+            autoFocus
+            selectionColor={colors.primary}
+          />
+
+          {/* Post type chips */}
+          <Text style={compose.sectionLabel}>Tag your hand</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={compose.typeRow}>
+            {ALL_POST_TYPES.map(t => {
+              const active = postType === t;
+              const c = POST_TYPE_COLORS[t];
+              return (
+                <TouchableOpacity
+                  key={t}
+                  style={[compose.typeChip, { borderColor: active ? c : `${c}40`, backgroundColor: active ? `${c}22` : 'transparent' }]}
+                  onPress={() => setPostType(t)}
+                >
+                  <Ionicons name={POST_TYPE_ICONS[t]} size={12} color={active ? c : colors.textDim} />
+                  <Text style={[compose.typeChipText, { color: active ? c : colors.textDim }]}>{t}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* Optional hand stats toggle */}
+          <TouchableOpacity style={compose.optionalToggle} onPress={() => setShowOptionals(v => !v)}>
+            <Ionicons name="layers-outline" size={14} color={colors.primary} />
+            <Text style={compose.optionalToggleText}>Add hand stats (optional)</Text>
+            <Ionicons name={showOptionals ? 'chevron-up' : 'chevron-down'} size={14} color={colors.textDim} />
+          </TouchableOpacity>
+
+          {showOptionals && (
+            <View style={compose.optionalFields}>
+              <View style={compose.fieldRow}>
+                <Ionicons name="layers" size={13} color={colors.gold} />
+                <TextInput
+                  style={compose.fieldInput}
+                  placeholder="Pot size (e.g. 42,000)"
+                  placeholderTextColor={colors.textDim}
+                  value={pot}
+                  onChangeText={setPot}
+                  keyboardType="default"
+                  selectionColor={colors.primary}
+                />
+              </View>
+              <View style={[compose.fieldRow, { marginTop: 8 }]}>
+                <Ionicons name="card" size={13} color={colors.primary} />
+                <TextInput
+                  style={compose.fieldInput}
+                  placeholder="Best hand (e.g. Full House)"
+                  placeholderTextColor={colors.textDim}
+                  value={handRank}
+                  onChangeText={setHandRank}
+                  selectionColor={colors.primary}
+                />
+              </View>
+            </View>
+          )}
+
+          {/* Char counter + type preview */}
+          <View style={compose.footer}>
+            <View style={[compose.selectedType, { borderColor: `${typeColor}50`, backgroundColor: `${typeColor}15` }]}>
+              <Ionicons name={POST_TYPE_ICONS[postType]} size={11} color={typeColor} />
+              <Text style={[compose.selectedTypeText, { color: typeColor }]}>{postType}</Text>
+            </View>
+            <Text style={[compose.counter, remaining < 20 && { color: remaining < 0 ? colors.secondary : colors.warning }]}>
+              {remaining}
+            </Text>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
 // ─── Post card (community feed) ───────────────────────────────────────────────
 
 function PostCard({ post }: { post: FeedPost }) {
@@ -257,7 +456,9 @@ function PostCard({ post }: { post: FeedPost }) {
 
 // ─── Me post card ─────────────────────────────────────────────────────────────
 
-function MePostCard({ post, username, subTab }: { post: MePost; username: string; subTab: string }) {
+function MePostCard({ post, username, avatarSymbol, avatarColor, subTab }: {
+  post: MePost; username: string; avatarSymbol: string; avatarColor: string; subTab: string;
+}) {
   const [liked, setLiked] = useState(subTab === 'likes');
   const typeColor = POST_TYPE_COLORS[post.type];
   const isRepost = subTab === 'reposts' || subTab === 'likes';
@@ -276,12 +477,18 @@ function MePostCard({ post, username, subTab }: { post: MePost; username: string
       )}
 
       <View style={card.header}>
-        <View style={[card.avatar, { borderColor: isRepost ? colors.textDim : colors.primary }]}>
-          <Text style={[card.avatarText, { color: isRepost ? colors.textDim : colors.primary }]}>♠</Text>
+        <View style={[card.avatar, { borderColor: isRepost ? colors.textDim : avatarColor }]}>
+          <Text style={[card.avatarText, { color: isRepost ? colors.textDim : avatarColor }]}>
+            {isRepost ? '♠' : avatarSymbol}
+          </Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={card.username}>{isRepost ? (post.repostedFrom ?? username) : username}</Text>
-          <Text style={card.handle}>{isRepost ? `@${(post.repostedFrom ?? username).toLowerCase().replace(/\s/g, '')}` : `@${username.toLowerCase().replace(/\s/g, '')}`} · {post.timeAgo}</Text>
+          <Text style={card.handle}>
+            {isRepost
+              ? `@${(post.repostedFrom ?? username).toLowerCase().replace(/\s/g, '')}`
+              : `@${username.toLowerCase().replace(/\s/g, '')}`} · {post.timeAgo}
+          </Text>
         </View>
         <View style={[card.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
           <Text style={[card.typeText, { color: typeColor }]}>{post.type}</Text>
@@ -330,30 +537,30 @@ function MePostCard({ post, username, subTab }: { post: MePost; username: string
 
 // ─── Me section ───────────────────────────────────────────────────────────────
 
-function MeSection({ bottomInset }: { bottomInset: number }) {
+function MeSection({
+  myPosts, bottomInset,
+}: { myPosts: MePost[]; bottomInset: number }) {
   const { profile, winRate } = useUser();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
-
-  const data = subTab === 'posts' ? MY_POSTS : subTab === 'reposts' ? MY_REPOSTS : MY_LIKES;
 
   const AVATAR_SYMBOLS = ['♠', '♥', '♦', '♣', '★'];
   const AVATAR_COLORS = [colors.primary, colors.secondary, colors.gold, colors.accent, colors.success];
   const avatarSymbol = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
   const avatarColor = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
 
+  const data = subTab === 'posts' ? myPosts : subTab === 'reposts' ? MY_REPOSTS : MY_LIKES;
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomInset + 90 }}>
       {/* Profile header */}
       <View style={meCard.profileHeader}>
         <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
-
         <View style={meCard.avatarWrap}>
-          <View style={[meCard.avatar, { borderColor: avatarColor }]}>
-            <Text style={[meCard.avatarText, { color: avatarColor }]}>{avatarSymbol}</Text>
+          <View style={[meCard.bigAvatar, { borderColor: avatarColor }]}>
+            <Text style={[meCard.bigAvatarText, { color: avatarColor }]}>{avatarSymbol}</Text>
           </View>
           <LinearGradient colors={[`${avatarColor}40`, 'transparent']} style={meCard.avatarGlow} />
         </View>
-
         <View style={meCard.profileInfo}>
           <Text style={meCard.username}>{profile.username}</Text>
           <Text style={meCard.handle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
@@ -362,7 +569,6 @@ function MeSection({ bottomInset }: { bottomInset: number }) {
             <Text style={meCard.rankText}>{profile.rank}</Text>
           </View>
         </View>
-
         <TouchableOpacity style={meCard.editBtn}>
           <Ionicons name="pencil-outline" size={14} color={colors.primary} />
           <Text style={meCard.editText}>Edit</Text>
@@ -372,7 +578,7 @@ function MeSection({ bottomInset }: { bottomInset: number }) {
       {/* Stats strip */}
       <View style={meCard.statsStrip}>
         <View style={meCard.stat}>
-          <Text style={meCard.statVal}>{MY_POSTS.length}</Text>
+          <Text style={meCard.statVal}>{myPosts.length}</Text>
           <Text style={meCard.statLabel}>Posts</Text>
         </View>
         <View style={meCard.statDivider} />
@@ -399,7 +605,7 @@ function MeSection({ bottomInset }: { bottomInset: number }) {
           return (
             <TouchableOpacity
               key={t.id}
-              style={[meCard.subTab, active && meCard.subTabActive]}
+              style={meCard.subTab}
               onPress={() => setSubTab(t.id as typeof subTab)}
             >
               <Ionicons name={t.icon} size={14} color={active ? colors.primary : colors.textDim} />
@@ -419,7 +625,14 @@ function MeSection({ bottomInset }: { bottomInset: number }) {
           </View>
         ) : (
           data.map(post => (
-            <MePostCard key={post.id} post={post} username={profile.username} subTab={subTab} />
+            <MePostCard
+              key={post.id}
+              post={post}
+              username={profile.username}
+              avatarSymbol={avatarSymbol}
+              avatarColor={avatarColor}
+              subTab={subTab}
+            />
           ))
         )}
       </View>
@@ -432,10 +645,16 @@ function MeSection({ bottomInset }: { bottomInset: number }) {
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<string>('trending');
+  const [composeVisible, setComposeVisible] = useState(false);
+  const [myPosts, setMyPosts] = useState<MePost[]>(INITIAL_MY_POSTS);
 
   const filteredPosts = ALL_POSTS.filter(p =>
     activeTab === 'trending' ? true : p.tab === activeTab
   );
+
+  function handleNewPost(post: MePost) {
+    setMyPosts(prev => [post, ...prev]);
+  }
 
   return (
     <View style={styles.container}>
@@ -445,7 +664,7 @@ export default function FeedScreen() {
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
         <Text style={styles.headerTitle}>FEED</Text>
         {activeTab !== 'me' && (
-          <TouchableOpacity style={styles.newPostBtn}>
+          <TouchableOpacity style={styles.newPostBtn} onPress={() => setComposeVisible(true)}>
             <Ionicons name="add" size={18} color={colors.primary} />
             <Text style={styles.newPostText}>Post</Text>
           </TouchableOpacity>
@@ -464,7 +683,7 @@ export default function FeedScreen() {
           return (
             <TouchableOpacity
               key={tab.id}
-              style={[styles.tab, active && styles.tabActive]}
+              style={styles.tab}
               onPress={() => setActiveTab(tab.id)}
             >
               {tab.id === 'me' && (
@@ -481,7 +700,7 @@ export default function FeedScreen() {
 
       {/* Content */}
       {activeTab === 'me' ? (
-        <MeSection bottomInset={insets.bottom} />
+        <MeSection myPosts={myPosts} bottomInset={insets.bottom} />
       ) : (
         <FlatList
           data={filteredPosts}
@@ -496,6 +715,13 @@ export default function FeedScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+
+      {/* Compose modal */}
+      <ComposeModal
+        visible={composeVisible}
+        onClose={() => setComposeVisible(false)}
+        onPost={handleNewPost}
+      />
     </View>
   );
 }
@@ -531,6 +757,89 @@ const card = StyleSheet.create({
   actionCount: { color: colors.textMuted, fontSize: 12 },
 });
 
+const compose = StyleSheet.create({
+  overlay: { flex: 1, justifyContent: 'flex-end' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' },
+  sheet: {
+    borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    borderWidth: 1, borderBottomWidth: 0, borderColor: colors.border,
+    overflow: 'hidden', paddingTop: 8,
+  },
+  handle: {
+    width: 36, height: 4, borderRadius: 2,
+    backgroundColor: colors.border, alignSelf: 'center', marginBottom: 4,
+  },
+  topBar: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingVertical: 12,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  sheetTitle: {
+    color: colors.text, fontSize: 15, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
+  },
+  cancelBtn: { paddingVertical: 4, paddingHorizontal: 2 },
+  cancelText: { color: colors.textDim, fontSize: 14, fontWeight: '600' },
+  postBtn: {
+    backgroundColor: colors.primary, borderRadius: 20,
+    paddingHorizontal: 18, paddingVertical: 8,
+  },
+  postBtnDisabled: { backgroundColor: `${colors.primary}40` },
+  postBtnText: { color: colors.background, fontSize: 13, fontWeight: '800' },
+  postBtnTextDisabled: { color: `${colors.background}80` },
+  authorRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4,
+  },
+  avatar: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: colors.surface, borderWidth: 2,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  avatarText: { fontSize: 20, fontWeight: '700' },
+  authorName: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  authorHandle: { color: colors.textDim, fontSize: 11, marginTop: 1 },
+  input: {
+    color: colors.text, fontSize: 16, lineHeight: 24,
+    paddingHorizontal: 16, paddingTop: 10, paddingBottom: 10,
+    minHeight: 100, textAlignVertical: 'top',
+  },
+  sectionLabel: {
+    color: colors.textDim, fontSize: 11, fontWeight: '700',
+    letterSpacing: 1, paddingHorizontal: 16, marginBottom: 8,
+  },
+  typeRow: { paddingHorizontal: 16, gap: 8 },
+  typeChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderWidth: 1, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
+  },
+  typeChipText: { fontSize: 11, fontWeight: '700' },
+  optionalToggle: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4,
+  },
+  optionalToggleText: { color: colors.primary, fontSize: 12, fontWeight: '600', flex: 1 },
+  optionalFields: { paddingHorizontal: 16, paddingTop: 4 },
+  fieldRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    borderWidth: 1, borderColor: colors.border, borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 10,
+    backgroundColor: colors.surface,
+  },
+  fieldInput: { flex: 1, color: colors.text, fontSize: 13 },
+  footer: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingTop: 12,
+    borderTopWidth: 1, borderTopColor: colors.border, marginTop: 12,
+  },
+  selectedType: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    borderWidth: 1, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
+  },
+  selectedTypeText: { fontSize: 10, fontWeight: '800' },
+  counter: { color: colors.textDim, fontSize: 13, fontWeight: '600' },
+});
+
 const meCard = StyleSheet.create({
   profileHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
@@ -539,12 +848,12 @@ const meCard = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: colors.border,
   },
   avatarWrap: { position: 'relative' },
-  avatar: {
+  bigAvatar: {
     width: 64, height: 64, borderRadius: 32,
     backgroundColor: colors.surface, borderWidth: 2,
     alignItems: 'center', justifyContent: 'center',
   },
-  avatarText: { fontSize: 30, fontWeight: '700' },
+  bigAvatarText: { fontSize: 30, fontWeight: '700' },
   avatarGlow: {
     position: 'absolute', top: -4, left: -4, right: -4, bottom: -4,
     borderRadius: 36,
@@ -582,7 +891,6 @@ const meCard = StyleSheet.create({
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 5, paddingVertical: 12, position: 'relative',
   },
-  subTabActive: {},
   subTabText: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
   subTabTextActive: { color: colors.primary, fontWeight: '800' },
   subTabIndicator: {
@@ -590,8 +898,7 @@ const meCard = StyleSheet.create({
     height: 2, backgroundColor: colors.primary, borderRadius: 1,
   },
   repostBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingBottom: 6,
+    flexDirection: 'row', alignItems: 'center', gap: 5, paddingBottom: 6,
   },
   repostLabel: { fontSize: 11, fontWeight: '600' },
   empty: { alignItems: 'center', paddingVertical: 48, gap: 10 },
@@ -615,16 +922,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6,
   },
   newPostText: { color: colors.primary, fontSize: 12, fontWeight: '700' },
-  tabBarScroll: {
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-    flexGrow: 0,
-  },
+  tabBarScroll: { borderBottomWidth: 1, borderBottomColor: colors.border, flexGrow: 0 },
   tabBarContent: { paddingHorizontal: 4 },
   tab: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 14, paddingVertical: 12, position: 'relative',
   },
-  tabActive: {},
   tabText: { color: colors.textDim, fontSize: 11, fontWeight: '600' },
   tabTextActive: { color: colors.primary, fontWeight: '800' },
   tabTextMe: { color: colors.secondary, fontWeight: '800' },
