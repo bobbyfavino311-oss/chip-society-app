@@ -84,34 +84,13 @@ function AceSocialLogo() {
   return (
     <View style={logo.wrap}>
       {/* Crisp foreground letters with inline textShadow for neon glow */}
-      <Animated.Text
-        style={[
-          logo.word,
-          {
-            color: aceColor,
-            opacity: Animated.multiply(aceOpacity, aceGlow),
-            textShadowColor: aceColor,
-          },
-        ]}
-        allowFontScaling={false}
-      >
-        Ace
+      <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
+        ACE
       </Animated.Text>
-      <Animated.Text
-        style={[
-          logo.word,
-          logo.wordSocial,
-          {
-            color: socialColor,
-            opacity: Animated.multiply(socialOpacity, socialGlow),
-            textShadowColor: socialColor,
-          },
-        ]}
-        allowFontScaling={false}
-      >
-        Social
+      <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
+        SOCIAL
       </Animated.Text>
-      <Text style={logo.sub} allowFontScaling={false}>✦  TEXAS HOLD'EM POKER  ✦</Text>
+      <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
   );
 }
@@ -365,31 +344,19 @@ export default function HomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const logo = StyleSheet.create({
-  wrap: {
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  // Each script word
+  wrap: { alignItems: 'center', paddingVertical: 8 },
   word: {
-    fontFamily: 'Pacifico_400Regular',
-    fontSize: 78,
-    lineHeight: 90,
-    letterSpacing: 1,
-    // Neon tube glow — tight inner + wide outer
-    textShadowRadius: 18,
-    textShadowOffset: { width: 0, height: 0 },
-  },
-  // "Social" gets a slightly larger feel — Pacifico reads well at the same size
-  wordSocial: {
-    fontSize: 84,
-    lineHeight: 94,
+    fontFamily: 'Orbitron_900Black',
+    fontSize: 48,
+    letterSpacing: 8,
+    lineHeight: 54,
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 9,
     color: colors.textMuted,
-    letterSpacing: 5,
-    marginTop: 2,
+    letterSpacing: 4,
+    marginTop: 4,
   },
 });
 
