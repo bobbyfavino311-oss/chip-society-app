@@ -95,11 +95,12 @@ function AceSocialLogo() {
         ]}
         allowFontScaling={false}
       >
-        ACE
+        Ace
       </Animated.Text>
       <Animated.Text
         style={[
           logo.word,
+          logo.wordSocial,
           {
             color: socialColor,
             opacity: Animated.multiply(socialOpacity, socialGlow),
@@ -108,7 +109,7 @@ function AceSocialLogo() {
         ]}
         allowFontScaling={false}
       >
-        SOCIAL
+        Social
       </Animated.Text>
       <Text style={logo.sub} allowFontScaling={false}>✦  TEXAS HOLD'EM POKER  ✦</Text>
     </View>
@@ -366,47 +367,29 @@ export default function HomeScreen() {
 const logo = StyleSheet.create({
   wrap: {
     alignItems: 'center',
-    paddingVertical: 12,
-    // Stack glow + crisp layers on top of each other
-    position: 'relative',
+    paddingVertical: 4,
   },
-  // Absolute-positioned glow stack behind the real letters
-  glowStack: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  // Blurred/spread glow duplicate
-  wordGlow: {
-    fontFamily: 'FasterOne_400Regular',
-    fontSize: 72,
-    lineHeight: 76,
-    letterSpacing: 2,
-    // Simulate a wide neon tube glow with textShadow
-    textShadowRadius: 28,
-    textShadowOffset: { width: 0, height: 0 },
-    transform: [{ skewX: '-4deg' }],
-  },
-  // Crisp foreground word
+  // Each script word
   word: {
-    fontFamily: 'FasterOne_400Regular',
-    fontSize: 72,
-    lineHeight: 76,
-    letterSpacing: 2,
-    textShadowRadius: 10,
+    fontFamily: 'Pacifico_400Regular',
+    fontSize: 78,
+    lineHeight: 90,
+    letterSpacing: 1,
+    // Neon tube glow — tight inner + wide outer
+    textShadowRadius: 18,
     textShadowOffset: { width: 0, height: 0 },
-    transform: [{ skewX: '-4deg' }],
+  },
+  // "Social" gets a slightly larger feel — Pacifico reads well at the same size
+  wordSocial: {
+    fontSize: 84,
+    lineHeight: 94,
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 5,
-    marginTop: 8,
+    marginTop: 2,
   },
 });
 
