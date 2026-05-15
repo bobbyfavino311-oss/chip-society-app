@@ -347,8 +347,8 @@ const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
   word: {
     fontFamily: 'Pacifico_400Regular',
-    fontSize: 80,
-    lineHeight: 92,
+    fontSize: 62,
+    lineHeight: 72,
     textShadowRadius: 20,
     textShadowOffset: { width: 0, height: 0 },
   },
