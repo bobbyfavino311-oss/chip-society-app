@@ -249,10 +249,10 @@ function ChipSocietyLogo() {
   return (
     <View style={logo.wrap}>
       <View style={logo.wordGroup}>
-        <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
+        <Animated.Text style={[logo.word, { color: aceColor, lineHeight: LOGO_LINE_HEIGHT, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
           Chip
         </Animated.Text>
-        <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
+        <Animated.Text style={[logo.word, { color: socialColor, lineHeight: LOGO_LINE_HEIGHT, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
           Society
         </Animated.Text>
       </View>
@@ -550,6 +550,9 @@ export default function HomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const LOGO_SIZE = Math.min(62, width * 0.162);
+// Web needs a forced line-height to keep the two Pacifico words snug;
+// native uses the font's own metrics (forcing it clips the descender).
+const LOGO_LINE_HEIGHT = Platform.select({ web: LOGO_SIZE * 1.12, default: undefined });
 
 const tc = StyleSheet.create({
   card: {
@@ -594,11 +597,10 @@ const tc = StyleSheet.create({
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
-  wordGroup: { alignItems: 'center', paddingBottom: 18 },
+  wordGroup: { alignItems: 'center', paddingBottom: 12 },
   word: {
     fontFamily: 'Pacifico_400Regular',
     fontSize: LOGO_SIZE,
-    lineHeight: LOGO_SIZE * 1.08,
     textShadowRadius: 20,
     textShadowOffset: { width: 0, height: 0 },
   },
