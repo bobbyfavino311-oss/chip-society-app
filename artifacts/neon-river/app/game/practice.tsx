@@ -21,6 +21,7 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame } from '@/hooks/usePokerGame';
+import { SoundEngine } from '@/lib/soundEngine';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -208,6 +209,7 @@ export default function PracticeScreen() {
       Animated.timing(potPulse, { toValue: 1.3, duration: 110, useNativeDriver: true }),
       Animated.timing(potPulse, { toValue: 1, duration: 180, useNativeDriver: true }),
     ]).start();
+    SoundEngine.chip();
     prevPotRef.current = state.pot;
   }, [state.pot, state.phase]);
 
@@ -235,6 +237,7 @@ export default function PracticeScreen() {
       ])
     );
     Animated.parallel(anims).start();
+    if (isHumanWin) SoundEngine.win(); else SoundEngine.lose();
     prevPotRef.current = 0;
   }, [state.phase, state.winnerIds]);
 
@@ -246,6 +249,7 @@ export default function PracticeScreen() {
           setDifficulty(diff);
           setGameStarted(true);
           startNewHand(0);
+          SoundEngine.deal();
         }}
       />
     );
@@ -271,6 +275,7 @@ export default function PracticeScreen() {
     else await recordLoss();
     setHandCount(h => h + 1);
     continueAfterHand();
+    SoundEngine.deal();
   };
 
   const seatPositions = [
@@ -493,11 +498,11 @@ export default function PracticeScreen() {
             pot={state.pot}
             minRaise={state.minRaise}
             currentBet={state.currentBet}
-            onFold={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); handleAction('fold'); }}
-            onCheck={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); handleAction('check'); }}
-            onCall={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); handleAction('call'); }}
-            onRaise={amt => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); handleAction('raise', amt); }}
-            onAllIn={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); handleAction('allin'); }}
+            onFold={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); SoundEngine.fold(); handleAction('fold'); }}
+            onCheck={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); SoundEngine.check(); handleAction('check'); }}
+            onCall={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); SoundEngine.call(); handleAction('call'); }}
+            onRaise={amt => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); SoundEngine.raise(); handleAction('raise', amt); }}
+            onAllIn={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); SoundEngine.allin(); handleAction('allin'); }}
           />
         </View>
       ) : (
