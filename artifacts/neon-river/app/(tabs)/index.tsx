@@ -248,12 +248,14 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
-      <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
-        Chip
-      </Animated.Text>
-      <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
-        Society
-      </Animated.Text>
+      <View style={logo.wordGroup}>
+        <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
+          Chip
+        </Animated.Text>
+        <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
+          Society
+        </Animated.Text>
+      </View>
       <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
   );
@@ -592,16 +594,11 @@ const tc = StyleSheet.create({
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  textStack: { alignItems: 'center' },
+  wordGroup: { alignItems: 'center', paddingBottom: 18 },
   word: {
     fontFamily: 'Pacifico_400Regular',
     fontSize: LOGO_SIZE,
-    lineHeight: LOGO_SIZE * 1.1,
+    lineHeight: LOGO_SIZE * 1.08,
     textShadowRadius: 20,
     textShadowOffset: { width: 0, height: 0 },
   },
@@ -610,7 +607,6 @@ const logo = StyleSheet.create({
     fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 4,
-    marginTop: 26,
   },
 });
 
