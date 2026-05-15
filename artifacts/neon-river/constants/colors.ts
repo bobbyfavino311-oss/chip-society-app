@@ -4,9 +4,9 @@ const colors = {
   surfaceElevated: '#180030',
   surfaceCard: '#1e0040',
 
-  tableFelt: '#071a0e',
-  tableRing: '#0d2e17',
-  tableBorder: '#1a4a28',
+  tableFelt: '#0d1638',
+  tableRing: '#1a0040',
+  tableBorder: '#cc0088',
 
   primary: '#00d4ff',
   primaryDim: 'rgba(0,212,255,0.2)',

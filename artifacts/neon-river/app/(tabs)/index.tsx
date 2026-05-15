@@ -30,7 +30,7 @@ const RANK_COLORS: Record<string, string> = {
 
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
-function AceSocialLogo() {
+function ChipSocietyLogo() {
   const aceOpacity = useRef(new Animated.Value(1)).current;
   const socialOpacity = useRef(new Animated.Value(1)).current;
   const aceGlow = useRef(new Animated.Value(1)).current;
@@ -85,10 +85,10 @@ function AceSocialLogo() {
     <View style={logo.wrap}>
       {/* Crisp foreground letters with inline textShadow for neon glow */}
       <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
-        ACE
+        Chip
       </Animated.Text>
       <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
-        SOCIAL
+        Society
       </Animated.Text>
       <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
@@ -273,7 +273,7 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 80 }]}
         showsVerticalScrollIndicator={false}
       >
-        <AceSocialLogo />
+        <ChipSocietyLogo />
 
         {/* Quick Play CTA */}
         <TouchableOpacity
@@ -344,13 +344,12 @@ export default function HomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const logo = StyleSheet.create({
-  wrap: { alignItems: 'center', paddingVertical: 8 },
+  wrap: { alignItems: 'center', paddingVertical: 4 },
   word: {
-    fontFamily: 'Righteous_400Regular',
-    fontSize: 72,
-    letterSpacing: 10,
-    lineHeight: 78,
-    textShadowRadius: 14,
+    fontFamily: 'Pacifico_400Regular',
+    fontSize: 80,
+    lineHeight: 92,
+    textShadowRadius: 20,
     textShadowOffset: { width: 0, height: 0 },
   },
   sub: {

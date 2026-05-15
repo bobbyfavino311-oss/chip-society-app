@@ -30,6 +30,7 @@ export interface UserProfile {
   losses: number;
   handsPlayed: number;
   avatarIndex: number;
+  avatarUri?: string;
   lastDailyReward: string | null;
   streakDays: number;
   dailyMissionsCompleted: number;

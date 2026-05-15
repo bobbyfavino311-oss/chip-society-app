@@ -1,8 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
+  Animated,
   Platform,
   ScrollView,
   StyleSheet,
@@ -184,13 +185,105 @@ export default function PracticeScreen() {
     continueAfterHand();
   };
 
-  // Seat positions for 4 AI players around the top of the table
+  // Seat positions for 4 AI players — bottom pair pushed further down
   const seatPositions = [
-    { left: 4, top: '32%' },
-    { left: 36, top: '6%' },
-    { right: 36, top: '6%' },
-    { right: 4, top: '32%' },
+    { left: 2, top: '56%' },
+    { left: 34, top: '6%' },
+    { right: 34, top: '6%' },
+    { right: 2, top: '56%' },
   ] as const;
+
+  // ── Chip-fly animation ────────────────────────────────────────────────────
+  // Approximate pixel offsets from table centre for each seat (used for chip direction)
+  const SEAT_VEC = [
+    { x: -145, y: 70 },   // AI seat 0 — left-lower
+    { x: -90, y: -120 },  // AI seat 1 — upper-left
+    { x: 90, y: -120 },   // AI seat 2 — upper-right
+    { x: 145, y: 70 },    // AI seat 3 — right-lower
+    { x: 0, y: 140 },     // Human — bottom centre
+  ] as const;
+
+  const N_CHIP = 4;
+  const chipAnims = useRef(
+    Array.from({ length: N_CHIP }, () => ({
+      pos: new Animated.ValueXY({ x: 0, y: 0 }),
+      opacity: new Animated.Value(0),
+    }))
+  ).current;
+  const winAnims = useRef(
+    Array.from({ length: 6 }, () => ({
+      pos: new Animated.ValueXY({ x: 0, y: -20 }),
+      opacity: new Animated.Value(0),
+    }))
+  ).current;
+  const potPulse = useRef(new Animated.Value(1)).current;
+  const prevPotRef = useRef(0);
+  const prevPhaseRef = useRef('');
+
+  // Fire bet-chip animation whenever pot grows
+  useEffect(() => {
+    if (state.pot <= prevPotRef.current) return;
+    if (state.phase === 'idle' || state.phase === 'handover' || state.phase === 'showdown') {
+      prevPotRef.current = 0;
+      return;
+    }
+    const actor = state.players[state.currentPlayerIndex];
+    const localAiPlayers = state.players.filter(p => !p.isHuman);
+    const isHumanActor = actor?.isHuman ?? false;
+    let vecIdx = 4;
+    if (!isHumanActor && actor) {
+      const aiIdx = localAiPlayers.findIndex(p => p.id === actor.id);
+      vecIdx = aiIdx >= 0 ? Math.min(aiIdx, 3) : 0;
+    }
+    const vec = SEAT_VEC[vecIdx];
+    chipAnims.forEach(({ pos, opacity }, i) => {
+      pos.setValue({ x: vec.x + (i - N_CHIP / 2 + 0.5) * 12, y: vec.y + (i % 2) * 6 });
+      opacity.setValue(0);
+    });
+    const anims = chipAnims.map(({ pos, opacity }, i) =>
+      Animated.sequence([
+        Animated.delay(i * 55),
+        Animated.parallel([
+          Animated.timing(opacity, { toValue: 1, duration: 80, useNativeDriver: true }),
+          Animated.timing(pos, { toValue: { x: (i - N_CHIP / 2 + 0.5) * 4, y: -18 }, duration: 320, useNativeDriver: true }),
+        ]),
+        Animated.timing(opacity, { toValue: 0, duration: 130, useNativeDriver: true }),
+      ])
+    );
+    Animated.parallel(anims).start();
+    Animated.sequence([
+      Animated.timing(potPulse, { toValue: 1.3, duration: 110, useNativeDriver: true }),
+      Animated.timing(potPulse, { toValue: 1, duration: 180, useNativeDriver: true }),
+    ]).start();
+    prevPotRef.current = state.pot;
+  }, [state.pot, state.phase]);
+
+  // Fire win-chip animation when hand ends
+  useEffect(() => {
+    if (state.phase !== 'handover') { prevPhaseRef.current = state.phase; return; }
+    if (prevPhaseRef.current === 'handover') return;
+    prevPhaseRef.current = 'handover';
+    if (state.winnerIds.length === 0) return;
+    const winnerId = state.winnerIds[0];
+    const isHumanWin = winnerId === 'human';
+    const localAiPlayers = state.players.filter(p => !p.isHuman);
+    const aiIdx = isHumanWin ? -1 : localAiPlayers.findIndex(p => p.id === winnerId);
+    const vecIdx = isHumanWin ? 4 : Math.min(aiIdx < 0 ? 0 : aiIdx, 3);
+    const target = SEAT_VEC[vecIdx];
+    winAnims.forEach(({ pos, opacity }) => { pos.setValue({ x: 0, y: -20 }); opacity.setValue(0); });
+    const anims = winAnims.map(({ pos, opacity }, i) =>
+      Animated.sequence([
+        Animated.delay(i * 65 + 180),
+        Animated.parallel([
+          Animated.timing(opacity, { toValue: 1, duration: 90, useNativeDriver: true }),
+          Animated.timing(pos, { toValue: { x: target.x + (i - 2.5) * 16, y: target.y }, duration: 460, useNativeDriver: true }),
+        ]),
+        Animated.timing(opacity, { toValue: 0, duration: 180, useNativeDriver: true }),
+      ])
+    );
+    Animated.parallel(anims).start();
+    prevPotRef.current = 0;
+  }, [state.phase, state.winnerIds]);
 
   return (
     <View style={styles.screen}>
@@ -202,24 +295,45 @@ export default function PracticeScreen() {
           <Ionicons name="close" size={22} color={colors.textMuted} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>ACE SOCIAL</Text>
+          <Text style={styles.headerTitle}>CHIP SOCIETY</Text>
           <Text style={styles.headerDiff}>{DIFFICULTY_LABELS[difficulty].toUpperCase()}</Text>
         </View>
-        <View style={styles.potBadge}>
+        <Animated.View style={[styles.potBadge, { transform: [{ scale: potPulse }] }]}>
           <Text style={styles.potLabel}>POT</Text>
           <Text style={styles.potAmount}>{formatChips(state.pot)}</Text>
-        </View>
+        </Animated.View>
       </View>
 
       {/* Table */}
       <View style={styles.tableArea}>
         <LinearGradient
-          colors={[colors.tableFelt, '#0b2213', colors.tableFelt]}
+          colors={['#22003a', '#0e1a44', '#001a38', '#0e1a44', '#22003a']}
           style={styles.tableSurface}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
+          {/* Miami neon trim rings */}
+          <View style={styles.tableRingOuter} pointerEvents="none" />
+          <View style={styles.tableRingInner} pointerEvents="none" />
+
           <View style={styles.tableInner}>
+            {/* Bet chip tokens */}
+            {chipAnims.map(({ pos, opacity }, i) => (
+              <Animated.View
+                key={`chip_${i}`}
+                style={[styles.chipToken, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }] }]}
+                pointerEvents="none"
+              />
+            ))}
+            {/* Win chip tokens */}
+            {winAnims.map(({ pos, opacity }, i) => (
+              <Animated.View
+                key={`win_${i}`}
+                style={[styles.chipTokenWin, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }] }]}
+                pointerEvents="none"
+              />
+            ))}
+
             {/* AI Players */}
             {aiPlayers.map((player, i) => {
               const pos = seatPositions[i] ?? { left: 0, top: '50%' };
@@ -480,8 +594,34 @@ const styles = StyleSheet.create({
   potAmount: { color: colors.gold, fontSize: 16, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
 
   tableArea: { flex: 1 },
-  tableSurface: { flex: 1, margin: 8, borderRadius: 60, overflow: 'hidden' },
+  tableSurface: {
+    flex: 1, margin: 8, borderRadius: 60, overflow: 'hidden',
+    borderWidth: 3, borderColor: '#cc0088',
+  },
+  tableRingOuter: {
+    position: 'absolute', top: 6, left: 6, right: 6, bottom: 6,
+    borderRadius: 56, borderWidth: 1.5, borderColor: 'rgba(204,0,136,0.35)',
+  },
+  tableRingInner: {
+    position: 'absolute', top: 18, left: 18, right: 18, bottom: 18,
+    borderRadius: 48, borderWidth: 1, borderColor: 'rgba(0,212,255,0.18)',
+  },
   tableInner: { flex: 1, position: 'relative', alignItems: 'center', justifyContent: 'center' },
+
+  chipToken: {
+    position: 'absolute',
+    width: 14, height: 14, borderRadius: 7,
+    backgroundColor: colors.primary,
+    borderWidth: 2, borderColor: 'rgba(0,212,255,0.6)',
+    zIndex: 20,
+  },
+  chipTokenWin: {
+    position: 'absolute',
+    width: 16, height: 16, borderRadius: 8,
+    backgroundColor: colors.gold,
+    borderWidth: 2, borderColor: 'rgba(255,215,0,0.7)',
+    zIndex: 20,
+  },
 
   aiSeat: { position: 'absolute' },
 

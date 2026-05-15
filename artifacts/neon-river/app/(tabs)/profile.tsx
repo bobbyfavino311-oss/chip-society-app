@@ -1,7 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import {
   Alert,
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -83,6 +85,25 @@ export default function ProfileScreen() {
     setEditing(false);
   };
 
+  const pickAvatar = async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Please allow photo library access to set an avatar.');
+        return;
+      }
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      await updateProfile({ avatarUri: result.assets[0].uri });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -99,9 +120,20 @@ export default function ProfileScreen() {
         <Text style={styles.header}>PLAYER PROFILE</Text>
 
         <View style={styles.avatarSection}>
-          <View style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}>
-            <Text style={[styles.avatarText, { color: rankColor }]}>♠</Text>
-          </View>
+          <TouchableOpacity
+            style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}
+            onPress={pickAvatar}
+            activeOpacity={0.8}
+          >
+            {profile.avatarUri ? (
+              <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
+            ) : (
+              <Text style={[styles.avatarText, { color: rankColor }]}>♠</Text>
+            )}
+            <View style={styles.cameraOverlay}>
+              <Ionicons name="camera" size={14} color={colors.background} />
+            </View>
+          </TouchableOpacity>
 
           {editing ? (
             <View style={styles.editRow}>
@@ -206,8 +238,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 16,
     elevation: 8,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
   },
   avatarText: { fontSize: 42, fontWeight: '700' },
+  cameraOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.background,
+  },
   nameRow: { flexDirection: 'row', alignItems: 'center' },
   username: { color: colors.text, fontSize: 22, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
   editRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
