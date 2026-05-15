@@ -148,62 +148,15 @@ export default function PracticeScreen() {
 
   const insets = useSafeAreaInsets();
 
-  if (!gameStarted) {
-    return (
-      <SetupScreen
-        onStart={diff => {
-          setDifficulty(diff);
-          setGameStarted(true);
-          startNewHand(0);
-        }}
-      />
-    );
-  }
-
-  const humanPlayer = state.players.find(p => p.isHuman);
-  const aiPlayers = state.players.filter(p => !p.isHuman);
-  const currentPlayer = state.players[state.currentPlayerIndex];
-  const isHumanTurn = currentPlayer?.isHuman === true && humanPlayer?.status === 'active';
-  const isAllIn = humanPlayer?.status === 'allIn';
-
-  const callAmount = humanPlayer ? Math.max(0, state.currentBet - humanPlayer.betInRound) : 0;
-  const canCheck = callAmount === 0;
-
-  const isHandOver = state.phase === 'handover' || state.phase === 'showdown';
-  const isGameOver = state.phase === 'idle' && state.message.includes('Not enough');
-
-  // Show the "RUN IT OUT" button when human is all-in and phase is still running
-  const showRunItOut = isAllIn
-    && !isHandOver
-    && state.phase !== 'idle';
-
-  const onHandOver = async () => {
-    const didWin = state.winnerIds.includes('human');
-    if (didWin) await recordWin(0);
-    else await recordLoss();
-    setHandCount(h => h + 1);
-    continueAfterHand();
-  };
-
-  // Seat positions for 4 AI players — bottom pair pushed further down
-  const seatPositions = [
-    { left: 2, top: '56%' },
-    { left: 34, top: '6%' },
-    { right: 34, top: '6%' },
-    { right: 2, top: '56%' },
-  ] as const;
-
-  // ── Chip-fly animation ────────────────────────────────────────────────────
-  // Approximate pixel offsets from table centre for each seat (used for chip direction)
-  const SEAT_VEC = [
-    { x: -145, y: 70 },   // AI seat 0 — left-lower
-    { x: -90, y: -120 },  // AI seat 1 — upper-left
-    { x: 90, y: -120 },   // AI seat 2 — upper-right
-    { x: 145, y: 70 },    // AI seat 3 — right-lower
-    { x: 0, y: 140 },     // Human — bottom centre
-  ] as const;
-
+  // ── Chip-fly animation refs — must be declared before any early return ─────
   const N_CHIP = 4;
+  const SEAT_VEC = [
+    { x: -145, y: 70 },
+    { x: -90, y: -120 },
+    { x: 90, y: -120 },
+    { x: 145, y: 70 },
+    { x: 0, y: 140 },
+  ] as const;
   const chipAnims = useRef(
     Array.from({ length: N_CHIP }, () => ({
       pos: new Animated.ValueXY({ x: 0, y: 0 }),
@@ -284,6 +237,48 @@ export default function PracticeScreen() {
     Animated.parallel(anims).start();
     prevPotRef.current = 0;
   }, [state.phase, state.winnerIds]);
+
+  // ── Setup screen (early return — hooks are all above this) ────────────────
+  if (!gameStarted) {
+    return (
+      <SetupScreen
+        onStart={diff => {
+          setDifficulty(diff);
+          setGameStarted(true);
+          startNewHand(0);
+        }}
+      />
+    );
+  }
+
+  const humanPlayer = state.players.find(p => p.isHuman);
+  const aiPlayers = state.players.filter(p => !p.isHuman);
+  const currentPlayer = state.players[state.currentPlayerIndex];
+  const isHumanTurn = currentPlayer?.isHuman === true && humanPlayer?.status === 'active';
+  const isAllIn = humanPlayer?.status === 'allIn';
+
+  const callAmount = humanPlayer ? Math.max(0, state.currentBet - humanPlayer.betInRound) : 0;
+  const canCheck = callAmount === 0;
+
+  const isHandOver = state.phase === 'handover' || state.phase === 'showdown';
+  const isGameOver = state.phase === 'idle' && state.message.includes('Not enough');
+
+  const showRunItOut = isAllIn && !isHandOver && state.phase !== 'idle';
+
+  const onHandOver = async () => {
+    const didWin = state.winnerIds.includes('human');
+    if (didWin) await recordWin(0);
+    else await recordLoss();
+    setHandCount(h => h + 1);
+    continueAfterHand();
+  };
+
+  const seatPositions = [
+    { left: 2, top: '56%' },
+    { left: 34, top: '6%' },
+    { right: 34, top: '6%' },
+    { right: 2, top: '56%' },
+  ] as const;
 
   return (
     <View style={styles.screen}>
