@@ -1,6 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { Card, isRedSuit, suitSymbol, valueLabel } from '../lib/pokerEngine';
+import { SoundEngine } from '../lib/soundEngine';
+import FaceCardArt from './FaceCardArt';
 import colors from '../constants/colors';
 
 interface PlayingCardProps {
@@ -8,61 +10,166 @@ interface PlayingCardProps {
   faceDown?: boolean;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   highlighted?: boolean;
+  animated?: boolean;
 }
 
 const SIZES = {
-  sm: { w: 30, h: 42, font: 10, suit: 11, radius: 4 },
-  md: { w: 42, h: 58, font: 14, suit: 16, radius: 5 },
-  lg: { w: 56, h: 78, font: 18, suit: 20, radius: 7 },
-  xl: { w: 70, h: 98, font: 22, suit: 26, radius: 9 },
+  sm: { w: 30, h: 42, cornerFont: 8, cornerSuit: 7, centerSuit: 14, radius: 4, artSize: 18 },
+  md: { w: 42, h: 58, cornerFont: 10, cornerSuit: 9, centerSuit: 22, radius: 5, artSize: 26 },
+  lg: { w: 56, h: 78, cornerFont: 13, cornerSuit: 11, centerSuit: 30, radius: 7, artSize: 36 },
+  xl: { w: 70, h: 98, cornerFont: 16, cornerSuit: 14, centerSuit: 38, radius: 9, artSize: 48 },
 };
 
-export default function PlayingCard({ card, faceDown = false, size = 'md', highlighted = false }: PlayingCardProps) {
+const FACE_VALUES = new Set(['J', 'Q', 'K', 'A']);
+
+export default function PlayingCard({
+  card,
+  faceDown = false,
+  size = 'md',
+  highlighted = false,
+  animated: doAnimate = true,
+}: PlayingCardProps) {
   const dim = SIZES[size];
+
+  // ─── Flip animation ───────────────────────────────────────────────────────
+  // flipAnim: 0 = back showing, 1 = front showing
+  const flipAnim = useRef(new Animated.Value(faceDown || !card ? 0 : 1)).current;
+  const prevFaceDown = useRef(faceDown);
+  const prevCard = useRef(card);
+
+  useEffect(() => {
+    const wasFaceDown = prevFaceDown.current;
+    const wasCard = prevCard.current;
+    prevFaceDown.current = faceDown;
+    prevCard.current = card;
+
+    const isVisible = !faceDown && !!card;
+    const wasVisible = !wasFaceDown && !!wasCard;
+
+    if (isVisible && !wasVisible) {
+      if (doAnimate) {
+        SoundEngine.cardFlip();
+        flipAnim.setValue(0);
+        Animated.timing(flipAnim, {
+          toValue: 1,
+          duration: 340,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        flipAnim.setValue(1);
+      }
+    } else if (!isVisible && wasVisible) {
+      flipAnim.setValue(0);
+    } else if (isVisible) {
+      flipAnim.setValue(1);
+    }
+  }, [faceDown, card]);
+
+  // Front interpolation: swings in from left (90→0 deg)
+  const frontRotateY = flipAnim.interpolate({
+    inputRange: [0, 0.49, 0.5, 1],
+    outputRange: ['90deg', '90deg', '0deg', '0deg'],
+  });
+  const frontOpacity = flipAnim.interpolate({
+    inputRange: [0, 0.49, 0.5, 1],
+    outputRange: [0, 0, 1, 1],
+  });
+  // Back interpolation: swings out to right (0→-90 deg)
+  const backRotateY = flipAnim.interpolate({
+    inputRange: [0, 0.49, 0.5, 1],
+    outputRange: ['0deg', '-90deg', '-90deg', '-90deg'],
+  });
+  const backOpacity = flipAnim.interpolate({
+    inputRange: [0, 0.49, 0.5, 1],
+    outputRange: [1, 1, 0, 0],
+  });
+
+  // ─── Card content ─────────────────────────────────────────────────────────
   const isRed = card ? isRedSuit(card.suit) : false;
   const textColor = isRed ? colors.heartDiamond : colors.spadeClub;
+  const val = card ? valueLabel(card.value) : '';
+  const suit = card ? suitSymbol(card.suit) : '';
+  const isFaceCard = FACE_VALUES.has(val);
 
-  if (faceDown || !card) {
-    return (
-      <View style={[styles.card, { width: dim.w, height: dim.h, borderRadius: dim.radius }, styles.faceDown]}>
-        <View style={[styles.backOuter, { borderRadius: dim.radius - 2 }]}>
-          <View style={styles.backDiamond}>
-            <Text style={styles.backSymbol}>♠</Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
+  const cardStyle = [
+    styles.card,
+    { width: dim.w, height: dim.h, borderRadius: dim.radius },
+    highlighted && styles.highlighted,
+  ];
 
   return (
-    <View
-      style={[
-        styles.card,
-        { width: dim.w, height: dim.h, borderRadius: dim.radius },
-        highlighted && styles.highlighted,
-      ]}
-    >
-      <View style={styles.cornerTL}>
-        <Text style={[styles.cornerVal, { fontSize: dim.font - 2, color: textColor }]}>
-          {valueLabel(card.value)}
-        </Text>
-        <Text style={[styles.cornerSuit, { fontSize: dim.font - 4, color: textColor }]}>
-          {suitSymbol(card.suit)}
-        </Text>
-      </View>
+    <View style={{ width: dim.w, height: dim.h }}>
+      {/* ── Back face ─────────────────────────────────────────────────────── */}
+      <Animated.View
+        style={[
+          cardStyle,
+          styles.faceDown,
+          StyleSheet.absoluteFillObject,
+          { opacity: backOpacity, transform: [{ perspective: 1200 }, { rotateY: backRotateY }] },
+        ]}
+      >
+        <View style={[styles.backInner, { borderRadius: dim.radius - 2 }]}>
+          <View style={styles.backDiamond}>
+            <Text style={[styles.backSymbol, { fontSize: dim.centerSuit * 0.55 }]}>♠</Text>
+          </View>
+        </View>
+      </Animated.View>
 
-      <Text style={[styles.centerSuit, { fontSize: dim.suit, color: textColor }]}>
-        {suitSymbol(card.suit)}
-      </Text>
+      {/* ── Front face ────────────────────────────────────────────────────── */}
+      {card && (
+        <Animated.View
+          style={[
+            cardStyle,
+            StyleSheet.absoluteFillObject,
+            { opacity: frontOpacity, transform: [{ perspective: 1200 }, { rotateY: frontRotateY }] },
+          ]}
+        >
+          {/* Top-left corner */}
+          <View style={styles.cornerTL}>
+            <Text style={[styles.cornerVal, { fontSize: dim.cornerFont, color: textColor }]}>
+              {val}
+            </Text>
+            <Text style={[styles.cornerSuit, { fontSize: dim.cornerSuit, color: textColor }]}>
+              {suit}
+            </Text>
+          </View>
 
-      <View style={styles.cornerBR}>
-        <Text style={[styles.cornerVal, { fontSize: dim.font - 2, color: textColor, transform: [{ rotate: '180deg' }] }]}>
-          {valueLabel(card.value)}
-        </Text>
-        <Text style={[styles.cornerSuit, { fontSize: dim.font - 4, color: textColor, transform: [{ rotate: '180deg' }] }]}>
-          {suitSymbol(card.suit)}
-        </Text>
-      </View>
+          {/* Center content */}
+          <View style={styles.center}>
+            {isFaceCard ? (
+              <FaceCardArt
+                value={val as 'J' | 'Q' | 'K' | 'A'}
+                isRed={isRed}
+                size={dim.artSize}
+              />
+            ) : (
+              <Text style={[styles.centerSuit, { fontSize: dim.centerSuit, color: textColor }]}>
+                {suit}
+              </Text>
+            )}
+          </View>
+
+          {/* Bottom-right corner (rotated) */}
+          <View style={styles.cornerBR}>
+            <Text
+              style={[
+                styles.cornerVal,
+                { fontSize: dim.cornerFont, color: textColor, transform: [{ rotate: '180deg' }] },
+              ]}
+            >
+              {val}
+            </Text>
+            <Text
+              style={[
+                styles.cornerSuit,
+                { fontSize: dim.cornerSuit, color: textColor, transform: [{ rotate: '180deg' }] },
+              ]}
+            >
+              {suit}
+            </Text>
+          </View>
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -74,31 +181,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
+    shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 6,
-    position: 'relative',
     overflow: 'hidden',
   },
   highlighted: {
     shadowColor: colors.gold,
     shadowOpacity: 0.9,
-    shadowRadius: 12,
+    shadowRadius: 14,
     borderWidth: 2,
     borderColor: colors.gold,
   },
   faceDown: {
-    backgroundColor: '#1a0050',
+    backgroundColor: '#18004a',
     borderWidth: 1.5,
-    borderColor: '#6600cc',
+    borderColor: '#5500cc',
   },
-  backOuter: {
-    flex: 1,
-    width: '88%',
-    margin: 4,
-    backgroundColor: '#120035',
+  backInner: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    right: 4,
+    bottom: 4,
+    backgroundColor: '#110035',
     borderWidth: 1,
-    borderColor: '#8800ff',
+    borderColor: '#7700ff',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -107,9 +215,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   backSymbol: {
-    fontSize: 18,
-    color: '#6600cc',
-    opacity: 0.6,
+    color: '#5500aa',
+    opacity: 0.7,
   },
   cornerTL: {
     position: 'absolute',
@@ -129,9 +236,15 @@ const styles = StyleSheet.create({
   },
   cornerSuit: {
     fontWeight: '700',
-    lineHeight: 14,
+    lineHeight: 13,
+    marginTop: -2,
+  },
+  center: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerSuit: {
     fontWeight: '700',
+    textAlign: 'center',
   },
 });

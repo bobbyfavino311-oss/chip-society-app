@@ -24,6 +24,7 @@ import { useUser } from '@/context/UserContext';
 import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame } from '@/hooks/usePokerGame';
 import { SoundEngine } from '@/lib/soundEngine';
+import { getBestHand } from '@/lib/pokerEngine';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -147,7 +148,35 @@ function SetupScreen({ onStart }: { onStart: (diff: AIDifficulty, numPlayers: nu
 
 // ─── Community cards ──────────────────────────────────────────────────────────
 
-function CommunityCards({ cards, phase }: { cards: any[]; phase: string }) {
+const HAND_COLORS: Record<string, string> = {
+  'Royal Flush':    '#ff0090',
+  'Straight Flush': '#ff0090',
+  'Four of a Kind': '#ff0090',
+  'Full House':     '#bf5fff',
+  'Flush':          '#00d4ff',
+  'Straight':       '#00d4ff',
+  'Three of a Kind':'#ffd700',
+  'Two Pair':       '#ffd700',
+  'One Pair':       '#aaaacc',
+  'High Card':      '#666688',
+};
+
+function CommunityCards({
+  cards,
+  phase,
+  holeCards,
+}: {
+  cards: any[];
+  phase: string;
+  holeCards: any[];
+}) {
+  const hasComm = cards.length > 0;
+  const hasHole = holeCards.length >= 2;
+  const handResult = hasComm && hasHole
+    ? getBestHand(holeCards, cards)
+    : null;
+  const handColor = handResult ? (HAND_COLORS[handResult.name] ?? colors.textMuted) : colors.textMuted;
+
   return (
     <View style={table.communityArea}>
       <Text style={table.phaseLabel}>{PHASE_LABELS[phase] ?? ''}</Text>
@@ -158,6 +187,13 @@ function CommunityCards({ cards, phase }: { cards: any[]; phase: string }) {
             : <View key={i} style={table.emptySlot} />
         )}
       </View>
+      {handResult && (
+        <View style={[table.handBadge, { borderColor: handColor }]}>
+          <Text style={[table.handBadgeText, { color: handColor }]}>
+            {handResult.name.toUpperCase()}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -382,9 +418,6 @@ export default function PracticeScreen() {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          {/* Miami neon trim rings */}
-          <View style={styles.tableRingOuter} pointerEvents="none" />
-          <View style={styles.tableRingInner} pointerEvents="none" />
 
           <View style={styles.tableInner}>
             {/* Bet chip tokens */}
@@ -455,7 +488,11 @@ export default function PracticeScreen() {
                   </Animated.View>
                 )
               )}
-              <CommunityCards cards={state.communityCards} phase={state.phase} />
+              <CommunityCards
+                cards={state.communityCards}
+                phase={state.phase}
+                holeCards={humanPlayer?.holeCards ?? []}
+              />
 
               {/* Human hole cards — on the table, centered below flop */}
               {humanPlayer && (
@@ -749,6 +786,21 @@ const table = StyleSheet.create({
     borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.12)',
     borderStyle: 'dashed',
     backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  handBadge: {
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  handBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 2.5,
+    fontFamily: 'Orbitron_700Bold',
   },
 });
 

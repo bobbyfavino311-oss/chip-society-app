@@ -125,6 +125,12 @@ export const SoundEngine = {
     tone(180, 'sine', 0.35, 0.15, 0.32, 120);
   },
 
+  cardFlip() {
+    noise(0.055, 0.18, 800, 6000);
+    noise(0.04, 0.12, 300, 2000, 0.03);
+    tone(2200, 'sine', 0.03, 0.07, 0.005);
+  },
+
   // Flickering neon-sign static — low electrical hum + random crackles
   neonBuzz() {
     const dur = 0.18 + Math.random() * 0.22;
