@@ -176,6 +176,30 @@ export function getPostflopStrength(holeCards: Card[], communityCards: Card[]): 
   return Math.min(1, rankStrength * 0.85 + topValue * 0.15);
 }
 
+export function describeHand(result: HandResult): string {
+  const vl = (v: number) => VALUE_LABELS[v] ?? String(v);
+  const plural = (v: number) => {
+    const l = vl(v);
+    if (l === 'A') return 'Aces';
+    if (l === 'K') return 'Kings';
+    if (l === 'Q') return 'Queens';
+    if (l === 'J') return 'Jacks';
+    return `${l}s`;
+  };
+  switch (result.rank) {
+    case 9: return 'Royal Flush';
+    case 8: return `Straight Flush, ${vl(result.values[0])} high`;
+    case 7: return `Four of a Kind — ${plural(result.values[0])}`;
+    case 6: return `Full House — ${plural(result.values[0])} over ${plural(result.values[1])}`;
+    case 5: return `Flush — ${vl(result.values[0])} high`;
+    case 4: return `Straight — ${vl(result.values[0])} high`;
+    case 3: return `Three of a Kind — ${plural(result.values[0])}`;
+    case 2: return `Two Pair — ${plural(result.values[0])} & ${plural(result.values[1])}`;
+    case 1: return `Pair of ${plural(result.values[0])}`;
+    default: return `${vl(result.values[0])} High`;
+  }
+}
+
 export function determineWinners(
   activePlayers: { id: string; holeCards: Card[] }[],
   communityCards: Card[]

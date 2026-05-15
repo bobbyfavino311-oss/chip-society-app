@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AIDifficulty, AIAction, getAIDecision, getAIDelay, getRaiseAmount } from '../lib/aiBot';
-import { Card, createDeck, determineWinners, shuffleDeck } from '../lib/pokerEngine';
+import { Card, createDeck, describeHand, determineWinners, shuffleDeck } from '../lib/pokerEngine';
 
 const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
@@ -136,7 +136,7 @@ function doShowdown(state: GameState): GameState {
   );
   const winnerIds = winners.map(w => w.winnerId);
   const share = Math.floor(potSize / winnerIds.length);
-  const winnerHand = winners[0]?.handResult.name ?? '';
+  const winnerHand = winners[0] ? describeHand(winners[0].handResult) : '';
 
   const players = s.players.map(p =>
     winnerIds.includes(p.id)
@@ -144,10 +144,13 @@ function doShowdown(state: GameState): GameState {
       : p
   );
 
+  const isHumanWinner = winnerIds.includes('human');
   const winnerNames = players
     .filter(p => winnerIds.includes(p.id))
-    .map(p => p.name)
+    .map(p => (p.isHuman ? 'You' : p.name))
     .join(' & ');
+
+  const message = isHumanWinner ? 'You won!' : `${winnerNames} wins!`;
 
   return {
     ...s,
@@ -158,7 +161,7 @@ function doShowdown(state: GameState): GameState {
     winnerIds,
     winnerHand,
     winnerPot: potSize,
-    message: `${winnerNames} wins with ${winnerHand}!`,
+    message,
     pot: 0,
   };
 }

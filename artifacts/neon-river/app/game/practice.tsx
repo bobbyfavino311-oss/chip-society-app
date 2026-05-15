@@ -344,10 +344,9 @@ export default function PracticeScreen() {
           <Text style={styles.headerTitle}>CHIP SOCIETY</Text>
           <Text style={styles.headerDiff}>{DIFFICULTY_LABELS[difficulty].toUpperCase()}</Text>
         </View>
-        <Animated.View style={[styles.potBadge, { transform: [{ scale: potPulse }] }]}>
-          <Text style={styles.potLabel}>POT</Text>
-          <Text style={styles.potAmount}>{formatChips(state.pot)}</Text>
-        </Animated.View>
+        <View style={styles.potBadge}>
+          <Text style={styles.potLabel}>{numPlayers}P · {DIFFICULTY_LABELS[difficulty]}</Text>
+        </View>
       </View>
 
       {/* Table */}
@@ -406,8 +405,17 @@ export default function PracticeScreen() {
               );
             })}
 
-            {/* Center: community cards + human hole cards stacked vertically */}
+            {/* Center: pot → community cards → human hole cards */}
             <View style={styles.centerCol}>
+              {/* Pot badge — always visible on the table */}
+              {(state.pot > 0 || state.winnerPot > 0) && (
+                <Animated.View style={[styles.potOnTable, { transform: [{ scale: potPulse }] }]}>
+                  <Text style={styles.potOnTableLabel}>POT</Text>
+                  <Text style={styles.potOnTableAmount}>
+                    {formatChips(state.pot > 0 ? state.pot : state.winnerPot)}
+                  </Text>
+                </Animated.View>
+              )}
               <CommunityCards cards={state.communityCards} phase={state.phase} />
 
               {/* Human hole cards — on the table, centered below flop */}
@@ -475,7 +483,7 @@ export default function PracticeScreen() {
               )}
             </View>
             {isHumanTurn && (
-              <DotTimer seconds={state.timer} maxSeconds={30} isActive size={9} gap={5} />
+              <DotTimer seconds={state.timer} maxSeconds={20} isActive size={9} gap={5} />
             )}
           </View>
         )}
@@ -489,17 +497,30 @@ export default function PracticeScreen() {
             style={StyleSheet.absoluteFill}
           />
           {/* Winner banner */}
-          {state.winnerIds.length > 0 && state.winnerPot > 0 && (
-            <View style={styles.winnerBanner}>
-              <Ionicons name="trophy" size={18} color={colors.gold} />
-              <Text style={styles.winnerBannerPot}>{formatChips(state.winnerPot)}</Text>
-              <Text style={styles.winnerBannerLabel}>CHIPS WON</Text>
-            </View>
-          )}
-          <Text style={styles.handoverMsg}>{state.message || 'Hand complete!'}</Text>
-          {state.winnerHand !== '' && (
-            <Text style={styles.handoverHand}>{state.winnerHand}</Text>
-          )}
+          {state.winnerIds.length > 0 && state.winnerPot > 0 && (() => {
+            const humanWon = state.winnerIds.includes('human');
+            return (
+              <View style={[styles.winnerBanner, humanWon && styles.winnerBannerHuman]}>
+                <Ionicons name="trophy" size={20} color={humanWon ? colors.gold : colors.textDim} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.handoverMsg, humanWon && { color: colors.gold, fontSize: 18 }]}>
+                    {state.message || 'Hand complete!'}
+                  </Text>
+                  {state.winnerHand !== '' && (
+                    <Text style={[styles.handoverHand, !humanWon && { color: colors.textDim, fontSize: 13 }]}>
+                      {state.winnerHand}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.potWonBadge}>
+                  <Text style={[styles.potWonAmt, humanWon && { color: colors.gold }]}>
+                    +{formatChips(Math.floor(state.winnerPot / state.winnerIds.length))}
+                  </Text>
+                  <Text style={styles.winnerBannerLabel}>CHIPS</Text>
+                </View>
+              </View>
+            );
+          })()}
           {/* Per-player chip delta */}
           <View style={styles.deltasRow}>
             {state.players
@@ -652,9 +673,32 @@ const styles = StyleSheet.create({
   headerCenter: { flex: 1, alignItems: 'center' },
   headerTitle: { color: colors.primary, fontSize: 14, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 3 },
   headerDiff: { color: colors.textDim, fontSize: 9, letterSpacing: 1, marginTop: 1 },
-  potBadge: { alignItems: 'center' },
-  potLabel: { color: colors.textDim, fontSize: 8, letterSpacing: 1 },
-  potAmount: { color: colors.gold, fontSize: 16, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
+  potBadge: { alignItems: 'flex-end' },
+  potLabel: { color: colors.textMuted, fontSize: 9, letterSpacing: 1 },
+
+  potOnTable: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(5,0,16,0.72)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.35)',
+    paddingHorizontal: 18,
+    paddingVertical: 5,
+  },
+  potOnTableLabel: {
+    color: colors.gold,
+    fontSize: 8,
+    fontWeight: '700',
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  potOnTableAmount: {
+    color: colors.gold,
+    fontSize: 20,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    lineHeight: 24,
+  },
 
   tableArea: { flex: 1 },
   tableSurface: {
@@ -767,15 +811,24 @@ const styles = StyleSheet.create({
     alignItems: 'center', gap: 8, position: 'relative',
   },
   winnerBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,215,0,0.1)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255,215,0,0.3)',
-    paddingHorizontal: 16, paddingVertical: 8,
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 14,
+    borderWidth: 1, borderColor: colors.border,
+    paddingHorizontal: 14, paddingVertical: 10,
+    width: '100%',
   },
-  winnerBannerPot: { color: colors.gold, fontSize: 24, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
-  winnerBannerLabel: { color: colors.gold, fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  handoverMsg: { color: colors.text, fontSize: 15, fontWeight: '700', textAlign: 'center' },
-  handoverHand: { color: colors.gold, fontSize: 16, fontWeight: '800', fontFamily: 'Orbitron_700Bold', textAlign: 'center' },
+  winnerBannerHuman: {
+    backgroundColor: 'rgba(255,215,0,0.08)',
+    borderColor: 'rgba(255,215,0,0.4)',
+  },
+  winnerBannerLabel: { color: colors.textMuted, fontSize: 9, fontWeight: '600', letterSpacing: 1 },
+  potWonBadge: { alignItems: 'center' },
+  potWonAmt: {
+    color: colors.textDim, fontSize: 20, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', lineHeight: 24,
+  },
+  handoverMsg: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  handoverHand: { color: colors.gold, fontSize: 15, fontWeight: '700', fontFamily: 'Orbitron_400Regular', marginTop: 2 },
   deltasRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, justifyContent: 'center' },
   deltaChip: {
     alignItems: 'center', backgroundColor: colors.surface, borderRadius: 8,
