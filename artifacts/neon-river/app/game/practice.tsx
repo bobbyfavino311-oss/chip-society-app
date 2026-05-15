@@ -829,7 +829,7 @@ const styles = StyleSheet.create({
     color: colors.text, letterSpacing: 2,
   },
   exitSub: { color: colors.textMuted, fontSize: 12, textAlign: 'center', marginBottom: 8 },
-  exitBtns: { flexDirection: 'row', gap: 12, marginTop: 4 },
+  exitBtns: { flexDirection: 'row', gap: 12, marginTop: 4, alignSelf: 'stretch' },
   exitChoiceBtn: {
     flex: 1, paddingVertical: 13, borderRadius: 50,
     alignItems: 'center', justifyContent: 'center',
