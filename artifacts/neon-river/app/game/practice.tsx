@@ -314,23 +314,23 @@ export default function PracticeScreen() {
   const seatPositions: Record<string, number | string>[] =
     aiPlayers.length === 3
       ? [
-          { left: 6, top: '22%' },
-          { left: SEAT_CX, top: '3%' },
-          { right: 6, top: '22%' },
+          { left: 6, top: '28%' },
+          { left: SEAT_CX, top: '4%' },
+          { right: 6, top: '28%' },
         ]
       : aiPlayers.length === 5
       ? [
-          { left: 6, bottom: '5%' },
-          { left: 6, top: '8%' },
-          { left: SEAT_CX, top: '2%' },
-          { right: 6, top: '8%' },
-          { right: 6, bottom: '5%' },
+          { left: 6, bottom: '8%' },
+          { left: 6, top: '26%' },
+          { left: SEAT_CX, top: '3%' },
+          { right: 6, top: '26%' },
+          { right: 6, bottom: '8%' },
         ]
       : [
-          { left: 6, bottom: '5%' },
-          { left: 28, top: '6%' },
-          { right: 28, top: '6%' },
-          { right: 6, bottom: '5%' },
+          { left: 6, bottom: '8%' },
+          { left: 22, top: '8%' },
+          { right: 22, top: '8%' },
+          { right: 6, bottom: '8%' },
         ];
 
   return (

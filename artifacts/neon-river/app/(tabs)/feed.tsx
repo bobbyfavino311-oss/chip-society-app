@@ -923,11 +923,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6,
   },
   newPostText: { color: colors.primary, fontSize: 12, fontWeight: '700' },
-  tabBarScroll: { borderBottomWidth: 1, borderBottomColor: colors.border, flexGrow: 0 },
+  tabBarScroll: { borderBottomWidth: 1, borderBottomColor: colors.border, flexGrow: 0, marginBottom: 8 },
   tabBarContent: { paddingHorizontal: 4 },
   tab: {
     flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 14, paddingVertical: 12, position: 'relative',
+    paddingHorizontal: 14, paddingVertical: 16, position: 'relative',
   },
   tabText: { color: colors.textDim, fontSize: 11, fontWeight: '600' },
   tabTextActive: { color: colors.primary, fontWeight: '800' },
