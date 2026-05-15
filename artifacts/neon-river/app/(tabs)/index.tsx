@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, borderWidth: 2,
     alignItems: 'center', justifyContent: 'center',
   },
-  scroll: { paddingHorizontal: 16, gap: 16 },
+  scroll: { paddingHorizontal: 16, gap: 16, paddingTop: 56 },
   quickPlay: {
     borderRadius: colors.radiusLg, overflow: 'hidden',
     flexDirection: 'row', alignItems: 'center',
