@@ -540,7 +540,7 @@ export default function HomeScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const LOGO_SIZE = Math.min(62, width * 0.162);
+const LOGO_SIZE = Math.min(46, width * 0.118);
 // Web needs a forced line-height to keep the two Pacifico words snug;
 // native uses the font's own metrics (forcing it clips the descender).
 const LOGO_LINE_HEIGHT = Platform.select({ web: LOGO_SIZE * 1.12, default: undefined });
