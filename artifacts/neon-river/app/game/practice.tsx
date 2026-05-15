@@ -5,6 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Animated,
   Dimensions,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -165,6 +166,7 @@ export default function PracticeScreen() {
   const { profile, recordWin, recordLoss } = useUser();
   const [difficulty, setDifficulty] = useState<AIDifficulty>('casual');
   const [gameStarted, setGameStarted] = useState(false);
+  const [exitConfirm, setExitConfirm] = useState(false);
   const [handCount, setHandCount] = useState(0);
   const [numPlayers, setNumPlayers] = useState(5);
 
@@ -335,19 +337,40 @@ export default function PracticeScreen() {
     <View style={styles.screen}>
       <LinearGradient colors={[colors.background, '#050015']} style={StyleSheet.absoluteFill} />
 
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 8) }]}>
-        <TouchableOpacity style={styles.exitBtn} onPress={() => { setGameStarted(false); router.back(); }}>
-          <Ionicons name="close" size={22} color={colors.textMuted} />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>CHIP SOCIETY</Text>
-          <Text style={styles.headerDiff}>{DIFFICULTY_LABELS[difficulty].toUpperCase()}</Text>
+      {/* Floating back button */}
+      <TouchableOpacity
+        style={[styles.backBtn, { top: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}
+        onPress={() => setExitConfirm(true)}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="chevron-back" size={20} color={colors.text} />
+      </TouchableOpacity>
+
+      {/* Exit confirmation modal */}
+      <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
+        <View style={styles.exitOverlay}>
+          <View style={styles.exitCard}>
+            <Text style={styles.exitTitle}>EXIT GAME?</Text>
+            <Text style={styles.exitSub}>Your current hand will be lost.</Text>
+            <View style={styles.exitBtns}>
+              <TouchableOpacity
+                style={[styles.exitChoiceBtn, styles.exitYes]}
+                onPress={() => { setExitConfirm(false); setGameStarted(false); router.back(); }}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.exitChoiceText}>YES, EXIT</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.exitChoiceBtn, styles.exitNo]}
+                onPress={() => setExitConfirm(false)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.exitChoiceText}>NO, STAY</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-        <View style={styles.potBadge}>
-          <Text style={styles.potLabel}>{numPlayers}P · {DIFFICULTY_LABELS[difficulty]}</Text>
-        </View>
-      </View>
+      </Modal>
 
       {/* Table */}
       <View style={styles.tableArea}>
@@ -721,17 +744,36 @@ const table = StyleSheet.create({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
 
-  header: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 12, paddingBottom: 8,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+  backBtn: {
+    position: 'absolute', left: 12, zIndex: 20,
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1, borderColor: colors.border,
+    alignItems: 'center', justifyContent: 'center',
   },
-  exitBtn: { padding: 8 },
-  headerCenter: { flex: 1, alignItems: 'center' },
-  headerTitle: { color: colors.primary, fontSize: 14, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 3 },
-  headerDiff: { color: colors.textDim, fontSize: 9, letterSpacing: 1, marginTop: 1 },
-  potBadge: { alignItems: 'flex-end' },
-  potLabel: { color: colors.textMuted, fontSize: 9, letterSpacing: 1 },
+  exitOverlay: {
+    flex: 1, backgroundColor: 'rgba(5,0,16,0.82)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  exitCard: {
+    width: 280, borderRadius: 20,
+    backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.border,
+    padding: 28, alignItems: 'center', gap: 8,
+  },
+  exitTitle: {
+    fontFamily: 'Orbitron_700Bold', fontSize: 18,
+    color: colors.text, letterSpacing: 2,
+  },
+  exitSub: { color: colors.textMuted, fontSize: 12, textAlign: 'center', marginBottom: 8 },
+  exitBtns: { flexDirection: 'row', gap: 12, marginTop: 4 },
+  exitChoiceBtn: {
+    flex: 1, paddingVertical: 13, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  exitYes: { backgroundColor: colors.secondary },
+  exitNo: { backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: colors.border },
+  exitChoiceText: { color: colors.text, fontSize: 12, fontWeight: '800', letterSpacing: 1 },
 
   potOnTable: {
     alignItems: 'center',

@@ -588,7 +588,7 @@ const tc = StyleSheet.create({
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
-  wordGroup: { alignItems: 'center', paddingBottom: 12 },
+  wordGroup: { alignItems: 'center', paddingBottom: 22 },
   word: {
     fontFamily: 'Pacifico_400Regular',
     fontSize: LOGO_SIZE,
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, borderWidth: 2,
     alignItems: 'center', justifyContent: 'center',
   },
-  scroll: { paddingHorizontal: 16, gap: 16, paddingTop: 56 },
+  scroll: { paddingHorizontal: 16, gap: 16, paddingTop: 72 },
   quickPlay: {
     borderRadius: colors.radiusLg, overflow: 'hidden',
     flexDirection: 'row', alignItems: 'center',
