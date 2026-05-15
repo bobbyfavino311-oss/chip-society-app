@@ -438,24 +438,15 @@ export default function HomeScreen() {
         end={{ x: 1, y: 1 }}
       />
 
-      {/* Compact top profile bar */}
-      <View style={[styles.topBar, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 0) }]}>
-        <View style={[styles.topAvatar, { borderColor: rankColor }]}>
-          {profile.avatarUri
-            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17 }} />
-            : getAvatar(profile.avatarIndex).render(34)
-          }
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.topName}>{profile.username}</Text>
-          <Text style={[styles.topRank, { color: rankColor }]}>{profile.rank}</Text>
-        </View>
-        <View style={styles.topChips}>
-          <MaterialCommunityIcons name="poker-chip" size={14} color={colors.gold} />
-          <Text style={styles.topChipsText}>{formatChips(profile.chips)}</Text>
-        </View>
-        <TouchableOpacity style={styles.settingsBtn} onPress={() => router.push('/(tabs)/profile')}>
-          <Ionicons name="settings-outline" size={20} color={colors.textMuted} />
+      {/* Profile avatar — top right only */}
+      <View style={[styles.topCorner, { top: insets.top + (Platform.OS === 'web' ? 20 : 8) }]}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} activeOpacity={0.8}>
+          <View style={[styles.topAvatar, { borderColor: rankColor }]}>
+            {profile.avatarUri
+              ? <Image source={{ uri: profile.avatarUri }} style={{ width: 38, height: 38, borderRadius: 19 }} />
+              : getAvatar(profile.avatarIndex).render(38)
+            }
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -671,22 +662,14 @@ const feat = StyleSheet.create({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  topBar: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 16, paddingBottom: 12,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+  topCorner: {
+    position: 'absolute', right: 16, zIndex: 10,
   },
   topAvatar: {
-    width: 36, height: 36, borderRadius: 18,
+    width: 40, height: 40, borderRadius: 20,
     backgroundColor: colors.surface, borderWidth: 2,
     alignItems: 'center', justifyContent: 'center',
   },
-  topAvatarText: { fontSize: 16, color: colors.primary },
-  topName: { color: colors.text, fontSize: 13, fontWeight: '700' },
-  topRank: { fontSize: 9, fontWeight: '600', letterSpacing: 0.5 },
-  topChips: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,215,0,0.1)', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,215,0,0.2)' },
-  topChipsText: { color: colors.gold, fontSize: 12, fontWeight: '700' },
-  settingsBtn: { padding: 4 },
   scroll: { paddingHorizontal: 16, gap: 16 },
   quickPlay: {
     borderRadius: colors.radiusLg, overflow: 'hidden',
