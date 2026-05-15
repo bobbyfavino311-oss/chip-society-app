@@ -10,6 +10,11 @@ const AI_NAMES = ['Ace', 'Blaze', 'Shadow', 'Vegas', 'Ghost'];
 export type GamePhase = 'idle' | 'preflop' | 'flop' | 'turn' | 'river' | 'showdown' | 'handover';
 export type PlayerStatus = 'active' | 'folded' | 'allIn';
 
+export interface SidePot {
+  amount: number;
+  eligiblePlayerIds: string[];
+}
+
 export interface GamePlayer {
   id: string;
   name: string;
@@ -46,6 +51,8 @@ export interface GameState {
   winnerHand: string;
   winnerPot: number; // pot size at time of win (for display)
   allInRunout: boolean; // true when we are running out the board with all players all-in
+  sidePots: SidePot[];  // populated when at least one player is all-in for less
+  isSplitPot: boolean;  // true when two or more players tie for the same pot
 }
 
 const INITIAL_STATE: GameState = {
@@ -67,6 +74,8 @@ const INITIAL_STATE: GameState = {
   winnerHand: '',
   winnerPot: 0,
   allInRunout: false,
+  sidePots: [],
+  isSplitPot: false,
 };
 
 function getActivePlayers(players: GamePlayer[]): GamePlayer[] {
@@ -100,15 +109,75 @@ function runOutBoard(state: GameState): GameState {
   return { ...state, communityCards, deck };
 }
 
-function doShowdown(state: GameState): GameState {
-  // Always complete the board before evaluating
-  const s = runOutBoard(state);
+// ─── Side-pot computation ────────────────────────────────────────────────────
+// chipDelta is negative for every chip invested during the hand (before winnings).
+// So -player.chipDelta = total chips that player put into the pot this hand.
 
+function computeSidePots(players: GamePlayer[]): SidePot[] {
+  const contribs = players.map(p => ({
+    id: p.id,
+    invested: -p.chipDelta,
+    isEligible: p.status === 'active' || p.status === 'allIn',
+    isAllIn: p.status === 'allIn',
+  }));
+
+  const eligible = contribs.filter(c => c.isEligible);
+  if (eligible.length <= 1) return [];
+
+  // All-in "cap" levels sorted ascending
+  const allInLevels = [...new Set(
+    contribs.filter(c => c.isAllIn).map(c => c.invested)
+  )].sort((a, b) => a - b);
+
+  if (allInLevels.length === 0) return []; // no all-ins → single pot
+
+  const maxInvested = Math.max(...contribs.map(c => c.invested));
+  // Build unique level breakpoints, ending with the max contribution
+  const levels = [...allInLevels, maxInvested]
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .sort((a, b) => a - b);
+
+  const pots: SidePot[] = [];
+  let prevLevel = 0;
+
+  for (const level of levels) {
+    if (level <= prevLevel) continue;
+    const diff = level - prevLevel;
+
+    let potAmount = 0;
+    for (const c of contribs) {
+      potAmount += Math.min(Math.max(0, c.invested - prevLevel), diff);
+    }
+
+    const eligibleForThis = eligible
+      .filter(c => c.invested >= level)
+      .map(c => c.id);
+
+    if (potAmount > 0 && eligibleForThis.length > 0) {
+      pots.push({ amount: potAmount, eligiblePlayerIds: eligibleForThis });
+    }
+    prevLevel = level;
+  }
+
+  // Only meaningful if there are actually 2+ distinct pots
+  return pots.length > 1 ? pots : [];
+}
+
+function makeWinnerLabel(players: GamePlayer[], winnerIds: string[]): string {
+  return players
+    .filter(p => winnerIds.includes(p.id))
+    .map(p => (p.isHuman ? 'You' : p.name))
+    .join(' & ');
+}
+
+function doShowdown(state: GameState): GameState {
+  const s = runOutBoard(state);
   const eligible = s.players.filter(p => p.status === 'active' || p.status === 'allIn');
-  if (eligible.length === 0) return { ...s, phase: 'handover' };
+  if (eligible.length === 0) return { ...s, phase: 'handover', sidePots: [], isSplitPot: false };
 
   const potSize = s.pot;
 
+  // ── Single survivor (everyone else folded) ──────────────────────────────
   if (eligible.length === 1) {
     const winner = eligible[0];
     const players = s.players.map(p =>
@@ -117,19 +186,61 @@ function doShowdown(state: GameState): GameState {
         : p
     );
     return {
-      ...s,
-      players,
-      phase: 'handover',
-      showCards: true,
-      allInRunout: false,
-      winnerIds: [winner.id],
-      winnerHand: '',
-      winnerPot: potSize,
-      message: `${winner.name} wins!`,
-      pot: 0,
+      ...s, players, phase: 'handover', showCards: true, allInRunout: false,
+      winnerIds: [winner.id], winnerHand: '', winnerPot: potSize,
+      message: winner.isHuman ? 'You won!' : `${winner.name} wins!`,
+      pot: 0, sidePots: [], isSplitPot: false,
     };
   }
 
+  // ── Compute side pots ──────────────────────────────────────────────────
+  const sidePots = computeSidePots(s.players);
+
+  if (sidePots.length > 1) {
+    // Evaluate each pot separately and distribute chips
+    let playersMut = s.players.map(p => ({ ...p }));
+    const chipGains: Record<string, number> = {};
+    // Track the first (main) pot's winners for the headline display
+    let mainWinnerIds: string[] = [];
+    let mainWinnerHand = '';
+
+    for (let pi = 0; pi < sidePots.length; pi++) {
+      const pot = sidePots[pi];
+      const potEligible = eligible.filter(p => pot.eligiblePlayerIds.includes(p.id));
+      if (potEligible.length === 0) continue;
+
+      const potWinners = determineWinners(
+        potEligible.map(p => ({ id: p.id, holeCards: p.holeCards })),
+        s.communityCards
+      );
+      const potWinnerIds = potWinners.map(w => w.winnerId);
+      const share = Math.floor(pot.amount / potWinnerIds.length);
+      for (const wid of potWinnerIds) chipGains[wid] = (chipGains[wid] ?? 0) + share;
+
+      if (pi === 0) {
+        mainWinnerIds = potWinnerIds;
+        mainWinnerHand = potWinners[0] ? describeHand(potWinners[0].handResult) : '';
+      }
+    }
+
+    playersMut = playersMut.map(p => {
+      const gain = chipGains[p.id] ?? 0;
+      return { ...p, chips: p.chips + gain, chipDelta: p.chipDelta + gain };
+    });
+
+    const isSplit = mainWinnerIds.length > 1;
+    const isHumanWinner = mainWinnerIds.includes('human');
+    const label = makeWinnerLabel(playersMut, mainWinnerIds);
+    const message = isSplit ? `Split pot — ${label}` : (isHumanWinner ? 'You won!' : `${label} wins!`);
+
+    return {
+      ...s, players: playersMut, phase: 'handover', showCards: true, allInRunout: false,
+      winnerIds: mainWinnerIds, winnerHand: mainWinnerHand, winnerPot: potSize,
+      message, pot: 0, sidePots, isSplitPot: isSplit,
+    };
+  }
+
+  // ── Standard showdown (single pot, no side pots) ────────────────────────
   const winners = determineWinners(
     eligible.map(p => ({ id: p.id, holeCards: p.holeCards })),
     s.communityCards
@@ -144,25 +255,17 @@ function doShowdown(state: GameState): GameState {
       : p
   );
 
+  const isSplit = winnerIds.length > 1;
   const isHumanWinner = winnerIds.includes('human');
-  const winnerNames = players
-    .filter(p => winnerIds.includes(p.id))
-    .map(p => (p.isHuman ? 'You' : p.name))
-    .join(' & ');
-
-  const message = isHumanWinner ? 'You won!' : `${winnerNames} wins!`;
+  const label = makeWinnerLabel(players, winnerIds);
+  const message = isSplit
+    ? `Split pot — ${label}`
+    : isHumanWinner ? 'You won!' : `${label} wins!`;
 
   return {
-    ...s,
-    players,
-    phase: 'handover',
-    showCards: true,
-    allInRunout: false,
-    winnerIds,
-    winnerHand,
-    winnerPot: potSize,
-    message,
-    pot: 0,
+    ...s, players, phase: 'handover', showCards: true, allInRunout: false,
+    winnerIds, winnerHand, winnerPot: potSize,
+    message, pot: 0, sidePots: [], isSplitPot: isSplit,
   };
 }
 

@@ -409,12 +409,26 @@ export default function PracticeScreen() {
             <View style={styles.centerCol}>
               {/* Pot badge — always visible on the table */}
               {(state.pot > 0 || state.winnerPot > 0) && (
-                <Animated.View style={[styles.potOnTable, { transform: [{ scale: potPulse }] }]}>
-                  <Text style={styles.potOnTableLabel}>POT</Text>
-                  <Text style={styles.potOnTableAmount}>
-                    {formatChips(state.pot > 0 ? state.pot : state.winnerPot)}
-                  </Text>
-                </Animated.View>
+                state.sidePots.length > 1 ? (
+                  /* Side pot breakdown */
+                  <Animated.View style={[styles.sidePotRow, { transform: [{ scale: potPulse }] }]}>
+                    {state.sidePots.map((sp, i) => (
+                      <View key={i} style={styles.sidePotChip}>
+                        <Text style={styles.sidePotLabel}>
+                          {i === 0 ? 'MAIN' : `SIDE ${i}`}
+                        </Text>
+                        <Text style={styles.sidePotAmt}>{formatChips(sp.amount)}</Text>
+                      </View>
+                    ))}
+                  </Animated.View>
+                ) : (
+                  <Animated.View style={[styles.potOnTable, { transform: [{ scale: potPulse }] }]}>
+                    <Text style={styles.potOnTableLabel}>POT</Text>
+                    <Text style={styles.potOnTableAmount}>
+                      {formatChips(state.pot > 0 ? state.pot : state.winnerPot)}
+                    </Text>
+                  </Animated.View>
+                )
               )}
               <CommunityCards cards={state.communityCards} phase={state.phase} />
 
@@ -453,8 +467,20 @@ export default function PracticeScreen() {
               )}
             </View>
 
+            {/* All-in runout notification */}
+            {(() => {
+              const nonFolded = state.players.filter(p => p.status !== 'folded');
+              const allAllIn = nonFolded.length >= 2 && nonFolded.every(p => p.status === 'allIn');
+              if (!allAllIn || isHandOver) return null;
+              return (
+                <View style={styles.allInOverlay}>
+                  <Text style={styles.allInOverlayTitle}>ALL IN!</Text>
+                  <Text style={styles.allInOverlaySub}>Running out the board…</Text>
+                </View>
+              );
+            })()}
             {/* Action message */}
-            {state.message !== '' && (
+            {state.message !== '' && !isHandOver && (
               <View style={styles.messageBox}>
                 <Text style={styles.messageText}>{state.message}</Text>
               </View>
@@ -496,29 +522,60 @@ export default function PracticeScreen() {
             colors={['rgba(5,0,16,0)', 'rgba(5,0,16,0.98)']}
             style={StyleSheet.absoluteFill}
           />
-          {/* Winner banner */}
+          {/* Winner / split pot banner */}
           {state.winnerIds.length > 0 && state.winnerPot > 0 && (() => {
             const humanWon = state.winnerIds.includes('human');
+            const isSplit = state.isSplitPot;
+            const hasSidePots = state.sidePots.length > 1;
+            const share = Math.floor(state.winnerPot / Math.max(1, state.winnerIds.length));
             return (
-              <View style={[styles.winnerBanner, humanWon && styles.winnerBannerHuman]}>
-                <Ionicons name="trophy" size={20} color={humanWon ? colors.gold : colors.textDim} />
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.handoverMsg, humanWon && { color: colors.gold, fontSize: 18 }]}>
-                    {state.message || 'Hand complete!'}
-                  </Text>
-                  {state.winnerHand !== '' && (
-                    <Text style={[styles.handoverHand, !humanWon && { color: colors.textDim, fontSize: 13 }]}>
-                      {state.winnerHand}
+              <>
+                {/* Split pot callout */}
+                {isSplit && (
+                  <View style={styles.splitPotBanner}>
+                    <Ionicons name="git-branch" size={16} color={colors.primary} />
+                    <Text style={styles.splitPotText}>SPLIT POT</Text>
+                    <Text style={styles.splitPotSub}>
+                      {state.winnerIds.length}-way · {formatChips(share)} each
                     </Text>
+                  </View>
+                )}
+                {/* Side pot breakdown */}
+                {hasSidePots && (
+                  <View style={styles.sidePotHandover}>
+                    {state.sidePots.map((sp, i) => (
+                      <View key={i} style={styles.sidePotHandoverRow}>
+                        <Text style={styles.sidePotHandoverLabel}>
+                          {i === 0 ? 'MAIN POT' : `SIDE POT ${i}`}
+                        </Text>
+                        <Text style={styles.sidePotHandoverAmt}>{formatChips(sp.amount)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                {/* Primary winner card */}
+                <View style={[styles.winnerBanner, humanWon && styles.winnerBannerHuman]}>
+                  <Ionicons name="trophy" size={20} color={humanWon ? colors.gold : colors.textDim} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.handoverMsg, humanWon && { color: colors.gold, fontSize: 18 }]}>
+                      {state.message || 'Hand complete!'}
+                    </Text>
+                    {state.winnerHand !== '' && (
+                      <Text style={[styles.handoverHand, !humanWon && { color: colors.textDim, fontSize: 13 }]}>
+                        {state.winnerHand}
+                      </Text>
+                    )}
+                  </View>
+                  {!isSplit && (
+                    <View style={styles.potWonBadge}>
+                      <Text style={[styles.potWonAmt, humanWon && { color: colors.gold }]}>
+                        +{formatChips(share)}
+                      </Text>
+                      <Text style={styles.winnerBannerLabel}>CHIPS</Text>
+                    </View>
                   )}
                 </View>
-                <View style={styles.potWonBadge}>
-                  <Text style={[styles.potWonAmt, humanWon && { color: colors.gold }]}>
-                    +{formatChips(Math.floor(state.winnerPot / state.winnerIds.length))}
-                  </Text>
-                  <Text style={styles.winnerBannerLabel}>CHIPS</Text>
-                </View>
-              </View>
+              </>
             );
           })()}
           {/* Per-player chip delta */}
@@ -804,6 +861,116 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7, paddingVertical: 3,
   },
   betChipText: { color: colors.primary, fontSize: 10, fontWeight: '700' },
+
+  // Side pot row (on the table)
+  sidePotRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  sidePotChip: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(5,0,16,0.72)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.35)',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  sidePotLabel: {
+    color: colors.textMuted,
+    fontSize: 7,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  sidePotAmt: {
+    color: colors.gold,
+    fontSize: 15,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+  },
+
+  // All-in runout overlay
+  allInOverlay: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0, right: 0,
+    alignItems: 'center',
+    gap: 2,
+  },
+  allInOverlayTitle: {
+    color: colors.secondary,
+    fontSize: 22,
+    fontWeight: '900',
+    fontFamily: 'Orbitron_900Black',
+    letterSpacing: 4,
+    textShadowColor: colors.secondary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+  },
+  allInOverlaySub: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 1,
+  },
+
+  // Split pot + side pot in handover panel
+  splitPotBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(0,212,255,0.08)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,212,255,0.3)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    width: '100%',
+  },
+  splitPotText: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 2,
+  },
+  splitPotSub: {
+    color: colors.textMuted,
+    fontSize: 11,
+    flex: 1,
+    textAlign: 'right',
+  },
+  sidePotHandover: {
+    width: '100%',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  sidePotHandoverRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  sidePotHandoverLabel: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  sidePotHandoverAmt: {
+    color: colors.gold,
+    fontSize: 13,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+  },
 
   // Handover panel
   handoverPanel: {
