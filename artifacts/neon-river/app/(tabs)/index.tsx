@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { router } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -12,11 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
-import { SoundEngine } from '@/lib/soundEngine';
 import { getAvatar } from '@/components/CasinoAvatars';
 
 const { width } = Dimensions.get('window');
@@ -30,6 +30,55 @@ const RANK_COLORS: Record<string, string> = {
   'Neon Elite': colors.secondary,
   'Neon Legend': colors.accent,
 };
+
+// ─── 80s casino chip SVG ─────────────────────────────────────────────────────
+
+function CasinoChip({ color, size = 68 }: { color: string; size?: number }) {
+  const r = size / 2;
+  const outerR = r - 2;
+  const midR = r * 0.72;
+  const innerR = r * 0.44;
+  const NUM_SEGMENTS = 8;
+  const segLen = r * 0.14;
+
+  const segments = Array.from({ length: NUM_SEGMENTS }, (_, i) => {
+    const angle = (i * (360 / NUM_SEGMENTS) - 90) * (Math.PI / 180);
+    return {
+      x1: r + (outerR - 1) * Math.cos(angle),
+      y1: r + (outerR - 1) * Math.sin(angle),
+      x2: r + (outerR - segLen) * Math.cos(angle),
+      y2: r + (outerR - segLen) * Math.sin(angle),
+    };
+  });
+
+  return (
+    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Outer glow ring */}
+      <Circle cx={r} cy={r} r={outerR} fill={`${color}18`} stroke={color} strokeWidth={2.5} />
+      {/* Mid ring */}
+      <Circle cx={r} cy={r} r={midR} fill="none" stroke={color} strokeWidth={1} strokeOpacity={0.55} />
+      {/* Inner fill */}
+      <Circle cx={r} cy={r} r={innerR} fill={`${color}30`} stroke={color} strokeWidth={1.5} strokeOpacity={0.8} />
+      {/* Center dot */}
+      <Circle cx={r} cy={r} r={r * 0.13} fill={color} />
+      {/* Edge tick marks */}
+      {segments.map((s, i) => (
+        <Line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
+          stroke={color} strokeWidth={3} strokeLinecap="round" />
+      ))}
+      {/* Card suit in the inner area */}
+      <SvgText
+        x={r} y={r + r * 0.14}
+        textAnchor="middle"
+        fontSize={r * 0.46}
+        fill={color}
+        opacity={0.85}
+      >
+        {color === colors.secondary ? '♥' : '♠'}
+      </SvgText>
+    </Svg>
+  );
+}
 
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
@@ -86,13 +135,23 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
-      {/* Crisp foreground letters with inline textShadow for neon glow */}
-      <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
-        Chip
-      </Animated.Text>
-      <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
-        Society
-      </Animated.Text>
+      <View style={logo.row}>
+        {/* Left chip — blue */}
+        <CasinoChip color={colors.primary} size={LOGO_SIZE * 0.96} />
+
+        {/* Logo text stack */}
+        <View style={logo.textStack}>
+          <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
+            Chip
+          </Animated.Text>
+          <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
+            Society
+          </Animated.Text>
+        </View>
+
+        {/* Right chip — pink */}
+        <CasinoChip color={colors.secondary} size={LOGO_SIZE * 0.96} />
+      </View>
       <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
   );
@@ -238,23 +297,6 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
-  const buzzTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useFocusEffect(
-    useCallback(() => {
-      function scheduleBuzz() {
-        const delay = 7000 + Math.random() * 11000;
-        buzzTimerRef.current = setTimeout(() => {
-          SoundEngine.neonBuzz();
-          scheduleBuzz();
-        }, delay);
-      }
-      scheduleBuzz();
-      return () => {
-        if (buzzTimerRef.current) { clearTimeout(buzzTimerRef.current); buzzTimerRef.current = null; }
-      };
-    }, [])
-  );
 
   const formatChips = (n: number) => {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -370,10 +412,16 @@ const LOGO_SIZE = Math.min(62, width * 0.162);
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  textStack: { alignItems: 'center' },
   word: {
     fontFamily: 'Pacifico_400Regular',
     fontSize: LOGO_SIZE,
-    lineHeight: LOGO_SIZE * 1.16,
+    lineHeight: LOGO_SIZE * 1.14,
     textShadowRadius: 20,
     textShadowOffset: { width: 0, height: 0 },
   },
@@ -382,7 +430,7 @@ const logo = StyleSheet.create({
     fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 4,
-    marginTop: 12,
+    marginTop: 10,
   },
 });
 
