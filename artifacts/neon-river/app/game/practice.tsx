@@ -396,14 +396,14 @@ export default function PracticeScreen() {
                 onPress={() => { setExitConfirm(false); setGameStarted(false); router.back(); }}
                 activeOpacity={0.85}
               >
-                <Text style={styles.exitChoiceText}>YES, EXIT</Text>
+                <Text style={styles.exitChoiceText}>YES</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.exitChoiceBtn, styles.exitNo]}
                 onPress={() => setExitConfirm(false)}
                 activeOpacity={0.85}
               >
-                <Text style={styles.exitChoiceText}>NO, STAY</Text>
+                <Text style={styles.exitChoiceText}>NO</Text>
               </TouchableOpacity>
             </View>
           </View>
