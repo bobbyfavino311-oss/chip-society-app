@@ -248,23 +248,12 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
-      <View style={logo.row}>
-        {/* Left chip — blue */}
-        <CasinoChip color={colors.primary} size={LOGO_SIZE * 0.96} />
-
-        {/* Logo text stack */}
-        <View style={logo.textStack}>
-          <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
-            Chip
-          </Animated.Text>
-          <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
-            Society
-          </Animated.Text>
-        </View>
-
-        {/* Right chip — pink */}
-        <CasinoChip color={colors.secondary} size={LOGO_SIZE * 0.96} />
-      </View>
+      <Animated.Text style={[logo.word, { color: aceColor, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
+        Chip
+      </Animated.Text>
+      <Animated.Text style={[logo.word, { color: socialColor, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
+        Society
+      </Animated.Text>
       <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
   );
