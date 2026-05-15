@@ -601,7 +601,7 @@ const logo = StyleSheet.create({
   word: {
     fontFamily: 'Pacifico_400Regular',
     fontSize: LOGO_SIZE,
-    lineHeight: LOGO_SIZE * 1.14,
+    lineHeight: LOGO_SIZE * 1.45,
     textShadowRadius: 20,
     textShadowOffset: { width: 0, height: 0 },
   },
@@ -610,7 +610,7 @@ const logo = StyleSheet.create({
     fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 4,
-    marginTop: 10,
+    marginTop: 6,
   },
 });
 
