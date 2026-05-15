@@ -80,6 +80,119 @@ function CasinoChip({ color, size = 68 }: { color: string; size?: number }) {
   );
 }
 
+// ─── Live tournament pool ─────────────────────────────────────────────────────
+
+interface LiveTournament {
+  id: string;
+  name: string;
+  style: string;
+  prizePool: number;
+  buyIn: number;
+  totalSeats: number;
+  filledSeats: number;
+  status: 'registering' | 'live' | 'late';
+  endTime: number;
+  accentColor: string;
+}
+
+const T_NAMES = [
+  'NEON MIDNIGHT OPEN', 'CYBER SUNDAY CLASSIC', 'VAPOR WAVE CUP',
+  'CHROME CITY SERIES', 'ELECTRIC SUNSET OPEN', 'RETROWAVE SHOWDOWN',
+  'PIXEL PARADISE PRIX', 'SYNTHWAVE INVITATIONAL', 'MIAMI NIGHT SPECIAL',
+  'LASER GRID CHAMPIONSHIP', 'NEON STRIP OPEN', 'ARCADE FURY CUP',
+  'CIRCUIT BREAKER SERIES', 'HYPERNOVA CHALLENGE', 'HOLOGRAM OPEN',
+  'DIGITAL DUSK CLASSIC', 'PULSE CITY MASTERS', 'CHROME STALLION CUP',
+  'ULTRA VIOLET OPEN', 'GRID IRON INVITATIONAL',
+];
+const T_STYLES = ["No Limit Hold'em", "Pot Limit Omaha", "Turbo Hold'em", 'Short Deck NL'];
+const T_COLORS = [colors.primary, colors.secondary, colors.gold, '#00ff88', '#bf5fff'];
+const T_PRIZES = [10000, 25000, 50000, 100000, 250000, 500000, 1000000];
+const T_BUYINS = [100, 250, 500, 1000, 2500];
+const T_SEATS = [64, 128, 256, 512];
+
+function makeTournament(usedNames: Set<string>): LiveTournament {
+  const pool = T_NAMES.filter(n => !usedNames.has(n));
+  const nameList = pool.length > 0 ? pool : T_NAMES;
+  const name = nameList[Math.floor(Math.random() * nameList.length)];
+  const totalSeats = T_SEATS[Math.floor(Math.random() * T_SEATS.length)];
+  const filledSeats = Math.floor(totalSeats * (0.2 + Math.random() * 0.75));
+  const roll = Math.random();
+  const status: LiveTournament['status'] = roll > 0.5 ? 'live' : roll > 0.25 ? 'registering' : 'late';
+  return {
+    id: `t_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+    name,
+    style: T_STYLES[Math.floor(Math.random() * T_STYLES.length)],
+    prizePool: T_PRIZES[Math.floor(Math.random() * T_PRIZES.length)],
+    buyIn: T_BUYINS[Math.floor(Math.random() * T_BUYINS.length)],
+    totalSeats,
+    filledSeats,
+    status,
+    endTime: Date.now() + (4 + Math.floor(Math.random() * 56)) * 60_000,
+    accentColor: T_COLORS[Math.floor(Math.random() * T_COLORS.length)],
+  };
+}
+
+function initTournamentPool(): LiveTournament[] {
+  const used = new Set<string>();
+  return Array.from({ length: 6 }, () => {
+    const t = makeTournament(used);
+    used.add(t.name);
+    return t;
+  });
+}
+
+const STATUS_LABELS = { live: '● LIVE', registering: 'REGISTERING', late: 'LATE REG' };
+const STATUS_COLORS = { live: '#ff4455', registering: colors.success, late: colors.gold };
+
+function TournamentCard({ t }: { t: LiveTournament }) {
+  const msLeft = Math.max(0, t.endTime - Date.now());
+  const totalSec = Math.floor(msLeft / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const timeStr = h > 0
+    ? `${h}h ${m.toString().padStart(2, '0')}m`
+    : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+  const fmtPrize = (n: number) =>
+    n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `${(n / 1_000).toFixed(0)}K` : String(n);
+  const fmtBuy = (n: number) => n >= 1000 ? `${n / 1000}K` : String(n);
+
+  const sc = STATUS_COLORS[t.status];
+  const fillPct = Math.min(100, Math.round((t.filledSeats / t.totalSeats) * 100));
+
+  return (
+    <View style={[tc.card, { borderColor: `${t.accentColor}55` }]}>
+      <LinearGradient colors={['#190028', '#07000f']} style={StyleSheet.absoluteFill} />
+      <View style={[tc.strip, { backgroundColor: t.accentColor }]} />
+      <View style={tc.body}>
+        <View style={tc.topRow}>
+          <View style={[tc.badge, { backgroundColor: `${sc}22`, borderColor: `${sc}55` }]}>
+            <Text style={[tc.badgeText, { color: sc }]}>{STATUS_LABELS[t.status]}</Text>
+          </View>
+          <Text style={tc.timeLeft}>{timeStr}</Text>
+        </View>
+        <Text style={[tc.name, { color: t.accentColor }]} numberOfLines={2}>{t.name}</Text>
+        <Text style={tc.variant}>{t.style}</Text>
+        <View style={tc.infoRow}>
+          <View>
+            <Text style={tc.subLabel}>PRIZE POOL</Text>
+            <Text style={[tc.prize, { color: t.accentColor }]}>{fmtPrize(t.prizePool)}</Text>
+          </View>
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text style={tc.subLabel}>PLAYERS</Text>
+            <Text style={tc.seats}>{t.filledSeats}/{t.totalSeats}</Text>
+          </View>
+        </View>
+        <View style={tc.bar}>
+          <View style={[tc.barFill, { width: `${fillPct}%` as any, backgroundColor: t.accentColor }]} />
+        </View>
+        <Text style={tc.buyIn}>BUY-IN · {fmtBuy(t.buyIn)} chips</Text>
+      </View>
+    </View>
+  );
+}
+
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
 function ChipSocietyLogo() {
@@ -298,6 +411,27 @@ export default function HomeScreen() {
   const { profile } = useUser();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
 
+  const [tournaments, setTournaments] = useState<LiveTournament[]>(initTournamentPool);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTournaments(prev => {
+        const now = Date.now();
+        const used = new Set(prev.map(t => t.name));
+        return prev.map(t => {
+          if (t.endTime <= now) {
+            used.delete(t.name);
+            const next = makeTournament(used);
+            used.add(next.name);
+            return next;
+          }
+          return { ...t }; // new ref so countdown re-renders
+        });
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const formatChips = (n: number) => {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
@@ -386,6 +520,22 @@ export default function HomeScreen() {
 
         <FeaturedTournament />
 
+        {/* Live Tournaments — scrolling pool */}
+        <View style={styles.sectionRow}>
+          <Text style={styles.sectionTitle}>LIVE TOURNAMENTS</Text>
+          <View style={styles.activeBadge}>
+            <View style={styles.activeDot} />
+            <Text style={styles.activeCount}>{tournaments.length} ACTIVE</Text>
+          </View>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+        >
+          {tournaments.map(t => <TournamentCard key={t.id} t={t} />)}
+        </ScrollView>
+
         {/* Stats snapshot */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
@@ -409,6 +559,47 @@ export default function HomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const LOGO_SIZE = Math.min(62, width * 0.162);
+
+const tc = StyleSheet.create({
+  card: {
+    width: width * 0.62,
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+    flexDirection: 'row',
+  },
+  strip: { width: 4 },
+  body: { flex: 1, padding: 12, gap: 5 },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  badge: {
+    borderRadius: 5, borderWidth: 1,
+    paddingHorizontal: 6, paddingVertical: 2,
+  },
+  badgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
+  timeLeft: {
+    color: colors.textMuted, fontSize: 11,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  name: {
+    fontSize: 11, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 0.4, lineHeight: 16,
+  },
+  variant: { color: colors.textMuted, fontSize: 9 },
+  infoRow: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'flex-end', marginTop: 4,
+  },
+  subLabel: {
+    color: colors.textDim, fontSize: 7,
+    letterSpacing: 1, fontFamily: 'Orbitron_400Regular',
+  },
+  prize: { fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  seats: { color: colors.text, fontSize: 11, fontWeight: '700' },
+  bar: { height: 3, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2, marginTop: 2 },
+  barFill: { height: 3, borderRadius: 2 },
+  buyIn: { color: colors.textDim, fontSize: 9, marginTop: 2 },
+});
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
@@ -520,6 +711,9 @@ const styles = StyleSheet.create({
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionTitle: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
   seeAll: { color: colors.primary, fontSize: 11, fontWeight: '600' },
+  activeBadge: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  activeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#ff4455' },
+  activeCount: { color: '#ff4455', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
   statsRow: { flexDirection: 'row', gap: 10 },
   statCard: {
     flex: 1, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border,
