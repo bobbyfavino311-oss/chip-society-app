@@ -124,4 +124,24 @@ export const SoundEngine = {
     tone(250, 'sine', 0.30, 0.18, 0.15, 160);
     tone(180, 'sine', 0.35, 0.15, 0.32, 120);
   },
+
+  // Flickering neon-sign static — low electrical hum + random crackles
+  neonBuzz() {
+    const dur = 0.18 + Math.random() * 0.22;
+    // 60 Hz power-line hum with harmonics
+    tone(60, 'sawtooth', dur, 0.055);
+    tone(120, 'sawtooth', dur, 0.028);
+    tone(240, 'sawtooth', dur * 0.6, 0.012);
+    // 2-5 random crackle bursts layered over the hum
+    const cracks = 2 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < cracks; i++) {
+      const d = Math.random() * (dur * 0.8);
+      const len = 0.006 + Math.random() * 0.018;
+      noise(len, 0.10 + Math.random() * 0.08, 1800, 14000, d);
+    }
+    // Occasional high-pitched spit
+    if (Math.random() < 0.5) {
+      tone(3200 + Math.random() * 1800, 'sine', 0.012, 0.04, Math.random() * dur * 0.5);
+    }
+  },
 };

@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -15,6 +15,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { SoundEngine } from '@/lib/soundEngine';
+import { getAvatar } from '@/components/CasinoAvatars';
 
 const { width } = Dimensions.get('window');
 
@@ -235,6 +237,23 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
+  const buzzTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      function scheduleBuzz() {
+        const delay = 7000 + Math.random() * 11000;
+        buzzTimerRef.current = setTimeout(() => {
+          SoundEngine.neonBuzz();
+          scheduleBuzz();
+        }, delay);
+      }
+      scheduleBuzz();
+      return () => {
+        if (buzzTimerRef.current) { clearTimeout(buzzTimerRef.current); buzzTimerRef.current = null; }
+      };
+    }, [])
+  );
 
   const formatChips = (n: number) => {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -254,7 +273,10 @@ export default function HomeScreen() {
       {/* Compact top profile bar */}
       <View style={[styles.topBar, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
         <View style={[styles.topAvatar, { borderColor: rankColor }]}>
-          <Text style={styles.topAvatarText}>♠</Text>
+          {profile.avatarUri
+            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17 }} />
+            : getAvatar(profile.avatarIndex).render(34)
+          }
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.topName}>{profile.username}</Text>

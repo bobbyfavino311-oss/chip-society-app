@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { CASINO_AVATARS, getAvatar } from '@/components/CasinoAvatars';
 
 const RANK_COLORS: Record<string, string> = {
   'Neon Bronze': '#cd7f32',
@@ -71,6 +72,7 @@ export default function ProfileScreen() {
   const { profile, updateProfile, winRate } = useUser();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.username);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const rankIdx = RANK_ORDER.indexOf(profile.rank);
@@ -120,20 +122,22 @@ export default function ProfileScreen() {
         <Text style={styles.header}>PLAYER PROFILE</Text>
 
         <View style={styles.avatarSection}>
-          <TouchableOpacity
-            style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}
-            onPress={pickAvatar}
-            activeOpacity={0.8}
-          >
-            {profile.avatarUri ? (
-              <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
-            ) : (
-              <Text style={[styles.avatarText, { color: rankColor }]}>♠</Text>
-            )}
-            <View style={styles.cameraOverlay}>
+          <View style={{ position: 'relative' }}>
+            <TouchableOpacity
+              style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}
+              onPress={() => setShowAvatarPicker(p => !p)}
+              activeOpacity={0.8}
+            >
+              {profile.avatarUri ? (
+                <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
+              ) : (
+                getAvatar(profile.avatarIndex).render(82)
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cameraOverlay} onPress={pickAvatar}>
               <Ionicons name="camera" size={14} color={colors.background} />
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
 
           {editing ? (
             <View style={styles.editRow}>
@@ -160,6 +164,42 @@ export default function ProfileScreen() {
           <View style={[styles.rankBadge, { borderColor: rankColor }]}>
             <Text style={[styles.rankText, { color: rankColor }]}>{profile.rank}</Text>
           </View>
+
+          {/* Avatar picker grid */}
+          {showAvatarPicker && (
+            <View style={styles.avatarPickerWrap}>
+              <Text style={styles.avatarPickerTitle}>CHOOSE AVATAR</Text>
+              <View style={styles.avatarGrid}>
+                {CASINO_AVATARS.map(av => {
+                  const isSelected = !profile.avatarUri && profile.avatarIndex === av.id;
+                  return (
+                    <TouchableOpacity
+                      key={av.id}
+                      style={[
+                        styles.avatarGridCell,
+                        isSelected && { borderColor: av.accentColor, shadowColor: av.accentColor, shadowOpacity: 0.7, shadowRadius: 8 },
+                      ]}
+                      onPress={async () => {
+                        await updateProfile({ avatarIndex: av.id, avatarUri: undefined });
+                        setShowAvatarPicker(false);
+                      }}
+                      activeOpacity={0.75}
+                    >
+                      {av.render(48)}
+                      {isSelected && (
+                        <View style={[styles.avatarGridCheck, { backgroundColor: av.accentColor }]}>
+                          <Ionicons name="checkmark" size={8} color="#050010" />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              <TouchableOpacity style={styles.closePickerBtn} onPress={() => setShowAvatarPicker(false)}>
+                <Text style={styles.closePickerText}>DONE</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         <View style={styles.card}>
@@ -334,4 +374,65 @@ const styles = StyleSheet.create({
   chipLabel: { color: colors.textMuted, fontSize: 10, letterSpacing: 2, fontWeight: '600' },
   streakNum: { color: colors.text, fontSize: 18, fontWeight: '700' },
   streakSub: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
+  avatarPickerWrap: {
+    width: '100%',
+    backgroundColor: colors.surface,
+    borderRadius: colors.radius,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+    marginTop: 6,
+  },
+  avatarPickerTitle: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  avatarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'center',
+  },
+  avatarGridCell: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: colors.background,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatarGridCheck: {
+    position: 'absolute',
+    bottom: 1,
+    right: 1,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closePickerBtn: {
+    marginTop: 12,
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  closePickerText: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+  },
 });
