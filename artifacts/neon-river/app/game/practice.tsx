@@ -831,7 +831,7 @@ const styles = StyleSheet.create({
   exitSub: { color: colors.textMuted, fontSize: 12, textAlign: 'center', marginBottom: 8 },
   exitBtns: { flexDirection: 'row', gap: 12, marginTop: 4 },
   exitChoiceBtn: {
-    flex: 1, paddingVertical: 13, borderRadius: 12,
+    flex: 1, paddingVertical: 13, borderRadius: 50,
     alignItems: 'center', justifyContent: 'center',
   },
   exitYes: { backgroundColor: colors.secondary },
