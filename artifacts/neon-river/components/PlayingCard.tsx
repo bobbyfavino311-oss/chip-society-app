@@ -6,14 +6,15 @@ import colors from '../constants/colors';
 interface PlayingCardProps {
   card?: Card;
   faceDown?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   highlighted?: boolean;
 }
 
 const SIZES = {
-  sm: { w: 28, h: 40, font: 9, suit: 10 },
-  md: { w: 38, h: 54, font: 13, suit: 14 },
-  lg: { w: 52, h: 72, font: 17, suit: 18 },
+  sm: { w: 30, h: 42, font: 10, suit: 11, radius: 4 },
+  md: { w: 42, h: 58, font: 14, suit: 16, radius: 5 },
+  lg: { w: 56, h: 78, font: 18, suit: 20, radius: 7 },
+  xl: { w: 70, h: 98, font: 22, suit: 26, radius: 9 },
 };
 
 export default function PlayingCard({ card, faceDown = false, size = 'md', highlighted = false }: PlayingCardProps) {
@@ -23,9 +24,11 @@ export default function PlayingCard({ card, faceDown = false, size = 'md', highl
 
   if (faceDown || !card) {
     return (
-      <View style={[styles.card, { width: dim.w, height: dim.h }, styles.faceDown]}>
-        <View style={styles.backPattern}>
-          <View style={styles.backInner} />
+      <View style={[styles.card, { width: dim.w, height: dim.h, borderRadius: dim.radius }, styles.faceDown]}>
+        <View style={[styles.backOuter, { borderRadius: dim.radius - 2 }]}>
+          <View style={styles.backDiamond}>
+            <Text style={styles.backSymbol}>♠</Text>
+          </View>
         </View>
       </View>
     );
@@ -35,80 +38,100 @@ export default function PlayingCard({ card, faceDown = false, size = 'md', highl
     <View
       style={[
         styles.card,
-        { width: dim.w, height: dim.h },
+        { width: dim.w, height: dim.h, borderRadius: dim.radius },
         highlighted && styles.highlighted,
       ]}
     >
-      <Text style={[styles.topLabel, { fontSize: dim.font, color: textColor }]}>
-        {valueLabel(card.value)}
-      </Text>
+      <View style={styles.cornerTL}>
+        <Text style={[styles.cornerVal, { fontSize: dim.font - 2, color: textColor }]}>
+          {valueLabel(card.value)}
+        </Text>
+        <Text style={[styles.cornerSuit, { fontSize: dim.font - 4, color: textColor }]}>
+          {suitSymbol(card.suit)}
+        </Text>
+      </View>
+
       <Text style={[styles.centerSuit, { fontSize: dim.suit, color: textColor }]}>
         {suitSymbol(card.suit)}
       </Text>
-      <Text style={[styles.bottomLabel, { fontSize: dim.font, color: textColor }]}>
-        {valueLabel(card.value)}
-      </Text>
+
+      <View style={styles.cornerBR}>
+        <Text style={[styles.cornerVal, { fontSize: dim.font - 2, color: textColor, transform: [{ rotate: '180deg' }] }]}>
+          {valueLabel(card.value)}
+        </Text>
+        <Text style={[styles.cornerSuit, { fontSize: dim.font - 4, color: textColor, transform: [{ rotate: '180deg' }] }]}>
+          {suitSymbol(card.suit)}
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBg,
-    borderRadius: 4,
+    backgroundColor: '#f8f4ef',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#ffffff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 6,
     position: 'relative',
     overflow: 'hidden',
   },
   highlighted: {
     shadowColor: colors.gold,
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    borderWidth: 1,
+    shadowOpacity: 0.9,
+    shadowRadius: 12,
+    borderWidth: 2,
     borderColor: colors.gold,
   },
   faceDown: {
-    backgroundColor: '#1a0040',
-    borderWidth: 1,
-    borderColor: colors.accent,
+    backgroundColor: '#1a0050',
+    borderWidth: 1.5,
+    borderColor: '#6600cc',
   },
-  backPattern: {
+  backOuter: {
     flex: 1,
-    width: '100%',
+    width: '88%',
+    margin: 4,
+    backgroundColor: '#120035',
+    borderWidth: 1,
+    borderColor: '#8800ff',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1a0040',
   },
-  backInner: {
-    width: '70%',
-    height: '70%',
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: colors.secondary,
-    backgroundColor: '#110033',
+  backDiamond: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  topLabel: {
+  backSymbol: {
+    fontSize: 18,
+    color: '#6600cc',
+    opacity: 0.6,
+  },
+  cornerTL: {
     position: 'absolute',
-    top: 2,
-    left: 3,
+    top: 4,
+    left: 5,
+    alignItems: 'center',
+  },
+  cornerBR: {
+    position: 'absolute',
+    bottom: 4,
+    right: 5,
+    alignItems: 'center',
+  },
+  cornerVal: {
+    fontWeight: '900',
+    lineHeight: 18,
+  },
+  cornerSuit: {
     fontWeight: '700',
-    lineHeight: 13,
+    lineHeight: 14,
   },
   centerSuit: {
     fontWeight: '700',
-  },
-  bottomLabel: {
-    position: 'absolute',
-    bottom: 2,
-    right: 3,
-    fontWeight: '700',
-    lineHeight: 13,
-    transform: [{ rotate: '180deg' }],
   },
 });

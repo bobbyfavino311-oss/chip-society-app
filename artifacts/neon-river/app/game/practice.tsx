@@ -152,9 +152,11 @@ function CommunityCards({ cards, phase }: { cards: any[]; phase: string }) {
     <View style={table.communityArea}>
       <Text style={table.phaseLabel}>{PHASE_LABELS[phase] ?? ''}</Text>
       <View style={table.communityCards}>
-        {[0, 1, 2, 3, 4].map(i => (
-          <PlayingCard key={i} card={cards[i]} faceDown={!cards[i]} size="lg" />
-        ))}
+        {[0, 1, 2, 3, 4].map(i =>
+          cards[i]
+            ? <PlayingCard key={i} card={cards[i]} size="xl" />
+            : <View key={i} style={table.emptySlot} />
+        )}
       </View>
     </View>
   );
@@ -461,12 +463,12 @@ export default function PracticeScreen() {
                   <View style={styles.humanHoleCards}>
                     {humanPlayer.holeCards.length > 0 ? (
                       humanPlayer.holeCards.map((card, i) => (
-                        <PlayingCard key={i} card={card} faceDown={false} size="lg" />
+                        <PlayingCard key={i} card={card} faceDown={false} size="xl" />
                       ))
                     ) : (
                       <>
-                        <PlayingCard faceDown size="lg" />
-                        <PlayingCard faceDown size="lg" />
+                        <PlayingCard faceDown size="xl" />
+                        <PlayingCard faceDown size="xl" />
                       </>
                     )}
                   </View>
@@ -736,9 +738,18 @@ const setup = StyleSheet.create({
 });
 
 const table = StyleSheet.create({
-  communityArea: { alignItems: 'center', gap: 4 },
-  phaseLabel: { color: colors.textMuted, fontSize: 9, fontWeight: '700', letterSpacing: 2 },
-  communityCards: { flexDirection: 'row', gap: 4 },
+  communityArea: { alignItems: 'center', gap: 8 },
+  phaseLabel: {
+    color: colors.textMuted, fontSize: 10, fontWeight: '700',
+    letterSpacing: 3, fontFamily: 'Orbitron_400Regular',
+  },
+  communityCards: { flexDirection: 'row', gap: 6 },
+  emptySlot: {
+    width: 70, height: 98, borderRadius: 9,
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.12)',
+    borderStyle: 'dashed',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+  },
 });
 
 const styles = StyleSheet.create({
@@ -814,7 +825,7 @@ const styles = StyleSheet.create({
   },
   tableInner: {
     flex: 1, position: 'relative', alignItems: 'center', justifyContent: 'center',
-    paddingBottom: '22%',
+    paddingBottom: '18%',
   },
 
   chipToken: {

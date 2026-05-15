@@ -115,13 +115,13 @@ export default function PlayerSeat({
               key={i}
               card={card}
               faceDown={!showCards && !isHuman}
-              size="sm"
+              size="md"
             />
           ))
         ) : (
           <>
-            <PlayingCard faceDown size="sm" />
-            <PlayingCard faceDown size="sm" />
+            <PlayingCard faceDown size="md" />
+            <PlayingCard faceDown size="md" />
           </>
         )}
       </View>
