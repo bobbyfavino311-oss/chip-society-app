@@ -357,7 +357,7 @@ const logo = StyleSheet.create({
     fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 4,
-    marginTop: 18,
+    marginTop: 28,
   },
 });
 
