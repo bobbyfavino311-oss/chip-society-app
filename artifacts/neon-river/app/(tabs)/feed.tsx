@@ -193,11 +193,11 @@ const MY_LIKES: MePost[] = [
 ];
 
 const FEED_TABS = [
-  { id: 'trending', label: 'Trending' },
-  { id: 'following', label: 'Following' },
-  { id: 'pots', label: 'Biggest Pots' },
-  { id: 'highlights', label: 'Highlights' },
-  { id: 'me', label: 'Me' },
+  { id: 'trending',   label: 'Trending',     icon: 'flame' as const },
+  { id: 'following',  label: 'Following',    icon: 'people' as const },
+  { id: 'pots',       label: 'Biggest Pots', icon: 'cash' as const },
+  { id: 'highlights', label: 'Highlights',   icon: 'star' as const },
+  { id: 'me',         label: 'Me',           icon: 'person-circle' as const },
 ];
 
 const ME_SUBTABS = [
@@ -673,19 +673,23 @@ export default function FeedScreen() {
       >
         {FEED_TABS.map(tab => {
           const active = activeTab === tab.id;
+          const isMe = tab.id === 'me';
+          const activeColor = isMe ? colors.secondary : colors.primary;
           return (
             <TouchableOpacity
               key={tab.id}
-              style={styles.tab}
+              style={[styles.tab, active && [styles.tabActive, { borderColor: activeColor, backgroundColor: isMe ? 'rgba(255,0,144,0.12)' : 'rgba(0,212,255,0.12)' }]]}
               onPress={() => setActiveTab(tab.id)}
+              activeOpacity={0.75}
             >
-              {tab.id === 'me' && (
-                <Ionicons name="person-circle-outline" size={13} color={active ? colors.secondary : colors.textDim} style={{ marginRight: 3 }} />
-              )}
-              <Text style={[styles.tabText, active && (tab.id === 'me' ? styles.tabTextMe : styles.tabTextActive)]}>
+              <Ionicons
+                name={tab.icon}
+                size={13}
+                color={active ? activeColor : colors.textDim}
+              />
+              <Text style={[styles.tabText, active && { color: activeColor, fontWeight: '800' }]}>
                 {tab.label}
               </Text>
-              {active && <View style={[styles.tabIndicator, tab.id === 'me' && { backgroundColor: colors.secondary }]} />}
             </TouchableOpacity>
           );
         })}
@@ -923,17 +927,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6,
   },
   newPostText: { color: colors.primary, fontSize: 12, fontWeight: '700' },
-  tabBarScroll: { borderBottomWidth: 1, borderBottomColor: colors.border, flexGrow: 0, marginBottom: 8 },
-  tabBarContent: { paddingHorizontal: 4 },
+  tabBarScroll: { flexGrow: 0, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
+  tabBarContent: { paddingHorizontal: 12, gap: 8, flexDirection: 'row', alignItems: 'center' },
   tab: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 14, paddingVertical: 16, position: 'relative',
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 13, paddingVertical: 8,
+    borderRadius: 50, borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
-  tabText: { color: colors.textDim, fontSize: 11, fontWeight: '600' },
-  tabTextActive: { color: colors.primary, fontWeight: '800' },
-  tabTextMe: { color: colors.secondary, fontWeight: '800' },
-  tabIndicator: {
-    position: 'absolute', bottom: 0, left: '15%', right: '15%',
-    height: 2, backgroundColor: colors.primary, borderRadius: 1,
+  tabActive: {
+    borderWidth: 1.5,
   },
+  tabText: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
 });
