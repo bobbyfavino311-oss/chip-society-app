@@ -267,8 +267,8 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: ComposeSheetPro
   const typeColor = POST_TYPE_COLORS[postType];
 
   return (
-    <View style={compose.overlay}>
-      {/* Dim backdrop */}
+    <View style={compose.overlay} pointerEvents="box-none">
+      {/* Dim backdrop — only occupies space ABOVE the sheet, never overlaps it */}
       <TouchableOpacity style={compose.backdrop} activeOpacity={1} onPress={handleClose} />
 
       {/* Sheet */}
@@ -761,10 +761,10 @@ const compose = StyleSheet.create({
     zIndex: 999, justifyContent: 'flex-end',
   },
   backdrop: {
-    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
   },
-  kvSheet: { width: '100%', zIndex: 10 },
+  kvSheet: { width: '100%' },
   sheet: {
     borderTopLeftRadius: 20, borderTopRightRadius: 20,
     borderWidth: 1, borderBottomWidth: 0, borderColor: colors.border,
