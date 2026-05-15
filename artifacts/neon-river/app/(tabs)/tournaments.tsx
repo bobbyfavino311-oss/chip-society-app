@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Platform,
@@ -263,6 +264,34 @@ export default function TournamentsScreen() {
           </>
         )}
 
+        {/* AI Tournament CTA */}
+        <TouchableOpacity
+          style={styles.aiTournamentCard}
+          onPress={() => router.push('/game/tournament' as any)}
+          activeOpacity={0.85}
+        >
+          <LinearGradient
+            colors={['#3300aa', '#1a0060', '#050010']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+          <View style={styles.aiTournamentLeft}>
+            <View style={styles.aiTournamentBadge}>
+              <Text style={styles.aiTournamentBadgeText}>🤖 AI</Text>
+            </View>
+            <View>
+              <Text style={styles.aiTournamentTitle}>QUICK TOURNAMENT</Text>
+              <Text style={styles.aiTournamentSub}>Single-table · Mixed AI · Play now</Text>
+            </View>
+          </View>
+          <View style={styles.aiTournamentRight}>
+            <Text style={styles.aiTournamentPrize}>4,500</Text>
+            <Text style={styles.aiTournamentPrizeLabel}>MAX PRIZE</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.accent} />
+          </View>
+        </TouchableOpacity>
+
         {/* Filter */}
         <View style={styles.filterRow}>
           {FILTER_TABS.map(f => (
@@ -347,4 +376,21 @@ const styles = StyleSheet.create({
   filterBtnActive: { borderColor: colors.primary, backgroundColor: 'rgba(0,212,255,0.1)' },
   filterText: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
   filterTextActive: { color: colors.primary, fontWeight: '700' },
+  aiTournamentCard: {
+    borderRadius: colors.radiusLg, borderWidth: 1, borderColor: 'rgba(191,95,255,0.5)',
+    overflow: 'hidden', padding: 16,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+  },
+  aiTournamentLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+  aiTournamentBadge: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: 'rgba(191,95,255,0.2)', borderWidth: 1, borderColor: colors.accent,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  aiTournamentBadgeText: { fontSize: 18 },
+  aiTournamentTitle: { color: colors.text, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  aiTournamentSub: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
+  aiTournamentRight: { alignItems: 'flex-end', gap: 2 },
+  aiTournamentPrize: { color: colors.gold, fontSize: 18, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  aiTournamentPrizeLabel: { color: colors.textMuted, fontSize: 8, fontWeight: '700', letterSpacing: 1 },
 });
