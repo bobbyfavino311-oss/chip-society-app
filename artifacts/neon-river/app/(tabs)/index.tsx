@@ -272,7 +272,7 @@ export default function HomeScreen() {
       />
 
       {/* Compact top profile bar */}
-      <View style={[styles.topBar, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
+      <View style={[styles.topBar, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 0) }]}>
         <View style={[styles.topAvatar, { borderColor: rankColor }]}>
           {profile.avatarUri
             ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17 }} />
@@ -366,12 +366,14 @@ export default function HomeScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
+const LOGO_SIZE = Math.min(62, width * 0.162);
+
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
   word: {
     fontFamily: 'Pacifico_400Regular',
-    fontSize: 62,
-    lineHeight: 72,
+    fontSize: LOGO_SIZE,
+    lineHeight: LOGO_SIZE * 1.16,
     textShadowRadius: 20,
     textShadowOffset: { width: 0, height: 0 },
   },
@@ -380,7 +382,7 @@ const logo = StyleSheet.create({
     fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 4,
-    marginTop: 28,
+    marginTop: 12,
   },
 });
 

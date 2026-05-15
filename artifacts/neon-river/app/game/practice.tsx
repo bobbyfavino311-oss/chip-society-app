@@ -76,7 +76,7 @@ function SetupScreen({ onStart }: { onStart: (diff: AIDifficulty, numPlayers: nu
   const col = DIFFICULTY_COLORS[selected];
 
   return (
-    <View style={[setup.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 20) }]}>
+    <View style={[setup.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 20) }]}>
       <LinearGradient
         colors={[colors.background, '#0a0020', colors.background]}
         style={StyleSheet.absoluteFill}
@@ -312,23 +312,23 @@ export default function PracticeScreen() {
   const seatPositions: Record<string, number | string>[] =
     aiPlayers.length === 3
       ? [
-          { left: 4, top: '26%' },
-          { left: SEAT_CX, top: '4%' },
-          { right: 4, top: '26%' },
+          { left: 6, top: '22%' },
+          { left: SEAT_CX, top: '3%' },
+          { right: 6, top: '22%' },
         ]
       : aiPlayers.length === 5
       ? [
-          { left: 4, top: '54%' },
-          { left: 4, top: '12%' },
+          { left: 6, bottom: '5%' },
+          { left: 6, top: '8%' },
           { left: SEAT_CX, top: '2%' },
-          { right: 4, top: '12%' },
-          { right: 4, top: '54%' },
+          { right: 6, top: '8%' },
+          { right: 6, bottom: '5%' },
         ]
       : [
-          { left: 4, top: '54%' },
-          { left: 30, top: '5%' },
-          { right: 30, top: '5%' },
-          { right: 4, top: '54%' },
+          { left: 6, bottom: '5%' },
+          { left: 28, top: '6%' },
+          { right: 28, top: '6%' },
+          { right: 6, bottom: '5%' },
         ];
 
   return (
@@ -336,7 +336,7 @@ export default function PracticeScreen() {
       <LinearGradient colors={[colors.background, '#050015']} style={StyleSheet.absoluteFill} />
 
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 8) }]}>
+      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 8) }]}>
         <TouchableOpacity style={styles.exitBtn} onPress={() => { setGameStarted(false); router.back(); }}>
           <Ionicons name="close" size={22} color={colors.textMuted} />
         </TouchableOpacity>
@@ -770,7 +770,10 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 18, left: 18, right: 18, bottom: 18,
     borderRadius: 48, borderWidth: 1, borderColor: 'rgba(0,212,255,0.18)',
   },
-  tableInner: { flex: 1, position: 'relative', alignItems: 'center', justifyContent: 'center' },
+  tableInner: {
+    flex: 1, position: 'relative', alignItems: 'center', justifyContent: 'center',
+    paddingBottom: '22%',
+  },
 
   chipToken: {
     position: 'absolute',
