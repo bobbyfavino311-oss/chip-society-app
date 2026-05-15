@@ -4,7 +4,7 @@ import { Card, createDeck, determineWinners, shuffleDeck } from '../lib/pokerEng
 
 const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
-const TIMER_SECONDS = 30;
+const TIMER_SECONDS = 20;
 const AI_NAMES = ['Ace', 'Blaze', 'Shadow', 'Vegas', 'Ghost'];
 
 export type GamePhase = 'idle' | 'preflop' | 'flop' | 'turn' | 'river' | 'showdown' | 'handover';
@@ -378,7 +378,7 @@ function executeAIAction(prev: GameState): GameState {
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
-export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanChips: number) {
+export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanChips: number, numPlayers: number = 5) {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const aiRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -445,9 +445,11 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
     // cancel the already-scheduled timeout. aiKeyRef prevents duplicates.
   }, [state.currentPlayerIndex, state.phase, state.numToAct, state.allInRunout]); // eslint-disable-line
 
-  const startNewHand = useCallback((dealerIdx: number = 0) => {
+  const startNewHand = useCallback((dealerIdx: number = 0, overrideNumAI?: number) => {
     clearTimer();
     clearAI();
+
+    const numAI = Math.min(5, Math.max(3, overrideNumAI ?? (numPlayers - 1)));
 
     const players: GamePlayer[] = [
       {
@@ -466,7 +468,7 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
         isBigBlind: false,
         avatarIndex: 0,
       },
-      ...AI_NAMES.slice(0, 4).map((name, i) => ({
+      ...AI_NAMES.slice(0, numAI).map((name, i) => ({
         id: `ai_${i}`,
         name,
         chips: 1200 + i * 150,
@@ -485,7 +487,7 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
     ];
 
     setState(dealAndPostBlinds(players, dealerIdx));
-  }, [difficulty, humanName, humanChips, clearTimer, clearAI]);
+  }, [difficulty, humanName, humanChips, numPlayers, clearTimer, clearAI]);
 
   const handleAction = useCallback((action: AIAction, raiseAmount?: number) => {
     clearTimer();

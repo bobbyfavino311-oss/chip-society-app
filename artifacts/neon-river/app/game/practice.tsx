@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Animated,
+  Dimensions,
   Platform,
   ScrollView,
   StyleSheet,
@@ -68,9 +69,11 @@ function formatChips(n: number): string {
 
 // ─── Setup screen ─────────────────────────────────────────────────────────────
 
-function SetupScreen({ onStart }: { onStart: (diff: AIDifficulty) => void }) {
+function SetupScreen({ onStart }: { onStart: (diff: AIDifficulty, numPlayers: number) => void }) {
   const [selected, setSelected] = useState<AIDifficulty>('casual');
+  const [playerCount, setPlayerCount] = useState(5);
   const insets = useSafeAreaInsets();
+  const col = DIFFICULTY_COLORS[selected];
 
   return (
     <View style={[setup.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 20) }]}>
@@ -87,28 +90,51 @@ function SetupScreen({ onStart }: { onStart: (diff: AIDifficulty) => void }) {
       <ScrollView contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 40 }}>
         {(Object.keys(DIFFICULTY_LABELS) as AIDifficulty[]).map(diff => {
           const isSelected = selected === diff;
-          const col = DIFFICULTY_COLORS[diff];
+          const c = DIFFICULTY_COLORS[diff];
           return (
             <TouchableOpacity
               key={diff}
-              style={[setup.diffCard, isSelected && { borderColor: col }]}
+              style={[setup.diffCard, isSelected && { borderColor: c }]}
               onPress={() => { setSelected(diff); Haptics.selectionAsync(); }}
               activeOpacity={0.85}
             >
               {isSelected && (
-                <LinearGradient colors={[`${col}22`, 'transparent']} style={StyleSheet.absoluteFill} />
+                <LinearGradient colors={[`${c}22`, 'transparent']} style={StyleSheet.absoluteFill} />
               )}
               <View>
-                <Text style={[setup.diffName, isSelected && { color: col }]}>
+                <Text style={[setup.diffName, isSelected && { color: c }]}>
                   {DIFFICULTY_LABELS[diff].toUpperCase()}
                 </Text>
                 <Text style={setup.diffDesc}>{getDiffDesc(diff)}</Text>
               </View>
-              {isSelected && <Ionicons name="checkmark-circle" size={22} color={col} />}
+              {isSelected && <Ionicons name="checkmark-circle" size={22} color={c} />}
             </TouchableOpacity>
           );
         })}
-        <TouchableOpacity style={setup.startBtn} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); onStart(selected); }}>
+
+        {/* Player count picker */}
+        <View style={setup.playerSection}>
+          <Text style={setup.sectionLabel}>TABLE SIZE</Text>
+          <View style={setup.playerCountRow}>
+            {([4, 5, 6] as const).map(n => {
+              const active = playerCount === n;
+              return (
+                <TouchableOpacity
+                  key={n}
+                  style={[setup.playerCountBtn, active && { borderColor: col, backgroundColor: `${col}18` }]}
+                  onPress={() => { setPlayerCount(n); Haptics.selectionAsync(); }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[setup.playerCountNum, active && { color: col }]}>{n}</Text>
+                  <Text style={setup.playerCountLabel}>players</Text>
+                  <Text style={setup.playerCountSub}>You + {n - 1} bots</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        <TouchableOpacity style={setup.startBtn} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); onStart(selected, playerCount); }}>
           <LinearGradient colors={[colors.primary, '#0088bb']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
           <Ionicons name="flash" size={20} color={colors.background} />
           <Text style={setup.startText}>DEAL CARDS</Text>
@@ -126,7 +152,7 @@ function CommunityCards({ cards, phase }: { cards: any[]; phase: string }) {
       <Text style={table.phaseLabel}>{PHASE_LABELS[phase] ?? ''}</Text>
       <View style={table.communityCards}>
         {[0, 1, 2, 3, 4].map(i => (
-          <PlayingCard key={i} card={cards[i]} faceDown={!cards[i]} size="md" />
+          <PlayingCard key={i} card={cards[i]} faceDown={!cards[i]} size="lg" />
         ))}
       </View>
     </View>
@@ -140,24 +166,26 @@ export default function PracticeScreen() {
   const [difficulty, setDifficulty] = useState<AIDifficulty>('casual');
   const [gameStarted, setGameStarted] = useState(false);
   const [handCount, setHandCount] = useState(0);
+  const [numPlayers, setNumPlayers] = useState(5);
 
   const { state, startNewHand, handleAction, skipBotTurn, skipToShowdown, continueAfterHand } = usePokerGame(
     difficulty,
     profile.username,
-    profile.chips
+    profile.chips,
+    numPlayers
   );
 
   const insets = useSafeAreaInsets();
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
   const N_CHIP = 4;
-  const SEAT_VEC = [
-    { x: -145, y: 70 },
-    { x: -90, y: -120 },
-    { x: 90, y: -120 },
-    { x: 145, y: 70 },
-    { x: 0, y: 140 },
-  ] as const;
+  const numAI = numPlayers - 1;
+  const seatVec =
+    numAI === 3
+      ? [{ x: -140, y: 20 }, { x: 0, y: -130 }, { x: 140, y: 20 }, { x: 0, y: 140 }]
+      : numAI === 5
+      ? [{ x: -145, y: 70 }, { x: -145, y: -60 }, { x: 0, y: -130 }, { x: 145, y: -60 }, { x: 145, y: 70 }, { x: 0, y: 140 }]
+      : [{ x: -145, y: 70 }, { x: -90, y: -120 }, { x: 90, y: -120 }, { x: 145, y: 70 }, { x: 0, y: 140 }];
   const chipAnims = useRef(
     Array.from({ length: N_CHIP }, () => ({
       pos: new Animated.ValueXY({ x: 0, y: 0 }),
@@ -187,9 +215,9 @@ export default function PracticeScreen() {
     let vecIdx = 4;
     if (!isHumanActor && actor) {
       const aiIdx = localAiPlayers.findIndex(p => p.id === actor.id);
-      vecIdx = aiIdx >= 0 ? Math.min(aiIdx, 3) : 0;
+      vecIdx = aiIdx >= 0 ? Math.min(aiIdx, seatVec.length - 2) : 0;
     }
-    const vec = SEAT_VEC[vecIdx];
+    const vec = seatVec[vecIdx];
     chipAnims.forEach(({ pos, opacity }, i) => {
       pos.setValue({ x: vec.x + (i - N_CHIP / 2 + 0.5) * 12, y: vec.y + (i % 2) * 6 });
       opacity.setValue(0);
@@ -223,8 +251,8 @@ export default function PracticeScreen() {
     const isHumanWin = winnerId === 'human';
     const localAiPlayers = state.players.filter(p => !p.isHuman);
     const aiIdx = isHumanWin ? -1 : localAiPlayers.findIndex(p => p.id === winnerId);
-    const vecIdx = isHumanWin ? 4 : Math.min(aiIdx < 0 ? 0 : aiIdx, 3);
-    const target = SEAT_VEC[vecIdx];
+    const vecIdx = isHumanWin ? seatVec.length - 1 : Math.min(aiIdx < 0 ? 0 : aiIdx, seatVec.length - 2);
+    const target = seatVec[vecIdx];
     winAnims.forEach(({ pos, opacity }) => { pos.setValue({ x: 0, y: -20 }); opacity.setValue(0); });
     const anims = winAnims.map(({ pos, opacity }, i) =>
       Animated.sequence([
@@ -245,10 +273,11 @@ export default function PracticeScreen() {
   if (!gameStarted) {
     return (
       <SetupScreen
-        onStart={diff => {
+        onStart={(diff, n) => {
           setDifficulty(diff);
+          setNumPlayers(n);
           setGameStarted(true);
-          startNewHand(0);
+          startNewHand(0, n - 1);
           SoundEngine.deal();
         }}
       />
@@ -278,12 +307,29 @@ export default function PracticeScreen() {
     SoundEngine.deal();
   };
 
-  const seatPositions = [
-    { left: 2, top: '56%' },
-    { left: 34, top: '6%' },
-    { right: 34, top: '6%' },
-    { right: 2, top: '56%' },
-  ] as const;
+  const TABLE_W = Dimensions.get('window').width - 16;
+  const SEAT_CX = Math.round(TABLE_W / 2 - 37);
+  const seatPositions: Record<string, number | string>[] =
+    aiPlayers.length === 3
+      ? [
+          { left: 4, top: '26%' },
+          { left: SEAT_CX, top: '4%' },
+          { right: 4, top: '26%' },
+        ]
+      : aiPlayers.length === 5
+      ? [
+          { left: 4, top: '54%' },
+          { left: 4, top: '12%' },
+          { left: SEAT_CX, top: '2%' },
+          { right: 4, top: '12%' },
+          { right: 4, top: '54%' },
+        ]
+      : [
+          { left: 4, top: '54%' },
+          { left: 30, top: '5%' },
+          { right: 30, top: '5%' },
+          { right: 4, top: '54%' },
+        ];
 
   return (
     <View style={styles.screen}>
@@ -569,6 +615,23 @@ const setup = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', paddingVertical: 18, gap: 10, marginTop: 8,
   },
   startText: { color: colors.background, fontSize: 16, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
+  playerSection: { gap: 8, marginTop: 4 },
+  sectionLabel: {
+    color: colors.textMuted, fontSize: 10, fontWeight: '700',
+    letterSpacing: 2, fontFamily: 'Orbitron_400Regular',
+  },
+  playerCountRow: { flexDirection: 'row', gap: 10 },
+  playerCountBtn: {
+    flex: 1, alignItems: 'center', paddingVertical: 14,
+    borderRadius: colors.radius, borderWidth: 1.5,
+    borderColor: colors.border, backgroundColor: colors.surface,
+  },
+  playerCountNum: {
+    color: colors.textDim, fontSize: 24, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', lineHeight: 28,
+  },
+  playerCountLabel: { color: colors.textMuted, fontSize: 10, fontWeight: '600', marginTop: 2 },
+  playerCountSub: { color: colors.textMuted, fontSize: 9, marginTop: 1 },
 });
 
 const table = StyleSheet.create({
