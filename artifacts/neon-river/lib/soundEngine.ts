@@ -1,3 +1,6 @@
+import { Platform } from 'react-native';
+import * as Haptics from 'expo-haptics';
+
 let _ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext | null {
@@ -67,36 +70,62 @@ function noise(duration: number, vol = 0.12, loFreq = 200, hiFreq = 3000, delay 
   src.stop(t + duration + 0.01);
 }
 
+const isNative = Platform.OS !== 'web';
+
 export const SoundEngine = {
   deal() {
+    if (isNative) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      return;
+    }
     noise(0.07, 0.14, 600, 5000);
     noise(0.05, 0.09, 300, 2000, 0.04);
     tone(1800, 'sine', 0.04, 0.06, 0.01);
   },
 
   chip() {
+    if (isNative) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      return;
+    }
     tone(1100, 'sine', 0.07, 0.22);
     tone(1500, 'sine', 0.05, 0.12, 0.012);
     noise(0.04, 0.09, 1200, 6000);
   },
 
   check() {
+    if (isNative) {
+      Haptics.selectionAsync();
+      return;
+    }
     noise(0.035, 0.09, 150, 700);
     tone(380, 'sine', 0.055, 0.10);
   },
 
   fold() {
+    if (isNative) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      return;
+    }
     tone(280, 'sine', 0.22, 0.22, 0, 160);
     noise(0.06, 0.07, 100, 600, 0.02);
   },
 
   call() {
+    if (isNative) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      return;
+    }
     tone(900, 'sine', 0.06, 0.18);
     tone(1100, 'sine', 0.05, 0.12, 0.015);
     noise(0.04, 0.07, 800, 3000);
   },
 
   raise() {
+    if (isNative) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      return;
+    }
     tone(600, 'sine', 0.06, 0.18);
     tone(900, 'sine', 0.07, 0.20, 0.04);
     tone(1200, 'sine', 0.06, 0.16, 0.08);
@@ -104,6 +133,10 @@ export const SoundEngine = {
   },
 
   allin() {
+    if (isNative) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      return;
+    }
     [350, 500, 680, 950, 1300].forEach((f, i) => {
       tone(f, 'sawtooth', 0.22, 0.13 + i * 0.015, i * 0.065, f * 1.06);
     });
@@ -111,6 +144,10 @@ export const SoundEngine = {
   },
 
   win() {
+    if (isNative) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      return;
+    }
     [523, 659, 784, 1047, 1319].forEach((f, i) => {
       tone(f, 'sine', 0.28, 0.18 + i * 0.01, i * 0.11);
     });
@@ -120,32 +157,37 @@ export const SoundEngine = {
   },
 
   lose() {
+    if (isNative) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
     tone(330, 'sine', 0.30, 0.20, 0, 200);
     tone(250, 'sine', 0.30, 0.18, 0.15, 160);
     tone(180, 'sine', 0.35, 0.15, 0.32, 120);
   },
 
   cardFlip() {
+    if (isNative) {
+      Haptics.selectionAsync();
+      return;
+    }
     noise(0.055, 0.18, 800, 6000);
     noise(0.04, 0.12, 300, 2000, 0.03);
     tone(2200, 'sine', 0.03, 0.07, 0.005);
   },
 
-  // Flickering neon-sign static — low electrical hum + random crackles
   neonBuzz() {
+    if (isNative) return;
     const dur = 0.18 + Math.random() * 0.22;
-    // 60 Hz power-line hum with harmonics
     tone(60, 'sawtooth', dur, 0.055);
     tone(120, 'sawtooth', dur, 0.028);
     tone(240, 'sawtooth', dur * 0.6, 0.012);
-    // 2-5 random crackle bursts layered over the hum
     const cracks = 2 + Math.floor(Math.random() * 4);
     for (let i = 0; i < cracks; i++) {
       const d = Math.random() * (dur * 0.8);
       const len = 0.006 + Math.random() * 0.018;
       noise(len, 0.10 + Math.random() * 0.08, 1800, 14000, d);
     }
-    // Occasional high-pitched spit
     if (Math.random() < 0.5) {
       tone(3200 + Math.random() * 1800, 'sine', 0.012, 0.04, Math.random() * dur * 0.5);
     }

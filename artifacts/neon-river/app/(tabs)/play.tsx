@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { useColors } from '@/hooks/useColors';
 
 const RANK_COLORS: Record<string, string> = {
   'Neon Bronze': '#cd7f32',
@@ -72,13 +73,14 @@ function GameModeCard({ icon, title, subtitle, color, onPress, badge, locked }: 
 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
+  const colors = useColors();
   const { profile } = useUser();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={[colors.background, '#0a0025', colors.background]}
+        colors={[colors.background, colors.surfaceElevated, colors.background]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}

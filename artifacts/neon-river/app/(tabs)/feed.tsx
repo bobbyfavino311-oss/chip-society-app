@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { useColors } from '@/hooks/useColors';
 
 // ─── Types & constants ────────────────────────────────────────────────────────
 
@@ -637,6 +638,7 @@ function MeSection({
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
+  const colors = useColors();
   const [activeTab, setActiveTab] = useState<string>('trending');
   const [composeVisible, setComposeVisible] = useState(false);
   const [myPosts, setMyPosts] = useState<MePost[]>(INITIAL_MY_POSTS);
@@ -650,8 +652,8 @@ export default function FeedScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <LinearGradient colors={[colors.background, '#080018']} style={StyleSheet.absoluteFill} />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient colors={[colors.background, colors.surfaceElevated]} style={StyleSheet.absoluteFill} />
 
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>

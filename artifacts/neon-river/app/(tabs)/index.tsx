@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -16,7 +17,9 @@ import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
+import { useColors } from '@/hooks/useColors';
 import { getAvatar } from '@/components/CasinoAvatars';
 
 const { width } = Dimensions.get('window');
@@ -400,7 +403,19 @@ function FeaturedTournament() {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
+  const colors = useColors();
+  const { isDark, toggleTheme } = useTheme();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const dropAnim = useRef(new Animated.Value(0)).current;
+
+  const openSettings = () => {
+    setSettingsOpen(true);
+    Animated.spring(dropAnim, { toValue: 1, useNativeDriver: true, tension: 80, friction: 10 }).start();
+  };
+  const closeSettings = () => {
+    Animated.timing(dropAnim, { toValue: 0, duration: 140, useNativeDriver: true }).start(() => setSettingsOpen(false));
+  };
 
   const [tournaments, setTournaments] = useState<LiveTournament[]>(initTournamentPool);
 
@@ -430,24 +445,95 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={[colors.background, '#080020', colors.background]}
+        colors={isDark
+          ? [colors.background, '#080020', colors.background]
+          : [colors.background, colors.surfaceElevated, colors.background]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
 
-      {/* Profile avatar — top right only */}
-      <View style={[styles.topCorner, { top: insets.top + (Platform.OS === 'web' ? 20 : 8) }]}>
-        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} activeOpacity={0.8}>
-          <View style={[styles.topAvatar, { borderColor: rankColor }]}>
-            {profile.avatarUri
-              ? <Image source={{ uri: profile.avatarUri }} style={{ width: 38, height: 38, borderRadius: 19 }} />
-              : getAvatar(profile.avatarIndex).render(38)
-            }
-          </View>
-        </TouchableOpacity>
+      {/* Backdrop to close settings when tapping outside */}
+      {settingsOpen && (
+        <TouchableOpacity
+          style={[StyleSheet.absoluteFillObject, { zIndex: 5 }]}
+          onPress={closeSettings}
+          activeOpacity={1}
+        />
+      )}
+
+      {/* Top-right: gear + avatar */}
+      <View style={[styles.topCorner, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          {/* Settings gear */}
+          <TouchableOpacity onPress={settingsOpen ? closeSettings : openSettings} activeOpacity={0.8}>
+            <View style={[styles.topAvatar, { borderColor: settingsOpen ? colors.primary : colors.border, backgroundColor: colors.surface }]}>
+              <Ionicons
+                name={settingsOpen ? 'close' : 'settings-outline'}
+                size={18}
+                color={settingsOpen ? colors.primary : colors.textMuted}
+              />
+            </View>
+          </TouchableOpacity>
+          {/* Profile avatar */}
+          <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} activeOpacity={0.8}>
+            <View style={[styles.topAvatar, { borderColor: rankColor, backgroundColor: colors.surface }]}>
+              {profile.avatarUri
+                ? <Image source={{ uri: profile.avatarUri }} style={{ width: 38, height: 38, borderRadius: 19 }} />
+                : getAvatar(profile.avatarIndex).render(38)
+              }
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Settings dropdown panel */}
+        {settingsOpen && (
+          <Animated.View
+            style={[
+              styles.settingsDropdown,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                opacity: dropAnim,
+                transform: [{ translateY: dropAnim.interpolate({ inputRange: [0, 1], outputRange: [-6, 0] }) }],
+              },
+            ]}
+          >
+            {/* Profile row */}
+            <TouchableOpacity
+              style={styles.settingsItem}
+              onPress={() => { closeSettings(); setTimeout(() => router.push('/(tabs)/profile'), 180); }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="person-outline" size={18} color={colors.primary} />
+              <Text style={[styles.settingsItemText, { color: colors.text }]}>Profile</Text>
+              <Ionicons name="chevron-forward" size={15} color={colors.textMuted} style={{ marginLeft: 'auto' }} />
+            </TouchableOpacity>
+
+            <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
+
+            {/* Theme toggle row */}
+            <View style={styles.settingsItem}>
+              <Ionicons
+                name={isDark ? 'moon-outline' : 'sunny-outline'}
+                size={18}
+                color={colors.accent}
+              />
+              <Text style={[styles.settingsItemText, { color: colors.text }]}>
+                {isDark ? 'Dark Mode' : 'Light Mode'}
+              </Text>
+              <Switch
+                value={!isDark}
+                onValueChange={toggleTheme}
+                trackColor={{ false: colors.border, true: `${colors.accent}55` }}
+                thumbColor={!isDark ? colors.accent : colors.textMuted}
+                style={{ marginLeft: 'auto', transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }] }}
+              />
+            </View>
+          </Animated.View>
+        )}
       </View>
 
       <ScrollView
@@ -661,9 +747,38 @@ const feat = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1 },
   topCorner: {
     position: 'absolute', right: 16, zIndex: 10,
+  },
+  settingsDropdown: {
+    position: 'absolute',
+    top: 50,
+    right: 0,
+    width: 224,
+    borderRadius: 14,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
+    elevation: 14,
+  },
+  settingsItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    gap: 12,
+  },
+  settingsItemText: {
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  settingsDivider: {
+    height: 1,
+    marginHorizontal: 12,
   },
   topAvatar: {
     width: 40, height: 40, borderRadius: 20,

@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -223,6 +224,7 @@ const FILTER_TABS = [
 
 export default function TournamentsScreen() {
   const insets = useSafeAreaInsets();
+  const colors = useColors();
   const [filter, setFilter] = useState('all');
 
   const featured = TOURNAMENTS.find(t => t.featured);
@@ -231,9 +233,9 @@ export default function TournamentsScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={[colors.background, '#08001c']}
+        colors={[colors.background, colors.surfaceElevated]}
         style={StyleSheet.absoluteFill}
       />
 

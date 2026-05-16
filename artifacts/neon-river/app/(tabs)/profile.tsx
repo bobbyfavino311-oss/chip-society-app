@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { useColors } from '@/hooks/useColors';
 import { CASINO_AVATARS, getAvatar } from '@/components/CasinoAvatars';
 
 const RANK_COLORS: Record<string, string> = {
@@ -69,6 +70,7 @@ const statStyles = StyleSheet.create({
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
+  const colors = useColors();
   const { profile, updateProfile, winRate } = useUser();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.username);
@@ -107,9 +109,9 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={[colors.background, '#0a0025', colors.background]}
+        colors={[colors.background, colors.surfaceElevated, colors.background]}
         style={StyleSheet.absoluteFill}
       />
       <ScrollView
