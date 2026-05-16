@@ -352,27 +352,27 @@ export default function PracticeScreen() {
   };
 
   const TABLE_W = Dimensions.get('window').width - 16;
-  const SEAT_CX = Math.round(TABLE_W / 2 - 37);
+  const SEAT_CX = Math.round(TABLE_W / 2 - 46);
   const seatPositions: Record<string, number | string>[] =
     aiPlayers.length === 3
       ? [
-          { left: 6, top: '28%' },
-          { left: SEAT_CX, top: '4%' },
-          { right: 6, top: '28%' },
+          { left: 4, top: '30%' },
+          { left: SEAT_CX, top: '3%' },
+          { right: 4, top: '30%' },
         ]
       : aiPlayers.length === 5
       ? [
-          { left: 6, bottom: '8%' },
-          { left: 6, top: '26%' },
-          { left: SEAT_CX, top: '3%' },
-          { right: 6, top: '26%' },
-          { right: 6, bottom: '8%' },
+          { left: 4, top: '43%' },
+          { left: 16, top: '5%' },
+          { left: SEAT_CX, top: '2%' },
+          { right: 16, top: '5%' },
+          { right: 4, top: '43%' },
         ]
       : [
-          { left: 6, bottom: '8%' },
-          { left: 22, top: '8%' },
-          { right: 22, top: '8%' },
-          { right: 6, bottom: '8%' },
+          { left: 4, top: '42%' },
+          { left: 28, top: '6%' },
+          { right: 28, top: '6%' },
+          { right: 4, top: '42%' },
         ];
 
   return (
@@ -417,57 +417,40 @@ export default function PracticeScreen() {
       {/* Table */}
       <View style={styles.tableArea}>
         <LinearGradient
-          colors={['#22003a', '#0e1a44', '#001a38', '#0e1a44', '#22003a']}
-          style={styles.tableSurface}
+          colors={['#1a0032', '#08001c', '#00152e', '#08001c', '#1a0032']}
+          style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-        >
+        />
 
+        {/* Felt oval (overflow:hidden for rounded shape, chip anims, center content) */}
+        <View style={styles.tableSurface}>
+          <LinearGradient
+            colors={['#0d1f3c', '#061528', '#091e38']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+          <View style={styles.tableInnerRing} />
+          <View style={styles.tableCenterGlow} />
+
+          {/* Bet chip tokens */}
+          {chipAnims.map(({ pos, opacity }, i) => (
+            <Animated.View
+              key={`chip_${i}`}
+              style={[styles.chipToken, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }], pointerEvents: 'none' }]}
+            />
+          ))}
+          {/* Win chip tokens */}
+          {winAnims.map(({ pos, opacity }, i) => (
+            <Animated.View
+              key={`win_${i}`}
+              style={[styles.chipTokenWin, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }], pointerEvents: 'none' }]}
+            />
+          ))}
+
+          {/* Center: pot → community cards → human hole cards */}
           <View style={styles.tableInner}>
-            {/* Bet chip tokens */}
-            {chipAnims.map(({ pos, opacity }, i) => (
-              <Animated.View
-                key={`chip_${i}`}
-                style={[styles.chipToken, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }] }]}
-                pointerEvents="none"
-              />
-            ))}
-            {/* Win chip tokens */}
-            {winAnims.map(({ pos, opacity }, i) => (
-              <Animated.View
-                key={`win_${i}`}
-                style={[styles.chipTokenWin, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }] }]}
-                pointerEvents="none"
-              />
-            ))}
-
-            {/* AI Players */}
-            {aiPlayers.map((player, i) => {
-              const pos = seatPositions[i] ?? { left: 0, top: '50%' };
-              const isCurrentSeat = state.players[state.currentPlayerIndex]?.id === player.id;
-              const isWinner = state.winnerIds.includes(player.id);
-              return (
-                <View key={player.id} style={[styles.aiSeat, pos as any]}>
-                  <PlayerSeat
-                    name={player.name}
-                    chips={player.chips}
-                    holeCards={player.holeCards}
-                    status={isWinner ? 'winner' : player.status}
-                    isCurrentTurn={isCurrentSeat}
-                    isDealer={player.isDealer}
-                    isSmallBlind={player.isSmallBlind}
-                    isBigBlind={player.isBigBlind}
-                    betInRound={player.betInRound}
-                    timer={state.timer}
-                    showCards={state.showCards}
-                    avatarIndex={player.avatarIndex}
-                    isHuman={false}
-                  />
-                </View>
-              );
-            })}
-
-            {/* Center: pot → community cards → human hole cards */}
             <View style={styles.centerCol}>
               {/* Pot badge — always visible on the table */}
               {(state.pot > 0 || state.winnerPot > 0) && (
@@ -552,13 +535,51 @@ export default function PracticeScreen() {
               </View>
             )}
           </View>
-        </LinearGradient>
+        </View>
 
-        {/* Player info strip — name bottom-left, timer right */}
+        {/* AI seat overlay — absoluteFillObject, no overflow:hidden, seats are never clipped */}
+        <View style={[StyleSheet.absoluteFillObject, { pointerEvents: 'box-none' }]}>
+          {aiPlayers.map((player, i) => {
+            const pos = seatPositions[i] ?? { left: 0, top: '40%' };
+            const isCurrentSeat = state.players[state.currentPlayerIndex]?.id === player.id;
+            const isWinner = state.winnerIds.includes(player.id);
+            return (
+              <View key={player.id} style={[styles.aiSeat, pos as any]}>
+                <PlayerSeat
+                  name={player.name}
+                  chips={player.chips}
+                  holeCards={player.holeCards}
+                  status={isWinner ? 'winner' : player.status}
+                  isCurrentTurn={isCurrentSeat}
+                  isDealer={player.isDealer}
+                  isSmallBlind={player.isSmallBlind}
+                  isBigBlind={player.isBigBlind}
+                  betInRound={player.betInRound}
+                  timer={state.timer}
+                  showCards={state.showCards}
+                  avatarIndex={player.avatarIndex}
+                  isHuman={false}
+                  lastAction={player.lastAction}
+                />
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Human player HUD strip */}
         {humanPlayer && (
           <View style={styles.playerStrip}>
             <View style={styles.playerStripLeft}>
-              <View style={[styles.humanAvatar, { borderColor: isHumanTurn ? colors.primary : colors.border }]}>
+              <View style={[
+                styles.humanAvatar,
+                {
+                  borderColor: isHumanTurn ? colors.primary : colors.border,
+                  shadowColor: isHumanTurn ? colors.primary : 'transparent',
+                  shadowOpacity: 0.7,
+                  shadowRadius: 10,
+                  shadowOffset: { width: 0, height: 0 },
+                },
+              ]}>
                 <Text style={styles.humanAvatarText}>♠</Text>
                 {humanPlayer.isDealer && (
                   <View style={styles.dealerDot}><Text style={styles.dealerDotText}>D</Text></View>
@@ -571,6 +592,11 @@ export default function PracticeScreen() {
               {humanPlayer.betInRound > 0 && (
                 <View style={styles.betChip}>
                   <Text style={styles.betChipText}>{formatChips(humanPlayer.betInRound)}</Text>
+                </View>
+              )}
+              {humanPlayer.lastAction && (
+                <View style={[styles.betChip, { borderColor: 'rgba(191,95,255,0.5)', backgroundColor: 'rgba(191,95,255,0.1)' }]}>
+                  <Text style={[styles.betChipText, { color: '#bf5fff' }]}>{humanPlayer.lastAction}</Text>
                 </View>
               )}
             </View>
@@ -866,21 +892,32 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
-  tableArea: { flex: 1 },
+  tableArea: { flex: 1, position: 'relative' },
   tableSurface: {
-    flex: 1, margin: 8, borderRadius: 60, overflow: 'hidden',
-    borderWidth: 3, borderColor: '#cc0088',
+    flex: 1,
+    margin: 6,
+    borderRadius: 90,
+    overflow: 'hidden',
+    borderWidth: 4,
+    borderColor: '#ff0090',
+    shadowColor: '#ff0090',
+    shadowOpacity: 0.55,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 10,
   },
-  tableRingOuter: {
-    position: 'absolute', top: 6, left: 6, right: 6, bottom: 6,
-    borderRadius: 56, borderWidth: 1.5, borderColor: 'rgba(204,0,136,0.35)',
+  tableInnerRing: {
+    position: 'absolute', top: 14, left: 14, right: 14, bottom: 14,
+    borderRadius: 78, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.38)',
   },
-  tableRingInner: {
-    position: 'absolute', top: 18, left: 18, right: 18, bottom: 18,
-    borderRadius: 48, borderWidth: 1, borderColor: 'rgba(0,212,255,0.18)',
+  tableCenterGlow: {
+    position: 'absolute',
+    top: '28%', left: '28%', right: '28%', bottom: '28%',
+    borderRadius: 1000,
+    backgroundColor: 'rgba(0,212,255,0.018)',
   },
   tableInner: {
-    flex: 1, position: 'relative', alignItems: 'center', justifyContent: 'center',
+    flex: 1, alignItems: 'center', justifyContent: 'center',
     paddingBottom: '18%',
   },
 

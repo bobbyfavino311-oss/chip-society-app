@@ -29,6 +29,7 @@ export interface GamePlayer {
   isSmallBlind: boolean;
   isBigBlind: boolean;
   avatarIndex: number;
+  lastAction?: string; // last action label for seat display ('FOLD' | 'CHECK' | 'CALL' | 'RAISE' | 'ALL IN')
   chipDelta: number; // chips won/lost this hand (shown at handover)
 }
 
@@ -277,7 +278,7 @@ function advancePhase(state: GameState): GameState {
   // Only one active → they win (others folded)
   if (active.length === 1) return doShowdown(state);
 
-  const players = state.players.map(p => ({ ...p, betInRound: 0 }));
+  const players = state.players.map(p => ({ ...p, betInRound: 0, lastAction: undefined }));
   const base = { ...state, players, currentBet: 0, minRaise: BIG_BLIND };
 
   let firstActor = (state.dealerIndex + 1) % players.length;
@@ -367,6 +368,12 @@ function applyAction(state: GameState, action: AIAction, raiseAmount?: number): 
     }
   }
 
+  // Record the last action label on the acting player for seat display
+  const ACTION_LABELS: Record<string, string> = {
+    fold: 'FOLD', check: 'CHECK', call: 'CALL', raise: 'RAISE', allin: 'ALL IN',
+  };
+  player.lastAction = ACTION_LABELS[action];
+
   const active = players.filter(p => p.status === 'active');
   const next = active.length > 0 ? nextActiveIndex(players, state.currentPlayerIndex) : state.currentPlayerIndex;
 
@@ -403,6 +410,7 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number): GameState 
     holeCards: [] as Card[],
     betInRound: 0,
     chipDelta: 0,
+    lastAction: undefined,
     status: 'active' as PlayerStatus,
     isDealer: false,
     isSmallBlind: false,

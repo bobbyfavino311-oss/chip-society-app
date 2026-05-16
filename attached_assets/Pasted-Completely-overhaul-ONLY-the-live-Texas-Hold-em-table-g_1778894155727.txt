@@ -1,0 +1,476 @@
+Completely overhaul ONLY the live Texas Hold’em table gameplay experience for CHIP SOCIETY.
+
+DO NOT redesign:
+- login screens
+- menus
+- social feed
+- profile systems
+- tournaments
+- monetization
+- navigation
+- matchmaking
+- ranking systems
+
+ONLY redesign and rebuild:
+- the live poker table gameplay experience
+- poker engine logic
+- table UI
+- player positioning
+- betting flow
+- animations
+- gameplay responsiveness
+
+The goal is to make the actual poker gameplay feel:
+- premium
+- polished
+- modern
+- immersive
+- competitive
+- App Store top-tier quality
+
+The current gameplay table feels:
+- flat
+- empty
+- static
+- outdated
+- visually weak
+
+The new gameplay experience should compete with:
+- PokerStars
+- WSOP
+- Zynga Poker
+
+BUT maintain the CHIP SOCIETY identity:
+- neon 80s Miami aesthetic
+- synthwave luxury
+- neon casino atmosphere
+
+--------------------------------------------------
+TABLE OVERHAUL
+--------------------------------------------------
+
+Completely redesign the poker table.
+
+The table should feel:
+- modern
+- luxurious
+- immersive
+- polished
+- premium
+
+--------------------------------------------------
+TABLE DESIGN
+--------------------------------------------------
+
+Use:
+- curved oval poker table
+- glowing neon edge lighting
+- animated reflections
+- subtle ambient lighting
+- realistic felt texture
+- chrome trim accents
+- dynamic shadows
+- soft environmental glow
+
+TABLE COLORS:
+- dark navy blue felt
+- black outer trim
+- neon pink glow
+- electric blue reflections
+- purple ambient highlights
+
+The table should feel like:
+- a futuristic luxury casino
+- a high-end neon poker lounge
+
+--------------------------------------------------
+PLAYER POSITIONING
+--------------------------------------------------
+
+IMPORTANT:
+Maximum:
+- 5 players only
+
+Players must:
+- sit evenly around the curved table
+- maintain perfect symmetry
+- scale correctly on all iPhones
+- avoid awkward spacing
+- avoid overlapping UI
+
+Use:
+- curved seating alignment
+- responsive geometry
+- dynamic spacing system
+
+The current seat layout feels awkward and disconnected.
+
+The new seat positioning must feel:
+- balanced
+- premium
+- realistic
+- visually polished
+
+--------------------------------------------------
+PLAYER HUD OVERHAUL
+--------------------------------------------------
+
+Each player seat should include:
+- animated avatar ring
+- username
+- chip count
+- dealer indicator
+- live action label
+- turn timer
+
+--------------------------------------------------
+AVATAR SYSTEM
+--------------------------------------------------
+
+Player avatar rings should:
+- glow neon
+- pulse during active turns
+- animate on betting actions
+- visually highlight aggressive plays
+
+--------------------------------------------------
+LIVE ACTION LABELS
+--------------------------------------------------
+
+Display live player actions:
+- CALL
+- CHECK
+- RAISE
+- FOLD
+- ALL IN
+
+Animations:
+- smooth fades
+- neon flashes
+- responsive movement
+
+--------------------------------------------------
+TURN TIMER OVERHAUL
+--------------------------------------------------
+
+Each player must have:
+- visible 30-second countdown timer beside avatar
+
+The timer should:
+- wrap around avatar ring
+- animate smoothly
+- synchronize perfectly online
+- pulse near expiration
+
+COLORS:
+- blue during normal time
+- pink under 10 seconds
+- red under 5 seconds
+
+At expiration:
+- automatic fold
+- visual urgency effect
+
+The timer system must NEVER desynchronize.
+
+--------------------------------------------------
+POKER ENGINE REBUILD
+--------------------------------------------------
+
+Completely rebuild the live gameplay engine.
+
+The engine must:
+- be fully server-authoritative
+- synchronize perfectly online
+- maintain stable gameplay
+- prevent broken game states
+
+The poker engine MUST ALWAYS correctly complete:
+1. Pre-Flop
+2. Flop
+3. Turn
+4. River
+5. Showdown
+
+UNLESS:
+- all players fold except one
+OR
+- all remaining players are all-in
+
+NO skipped streets.
+NO broken action.
+NO premature hand endings.
+NO frozen gameplay.
+
+--------------------------------------------------
+BETTING ROUND LOGIC
+--------------------------------------------------
+
+Every betting round must continue UNTIL:
+- all active players have acted
+AND
+- all bets are equalized
+
+The engine must correctly:
+- rotate turns
+- continue action after raises
+- skip folded players
+- skip all-in players
+- track last aggressor
+- manage betting order correctly
+
+--------------------------------------------------
+FULL TEXAS HOLD’EM RULE SUPPORT
+--------------------------------------------------
+
+The engine must fully support:
+- blinds
+- folds
+- raises
+- re-raises
+- side pots
+- all-ins
+- split pots
+- kickers
+- showdown logic
+- blind rotation
+- dealer button rotation
+
+HAND RANKINGS:
+- Royal Flush
+- Straight Flush
+- Four of a Kind
+- Full House
+- Flush
+- Straight
+- Three of a Kind
+- Two Pair
+- One Pair
+- High Card
+
+The engine must NEVER:
+- incorrectly evaluate hands
+- miss side pots
+- skip betting rounds
+- break showdown logic
+
+--------------------------------------------------
+ALL-IN MODE
+--------------------------------------------------
+
+When players go all-in:
+- table lighting intensifies
+- neon glow increases
+- chip movement effects trigger
+- player indicators highlight
+
+The moment should feel:
+- exciting
+- intense
+- rewarding
+
+--------------------------------------------------
+SHOWDOWN OVERHAUL
+--------------------------------------------------
+
+Showdowns should feel:
+- rewarding
+- polished
+- premium
+
+Features:
+- glowing winning cards
+- animated hand labels
+- winner highlight effects
+- smooth chip transfer animations
+- neon visual effects
+
+Winning hands should animate clearly.
+
+Example:
+“FULL HOUSE”
+appears with premium neon animation.
+
+--------------------------------------------------
+CARD DESIGN OVERHAUL
+--------------------------------------------------
+
+Cards should feel:
+- elegant
+- premium
+- realistic
+
+Use:
+- subtle neon edge highlights
+- luxury typography
+- realistic shadows
+- smooth dealing animations
+- clean lighting
+
+Card dealing should:
+- slide naturally
+- feel responsive
+- animate smoothly
+
+--------------------------------------------------
+CHIP SYSTEM OVERHAUL
+--------------------------------------------------
+
+Completely rebuild chip animations.
+
+Chips should:
+- move physically toward pot
+- stack dynamically
+- animate smoothly
+- scale based on bet size
+
+Winning pots should:
+- slide smoothly to winner
+- trigger glow effects
+- feel satisfying
+
+--------------------------------------------------
+ACTION BUTTON REDESIGN
+--------------------------------------------------
+
+Buttons:
+- Fold
+- Check
+- Call
+- Raise
+- All-In
+
+Current buttons feel:
+- oversized
+- flat
+- outdated
+
+New buttons should:
+- glow neon
+- use gradients
+- feel premium
+- include responsive touch feedback
+- scale correctly on all iPhones
+
+--------------------------------------------------
+RAISE SLIDER OVERHAUL
+--------------------------------------------------
+
+Build:
+- smooth animated raise slider
+- draggable chip slider
+- responsive haptic feedback
+
+Quick Bet Buttons:
+- 25%
+- 50%
+- Pot
+- 2x Pot
+- All-In
+
+The slider should feel:
+- fluid
+- modern
+- responsive
+
+--------------------------------------------------
+PERFORMANCE REQUIREMENTS
+--------------------------------------------------
+
+Gameplay must maintain:
+- 60 FPS
+- smooth animations
+- instant betting response
+- low-latency synchronization
+- stable multiplayer performance
+
+Even during:
+- chip animations
+- all-ins
+- showdown effects
+- betting transitions
+
+--------------------------------------------------
+MOBILE OPTIMIZATION
+--------------------------------------------------
+
+The gameplay table must fit perfectly on:
+- iPhone 16 Pro Max
+- iPhone 15
+- iPhone 14
+- smaller iPhones
+
+Requirements:
+- responsive layouts
+- thumb-friendly controls
+- safe-area compatibility
+- clean spacing
+- uncluttered gameplay UI
+
+NO overlapping elements.
+NO cramped controls.
+NO dead space.
+
+--------------------------------------------------
+TECH REQUIREMENTS
+--------------------------------------------------
+
+FRONTEND:
+- Flutter preferred
+OR
+- React Native
+
+BACKEND:
+- Node.js
+- Socket.IO
+- Redis
+- PostgreSQL
+
+Use:
+- WebSockets
+- event-driven synchronization
+- server-authoritative gameplay
+
+--------------------------------------------------
+GAME STATE ARCHITECTURE
+--------------------------------------------------
+
+Use finite state machine architecture.
+
+Required states:
+- WAITING
+- DEALING
+- PRE_FLOP
+- FLOP
+- TURN
+- RIVER
+- SHOWDOWN
+- POT_DISTRIBUTION
+- RESET
+
+Every state transition must:
+- synchronize globally
+- validate correctly
+- prevent race conditions
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The live poker gameplay experience should feel:
+- modern
+- social
+- luxurious
+- immersive
+- competitive
+- visually polished
+
+The table should feel alive.
+
+This should NOT feel like:
+- a cheap poker clone
+- a static card game
+- a generic casino app
+
+It should feel like:
+a premium modern multiplayer poker table experience built specifically for iOS.
