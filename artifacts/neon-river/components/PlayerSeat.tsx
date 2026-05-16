@@ -36,6 +36,7 @@ interface PlayerSeatProps {
   avatarIndex?: number;
   isHuman?: boolean;
   lastAction?: string;
+  handName?: string;
 }
 
 export default function PlayerSeat({
@@ -53,6 +54,7 @@ export default function PlayerSeat({
   avatarIndex = 0,
   isHuman = false,
   lastAction,
+  handName,
 }: PlayerSeatProps) {
   const isFolded = status === 'folded';
   const isAllIn = status === 'allIn';
@@ -127,7 +129,7 @@ export default function PlayerSeat({
             <PlayingCard
               key={i}
               card={card}
-              faceDown={!showCards && !isHuman}
+              faceDown={!(showCards && !isFolded) && !isHuman}
               size="sm"
               animated={false}
             />
@@ -170,12 +172,7 @@ export default function PlayerSeat({
             isWinner && { borderColor: colors.gold, borderWidth: 2.5 },
           ]}
         >
-          <Text style={[styles.avatarText, { color: avatarColor }]}>{avatarSymbol}</Text>
-          {isFolded && (
-            <View style={styles.foldedOverlay}>
-              <Text style={styles.foldedX}>✕</Text>
-            </View>
-          )}
+          <Text style={[styles.avatarText, { color: isFolded ? colors.textDim : avatarColor }]}>{avatarSymbol}</Text>
         </View>
 
         {/* Position badge */}
@@ -231,6 +228,13 @@ export default function PlayerSeat({
       ) : (
         <Text style={[styles.chipsText, isFolded && styles.fadedText]}>
           {formatChips(chips)}
+        </Text>
+      )}
+
+      {/* Hand name — shown at showdown for non-folded players */}
+      {handName && !isFolded && (
+        <Text style={[styles.handNameText, isWinner && { color: colors.gold }]} numberOfLines={1}>
+          {handName}
         </Text>
       )}
 
@@ -292,18 +296,6 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 20,
     fontWeight: '700',
-  },
-  foldedOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.65)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: AVATAR_SIZE / 2,
-  },
-  foldedX: {
-    color: '#ff4444',
-    fontSize: 18,
-    fontWeight: '800',
   },
   posBadge: {
     position: 'absolute',
@@ -382,6 +374,16 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.5,
+    marginTop: 1,
+  },
+
+  handNameText: {
+    color: colors.textMuted,
+    fontSize: 8,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    maxWidth: 88,
     marginTop: 1,
   },
 

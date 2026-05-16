@@ -24,7 +24,7 @@ import { useUser } from '@/context/UserContext';
 import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame } from '@/hooks/usePokerGame';
 import { SoundEngine } from '@/lib/soundEngine';
-import { getBestHand } from '@/lib/pokerEngine';
+import { getBestHand, describeHand } from '@/lib/pokerEngine';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -179,11 +179,13 @@ function CommunityCards({
 
   return (
     <View style={table.communityArea}>
-      <Text style={table.phaseLabel}>{PHASE_LABELS[phase] ?? ''}</Text>
+      {phase !== 'idle' && phase !== 'handover' && (
+        <Text style={table.phaseLabel}>{PHASE_LABELS[phase] ?? ''}</Text>
+      )}
       <View style={table.communityCards}>
         {[0, 1, 2, 3, 4].map(i =>
           cards[i]
-            ? <PlayingCard key={i} card={cards[i]} size="xl" />
+            ? <PlayingCard key={i} card={cards[i]} size="lg" />
             : <View key={i} style={table.emptySlot} />
         )}
       </View>
@@ -487,12 +489,12 @@ export default function PracticeScreen() {
                   <View style={styles.humanHoleCards}>
                     {humanPlayer.holeCards.length > 0 ? (
                       humanPlayer.holeCards.map((card, i) => (
-                        <PlayingCard key={i} card={card} faceDown={false} size="xl" />
+                        <PlayingCard key={i} card={card} faceDown={false} size="lg" />
                       ))
                     ) : (
                       <>
-                        <PlayingCard faceDown size="xl" />
-                        <PlayingCard faceDown size="xl" />
+                        <PlayingCard faceDown size="lg" />
+                        <PlayingCard faceDown size="lg" />
                       </>
                     )}
                   </View>
@@ -543,6 +545,10 @@ export default function PracticeScreen() {
             const pos = seatPositions[i] ?? { left: 0, top: '40%' };
             const isCurrentSeat = state.players[state.currentPlayerIndex]?.id === player.id;
             const isWinner = state.winnerIds.includes(player.id);
+            const atShowdown = state.showCards && player.status !== 'folded';
+            const handName = atShowdown && player.holeCards.length === 2 && state.communityCards.length >= 3
+              ? describeHand(getBestHand(player.holeCards, state.communityCards))
+              : undefined;
             return (
               <View key={player.id} style={[styles.aiSeat, pos as any]}>
                 <PlayerSeat
@@ -560,6 +566,7 @@ export default function PracticeScreen() {
                   avatarIndex={player.avatarIndex}
                   isHuman={false}
                   lastAction={player.lastAction}
+                  handName={handName}
                 />
               </View>
             );
@@ -670,6 +677,37 @@ export default function PracticeScreen() {
               </>
             );
           })()}
+          {/* Showdown breakdown — only when multiple players reached showdown */}
+          {state.showCards && (() => {
+            const showdownPlayers = state.players.filter(p => p.status !== 'folded');
+            if (showdownPlayers.length < 2 || state.communityCards.length < 3) return null;
+            return (
+              <View style={styles.showdownPanel}>
+                <Text style={styles.showdownPanelTitle}>SHOWDOWN</Text>
+                {showdownPlayers.map(p => {
+                  const hand = p.holeCards.length === 2
+                    ? getBestHand(p.holeCards, state.communityCards)
+                    : null;
+                  const isWinner = state.winnerIds.includes(p.id);
+                  return (
+                    <View key={p.id} style={[styles.showdownRow, isWinner && styles.showdownRowWin]}>
+                      {isWinner
+                        ? <Ionicons name="trophy" size={10} color={colors.gold} />
+                        : <View style={{ width: 10 }} />
+                      }
+                      <Text style={[styles.showdownName, isWinner && { color: colors.gold }]}>
+                        {p.isHuman ? 'You' : p.name}
+                      </Text>
+                      <Text style={[styles.showdownHand, isWinner && { color: colors.gold }]} numberOfLines={1}>
+                        {hand ? describeHand(hand) : '—'}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })()}
+
           {/* Per-player chip delta */}
           <View style={styles.deltasRow}>
             {state.players
@@ -700,8 +738,8 @@ export default function PracticeScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               />
-              <Ionicons name="play" size={16} color={colors.background} />
-              <Text style={styles.nextBtnText}>NEXT HAND  #{handCount + 2}</Text>
+              <Ionicons name="play" size={14} color={colors.background} />
+              <Text style={styles.nextBtnText}>NEXT HAND #{handCount + 2}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -812,8 +850,8 @@ const table = StyleSheet.create({
   },
   communityCards: { flexDirection: 'row', gap: 6 },
   emptySlot: {
-    width: 70, height: 98, borderRadius: 9,
-    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.12)',
+    width: 56, height: 78, borderRadius: 7,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
     borderStyle: 'dashed',
     backgroundColor: 'rgba(255,255,255,0.03)',
   },
@@ -898,13 +936,13 @@ const styles = StyleSheet.create({
     margin: 6,
     borderRadius: 90,
     overflow: 'hidden',
-    borderWidth: 4,
-    borderColor: '#ff0090',
+    borderWidth: 2,
+    borderColor: '#cc0070',
     shadowColor: '#ff0090',
-    shadowOpacity: 0.55,
-    shadowRadius: 24,
+    shadowOpacity: 0.4,
+    shadowRadius: 18,
     shadowOffset: { width: 0, height: 0 },
-    elevation: 10,
+    elevation: 8,
   },
   tableInnerRing: {
     position: 'absolute', top: 14, left: 14, right: 14, bottom: 14,
@@ -1155,10 +1193,54 @@ const styles = StyleSheet.create({
   nextBtn: {
     borderRadius: colors.radius, overflow: 'hidden',
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 15, paddingHorizontal: 32, gap: 10,
+    paddingVertical: 11, paddingHorizontal: 24, gap: 8,
     borderWidth: 1, borderColor: colors.border, width: '100%',
   },
-  nextBtnText: { color: colors.background, fontSize: 14, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  nextBtnText: { color: colors.background, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+
+  showdownPanel: {
+    width: '100%',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
+  },
+  showdownPanelTitle: {
+    color: colors.textMuted,
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+    textAlign: 'center',
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+  },
+  showdownRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  showdownRowWin: {
+    backgroundColor: 'rgba(255,215,0,0.06)',
+  },
+  showdownName: {
+    color: colors.textDim,
+    fontSize: 10,
+    fontWeight: '700',
+    width: 52,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  showdownHand: {
+    color: colors.textMuted,
+    fontSize: 10,
+    flex: 1,
+  },
 
   // Waiting / watching panel
   waitingPanel: {
