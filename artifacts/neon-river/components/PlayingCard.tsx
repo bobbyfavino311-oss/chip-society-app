@@ -20,7 +20,7 @@ const SIZES = {
   xl: { w: 70, h: 98, cornerFont: 16, cornerSuit: 14, centerSuit: 38, radius: 9, artSize: 48 },
 };
 
-const FACE_VALUES = new Set(['J', 'Q', 'K', 'A']);
+const FACE_VALUES = new Set(['J', 'Q', 'K']);
 
 export default function PlayingCard({
   card,
@@ -143,10 +143,14 @@ export default function PlayingCard({
           <View style={styles.center}>
             {isFaceCard ? (
               <FaceCardArt
-                value={val as 'J' | 'Q' | 'K' | 'A'}
+                value={val as 'J' | 'Q' | 'K'}
                 isRed={isRed}
                 size={dim.artSize}
               />
+            ) : val === 'A' ? (
+              <Text style={[styles.centerSuit, { fontSize: dim.centerSuit * 1.6, color: textColor }]}>
+                {suit}
+              </Text>
             ) : (
               <Text style={[styles.centerSuit, { fontSize: dim.centerSuit, color: textColor }]}>
                 {suit}

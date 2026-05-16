@@ -1,315 +1,321 @@
 import React from 'react';
-import Svg, { Circle, Ellipse, Path, Rect, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 
 interface FaceCardArtProps {
-  value: 'J' | 'Q' | 'K' | 'A';
+  value: 'J' | 'Q' | 'K';
   isRed: boolean;
   size: number;
 }
 
-// ─── Design tokens ────────────────────────────────────────────────────────────
-const SKIN    = '#D4A070';  // Miami tan
-const SKIN_SH = '#A07040';  // shadow/depth
-const GOLD    = '#FFD700';
-const GOLD_FR = '#B89020';  // sunglass frame
+// ─── Shared palette ────────────────────────────────────────────────────────
+const SKIN   = '#F5D5A0';
+const SKIN_D = '#C8964A';
+const GOLD   = '#D4AF37';
+const DARK   = '#111111';
+const SILVER = '#C0C0C0';
+const WHITE  = '#FFFFFF';
 
-// ─── KING — South Beach Godfather ─────────────────────────────────────────────
-// Bold aviator shades, slicked hair, gold chain, white suit, lit cigar
+// ─────────────────────────────────────────────────────────────────────────────
+// KING — Two-headed traditional king figure
+// viewBox "0 0 50 70": top figure y=0..34, bottom = rotate(180,25,35)
+// ─────────────────────────────────────────────────────────────────────────────
+function KingFigure({ isRed }: { isRed: boolean }) {
+  const robe = isRed ? '#C41E3A' : '#1A3070';
+  const alt  = isRed ? '#1A3070' : '#C41E3A';
+
+  return (
+    <>
+      {/* ── Crown — 5-prong ────────────────────────────────────── */}
+      <Path
+        d="M 11,8.5 L 11,6 L 15,1.5 L 18,6 L 22,3 L 25,0.5 L 28,3 L 32,6 L 35,1.5 L 39,6 L 39,8.5 Z"
+        fill={GOLD} stroke={DARK} strokeWidth="0.6"
+      />
+      <Rect x="11" y="7.5" width="28" height="2.5" fill={GOLD} />
+      <Circle cx="18"   cy="5"   r="2"   fill={alt}  stroke={DARK} strokeWidth="0.4" />
+      <Circle cx="25"   cy="2.5" r="2.2" fill={alt}  stroke={DARK} strokeWidth="0.4" />
+      <Circle cx="32"   cy="5"   r="2"   fill={alt}  stroke={DARK} strokeWidth="0.4" />
+      <Path d="M 12,8.2 L 38,8.2" stroke="#EED848" strokeWidth="0.8" opacity="0.7" />
+
+      {/* ── Side hair ──────────────────────────────────────────── */}
+      <Path d="M 11,9.5 Q 8,13 8.5,21.5 Q 10,24.5 14,23.5 L 14.5,9.5 Z" fill={DARK} />
+      <Path d="M 39,9.5 Q 42,13 41.5,21.5 Q 40,24.5 36,23.5 L 35.5,9.5 Z" fill={DARK} />
+
+      {/* ── Face ───────────────────────────────────────────────── */}
+      <Ellipse cx="25" cy="18" rx="11" ry="10" fill={SKIN} stroke={DARK} strokeWidth="0.5" />
+
+      {/* Eyebrows */}
+      <Path d="M 17.5,14 Q 20.5,12.5 23,13.5" stroke={DARK} strokeWidth="1.3" fill="none" strokeLinecap="round" />
+      <Path d="M 27,13.5 Q 29.5,12.5 32.5,14"  stroke={DARK} strokeWidth="1.3" fill="none" strokeLinecap="round" />
+
+      {/* Eyes */}
+      <Ellipse cx="20.5" cy="16.5" rx="2.8" ry="2"   fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      <Ellipse cx="29.5" cy="16.5" rx="2.8" ry="2"   fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      <Circle  cx="21"   cy="16.5" r="1.4"  fill={DARK} />
+      <Circle  cx="30"   cy="16.5" r="1.4"  fill={DARK} />
+      <Circle  cx="21.5" cy="15.9" r="0.5"  fill={WHITE} />
+      <Circle  cx="30.5" cy="15.9" r="0.5"  fill={WHITE} />
+
+      {/* Nose */}
+      <Path d="M 23.5,18.5 Q 25,21 26.5,18.5" stroke={SKIN_D} strokeWidth="0.9" fill="none" strokeLinecap="round" />
+
+      {/* Mustache */}
+      <Path d="M 18.5,21.5 Q 21.5,24.5 25,23.5 Q 28.5,24.5 31.5,21.5" fill={DARK} />
+
+      {/* Beard */}
+      <Path
+        d="M 15.5,22 Q 13,27 15,31 Q 20,34.5 25,34.5 Q 30,34.5 35,31 Q 37,27 34.5,22 Q 31,26.5 25,27 Q 19,26.5 15.5,22 Z"
+        fill={DARK}
+      />
+      <Path d="M 18.5,25.5 Q 22,27 25,27"   stroke="#404040" strokeWidth="0.8" fill="none" />
+      <Path d="M 25,27 Q 28,27 31.5,25.5"   stroke="#404040" strokeWidth="0.8" fill="none" />
+
+      {/* ── Robe ───────────────────────────────────────────────── */}
+      <Path
+        d="M 13,26.5 Q 7.5,30 5.5,34.5 L 44.5,34.5 Q 42.5,30 37,26.5 Q 33,23 25,23 Q 17,23 13,26.5 Z"
+        fill={robe} stroke={DARK} strokeWidth="0.5"
+      />
+      {/* White collar */}
+      <Path d="M 19,23 L 25,30 L 31,23" fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      {/* Gold epaulette trim */}
+      <Path d="M 13,26.5 Q 7.5,30 5.5,34.5"   stroke={GOLD} strokeWidth="2" fill="none" strokeLinecap="round" />
+      <Path d="M 37,26.5 Q 42.5,30 44.5,34.5" stroke={GOLD} strokeWidth="2" fill="none" strokeLinecap="round" />
+      {/* Robe detail lines */}
+      <Path d="M 5.5,34.5 L 13,28.5"  stroke={GOLD} strokeWidth="0.6" opacity="0.5" />
+      <Path d="M 44.5,34.5 L 37,28.5" stroke={GOLD} strokeWidth="0.6" opacity="0.5" />
+
+      {/* ── Sword (right side) ─────────────────────────────────── */}
+      {/* Blade */}
+      <Path d="M 38.5,9 L 37.5,9 L 37,26 L 38,26.5 L 39,26 Z" fill={SILVER} stroke="#888" strokeWidth="0.4" />
+      {/* Cross guard */}
+      <Rect x="34"  y="25.5" width="9.5" height="2.5" rx="1.2" fill={GOLD} stroke={DARK} strokeWidth="0.4" />
+      {/* Grip */}
+      <Rect x="37"  y="27.5" width="2.5" height="5.5" rx="1"   fill="#7A3010" stroke={DARK} strokeWidth="0.3" />
+      {/* Pommel */}
+      <Ellipse cx="38.25" cy="33.5" rx="2.5" ry="1.8" fill={GOLD} stroke={DARK} strokeWidth="0.3" />
+
+      {/* ── Orb scepter (left side) ────────────────────────────── */}
+      <Rect  x="10"   y="27"   width="2"   height="7.5" rx="1"   fill={GOLD} />
+      <Circle cx="11"   cy="26"   r="3.5" fill={GOLD}  stroke={DARK} strokeWidth="0.4" />
+      <Circle cx="11"   cy="26"   r="2.2" fill={alt} />
+      <Circle cx="11"   cy="25.2" r="0.8" fill={WHITE} opacity="0.5" />
+    </>
+  );
+}
+
 function King({ isRed }: { isRed: boolean }) {
-  const lens    = isRed ? '#AA0044' : '#004499';
-  const lensHi  = isRed ? '#FF2277' : '#22AAFF';
-  const shirt   = isRed ? '#FFBBCC' : '#BBDDFF';
-
   return (
     <>
-      {/* ── HAIR — single clean path silhouette ── */}
-      <Path
-        d="M 6,26 Q 5,2 25,2 Q 45,2 44,26 Q 41,33 37,33 L 13,33 Q 9,33 6,26 Z"
-        fill="#120810"
-      />
-      {/* Sideburns */}
-      <Rect x="5"  y="25" width="6" height="18" rx="3" fill="#120810" />
-      <Rect x="39" y="25" width="6" height="18" rx="3" fill="#120810" />
-      {/* Silver temples */}
-      <Ellipse cx="8"  cy="29" rx="2.8" ry="5" fill="#AAAAAA" opacity="0.5" />
-      <Ellipse cx="42" cy="29" rx="2.8" ry="5" fill="#AAAAAA" opacity="0.5" />
-      {/* Hair gloss wave */}
-      <Path d="M 15,6 Q 20,3 25,4 Q 30,3 35,6" stroke="#2A1828" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-
-      {/* ── FACE ── */}
-      <Ellipse cx="25" cy="38" rx="14" ry="15" fill={SKIN} />
-      {/* Jaw / chin depth */}
-      <Ellipse cx="25" cy="50" rx="11" ry="5.5" fill={SKIN_SH} opacity="0.45" />
-      {/* Beard shadow — one bold shape */}
-      <Path
-        d="M 13,44 Q 10,55 25,58 Q 40,55 37,44 Q 31,50 25,51 Q 19,50 13,44 Z"
-        fill="#3A1808" opacity="0.28"
-      />
-
-      {/* ── AVIATOR SUNGLASSES — teardrop paths ── */}
-      {/* Left lens */}
-      <Path d="M 7,31 Q 7,23 16.5,23 Q 26,23 26,31 Q 26,41 16.5,42 Q 7,41 7,31 Z" fill={lens} />
-      {/* Lens glare triangle */}
-      <Path d="M 10,24 L 15,24 L 9.5,31 Z" fill={lensHi} opacity="0.4" />
-      {/* Left frame stroke */}
-      <Path d="M 7,31 Q 7,23 16.5,23 Q 26,23 26,31 Q 26,41 16.5,42 Q 7,41 7,31 Z"
-            fill="none" stroke={GOLD_FR} strokeWidth="2.5" />
-      {/* Right lens */}
-      <Path d="M 24,31 Q 24,23 33.5,23 Q 43,23 43,31 Q 43,41 33.5,42 Q 24,41 24,31 Z" fill={lens} />
-      <Path d="M 27,24 L 32,24 L 26.5,31 Z" fill={lensHi} opacity="0.4" />
-      <Path d="M 24,31 Q 24,23 33.5,23 Q 43,23 43,31 Q 43,41 33.5,42 Q 24,41 24,31 Z"
-            fill="none" stroke={GOLD_FR} strokeWidth="2.5" />
-      {/* Bridge */}
-      <Path d="M 26,27 L 24,27" stroke={GOLD_FR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      {/* Temple bars */}
-      <Path d="M  7,29 L 3,27" stroke={GOLD_FR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <Path d="M 43,29 L 47,27" stroke={GOLD_FR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-
-      {/* ── NOSE SHADOW ── */}
-      <Ellipse cx="25" cy="45" rx="2.5" ry="3.5" fill={SKIN_SH} opacity="0.5" />
-
-      {/* ── LIP + CIGAR ── */}
-      <Path d="M 19,51 Q 23,54.5 28,51" fill="#8A3820" />
-      <Rect x="27.5" y="49.5" width="13" height="3.5" rx="1.7" fill="#C8A840" />
-      {/* Cigar band */}
-      <Rect x="31"   y="49.5" width="2"  height="3.5" fill="#E8C850" />
-      {/* Ember */}
-      <Circle cx="41"  cy="51.2" r="2.5" fill="#FF5500" />
-      <Circle cx="41"  cy="51.2" r="1.2" fill="#FFBB00" />
-
-      {/* ── WHITE SUIT ── */}
-      <Path d="M 2,70 L 10,52 L 20,59 L 25,65 L 30,59 L 40,52 L 48,70 Z" fill="#F0EEE8" />
-      <Path d="M 10,52 L 19,62 L 25,65" fill="none" stroke="#C8C6C0" strokeWidth="1.5" />
-      <Path d="M 40,52 L 31,62 L 25,65" fill="none" stroke="#C8C6C0" strokeWidth="1.5" />
-      {/* Open collar shirt */}
-      <Path d="M 20,59 L 25,70 L 30,59 L 25,65 Z" fill={shirt} />
-
-      {/* ── GOLD CHAIN — thick + bold ── */}
-      <Path d="M 14,53 Q 25,64 36,53" stroke={GOLD} strokeWidth="4" fill="none" strokeLinecap="round" />
-      {/* Second chain layer */}
-      <Path d="M 16,55.5 Q 25,65 34,55.5" stroke={GOLD} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5" />
+      <KingFigure isRed={isRed} />
+      <G transform="rotate(180, 25, 35)">
+        <KingFigure isRed={isRed} />
+      </G>
     </>
   );
 }
 
-// ─── QUEEN — Miami Glamour Diva ───────────────────────────────────────────────
-// Giant 80s hair, bold makeup, hoop earrings, power blazer, statement necklace
-function Queen({ isRed }: { isRed: boolean }) {
-  const hair    = isRed ? '#880020' : '#0A0A28';
-  const hairHi  = isRed ? '#CC3050' : '#2222BB';
-  const lip     = isRed ? '#FF0055' : '#CC00EE';
-  const lipHi   = isRed ? '#FF55AA' : '#EE55FF';
-  const blazer  = isRed ? '#EE1177' : '#8800CC';
-  const blazerHi = isRed ? '#FF55AA' : '#BB55EE';
-  const eyeS    = isRed ? '#FF44AA' : '#9944FF';
+// ─────────────────────────────────────────────────────────────────────────────
+// QUEEN — Two-headed traditional queen figure
+// ─────────────────────────────────────────────────────────────────────────────
+function QueenFigure({ isRed }: { isRed: boolean }) {
+  const dress  = isRed ? '#C41E3A' : '#1A3070';
+  const alt    = isRed ? '#1A3070' : '#C41E3A';
+  const hairC  = isRed ? '#3A0818' : '#0A0A20';
+  const hairHi = isRed ? '#882040' : '#222268';
+  const lipC   = isRed ? '#CC2255' : '#882288';
 
   return (
     <>
-      {/* ── MASSIVE 80S HAIR — fills top of card ── */}
-      {/* Main hair mass */}
+      {/* ── Crown — rounded arch style ─────────────────────────── */}
       <Path
-        d="M 1,55 Q 0,28 6,14 Q 10,3 25,2 Q 40,3 44,14 Q 50,28 49,55
-           Q 44,44 41,41 L 9,41 Q 6,44 1,55 Z"
-        fill={hair}
+        d="M 12,8 L 12,5.5 Q 16,0.5 20,4.5 Q 22.5,0.5 25,0.5 Q 27.5,0.5 30,4.5 Q 34,0.5 38,5.5 L 38,8 Z"
+        fill={GOLD} stroke={DARK} strokeWidth="0.5"
       />
-      {/* Volume bumps at top */}
-      <Ellipse cx="14" cy="8"  rx="6"  ry="8"  fill={hair} />
-      <Ellipse cx="36" cy="8"  rx="6"  ry="8"  fill={hair} />
-      {/* Side voluminous swoops */}
-      <Ellipse cx="4"  cy="35" rx="5"  ry="14" fill={hair} />
-      <Ellipse cx="46" cy="35" rx="5"  ry="14" fill={hair} />
-      {/* Curl/wave highlights */}
-      <Path d="M 4,18  Q 7,8  14,8"   stroke={hairHi} strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.65" />
-      <Path d="M 46,18 Q 43,8  36,8"  stroke={hairHi} strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.65" />
-      <Path d="M 2,32  Q 1,22  4,16"  stroke={hairHi} strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.5" />
-      <Path d="M 48,32 Q 49,22 46,16" stroke={hairHi} strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.5" />
-      <Path d="M 16,3  Q 20,1  25,2 Q 30,1 34,3" stroke={hairHi} strokeWidth="3" fill="none" opacity="0.6" />
+      <Rect x="12" y="7" width="26" height="2.5" fill={GOLD} />
+      <Circle cx="18.5" cy="4.5" r="2"   fill={alt} stroke={DARK} strokeWidth="0.4" />
+      <Circle cx="25"   cy="2"   r="2.2" fill={alt} stroke={DARK} strokeWidth="0.4" />
+      <Circle cx="31.5" cy="4.5" r="2"   fill={alt} stroke={DARK} strokeWidth="0.4" />
+      <Path d="M 13,7.5 L 37,7.5" stroke="#EED848" strokeWidth="0.8" opacity="0.7" />
 
-      {/* ── FACE ── */}
-      <Ellipse cx="25" cy="41" rx="13.5" ry="14" fill={SKIN} />
+      {/* ── Long flowing hair ──────────────────────────────────── */}
+      <Path d="M 13,8.5 Q 7.5,12 6.5,24 Q 7.5,32 11,34.5 L 14,8.5 Z"      fill={hairC} />
+      <Path d="M 13.5,10 Q 9,14 8.5,22 Q 9,28 11.5,32"
+            stroke={hairHi} strokeWidth="1.5" fill="none" opacity="0.6" strokeLinecap="round" />
+      <Path d="M 37,8.5 Q 42.5,12 43.5,24 Q 42.5,32 39,34.5 L 36,8.5 Z"   fill={hairC} />
+      <Path d="M 36.5,10 Q 41,14 41.5,22 Q 41,28 38.5,32"
+            stroke={hairHi} strokeWidth="1.5" fill="none" opacity="0.6" strokeLinecap="round" />
+
+      {/* ── Face ───────────────────────────────────────────────── */}
+      <Ellipse cx="25" cy="17.5" rx="10.5" ry="9.5" fill={SKIN} stroke={DARK} strokeWidth="0.5" />
+
       {/* Cheek blush */}
-      <Ellipse cx="14" cy="44" rx="5" ry="3.5" fill="#FF8888" opacity="0.28" />
-      <Ellipse cx="36" cy="44" rx="5" ry="3.5" fill="#FF8888" opacity="0.28" />
+      <Ellipse cx="17" cy="19" rx="3.5" ry="2" fill="#FF8888" opacity="0.22" />
+      <Ellipse cx="33" cy="19" rx="3.5" ry="2" fill="#FF8888" opacity="0.22" />
 
-      {/* ── EYE MAKEUP — bold color blocks ── */}
-      <Ellipse cx="19" cy="35" rx="6" ry="4.5" fill={eyeS} opacity="0.55" />
-      <Ellipse cx="31" cy="35" rx="6" ry="4.5" fill={eyeS} opacity="0.55" />
+      {/* Eyebrows */}
+      <Path d="M 18.5,13 Q 20.5,11.5 23,12.5" stroke={DARK} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      <Path d="M 27,12.5 Q 29.5,11.5 31.5,13"  stroke={DARK} strokeWidth="1.2" fill="none" strokeLinecap="round" />
 
-      {/* ── BROWS — thick, dramatic arch ── */}
-      <Path d="M 13,32 Q 18,27.5 23,30" stroke="#180820" strokeWidth="3"   fill="none" strokeLinecap="round" />
-      <Path d="M 27,30 Q 32,27.5 37,32" stroke="#180820" strokeWidth="3"   fill="none" strokeLinecap="round" />
+      {/* Eyes */}
+      <Ellipse cx="20.5" cy="15.5" rx="2.8" ry="2.2" fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      <Ellipse cx="29.5" cy="15.5" rx="2.8" ry="2.2" fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      <Circle  cx="21"   cy="15.5" r="1.5"  fill={DARK} />
+      <Circle  cx="30"   cy="15.5" r="1.5"  fill={DARK} />
+      <Circle  cx="21.5" cy="14.8" r="0.5"  fill={WHITE} />
+      <Circle  cx="30.5" cy="14.8" r="0.5"  fill={WHITE} />
+      {/* Eyelash bar */}
+      <Path d="M 18,13.5 L 23.3,13.5" stroke={DARK} strokeWidth="1.2" strokeLinecap="round" />
+      <Path d="M 26.7,13.5 L 32,13.5"  stroke={DARK} strokeWidth="1.2" strokeLinecap="round" />
 
-      {/* ── EYES — clean & punchy ── */}
-      <Ellipse cx="19" cy="36.5" rx="4.5" ry="3.5" fill="#fff" />
-      <Ellipse cx="31" cy="36.5" rx="4.5" ry="3.5" fill="#fff" />
-      <Circle cx="19" cy="36.5" r="2.8" fill="#180818" />
-      <Circle cx="31" cy="36.5" r="2.8" fill="#180818" />
-      <Circle cx="20" cy="35.6" r="1.1" fill="#fff" />
-      <Circle cx="32" cy="35.6" r="1.1" fill="#fff" />
-      {/* Bold lash bar + wing */}
-      <Path d="M 14.5,33.8 L 23.5,33.8" stroke="#180820" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-      <Path d="M 26.5,33.8 L 35.5,33.8" stroke="#180820" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-      <Path d="M 14.5,33.8 L 11.5,30.5" stroke="#180820" strokeWidth="2"   fill="none" strokeLinecap="round" />
-      <Path d="M 35.5,33.8 L 38.5,30.5" stroke="#180820" strokeWidth="2"   fill="none" strokeLinecap="round" />
+      {/* Nose */}
+      <Path d="M 23.5,18 Q 25,20 26.5,18" stroke={SKIN_D} strokeWidth="0.8" fill="none" strokeLinecap="round" />
 
-      {/* ── NOSE ── */}
-      <Ellipse cx="25" cy="42.5" rx="2" ry="2.8" fill={SKIN_SH} opacity="0.4" />
+      {/* Lips */}
+      <Path d="M 20,21.5 Q 22.5,24.5 25,23 Q 27.5,24.5 30,21.5" fill={lipC} />
+      <Path d="M 20,21.5 Q 22.5,20 25,21.5 Q 27.5,20 30,21.5"   fill="#FF88AA" opacity="0.55" />
+      <Ellipse cx="25" cy="21" rx="3" ry="0.8" fill={WHITE} opacity="0.2" />
 
-      {/* ── HOT LIPS — the star of the face ── */}
-      <Path d="M 17.5,49 Q 22,54.5 32.5,49" fill={lip} />
-      <Path d="M 17.5,49 Q 21,46 25,49 Q 29,46 32.5,49" fill={lipHi} />
-      <Ellipse cx="25" cy="48.5" rx="4" ry="1.2" fill="#fff" opacity="0.2" />
+      {/* ── Dress ──────────────────────────────────────────────── */}
+      <Path
+        d="M 11,27.5 Q 7,31 5,34.5 L 45,34.5 Q 43,31 39,27.5 Q 35,23 25,23 Q 15,23 11,27.5 Z"
+        fill={dress} stroke={DARK} strokeWidth="0.5"
+      />
+      {/* Lace collar */}
+      <Path d="M 19,23 L 25,29 L 31,23" fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      {/* Necklace */}
+      <Path d="M 17,23 Q 25,27 33,23" stroke={GOLD} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      {/* Gold trim */}
+      <Path d="M 11,27.5 Q 7,31 5,34.5"   stroke={GOLD} strokeWidth="2" fill="none" strokeLinecap="round" />
+      <Path d="M 39,27.5 Q 43,31 45,34.5" stroke={GOLD} strokeWidth="2" fill="none" strokeLinecap="round" />
 
-      {/* ── HOOP EARRINGS — big and gold ── */}
-      <Circle cx="6"  cy="43" r="7" fill="none" stroke={GOLD} strokeWidth="3.5" />
-      <Circle cx="44" cy="43" r="7" fill="none" stroke={GOLD} strokeWidth="3.5" />
+      {/* ── Flower (left hand) ─────────────────────────────────── */}
+      <Rect   x="9"    y="29"   width="2"   height="6"   rx="1"   fill={GOLD} />
+      <Circle cx="10"   cy="28"   r="3.5" fill={lipC}  stroke={DARK} strokeWidth="0.4" />
+      <Circle cx="10"   cy="28"   r="2"   fill="#FFCCDD" opacity="0.7" />
+      <Circle cx="10"   cy="28"   r="0.8" fill={GOLD} />
+      <Circle cx="10"   cy="24.5" r="1.5" fill={lipC}  opacity="0.65" />
+      <Circle cx="13.5" cy="28"   r="1.5" fill={lipC}  opacity="0.65" />
+      <Circle cx="10"   cy="31.5" r="1.5" fill={lipC}  opacity="0.65" />
+      <Circle cx="6.5"  cy="28"   r="1.5" fill={lipC}  opacity="0.65" />
 
-      {/* ── POWER BLAZER ── */}
-      <Path d="M 2,70 L 10,54 L 20,60 L 25,67 L 30,60 L 40,54 L 48,70 Z" fill={blazer} />
-      {/* Shoulder pads */}
-      <Ellipse cx="9"  cy="56" rx="9" ry="4" fill={blazer} />
-      <Ellipse cx="41" cy="56" rx="9" ry="4" fill={blazer} />
-      <Path d="M 10,54 L 19,63 L 25,67" fill="none" stroke={blazerHi} strokeWidth="1.5" />
-      <Path d="M 40,54 L 31,63 L 25,67" fill="none" stroke={blazerHi} strokeWidth="1.5" />
-      {/* Blouse */}
-      <Path d="M 20,60 L 25,70 L 30,60 L 25,67 Z" fill="#FFF0F8" />
-
-      {/* ── STATEMENT NECKLACE ── */}
-      <Path d="M 15,54 Q 25,62 35,54" stroke={GOLD} strokeWidth="3" fill="none" strokeLinecap="round" />
-      <Circle cx="25" cy="61" r="5"   fill={GOLD} />
-      <Circle cx="25" cy="61" r="3.2" fill={lip} />
-      <Circle cx="25" cy="61" r="1.5" fill={GOLD} />
+      {/* ── Scepter (right hand) ───────────────────────────────── */}
+      <Rect   x="39"   y="27"   width="2"   height="7.5" rx="1"   fill={GOLD} />
+      <Circle cx="40"   cy="26"   r="3"   fill={GOLD}  stroke={DARK} strokeWidth="0.4" />
+      <Circle cx="40"   cy="26"   r="1.8" fill={alt} />
+      <Circle cx="40"   cy="25.2" r="0.6" fill={WHITE} opacity="0.5" />
     </>
   );
 }
 
-// ─── JACK — Miami Vice Detective (Crockett energy) ────────────────────────────
-// Sandy hair, big round shades, Crockett stubble, pastel blazer, no tie, badge
+function Queen({ isRed }: { isRed: boolean }) {
+  return (
+    <>
+      <QueenFigure isRed={isRed} />
+      <G transform="rotate(180, 25, 35)">
+        <QueenFigure isRed={isRed} />
+      </G>
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// JACK — Two-headed traditional knave figure
+// ─────────────────────────────────────────────────────────────────────────────
+function JackFigure({ isRed }: { isRed: boolean }) {
+  const tabard  = isRed ? '#C41E3A' : '#1A3070';
+  const hatC    = isRed ? '#1A3070' : '#C41E3A';
+  const feather = isRed ? '#FF5577' : '#5599FF';
+  const stripes = isRed ? '#FF8899' : '#6688FF';
+
+  return (
+    <>
+      {/* ── Hat — flat brim + crown ─────────────────────────────── */}
+      <Rect  x="8"   y="9.5" width="34" height="3"   rx="1.5" fill={DARK} />
+      <Path d="M 12,9.5 Q 12,2 25,2 Q 38,2 38,9.5 Z" fill={hatC} stroke={DARK} strokeWidth="0.5" />
+      <Rect  x="11"  y="8.5" width="28" height="1.8" fill={GOLD} />
+      <Circle cx="25" cy="9.5" r="1.8" fill={GOLD} stroke={DARK} strokeWidth="0.3" />
+
+      {/* ── Feather (right of hat) ─────────────────────────────── */}
+      <Path d="M 36,9 Q 42,3 47,0.5 Q 44,5 45,10 Q 41,6.5 36,9"
+            fill={feather} stroke={DARK} strokeWidth="0.4" />
+      <Path d="M 36,9 Q 42,4 47,0.5" stroke={WHITE} strokeWidth="0.6" fill="none" opacity="0.5" />
+
+      {/* ── Side hair ──────────────────────────────────────────── */}
+      <Path d="M 12,12 Q 9,15 9.5,21.5 Q 11,24 14.5,23 L 14.5,12 Z" fill="#3A2010" />
+      <Path d="M 38,12 Q 41,15 40.5,21.5 Q 39,24 35.5,23 L 35.5,12 Z" fill="#3A2010" />
+
+      {/* ── Face — young, clean-shaven ─────────────────────────── */}
+      <Ellipse cx="25" cy="18" rx="10.5" ry="9.5" fill={SKIN} stroke={DARK} strokeWidth="0.5" />
+
+      {/* Eyebrows */}
+      <Path d="M 18.5,14 Q 21,12.8 23.5,13.5" stroke={DARK} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      <Path d="M 26.5,13.5 Q 29,12.8 31.5,14"  stroke={DARK} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+
+      {/* Eyes */}
+      <Ellipse cx="20.5" cy="16.5" rx="2.8" ry="2"   fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      <Ellipse cx="29.5" cy="16.5" rx="2.8" ry="2"   fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      <Circle  cx="21"   cy="16.5" r="1.4"  fill={DARK} />
+      <Circle  cx="30"   cy="16.5" r="1.4"  fill={DARK} />
+      <Circle  cx="21.5" cy="15.9" r="0.5"  fill={WHITE} />
+      <Circle  cx="30.5" cy="15.9" r="0.5"  fill={WHITE} />
+
+      {/* Nose */}
+      <Path d="M 23.5,19 Q 25,21.5 26.5,19" stroke={SKIN_D} strokeWidth="0.9" fill="none" strokeLinecap="round" />
+
+      {/* Mouth — slight smile */}
+      <Path d="M 20.5,22.5 Q 24.5,25.5 29.5,22.5" stroke="#8A4030" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+
+      {/* ── Tabard ─────────────────────────────────────────────── */}
+      <Path
+        d="M 12.5,27 Q 7,31 5,34.5 L 45,34.5 Q 43,31 37.5,27 Q 33,23.5 25,23.5 Q 17,23.5 12.5,27 Z"
+        fill={tabard} stroke={DARK} strokeWidth="0.5"
+      />
+      {/* White collar */}
+      <Path d="M 19,23.5 L 25,30 L 31,23.5" fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      {/* Gold trim */}
+      <Path d="M 12.5,27 Q 7,31 5,34.5"   stroke={GOLD} strokeWidth="2" fill="none" strokeLinecap="round" />
+      <Path d="M 37.5,27 Q 43,31 45,34.5" stroke={GOLD} strokeWidth="2" fill="none" strokeLinecap="round" />
+      {/* Diagonal livery stripes */}
+      <Path d="M 6.5,34.5 L 18,27.5"  stroke={stripes} strokeWidth="0.9" opacity="0.38" />
+      <Path d="M 12,34.5 L 22,27.5"   stroke={stripes} strokeWidth="0.9" opacity="0.38" />
+      <Path d="M 43.5,34.5 L 32,27.5" stroke={stripes} strokeWidth="0.9" opacity="0.38" />
+      <Path d="M 38,34.5 L 28,27.5"   stroke={stripes} strokeWidth="0.9" opacity="0.38" />
+
+      {/* ── Halberd / spear (right side) ───────────────────────── */}
+      <Rect  x="37"  y="9"  width="2"   height="25.5" rx="1"   fill="#7A3010" stroke={DARK} strokeWidth="0.3" />
+      <Path d="M 36.5,9 L 38,3 L 39.5,9 Z"            fill={SILVER} stroke={DARK} strokeWidth="0.4" />
+      <Path d="M 39,12 Q 44,14 43,18 Q 44,16 40.5,15 Z" fill={SILVER} stroke={DARK} strokeWidth="0.4" />
+      <Path d="M 37,12 Q 32,14 33,18 Q 32,16 35.5,15 Z" fill={SILVER} stroke={DARK} strokeWidth="0.4" opacity="0.6" />
+
+      {/* ── Shield (left side) ─────────────────────────────────── */}
+      <Path d="M 7.5,27 L 7.5,31.5 Q 7.5,34.5 11.5,34.5 Q 15.5,34.5 15.5,31.5 L 15.5,27 Z"
+            fill={WHITE} stroke={DARK} strokeWidth="0.5" />
+      {/* Shield cross design in suit color */}
+      <Path d="M 7.5,30 L 15.5,30"   stroke={tabard} strokeWidth="1.4" />
+      <Path d="M 11.5,27 L 11.5,34.5" stroke={tabard} strokeWidth="1.4" />
+      <Circle cx="11.5" cy="30" r="1.5" fill={GOLD} />
+    </>
+  );
+}
+
 function Jack({ isRed }: { isRed: boolean }) {
-  const blazer   = isRed ? '#FF8FAB' : '#5FCCCC';
-  const blazerSh = isRed ? '#CC4466' : '#2AACAC';
-  const lens     = isRed ? '#AA0033' : '#003388';
-  const lensHi   = isRed ? '#FF3388' : '#33AAFF';
-
   return (
     <>
-      {/* ── SANDY HAIR — single path ── */}
-      <Path
-        d="M 8,29 Q 7,3 25,3 Q 43,3 42,29 Q 40,36 36,36 L 14,36 Q 10,36 8,29 Z"
-        fill="#9B7030"
-      />
-      {/* Side hair down */}
-      <Rect x="7"  y="28" width="6" height="16" rx="3" fill="#9B7030" />
-      <Rect x="37" y="28" width="6" height="16" rx="3" fill="#9B7030" />
-      {/* Sun-bleached highlight */}
-      <Path d="M 17,4 Q 22,1 25,2 Q 28,1 33,4"   stroke="#DDB860" strokeWidth="3"   fill="none" strokeLinecap="round" opacity="0.65" />
-      <Path d="M 13,10 Q 15,5 19,7"               stroke="#DDB860" strokeWidth="2"   fill="none" strokeLinecap="round" opacity="0.4" />
-      {/* Hair texture wave */}
-      <Path d="M 13,14 Q 18,8 25,10 Q 32,8 37,14" stroke="#7A5020" strokeWidth="2" fill="none" strokeLinecap="round" />
-
-      {/* ── FACE ── */}
-      <Ellipse cx="25" cy="40" rx="14" ry="15" fill={SKIN} />
-      {/* Chin shadow */}
-      <Ellipse cx="25" cy="52" rx="11" ry="5.5" fill={SKIN_SH} opacity="0.45" />
-      {/* Heavy Crockett stubble — one solid shape */}
-      <Path
-        d="M 13,46 Q 10,57 25,60 Q 40,57 37,46 Q 31,52 25,53 Q 19,52 13,46 Z"
-        fill="#3A1808" opacity="0.3"
-      />
-      {/* Upper lip mustache shadow */}
-      <Ellipse cx="25" cy="50" rx="7" ry="3" fill="#3A1808" opacity="0.22" />
-
-      {/* ── ROUND SUNGLASSES — wayfarer-ish ── */}
-      {/* Left lens */}
-      <Ellipse cx="17.5" cy="34" rx="9"   ry="7.5" fill={lens} />
-      <Path d="M 12,28 L 17,28 L 11,34 Z"                fill={lensHi} opacity="0.4" />
-      <Ellipse cx="17.5" cy="34" rx="9"   ry="7.5" fill="none" stroke={GOLD_FR} strokeWidth="2.5" />
-      {/* Right lens */}
-      <Ellipse cx="32.5" cy="34" rx="9"   ry="7.5" fill={lens} />
-      <Path d="M 27,28 L 32,28 L 26,34 Z"                fill={lensHi} opacity="0.4" />
-      <Ellipse cx="32.5" cy="34" rx="9"   ry="7.5" fill="none" stroke={GOLD_FR} strokeWidth="2.5" />
-      {/* Bridge */}
-      <Path d="M 26.5,32.5 L 23.5,32.5" stroke={GOLD_FR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      {/* Temples */}
-      <Path d="M  8.5,32 L  4,30" stroke={GOLD_FR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <Path d="M 41.5,32 L 46,30" stroke={GOLD_FR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-
-      {/* ── NOSE ── */}
-      <Ellipse cx="25" cy="45" rx="2.5" ry="4" fill={SKIN_SH} opacity="0.45" />
-
-      {/* ── COCKY SMIRK ── */}
-      <Path d="M 19,52 Q 24.5,57 31,53" stroke="#8A3820" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-      <Path d="M 27,54 Q 30,52 32,53"   stroke="#8A3820" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-
-      {/* ── PASTEL BLAZER — wide lapels, open collar ── */}
-      <Path d="M 2,70 L 10,53 L 20,60 L 25,66 L 30,60 L 40,53 L 48,70 Z" fill={blazer} />
-      {/* Wide dark lapels — very 80s */}
-      <Path d="M 10,53 L 20,63 L 25,66" fill={blazerSh} />
-      <Path d="M 40,53 L 30,63 L 25,66" fill={blazerSh} />
-      {/* No shirt, open chest — Crockett signature */}
-      <Path d="M 20,60 L 25,70 L 30,60 L 25,66 Z" fill={SKIN} opacity="0.65" />
-
-      {/* ── DETECTIVE BADGE ── */}
-      <Rect x="12" y="59" width="9" height="7" rx="2.5" fill={GOLD} />
-      <Rect x="13" y="60" width="7" height="5" rx="1.5" fill="#DAA520" />
-      <Circle cx="16.5" cy="62.5" r="2" fill={GOLD} />
-      <SvgText x="16.5" y="65.5" textAnchor="middle" fontSize="2.5" fill="#fff" fontWeight="800">MPD</SvgText>
+      <JackFigure isRed={isRed} />
+      <G transform="rotate(180, 25, 35)">
+        <JackFigure isRed={isRed} />
+      </G>
     </>
   );
 }
 
-// ─── ACE — Neon Miami Nightscape ──────────────────────────────────────────────
-function Ace({ isRed }: { isRed: boolean }) {
-  const neon  = isRed ? '#FF0066' : '#00CCFF';
-  const neon2 = isRed ? '#FF8800' : '#00FFAA';
-  return (
-    <>
-      {/* Sky glow */}
-      <Ellipse cx="25" cy="48" rx="25" ry="25" fill={neon} opacity="0.06" />
-      {/* Sunset/rise disc */}
-      <Circle cx="25" cy="44" r="12" fill={isRed ? '#FF4400' : '#FF8800'} opacity="0.22" />
-      <Circle cx="25" cy="44" r="7"  fill={isRed ? '#FF6600' : '#FFBB00'} opacity="0.28" />
-      {/* Horizon */}
-      <Path d="M 3,48 L 47,48" stroke={neon} strokeWidth="1.5" fill="none" opacity="0.6" />
-      {/* Grid/road lines — very 80s synthwave */}
-      <Path d="M 25,48 L 5,70"  stroke={neon} strokeWidth="0.8" fill="none" opacity="0.4" />
-      <Path d="M 25,48 L 45,70" stroke={neon} strokeWidth="0.8" fill="none" opacity="0.4" />
-      <Path d="M 25,48 L 25,70" stroke={neon} strokeWidth="0.8" fill="none" opacity="0.4" />
-      <Path d="M 15,55 L 35,55" stroke={neon} strokeWidth="0.6" fill="none" opacity="0.35" />
-      <Path d="M 11,61 L 39,61" stroke={neon} strokeWidth="0.6" fill="none" opacity="0.3" />
-      <Path d="M  7,67 L 43,67" stroke={neon} strokeWidth="0.6" fill="none" opacity="0.25" />
-      {/* Palm tree left */}
-      <Rect x="9"  y="36" width="2.5" height="14" rx="1.2" fill={neon2} opacity="0.8" />
-      <Path d="M 10.2,36 Q 1,30  3,23  Q 6,31 10.2,36"  fill={neon2} opacity="0.8" />
-      <Path d="M 10.2,36 Q 1,33  2,25  Q 6,32 10.2,36"  fill={neon2} opacity="0.5" />
-      <Path d="M 10.2,36 Q 16,28 20,27 Q 16,33 10.2,36" fill={neon2} opacity="0.8" />
-      {/* Palm tree right */}
-      <Rect x="38.5" y="36" width="2.5" height="14" rx="1.2" fill={neon2} opacity="0.8" />
-      <Path d="M 39.8,36 Q 49,30 47,23 Q 44,31 39.8,36" fill={neon2} opacity="0.8" />
-      <Path d="M 39.8,36 Q 34,28 30,27 Q 34,33 39.8,36" fill={neon2} opacity="0.8" />
-      {/* Neon city silhouette */}
-      <Path d="M 3,48 L 3,44 L 6,44 L 6,42 L 8,42 L 8,40 L 10,40 L 10,42 L 12,42 L 12,43 L 14,43 L 14,48 Z"
-            fill={neon} opacity="0.38" />
-      <Path d="M 36,48 L 36,43 L 38,43 L 38,42 L 40,42 L 40,40 L 42,40 L 42,42 L 44,42 L 44,44 L 47,44 L 47,48 Z"
-            fill={neon} opacity="0.38" />
-      {/* Water neon reflections */}
-      <Path d="M 8,52  Q 18,54 25,52 Q 32,54 42,52" stroke={neon} strokeWidth="1.5" fill="none" opacity="0.35" strokeLinecap="round" />
-      <Path d="M 10,57 Q 18,59 25,57 Q 32,59 40,57" stroke={neon} strokeWidth="1"   fill="none" opacity="0.25" strokeLinecap="round" />
-      <Path d="M 12,62 Q 19,64 25,62 Q 31,64 38,62" stroke={neon} strokeWidth="0.8" fill="none" opacity="0.18" strokeLinecap="round" />
-    </>
-  );
-}
-
-// ─── Export ───────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 export default function FaceCardArt({ value, isRed, size }: FaceCardArtProps) {
-  // viewBox is 50×70 (5:7); render at correct aspect ratio so nothing gets squished
   const h = Math.round(size * 1.4);
   return (
     <Svg width={size} height={h} viewBox="0 0 50 70">
       {value === 'K' && <King isRed={isRed} />}
       {value === 'Q' && <Queen isRed={isRed} />}
       {value === 'J' && <Jack isRed={isRed} />}
-      {value === 'A' && <Ace isRed={isRed} />}
     </Svg>
   );
 }
