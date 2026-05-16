@@ -100,28 +100,33 @@ export default function PlayingCard({
   return (
     <View style={{ width: dim.w, height: dim.h }}>
       {/* ── Back face ─────────────────────────────────────────────────────── */}
-      <Animated.View
-        style={[
-          cardStyle,
-          styles.faceDown,
-          StyleSheet.absoluteFillObject,
-          { opacity: backOpacity, transform: [{ perspective: 1200 }, { rotateY: backRotateY }] },
-        ]}
-      >
-        <View style={[styles.backInner, { borderRadius: dim.radius - 2 }]}>
-          <View style={styles.backDiamond}>
-            <Text style={[styles.backSymbol, { fontSize: dim.centerSuit * 0.55 }]}>♠</Text>
+      {/* perspective must live in a non-animated View so useNativeDriver:true */}
+      {/* only sees natively-supported animated properties (rotateY, opacity)  */}
+      <View style={[StyleSheet.absoluteFillObject, { transform: [{ perspective: 1200 }] }]}>
+        <Animated.View
+          style={[
+            cardStyle,
+            styles.faceDown,
+            StyleSheet.absoluteFillObject,
+            { opacity: backOpacity, transform: [{ rotateY: backRotateY }] },
+          ]}
+        >
+          <View style={[styles.backInner, { borderRadius: dim.radius - 2 }]}>
+            <View style={styles.backDiamond}>
+              <Text style={[styles.backSymbol, { fontSize: dim.centerSuit * 0.55 }]}>♠</Text>
+            </View>
           </View>
-        </View>
-      </Animated.View>
+        </Animated.View>
+      </View>
 
       {/* ── Front face ────────────────────────────────────────────────────── */}
       {card && (
+        <View style={[StyleSheet.absoluteFillObject, { transform: [{ perspective: 1200 }] }]}>
         <Animated.View
           style={[
             cardStyle,
             StyleSheet.absoluteFillObject,
-            { opacity: frontOpacity, transform: [{ perspective: 1200 }, { rotateY: frontRotateY }] },
+            { opacity: frontOpacity, transform: [{ rotateY: frontRotateY }] },
           ]}
         >
           {/* Top-left corner */}
@@ -169,6 +174,7 @@ export default function PlayingCard({
             </Text>
           </View>
         </Animated.View>
+        </View>
       )}
     </View>
   );
