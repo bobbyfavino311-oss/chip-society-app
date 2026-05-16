@@ -139,7 +139,7 @@ export function getBestHand(holeCards: Card[], communityCards: Card[]): HandResu
     }
   }
 
-  return best!;
+  return best ?? { rank: 0, values: [], name: 'High Card' };
 }
 
 export function getPreflopStrength(holeCards: Card[]): number {

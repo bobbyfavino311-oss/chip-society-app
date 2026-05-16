@@ -262,16 +262,18 @@ export default function PracticeScreen() {
       pos.setValue({ x: vec.x + (i - N_CHIP / 2 + 0.5) * 12, y: vec.y + (i % 2) * 6 });
       opacity.setValue(0);
     });
-    const anims = chipAnims.map(({ pos, opacity }, i) =>
-      Animated.sequence([
+    const anims = chipAnims.map(({ pos, opacity }, i) => {
+      const tx = (i - N_CHIP / 2 + 0.5) * 4;
+      return Animated.sequence([
         Animated.delay(i * 55),
         Animated.parallel([
           Animated.timing(opacity, { toValue: 1, duration: 80, useNativeDriver: true }),
-          Animated.timing(pos, { toValue: { x: (i - N_CHIP / 2 + 0.5) * 4, y: -18 }, duration: 320, useNativeDriver: true }),
+          Animated.timing(pos.x, { toValue: tx, duration: 320, useNativeDriver: true }),
+          Animated.timing(pos.y, { toValue: -18, duration: 320, useNativeDriver: true }),
         ]),
         Animated.timing(opacity, { toValue: 0, duration: 130, useNativeDriver: true }),
-      ])
-    );
+      ]);
+    });
     Animated.parallel(anims).start();
     Animated.sequence([
       Animated.timing(potPulse, { toValue: 1.3, duration: 110, useNativeDriver: true }),
@@ -294,16 +296,18 @@ export default function PracticeScreen() {
     const vecIdx = isHumanWin ? seatVec.length - 1 : Math.min(aiIdx < 0 ? 0 : aiIdx, seatVec.length - 2);
     const target = seatVec[vecIdx];
     winAnims.forEach(({ pos, opacity }) => { pos.setValue({ x: 0, y: -20 }); opacity.setValue(0); });
-    const anims = winAnims.map(({ pos, opacity }, i) =>
-      Animated.sequence([
+    const anims = winAnims.map(({ pos, opacity }, i) => {
+      const tx = target.x + (i - 2.5) * 16;
+      return Animated.sequence([
         Animated.delay(i * 65 + 180),
         Animated.parallel([
           Animated.timing(opacity, { toValue: 1, duration: 90, useNativeDriver: true }),
-          Animated.timing(pos, { toValue: { x: target.x + (i - 2.5) * 16, y: target.y }, duration: 460, useNativeDriver: true }),
+          Animated.timing(pos.x, { toValue: tx, duration: 460, useNativeDriver: true }),
+          Animated.timing(pos.y, { toValue: target.y, duration: 460, useNativeDriver: true }),
         ]),
         Animated.timing(opacity, { toValue: 0, duration: 180, useNativeDriver: true }),
-      ])
-    );
+      ]);
+    });
     Animated.parallel(anims).start();
     if (isHumanWin) SoundEngine.win(); else SoundEngine.lose();
     prevPotRef.current = 0;
