@@ -18,8 +18,8 @@ const ACTION_COLORS: Record<string, string> = {
   'ALL IN': '#ff0090',
 };
 
-const AVATAR_SIZE = 46;
-const ARC_SIZE = 60;
+const AVATAR_SIZE = 30;
+const ARC_SIZE = 44;
 
 interface PlayerSeatProps {
   name: string;
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   avatarText: {
-    fontSize: 20,
+    fontSize: 13,
     fontWeight: '700',
   },
   posBadge: {

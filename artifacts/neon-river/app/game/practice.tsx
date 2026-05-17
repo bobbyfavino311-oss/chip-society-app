@@ -118,7 +118,7 @@ function SetupScreen({ onStart }: { onStart: (diff: AIDifficulty, numPlayers: nu
         <View style={setup.playerSection}>
           <Text style={setup.sectionLabel}>TABLE SIZE</Text>
           <View style={setup.playerCountRow}>
-            {([4, 5, 6] as const).map(n => {
+            {([4, 5] as const).map(n => {
               const active = playerCount === n;
               return (
                 <TouchableOpacity
@@ -170,6 +170,29 @@ function CommunityCards({
   phase: string;
   holeCards: any[];
 }) {
+  // Track how many cards have been revealed face-up so far
+  const [revealedCount, setRevealedCount] = useState(0);
+  const prevLengthRef = useRef(0);
+
+  useEffect(() => {
+    const prev = prevLengthRef.current;
+    const curr = cards.length;
+    if (curr > prev) {
+      // New cards arrived — reveal them one by one with 240ms stagger
+      for (let idx = prev; idx < curr; idx++) {
+        const delay = (idx - prev) * 240;
+        setTimeout(() => {
+          setRevealedCount(idx + 1);
+        }, delay);
+      }
+      prevLengthRef.current = curr;
+    } else if (curr === 0 && prev > 0) {
+      // Hand reset
+      prevLengthRef.current = 0;
+      setRevealedCount(0);
+    }
+  }, [cards.length]);
+
   const hasComm = cards.length > 0;
   const hasHole = holeCards.length >= 2;
   const handResult = hasComm && hasHole
@@ -185,7 +208,7 @@ function CommunityCards({
       <View style={table.communityCards}>
         {[0, 1, 2, 3, 4].map(i =>
           cards[i]
-            ? <PlayingCard key={i} card={cards[i]} size="lg" />
+            ? <PlayingCard key={i} card={cards[i]} faceDown={i >= revealedCount} size="lg" />
             : <View key={i} style={table.emptySlot} />
         )}
       </View>
@@ -433,7 +456,6 @@ export default function PracticeScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           />
-          <View style={styles.tableInnerRing} />
           <View style={styles.tableCenterGlow} />
 
           {/* Bet chip tokens */}
@@ -489,12 +511,12 @@ export default function PracticeScreen() {
                   <View style={styles.humanHoleCards}>
                     {humanPlayer.holeCards.length > 0 ? (
                       humanPlayer.holeCards.map((card, i) => (
-                        <PlayingCard key={i} card={card} faceDown={false} size="lg" />
+                        <PlayingCard key={i} card={card} faceDown={false} size="xl" />
                       ))
                     ) : (
                       <>
-                        <PlayingCard faceDown size="lg" />
-                        <PlayingCard faceDown size="lg" />
+                        <PlayingCard faceDown size="xl" />
+                        <PlayingCard faceDown size="xl" />
                       </>
                     )}
                   </View>
@@ -933,20 +955,16 @@ const styles = StyleSheet.create({
   tableArea: { flex: 1, position: 'relative' },
   tableSurface: {
     flex: 1,
-    margin: 6,
-    borderRadius: 90,
+    margin: 0,
+    borderRadius: 0,
     overflow: 'hidden',
     borderWidth: 2,
-    borderColor: '#cc0070',
+    borderColor: '#ff0090',
     shadowColor: '#ff0090',
-    shadowOpacity: 0.4,
-    shadowRadius: 18,
+    shadowOpacity: 0.55,
+    shadowRadius: 20,
     shadowOffset: { width: 0, height: 0 },
     elevation: 8,
-  },
-  tableInnerRing: {
-    position: 'absolute', top: 14, left: 14, right: 14, bottom: 14,
-    borderRadius: 78, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.38)',
   },
   tableCenterGlow: {
     position: 'absolute',
