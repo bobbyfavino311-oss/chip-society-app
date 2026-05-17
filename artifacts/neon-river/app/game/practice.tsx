@@ -381,23 +381,23 @@ export default function PracticeScreen() {
   const seatPositions: Record<string, number | string>[] =
     aiPlayers.length === 3
       ? [
-          { left: 4, top: '30%' },
+          { left: 4, bottom: 56 },
           { left: SEAT_CX, top: '3%' },
-          { right: 4, top: '30%' },
+          { right: 4, bottom: 56 },
         ]
       : aiPlayers.length === 5
       ? [
-          { left: 4, top: '43%' },
+          { left: 4, bottom: 56 },
           { left: 16, top: '5%' },
           { left: SEAT_CX, top: '2%' },
           { right: 16, top: '5%' },
-          { right: 4, top: '43%' },
+          { right: 4, bottom: 56 },
         ]
       : [
-          { left: 4, top: '42%' },
+          { left: 4, bottom: 56 },
           { left: 28, top: '6%' },
           { right: 28, top: '6%' },
-          { right: 4, top: '42%' },
+          { right: 4, bottom: 56 },
         ];
 
   return (
@@ -821,6 +821,9 @@ export default function PracticeScreen() {
           </View>
         </View>
       )}
+
+      {/* Full-screen neon rim border — sits on top of everything, touch-passthrough */}
+      <View style={styles.screenRimBorder} />
     </View>
   );
 }
@@ -958,13 +961,16 @@ const styles = StyleSheet.create({
     margin: 0,
     borderRadius: 0,
     overflow: 'hidden',
+  },
+  screenRimBorder: {
+    ...StyleSheet.absoluteFillObject,
     borderWidth: 2,
     borderColor: '#ff0090',
     shadowColor: '#ff0090',
-    shadowOpacity: 0.55,
-    shadowRadius: 20,
+    shadowOpacity: 0.7,
+    shadowRadius: 16,
     shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
+    pointerEvents: 'none' as any,
   },
   tableCenterGlow: {
     position: 'absolute',
