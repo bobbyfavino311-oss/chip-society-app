@@ -822,8 +822,6 @@ export default function PracticeScreen() {
         </View>
       )}
 
-      {/* Full-screen neon rim border — sits on top of everything, touch-passthrough */}
-      <View style={styles.screenRimBorder} />
     </View>
   );
 }
@@ -961,16 +959,6 @@ const styles = StyleSheet.create({
     margin: 0,
     borderRadius: 0,
     overflow: 'hidden',
-  },
-  screenRimBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderWidth: 2,
-    borderColor: '#ff0090',
-    shadowColor: '#ff0090',
-    shadowOpacity: 0.7,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 0 },
-    pointerEvents: 'none' as any,
   },
   tableCenterGlow: {
     position: 'absolute',
