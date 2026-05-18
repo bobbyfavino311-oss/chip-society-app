@@ -1,0 +1,451 @@
+Implement a complete monetization, economy, onboarding, and App Store-ready launch system for CHIP SOCIETY.
+
+IMPORTANT:
+This app is a SOCIAL POKER EXPERIENCE using VIRTUAL CHIPS ONLY.
+
+The app must NOT:
+- allow cash withdrawals
+- allow real-money gambling
+- allow chip cash-outs
+- allow real-world payouts
+- advertise gambling winnings
+
+The app must remain compliant with:
+- Apple App Store simulated gambling guidelines
+- virtual chip poker standards
+- social casino app policies
+
+The entire system should feel:
+- premium
+- addictive
+- rewarding
+- social
+- progression-focused
+- App Store quality
+
+--------------------------------------------------
+CORE ECONOMY SYSTEM
+--------------------------------------------------
+
+All users start with:
+- 250,000 free chips
+
+The starting amount should feel:
+- generous
+- exciting
+- enough to begin progression
+
+New users should immediately feel:
+- wealthy
+- able to explore tables
+- encouraged to keep playing
+
+--------------------------------------------------
+CHIP ECONOMY
+--------------------------------------------------
+
+Build a full virtual chip economy.
+
+Players use chips to:
+- join poker tables
+- enter high stakes games
+- unlock progression
+- participate in special tables
+
+Chips are:
+- virtual only
+- non-withdrawable
+- non-transferable for real money
+
+--------------------------------------------------
+TABLE STAKES SYSTEM
+--------------------------------------------------
+
+Create multiple table tiers.
+
+BEGINNER TABLES:
+- 25 / 50 blinds
+- low pressure
+- beginner friendly
+
+CASUAL TABLES:
+- 100 / 200 blinds
+- moderate stakes
+
+MID STAKES:
+- 500 / 1,000 blinds
+
+HIGH ROLLER:
+- 5,000 / 10,000 blinds
+
+ELITE NEON TABLES:
+- 50,000 / 100,000 blinds
+
+Each table should feel:
+- visually distinct
+- progression rewarding
+- socially aspirational
+
+--------------------------------------------------
+IN-APP PURCHASE SYSTEM
+--------------------------------------------------
+
+Implement Apple In-App Purchases ONLY.
+
+All purchases must use:
+- official Apple payment APIs
+- App Store compliant purchase flow
+
+DO NOT:
+- link external payment systems
+- bypass Apple payments
+- mention cash gambling
+
+--------------------------------------------------
+CHIP STORE DESIGN
+--------------------------------------------------
+
+Create a premium neon-themed chip store.
+
+The store should feel:
+- luxurious
+- modern
+- visually rewarding
+- high-end casino inspired
+
+Use:
+- neon gradients
+- glowing chip stacks
+- premium package cards
+- smooth animations
+- synthwave lighting
+
+--------------------------------------------------
+CHIP PACKAGES
+--------------------------------------------------
+
+Implement these chip bundles:
+
+STARTER STACK
+- 100K Chips
+- $1.99
+
+NEON STACK
+- 500K Chips
+- $4.99
+
+HIGH ROLLER STACK
+- 2M Chips
+- $19.99
+
+VAULT STACK
+- 10M Chips
+- $49.99
+
+LEGEND STACK
+- 50M Chips
+- $99.99
+
+Highlight:
+- best value offers
+- glowing premium bundles
+- limited-time visuals
+
+--------------------------------------------------
+VIP MEMBERSHIP SYSTEM
+--------------------------------------------------
+
+Implement a recurring VIP subscription system.
+
+Name:
+“CHIP SOCIETY VIP”
+
+VIP benefits:
+- daily bonus chips
+- exclusive neon table themes
+- VIP badge
+- unique avatar glow
+- bonus XP progression
+- exclusive profile cosmetics
+- access to VIP lounge tables
+- increased free rewards
+
+Subscription should feel:
+- prestigious
+- luxury-focused
+- socially desirable
+
+--------------------------------------------------
+DAILY REWARDS SYSTEM
+--------------------------------------------------
+
+Implement retention systems.
+
+Daily rewards:
+- free chips every day
+- streak bonuses
+- increasing rewards for consecutive logins
+
+Examples:
+Day 1:
+25K Chips
+
+Day 7:
+250K Chips
+
+Day 30:
+Exclusive cosmetic reward
+
+--------------------------------------------------
+FREE CHIP SYSTEM
+--------------------------------------------------
+
+Players should never feel trapped.
+
+Add:
+- free hourly chip bonus
+- watch-ad-for-chips option
+- comeback bonuses for bankrupt players
+
+Players should always:
+- have a path back into gameplay
+
+--------------------------------------------------
+LEVELING SYSTEM
+--------------------------------------------------
+
+Implement player progression levels.
+
+Players gain XP from:
+- winning hands
+- playing games
+- daily activity
+- achievements
+
+Example ranks:
+- Neon Bronze
+- Neon Silver
+- Neon Gold
+- Neon Platinum
+- Neon Diamond
+- Neon Elite
+- Neon Legend
+
+Progression should feel:
+- rewarding
+- addictive
+- status-driven
+
+--------------------------------------------------
+COSMETIC SYSTEM
+--------------------------------------------------
+
+Implement cosmetic unlocks and premium cosmetics.
+
+Cosmetics include:
+- neon card decks
+- luxury chip styles
+- animated avatar frames
+- table themes
+- profile backgrounds
+- VIP effects
+- synthwave visual themes
+
+Cosmetics should:
+- never affect gameplay fairness
+- remain visual only
+
+--------------------------------------------------
+AI BOT SYSTEM
+--------------------------------------------------
+
+At launch:
+tables may not have enough real players.
+
+Implement intelligent AI bots to:
+- fill empty seats
+- maintain active tables
+- create instant matchmaking
+
+Bots should:
+- behave realistically
+- vary skill levels
+- bluff occasionally
+- make believable decisions
+
+Players should NOT easily detect bots.
+
+--------------------------------------------------
+MULTIPLAYER MATCHMAKING
+--------------------------------------------------
+
+Implement:
+- quick play matchmaking
+- private tables
+- invite codes
+- friend invites
+
+Table flow should feel:
+- instant
+- active
+- populated
+
+Dead tables must be avoided.
+
+--------------------------------------------------
+PRIVATE TABLE SYSTEM
+--------------------------------------------------
+
+Players should be able to:
+- create private rooms
+- invite friends
+- share room codes
+
+Example:
+“Join Table: VICE-742”
+
+--------------------------------------------------
+APP STORE COMPLIANCE
+--------------------------------------------------
+
+The app MUST clearly communicate:
+- chips are virtual only
+- no real-money gambling exists
+- no cash payouts exist
+
+Use language such as:
+- “social poker”
+- “virtual chips”
+- “play for fun”
+
+DO NOT use:
+- “win real money”
+- “cash poker”
+- “earn money”
+
+--------------------------------------------------
+ONBOARDING EXPERIENCE
+--------------------------------------------------
+
+Create a polished onboarding flow.
+
+New users should:
+- instantly understand gameplay
+- receive free chips immediately
+- enter gameplay quickly
+- feel rewarded early
+
+The onboarding should feel:
+- exciting
+- premium
+- modern
+
+--------------------------------------------------
+RETENTION FEATURES
+--------------------------------------------------
+
+Implement:
+- daily missions
+- login rewards
+- comeback bonuses
+- progression milestones
+- achievements
+- streak systems
+
+The app should encourage:
+- daily engagement
+- long-term progression
+- social competition
+
+--------------------------------------------------
+STORE VISUAL DESIGN
+--------------------------------------------------
+
+The monetization UI should feel:
+- luxurious
+- synthwave-inspired
+- modern
+- premium App Store quality
+
+Use:
+- glowing gradients
+- animated chip stacks
+- neon reflections
+- luxury casino styling
+
+Avoid:
+- cheap casino aesthetics
+- cluttered layouts
+- aggressive popups
+
+--------------------------------------------------
+PLAYER PSYCHOLOGY
+--------------------------------------------------
+
+The economy should create:
+- progression
+- status
+- exclusivity
+- aspiration
+- competition
+
+Players should feel motivated to:
+- rank up
+- unlock cosmetics
+- access higher stakes
+- show off status
+
+--------------------------------------------------
+SERVER REQUIREMENTS
+--------------------------------------------------
+
+The backend must securely handle:
+- chip balances
+- purchases
+- matchmaking
+- multiplayer state
+- progression
+- rewards
+
+Use:
+- server-authoritative validation
+- secure purchase verification
+- anti-cheat protections
+
+--------------------------------------------------
+ANTI-CHEAT SYSTEMS
+--------------------------------------------------
+
+Prevent:
+- chip hacking
+- fake purchases
+- balance manipulation
+- gameplay exploits
+
+All chip balances must:
+- validate server-side
+- never trust client values
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+CHIP SOCIETY should feel like:
+- a premium social poker platform
+- a luxury neon casino universe
+- a modern multiplayer poker experience
+- an addictive progression-based social game
+
+The monetization should feel:
+- rewarding
+- optional
+- premium
+- integrated naturally
+
+This should NOT feel like:
+- a cheap gambling app
+- a scammy casino game
+- an aggressive paywall system
+
+It should feel like:
+a polished App Store-ready social poker experience designed for long-term growth and monetization.
