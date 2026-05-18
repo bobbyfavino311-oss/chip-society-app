@@ -213,7 +213,7 @@ function CommunityCards({
       <View style={table.communityCards}>
         {[0, 1, 2, 3, 4].map(i =>
           cards[i]
-            ? <PlayingCard key={i} card={cards[i]} faceDown={i >= revealedCount} size="lg" />
+            ? <PlayingCard key={i} card={cards[i]} faceDown={i >= revealedCount} size="md" />
             : <View key={i} style={table.emptySlot} />
         )}
       </View>
@@ -386,23 +386,23 @@ export default function PracticeScreen() {
   const seatPositions: Record<string, number | string>[] =
     aiPlayers.length === 3
       ? [
-          { left: 4, bottom: 56 },
-          { left: SEAT_CX, top: '3%' },
-          { right: 4, bottom: 56 },
+          { left: 8, bottom: 58 },
+          { left: SEAT_CX, top: '4%' },
+          { right: 8, bottom: 58 },
         ]
       : aiPlayers.length === 5
       ? [
-          { left: 4, bottom: 56 },
-          { left: 16, top: '5%' },
+          { left: 8, bottom: 58 },
+          { left: 18, top: '6%' },
           { left: SEAT_CX, top: '2%' },
-          { right: 16, top: '5%' },
-          { right: 4, bottom: 56 },
+          { right: 18, top: '6%' },
+          { right: 8, bottom: 58 },
         ]
       : [
-          { left: 4, bottom: 56 },
-          { left: 28, top: '6%' },
-          { right: 28, top: '6%' },
-          { right: 4, bottom: 56 },
+          { left: 8, bottom: 58 },
+          { left: 22, top: '7%' },
+          { right: 22, top: '7%' },
+          { right: 8, bottom: 58 },
         ];
 
   return (
@@ -516,12 +516,12 @@ export default function PracticeScreen() {
                   <View style={styles.humanHoleCards}>
                     {humanPlayer.holeCards.length > 0 ? (
                       humanPlayer.holeCards.map((card, i) => (
-                        <PlayingCard key={i} card={card} faceDown={false} size="xl" />
+                        <PlayingCard key={i} card={card} faceDown={false} size="lg" />
                       ))
                     ) : (
                       <>
-                        <PlayingCard faceDown size="xl" />
-                        <PlayingCard faceDown size="xl" />
+                        <PlayingCard faceDown size="lg" />
+                        <PlayingCard faceDown size="lg" />
                       </>
                     )}
                   </View>
@@ -878,7 +878,7 @@ const table = StyleSheet.create({
   },
   communityCards: { flexDirection: 'row', gap: 6 },
   emptySlot: {
-    width: 56, height: 78, borderRadius: 7,
+    width: 42, height: 58, borderRadius: 6,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
     borderStyle: 'dashed',
     backgroundColor: 'rgba(255,255,255,0.03)',
@@ -973,7 +973,7 @@ const styles = StyleSheet.create({
   },
   tableInner: {
     flex: 1, alignItems: 'center', justifyContent: 'center',
-    paddingBottom: '18%',
+    paddingBottom: '6%',
   },
 
   chipToken: {
@@ -996,17 +996,17 @@ const styles = StyleSheet.create({
   // Center column: community cards on top, human hole cards directly below
   centerCol: {
     alignItems: 'center',
-    gap: 16,
+    gap: 10,
   },
 
   // Human cards on the table (below community cards)
   humanCardsOnTable: {
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   humanHoleCards: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
 
   statusBadge: {
@@ -1105,17 +1105,17 @@ const styles = StyleSheet.create({
   },
   allInOverlayTitle: {
     color: colors.secondary,
-    fontSize: 22,
+    fontSize: 17,
     fontWeight: '900',
     fontFamily: 'Orbitron_900Black',
-    letterSpacing: 4,
+    letterSpacing: 3,
     textShadowColor: colors.secondary,
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
+    textShadowRadius: 10,
   },
   allInOverlaySub: {
     color: colors.textMuted,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     letterSpacing: 1,
   },
@@ -1178,42 +1178,43 @@ const styles = StyleSheet.create({
 
   // Handover panel
   handoverPanel: {
-    paddingHorizontal: 20, paddingTop: 12,
-    alignItems: 'center', gap: 8, position: 'relative',
+    paddingHorizontal: 16, paddingTop: 8,
+    alignItems: 'center', gap: 5, position: 'relative',
   },
   winnerBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 14,
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12,
     borderWidth: 1, borderColor: colors.border,
-    paddingHorizontal: 14, paddingVertical: 10,
+    paddingHorizontal: 12, paddingVertical: 7,
     width: '100%',
   },
   winnerBannerHuman: {
     backgroundColor: 'rgba(255,215,0,0.08)',
     borderColor: 'rgba(255,215,0,0.4)',
   },
-  winnerBannerLabel: { color: colors.textMuted, fontSize: 9, fontWeight: '600', letterSpacing: 1 },
+  winnerBannerLabel: { color: colors.textMuted, fontSize: 8, fontWeight: '600', letterSpacing: 1 },
   potWonBadge: { alignItems: 'center' },
   potWonAmt: {
-    color: colors.textDim, fontSize: 20, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold', lineHeight: 24,
+    color: colors.textDim, fontSize: 16, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', lineHeight: 19,
   },
-  handoverMsg: { color: colors.text, fontSize: 15, fontWeight: '700' },
-  handoverHand: { color: colors.gold, fontSize: 15, fontWeight: '700', fontFamily: 'Orbitron_400Regular', marginTop: 2 },
-  deltasRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, justifyContent: 'center' },
+  handoverMsg: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  handoverHand: { color: colors.gold, fontSize: 11, fontWeight: '700', fontFamily: 'Orbitron_400Regular', marginTop: 1 },
+  deltasRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, justifyContent: 'center' },
   deltaChip: {
-    alignItems: 'center', backgroundColor: colors.surface, borderRadius: 8,
-    borderWidth: 1, borderColor: colors.border, paddingHorizontal: 10, paddingVertical: 5,
+    alignItems: 'center', backgroundColor: colors.surface, borderRadius: 7,
+    borderWidth: 1, borderColor: colors.border, paddingHorizontal: 9, paddingVertical: 4,
   },
   deltaName: { color: colors.textDim, fontSize: 9, letterSpacing: 0.5 },
-  deltaAmt: { fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  deltaAmt: { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
   nextBtn: {
     borderRadius: colors.radius, overflow: 'hidden',
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 11, paddingHorizontal: 24, gap: 8,
-    borderWidth: 1, borderColor: colors.border, width: '100%',
+    paddingVertical: 9, paddingHorizontal: 28, gap: 7,
+    borderWidth: 1, borderColor: colors.border,
+    alignSelf: 'stretch',
   },
-  nextBtnText: { color: colors.background, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  nextBtnText: { color: colors.background, fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
 
   showdownPanel: {
     width: '100%',
@@ -1237,9 +1238,9 @@ const styles = StyleSheet.create({
   showdownRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    gap: 5,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.05)',
   },
@@ -1261,10 +1262,10 @@ const styles = StyleSheet.create({
 
   // Waiting / watching panel
   waitingPanel: {
-    paddingHorizontal: 20, paddingTop: 12,
-    alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.border, gap: 10,
+    paddingHorizontal: 16, paddingTop: 8,
+    alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.border, gap: 7,
   },
-  waitingText: { color: colors.textMuted, fontSize: 13, fontStyle: 'italic', textAlign: 'center' },
+  waitingText: { color: colors.textMuted, fontSize: 12, fontStyle: 'italic', textAlign: 'center' },
   waitingActions: { flexDirection: 'row', gap: 10 },
   skipBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,

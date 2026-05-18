@@ -1,0 +1,327 @@
+The current mobile poker table layout has major responsive UI problems and does NOT properly fit modern iPhone screens.
+
+The entire gameplay screen needs to be rebuilt using true mobile-first responsive layout logic.
+
+The current issues include:
+- community cards are too large
+- player cards overflow into gameplay space
+- player HUDs are clipped near screen edges
+- side players are partially cut off
+- the bottom UI consumes too much vertical space
+- showdown panels are oversized
+- the “Next Hand” button is far too large
+- the gameplay area feels vertically stretched
+- important information competes for space
+- table proportions are incorrect
+- spacing hierarchy is broken
+- too many stacked UI layers
+- folded player seats disappear awkwardly
+- player labels overlap gameplay elements
+- the table is not optimized for portrait mobile gameplay
+
+The app currently feels like:
+- a desktop layout squeezed onto mobile
+NOT:
+- a true premium iPhone poker app
+
+Completely rebuild the gameplay screen layout using a responsive mobile-first system.
+
+--------------------------------------------------
+PRIMARY GOAL
+--------------------------------------------------
+
+The gameplay screen must:
+- fit perfectly on all iPhones
+- maintain clean spacing
+- maximize gameplay visibility
+- reduce clutter
+- improve readability
+- keep all important gameplay elements visible simultaneously
+
+The layout should feel:
+- compact
+- efficient
+- premium
+- modern
+- balanced
+
+--------------------------------------------------
+SCREEN STRUCTURE REBUILD
+--------------------------------------------------
+
+The screen currently has too many vertically stacked sections.
+
+Rebuild the layout using:
+- layered positioning
+- floating UI panels
+- compact spacing
+- anchored player positioning
+
+The poker table should dominate the screen.
+
+The gameplay area should occupy:
+- approximately 70–75% of the visible screen height
+
+The bottom control area should occupy:
+- no more than 25–30% of screen height
+
+--------------------------------------------------
+TABLE RESIZING FIX
+--------------------------------------------------
+
+The table currently feels:
+- too tall
+- too narrow
+- stretched vertically
+
+Fix immediately:
+- widen the table significantly
+- reduce vertical stretching
+- make the oval more horizontal
+- center all gameplay elements inside the felt area
+
+The table should feel:
+- balanced
+- realistic
+- immersive
+- spatially efficient
+
+--------------------------------------------------
+COMMUNITY CARD FIX
+--------------------------------------------------
+
+Current community cards are:
+- too large
+- spaced poorly
+- consuming too much space
+
+Fix:
+- reduce card size by 15–20%
+- align cards horizontally with equal spacing
+- center the card row properly
+- reduce vertical padding above and below cards
+
+Community cards should:
+- remain readable
+- feel premium
+- stop dominating the screen
+
+--------------------------------------------------
+PLAYER CARD FIX
+--------------------------------------------------
+
+Current player hole cards:
+- are oversized
+- disconnected from seats
+- floating awkwardly
+
+Fix:
+- reduce hole card size slightly
+- anchor cards directly beside player HUD
+- improve spacing consistency
+- maintain readability without crowding the table
+
+--------------------------------------------------
+PLAYER SEAT POSITIONING FIX
+--------------------------------------------------
+
+The side players are currently:
+- clipped
+- partially off screen
+- positioned too close to edges
+
+Fix all seat positions.
+
+Requirements:
+- all 5 seats must remain fully visible
+- no avatars may touch screen edges
+- no cards may clip outside safe areas
+- side players should curve naturally around table
+
+Use:
+- responsive percentage-based positioning
+- dynamic scaling for smaller devices
+- safe-area-aware layout logic
+
+--------------------------------------------------
+BOTTOM PANEL OVERHAUL
+--------------------------------------------------
+
+The bottom section currently consumes WAY too much space.
+
+Problems:
+- oversized results box
+- oversized “Next Hand” button
+- excessive vertical stacking
+- poor spacing hierarchy
+
+Completely compress the bottom UI.
+
+--------------------------------------------------
+RESULT PANEL FIX
+--------------------------------------------------
+
+The showdown/results panel should:
+- become a compact floating card
+- reduce height significantly
+- use cleaner typography
+- reduce unnecessary padding
+
+The results section should display:
+- winner
+- hand type
+- chip gain/loss
+
+WITHOUT consuming half the screen.
+
+--------------------------------------------------
+NEXT HAND BUTTON FIX
+--------------------------------------------------
+
+The “NEXT HAND” button is massively oversized.
+
+Fix immediately:
+- reduce height by 40–50%
+- reduce vertical padding
+- make width more compact
+- improve button proportions
+
+The button should feel:
+- sleek
+- modern
+- premium
+
+NOT:
+- arcade-like
+- oversized
+- cartoonish
+
+--------------------------------------------------
+SHOWDOWN PANEL FIX
+--------------------------------------------------
+
+The showdown information area is too large.
+
+Fix:
+- reduce font sizes slightly
+- compress rows
+- tighten spacing
+- simplify information hierarchy
+
+The showdown area should:
+- feel elegant
+- feel compact
+- remain easy to scan
+
+--------------------------------------------------
+TYPOGRAPHY FIX
+--------------------------------------------------
+
+Typography is inconsistent across the screen.
+
+Fix:
+- establish one primary font family
+- establish one hierarchy system
+- improve readability
+- reduce oversized labels
+
+Avoid:
+- excessive letter spacing
+- giant bold labels
+- inconsistent font weights
+
+The UI should feel:
+- cohesive
+- professional
+- premium
+
+--------------------------------------------------
+VISUAL HIERARCHY FIX
+--------------------------------------------------
+
+Currently:
+everything competes equally for attention.
+
+Rebuild hierarchy so the eye naturally focuses on:
+1. Community cards
+2. Pot amount
+3. Active player
+4. Your controls
+5. Showdown results
+
+Reduce unnecessary visual noise.
+
+--------------------------------------------------
+SAFE AREA OPTIMIZATION
+--------------------------------------------------
+
+Ensure the gameplay screen works perfectly with:
+- Dynamic Island
+- iPhone notches
+- gesture navigation areas
+- rounded corners
+
+NO gameplay elements should:
+- touch device edges
+- clip into corners
+- overlap safe areas
+
+--------------------------------------------------
+RESPONSIVE SCALING SYSTEM
+--------------------------------------------------
+
+Build a fully responsive scaling system.
+
+Requirements:
+- automatic UI scaling by device height
+- dynamic card scaling
+- adaptive seat spacing
+- responsive font sizing
+- proportional table resizing
+
+The UI must remain clean on:
+- iPhone 16 Pro Max
+- iPhone 15
+- iPhone 14
+- smaller iPhones
+
+--------------------------------------------------
+GAMEPLAY DENSITY FIX
+--------------------------------------------------
+
+The gameplay currently feels:
+- stretched
+- sparse
+- inefficiently spaced
+
+Improve:
+- information density
+- spatial efficiency
+- grouping logic
+- gameplay focus
+
+The final screen should feel:
+- tighter
+- cleaner
+- more immersive
+- professionally designed
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The gameplay screen should now feel like:
+- a true production-quality poker app
+- built specifically for iOS
+- optimized for portrait mobile gameplay
+- clean and responsive
+- visually balanced
+- premium and modern
+
+This should NOT feel like:
+- a desktop UI port
+- a stretched prototype
+- a mockup
+
+It should feel like:
+a polished App Store-ready multiplayer poker experience designed by a professional mobile gaming studio.
