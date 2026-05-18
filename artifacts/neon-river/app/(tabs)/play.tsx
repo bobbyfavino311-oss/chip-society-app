@@ -17,11 +17,11 @@ import { useUser } from '@/context/UserContext';
 
 // ─── Table stakes ─────────────────────────────────────────────────────────────
 const TABLE_STAKES = [
-  { id: 'beginner',   name: 'BEGINNER',    blinds: '25 / 50',        minChips: 0,         minChipsLabel: 'Free',  color: '#00d4aa' },
-  { id: 'casual',     name: 'CASUAL',      blinds: '100 / 200',      minChips: 5_000,     minChipsLabel: '5K',    color: '#00d4ff' },
-  { id: 'mid',        name: 'MID STAKES',  blinds: '500 / 1,000',    minChips: 25_000,    minChipsLabel: '25K',   color: '#ffd700' },
-  { id: 'highroller', name: 'HIGH ROLLER', blinds: '5,000 / 10,000', minChips: 250_000,   minChipsLabel: '250K',  color: '#ff8800' },
-  { id: 'elite',      name: 'ELITE NEON',  blinds: '50K / 100K',     minChips: 2_500_000, minChipsLabel: '2.5M',  color: '#ff0090' },
+  { id: 'beginner',   name: 'BEGINNER',    blinds: '25 / 50',        minChips: 0,           minChipsLabel: 'Free',  color: '#00d4aa' },
+  { id: 'casual',     name: 'CASUAL',      blinds: '50 / 100',       minChips: 5_000,       minChipsLabel: '5K',    color: '#00d4ff' },
+  { id: 'mid',        name: 'MID STAKES',  blinds: '250 / 500',      minChips: 25_000,      minChipsLabel: '25K',   color: '#ffd700' },
+  { id: 'highroller', name: 'HIGH ROLLER', blinds: '2,500 / 5,000',  minChips: 250_000,     minChipsLabel: '250K',  color: '#ff8800' },
+  { id: 'elite',      name: 'ELITE NEON',  blinds: '25K / 50K',      minChips: 2_500_000,   minChipsLabel: '2.5M',  color: '#ff0090' },
 ];
 
 // ─── Live mode card ────────────────────────────────────────────────────────────
@@ -191,7 +191,7 @@ export default function PlayScreen() {
               <TouchableOpacity
                 key={t.id}
                 style={[styles.stakeRow, { borderColor: canAfford ? `${t.color}50` : colors.border, opacity: canAfford ? 1 : 0.5 }]}
-                onPress={() => canAfford && router.push('/game/practice')}
+                onPress={() => canAfford && router.push(`/game/practice?tier=${t.id}` as any)}
                 activeOpacity={0.8}
               >
                 <LinearGradient

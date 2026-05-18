@@ -82,7 +82,7 @@ const INITIAL_GAME: GameState = {
   currentBet: 0, currentPlayerIndex: 0, dealerIndex: 0, timer: TIMER_SECONDS,
   message: '', lastAggressorIndex: -1, minRaise: 100, numToAct: 0,
   showCards: false, winnerIds: [], winnerHand: '', winnerPot: 0,
-  allInRunout: false, sidePots: [], isSplitPot: false,
+  allInRunout: false, sidePots: [], isSplitPot: false, bigBlind: 100,
 };
 
 function getActivePlayers(players: GamePlayer[]) {
@@ -345,7 +345,7 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, smallBlind:
 
   return {
     ...INITIAL_GAME, players: ps, deck: deck.slice(cur), phase: 'preflop',
-    pot: sbAmt + bbAmt, currentBet: bigBlind, currentPlayerIndex: firstActor,
+    pot: sbAmt + bbAmt, currentBet: bigBlind, bigBlind, currentPlayerIndex: firstActor,
     lastAggressorIndex: bbIdx, dealerIndex: dealerIdx,
     numToAct: ps.filter(p => p.status === 'active').length,
     timer: TIMER_SECONDS, message: 'Cards dealt!', minRaise: bigBlind,

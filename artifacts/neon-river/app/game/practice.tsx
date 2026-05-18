@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Animated,
@@ -22,7 +22,7 @@ import DotTimer from '@/components/DotTimer';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { AIDifficulty } from '@/lib/aiBot';
-import { usePokerGame } from '@/hooks/usePokerGame';
+import { usePokerGame, TableConfig } from '@/hooks/usePokerGame';
 import { SoundEngine } from '@/lib/soundEngine';
 import { getBestHand, describeHand } from '@/lib/pokerEngine';
 
@@ -50,6 +50,15 @@ const PHASE_LABELS: Record<string, string> = {
   turn: 'TURN',
   river: 'RIVER',
   showdown: 'SHOWDOWN',
+};
+
+// ─── Stake tier → table config ────────────────────────────────────────────────
+const STAKE_CONFIGS: Record<string, TableConfig> = {
+  beginner:   { smallBlind:    25, bigBlind:    50, minBuyIn:     2_000 },
+  casual:     { smallBlind:    50, bigBlind:   100, minBuyIn:     5_000 },
+  mid:        { smallBlind:   250, bigBlind:   500, minBuyIn:    25_000 },
+  highroller: { smallBlind: 2_500, bigBlind: 5_000, minBuyIn:   250_000 },
+  elite:      { smallBlind:25_000, bigBlind:50_000, minBuyIn: 2_500_000 },
 };
 
 function getDiffDesc(d: AIDifficulty): string {
@@ -321,6 +330,9 @@ const g = StyleSheet.create({
 
 export default function PracticeScreen() {
   const { profile, recordWin, recordLoss } = useUser();
+  const { tier } = useLocalSearchParams<{ tier?: string }>();
+  const tableConfig = STAKE_CONFIGS[tier ?? ''] ?? STAKE_CONFIGS.casual;
+
   const [difficulty, setDifficulty] = useState<AIDifficulty>('casual');
   const [gameStarted, setGameStarted] = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
@@ -331,7 +343,8 @@ export default function PracticeScreen() {
     difficulty,
     profile.username,
     profile.chips,
-    numPlayers
+    numPlayers,
+    tableConfig,
   );
 
   const insets = useSafeAreaInsets();

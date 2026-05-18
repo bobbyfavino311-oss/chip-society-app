@@ -1,0 +1,290 @@
+CRITICAL GAMEPLAY TABLE / STAKES SYSTEM FIX REQUIRED FOR CHIP SOCIETY
+
+The current gameplay table experience still has major realism and visual consistency problems.
+
+The following issues MUST be fixed immediately:
+
+- The glowing pink border around gameplay feels distracting and outdated
+- AI players are spawning with bankrolls BELOW the table minimum buy-in
+- Table stakes and player bankrolls are inconsistent
+- Bots are joining tables illegally
+- Stakes do not feel authentic to real poker ecosystems
+
+These issues break:
+- immersion
+- realism
+- progression
+- competitive integrity
+- premium visual quality
+
+The gameplay experience must now feel:
+- realistic
+- authentic
+- balanced
+- premium
+- casino-quality
+
+--------------------------------------------------
+REMOVE THE PINK GAMEPLAY BORDER
+--------------------------------------------------
+
+The current neon pink border surrounding gameplay tables should be REMOVED completely.
+
+The border currently:
+- feels too aggressive
+- crowds the screen
+- makes gameplay look cramped
+- cheapens the premium aesthetic
+
+--------------------------------------------------
+NEW TABLE EDGE DESIGN
+--------------------------------------------------
+
+Replace the bright pink border with:
+- subtle ambient neon edge lighting
+- soft glow accents
+- luxury table shadows
+- clean rounded edges
+
+The table should feel:
+- sleek
+- premium
+- modern
+- immersive
+
+NOT:
+- boxed in
+- over-framed
+- arcade-like
+
+--------------------------------------------------
+GAMEPLAY VISUAL CLEANUP
+--------------------------------------------------
+
+Reduce:
+- excessive border glow
+- visual clutter
+- unnecessary outlines
+
+Increase:
+- breathing room
+- spacing
+- elegance
+- gameplay readability
+
+The table should now feel:
+like a luxury high-end poker app.
+
+--------------------------------------------------
+TABLE STAKES SYSTEM OVERHAUL
+--------------------------------------------------
+
+The current stake system is unrealistic and broken.
+
+AI bots and players are being seated at tables with bankrolls BELOW the minimum buy-in.
+
+This should NEVER happen.
+
+--------------------------------------------------
+MANDATORY BUY-IN VALIDATION
+--------------------------------------------------
+
+Every table must enforce:
+STRICT MINIMUM BUY-IN REQUIREMENTS.
+
+Example:
+
+TABLE:
+25K minimum buy-in
+
+ALL players seated at that table MUST have:
+AT LEAST 25K chips available.
+
+No exceptions.
+
+--------------------------------------------------
+INVALID PLAYER PREVENTION
+--------------------------------------------------
+
+Prevent ANY player or AI bot from joining a table if:
+their bankroll is BELOW the minimum buy-in.
+
+DO NOT:
+- auto-seat short stacks illegally
+- generate fake low-stack bots
+- bypass table requirements
+
+--------------------------------------------------
+AI BANKROLL GENERATION SYSTEM
+--------------------------------------------------
+
+AI bankrolls should now be generated dynamically based on:
+- table stakes
+- game mode
+- skill tier
+- progression level
+
+--------------------------------------------------
+AI BUY-IN RULES
+--------------------------------------------------
+
+Example table:
+25K minimum buy-in
+
+Valid AI bankroll examples:
+- 25K
+- 31K
+- 48K
+- 72K
+- 110K
+
+INVALID examples:
+- 500
+- 2K
+- 10K
+- 18K
+
+Bots should NEVER appear under-rolled for the table.
+
+--------------------------------------------------
+REALISTIC TABLE ECONOMY
+--------------------------------------------------
+
+Higher stakes tables should naturally contain:
+- larger bankrolls
+- more aggressive AI
+- tougher competition
+- deeper stacks
+
+Low stakes tables should contain:
+- beginner bankroll ranges
+- safer AI behavior
+- smaller pots
+
+The ecosystem should feel:
+like a real online poker platform.
+
+--------------------------------------------------
+TABLE TIER STRUCTURE
+--------------------------------------------------
+
+Implement realistic table tiers.
+
+EXAMPLES:
+
+BEGINNER:
+1K / 5K buy-ins
+
+LOW STAKES:
+10K / 25K
+
+MID STAKES:
+50K / 100K
+
+HIGH STAKES:
+250K+
+
+VIP TABLES:
+1M+
+
+Each table should feel distinct.
+
+--------------------------------------------------
+BUY-IN DISPLAY FIX
+--------------------------------------------------
+
+Clearly display:
+- minimum buy-in
+- maximum buy-in
+- average stack size
+
+inside:
+- lobby cards
+- matchmaking screens
+- tournament entries
+
+--------------------------------------------------
+MATCHMAKING IMPROVEMENTS
+--------------------------------------------------
+
+Match players into tables using:
+- bankroll ranges
+- skill level
+- table stake eligibility
+
+Avoid:
+- wildly mismatched bankrolls
+- impossible stack imbalances
+- unrealistic seating
+
+--------------------------------------------------
+AI PERSONALITY SCALING
+--------------------------------------------------
+
+Different stakes should generate different AI personalities.
+
+LOW STAKES:
+- looser
+- simpler
+- beginner mistakes
+
+MID STAKES:
+- balanced strategy
+- more realistic betting
+
+HIGH STAKES:
+- aggressive
+- advanced poker logic
+- bluff awareness
+- pot odds awareness
+
+--------------------------------------------------
+TABLE IMMERSION IMPROVEMENTS
+--------------------------------------------------
+
+The table should feel:
+- alive
+- professional
+- believable
+
+Improve:
+- stack realism
+- bankroll consistency
+- betting authenticity
+- table pacing
+
+--------------------------------------------------
+PLAYER TRUST REQUIREMENTS
+--------------------------------------------------
+
+Poker players immediately notice:
+- fake stack systems
+- impossible buy-ins
+- unrealistic table logic
+
+The app must now feel:
+- authentic
+- mathematically consistent
+- professionally designed
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+CHIP SOCIETY should now feel like:
+- a legitimate premium online poker platform
+- a realistic multiplayer Texas Hold’em ecosystem
+- a polished social poker experience
+
+The gameplay tables should feel:
+- immersive
+- elegant
+- balanced
+- trustworthy
+- visually premium
+
+NOT:
+- random
+- inconsistent
+- arcade-like
+- fake casino gameplay.

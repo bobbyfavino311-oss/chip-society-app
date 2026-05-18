@@ -15,6 +15,14 @@ export interface SidePot {
   eligiblePlayerIds: string[];
 }
 
+export interface TableConfig {
+  smallBlind: number;
+  bigBlind: number;
+  minBuyIn: number;
+}
+
+const DEFAULT_TABLE_CONFIG: TableConfig = { smallBlind: SMALL_BLIND, bigBlind: BIG_BLIND, minBuyIn: 5_000 };
+
 export interface GamePlayer {
   id: string;
   name: string;
@@ -54,6 +62,7 @@ export interface GameState {
   allInRunout: boolean; // true when we are running out the board with all players all-in
   sidePots: SidePot[];  // populated when at least one player is all-in for less
   isSplitPot: boolean;  // true when two or more players tie for the same pot
+  bigBlind: number;     // table big blind — used for minRaise reset between streets
 }
 
 const INITIAL_STATE: GameState = {
@@ -77,6 +86,7 @@ const INITIAL_STATE: GameState = {
   allInRunout: false,
   sidePots: [],
   isSplitPot: false,
+  bigBlind: BIG_BLIND,
 };
 
 function getActivePlayers(players: GamePlayer[]): GamePlayer[] {
@@ -279,7 +289,7 @@ function advancePhase(state: GameState): GameState {
   if (active.length === 1) return doShowdown(state);
 
   const players = state.players.map(p => ({ ...p, betInRound: 0, lastAction: undefined }));
-  const base = { ...state, players, currentBet: 0, minRaise: BIG_BLIND };
+  const base = { ...state, players, currentBet: 0, minRaise: state.bigBlind };
 
   let firstActor = (state.dealerIndex + 1) % players.length;
   for (let i = 0; i < players.length; i++) {
@@ -403,7 +413,7 @@ function getActionMsg(name: string, action: AIAction, amount: number): string {
   }[action];
 }
 
-function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number): GameState {
+function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, sb: number = SMALL_BLIND, bb: number = BIG_BLIND): GameState {
   const deck = shuffleDeck(createDeck());
   const ps = players.map(p => ({
     ...p,
@@ -426,14 +436,14 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number): GameState 
   const sbIdx = (dealerIdx + 1) % ps.length;
   const bbIdx = (dealerIdx + 2) % ps.length;
 
-  const sbAmt = Math.min(SMALL_BLIND, ps[sbIdx].chips);
+  const sbAmt = Math.min(sb, ps[sbIdx].chips);
   ps[sbIdx].chips -= sbAmt;
   ps[sbIdx].betInRound = sbAmt;
   ps[sbIdx].chipDelta = -sbAmt;
   ps[sbIdx].isSmallBlind = true;
   if (ps[sbIdx].chips === 0) ps[sbIdx].status = 'allIn';
 
-  const bbAmt = Math.min(BIG_BLIND, ps[bbIdx].chips);
+  const bbAmt = Math.min(bb, ps[bbIdx].chips);
   ps[bbIdx].chips -= bbAmt;
   ps[bbIdx].betInRound = bbAmt;
   ps[bbIdx].chipDelta = -bbAmt;
@@ -454,7 +464,9 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number): GameState 
     deck: deck.slice(deckCursor),
     phase: 'preflop',
     pot: sbAmt + bbAmt,
-    currentBet: BIG_BLIND,
+    currentBet: bb,
+    minRaise: bb,
+    bigBlind: bb,
     currentPlayerIndex: firstActor,
     lastAggressorIndex: bbIdx,
     dealerIndex: dealerIdx,
@@ -492,7 +504,13 @@ function executeAIAction(prev: GameState): GameState {
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
-export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanChips: number, numPlayers: number = 5) {
+export function usePokerGame(
+  difficulty: AIDifficulty,
+  humanName: string,
+  humanChips: number,
+  numPlayers: number = 5,
+  tableConfig: TableConfig = DEFAULT_TABLE_CONFIG,
+) {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const aiRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -585,7 +603,12 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
       ...AI_NAMES.slice(0, numAI).map((name, i) => ({
         id: `ai_${i}`,
         name,
-        chips: 1200 + i * 150,
+        // AI stacks scale proportionally to the human stack and table minimum.
+        // Range: ~60% → ~150% of stackBase for natural variety.
+        chips: Math.max(
+          tableConfig.minBuyIn,
+          Math.round(Math.max(tableConfig.minBuyIn, humanChips * 0.8) * (0.6 + i * 0.22))
+        ),
         holeCards: [] as Card[],
         betInRound: 0,
         chipDelta: 0,
@@ -600,8 +623,8 @@ export function usePokerGame(difficulty: AIDifficulty, humanName: string, humanC
       })),
     ];
 
-    setState(dealAndPostBlinds(players, dealerIdx));
-  }, [difficulty, humanName, humanChips, numPlayers, clearTimer, clearAI]);
+    setState(dealAndPostBlinds(players, dealerIdx, tableConfig.smallBlind, tableConfig.bigBlind));
+  }, [difficulty, humanName, humanChips, numPlayers, tableConfig, clearTimer, clearAI]);
 
   const handleAction = useCallback((action: AIAction, raiseAmount?: number) => {
     clearTimer();
