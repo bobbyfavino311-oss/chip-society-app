@@ -1,0 +1,470 @@
+```text id="chip_society_onboarding_tournament_and_economy_fix_v2"
+CRITICAL MOBILE UI / UX / ECONOMY OVERHAUL REQUIRED FOR CHIP SOCIETY
+
+The current onboarding, tournament systems, and reward economy are not production ready.
+
+The app currently has:
+- broken onboarding flow
+- blocked navigation
+- improper scrolling behavior
+- inconsistent table themes
+- outdated tournament table UI
+- oversized reward values
+- poor economy pacing
+- layout overflow issues
+- poor mobile usability
+
+These problems make the app feel:
+- unfinished
+- frustrating
+- inflated
+- low quality
+- not App Store ready
+
+Fix ALL issues below.
+
+--------------------------------------------------
+CRITICAL ONBOARDING SCREEN FIX
+--------------------------------------------------
+
+The current “Welcome Bonus / Beginner Reward” screen blocks the player from entering the app.
+
+Players cannot:
+- scroll properly
+- continue naturally
+- reach the launch/start button
+- access gameplay easily
+
+This creates:
+- frustration
+- confusion
+- poor first impression
+
+--------------------------------------------------
+FIX THE SCROLLING SYSTEM
+--------------------------------------------------
+
+The onboarding screen must become:
+- fully scrollable
+- responsive
+- adaptive to ALL iPhone screen sizes
+
+Support:
+- iPhone SE
+- iPhone 13/14/15
+- Pro Max models
+- dynamic island devices
+
+The layout must NEVER:
+- clip content
+- trap the user
+- hide important buttons
+- overflow off-screen
+
+--------------------------------------------------
+SAFE AREA FIXES
+--------------------------------------------------
+
+Respect ALL iOS safe areas.
+
+Nothing should:
+- overlap the home bar
+- collide with the notch
+- sit too close to screen edges
+
+Use proper:
+- padding
+- spacing
+- responsive scaling
+
+--------------------------------------------------
+WELCOME SCREEN RESTRUCTURE
+--------------------------------------------------
+
+The onboarding screen currently feels:
+- oversized
+- cluttered
+- vertically stretched
+- difficult to navigate
+
+Rebuild the onboarding experience entirely.
+
+The screen should feel:
+- sleek
+- premium
+- cinematic
+- minimal
+- modern
+
+--------------------------------------------------
+NEW PLAYER STARTING CHIP BALANCE
+--------------------------------------------------
+
+Reduce the starting virtual chip balance dramatically.
+
+NEW PLAYERS SHOULD START WITH:
+50,000 VIRTUAL CHIPS
+
+NOT:
+250,000 chips
+
+The previous amount inflated the economy too quickly and removed progression value.
+
+50K should feel:
+- generous
+- exciting
+- balanced
+- sustainable
+
+--------------------------------------------------
+WELCOME BONUS REBALANCE
+--------------------------------------------------
+
+The welcome bonus section currently dominates the screen too aggressively.
+
+Reduce:
+- oversized reward presentation
+- visual clutter
+- giant chip typography
+
+The welcome bonus should feel:
+- premium
+- classy
+- rewarding
+
+NOT:
+- spammy
+- exaggerated
+- cheap casino style
+
+--------------------------------------------------
+NEW ONBOARDING FLOW
+--------------------------------------------------
+
+Redesign the first-launch experience into a clean vertical flow.
+
+ORDER:
+
+1. CHIP SOCIETY logo
+2. Premium synthwave tagline
+3. 50,000 virtual chip welcome bonus
+4. Small feature highlights
+5. Primary CTA button
+6. Secondary sign-in option
+
+The entire screen must fit naturally on mobile WITHOUT excessive scrolling.
+
+--------------------------------------------------
+PRIMARY BUTTON FIX
+--------------------------------------------------
+
+Add a large fixed CTA button at the bottom:
+
+“ENTER CHIP SOCIETY”
+
+This button must:
+- ALWAYS remain visible
+- respect safe areas
+- float above the home bar
+- use premium neon styling
+
+DO NOT allow:
+- hidden buttons
+- clipped buttons
+- inaccessible actions
+
+--------------------------------------------------
+SCROLL BEHAVIOR RULES
+--------------------------------------------------
+
+The onboarding page should:
+- vertically scroll ONLY if necessary
+- use momentum scrolling
+- feel smooth and native to iOS
+
+DO NOT:
+- hard lock the screen
+- freeze interaction
+- trap users
+
+--------------------------------------------------
+TYPOGRAPHY FIXES
+--------------------------------------------------
+
+Current typography is:
+- too large
+- unevenly spaced
+- breaking layout balance
+
+Fix:
+- font scaling
+- line spacing
+- text hierarchy
+- vertical rhythm
+
+Maintain:
+- neon synthwave style
+- futuristic aesthetic
+
+BUT:
+improve readability dramatically.
+
+--------------------------------------------------
+BACKGROUND CLEANUP
+--------------------------------------------------
+
+The glowing circles and background effects are too large and distracting.
+
+Reduce:
+- glow intensity
+- oversized shapes
+- visual clutter
+
+The background should:
+- support the UI
+- NOT overpower it
+
+Use:
+- subtle ambient neon lighting
+- softer gradients
+- luxury synthwave atmosphere
+
+--------------------------------------------------
+TOURNAMENT MODE CRITICAL FIX
+--------------------------------------------------
+
+The TOURNAMENT SECTION is still using:
+- the OLD poker table design
+- outdated gameplay UI
+- inconsistent layouts
+
+This is unacceptable.
+
+--------------------------------------------------
+UNIFY ALL GAME MODES
+--------------------------------------------------
+
+ALL gameplay modes must now use:
+the NEW redesigned table system ONLY.
+
+This includes:
+- tournaments
+- ranked
+- quick match
+- private tables
+- AI practice
+- social games
+
+There should NEVER be:
+- old table layouts
+- mixed design systems
+- inconsistent gameplay visuals
+
+--------------------------------------------------
+TOURNAMENT TABLE REDESIGN
+--------------------------------------------------
+
+Tournament mode must inherit:
+- new neon oval table
+- improved player spacing
+- modern card scaling
+- updated chip system
+- new action HUD
+- redesigned community cards
+- improved animations
+
+Tournament mode should feel:
+- elite
+- competitive
+- premium
+- visually unified
+
+--------------------------------------------------
+TOURNAMENT LOBBY REDESIGN
+--------------------------------------------------
+
+Update tournament lobby UI to match the new CHIP SOCIETY aesthetic.
+
+Use:
+- neon navy backgrounds
+- glowing pink accents
+- cyan highlights
+- luxury typography
+
+Tournament cards should display:
+- buy-in
+- player count
+- blind structure
+- prize pool
+- start timer
+
+WITHOUT:
+- clutter
+- oversized UI
+- outdated poker styling
+
+--------------------------------------------------
+DAILY BONUS ECONOMY FIX
+--------------------------------------------------
+
+The daily reward system currently gives rewards that are FAR TOO HIGH.
+
+This is inflating the in-game economy and reducing long-term retention value.
+
+Rebuild the daily streak system completely.
+
+--------------------------------------------------
+NEW DAILY BONUS STRUCTURE
+--------------------------------------------------
+
+Daily rewards should ONLY increase in increments of 5K.
+
+7-DAY STREAK STRUCTURE:
+
+DAY 1:
+5K
+
+DAY 2:
+10K
+
+DAY 3:
+15K
+
+DAY 4:
+20K
+
+DAY 5:
+25K
+
+DAY 6:
+30K
+
+DAY 7:
+35K
+
+This structure should feel:
+- sustainable
+- rewarding
+- controlled
+- progression-based
+
+NOT:
+- excessive
+- economy breaking
+- inflated
+
+--------------------------------------------------
+DAILY BONUS DESIGN
+--------------------------------------------------
+
+The daily reward UI should feel:
+- elegant
+- premium
+- minimal
+- rewarding
+
+Use:
+- neon glow accents
+- soft animations
+- luxury typography
+- subtle progression indicators
+
+DO NOT:
+- use giant casino popups
+- overload the screen
+- make rewards feel fake
+
+--------------------------------------------------
+LONG TERM ECONOMY BALANCING
+--------------------------------------------------
+
+The entire chip economy must now prioritize:
+- long-term retention
+- sustainable progression
+- meaningful chip value
+- balanced growth pacing
+
+Avoid:
+- excessive giveaways
+- runaway inflation
+- meaningless balances
+
+Players should gradually build bankrolls over time.
+
+--------------------------------------------------
+RESPONSIVE MOBILE DESIGN REQUIREMENTS
+--------------------------------------------------
+
+ALL screens in the app must now:
+- adapt dynamically to screen height
+- scale properly across iPhones
+- avoid overflow
+- maintain touch comfort
+
+UI elements must NEVER:
+- overlap
+- clip
+- disappear off-screen
+- require zooming
+
+--------------------------------------------------
+GLOBAL MOBILE OPTIMIZATION PASS
+--------------------------------------------------
+
+Run a FULL mobile optimization pass across:
+- onboarding
+- gameplay
+- tournaments
+- rewards
+- profile
+- social feed
+- store
+- ranked mode
+
+Focus on:
+- spacing
+- readability
+- touch ergonomics
+- visual balance
+- performance
+
+--------------------------------------------------
+PERFORMANCE REQUIREMENTS
+--------------------------------------------------
+
+Animations and layouts must remain:
+- smooth
+- optimized
+- responsive
+
+Maintain:
+- 60 FPS feel
+- responsive touch latency
+- fast UI transitions
+
+Avoid:
+- oversized assets
+- laggy glow effects
+- excessive blur rendering
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The final CHIP SOCIETY mobile experience should feel like:
+- a top-tier modern iOS poker app
+- a premium social casino platform
+- a luxury synthwave multiplayer experience
+
+The app should feel:
+- polished
+- responsive
+- intuitive
+- visually stunning
+- production ready
+
+NOT:
+- like a prototype
+- a broken beta
+- an inconsistent UI experiment.
+```

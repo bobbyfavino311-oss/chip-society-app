@@ -1,0 +1,262 @@
+CRITICAL POKER ENGINE FIX REQUIRED — ALL-IN / SIDE POT SYSTEM IS BROKEN
+
+The CHIP SOCIETY poker engine is incorrectly handling all-in situations and side pot calculations.
+
+Current bug:
+A player went ALL IN with 85K chips against a bot that only had 1K chips.
+
+When the player lost the hand:
+the game incorrectly transferred ALL 85K chips to the bot.
+
+This is a major poker logic failure.
+
+This issue completely breaks:
+- gameplay fairness
+- chip economy
+- player trust
+- competitive integrity
+
+The poker engine MUST be rebuilt to support REAL Texas Hold’em side pot logic properly.
+
+--------------------------------------------------
+CORE PROBLEM
+--------------------------------------------------
+
+The game is currently:
+- incorrectly awarding entire stacks
+- ignoring side pot rules
+- failing all-in cap calculations
+- transferring chips illegally
+
+This is unacceptable for multiplayer poker.
+
+--------------------------------------------------
+CORRECT TEXAS HOLD’EM RULE
+--------------------------------------------------
+
+In Texas Hold’em:
+
+A player can ONLY win the amount they are eligible to contest.
+
+Example:
+
+PLAYER A:
+85,000 chips
+
+PLAYER B:
+1,000 chips
+
+If PLAYER B goes all-in for 1,000:
+PLAYER A can ONLY lose 1,000 chips to that player.
+
+The REMAINING 84,000 chips MUST:
+- remain with PLAYER A
+OR
+- stay in uncontested pots against remaining players
+
+The smaller stack can NEVER win more chips than they contributed.
+
+--------------------------------------------------
+REBUILD SIDE POT SYSTEM
+--------------------------------------------------
+
+Implement a FULL professional side-pot engine.
+
+The system must support:
+- multiple all-ins
+- uneven stack sizes
+- main pots
+- side pots
+- split pots
+- multi-way all-ins
+
+The logic must behave exactly like:
+real casino Texas Hold’em.
+
+--------------------------------------------------
+PROPER SIDE POT EXAMPLE
+--------------------------------------------------
+
+Example:
+
+PLAYER A:
+85K
+
+PLAYER B:
+1K
+
+PLAYER C:
+12K
+
+If all players go all-in:
+
+MAIN POT:
+1K from each player
+
+SIDE POT 1:
+11K between A and C
+
+SIDE POT 2:
+remaining uncontested chips returned automatically
+
+The engine must:
+- calculate all pots correctly
+- distribute winnings correctly
+- prevent illegal chip transfers
+
+--------------------------------------------------
+UNCONTESTED CHIP RETURN SYSTEM
+--------------------------------------------------
+
+Any chips NOT matched by opponents must:
+- automatically return to the player
+- NEVER enter the contested pot
+- NEVER be transferable to smaller stacks
+
+This is mandatory poker behavior.
+
+--------------------------------------------------
+POT CALCULATION ENGINE
+--------------------------------------------------
+
+Rewrite the betting engine to correctly track:
+- committed chips
+- eligible pots
+- side pot ownership
+- contested amounts
+- refund amounts
+
+Each betting round must:
+- maintain exact chip accounting
+- prevent duplicate contributions
+- validate legal raise sizes
+
+--------------------------------------------------
+HAND RESOLUTION ENGINE
+--------------------------------------------------
+
+At showdown:
+the engine must evaluate:
+
+1. MAIN POT winner
+2. SIDE POT winners
+3. Split pot scenarios
+4. Refund scenarios
+
+Each pot must resolve independently.
+
+--------------------------------------------------
+SHOWDOWN UI IMPROVEMENTS
+--------------------------------------------------
+
+When side pots exist:
+display clearly:
+
+- MAIN POT
+- SIDE POT 1
+- SIDE POT 2
+- SIDE POT 3
+
+Each with:
+- chip amounts
+- eligible players
+- winning player
+
+The UI should feel:
+- professional
+- easy to understand
+- premium poker quality
+
+--------------------------------------------------
+CHIP ACCOUNTING VALIDATION
+--------------------------------------------------
+
+Implement strict chip accounting validation.
+
+The TOTAL chips on the table before the hand MUST equal:
+the TOTAL chips after the hand.
+
+No chips should:
+- disappear
+- duplicate
+- transfer illegally
+
+--------------------------------------------------
+SERVER AUTHORITATIVE LOGIC
+--------------------------------------------------
+
+ALL betting and pot calculations must occur:
+SERVER SIDE ONLY.
+
+The client should NEVER:
+- calculate side pots independently
+- decide winners locally
+- control pot distribution
+
+Prevent:
+- desyncs
+- exploits
+- chip duplication
+- fake outcomes
+
+--------------------------------------------------
+ALL-IN EDGE CASE TESTING
+--------------------------------------------------
+
+Test ALL scenarios including:
+- heads-up all-ins
+- 3-way all-ins
+- 5-player all-ins
+- unequal stacks
+- split pots
+- ties
+- folded side pots
+- disconnected players
+- tournament all-ins
+
+The engine must NEVER:
+- overpay winners
+- steal uncontested chips
+- miscalculate side pots
+
+--------------------------------------------------
+PLAYER TRUST REQUIREMENT
+--------------------------------------------------
+
+Poker players instantly notice broken side pot logic.
+
+This issue destroys:
+- credibility
+- retention
+- competitiveness
+
+The poker engine must now feel:
+- authentic
+- mathematically accurate
+- casino-grade
+- trustworthy
+
+--------------------------------------------------
+FINAL GOAL
+--------------------------------------------------
+
+CHIP SOCIETY should now behave like:
+a real professional Texas Hold’em platform.
+
+The betting engine must support:
+- authentic poker rules
+- accurate side pots
+- correct all-in handling
+- proper chip protection
+- competitive integrity
+
+The final experience should feel:
+- fair
+- polished
+- reliable
+- production-ready
+
+NOT:
+- like an arcade poker prototype
+- broken fake poker logic
+- random chip redistribution.
