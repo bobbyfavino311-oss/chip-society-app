@@ -177,20 +177,25 @@ function CommunityCards({
   useEffect(() => {
     const prev = prevLengthRef.current;
     const curr = cards.length;
-    if (curr > prev) {
-      // New cards arrived — reveal them one by one with 240ms stagger
-      for (let idx = prev; idx < curr; idx++) {
-        const delay = (idx - prev) * 240;
-        setTimeout(() => {
-          setRevealedCount(idx + 1);
-        }, delay);
-      }
-      prevLengthRef.current = curr;
-    } else if (curr === 0 && prev > 0) {
-      // Hand reset
+    const ids: ReturnType<typeof setTimeout>[] = [];
+
+    if (curr === 0) {
+      // New hand — reset immediately
       prevLengthRef.current = 0;
       setRevealedCount(0);
+    } else if (curr > prev) {
+      // New card(s) arrived — stagger reveal for only the new ones
+      for (let idx = prev; idx < curr; idx++) {
+        const delay = (idx - prev) * 240;
+        const id = setTimeout(() => {
+          setRevealedCount(c => Math.max(c, idx + 1));
+        }, delay);
+        ids.push(id);
+      }
+      prevLengthRef.current = curr;
     }
+
+    return () => ids.forEach(clearTimeout);
   }, [cards.length]);
 
   const hasComm = cards.length > 0;
