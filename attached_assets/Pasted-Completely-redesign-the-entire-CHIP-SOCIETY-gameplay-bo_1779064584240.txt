@@ -1,0 +1,407 @@
+Completely redesign the entire CHIP SOCIETY gameplay board from scratch using the attached reference image as inspiration for layout simplicity and spacing structure.
+
+DO NOT copy the exact visual design.
+
+Instead:
+use the reference image’s:
+- cleaner spacing
+- minimal layout
+- centered gameplay focus
+- simplified board structure
+- mobile-first organization
+
+BUT transform it into:
+a premium neon 80s Miami poker experience.
+
+The current CHIP SOCIETY table feels:
+- overcrowded
+- visually noisy
+- vertically stretched
+- too complicated
+- disconnected
+- poorly balanced
+
+The new gameplay board should feel:
+- clean
+- modern
+- immersive
+- premium
+- spatially balanced
+- easy to read instantly
+
+--------------------------------------------------
+NEW VISUAL DIRECTION
+--------------------------------------------------
+
+Theme:
+- 1980s Miami nightlife
+- synthwave casino
+- neon luxury
+- retro-futuristic poker lounge
+
+PRIMARY COLORS:
+- neon pink
+- electric cyan
+- deep navy blue
+- purple gradients
+- glossy black
+- chrome accents
+
+The gameplay should feel like:
+- a luxury neon poker club
+- a retro-futuristic casino
+- an upscale social poker environment
+
+--------------------------------------------------
+CORE LAYOUT REBUILD
+--------------------------------------------------
+
+The current gameplay board is too vertically stacked.
+
+Completely rebuild the layout around:
+- a centered horizontal gameplay flow
+- cleaner spacing
+- floating UI elements
+- minimal clutter
+- responsive mobile-first proportions
+
+The gameplay must feel:
+- wider
+- cleaner
+- more modern
+- easier to scan instantly
+
+--------------------------------------------------
+REMOVE THE OLD OVAL TABLE
+--------------------------------------------------
+
+DO NOT use:
+- the large glowing oval poker table
+- oversized neon borders
+- giant felt surfaces
+- thick table outlines
+
+Instead:
+create a modern floating gameplay surface.
+
+Use:
+- subtle curved table background
+- soft ambient glow
+- layered gradients
+- smooth lighting
+- minimal framing
+
+The gameplay area should feel:
+- lightweight
+- sleek
+- immersive
+- modern
+
+--------------------------------------------------
+COMMUNITY CARD LAYOUT
+--------------------------------------------------
+
+The community cards should become:
+- the visual center of the board
+
+Requirements:
+- centered horizontally
+- evenly spaced
+- slightly elevated visually
+- floating above subtle glow
+
+Card sizing:
+- medium-large
+- highly readable
+- not oversized
+
+Use:
+- premium realistic cards
+- soft shadows
+- subtle neon reflections
+- smooth rounded corners
+
+The cards should feel:
+- premium
+- modern
+- luxurious
+
+--------------------------------------------------
+PLAYER SEAT REDESIGN
+--------------------------------------------------
+
+Completely redesign all player positions.
+
+The current seats feel:
+- disconnected
+- randomly floating
+- awkwardly spaced
+
+Use the reference image layout style:
+- simplified player positioning
+- compact alignment
+- curved top-row arrangement
+- clean spacing
+
+BUT improve it dramatically with:
+- neon accents
+- glowing avatar rings
+- better visual hierarchy
+- active-player highlights
+
+--------------------------------------------------
+PLAYER HUD SYSTEM
+--------------------------------------------------
+
+Each player HUD should include:
+- avatar
+- username
+- chip count
+- dealer icon
+- turn timer
+- action label
+
+The HUD should feel:
+- compact
+- premium
+- easy to scan
+
+Avoid:
+- oversized labels
+- giant glowing boxes
+- cluttered seat panels
+
+--------------------------------------------------
+ACTIVE PLAYER SYSTEM
+--------------------------------------------------
+
+The active player must be obvious instantly.
+
+When it is a player’s turn:
+- avatar ring glows brighter
+- soft neon pulse activates
+- timer animates smoothly
+- subtle spotlight effect appears
+
+DO NOT use:
+- giant flashing animations
+- excessive effects
+- distracting overlays
+
+Keep it:
+- elegant
+- premium
+- modern
+
+--------------------------------------------------
+BOTTOM PLAYER AREA REBUILD
+--------------------------------------------------
+
+The bottom player section currently consumes too much space.
+
+Completely redesign it.
+
+Use the reference image’s:
+- cleaner lower layout
+- compact organization
+- centered focus
+
+BUT improve it with:
+- premium controls
+- neon gradients
+- cleaner spacing
+- luxury styling
+
+The bottom gameplay area should contain:
+- player hole cards
+- betting controls
+- chip count
+- current action buttons
+
+WITHOUT:
+- giant stacked panels
+- oversized banners
+- unnecessary boxes
+
+--------------------------------------------------
+ACTION BUTTON OVERHAUL
+--------------------------------------------------
+
+Current buttons feel:
+- bulky
+- oversized
+- arcade-like
+
+Redesign all buttons.
+
+Buttons should:
+- feel sleek
+- have soft neon glow
+- use modern gradients
+- fit naturally into the layout
+
+BUTTON COLORS:
+- Fold = neon red
+- Check/Call = cyan/green
+- Raise = electric blue
+- All-In = neon pink/purple
+
+Buttons should:
+- feel premium
+- feel touch responsive
+- feel App Store quality
+
+--------------------------------------------------
+POT DISPLAY REDESIGN
+--------------------------------------------------
+
+Current pot display is too large and outdated.
+
+New pot display should:
+- float above community cards
+- use compact premium typography
+- have subtle neon border
+- feel integrated into gameplay
+
+The pot should feel:
+- important
+- clean
+- modern
+
+NOT:
+- like a giant floating box
+
+--------------------------------------------------
+SHOWDOWN REDESIGN
+--------------------------------------------------
+
+Current showdown UI is:
+- oversized
+- cluttered
+- vertically stacked
+
+Completely simplify showdown presentation.
+
+Requirements:
+- compact winner banner
+- clean hand label
+- smaller chip result display
+- smoother transitions
+
+The showdown should:
+- feel polished
+- feel rewarding
+- remain minimal
+
+--------------------------------------------------
+TYPOGRAPHY OVERHAUL
+--------------------------------------------------
+
+Current typography is inconsistent.
+
+Use:
+- one premium modern font family
+- clean hierarchy system
+- better spacing
+- stronger readability
+
+Typography should feel:
+- futuristic
+- luxury
+- minimal
+- polished
+
+Avoid:
+- giant bold text
+- excessive letter spacing
+- arcade-style labels
+
+--------------------------------------------------
+BACKGROUND REDESIGN
+--------------------------------------------------
+
+The current background feels empty.
+
+Create:
+- layered dark gradients
+- subtle neon lighting
+- ambient glow effects
+- atmospheric depth
+
+The background should feel:
+- immersive
+- modern
+- luxurious
+
+BUT:
+- never distract from gameplay
+
+--------------------------------------------------
+ANIMATION SYSTEM
+--------------------------------------------------
+
+Animations should feel:
+- smooth
+- lightweight
+- premium
+- responsive
+
+Use:
+- soft fades
+- smooth card dealing
+- subtle chip movement
+- elegant transitions
+
+DO NOT use:
+- giant explosions
+- distracting flashes
+- excessive particle effects
+
+--------------------------------------------------
+MOBILE-FIRST RESPONSIVE DESIGN
+--------------------------------------------------
+
+This gameplay board MUST be designed specifically for:
+- iPhone portrait gameplay
+
+Requirements:
+- safe-area compatibility
+- Dynamic Island support
+- responsive scaling
+- thumb-friendly controls
+- no clipped elements
+- no edge collisions
+
+Everything must fit perfectly on:
+- iPhone 16 Pro Max
+- iPhone 15
+- iPhone 14
+- smaller iPhones
+
+--------------------------------------------------
+VISUAL GOAL
+--------------------------------------------------
+
+The final gameplay experience should feel like:
+- a premium social poker app
+- luxury synthwave poker
+- modern App Store quality
+- sleek neon minimalism
+- a futuristic Miami poker lounge
+
+The gameplay should feel:
+- clean
+- immersive
+- stylish
+- balanced
+- modern
+- highly polished
+
+This should NOT feel like:
+- a cluttered casino app
+- a cheap poker clone
+- a prototype
+- a desktop UI squeezed onto mobile
+
+It should feel like:
+a world-class modern poker experience built specifically for iPhone.

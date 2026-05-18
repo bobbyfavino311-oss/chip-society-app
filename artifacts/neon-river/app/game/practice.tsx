@@ -228,6 +228,90 @@ function CommunityCards({
   );
 }
 
+// ─── Compact AI seat (top row) ────────────────────────────────────────────────
+
+const SEAT_AVATARS = ['♠', '♥', '♦', '♣', '★'];
+const SEAT_AVATAR_COLORS = [colors.primary, colors.secondary, '#bf5fff', colors.gold, colors.success];
+const SEAT_ACTION_COLORS: Record<string, string> = {
+  FOLD: '#ff4444', CHECK: '#00ff88', CALL: '#00d4ff', RAISE: '#bf5fff', 'ALL IN': '#ff0090',
+};
+
+function CompactAISeat({
+  player, isCurrentTurn, isWinner, timer,
+}: {
+  player: any; isCurrentTurn: boolean; isWinner: boolean; timer: number;
+}) {
+  const avatar = SEAT_AVATARS[player.avatarIndex % SEAT_AVATARS.length];
+  const avatarColor = SEAT_AVATAR_COLORS[player.avatarIndex % SEAT_AVATAR_COLORS.length];
+  const folded = player.status === 'folded';
+  const actionColor = player.lastAction ? (SEAT_ACTION_COLORS[player.lastAction] ?? colors.textMuted) : null;
+
+  return (
+    <View style={[g.seat, folded && g.seatFolded]}>
+      <View style={[
+        g.avatarRing,
+        isCurrentTurn && g.avatarRingActive,
+        isWinner && g.avatarRingWinner,
+      ]}>
+        <Text style={[g.avatarSymbol, { color: avatarColor }]}>{avatar}</Text>
+        {player.isDealer && <View style={g.posBadge}><Text style={g.posBadgeText}>D</Text></View>}
+        {player.isSmallBlind && !player.isDealer && (
+          <View style={[g.posBadge, { backgroundColor: '#00d4ff' }]}><Text style={g.posBadgeText}>S</Text></View>
+        )}
+        {player.isBigBlind && !player.isDealer && (
+          <View style={[g.posBadge, { backgroundColor: colors.secondary }]}><Text style={g.posBadgeText}>B</Text></View>
+        )}
+        {isWinner && <Ionicons name="trophy" size={9} color={colors.gold} style={{ position: 'absolute', top: -4, right: -4 }} />}
+      </View>
+      {isCurrentTurn && <DotTimer seconds={timer} maxSeconds={30} isActive size={4} gap={2} />}
+      <Text style={g.seatName} numberOfLines={1}>{player.name}</Text>
+      <Text style={[g.seatChips, folded && g.dimText]}>{formatChips(player.chips)}</Text>
+      {player.betInRound > 0 && !folded && (
+        <Text style={g.betLabel}>{formatChips(player.betInRound)}</Text>
+      )}
+      {actionColor && (
+        <View style={[g.actionBadge, { borderColor: actionColor }]}>
+          <Text style={[g.actionText, { color: actionColor }]}>{player.lastAction}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const g = StyleSheet.create({
+  seat: { alignItems: 'center', flex: 1, paddingHorizontal: 2, gap: 2 },
+  seatFolded: { opacity: 0.28 },
+  avatarRing: {
+    width: 46, height: 46, borderRadius: 23,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  avatarRingActive: {
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.9, shadowRadius: 10, shadowOffset: { width: 0, height: 0 },
+  },
+  avatarRingWinner: {
+    borderColor: colors.gold,
+    shadowColor: colors.gold,
+    shadowOpacity: 0.9, shadowRadius: 12, shadowOffset: { width: 0, height: 0 },
+  },
+  avatarSymbol: { fontSize: 22, lineHeight: 28 },
+  posBadge: {
+    position: 'absolute', bottom: -3, right: -3,
+    width: 15, height: 15, borderRadius: 8,
+    backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center',
+  },
+  posBadgeText: { fontSize: 7, fontWeight: '800', color: '#000' },
+  seatName: { color: colors.textDim, fontSize: 9, fontWeight: '600', maxWidth: 64, textAlign: 'center' },
+  seatChips: { color: colors.text, fontSize: 10, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
+  dimText: { color: colors.textMuted },
+  betLabel: { color: colors.primary, fontSize: 9, fontWeight: '700' },
+  actionBadge: { borderRadius: 4, borderWidth: 1, paddingHorizontal: 4, paddingVertical: 1 },
+  actionText: { fontSize: 7, fontWeight: '700', letterSpacing: 0.5 },
+});
+
 // ─── Main game screen ─────────────────────────────────────────────────────────
 
 export default function PracticeScreen() {
@@ -381,35 +465,21 @@ export default function PracticeScreen() {
     SoundEngine.deal();
   };
 
-  const TABLE_W = Dimensions.get('window').width - 16;
-  const SEAT_CX = Math.round(TABLE_W / 2 - 46);
-  const seatPositions: Record<string, number | string>[] =
-    aiPlayers.length === 3
-      ? [
-          { left: 8, bottom: 58 },
-          { left: SEAT_CX, top: '4%' },
-          { right: 8, bottom: 58 },
-        ]
-      : aiPlayers.length === 5
-      ? [
-          { left: 8, bottom: 58 },
-          { left: 18, top: '6%' },
-          { left: SEAT_CX, top: '2%' },
-          { right: 18, top: '6%' },
-          { right: 8, bottom: 58 },
-        ]
-      : [
-          { left: 8, bottom: 58 },
-          { left: 22, top: '7%' },
-          { right: 22, top: '7%' },
-          { right: 8, bottom: 58 },
-        ];
-
   return (
     <View style={styles.screen}>
-      <LinearGradient colors={[colors.background, '#050015']} style={StyleSheet.absoluteFill} />
+      {/* Layered atmospheric background */}
+      <LinearGradient
+        colors={['#0e0028', '#060016', '#001830', '#060016', '#0e0028']}
+        locations={[0, 0.25, 0.5, 0.75, 1]}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0.2, y: 0 }}
+        end={{ x: 0.8, y: 1 }}
+      />
+      {/* Ambient glow blobs */}
+      <View style={styles.glowLeft} />
+      <View style={styles.glowRight} />
 
-      {/* Floating back button */}
+      {/* Back button */}
       <TouchableOpacity
         style={[styles.backBtn, { top: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}
         onPress={() => setExitConfirm(true)}
@@ -418,7 +488,17 @@ export default function PracticeScreen() {
         <Ionicons name="chevron-back" size={20} color={colors.text} />
       </TouchableOpacity>
 
-      {/* Exit confirmation modal */}
+      {/* Phase label */}
+      <View style={[styles.topBar, { paddingTop: insets.top + (Platform.OS === 'web' ? 52 : 42) }]}>
+        {state.phase !== 'idle' && (
+          <Text style={styles.phaseLabel}>
+            {PHASE_LABELS[state.phase] ?? ''}
+            {handCount > 0 && `  #${handCount + 1}`}
+          </Text>
+        )}
+      </View>
+
+      {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
         <View style={styles.exitOverlay}>
           <View style={styles.exitCard}>
@@ -444,176 +524,102 @@ export default function PracticeScreen() {
         </View>
       </Modal>
 
-      {/* Table */}
-      <View style={styles.tableArea}>
-        <LinearGradient
-          colors={['#1a0032', '#08001c', '#00152e', '#08001c', '#1a0032']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+      {/* ── AI players row ── */}
+      <View style={styles.aiRow}>
+        {aiPlayers.map(player => (
+          <CompactAISeat
+            key={player.id}
+            player={player}
+            isCurrentTurn={state.players[state.currentPlayerIndex]?.id === player.id}
+            isWinner={state.winnerIds.includes(player.id)}
+            timer={state.timer}
+          />
+        ))}
+      </View>
+
+      {/* ── Center game area ── */}
+      <View style={styles.gameCenter}>
+        {/* Chip fly animations — float above the game center */}
+        {chipAnims.map(({ pos, opacity }, i) => (
+          <Animated.View key={`c${i}`} style={[styles.chipToken, {
+            opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }],
+          }]} />
+        ))}
+        {winAnims.map(({ pos, opacity }, i) => (
+          <Animated.View key={`w${i}`} style={[styles.chipTokenWin, {
+            opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }],
+          }]} />
+        ))}
+
+        {/* Side pot pills */}
+        {state.sidePots.length > 1 && (
+          <Animated.View style={[styles.sidePotRow, { transform: [{ scale: potPulse }] }]}>
+            {state.sidePots.map((sp, i) => (
+              <View key={i} style={styles.sidePotChip}>
+                <Text style={styles.sidePotLabel}>{i === 0 ? 'MAIN' : `SIDE ${i}`}</Text>
+                <Text style={styles.sidePotAmt}>{formatChips(sp.amount)}</Text>
+              </View>
+            ))}
+          </Animated.View>
+        )}
+
+        {/* Pot pill */}
+        {state.pot > 0 && state.sidePots.length <= 1 && (
+          <Animated.View style={[styles.potPill, { transform: [{ scale: potPulse }] }]}>
+            <Text style={styles.potLabel}>POT</Text>
+            <Text style={styles.potAmount}>{formatChips(state.pot)}</Text>
+          </Animated.View>
+        )}
+
+        {/* Community cards */}
+        <CommunityCards
+          cards={state.communityCards}
+          phase={state.phase}
+          holeCards={humanPlayer?.holeCards ?? []}
         />
 
-        {/* Felt oval (overflow:hidden for rounded shape, chip anims, center content) */}
-        <View style={styles.tableSurface}>
-          <LinearGradient
-            colors={['#0d1f3c', '#061528', '#091e38']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          />
-          <View style={styles.tableCenterGlow} />
-
-          {/* Bet chip tokens */}
-          {chipAnims.map(({ pos, opacity }, i) => (
-            <Animated.View
-              key={`chip_${i}`}
-              style={[styles.chipToken, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }], pointerEvents: 'none' }]}
-            />
-          ))}
-          {/* Win chip tokens */}
-          {winAnims.map(({ pos, opacity }, i) => (
-            <Animated.View
-              key={`win_${i}`}
-              style={[styles.chipTokenWin, { opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }], pointerEvents: 'none' }]}
-            />
-          ))}
-
-          {/* Center: pot → community cards → human hole cards */}
-          <View style={styles.tableInner}>
-            <View style={styles.centerCol}>
-              {/* Pot badge — always visible on the table */}
-              {(state.pot > 0 || state.winnerPot > 0) && (
-                state.sidePots.length > 1 ? (
-                  /* Side pot breakdown */
-                  <Animated.View style={[styles.sidePotRow, { transform: [{ scale: potPulse }] }]}>
-                    {state.sidePots.map((sp, i) => (
-                      <View key={i} style={styles.sidePotChip}>
-                        <Text style={styles.sidePotLabel}>
-                          {i === 0 ? 'MAIN' : `SIDE ${i}`}
-                        </Text>
-                        <Text style={styles.sidePotAmt}>{formatChips(sp.amount)}</Text>
-                      </View>
-                    ))}
-                  </Animated.View>
-                ) : (
-                  <Animated.View style={[styles.potOnTable, { transform: [{ scale: potPulse }] }]}>
-                    <Text style={styles.potOnTableLabel}>POT</Text>
-                    <Text style={styles.potOnTableAmount}>
-                      {formatChips(state.pot > 0 ? state.pot : state.winnerPot)}
-                    </Text>
-                  </Animated.View>
-                )
-              )}
-              <CommunityCards
-                cards={state.communityCards}
-                phase={state.phase}
-                holeCards={humanPlayer?.holeCards ?? []}
-              />
-
-              {/* Human hole cards — on the table, centered below flop */}
-              {humanPlayer && (
-                <View style={styles.humanCardsOnTable}>
-                  <View style={styles.humanHoleCards}>
-                    {humanPlayer.holeCards.length > 0 ? (
-                      humanPlayer.holeCards.map((card, i) => (
-                        <PlayingCard key={i} card={card} faceDown={false} size="lg" />
-                      ))
-                    ) : (
-                      <>
-                        <PlayingCard faceDown size="lg" />
-                        <PlayingCard faceDown size="lg" />
-                      </>
-                    )}
-                  </View>
-                  {/* Status overlays */}
-                  {humanPlayer.status === 'folded' && (
-                    <View style={styles.statusBadge}>
-                      <Text style={[styles.statusText, { color: colors.error }]}>FOLDED</Text>
-                    </View>
-                  )}
-                  {humanPlayer.status === 'allIn' && (
-                    <View style={[styles.statusBadge, { backgroundColor: 'rgba(255,0,144,0.2)', borderColor: colors.secondary }]}>
-                      <Text style={[styles.statusText, { color: colors.secondary }]}>ALL IN</Text>
-                    </View>
-                  )}
-                  {state.winnerIds.includes('human') && (
-                    <View style={[styles.statusBadge, { backgroundColor: 'rgba(255,215,0,0.2)', borderColor: colors.gold }]}>
-                      <Text style={[styles.statusText, { color: colors.gold, fontSize: 14 }]}>WINNER!</Text>
-                    </View>
-                  )}
-                </View>
-              )}
+        {/* All-in runout label */}
+        {(() => {
+          const nonFolded = state.players.filter(p => p.status !== 'folded');
+          const allAllIn = nonFolded.length >= 2 && nonFolded.every(p => p.status === 'allIn');
+          if (!allAllIn || isHandOver) return null;
+          return (
+            <View style={styles.allInOverlay}>
+              <Text style={styles.allInOverlayTitle}>ALL IN!</Text>
+              <Text style={styles.allInOverlaySub}>Running out the board…</Text>
             </View>
+          );
+        })()}
 
-            {/* All-in runout notification */}
-            {(() => {
-              const nonFolded = state.players.filter(p => p.status !== 'folded');
-              const allAllIn = nonFolded.length >= 2 && nonFolded.every(p => p.status === 'allIn');
-              if (!allAllIn || isHandOver) return null;
-              return (
-                <View style={styles.allInOverlay}>
-                  <Text style={styles.allInOverlayTitle}>ALL IN!</Text>
-                  <Text style={styles.allInOverlaySub}>Running out the board…</Text>
-                </View>
-              );
-            })()}
-            {/* Action message */}
-            {state.message !== '' && !isHandOver && (
-              <View style={styles.messageBox}>
-                <Text style={styles.messageText}>{state.message}</Text>
-              </View>
-            )}
+        {/* Status message */}
+        {state.message !== '' && !isHandOver && (
+          <View style={styles.messageBox}>
+            <Text style={styles.messageText}>{state.message}</Text>
           </View>
-        </View>
+        )}
+      </View>
 
-        {/* AI seat overlay — absoluteFillObject, no overflow:hidden, seats are never clipped */}
-        <View style={[StyleSheet.absoluteFillObject, { pointerEvents: 'box-none' }]}>
-          {aiPlayers.map((player, i) => {
-            const pos = seatPositions[i] ?? { left: 0, top: '40%' };
-            const isCurrentSeat = state.players[state.currentPlayerIndex]?.id === player.id;
-            const isWinner = state.winnerIds.includes(player.id);
-            const atShowdown = state.showCards && player.status !== 'folded';
-            const handName = atShowdown && player.holeCards.length === 2 && state.communityCards.length >= 3
-              ? describeHand(getBestHand(player.holeCards, state.communityCards))
-              : undefined;
-            return (
-              <View key={player.id} style={[styles.aiSeat, pos as any]}>
-                <PlayerSeat
-                  name={player.name}
-                  chips={player.chips}
-                  holeCards={player.holeCards}
-                  status={isWinner ? 'winner' : player.status}
-                  isCurrentTurn={isCurrentSeat}
-                  isDealer={player.isDealer}
-                  isSmallBlind={player.isSmallBlind}
-                  isBigBlind={player.isBigBlind}
-                  betInRound={player.betInRound}
-                  timer={state.timer}
-                  showCards={state.showCards}
-                  avatarIndex={player.avatarIndex}
-                  isHuman={false}
-                  lastAction={player.lastAction}
-                  handName={handName}
-                />
-              </View>
-            );
-          })}
-        </View>
+      {/* ── Human player row ── */}
+      {humanPlayer && (
+        <View style={styles.humanRow}>
+          {/* Hole cards */}
+          <View style={styles.humanCards}>
+            {humanPlayer.holeCards.length > 0
+              ? humanPlayer.holeCards.map((card, i) => (
+                  <PlayingCard key={i} card={card} faceDown={false} size="lg" />
+                ))
+              : <><PlayingCard faceDown size="lg" /><PlayingCard faceDown size="lg" /></>
+            }
+          </View>
 
-        {/* Human player HUD strip */}
-        {humanPlayer && (
-          <View style={styles.playerStrip}>
-            <View style={styles.playerStripLeft}>
-              <View style={[
-                styles.humanAvatar,
-                {
-                  borderColor: isHumanTurn ? colors.primary : colors.border,
-                  shadowColor: isHumanTurn ? colors.primary : 'transparent',
-                  shadowOpacity: 0.7,
-                  shadowRadius: 10,
-                  shadowOffset: { width: 0, height: 0 },
-                },
-              ]}>
+          {/* Player info block */}
+          <View style={styles.humanInfo}>
+            <View style={styles.humanInfoTop}>
+              <View style={[styles.humanAvatar, {
+                borderColor: isHumanTurn ? colors.primary : colors.border,
+                shadowColor: colors.primary, shadowOpacity: isHumanTurn ? 0.9 : 0,
+                shadowRadius: 10, shadowOffset: { width: 0, height: 0 },
+              }]}>
                 <Text style={styles.humanAvatarText}>♠</Text>
                 {humanPlayer.isDealer && (
                   <View style={styles.dealerDot}><Text style={styles.dealerDotText}>D</Text></View>
@@ -623,6 +629,8 @@ export default function PracticeScreen() {
                 <Text style={styles.humanName}>{humanPlayer.name}</Text>
                 <Text style={styles.humanChips}>{formatChips(humanPlayer.chips)}</Text>
               </View>
+            </View>
+            <View style={styles.humanBadgeRow}>
               {humanPlayer.betInRound > 0 && (
                 <View style={styles.betChip}>
                   <Text style={styles.betChipText}>{formatChips(humanPlayer.betInRound)}</Text>
@@ -633,22 +641,30 @@ export default function PracticeScreen() {
                   <Text style={[styles.betChipText, { color: '#bf5fff' }]}>{humanPlayer.lastAction}</Text>
                 </View>
               )}
+              {humanPlayer.status === 'folded' && (
+                <View style={styles.statusBadge}><Text style={styles.statusText}>FOLDED</Text></View>
+              )}
+              {humanPlayer.status === 'allIn' && (
+                <View style={[styles.statusBadge, { backgroundColor: 'rgba(255,0,144,0.2)', borderColor: colors.secondary }]}>
+                  <Text style={[styles.statusText, { color: colors.secondary }]}>ALL IN</Text>
+                </View>
+              )}
+              {state.winnerIds.includes('human') && (
+                <View style={[styles.statusBadge, { backgroundColor: 'rgba(255,215,0,0.2)', borderColor: colors.gold }]}>
+                  <Text style={[styles.statusText, { color: colors.gold }]}>WINNER!</Text>
+                </View>
+              )}
             </View>
-            {isHumanTurn && (
-              <DotTimer seconds={state.timer} maxSeconds={20} isActive size={9} gap={5} />
-            )}
           </View>
-        )}
-      </View>
 
-      {/* Bottom panel */}
+          {/* Turn timer */}
+          {isHumanTurn && <DotTimer seconds={state.timer} maxSeconds={20} isActive size={9} gap={5} />}
+        </View>
+      )}
+
+      {/* ── Bottom controls ── */}
       {isHandOver ? (
         <View style={[styles.handoverPanel, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 8) }]}>
-          <LinearGradient
-            colors={['rgba(5,0,16,0)', 'rgba(5,0,16,0.98)']}
-            style={StyleSheet.absoluteFill}
-          />
-          {/* Winner / split pot banner */}
           {state.winnerIds.length > 0 && state.winnerPot > 0 && (() => {
             const humanWon = state.winnerIds.includes('human');
             const isSplit = state.isSplitPot;
@@ -656,47 +672,36 @@ export default function PracticeScreen() {
             const share = Math.floor(state.winnerPot / Math.max(1, state.winnerIds.length));
             return (
               <>
-                {/* Split pot callout */}
                 {isSplit && (
                   <View style={styles.splitPotBanner}>
-                    <Ionicons name="git-branch" size={16} color={colors.primary} />
+                    <Ionicons name="git-branch" size={14} color={colors.primary} />
                     <Text style={styles.splitPotText}>SPLIT POT</Text>
-                    <Text style={styles.splitPotSub}>
-                      {state.winnerIds.length}-way · {formatChips(share)} each
-                    </Text>
+                    <Text style={styles.splitPotSub}>{state.winnerIds.length}-way · {formatChips(share)} each</Text>
                   </View>
                 )}
-                {/* Side pot breakdown */}
                 {hasSidePots && (
                   <View style={styles.sidePotHandover}>
                     {state.sidePots.map((sp, i) => (
                       <View key={i} style={styles.sidePotHandoverRow}>
-                        <Text style={styles.sidePotHandoverLabel}>
-                          {i === 0 ? 'MAIN POT' : `SIDE POT ${i}`}
-                        </Text>
+                        <Text style={styles.sidePotHandoverLabel}>{i === 0 ? 'MAIN POT' : `SIDE POT ${i}`}</Text>
                         <Text style={styles.sidePotHandoverAmt}>{formatChips(sp.amount)}</Text>
                       </View>
                     ))}
                   </View>
                 )}
-                {/* Primary winner card */}
                 <View style={[styles.winnerBanner, humanWon && styles.winnerBannerHuman]}>
-                  <Ionicons name="trophy" size={20} color={humanWon ? colors.gold : colors.textDim} />
+                  <Ionicons name="trophy" size={18} color={humanWon ? colors.gold : colors.textDim} />
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.handoverMsg, humanWon && { color: colors.gold, fontSize: 18 }]}>
+                    <Text style={[styles.handoverMsg, humanWon && { color: colors.gold }]}>
                       {state.message || 'Hand complete!'}
                     </Text>
                     {state.winnerHand !== '' && (
-                      <Text style={[styles.handoverHand, !humanWon && { color: colors.textDim, fontSize: 13 }]}>
-                        {state.winnerHand}
-                      </Text>
+                      <Text style={[styles.handoverHand, !humanWon && { color: colors.textDim }]}>{state.winnerHand}</Text>
                     )}
                   </View>
                   {!isSplit && (
                     <View style={styles.potWonBadge}>
-                      <Text style={[styles.potWonAmt, humanWon && { color: colors.gold }]}>
-                        +{formatChips(share)}
-                      </Text>
+                      <Text style={[styles.potWonAmt, humanWon && { color: colors.gold }]}>+{formatChips(share)}</Text>
                       <Text style={styles.winnerBannerLabel}>CHIPS</Text>
                     </View>
                   )}
@@ -704,7 +709,6 @@ export default function PracticeScreen() {
               </>
             );
           })()}
-          {/* Showdown breakdown — only when multiple players reached showdown */}
           {state.showCards && (() => {
             const showdownPlayers = state.players.filter(p => p.status !== 'folded');
             if (showdownPlayers.length < 2 || state.communityCards.length < 3) return null;
@@ -712,19 +716,12 @@ export default function PracticeScreen() {
               <View style={styles.showdownPanel}>
                 <Text style={styles.showdownPanelTitle}>SHOWDOWN</Text>
                 {showdownPlayers.map(p => {
-                  const hand = p.holeCards.length === 2
-                    ? getBestHand(p.holeCards, state.communityCards)
-                    : null;
+                  const hand = p.holeCards.length === 2 ? getBestHand(p.holeCards, state.communityCards) : null;
                   const isWinner = state.winnerIds.includes(p.id);
                   return (
                     <View key={p.id} style={[styles.showdownRow, isWinner && styles.showdownRowWin]}>
-                      {isWinner
-                        ? <Ionicons name="trophy" size={10} color={colors.gold} />
-                        : <View style={{ width: 10 }} />
-                      }
-                      <Text style={[styles.showdownName, isWinner && { color: colors.gold }]}>
-                        {p.isHuman ? 'You' : p.name}
-                      </Text>
+                      {isWinner ? <Ionicons name="trophy" size={9} color={colors.gold} /> : <View style={{ width: 9 }} />}
+                      <Text style={[styles.showdownName, isWinner && { color: colors.gold }]}>{p.isHuman ? 'You' : p.name}</Text>
                       <Text style={[styles.showdownHand, isWinner && { color: colors.gold }]} numberOfLines={1}>
                         {hand ? describeHand(hand) : '—'}
                       </Text>
@@ -734,38 +731,24 @@ export default function PracticeScreen() {
               </View>
             );
           })()}
-
-          {/* Per-player chip delta */}
           <View style={styles.deltasRow}>
-            {state.players
-              .filter(p => p.chipDelta !== 0)
-              .map(p => (
-                <View key={p.id} style={styles.deltaChip}>
-                  <Text style={styles.deltaName}>{p.isHuman ? 'You' : p.name}</Text>
-                  <Text style={[
-                    styles.deltaAmt,
-                    { color: p.chipDelta > 0 ? colors.success : colors.error }
-                  ]}>
-                    {p.chipDelta > 0 ? '+' : ''}{formatChips(p.chipDelta)}
-                  </Text>
-                </View>
-              ))
-            }
+            {state.players.filter(p => p.chipDelta !== 0).map(p => (
+              <View key={p.id} style={styles.deltaChip}>
+                <Text style={styles.deltaName}>{p.isHuman ? 'You' : p.name}</Text>
+                <Text style={[styles.deltaAmt, { color: p.chipDelta > 0 ? colors.success : colors.error }]}>
+                  {p.chipDelta > 0 ? '+' : ''}{formatChips(p.chipDelta)}
+                </Text>
+              </View>
+            ))}
           </View>
-
           {isGameOver ? (
             <TouchableOpacity style={styles.nextBtn} onPress={() => setGameStarted(false)}>
               <Text style={[styles.nextBtnText, { color: colors.text }]}>BACK TO LOBBY</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.nextBtn} onPress={onHandOver} activeOpacity={0.85}>
-              <LinearGradient
-                colors={[colors.primary, '#0088bb']}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              />
-              <Ionicons name="play" size={14} color={colors.background} />
+              <LinearGradient colors={[colors.primary, '#0088bb']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+              <Ionicons name="play" size={13} color={colors.background} />
               <Text style={styles.nextBtnText}>NEXT HAND #{handCount + 2}</Text>
             </TouchableOpacity>
           )}
@@ -789,36 +772,24 @@ export default function PracticeScreen() {
       ) : (
         <View style={[styles.waitingPanel, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 8) }]}>
           <Text style={styles.waitingText}>
-            {humanPlayer?.status === 'folded'
-              ? 'You folded — watching...'
-              : isAllIn
-              ? "You're ALL IN — watching the board run out..."
+            {humanPlayer?.status === 'folded' ? 'You folded — watching...'
+              : isAllIn ? "You're ALL IN — watching the board run out..."
               : `${currentPlayer?.name ?? 'Opponent'} is thinking...`}
           </Text>
           <View style={styles.waitingActions}>
-            {/* Skip single bot turn (when it's an AI's turn and human is still active/waiting) */}
-            {!isHumanTurn
-              && humanPlayer?.status === 'active'
-              && state.phase !== 'handover'
-              && state.phase !== 'showdown'
-              && state.phase !== 'idle' && (
-              <TouchableOpacity
-                style={styles.skipBtn}
+            {!isHumanTurn && humanPlayer?.status === 'active'
+              && state.phase !== 'handover' && state.phase !== 'showdown' && state.phase !== 'idle' && (
+              <TouchableOpacity style={styles.skipBtn}
                 onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); skipBotTurn(); }}
-                activeOpacity={0.75}
-              >
+                activeOpacity={0.75}>
                 <Ionicons name="play-skip-forward" size={14} color={colors.textMuted} />
                 <Text style={styles.skipText}>SKIP TURN</Text>
               </TouchableOpacity>
             )}
-
-            {/* Run it out / Skip to showdown (when human is all-in) */}
             {showRunItOut && (
-              <TouchableOpacity
-                style={[styles.skipBtn, styles.runItOutBtn]}
+              <TouchableOpacity style={[styles.skipBtn, styles.runItOutBtn]}
                 onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); skipToShowdown(); }}
-                activeOpacity={0.75}
-              >
+                activeOpacity={0.75}>
                 <Ionicons name="flash" size={14} color={colors.gold} />
                 <Text style={[styles.skipText, { color: colors.gold }]}>RUN IT OUT</Text>
               </TouchableOpacity>
@@ -826,7 +797,6 @@ export default function PracticeScreen() {
           </View>
         </View>
       )}
-
     </View>
   );
 }
@@ -903,6 +873,17 @@ const table = StyleSheet.create({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
 
+  // Atmospheric ambient glow blobs
+  glowLeft: {
+    position: 'absolute', top: '28%', left: -70, width: 180, height: 180, borderRadius: 90,
+    backgroundColor: 'rgba(255,0,144,0.07)',
+  },
+  glowRight: {
+    position: 'absolute', top: '38%', right: -70, width: 180, height: 180, borderRadius: 90,
+    backgroundColor: 'rgba(0,212,255,0.06)',
+  },
+
+  // Floating back button
   backBtn: {
     position: 'absolute', left: 12, zIndex: 20,
     width: 36, height: 36, borderRadius: 18,
@@ -910,141 +891,97 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.border,
     alignItems: 'center', justifyContent: 'center',
   },
-  exitOverlay: {
-    flex: 1, backgroundColor: 'rgba(5,0,16,0.82)',
-    alignItems: 'center', justifyContent: 'center',
+
+  // Phase label strip (above AI row)
+  topBar: { alignItems: 'center', paddingBottom: 2 },
+  phaseLabel: {
+    color: colors.textMuted, fontSize: 10, fontWeight: '700',
+    letterSpacing: 3, fontFamily: 'Orbitron_400Regular',
   },
+
+  // Exit modal
+  exitOverlay: { flex: 1, backgroundColor: 'rgba(5,0,16,0.82)', alignItems: 'center', justifyContent: 'center' },
   exitCard: {
-    width: 280, borderRadius: 20,
-    backgroundColor: colors.surface,
-    borderWidth: 1, borderColor: colors.border,
-    padding: 28, alignItems: 'center', gap: 8,
+    width: 280, borderRadius: 20, backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.border, padding: 28, alignItems: 'center', gap: 8,
   },
-  exitTitle: {
-    fontFamily: 'Orbitron_700Bold', fontSize: 18,
-    color: colors.text, letterSpacing: 2,
-  },
+  exitTitle: { fontFamily: 'Orbitron_700Bold', fontSize: 18, color: colors.text, letterSpacing: 2 },
   exitSub: { color: colors.textMuted, fontSize: 12, textAlign: 'center', marginBottom: 8 },
   exitBtns: { flexDirection: 'row', gap: 12, marginTop: 4, alignSelf: 'stretch' },
-  exitChoiceBtn: {
-    flex: 1, paddingVertical: 13, borderRadius: 50,
-    alignItems: 'center', justifyContent: 'center',
-  },
+  exitChoiceBtn: { flex: 1, paddingVertical: 13, borderRadius: 50, alignItems: 'center', justifyContent: 'center' },
   exitYes: { backgroundColor: colors.secondary },
   exitNo: { backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: colors.border },
   exitChoiceText: { color: colors.text, fontSize: 12, fontWeight: '800', letterSpacing: 1 },
 
-  potOnTable: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(5,0,16,0.72)',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.35)',
-    paddingHorizontal: 18,
-    paddingVertical: 5,
-  },
-  potOnTableLabel: {
-    color: colors.gold,
-    fontSize: 8,
-    fontWeight: '700',
-    letterSpacing: 2,
-    fontFamily: 'Orbitron_400Regular',
-  },
-  potOnTableAmount: {
-    color: colors.gold,
-    fontSize: 20,
-    fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-    lineHeight: 24,
+  // AI players top row
+  aiRow: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    paddingHorizontal: 8, paddingBottom: 6,
   },
 
-  tableArea: { flex: 1, position: 'relative' },
-  tableSurface: {
-    flex: 1,
-    margin: 0,
-    borderRadius: 0,
-    overflow: 'hidden',
-  },
-  tableCenterGlow: {
-    position: 'absolute',
-    top: '28%', left: '28%', right: '28%', bottom: '28%',
-    borderRadius: 1000,
-    backgroundColor: 'rgba(0,212,255,0.018)',
-  },
-  tableInner: {
-    flex: 1, alignItems: 'center', justifyContent: 'center',
-    paddingBottom: '6%',
-  },
+  // Center game area (flex:1 — community cards + pot float here)
+  gameCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 },
 
+  // Chip animations
   chipToken: {
-    position: 'absolute',
-    width: 14, height: 14, borderRadius: 7,
-    backgroundColor: colors.primary,
-    borderWidth: 2, borderColor: 'rgba(0,212,255,0.6)',
-    zIndex: 20,
+    position: 'absolute', width: 14, height: 14, borderRadius: 7,
+    backgroundColor: colors.primary, borderWidth: 2, borderColor: 'rgba(0,212,255,0.6)', zIndex: 20,
   },
   chipTokenWin: {
-    position: 'absolute',
-    width: 16, height: 16, borderRadius: 8,
-    backgroundColor: colors.gold,
-    borderWidth: 2, borderColor: 'rgba(255,215,0,0.7)',
-    zIndex: 20,
+    position: 'absolute', width: 16, height: 16, borderRadius: 8,
+    backgroundColor: colors.gold, borderWidth: 2, borderColor: 'rgba(255,215,0,0.7)', zIndex: 20,
   },
 
-  aiSeat: { position: 'absolute' },
+  // Side pot pills (in game center)
+  sidePotRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  sidePotChip: {
+    alignItems: 'center', backgroundColor: 'rgba(5,0,16,0.72)',
+    borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,215,0,0.35)',
+    paddingHorizontal: 12, paddingVertical: 4,
+  },
+  sidePotLabel: {
+    color: colors.textMuted, fontSize: 7, fontWeight: '700',
+    letterSpacing: 1.5, fontFamily: 'Orbitron_400Regular',
+  },
+  sidePotAmt: { color: colors.gold, fontSize: 15, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
 
-  // Center column: community cards on top, human hole cards directly below
-  centerCol: {
-    alignItems: 'center',
-    gap: 10,
+  // Pot pill
+  potPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 7,
+    backgroundColor: 'rgba(5,0,16,0.78)', borderRadius: 20,
+    borderWidth: 1, borderColor: 'rgba(255,215,0,0.35)',
+    paddingHorizontal: 18, paddingVertical: 6,
   },
+  potLabel: { color: colors.gold, fontSize: 8, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
+  potAmount: { color: colors.gold, fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_700Bold', lineHeight: 26 },
 
-  // Human cards on the table (below community cards)
-  humanCardsOnTable: {
-    alignItems: 'center',
-    gap: 4,
+  // All-in overlay
+  allInOverlay: { alignItems: 'center', gap: 2 },
+  allInOverlayTitle: {
+    color: colors.secondary, fontSize: 17, fontWeight: '900',
+    fontFamily: 'Orbitron_900Black', letterSpacing: 3,
+    textShadowColor: colors.secondary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10,
   },
-  humanHoleCards: {
-    flexDirection: 'row',
-    gap: 6,
-  },
+  allInOverlaySub: { color: colors.textMuted, fontSize: 10, fontWeight: '600', letterSpacing: 1 },
 
-  statusBadge: {
-    paddingHorizontal: 10, paddingVertical: 4,
-    backgroundColor: 'rgba(255,68,68,0.2)',
-    borderRadius: 8, borderWidth: 1, borderColor: colors.error,
-    marginTop: 4,
-  },
-  statusText: {
-    color: colors.error, fontSize: 11, fontWeight: '800', letterSpacing: 1,
-  },
-
-  messageBox: {
-    position: 'absolute', bottom: 12, left: 0, right: 0, alignItems: 'center',
-  },
+  // Status message (e.g. "Thinking…")
+  messageBox: { alignItems: 'center' },
   messageText: {
     color: colors.textMuted, fontSize: 11, fontWeight: '600',
-    backgroundColor: 'rgba(5,0,16,0.75)',
-    paddingHorizontal: 12, paddingVertical: 4,
-    borderRadius: 20, overflow: 'hidden',
+    backgroundColor: 'rgba(5,0,16,0.78)', paddingHorizontal: 14,
+    paddingVertical: 4, borderRadius: 20, overflow: 'hidden',
   },
 
-  // Bottom strip inside tableArea — name left, timer right
-  playerStrip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(37,0,74,0.6)',
-    backgroundColor: 'rgba(5,0,16,0.6)',
+  // Human player row (cards + info, above bottom controls)
+  humanRow: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 16, paddingVertical: 10, gap: 12,
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(5,0,16,0.55)',
   },
-  playerStripLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
+  humanCards: { flexDirection: 'row', gap: 6 },
+  humanInfo: { flex: 1, gap: 5 },
+  humanInfoTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   humanAvatar: {
     width: 38, height: 38, borderRadius: 19,
     backgroundColor: colors.surface, borderWidth: 2,
@@ -1059,145 +996,46 @@ const styles = StyleSheet.create({
   dealerDotText: { fontSize: 8, fontWeight: '800', color: colors.background },
   humanName: { color: colors.text, fontSize: 13, fontWeight: '700' },
   humanChips: { color: colors.gold, fontSize: 12, fontWeight: '700' },
+  humanBadgeRow: { flexDirection: 'row', gap: 5, flexWrap: 'wrap' },
   betChip: {
     backgroundColor: 'rgba(0,212,255,0.12)', borderRadius: 8,
-    borderWidth: 1, borderColor: colors.primaryDim,
-    paddingHorizontal: 7, paddingVertical: 3,
+    borderWidth: 1, borderColor: colors.primaryDim, paddingHorizontal: 7, paddingVertical: 3,
   },
   betChipText: { color: colors.primary, fontSize: 10, fontWeight: '700' },
-
-  // Side pot row (on the table)
-  sidePotRow: {
-    flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
+  statusBadge: {
+    paddingHorizontal: 8, paddingVertical: 3, backgroundColor: 'rgba(255,68,68,0.2)',
+    borderRadius: 6, borderWidth: 1, borderColor: colors.error,
   },
-  sidePotChip: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(5,0,16,0.72)',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.35)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  sidePotLabel: {
-    color: colors.textMuted,
-    fontSize: 7,
-    fontWeight: '700',
-    letterSpacing: 1.5,
-    fontFamily: 'Orbitron_400Regular',
-  },
-  sidePotAmt: {
-    color: colors.gold,
-    fontSize: 15,
-    fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-  },
-
-  // All-in runout overlay
-  allInOverlay: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0, right: 0,
-    alignItems: 'center',
-    gap: 2,
-  },
-  allInOverlayTitle: {
-    color: colors.secondary,
-    fontSize: 17,
-    fontWeight: '900',
-    fontFamily: 'Orbitron_900Black',
-    letterSpacing: 3,
-    textShadowColor: colors.secondary,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-  },
-  allInOverlaySub: {
-    color: colors.textMuted,
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 1,
-  },
+  statusText: { color: colors.error, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
 
   // Split pot + side pot in handover panel
   splitPotBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(0,212,255,0.08)',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(0,212,255,0.3)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    width: '100%',
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: 'rgba(0,212,255,0.08)', borderRadius: 10,
+    borderWidth: 1, borderColor: 'rgba(0,212,255,0.3)',
+    paddingHorizontal: 14, paddingVertical: 8, width: '100%',
   },
-  splitPotText: {
-    color: colors.primary,
-    fontSize: 13,
-    fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 2,
-  },
-  splitPotSub: {
-    color: colors.textMuted,
-    fontSize: 11,
-    flex: 1,
-    textAlign: 'right',
-  },
-  sidePotHandover: {
-    width: '100%',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
+  splitPotText: { color: colors.primary, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
+  splitPotSub: { color: colors.textMuted, fontSize: 11, flex: 1, textAlign: 'right' },
+  sidePotHandover: { width: '100%', borderRadius: 10, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   sidePotHandoverRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 14, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  sidePotHandoverLabel: {
-    color: colors.textMuted,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1,
-    fontFamily: 'Orbitron_400Regular',
-  },
-  sidePotHandoverAmt: {
-    color: colors.gold,
-    fontSize: 13,
-    fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-  },
+  sidePotHandoverLabel: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 1, fontFamily: 'Orbitron_400Regular' },
+  sidePotHandoverAmt: { color: colors.gold, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
 
   // Handover panel
-  handoverPanel: {
-    paddingHorizontal: 16, paddingTop: 8,
-    alignItems: 'center', gap: 5, position: 'relative',
-  },
+  handoverPanel: { paddingHorizontal: 16, paddingTop: 8, alignItems: 'center', gap: 5 },
   winnerBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12,
-    borderWidth: 1, borderColor: colors.border,
-    paddingHorizontal: 12, paddingVertical: 7,
-    width: '100%',
+    borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 7, width: '100%',
   },
-  winnerBannerHuman: {
-    backgroundColor: 'rgba(255,215,0,0.08)',
-    borderColor: 'rgba(255,215,0,0.4)',
-  },
+  winnerBannerHuman: { backgroundColor: 'rgba(255,215,0,0.08)', borderColor: 'rgba(255,215,0,0.4)' },
   winnerBannerLabel: { color: colors.textMuted, fontSize: 8, fontWeight: '600', letterSpacing: 1 },
   potWonBadge: { alignItems: 'center' },
-  potWonAmt: {
-    color: colors.textDim, fontSize: 16, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold', lineHeight: 19,
-  },
+  potWonAmt: { color: colors.textDim, fontSize: 16, fontWeight: '800', fontFamily: 'Orbitron_700Bold', lineHeight: 19 },
   handoverMsg: { color: colors.text, fontSize: 13, fontWeight: '700' },
   handoverHand: { color: colors.gold, fontSize: 11, fontWeight: '700', fontFamily: 'Orbitron_400Regular', marginTop: 1 },
   deltasRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, justifyContent: 'center' },
@@ -1210,55 +1048,24 @@ const styles = StyleSheet.create({
   nextBtn: {
     borderRadius: colors.radius, overflow: 'hidden',
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 9, paddingHorizontal: 28, gap: 7,
-    borderWidth: 1, borderColor: colors.border,
-    alignSelf: 'stretch',
+    paddingVertical: 11, gap: 7, borderWidth: 1, borderColor: colors.border, alignSelf: 'stretch',
   },
   nextBtnText: { color: colors.background, fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
 
-  showdownPanel: {
-    width: '100%',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    overflow: 'hidden',
-  },
+  // Showdown
+  showdownPanel: { width: '100%', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
   showdownPanelTitle: {
-    color: colors.textMuted,
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 2,
-    fontFamily: 'Orbitron_400Regular',
-    textAlign: 'center',
-    paddingVertical: 4,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    color: colors.textMuted, fontSize: 9, fontWeight: '700', letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular', textAlign: 'center', paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.03)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   showdownRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    gap: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4,
+    gap: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
   },
-  showdownRowWin: {
-    backgroundColor: 'rgba(255,215,0,0.06)',
-  },
-  showdownName: {
-    color: colors.textDim,
-    fontSize: 10,
-    fontWeight: '700',
-    width: 52,
-    fontFamily: 'Orbitron_400Regular',
-  },
-  showdownHand: {
-    color: colors.textMuted,
-    fontSize: 10,
-    flex: 1,
-  },
+  showdownRowWin: { backgroundColor: 'rgba(255,215,0,0.06)' },
+  showdownName: { color: colors.textDim, fontSize: 10, fontWeight: '700', width: 52, fontFamily: 'Orbitron_400Regular' },
+  showdownHand: { color: colors.textMuted, fontSize: 10, flex: 1 },
 
   // Waiting / watching panel
   waitingPanel: {
@@ -1273,9 +1080,6 @@ const styles = StyleSheet.create({
     borderRadius: 20, borderWidth: 1, borderColor: colors.border,
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
-  runItOutBtn: {
-    borderColor: 'rgba(255,215,0,0.4)',
-    backgroundColor: 'rgba(255,215,0,0.07)',
-  },
+  runItOutBtn: { borderColor: 'rgba(255,215,0,0.4)', backgroundColor: 'rgba(255,215,0,0.06)' },
   skipText: { color: colors.textMuted, fontSize: 11, fontWeight: '700', letterSpacing: 1.5, fontFamily: 'Orbitron_400Regular' },
 });
