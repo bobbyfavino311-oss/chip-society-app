@@ -1,0 +1,447 @@
+```text id="chip_society_rewards_economy_overhaul"
+Implement a complete rewards and economy expansion system for CHIP SOCIETY using the attached reference designs as inspiration ONLY.
+
+The final system should feel:
+- premium
+- addictive
+- rewarding
+- luxurious
+- modern
+- App Store quality
+
+Maintain the existing:
+- neon 80s Miami synthwave aesthetic
+- purple / neon blue / pink color palette
+- luxury casino atmosphere
+
+DO NOT directly copy the reference designs.
+
+Instead:
+- modernize them
+- integrate them naturally into CHIP SOCIETY
+- match the existing visual identity perfectly
+
+--------------------------------------------------
+CHIP BALANCE COLOR SYSTEM
+--------------------------------------------------
+
+Implement dynamic chip balance color coding globally throughout the app.
+
+This applies to:
+- player HUDs
+- profile pages
+- gameplay tables
+- leaderboard entries
+- social feed
+- tournament lobbies
+- home screen
+- friend list
+- chip store
+
+COLOR RULES:
+
+GREEN:
+- balances ABOVE 30,000 chips
+- represents healthy bankroll status
+
+YELLOW:
+- balances BELOW 30,000 chips
+- represents caution / low bankroll
+
+RED:
+- balances BELOW 5,000 chips
+- represents critical bankroll level
+
+Transitions between colors should:
+- animate smoothly
+- update instantly
+- feel polished and responsive
+
+DO NOT:
+- use harsh flashing
+- use cheap warning styles
+
+The system should feel:
+- premium
+- subtle
+- modern
+
+--------------------------------------------------
+FREE DAILY WHEEL SPIN FEATURE
+--------------------------------------------------
+
+Implement a luxury neon “Daily Wheel Spin” system.
+
+Players receive:
+- ONE FREE SPIN every 24 hours
+
+The wheel should feel:
+- exciting
+- rewarding
+- premium casino quality
+
+NOT:
+- cartoonish
+- cheap
+- overly flashy
+
+--------------------------------------------------
+DAILY WHEEL DESIGN
+--------------------------------------------------
+
+The wheel should include:
+- glowing neon sections
+- premium synthwave gradients
+- smooth physics animation
+- realistic spinning momentum
+- elegant reward reveals
+
+Visual style:
+- luxury casino wheel
+- retro Miami casino energy
+- modern mobile game polish
+
+Use:
+- neon blue
+- magenta
+- purple
+- gold accents
+
+--------------------------------------------------
+WHEEL REWARDS
+--------------------------------------------------
+
+Possible wheel rewards:
+- chips
+- XP boosts
+- VIP trial rewards
+- cosmetic unlocks
+- scratch tickets
+- temporary multipliers
+
+Example rewards:
+- 5K chips
+- 25K chips
+- 100K chips
+- 500K jackpot
+- VIP Day Pass
+- Bonus Scratch Ticket
+
+Rare rewards should:
+- feel exciting
+- have premium animations
+- include glow effects
+
+--------------------------------------------------
+24-HOUR SPIN TIMER
+--------------------------------------------------
+
+The free wheel spin should:
+- reset every 24 hours
+- display countdown timer
+- clearly show next available spin
+
+Players may optionally:
+- purchase extra spins
+
+--------------------------------------------------
+LOTTERY SCRATCH TICKET SYSTEM
+--------------------------------------------------
+
+Implement a fully interactive virtual scratch-off lottery system.
+
+Players receive:
+- ONE FREE lottery ticket every 24 hours
+
+Additional tickets may be:
+- purchased in the store
+- won from wheel spins
+- earned from events
+
+--------------------------------------------------
+SCRATCH TICKET EXPERIENCE
+--------------------------------------------------
+
+The scratch system should feel:
+- tactile
+- satisfying
+- immersive
+- rewarding
+
+Players should:
+- physically scratch tickets with finger gestures
+- reveal symbols underneath
+- trigger animations on wins
+
+Use:
+- realistic scratch particles
+- neon reveal effects
+- smooth scratch interaction
+- responsive touch feedback
+
+The scratch interaction must feel:
+- premium
+- satisfying
+- addictive
+
+--------------------------------------------------
+LOTTERY TICKET TIERS
+--------------------------------------------------
+
+Implement multiple ticket tiers.
+
+LOW TIER:
+- low-cost
+- smaller rewards
+
+MID TIER:
+- moderate rewards
+
+HIGH ROLLER TIER:
+- rare expensive tickets
+- massive jackpots
+
+VIP TIER:
+- exclusive premium tickets
+- ultra-rare rewards
+
+--------------------------------------------------
+TICKET REWARD EXAMPLES
+--------------------------------------------------
+
+Possible rewards:
+- chips
+- cosmetics
+- VIP boosts
+- XP boosts
+- rare avatars
+- neon table themes
+
+Example jackpots:
+- 50K
+- 250K
+- 1M
+- 10M
+- 50M
+
+Rare jackpots should:
+- feel dramatic
+- include luxury reveal effects
+- trigger celebratory animations
+
+--------------------------------------------------
+SCRATCH TICKET UI DESIGN
+--------------------------------------------------
+
+The scratch ticket UI should feel:
+- luxurious
+- modern
+- premium casino quality
+
+NOT:
+- cheap mobile casino
+- outdated gambling UI
+- cluttered
+
+Use:
+- layered neon lighting
+- premium typography
+- holographic textures
+- soft reflections
+- elegant gradients
+
+The system should feel:
+like a luxury synthwave casino experience.
+
+--------------------------------------------------
+LOTTERY STORE SYSTEM
+--------------------------------------------------
+
+Players may purchase:
+- additional scratch tickets
+
+Example:
+Starter Ticket Pack:
+- 5 Tickets
+
+Premium Pack:
+- 25 Tickets
+
+VIP Jackpot Pack:
+- 100 Tickets
+
+Display:
+- ticket rarity
+- jackpot potential
+- reward odds visually
+
+--------------------------------------------------
+HOURLY BONUS SYSTEM CHANGE
+--------------------------------------------------
+
+Remove the current:
+- 5K hourly bonus system
+
+Replace it with:
+- 5K DAILY bonus every 24 hours
+
+This should:
+- simplify economy pacing
+- slow chip inflation
+- increase retention pacing
+
+--------------------------------------------------
+DAILY BONUS SYSTEM REDESIGN
+--------------------------------------------------
+
+Create a cleaner premium daily reward flow.
+
+The daily bonus should include:
+- streak rewards
+- escalating bonuses
+- luxury animations
+- progression milestones
+
+Example:
+Day 1:
+5K
+
+Day 7:
+100K
+
+Day 30:
+Exclusive cosmetic reward
+
+--------------------------------------------------
+REWARD COLLECTION FLOW
+--------------------------------------------------
+
+Reward claiming should feel:
+- smooth
+- exciting
+- polished
+
+Include:
+- chip count-up animations
+- glow effects
+- satisfying sound hooks
+- elegant reward reveals
+
+DO NOT:
+- overwhelm the screen
+- use excessive popups
+
+--------------------------------------------------
+HOME SCREEN INTEGRATION
+--------------------------------------------------
+
+Integrate all new systems seamlessly into the home screen.
+
+Add:
+- Daily Spin button
+- Scratch Ticket button
+- Daily Bonus access
+
+The buttons should:
+- feel integrated naturally
+- avoid clutter
+- maintain premium layout balance
+
+--------------------------------------------------
+NOTIFICATION SYSTEM
+--------------------------------------------------
+
+Add subtle notifications for:
+- free spin ready
+- free ticket available
+- daily reward ready
+
+Use:
+- small glowing badges
+- elegant indicators
+- premium animations
+
+DO NOT:
+- spam users
+- use aggressive popups
+
+--------------------------------------------------
+PLAYER RETENTION DESIGN
+--------------------------------------------------
+
+The reward systems should encourage:
+- daily engagement
+- long-term retention
+- progression
+- excitement
+- anticipation
+
+The economy should feel:
+- rewarding
+- controlled
+- sustainable
+
+NOT:
+- inflated
+- overly generous
+- meaningless
+
+--------------------------------------------------
+ANTI-INFLATION ECONOMY CONTROL
+--------------------------------------------------
+
+Balance all reward systems carefully.
+
+Avoid:
+- giving away excessive chips
+- breaking progression pacing
+- making chip purchases meaningless
+
+Maintain:
+- long-term value
+- healthy progression
+- aspirational rewards
+
+--------------------------------------------------
+SERVER REQUIREMENTS
+--------------------------------------------------
+
+All reward systems must validate server-side.
+
+Protect against:
+- ticket duplication
+- timer exploits
+- reward abuse
+- fake balance injections
+
+All cooldowns and rewards must:
+- sync server-side
+- persist across devices
+- remain secure
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The final CHIP SOCIETY rewards ecosystem should feel like:
+- a premium social casino platform
+- a luxury synthwave poker universe
+- a modern multiplayer poker experience
+- an addictive daily progression system
+
+The new features should feel:
+- deeply integrated
+- immersive
+- visually stunning
+- rewarding
+- polished
+
+This should NOT feel:
+- cheap
+- cluttered
+- gimmicky
+- copied from old casino apps
+
+It should feel:
+like a world-class modern iOS social poker experience.
+```

@@ -36,6 +36,9 @@ function RootLayoutNav() {
           animation: 'slide_from_bottom',
         }}
       />
+      <Stack.Screen name="rewards/wheel"    options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
+      <Stack.Screen name="rewards/scratch"  options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
+      <Stack.Screen name="rewards/streak"   options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
       <Stack.Screen name="modes/quickmatch" options={{ headerShown: false, animation: 'slide_from_right' }} />
       <Stack.Screen name="modes/ranked"    options={{ headerShown: false, animation: 'slide_from_right' }} />
       <Stack.Screen name="modes/tournament" options={{ headerShown: false, animation: 'slide_from_right' }} />

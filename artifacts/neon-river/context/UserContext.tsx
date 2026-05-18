@@ -32,6 +32,7 @@ const DAILY_REWARDS: Record<number, number> = {
 };
 const DEFAULT_DAILY_REWARD = 250_000;
 const HOURLY_BONUS = 5_000;
+const HOURLY_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24-hour daily gift (was hourly)
 const COMEBACK_THRESHOLD = 1_000;
 const COMEBACK_BONUS = 50_000;
 const STARTING_CHIPS = 250_000;
@@ -54,6 +55,9 @@ export interface UserProfile {
   isNewUser: boolean;
   vipMember: boolean;
   rankedPoints: number;
+  lastWheelSpin: string | null;
+  scratchTickets: number;
+  lastFreeScratch: string | null;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -73,6 +77,9 @@ const DEFAULT_PROFILE: UserProfile = {
   isNewUser: true,
   vipMember: false,
   rankedPoints: 0,
+  lastWheelSpin: null,
+  scratchTickets: 1,
+  lastFreeScratch: null,
 };
 
 function getRankFromXP(xp: number): Rank {
@@ -99,6 +106,12 @@ interface UserContextValue {
   claimComebackBonus: () => Promise<number>;
   completeOnboarding: () => Promise<void>;
   awardRankedPoints: (delta: number) => Promise<void>;
+  claimWheelSpin: (chips: number, tickets: number) => Promise<void>;
+  useScratchTicket: () => Promise<boolean>;
+  addScratchTickets: (n: number) => Promise<void>;
+  canClaimWheel: boolean;
+  nextWheelIn: number;
+  canClaimFreeScratch: boolean;
   winRate: number;
   isLoaded: boolean;
   canClaimDaily: boolean;
@@ -220,10 +233,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [profile, updateProfile]);
 
   const claimHourlyBonus = useCallback(async (): Promise<number> => {
-    const oneHourAgo = Date.now() - 3_600_000;
     if (profile.lastHourlyBonus) {
       const last = new Date(profile.lastHourlyBonus).getTime();
-      if (last > oneHourAgo) return 0;
+      if (last > Date.now() - HOURLY_INTERVAL_MS) return 0;
     }
     const bonus = HOURLY_BONUS;
     await updateProfile({
@@ -251,6 +263,29 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     });
   }, [save]);
 
+  const claimWheelSpin = useCallback(async (chips: number, tickets: number) => {
+    setProfile(prev => {
+      const next = {
+        ...prev,
+        chips: prev.chips + chips,
+        scratchTickets: prev.scratchTickets + tickets,
+        lastWheelSpin: new Date().toISOString(),
+      };
+      save(next);
+      return next;
+    });
+  }, [save]);
+
+  const useScratchTicket = useCallback(async (): Promise<boolean> => {
+    if (profile.scratchTickets <= 0) return false;
+    await updateProfile({ scratchTickets: profile.scratchTickets - 1 });
+    return true;
+  }, [profile, updateProfile]);
+
+  const addScratchTickets = useCallback(async (n: number) => {
+    await updateProfile({ scratchTickets: profile.scratchTickets + n });
+  }, [profile, updateProfile]);
+
   // Derived values
   const today = new Date().toDateString();
   const canClaimDaily = profile.lastDailyReward !== today;
@@ -258,10 +293,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const nextHourlyIn = (() => {
     if (!profile.lastHourlyBonus) return 0;
     const last = new Date(profile.lastHourlyBonus).getTime();
-    const ms = last + 3_600_000 - now;
+    const ms = last + HOURLY_INTERVAL_MS - now;
     return Math.max(0, Math.ceil(ms / 60_000));
   })();
   const canClaimHourly = nextHourlyIn === 0;
+
+  const canClaimWheel = (() => {
+    if (!profile.lastWheelSpin) return true;
+    return Date.now() - new Date(profile.lastWheelSpin).getTime() >= 24 * 60 * 60 * 1000;
+  })();
+  const nextWheelIn = (() => {
+    if (!profile.lastWheelSpin) return 0;
+    const ms = new Date(profile.lastWheelSpin).getTime() + 24 * 60 * 60 * 1000 - Date.now();
+    return Math.max(0, Math.ceil(ms / 60_000));
+  })();
+  const canClaimFreeScratch = (() => {
+    if (!profile.lastFreeScratch) return false;
+    return Date.now() - new Date(profile.lastFreeScratch).getTime() >= 24 * 60 * 60 * 1000;
+  })();
 
   const yesterday = new Date(now - 86_400_000).toDateString();
   const isStreak = profile.lastDailyReward === yesterday;
@@ -279,6 +328,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         profile, updateProfile, addChips, removeChips,
         recordWin, recordLoss, claimDailyReward, claimHourlyBonus,
         claimComebackBonus, completeOnboarding, awardRankedPoints,
+        claimWheelSpin, useScratchTicket, addScratchTickets,
+        canClaimWheel, nextWheelIn, canClaimFreeScratch,
         winRate, isLoaded, canClaimDaily, canClaimHourly,
         nextHourlyIn, dailyRewardAmount,
       }}

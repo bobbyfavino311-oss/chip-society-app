@@ -314,6 +314,73 @@ const TRENDING_POSTS: TrendPost[] = [
   },
 ];
 
+// ─── Reward quick-access row ──────────────────────────────────────────────────
+function RewardRow() {
+  const { canClaimWheel, nextWheelIn, profile, canClaimDaily } = useUser();
+
+  const buttons = [
+    {
+      icon: '🎡' as const,
+      label: 'DAILY SPIN',
+      badge: canClaimWheel ? 'READY' : `${Math.floor(nextWheelIn / 60)}h`,
+      badgeActive: canClaimWheel,
+      color: '#bf5fff',
+      route: '/rewards/wheel',
+    },
+    {
+      icon: '🎫' as const,
+      label: 'SCRATCH',
+      badge: profile.scratchTickets > 0 ? `×${profile.scratchTickets}` : 'GET MORE',
+      badgeActive: profile.scratchTickets > 0,
+      color: '#00d4ff',
+      route: '/rewards/scratch',
+    },
+    {
+      icon: '🎁' as const,
+      label: 'STREAK',
+      badge: canClaimDaily ? 'CLAIM' : 'DAY ' + (profile.streakDays || 1),
+      badgeActive: canClaimDaily,
+      color: '#ffd700',
+      route: '/rewards/streak',
+    },
+  ];
+
+  return (
+    <View style={rr.row}>
+      {buttons.map((b) => (
+        <TouchableOpacity
+          key={b.label}
+          style={[rr.card, { borderColor: b.badgeActive ? `${b.color}55` : 'rgba(255,255,255,0.08)' }]}
+          onPress={() => router.push(b.route as any)}
+          activeOpacity={0.8}
+        >
+          {b.badgeActive && (
+            <LinearGradient colors={[`${b.color}18`, 'transparent']} style={StyleSheet.absoluteFill} />
+          )}
+          <Text style={rr.icon}>{b.icon}</Text>
+          <Text style={[rr.label, { color: b.badgeActive ? b.color : 'rgba(255,255,255,0.45)' }]}>{b.label}</Text>
+          <View style={[rr.badge, { backgroundColor: b.badgeActive ? b.color : 'rgba(255,255,255,0.1)' }]}>
+            <Text style={[rr.badgeText, { color: b.badgeActive ? '#050010' : 'rgba(255,255,255,0.4)' }]}>{b.badge}</Text>
+          </View>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+const rr = StyleSheet.create({
+  row: { flexDirection: 'row', gap: 8 },
+  card: {
+    flex: 1, borderRadius: 12, borderWidth: 1,
+    paddingVertical: 10, paddingHorizontal: 6,
+    alignItems: 'center', gap: 4, overflow: 'hidden',
+  },
+  icon: { fontSize: 22 },
+  label: { fontSize: 7, fontWeight: '800', letterSpacing: 0.8 },
+  badge: { borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
+  badgeText: { fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
+});
+
 function TrendCard({ post }: { post: TrendPost }) {
   const [liked, setLiked] = useState(false);
   return (
@@ -559,6 +626,9 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ChipSocietyLogo />
+
+        {/* ─── Rewards quick-access row ─── */}
+        <RewardRow />
 
         {/* Quick Play CTA */}
         <TouchableOpacity
