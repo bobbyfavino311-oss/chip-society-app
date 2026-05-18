@@ -20,22 +20,22 @@ const RANKS: { rank: Rank; minXP: number }[] = [
   { rank: 'Neon Legend',   minXP: 60000 },
 ];
 
-// Daily reward schedule: chips awarded per day of streak
+// Daily reward schedule — increments of 5K for sustainable economy pacing
 const DAILY_REWARDS: Record<number, number> = {
-  1: 25_000,
-  2: 35_000,
-  3: 50_000,
-  4: 75_000,
-  5: 100_000,
-  6: 150_000,
-  7: 250_000,
+  1:  5_000,
+  2: 10_000,
+  3: 15_000,
+  4: 20_000,
+  5: 25_000,
+  6: 30_000,
+  7: 35_000,
 };
-const DEFAULT_DAILY_REWARD = 250_000;
+const DEFAULT_DAILY_REWARD = 35_000;
 const HOURLY_BONUS = 5_000;
-const HOURLY_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24-hour daily gift (was hourly)
-const COMEBACK_THRESHOLD = 1_000;
-const COMEBACK_BONUS = 50_000;
-const STARTING_CHIPS = 250_000;
+const HOURLY_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const COMEBACK_THRESHOLD = 500;
+const COMEBACK_BONUS = 20_000;
+const STARTING_CHIPS = 50_000;
 
 export interface UserProfile {
   username: string;

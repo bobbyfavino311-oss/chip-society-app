@@ -17,13 +17,13 @@ import { useUser } from '@/context/UserContext';
 import { formatChips } from '@/utils/chipColor';
 
 const STREAK_REWARDS = [
-  { day: 1, chips: 5_000,   label: '5K',   color: '#00d4aa' },
-  { day: 2, chips: 10_000,  label: '10K',  color: '#00ccee' },
-  { day: 3, chips: 25_000,  label: '25K',  color: '#00aaff' },
-  { day: 4, chips: 50_000,  label: '50K',  color: '#5577ff' },
-  { day: 5, chips: 100_000, label: '100K', color: '#bf5fff' },
-  { day: 6, chips: 150_000, label: '150K', color: '#ff0090' },
-  { day: 7, chips: 250_000, label: '250K', color: '#ffd700', special: true },
+  { day: 1, chips:  5_000, label:  '5K', color: '#00d4aa' },
+  { day: 2, chips: 10_000, label: '10K', color: '#00ccee' },
+  { day: 3, chips: 15_000, label: '15K', color: '#00aaff' },
+  { day: 4, chips: 20_000, label: '20K', color: '#5577ff' },
+  { day: 5, chips: 25_000, label: '25K', color: '#bf5fff' },
+  { day: 6, chips: 30_000, label: '30K', color: '#ff0090' },
+  { day: 7, chips: 35_000, label: '35K', color: '#ffd700', special: true },
 ];
 
 export default function StreakScreen() {

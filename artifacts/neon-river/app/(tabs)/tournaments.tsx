@@ -269,7 +269,7 @@ export default function TournamentsScreen() {
         {/* AI Tournament CTA */}
         <TouchableOpacity
           style={styles.aiTournamentCard}
-          onPress={() => router.push('/game/tournament' as any)}
+          onPress={() => router.push('/game/practice' as any)}
           activeOpacity={0.85}
         >
           <LinearGradient
