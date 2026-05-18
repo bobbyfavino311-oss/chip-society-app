@@ -11,14 +11,30 @@ export type Rank =
   | 'Neon Legend';
 
 const RANKS: { rank: Rank; minXP: number }[] = [
-  { rank: 'Neon Bronze', minXP: 0 },
-  { rank: 'Neon Silver', minXP: 500 },
-  { rank: 'Neon Gold', minXP: 1500 },
+  { rank: 'Neon Bronze',   minXP: 0 },
+  { rank: 'Neon Silver',   minXP: 500 },
+  { rank: 'Neon Gold',     minXP: 1500 },
   { rank: 'Neon Platinum', minXP: 4000 },
-  { rank: 'Neon Diamond', minXP: 10000 },
-  { rank: 'Neon Elite', minXP: 25000 },
-  { rank: 'Neon Legend', minXP: 60000 },
+  { rank: 'Neon Diamond',  minXP: 10000 },
+  { rank: 'Neon Elite',    minXP: 25000 },
+  { rank: 'Neon Legend',   minXP: 60000 },
 ];
+
+// Daily reward schedule: chips awarded per day of streak
+const DAILY_REWARDS: Record<number, number> = {
+  1: 25_000,
+  2: 35_000,
+  3: 50_000,
+  4: 75_000,
+  5: 100_000,
+  6: 150_000,
+  7: 250_000,
+};
+const DEFAULT_DAILY_REWARD = 250_000;
+const HOURLY_BONUS = 5_000;
+const COMEBACK_THRESHOLD = 1_000;
+const COMEBACK_BONUS = 50_000;
+const STARTING_CHIPS = 250_000;
 
 export interface UserProfile {
   username: string;
@@ -32,13 +48,16 @@ export interface UserProfile {
   avatarIndex: number;
   avatarUri?: string;
   lastDailyReward: string | null;
+  lastHourlyBonus: string | null;
   streakDays: number;
   dailyMissionsCompleted: number;
+  isNewUser: boolean;
+  vipMember: boolean;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
-  username: 'Neon Player',
-  chips: 5000,
+  username: 'CS_Player',
+  chips: STARTING_CHIPS,
   xp: 0,
   rank: 'Neon Bronze',
   level: 1,
@@ -47,8 +66,11 @@ const DEFAULT_PROFILE: UserProfile = {
   handsPlayed: 0,
   avatarIndex: 0,
   lastDailyReward: null,
+  lastHourlyBonus: null,
   streakDays: 0,
   dailyMissionsCompleted: 0,
+  isNewUser: true,
+  vipMember: false,
 };
 
 function getRankFromXP(xp: number): Rank {
@@ -71,19 +93,37 @@ interface UserContextValue {
   recordWin: (chipsWon: number) => Promise<void>;
   recordLoss: () => Promise<void>;
   claimDailyReward: () => Promise<number>;
+  claimHourlyBonus: () => Promise<number>;
+  claimComebackBonus: () => Promise<number>;
+  completeOnboarding: () => Promise<void>;
   winRate: number;
   isLoaded: boolean;
+  canClaimDaily: boolean;
+  canClaimHourly: boolean;
+  nextHourlyIn: number;
+  dailyRewardAmount: number;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
-const STORAGE_KEY = '@neon_river_profile';
+const STORAGE_KEY = '@chip_society_profile';
+const LEGACY_KEY = '@neon_river_profile';
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [now, setNow] = useState(Date.now());
+
+  // Tick every 30s to refresh time-based states
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then(data => {
+    (async () => {
+      // Try new key first, fall back to legacy
+      let data = await AsyncStorage.getItem(STORAGE_KEY);
+      if (!data) data = await AsyncStorage.getItem(LEGACY_KEY);
       if (data) {
         try {
           const saved = JSON.parse(data) as Partial<UserProfile>;
@@ -91,7 +131,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       }
       setIsLoaded(true);
-    });
+    })();
   }, []);
 
   const save = useCallback(async (updated: UserProfile) => {
@@ -110,21 +150,30 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [save]);
 
   const addChips = useCallback(async (amount: number) => {
-    await updateProfile({ chips: Math.max(0, profile.chips + amount) });
-  }, [profile.chips, updateProfile]);
+    setProfile(prev => {
+      const next = { ...prev, chips: prev.chips + amount };
+      save(next);
+      return next;
+    });
+  }, [save]);
 
   const removeChips = useCallback(async (amount: number) => {
-    await updateProfile({ chips: Math.max(0, profile.chips - amount) });
-  }, [profile.chips, updateProfile]);
+    setProfile(prev => {
+      const next = { ...prev, chips: Math.max(0, prev.chips - amount) };
+      save(next);
+      return next;
+    });
+  }, [save]);
 
   const recordWin = useCallback(async (chipsWon: number) => {
     setProfile(prev => {
+      const xpGain = 50 + Math.floor(chipsWon / 1000);
       const next = {
         ...prev,
         wins: prev.wins + 1,
         handsPlayed: prev.handsPlayed + 1,
         chips: prev.chips + chipsWon,
-        xp: prev.xp + 50 + Math.floor(chipsWon / 100),
+        xp: prev.xp + xpGain,
       };
       next.rank = getRankFromXP(next.xp);
       next.level = getLevelFromXP(next.xp);
@@ -152,19 +201,61 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const today = new Date().toDateString();
     if (profile.lastDailyReward === today) return 0;
 
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    const yesterday = new Date(Date.now() - 86_400_000).toDateString();
     const isStreak = profile.lastDailyReward === yesterday;
     const newStreak = isStreak ? profile.streakDays + 1 : 1;
-    const reward = 500 + newStreak * 100;
+    const reward = DAILY_REWARDS[Math.min(newStreak, 7)] ?? DEFAULT_DAILY_REWARD;
+    const vipBonus = profile.vipMember ? Math.floor(reward * 0.5) : 0;
+    const total = reward + vipBonus;
 
     await updateProfile({
-      chips: profile.chips + reward,
+      chips: profile.chips + total,
       lastDailyReward: today,
       streakDays: newStreak,
     });
-
-    return reward;
+    return total;
   }, [profile, updateProfile]);
+
+  const claimHourlyBonus = useCallback(async (): Promise<number> => {
+    const oneHourAgo = Date.now() - 3_600_000;
+    if (profile.lastHourlyBonus) {
+      const last = new Date(profile.lastHourlyBonus).getTime();
+      if (last > oneHourAgo) return 0;
+    }
+    const bonus = HOURLY_BONUS;
+    await updateProfile({
+      chips: profile.chips + bonus,
+      lastHourlyBonus: new Date().toISOString(),
+    });
+    return bonus;
+  }, [profile, updateProfile]);
+
+  const claimComebackBonus = useCallback(async (): Promise<number> => {
+    if (profile.chips >= COMEBACK_THRESHOLD) return 0;
+    await updateProfile({ chips: COMEBACK_BONUS });
+    return COMEBACK_BONUS;
+  }, [profile, updateProfile]);
+
+  const completeOnboarding = useCallback(async () => {
+    await updateProfile({ isNewUser: false });
+  }, [updateProfile]);
+
+  // Derived values
+  const today = new Date().toDateString();
+  const canClaimDaily = profile.lastDailyReward !== today;
+
+  const nextHourlyIn = (() => {
+    if (!profile.lastHourlyBonus) return 0;
+    const last = new Date(profile.lastHourlyBonus).getTime();
+    const ms = last + 3_600_000 - now;
+    return Math.max(0, Math.ceil(ms / 60_000));
+  })();
+  const canClaimHourly = nextHourlyIn === 0;
+
+  const yesterday = new Date(now - 86_400_000).toDateString();
+  const isStreak = profile.lastDailyReward === yesterday;
+  const nextStreakDay = isStreak ? profile.streakDays + 1 : 1;
+  const dailyRewardAmount = DAILY_REWARDS[Math.min(nextStreakDay, 7)] ?? DEFAULT_DAILY_REWARD;
 
   const winRate =
     profile.handsPlayed > 0
@@ -173,7 +264,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ profile, updateProfile, addChips, removeChips, recordWin, recordLoss, claimDailyReward, winRate, isLoaded }}
+      value={{
+        profile, updateProfile, addChips, removeChips,
+        recordWin, recordLoss, claimDailyReward, claimHourlyBonus,
+        claimComebackBonus, completeOnboarding,
+        winRate, isLoaded, canClaimDaily, canClaimHourly,
+        nextHourlyIn, dailyRewardAmount,
+      }}
     >
       {children}
     </UserContext.Provider>

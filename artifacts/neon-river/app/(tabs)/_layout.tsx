@@ -57,13 +57,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="feed"
+        name="store"
         options={{
-          title: 'Feed',
+          title: 'Store',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="images" size={size} color={color} />
+            <Ionicons name="diamond" size={size} color={color} />
           ),
         }}
+      />
+      <Tabs.Screen
+        name="feed"
+        options={{ href: null }}
       />
       <Tabs.Screen
         name="tournaments"

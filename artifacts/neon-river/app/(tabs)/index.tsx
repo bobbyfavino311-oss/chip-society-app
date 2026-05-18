@@ -402,12 +402,18 @@ function FeaturedTournament() {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { profile } = useUser();
+  const { profile, isLoaded } = useUser();
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const dropAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isLoaded && profile.isNewUser) {
+      router.replace('/onboarding');
+    }
+  }, [isLoaded, profile.isNewUser]);
 
   const openSettings = () => {
     setSettingsOpen(true);

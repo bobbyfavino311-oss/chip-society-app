@@ -16,6 +16,14 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
 
+const TABLE_STAKES = [
+  { id: 'beginner',    name: 'BEGINNER',     blinds: '25 / 50',        minChips: 0,         minChipsLabel: 'Free',  color: '#00d4aa' },
+  { id: 'casual',      name: 'CASUAL',       blinds: '100 / 200',      minChips: 5_000,     minChipsLabel: '5K',    color: '#00d4ff' },
+  { id: 'mid',         name: 'MID STAKES',   blinds: '500 / 1,000',    minChips: 25_000,    minChipsLabel: '25K',   color: '#ffd700' },
+  { id: 'highroller',  name: 'HIGH ROLLER',  blinds: '5,000 / 10,000', minChips: 250_000,   minChipsLabel: '250K',  color: '#ff8800' },
+  { id: 'elite',       name: 'ELITE NEON',   blinds: '50K / 100K',     minChips: 2_500_000, minChipsLabel: '2.5M',  color: '#ff0090' },
+];
+
 const RANK_COLORS: Record<string, string> = {
   'Neon Bronze': '#cd7f32',
   'Neon Silver': '#a0a8c0',
@@ -163,6 +171,38 @@ export default function PlayScreen() {
           />
         </View>
 
+        {/* Table stakes */}
+        <Text style={styles.sectionTitle}>TABLE STAKES</Text>
+        <View style={styles.stakesGrid}>
+          {TABLE_STAKES.map(t => {
+            const canAfford = profile.chips >= t.minChips;
+            return (
+              <TouchableOpacity
+                key={t.id}
+                style={[styles.stakeRow, { borderColor: canAfford ? `${t.color}50` : colors.border, opacity: canAfford ? 1 : 0.5 }]}
+                onPress={() => canAfford && router.push('/game/practice')}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={canAfford ? [`${t.color}14`, 'transparent'] : ['transparent', 'transparent']}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                />
+                <View style={[styles.stakeDot, { backgroundColor: t.color }]} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.stakeName, { color: canAfford ? t.color : colors.textDim }]}>{t.name}</Text>
+                  <Text style={styles.stakeBlinds}>{t.blinds} blinds</Text>
+                </View>
+                <View style={styles.stakeRight}>
+                  <Text style={styles.stakeMin}>min {t.minChipsLabel}</Text>
+                  {!canAfford && <Ionicons name="lock-closed" size={12} color={colors.textDim} />}
+                  {canAfford && <Ionicons name="chevron-forward" size={14} color={t.color} />}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
         {/* Skill level info */}
         <View style={styles.infoCard}>
           <LinearGradient
@@ -228,4 +268,16 @@ const styles = StyleSheet.create({
     padding: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 10, overflow: 'hidden',
   },
   infoText: { color: colors.textMuted, fontSize: 12, lineHeight: 18, flex: 1 },
+  stakesGrid: { gap: 8 },
+  stakeRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    borderRadius: 12, borderWidth: 1,
+    paddingHorizontal: 14, paddingVertical: 12,
+    overflow: 'hidden', position: 'relative',
+  },
+  stakeDot: { width: 8, height: 8, borderRadius: 4 },
+  stakeName: { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+  stakeBlinds: { color: colors.textMuted, fontSize: 11, marginTop: 1 },
+  stakeRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  stakeMin: { color: colors.textDim, fontSize: 10 },
 });

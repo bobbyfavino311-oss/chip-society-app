@@ -1,4 +1,4 @@
-# NEON RIVER — Texas Hold'em Poker
+# CHIP SOCIETY — Texas Hold'em Poker
 
 A premium iOS multiplayer Texas Hold'em poker app with a retro 1980s synthwave / neon-casino aesthetic. Virtual chips only, no real-money gambling.
 
