@@ -170,21 +170,37 @@ export default function PlayingCard({
         <View style={[StyleSheet.absoluteFillObject, { transform: [{ perspective: 1200 }] }]}>
           <Animated.View
             style={[
-              cardBase,
-              styles.cardFront,
-              highlighted && styles.highlighted,
               StyleSheet.absoluteFillObject,
               { opacity: frontOpacity, transform: [{ rotateY: frontRotateY }] },
             ]}
           >
-            {/* Large centered value */}
-            <Text style={[styles.cardValue, { fontSize: dim.valFont, color: textColor }]}>
-              {val}
-            </Text>
-            {/* Suit symbol below */}
-            <Text style={[styles.cardSuit, { fontSize: dim.suitFont, color: textColor }]}>
-              {suit}
-            </Text>
+            {/* Outer cyan glow ring when highlighted */}
+            {highlighted && (
+              <View
+                style={[
+                  cardBase,
+                  StyleSheet.absoluteFillObject,
+                  styles.highlightOuter,
+                ]}
+              />
+            )}
+            <View
+              style={[
+                cardBase,
+                styles.cardFront,
+                highlighted && styles.highlightInner,
+                StyleSheet.absoluteFillObject,
+              ]}
+            >
+              {/* Large centered value */}
+              <Text style={[styles.cardValue, { fontSize: dim.valFont, color: textColor }]}>
+                {val}
+              </Text>
+              {/* Suit symbol below */}
+              <Text style={[styles.cardSuit, { fontSize: dim.suitFont, color: textColor }]}>
+                {suit}
+              </Text>
+            </View>
           </Animated.View>
         </View>
       )}
@@ -206,12 +222,22 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     gap: 1,
   },
-  highlighted: {
-    shadowColor: '#ffd700',
+  highlightOuter: {
+    shadowColor: '#00d4ff',
     shadowOpacity: 1,
-    shadowRadius: 16,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 0 },
+    borderWidth: 2.5,
+    borderColor: 'rgba(0,212,255,0.55)',
+    backgroundColor: 'transparent',
+  },
+  highlightInner: {
+    shadowColor: '#ff0090',
+    shadowOpacity: 1,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 0 },
     borderWidth: 2,
-    borderColor: '#ffd700',
+    borderColor: '#ff0090',
   },
   cardValue: {
     fontWeight: '800',
