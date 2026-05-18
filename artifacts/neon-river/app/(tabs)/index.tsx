@@ -470,6 +470,18 @@ export default function HomeScreen() {
         />
       )}
 
+      {/* Top-left: social feed */}
+      <TouchableOpacity
+        style={[styles.topLeft, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}
+        onPress={() => router.push('/(tabs)/feed')}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.topIconBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+          <Ionicons name="people" size={18} color={colors.textMuted} />
+        </View>
+        <View style={styles.feedPip} />
+      </TouchableOpacity>
+
       {/* Top-right: gear + avatar */}
       <View style={[styles.topCorner, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -756,6 +768,19 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   topCorner: {
     position: 'absolute', right: 16, zIndex: 10,
+  },
+  topLeft: {
+    position: 'absolute', left: 16, zIndex: 10,
+  },
+  topIconBtn: {
+    width: 40, height: 40, borderRadius: 20,
+    borderWidth: 1.5, alignItems: 'center', justifyContent: 'center',
+  },
+  feedPip: {
+    position: 'absolute', top: 0, right: 0,
+    width: 9, height: 9, borderRadius: 5,
+    backgroundColor: '#00d4ff',
+    borderWidth: 1.5, borderColor: '#050010',
   },
   settingsDropdown: {
     position: 'absolute',

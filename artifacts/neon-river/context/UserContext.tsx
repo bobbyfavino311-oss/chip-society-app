@@ -53,6 +53,7 @@ export interface UserProfile {
   dailyMissionsCompleted: number;
   isNewUser: boolean;
   vipMember: boolean;
+  rankedPoints: number;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -71,6 +72,7 @@ const DEFAULT_PROFILE: UserProfile = {
   dailyMissionsCompleted: 0,
   isNewUser: true,
   vipMember: false,
+  rankedPoints: 0,
 };
 
 function getRankFromXP(xp: number): Rank {
@@ -96,6 +98,7 @@ interface UserContextValue {
   claimHourlyBonus: () => Promise<number>;
   claimComebackBonus: () => Promise<number>;
   completeOnboarding: () => Promise<void>;
+  awardRankedPoints: (delta: number) => Promise<void>;
   winRate: number;
   isLoaded: boolean;
   canClaimDaily: boolean;
@@ -240,6 +243,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     await updateProfile({ isNewUser: false });
   }, [updateProfile]);
 
+  const awardRankedPoints = useCallback(async (delta: number) => {
+    setProfile(prev => {
+      const next = { ...prev, rankedPoints: Math.max(0, prev.rankedPoints + delta) };
+      save(next);
+      return next;
+    });
+  }, [save]);
+
   // Derived values
   const today = new Date().toDateString();
   const canClaimDaily = profile.lastDailyReward !== today;
@@ -267,7 +278,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       value={{
         profile, updateProfile, addChips, removeChips,
         recordWin, recordLoss, claimDailyReward, claimHourlyBonus,
-        claimComebackBonus, completeOnboarding,
+        claimComebackBonus, completeOnboarding, awardRankedPoints,
         winRate, isLoaded, canClaimDaily, canClaimHourly,
         nextHourlyIn, dailyRewardAmount,
       }}

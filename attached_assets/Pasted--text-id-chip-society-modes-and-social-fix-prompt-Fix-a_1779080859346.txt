@@ -1,0 +1,396 @@
+```text id="chip_society_modes_and_social_fix_prompt"
+Fix and fully implement the currently locked gameplay modes and social navigation systems inside CHIP SOCIETY.
+
+The current app has major unfinished functionality issues:
+- Tournament mode is locked
+- Ranked mode is locked
+- Private Tables are locked
+- Quick Match is locked
+- Virtual chip balances are not updating properly
+- Social feed access is poorly placed and difficult to access
+
+These systems must now be fully implemented and polished to App Store production quality.
+
+--------------------------------------------------
+PRIMARY GOAL
+--------------------------------------------------
+
+The app should now feel:
+- functional
+- connected
+- multiplayer-ready
+- socially active
+- responsive
+- polished
+
+The app should no longer feel:
+- incomplete
+- placeholder-based
+- partially locked
+- beta-stage
+
+--------------------------------------------------
+MODES TAB OVERHAUL
+--------------------------------------------------
+
+Completely rebuild the “MODES” section.
+
+The current locked placeholders make the app feel unfinished.
+
+All modes must now become:
+- functional
+- interactive
+- visually polished
+- multiplayer-ready
+
+--------------------------------------------------
+IMPLEMENT THESE MODES
+--------------------------------------------------
+
+1. QUICK MATCH
+2. RANKED
+3. TOURNAMENTS
+4. PRIVATE TABLES
+
+Each mode should:
+- have unique styling
+- contain working matchmaking flow
+- display live status
+- show player activity
+- feel premium and responsive
+
+--------------------------------------------------
+QUICK MATCH MODE
+--------------------------------------------------
+
+Quick Match should:
+- instantly place players into active tables
+- prioritize real players
+- fill remaining seats with AI bots if necessary
+- minimize wait times
+
+Requirements:
+- fast matchmaking
+- seamless table loading
+- automatic seat assignment
+- active table balancing
+
+Quick Match should feel:
+- immediate
+- active
+- frictionless
+
+--------------------------------------------------
+RANKED MODE
+--------------------------------------------------
+
+Implement a competitive ranked system.
+
+Players should:
+- gain or lose ranked points
+- climb divisions
+- unlock higher status
+
+RANKS:
+- Neon Bronze
+- Neon Silver
+- Neon Gold
+- Neon Platinum
+- Neon Diamond
+- Neon Elite
+- Neon Legend
+
+Ranked mode should:
+- feel competitive
+- feel rewarding
+- encourage progression
+
+Display:
+- current rank
+- RP progress
+- leaderboard positioning
+- win/loss trends
+
+--------------------------------------------------
+TOURNAMENT MODE
+--------------------------------------------------
+
+Build a functional tournament system.
+
+Tournament mode should include:
+- scheduled tournaments
+- sit-and-go tournaments
+- entry buy-ins using virtual chips
+- prize pools
+- elimination structure
+- final table system
+
+Tournament flow should include:
+- blind increases over time
+- automatic table balancing
+- player elimination tracking
+- placement rewards
+
+Tournament UI should feel:
+- exciting
+- premium
+- high stakes
+
+--------------------------------------------------
+PRIVATE TABLES
+--------------------------------------------------
+
+Implement full private table support.
+
+Players should be able to:
+- create private poker rooms
+- generate invite codes
+- invite friends
+- share room IDs
+
+Example:
+“JOIN TABLE: VICE-742”
+
+Private tables should support:
+- custom blinds
+- AI bot fill options
+- invite-only access
+- host controls
+
+--------------------------------------------------
+MODE SELECTION UI REDESIGN
+--------------------------------------------------
+
+The current modes section feels:
+- static
+- unfinished
+- placeholder-based
+
+Completely redesign the mode cards.
+
+Each mode card should:
+- glow subtly
+- have unique neon styling
+- display player counts
+- show live activity
+- animate slightly on hover/tap
+
+The modes page should feel:
+- alive
+- premium
+- multiplayer-focused
+
+--------------------------------------------------
+VIRTUAL CHIP BALANCE FIX
+--------------------------------------------------
+
+The virtual chip balance system is currently broken or delayed.
+
+Fix immediately:
+- chip count must update instantly after every hand
+- balances must synchronize server-side
+- player profile balance must always reflect current chip total
+
+Chip count updates must occur after:
+- winning hands
+- losses
+- purchases
+- rewards
+- tournament payouts
+- daily bonuses
+
+--------------------------------------------------
+PLAYER PROFILE CHIP DISPLAY
+--------------------------------------------------
+
+The player profile currently does NOT properly reflect:
+- live chip totals
+- real-time balance updates
+
+Fix:
+- synchronize profile chip count globally
+- update balances instantly across all screens
+- maintain consistent chip display everywhere
+
+Chip totals must remain synchronized between:
+- gameplay tables
+- profile page
+- home screen
+- social feed
+- store
+- ranked modes
+
+There should NEVER be:
+- delayed balances
+- mismatched totals
+- stale values
+
+--------------------------------------------------
+SERVER VALIDATION
+--------------------------------------------------
+
+All chip balances must:
+- validate server-side
+- never trust client-side totals
+- update through authoritative backend logic
+
+Prevent:
+- chip duplication
+- desyncs
+- fake balances
+- client-side exploits
+
+--------------------------------------------------
+SOCIAL FEED BUTTON ADDITION
+--------------------------------------------------
+
+The social feed is currently difficult to access.
+
+Add a dedicated social feed button directly on the MAIN HOME SCREEN.
+
+Placement:
+- top-left corner of the home screen
+
+The button should:
+- remain visible at all times
+- feel integrated naturally
+- use a premium neon icon
+- open the social feed instantly
+
+--------------------------------------------------
+SOCIAL FEED BUTTON DESIGN
+--------------------------------------------------
+
+The button should:
+- match the synthwave neon aesthetic
+- use subtle glow effects
+- feel modern and premium
+
+Possible icon styles:
+- neon chat bubble
+- stacked social cards
+- glowing community icon
+
+DO NOT:
+- use generic flat icons
+- use oversized buttons
+- clutter the top navigation
+
+The button should feel:
+- elegant
+- social
+- polished
+
+--------------------------------------------------
+SOCIAL FEED SYSTEM
+--------------------------------------------------
+
+The social feed should become:
+- a major core feature
+
+The feed should support:
+- poker highlights
+- big wins
+- bluff moments
+- chip flex posts
+- reactions
+- comments
+- player following
+
+The feed should feel:
+- alive
+- active
+- socially addictive
+
+--------------------------------------------------
+HOME SCREEN NAVIGATION FIX
+--------------------------------------------------
+
+The home screen currently lacks:
+- navigation clarity
+- feature accessibility
+- proper hierarchy
+
+Improve:
+- top navigation spacing
+- button positioning
+- visual grouping
+- quick-access usability
+
+The home screen should feel:
+- clean
+- premium
+- responsive
+- easy to navigate
+
+--------------------------------------------------
+MATCHMAKING STATUS SYSTEM
+--------------------------------------------------
+
+Add live multiplayer indicators.
+
+Display:
+- active tables
+- players online
+- queue status
+- estimated wait times
+
+This makes the app feel:
+- populated
+- active
+- socially alive
+
+--------------------------------------------------
+AI BOT TABLE FILL SYSTEM
+--------------------------------------------------
+
+When not enough real players are available:
+- automatically fill remaining seats with AI bots
+
+Bots should:
+- appear believable
+- maintain gameplay flow
+- prevent dead tables
+
+This is especially important for:
+- launch phase
+- low-population periods
+
+--------------------------------------------------
+MULTIPLAYER SERVER INTEGRATION
+--------------------------------------------------
+
+All modes must connect to:
+- live multiplayer backend
+- server-authoritative game engine
+- matchmaking services
+
+Support:
+- reconnect protection
+- stable synchronization
+- persistent player sessions
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+CHIP SOCIETY should now feel like:
+- a fully operational multiplayer poker platform
+- a polished App Store-ready social poker app
+- a living online poker community
+- a modern neon poker ecosystem
+
+The app should NO LONGER feel:
+- unfinished
+- placeholder-based
+- partially locked
+- early beta quality
+
+It should feel:
+- complete
+- immersive
+- active
+- multiplayer-ready
+- socially connected
+- premium production quality.
+```
