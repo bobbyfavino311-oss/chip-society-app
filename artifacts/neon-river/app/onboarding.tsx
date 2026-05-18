@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Image,
   Platform,
   StyleSheet,
   Text,
@@ -116,7 +117,12 @@ export default function OnboardingScreen() {
 
       <Animated.View style={[styles.content, { opacity: fadeIn, paddingTop: insets.top + 40 }]}>
 
-        {/* App name */}
+        {/* App icon + name */}
+        <Image
+          source={require('../assets/images/icon.png')}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
         <View style={styles.logoRow}>
           <Text style={styles.logoLine1}>CHIP</Text>
           <Text style={styles.logoLine2}>SOCIETY</Text>
@@ -201,6 +207,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,212,255,0.07)',
   },
 
+  logoImage: {
+    width: 110, height: 110, borderRadius: 24,
+    marginBottom: -4,
+  },
   logoRow: { alignItems: 'center', gap: 0 },
   logoLine1: {
     fontSize: 52, fontWeight: '900', fontFamily: 'Orbitron_900Black',
