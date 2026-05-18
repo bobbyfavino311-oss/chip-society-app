@@ -56,6 +56,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/* Feed is now a primary tab — social feed is a core feature */}
+      <Tabs.Screen
+        name="feed"
+        options={{
+          title: 'Feed',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={size} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="store"
         options={{
@@ -65,18 +75,10 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="feed"
-        options={{ href: null }}
-      />
+      {/* Tournaments accessible from Home screen tournament section */}
       <Tabs.Screen
         name="tournaments"
-        options={{
-          title: 'Tournaments',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="trophy" size={size} color={color} />
-          ),
-        }}
+        options={{ href: null }}
       />
       <Tabs.Screen
         name="profile"

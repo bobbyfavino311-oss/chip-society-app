@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -14,18 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
-
-function formatChips(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return String(n);
-}
-
-function formatBalance(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `${Math.floor(n / 1000).toLocaleString()}K`;
-  return n.toLocaleString();
-}
+import { formatChips, getChipColor } from '@/utils/chipColor';
 
 // ─── SVG chip icon ─────────────────────────────────────────────────────────────
 function MiniChip({ size = 20, color = '#00d4ff' }: { size?: number; color?: string }) {
@@ -172,11 +162,11 @@ function DailyBonusCard() {
           start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
         />
         <View style={styles.bonusLeft}>
-          <Text style={styles.bonusEmoji}>⏰</Text>
+          <Text style={styles.bonusEmoji}>🎁</Text>
           <View>
-            <Text style={styles.bonusTitle}>Hourly Bonus</Text>
+            <Text style={styles.bonusTitle}>Daily Gift</Text>
             <Text style={styles.bonusSub}>
-              {canClaimHourly ? 'Ready to collect!' : `Next in ${nextHourlyIn}m`}
+              {canClaimHourly ? 'Ready to collect!' : `Next in ${Math.floor(nextHourlyIn / 60)}h ${nextHourlyIn % 60}m`}
             </Text>
           </View>
         </View>
@@ -189,6 +179,115 @@ function DailyBonusCard() {
           </View>
         </View>
       </TouchableOpacity>
+    </View>
+  );
+}
+
+// ─── Scratch & Win ─────────────────────────────────────────────────────────────
+function ScratchSection() {
+  const { profile, canClaimFreeScratch, addScratchTickets, updateProfile } = useUser();
+
+  const handleFreeTicket = async () => {
+    await addScratchTickets(1);
+    await updateProfile({ lastFreeScratch: new Date().toISOString() });
+  };
+
+  const handleBuyTickets = (count: number, label: string) => {
+    Alert.alert(
+      'SCRATCH TICKETS',
+      `${label} will be available when the app launches on the App Store.\n\nTickets let you scratch & win up to 250K chips!`,
+      [{ text: 'Got it' }]
+    );
+  };
+
+  const canPlay = profile.scratchTickets > 0;
+
+  return (
+    <View style={styles.scratchSection}>
+      <View style={styles.sectionRow}>
+        <Text style={styles.sectionLabel}>SCRATCH & WIN</Text>
+        <View style={styles.ticketBadge}>
+          <Ionicons name="ticket" size={11} color="#bf5fff" />
+          <Text style={styles.ticketBadgeText}>{profile.scratchTickets} tickets</Text>
+        </View>
+      </View>
+      <Text style={[styles.sectionSub, { marginTop: -8 }]}>Match 3 symbols · Win up to 250K chips</Text>
+
+      {/* Play now card */}
+      <TouchableOpacity
+        style={[styles.scratchPlayCard, { borderColor: canPlay ? 'rgba(191,95,255,0.55)' : colors.border }]}
+        onPress={() => router.push('/rewards/scratch')}
+        activeOpacity={0.82}
+        disabled={!canPlay}
+      >
+        <LinearGradient
+          colors={canPlay ? ['rgba(191,95,255,0.18)', 'rgba(191,95,255,0.05)'] : ['rgba(255,255,255,0.03)', 'transparent']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        />
+        <View style={styles.scratchPlayLeft}>
+          <Text style={styles.scratchPlayEmoji}>🎫</Text>
+          <View>
+            <Text style={[styles.scratchPlayTitle, { color: canPlay ? '#bf5fff' : colors.textDim }]}>
+              {canPlay ? 'SCRATCH NOW' : 'NO TICKETS'}
+            </Text>
+            <Text style={styles.scratchPlaySub}>
+              {canPlay ? `${profile.scratchTickets} ticket${profile.scratchTickets !== 1 ? 's' : ''} available` : 'Get free or buy tickets below'}
+            </Text>
+          </View>
+        </View>
+        <View style={[styles.scratchPlayBtn, { backgroundColor: canPlay ? '#bf5fff' : colors.border }]}>
+          <Text style={[styles.scratchPlayBtnText, { color: canPlay ? '#fff' : colors.textDim }]}>
+            {canPlay ? 'PLAY' : 'LOCKED'}
+          </Text>
+        </View>
+      </TouchableOpacity>
+
+      {/* Free daily ticket */}
+      <TouchableOpacity
+        style={[styles.bonusCard, { borderColor: canClaimFreeScratch ? 'rgba(0,212,255,0.4)' : colors.border }]}
+        onPress={canClaimFreeScratch ? handleFreeTicket : undefined}
+        activeOpacity={0.8}
+      >
+        <LinearGradient
+          colors={canClaimFreeScratch ? ['rgba(0,212,255,0.08)', 'transparent'] : ['rgba(255,255,255,0.02)', 'transparent']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+        />
+        <View style={styles.bonusLeft}>
+          <Text style={styles.bonusEmoji}>🆓</Text>
+          <View>
+            <Text style={styles.bonusTitle}>Free Daily Ticket</Text>
+            <Text style={styles.bonusSub}>{canClaimFreeScratch ? 'Ready to collect!' : 'Already claimed today'}</Text>
+          </View>
+        </View>
+        <View style={[styles.claimBtn, { backgroundColor: canClaimFreeScratch ? '#00d4ff' : colors.border }]}>
+          <Text style={[styles.claimBtnText, { color: canClaimFreeScratch ? '#050010' : colors.textDim }]}>
+            {canClaimFreeScratch ? 'CLAIM' : 'WAIT'}
+          </Text>
+        </View>
+      </TouchableOpacity>
+
+      {/* Ticket packs */}
+      <View style={styles.ticketPackRow}>
+        {[
+          { label: '3 TICKETS', count: 3, price: '$0.99', color: '#00d4ff' },
+          { label: '10 TICKETS', count: 10, price: '$2.99', color: '#bf5fff', best: true },
+          { label: '25 TICKETS', count: 25, price: '$5.99', color: '#ffd700' },
+        ].map(tp => (
+          <TouchableOpacity
+            key={tp.label}
+            style={[styles.ticketPack, { borderColor: `${tp.color}44` }, tp.best && { borderWidth: 1.5 }]}
+            onPress={() => handleBuyTickets(tp.count, tp.label)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient colors={[`${tp.color}18`, 'transparent']} style={StyleSheet.absoluteFill} />
+            {tp.best && <View style={[styles.ticketPackBest, { backgroundColor: tp.color }]}><Text style={styles.ticketPackBestText}>BEST</Text></View>}
+            <Text style={[styles.ticketPackCount, { color: tp.color }]}>{tp.count}×</Text>
+            <Text style={[styles.ticketPackPrice, { color: tp.color }]}>{tp.price}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 }
@@ -236,14 +335,17 @@ export default function StoreScreen() {
             <Text style={styles.headerTitle}>CHIP STORE</Text>
             <Text style={styles.headerSub}>CHIP SOCIETY</Text>
           </View>
-          <View style={styles.balanceChip}>
-            <MiniChip size={18} color="#00d4ff" />
-            <Text style={styles.balanceText}>{formatBalance(profile.chips)}</Text>
+          <View style={[styles.balanceChip, { borderColor: `${getChipColor(profile.chips)}44` }]}>
+            <MiniChip size={18} color={getChipColor(profile.chips)} />
+            <Text style={[styles.balanceText, { color: getChipColor(profile.chips) }]}>{formatChips(profile.chips)}</Text>
           </View>
         </View>
 
         {/* Daily / Hourly bonuses */}
         <DailyBonusCard />
+
+        {/* Scratch & Win */}
+        <ScratchSection />
 
         {/* Chip packages */}
         <View style={styles.packagesSection}>
@@ -426,4 +528,38 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.2)', fontSize: 10,
     textAlign: 'center', lineHeight: 16,
   },
+
+  scratchSection: { gap: 10 },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  ticketBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: 'rgba(191,95,255,0.15)', borderRadius: 10,
+    borderWidth: 1, borderColor: 'rgba(191,95,255,0.3)',
+    paddingHorizontal: 8, paddingVertical: 3,
+  },
+  ticketBadgeText: { color: '#bf5fff', fontSize: 10, fontWeight: '800' },
+  scratchPlayCard: {
+    borderRadius: 14, borderWidth: 1, overflow: 'hidden',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingVertical: 14,
+  },
+  scratchPlayLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+  scratchPlayEmoji: { fontSize: 30 },
+  scratchPlayTitle: { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+  scratchPlaySub: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
+  scratchPlayBtn: { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, minWidth: 64, alignItems: 'center' },
+  scratchPlayBtnText: { fontSize: 12, fontWeight: '900', letterSpacing: 1 },
+  ticketPackRow: { flexDirection: 'row', gap: 8 },
+  ticketPack: {
+    flex: 1, borderRadius: 12, borderWidth: 1, overflow: 'hidden',
+    paddingVertical: 12, alignItems: 'center', gap: 4, position: 'relative',
+  },
+  ticketPackBest: {
+    position: 'absolute', top: 0, right: 0,
+    borderBottomLeftRadius: 8, borderTopRightRadius: 10,
+    paddingHorizontal: 6, paddingVertical: 2,
+  },
+  ticketPackBestText: { color: '#050010', fontSize: 7, fontWeight: '900', letterSpacing: 0.5 },
+  ticketPackCount: { fontSize: 20, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  ticketPackPrice: { fontSize: 11, fontWeight: '700' },
 });

@@ -237,7 +237,13 @@ export default function ProfileScreen() {
             style={StyleSheet.absoluteFill}
           />
           <MaterialCommunityIcons name="poker-chip" size={40} color={colors.gold} />
-          <Text style={styles.chipAmount}>{profile.chips.toLocaleString()}</Text>
+          <Text style={[styles.chipAmount, { color: profile.chips < 5_000 ? '#ff4444' : profile.chips < 30_000 ? '#ffd700' : '#00d4aa' }]}>
+            {profile.chips >= 1_000_000
+              ? `${(profile.chips / 1_000_000).toFixed(1)}M`
+              : profile.chips >= 1_000
+              ? `${(profile.chips / 1_000).toFixed(0)}K`
+              : profile.chips.toLocaleString()}
+          </Text>
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
         </View>
 

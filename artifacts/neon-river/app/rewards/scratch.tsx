@@ -145,10 +145,11 @@ export default function ScratchScreen() {
 
   const handleClaim = async () => {
     if (claimed) return;
-    const ok = await useScratchTicket();
-    if (ok && ticket.win && ticket.prize > 0) {
+    if (ticket.win && ticket.prize > 0) {
+      // Add chips first, then consume the ticket atomically
       addChips(ticket.prize);
     }
+    await useScratchTicket(); // deduct ticket regardless of win/loss
     setClaimed(true);
   };
 
@@ -268,15 +269,18 @@ export default function ScratchScreen() {
             </>
           )}
           {!claimed && (
-            <TouchableOpacity style={[sc.claimBtn, { backgroundColor: ticket.win ? '#ffd700' : colors.primary }]} onPress={handleClaim} activeOpacity={0.85}>
-              <Text style={[sc.claimBtnText, { color: '#050010' }]}>{ticket.win ? 'COLLECT WINNINGS' : 'CLOSE'}</Text>
+            <TouchableOpacity style={[sc.claimBtn, { backgroundColor: ticket.win ? '#ffd700' : 'rgba(255,255,255,0.12)' }]} onPress={handleClaim} activeOpacity={0.85}>
+              <Text style={[sc.claimBtnText, { color: ticket.win ? '#050010' : colors.textMuted }]}>{ticket.win ? 'COLLECT WINNINGS' : 'CLOSE'}</Text>
             </TouchableOpacity>
           )}
-          {claimed && (
+          {claimed && ticket.win && ticket.prize > 0 && (
             <View style={sc.claimedRow}>
               <Ionicons name="checkmark-circle" size={18} color={colors.success} />
-              <Text style={sc.claimedText}>Added to your balance</Text>
+              <Text style={sc.claimedText}>+{formatChips(ticket.prize)} added to balance</Text>
             </View>
+          )}
+          {claimed && (!ticket.win || ticket.prize === 0) && (
+            <Text style={sc.closedText}>Ticket used · Try again tomorrow</Text>
           )}
         </Animated.View>
       )}
@@ -325,5 +329,6 @@ const sc = StyleSheet.create({
   claimBtnText: { fontSize: 13, fontWeight: '900', letterSpacing: 1 },
   claimedRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   claimedText: { color: colors.success, fontSize: 12 },
+  closedText: { color: colors.textDim, fontSize: 11, textAlign: 'center', fontStyle: 'italic' },
   noTickets: { color: colors.textDim, fontSize: 11, textAlign: 'center', marginTop: 8, paddingHorizontal: 20 },
 });

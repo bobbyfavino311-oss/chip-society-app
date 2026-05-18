@@ -1,0 +1,344 @@
+```text id="chip_society_lottery_and_balance_fix"
+Fix and fully overhaul the CHIP SOCIETY lottery ticket system, balance synchronization system, and main navigation layout.
+
+The current implementation has multiple broken economy and UX issues that make the app feel unfinished and unreliable.
+
+The following problems MUST be fixed immediately:
+
+- Lottery tickets incorrectly display “Added to your balance” even when no chips are won
+- Lottery rewards are not accurately updating player balances
+- Chip totals are desynchronized across the app
+- The red / yellow / green bankroll indicator system is inconsistent
+- The Lottery tab is incorrectly placed on the main home screen
+- The Social Feed button placement is wrong and not prioritized properly
+
+The entire rewards and balance system must now feel:
+- accurate
+- responsive
+- premium
+- trustworthy
+- polished
+- App Store production quality
+
+--------------------------------------------------
+LOTTERY WIN MESSAGE FIX
+--------------------------------------------------
+
+The lottery ticket system currently displays:
+“Added to your balance”
+
+even when:
+- the player wins nothing
+- the ticket loses
+- no chips were awarded
+
+This is incorrect and misleading.
+
+Fix immediately:
+- ONLY display “Added to your balance” when chips are ACTUALLY awarded
+- losing tickets should display a proper losing state
+
+--------------------------------------------------
+LOSING TICKET STATES
+--------------------------------------------------
+
+When a ticket loses:
+DO NOT:
+- fake reward messages
+- animate fake balance increases
+- imply chips were won
+
+Instead display:
+- “No Win”
+- “Better Luck Next Time”
+- “Try Again Tomorrow”
+
+Use:
+- subtle animations
+- elegant fade-outs
+- premium UI feedback
+
+The losing state should still feel:
+- polished
+- rewarding emotionally
+- satisfying to interact with
+
+WITHOUT falsely rewarding chips.
+
+--------------------------------------------------
+LOTTERY REWARD ACCURACY FIX
+--------------------------------------------------
+
+Lottery winnings are currently NOT updating balances correctly.
+
+Fix immediately:
+- all lottery rewards must add exact chip values
+- player balances must update instantly
+- balances must remain synchronized globally
+
+Winning flow:
+1. Ticket reveals prize
+2. Server validates prize
+3. Exact chips added to balance
+4. Balance updates globally
+5. UI refreshes instantly everywhere
+
+--------------------------------------------------
+GLOBAL BALANCE SYNCHRONIZATION
+--------------------------------------------------
+
+The player balance system is currently inconsistent.
+
+Fix ALL chip balance syncing across:
+- gameplay tables
+- player profile
+- home screen
+- store
+- lottery system
+- social feed
+- tournaments
+- ranked mode
+
+The balance shown everywhere must ALWAYS match exactly.
+
+There should NEVER be:
+- mismatched totals
+- delayed updates
+- stale balances
+- visual desyncs
+
+--------------------------------------------------
+SERVER AUTHORITATIVE ECONOMY
+--------------------------------------------------
+
+ALL chip balances must be:
+- controlled server-side
+- validated server-side
+- synchronized globally
+
+The client must NEVER:
+- calculate balances independently
+- store authoritative totals locally
+
+Prevent:
+- fake chip additions
+- duplicate rewards
+- lottery exploits
+- client-side manipulation
+
+--------------------------------------------------
+BALANCE COLOR SYSTEM FIX
+--------------------------------------------------
+
+The red / yellow / green bankroll indicator system is currently inconsistent.
+
+Rebuild the system globally.
+
+RULES:
+
+GREEN:
+- ABOVE 30,000 chips
+
+YELLOW:
+- BELOW 30,000 chips
+
+RED:
+- BELOW 5,000 chips
+
+This system must update:
+- instantly
+- accurately
+- globally
+
+The color must ALWAYS match the REAL live balance.
+
+--------------------------------------------------
+COLOR TRANSITION REQUIREMENTS
+--------------------------------------------------
+
+Balance color transitions should:
+- animate smoothly
+- feel premium
+- avoid flashing
+- avoid harsh changes
+
+Use:
+- soft neon transitions
+- subtle glow updates
+- smooth color interpolation
+
+The bankroll status system should feel:
+- elegant
+- modern
+- luxurious
+
+--------------------------------------------------
+LOTTERY TAB RELOCATION
+--------------------------------------------------
+
+The Lottery system should NOT exist on the main home screen.
+
+Move the entire Lottery system into:
+STORE SECTION ONLY
+
+Lottery access should now exist inside:
+- Store
+- Rewards Store
+OR
+- Casino Rewards subsection
+
+--------------------------------------------------
+STORE INTEGRATION
+--------------------------------------------------
+
+Inside the Store:
+create a dedicated section called:
+- “Scratch & Win”
+OR
+- “Neon Lottery”
+
+The lottery area should include:
+- free daily ticket
+- purchasable tickets
+- ticket tiers
+- jackpot previews
+- odds visuals
+- premium ticket packs
+
+This should feel:
+- naturally integrated into monetization
+- premium casino-inspired
+- polished
+
+--------------------------------------------------
+MAIN SCREEN NAVIGATION FIX
+--------------------------------------------------
+
+The Lottery tab currently occupies valuable home screen space.
+
+Remove the Lottery tab entirely from:
+- home screen navigation
+- primary dashboard tabs
+
+Replace it with:
+SOCIAL FEED BUTTON
+
+--------------------------------------------------
+SOCIAL FEED BUTTON PLACEMENT
+--------------------------------------------------
+
+The Social Feed button should now occupy:
+the Lottery tab position on the MAIN HOME SCREEN.
+
+The Social Feed button should:
+- feel premium
+- feel socially important
+- act as a core feature entry point
+
+Use:
+- glowing neon icon
+- subtle activity indicator
+- modern social symbol
+
+The button should visually communicate:
+- active poker community
+- social interaction
+- player engagement
+
+--------------------------------------------------
+SOCIAL FEED PRIORITY
+--------------------------------------------------
+
+The Social Feed should now feel:
+- more important than lottery
+- central to the app experience
+- highly active
+
+The feed should encourage:
+- retention
+- engagement
+- competition
+- community interaction
+
+--------------------------------------------------
+HOME SCREEN CLEANUP
+--------------------------------------------------
+
+The main home screen currently feels:
+- cluttered
+- inconsistent
+- poorly prioritized
+
+Improve:
+- navigation hierarchy
+- spacing
+- feature organization
+- visual balance
+
+The home screen should prioritize:
+1. Gameplay
+2. Social Feed
+3. Multiplayer Modes
+4. Store
+5. Rewards
+
+NOT:
+random casino systems.
+
+--------------------------------------------------
+LOTTERY UX IMPROVEMENTS
+--------------------------------------------------
+
+The Lottery system should feel:
+- optional
+- polished
+- rewarding
+
+NOT:
+- intrusive
+- spammy
+- overly dominant
+
+Reduce:
+- excessive popups
+- forced prompts
+- aggressive reward screens
+
+--------------------------------------------------
+PLAYER TRUST REQUIREMENTS
+--------------------------------------------------
+
+The economy system MUST feel:
+- accurate
+- reliable
+- trustworthy
+
+Players should NEVER feel:
+- cheated
+- confused
+- misled by rewards
+
+All balance changes must:
+- visibly make sense
+- update instantly
+- remain transparent
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The CHIP SOCIETY economy and rewards ecosystem should now feel:
+- fully synchronized
+- premium
+- trustworthy
+- polished
+- production ready
+
+The app should feel:
+like a professionally engineered multiplayer poker platform with a modern social casino reward system.
+
+NOT:
+- a buggy prototype
+- fake reward simulator
+- inconsistent beta economy system.
+```

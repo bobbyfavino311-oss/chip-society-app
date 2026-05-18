@@ -314,31 +314,23 @@ const TRENDING_POSTS: TrendPost[] = [
   },
 ];
 
-// ─── Reward quick-access row ──────────────────────────────────────────────────
+// ─── Reward quick-access row (Spin + Streak only — Scratch is in Store) ───────
 function RewardRow() {
-  const { canClaimWheel, nextWheelIn, profile, canClaimDaily } = useUser();
+  const { canClaimWheel, nextWheelIn, canClaimDaily, profile } = useUser();
 
   const buttons = [
     {
-      icon: '🎡' as const,
+      icon: '🎡',
       label: 'DAILY SPIN',
-      badge: canClaimWheel ? 'READY' : `${Math.floor(nextWheelIn / 60)}h`,
+      badge: canClaimWheel ? 'READY' : `${Math.floor(nextWheelIn / 60)}h ${nextWheelIn % 60}m`,
       badgeActive: canClaimWheel,
       color: '#bf5fff',
       route: '/rewards/wheel',
     },
     {
-      icon: '🎫' as const,
-      label: 'SCRATCH',
-      badge: profile.scratchTickets > 0 ? `×${profile.scratchTickets}` : 'GET MORE',
-      badgeActive: profile.scratchTickets > 0,
-      color: '#00d4ff',
-      route: '/rewards/scratch',
-    },
-    {
-      icon: '🎁' as const,
+      icon: '🔥',
       label: 'STREAK',
-      badge: canClaimDaily ? 'CLAIM' : 'DAY ' + (profile.streakDays || 1),
+      badge: canClaimDaily ? 'CLAIM' : `DAY ${profile.streakDays || 1}`,
       badgeActive: canClaimDaily,
       color: '#ffd700',
       route: '/rewards/streak',
@@ -369,15 +361,15 @@ function RewardRow() {
 }
 
 const rr = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 8 },
+  row: { flexDirection: 'row', gap: 10 },
   card: {
-    flex: 1, borderRadius: 12, borderWidth: 1,
-    paddingVertical: 10, paddingHorizontal: 6,
-    alignItems: 'center', gap: 4, overflow: 'hidden',
+    flex: 1, borderRadius: 14, borderWidth: 1,
+    paddingVertical: 12, paddingHorizontal: 8,
+    alignItems: 'center', gap: 5, overflow: 'hidden',
   },
-  icon: { fontSize: 22 },
-  label: { fontSize: 7, fontWeight: '800', letterSpacing: 0.8 },
-  badge: { borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
+  icon: { fontSize: 24 },
+  label: { fontSize: 8, fontWeight: '800', letterSpacing: 0.8 },
+  badge: { borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3 },
   badgeText: { fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
 });
 
