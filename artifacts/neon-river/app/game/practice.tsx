@@ -446,6 +446,11 @@ export default function PracticeScreen() {
     prevPotRef.current = 0;
   }, [state.phase, state.winnerIds]);
 
+  // ── Achievement hooks (must be above every early return) ─────────────────
+  const { onHandWon, onWinStreak, onChipBalance } = useAchievements();
+  const winStreakRef = useRef(0);
+  const prevLostRef  = useRef(false);
+
   // ── Setup screen (early return — hooks are all above this) ────────────────
   if (!gameStarted) {
     return (
@@ -474,10 +479,6 @@ export default function PracticeScreen() {
   const isGameOver = state.phase === 'idle' && state.message.includes('Not enough');
 
   const showRunItOut = isAllIn && !isHandOver && state.phase !== 'idle';
-
-  const { onHandWon, onWinStreak, onChipBalance } = useAchievements();
-  const winStreakRef = useRef(0);
-  const prevLostRef  = useRef(false);
 
   const onHandOver = async () => {
     const didWin = state.winnerIds.includes('human');
