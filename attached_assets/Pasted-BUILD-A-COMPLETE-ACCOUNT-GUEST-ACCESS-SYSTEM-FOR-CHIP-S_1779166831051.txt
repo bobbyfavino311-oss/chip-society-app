@@ -1,0 +1,562 @@
+BUILD A COMPLETE ACCOUNT + GUEST ACCESS SYSTEM FOR CHIP SOCIETY.
+
+The app MUST support BOTH:
+- full registered player accounts
+- instant guest access
+
+The system should feel:
+- premium
+- modern
+- secure
+- frictionless
+- App Store quality
+- visually consistent with the neon 80s Miami aesthetic
+
+The onboarding and login experience should feel:
+like a luxury modern multiplayer gaming platform.
+
+--------------------------------------------------
+CORE ACCOUNT SYSTEM REQUIREMENTS
+--------------------------------------------------
+
+Users should have TWO options:
+
+1. Create Full Account
+2. Continue as Guest
+
+Full accounts unlock the complete CHIP SOCIETY experience.
+
+Guest mode allows users to instantly experience gameplay before committing to signup.
+
+--------------------------------------------------
+AUTHENTICATION METHODS
+--------------------------------------------------
+
+Support the following login methods:
+
+1. Email + Password
+2. Sign in with Apple
+3. Google Login
+4. Username login support
+5. Guest Login
+6. Password reset flow
+
+Prioritize:
+- Sign in with Apple for iOS compliance
+- fast onboarding
+- smooth mobile UX
+
+--------------------------------------------------
+NEW LOGIN FLOW
+--------------------------------------------------
+
+The login screen should include:
+
+PRIMARY:
+- Create Account
+
+SECONDARY:
+- Sign In
+
+TERTIARY:
+- Continue as Guest
+
+The “Continue as Guest” button should:
+- feel visually secondary
+- still look polished
+- remain easy to access
+
+Use:
+- subtle neon outline
+- clean typography
+- premium glow effect
+
+--------------------------------------------------
+ACCOUNT CREATION FLOW
+--------------------------------------------------
+
+The signup flow should be:
+- simple
+- premium
+- fast
+- visually polished
+
+STEP ORDER:
+
+1. Welcome screen
+2. Username creation
+3. Email input
+4. Password creation
+5. Avatar selection
+6. Privacy policy acceptance
+7. Account creation animation
+8. Enter main app
+
+--------------------------------------------------
+GUEST ACCOUNT SYSTEM
+--------------------------------------------------
+
+When a user selects:
+“Continue as Guest”
+
+Automatically create:
+- temporary guest profile
+- temporary guest username
+- temporary player ID
+
+Examples:
+- Guest8421
+- NeonGuest77
+- Visitor993
+
+Guest accounts should instantly enter the game experience.
+
+--------------------------------------------------
+GUEST ACCOUNT LIMITATIONS
+--------------------------------------------------
+
+Guest accounts should allow users to:
+- play poker
+- use AI practice
+- play quick match
+- explore gameplay UI
+- experience progression systems
+
+BUT restrict:
+- ranked mode
+- tournaments
+- social feed posting
+- multiplayer matchmaking
+- friend system
+- purchases
+- leaderboard placement
+- saving long-term progression
+
+--------------------------------------------------
+GUEST CHIP BALANCE
+--------------------------------------------------
+
+Guest users start with:
+25,000 virtual chips
+
+Registered full accounts start with:
+50,000 virtual chips
+
+This creates incentive to register.
+
+--------------------------------------------------
+GUEST ACCOUNT WARNING SYSTEM
+--------------------------------------------------
+
+Display subtle prompts encouraging account creation.
+
+Examples:
+- “Create an account to save progress”
+- “Protect your chip balance”
+- “Unlock ranked mode”
+- “Save your stats permanently”
+
+DO NOT:
+- spam popups
+- aggressively interrupt gameplay
+
+The prompts should feel:
+- elegant
+- premium
+- motivational
+
+--------------------------------------------------
+GUEST DATA STORAGE
+--------------------------------------------------
+
+Guest progress should save locally TEMPORARILY.
+
+Store:
+- chip balance
+- XP
+- avatar
+- tutorial progress
+
+If app is deleted:
+guest data may be lost.
+
+--------------------------------------------------
+ACCOUNT UPGRADE FLOW
+--------------------------------------------------
+
+Allow guests to upgrade into full accounts seamlessly.
+
+When upgrading:
+- preserve chip balance
+- preserve XP
+- preserve progression
+- preserve unlocked cosmetics
+
+The upgrade flow should feel:
+- instant
+- smooth
+- rewarding
+
+--------------------------------------------------
+ACCOUNT CONVERSION PROMPTS
+--------------------------------------------------
+
+Trigger upgrade suggestions when:
+- guest reaches low chips
+- guest tries ranked mode
+- guest enters tournaments
+- guest tries social features
+- guest reaches XP milestones
+
+Example:
+“Create your Chip Society account to unlock Ranked and save your progress permanently.”
+
+--------------------------------------------------
+GUEST MODE RESTRICTIONS UI
+--------------------------------------------------
+
+Locked features should show:
+- subtle lock icons
+- “Account Required” labels
+
+Use:
+- elegant UI treatment
+- premium neon lock effects
+
+DO NOT:
+- make the app feel paywalled
+- frustrate new users
+
+--------------------------------------------------
+USERNAME REQUIREMENTS
+--------------------------------------------------
+
+Usernames must:
+- be unique
+- support letters and numbers
+- support underscores
+- prohibit offensive names
+- prohibit impersonation
+
+Display:
+- real-time username availability checking
+- green checkmark for valid names
+- red warning for invalid names
+
+--------------------------------------------------
+PASSWORD REQUIREMENTS
+--------------------------------------------------
+
+Passwords must:
+- require minimum 8 characters
+- support uppercase + lowercase
+- support numbers
+
+Add:
+- password strength indicator
+- secure hidden password input
+- “show password” toggle
+
+--------------------------------------------------
+SIGN IN WITH APPLE
+--------------------------------------------------
+
+Implement native:
+“Sign in with Apple”
+
+Required for App Store approval if other third-party logins exist.
+
+The Apple login button should:
+- follow Apple design guidelines
+- integrate seamlessly into the neon UI
+- remain clean and professional
+
+--------------------------------------------------
+GOOGLE LOGIN
+--------------------------------------------------
+
+Implement:
+“Continue with Google”
+
+Requirements:
+- secure OAuth flow
+- persistent login sessions
+- backend token validation
+
+--------------------------------------------------
+AUTO LOGIN SYSTEM
+--------------------------------------------------
+
+After successful login:
+- persist user sessions securely
+- automatically log users back in
+- support secure token refresh
+
+Users should NOT need to login repeatedly.
+
+--------------------------------------------------
+ACCOUNT DATABASE STRUCTURE
+--------------------------------------------------
+
+Each FULL account should store:
+
+- User ID
+- Username
+- Email
+- Avatar
+- XP level
+- Rank
+- Chip balance
+- Achievement progress
+- Match history
+- Social data
+- Friends/followers
+- Tournament stats
+- Login streaks
+- Privacy acceptance timestamp
+- Account creation date
+
+--------------------------------------------------
+ACCOUNT SECURITY
+--------------------------------------------------
+
+Implement:
+- encrypted passwords
+- secure authentication tokens
+- backend validation
+- anti-spam protection
+- anti-bot signup protection
+- rate limiting
+
+Prevent:
+- duplicate accounts
+- fake chip exploits
+- account spoofing
+
+--------------------------------------------------
+PASSWORD RESET FLOW
+--------------------------------------------------
+
+Add:
+“Forgot Password?”
+
+Flow:
+1. Enter email
+2. Send secure reset email
+3. Reset password link
+4. Confirm new password
+5. Return to login
+
+--------------------------------------------------
+EMAIL VERIFICATION SYSTEM
+--------------------------------------------------
+
+After signup:
+send email verification.
+
+Unverified users should:
+- have limited social functionality
+- receive reminder prompts
+
+--------------------------------------------------
+ACCOUNT PROFILE SYSTEM
+--------------------------------------------------
+
+Each player account should include:
+- avatar
+- username
+- chip balance
+- XP level
+- player rank
+- win percentage
+- biggest pot won
+- achievements
+- badges
+- followers
+- tournament stats
+
+--------------------------------------------------
+PLAYER AVATAR SYSTEM
+--------------------------------------------------
+
+Allow players to:
+- choose starter avatars
+- unlock premium avatars later
+- customize profile appearance
+
+Maintain:
+- neon synthwave aesthetic
+- clean modern art style
+
+--------------------------------------------------
+LOGIN SCREEN DESIGN
+--------------------------------------------------
+
+The login screen should feel:
+- luxurious
+- modern
+- cinematic
+- premium
+
+Use:
+- dark navy background
+- neon cyan/purple lighting
+- subtle animated glow
+- smooth transitions
+
+DO NOT:
+- overcrowd the screen
+- use giant forms
+- create visual clutter
+
+--------------------------------------------------
+ACCOUNT CREATION ANIMATIONS
+--------------------------------------------------
+
+When an account is successfully created:
+- show smooth neon success animation
+- display “Welcome to Chip Society”
+- animate starting chip balance
+- transition smoothly into app
+
+--------------------------------------------------
+ACCOUNT RESTRICTIONS
+--------------------------------------------------
+
+Prevent:
+- offensive usernames
+- duplicate usernames
+- fake emails
+- exploit accounts
+- chip farming
+
+Add:
+- profanity filter
+- spam detection
+- duplicate device checks
+
+--------------------------------------------------
+SOCIAL ACCOUNT FEATURES
+--------------------------------------------------
+
+Accounts should support:
+- friends
+- followers
+- player search
+- social feed activity
+- profile viewing
+- stat comparison
+
+--------------------------------------------------
+ONLINE STATUS SYSTEM
+--------------------------------------------------
+
+Display:
+- online
+- in game
+- offline
+- at table
+
+Optional future support:
+- spectating
+- join friend table
+
+--------------------------------------------------
+BACKEND REQUIREMENTS
+--------------------------------------------------
+
+Use secure backend authentication.
+
+Recommended:
+- Firebase Auth
+OR
+- Supabase Auth
+
+Store all user data securely server-side.
+
+The client should NEVER:
+- control balances
+- validate purchases locally
+- manage rewards independently
+
+--------------------------------------------------
+APPLE COMPLIANCE REQUIREMENTS
+--------------------------------------------------
+
+The account system MUST comply with:
+- Apple Sign-In requirements
+- App Store privacy rules
+- secure credential handling
+- data deletion requests
+
+--------------------------------------------------
+ACCOUNT DELETION SYSTEM
+--------------------------------------------------
+
+Add:
+“Delete Account”
+
+Requirements:
+- confirmation warning
+- permanent deletion
+- backend wipe request
+- remove social data
+- remove progression data
+
+--------------------------------------------------
+ERROR HANDLING
+--------------------------------------------------
+
+Provide polished error messages for:
+- invalid passwords
+- duplicate usernames
+- network failures
+- invalid emails
+- login failures
+
+Messages should feel:
+- clean
+- modern
+- user-friendly
+
+--------------------------------------------------
+WELCOME FLOW UPDATE
+--------------------------------------------------
+
+The onboarding screen should now include:
+
+PRIMARY:
+“ENTER CHIP SOCIETY”
+
+SECONDARY:
+“Continue as Guest”
+
+TERTIARY:
+“Already have an account? Sign In”
+
+Layout must:
+- fit all iPhone screens
+- remain scroll-safe
+- avoid clipping
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The CHIP SOCIETY account system should feel like:
+- a premium multiplayer gaming platform
+- a modern social casino app
+- a polished App Store-ready experience
+
+The login flow should feel:
+- smooth
+- addictive
+- trustworthy
+- premium
+- seamless
+
+NOT:
+- clunky
+- outdated
+- prototype quality
+- generic mobile UI.

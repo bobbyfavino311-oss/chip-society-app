@@ -1,0 +1,214 @@
+CREATE A FULL-SCREEN “TERMS & PRIVACY AGREEMENT” FLOW FOR THE APP “CHIP SOCIETY”.
+
+This agreement screen MUST appear:
+- Immediately after account creation
+- Before entering the main app for the first time
+- Before multiplayer access is granted
+- Before social feed access is granted
+
+Users MUST:
+- Scroll through the agreement
+- Check an “I Agree” checkbox
+- Press a neon-themed “Accept & Continue” button
+- Have agreement acceptance stored permanently in backend database with timestamp
+
+STYLE REQUIREMENTS:
+- Theme must match Chip Society’s neon 80s Miami aesthetic
+- Dark navy / black background
+- Neon cyan and hot pink accents
+- Smooth glowing borders
+- Modern futuristic typography
+- Mobile optimized for iPhone screens
+- Scrollable content container with smooth scrolling
+- Sticky accept button at bottom
+- Prevent app access until accepted
+
+ADD:
+- “Decline” button that logs user out
+- Acceptance timestamp storage
+- Version number for policy updates
+- If policy updates in future, force users to re-accept
+
+DISPLAY THIS PRIVACY POLICY TEXT INSIDE THE AGREEMENT SCREEN:
+
+--------------------------------------------------
+CHIP SOCIETY PRIVACY POLICY
+Effective Date: [AUTO INSERT DATE]
+--------------------------------------------------
+
+Welcome to Chip Society (“the App”, “we”, “our”, or “us”).
+
+This Privacy Policy explains how we collect, use, store, and protect your information when you use the app.
+
+By using Chip Society, you agree to this Privacy Policy.
+
+--------------------------------------------------
+1. INFORMATION WE COLLECT
+--------------------------------------------------
+
+We may collect:
+
+• Username
+• Profile avatar
+• Player ID
+• Virtual chip balances
+• Match history
+• Gameplay statistics
+• Tournament history
+• XP progression
+• Device information
+• IP address
+• Crash analytics
+• App performance data
+
+--------------------------------------------------
+2. HOW WE USE INFORMATION
+--------------------------------------------------
+
+We use collected data to:
+
+• Operate gameplay systems
+• Save player progress
+• Store chip balances
+• Enable multiplayer matchmaking
+• Power tournaments and ranked modes
+• Improve app stability
+• Prevent cheating and exploits
+• Provide customer support
+• Deliver rewards and progression systems
+
+--------------------------------------------------
+3. VIRTUAL CURRENCY DISCLAIMER
+--------------------------------------------------
+
+All chips, rewards, bonuses, and items inside Chip Society are VIRTUAL ONLY.
+
+Virtual chips:
+• Have NO real-world monetary value
+• Cannot be redeemed for cash
+• Cannot be exchanged outside the app
+• Exist solely for entertainment purposes
+
+Chip Society does NOT support:
+• Real-money gambling
+• Cash prizes
+• Redeemable winnings
+
+--------------------------------------------------
+4. SOCIAL FEATURES
+--------------------------------------------------
+
+Chip Society includes:
+• Player profiles
+• Social feed
+• Comments
+• Reactions
+• User-generated content
+
+Public content may be visible to other players.
+
+Users are responsible for content they post.
+
+--------------------------------------------------
+5. DATA SHARING
+--------------------------------------------------
+
+We do NOT sell personal information.
+
+We may use trusted third-party services including:
+• Cloud hosting
+• Authentication providers
+• Analytics systems
+• Apple App Store services
+
+These providers only receive data necessary to operate the app.
+
+--------------------------------------------------
+6. DATA SECURITY
+--------------------------------------------------
+
+We use reasonable security measures to protect user information.
+
+However, no online system is completely secure.
+
+--------------------------------------------------
+7. CHILDREN’S PRIVACY
+--------------------------------------------------
+
+Chip Society is not intended for users under 13 years old.
+
+We do not knowingly collect personal information from children under 13.
+
+--------------------------------------------------
+8. ACCOUNT TERMINATION
+--------------------------------------------------
+
+We reserve the right to:
+• Suspend accounts
+• Reset balances
+• Restrict access
+• Ban users
+
+for:
+• Cheating
+• Exploits
+• Fraud
+• Harassment
+• Abuse of the platform
+
+--------------------------------------------------
+9. PUSH NOTIFICATIONS
+--------------------------------------------------
+
+The app may send notifications regarding:
+• Daily rewards
+• Tournaments
+• Social activity
+• Promotions
+• Updates
+
+Notifications may be disabled in iPhone settings.
+
+--------------------------------------------------
+10. USER RIGHTS
+--------------------------------------------------
+
+Users may request:
+• Account deletion
+• Data removal
+• Support assistance
+
+Contact:
+[INSERT SUPPORT EMAIL]
+
+--------------------------------------------------
+11. POLICY UPDATES
+--------------------------------------------------
+
+This Privacy Policy may be updated periodically.
+
+Users may be required to re-accept future updates.
+
+--------------------------------------------------
+12. ENTERTAINMENT DISCLAIMER
+--------------------------------------------------
+
+Chip Society is a social casino entertainment app only.
+
+No real-money gambling exists inside the app.
+
+--------------------------------------------------
+END OF POLICY
+--------------------------------------------------
+
+FUNCTIONAL REQUIREMENTS:
+- Save acceptance status in database
+- Save policy version number
+- Save timestamp of acceptance
+- Prevent bypassing agreement screen
+- If user declines, return to login screen
+- Add smooth neon fade animations
+- Add loading state on acceptance button
+- Add checkbox validation before continue button activates
+- Optimize layout for all iPhone screen sizes
+- Ensure scrolling works correctly on small screens
