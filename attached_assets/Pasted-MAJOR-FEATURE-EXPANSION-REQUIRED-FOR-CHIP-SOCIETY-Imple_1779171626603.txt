@@ -1,0 +1,406 @@
+MAJOR FEATURE EXPANSION REQUIRED FOR CHIP SOCIETY
+
+Implement a complete overhaul of:
+1. Audio / sound design
+2. Sign out + landing page flow
+3. Achievement + rewards progression system
+
+The goal is to make CHIP SOCIETY feel:
+- addictive
+- rewarding
+- premium
+- nostalgic
+- socially engaging
+- App Store quality
+
+The experience should now feel like:
+a luxury neon 80s poker universe.
+
+--------------------------------------------------
+80s SYNTHWAVE AUDIO OVERHAUL
+--------------------------------------------------
+
+The current sound design feels:
+- generic
+- lifeless
+- modern stock-audio
+- not immersive
+
+Completely redesign the audio experience around:
+RETRO 1980s SYNTHWAVE / MIAMI VICE ENERGY.
+
+--------------------------------------------------
+AUDIO STYLE REQUIREMENTS
+--------------------------------------------------
+
+All sounds should feel inspired by:
+- 1980s arcades
+- neon nightlife
+- Miami Vice
+- retro casinos
+- synthwave music
+- vintage electronic sounds
+
+The audio should feel:
+- smooth
+- futuristic
+- nostalgic
+- luxurious
+- satisfying
+
+NOT:
+- cartoonish
+- cheesy
+- cheap casino sounds
+
+--------------------------------------------------
+NEW SOUND EFFECTS
+--------------------------------------------------
+
+Replace ALL gameplay audio with custom retro-inspired sounds.
+
+Implement new sounds for:
+- card dealing
+- chip betting
+- chip stacking
+- winning pots
+- folding
+- checking
+- raising
+- all-ins
+- notifications
+- achievement unlocks
+- level-ups
+- reward collection
+- menu navigation
+- button presses
+- wheel spins
+- scratch tickets
+
+--------------------------------------------------
+AUDIO ATMOSPHERE
+--------------------------------------------------
+
+Add subtle ambient audio:
+- low synth hums
+- soft nightclub atmosphere
+- distant casino ambience
+- neon electrical textures
+
+Keep ambience:
+- subtle
+- immersive
+- non-distracting
+
+--------------------------------------------------
+BIG WIN AUDIO MOMENTS
+--------------------------------------------------
+
+Large pots and rare achievements should trigger:
+- deeper synth hits
+- retro electronic stingers
+- premium reward sounds
+
+Winning should feel:
+- exciting
+- stylish
+- rewarding
+
+--------------------------------------------------
+AUDIO SETTINGS MENU
+--------------------------------------------------
+
+Add a complete audio settings section.
+
+Include:
+- master volume
+- music volume
+- effects volume
+- mute toggle
+- vibration toggle
+
+Settings must:
+- save persistently
+- sync correctly
+- update instantly
+
+--------------------------------------------------
+SIGN OUT SYSTEM
+--------------------------------------------------
+
+The app currently has NO proper sign-out system.
+
+Implement:
+- sign out button
+- session ending flow
+- account switching support
+
+--------------------------------------------------
+SIGN OUT BUTTON PLACEMENT
+--------------------------------------------------
+
+Place “Sign Out” inside:
+PLAYER PROFILE SETTINGS
+
+Use:
+- elegant button styling
+- subtle red neon accent
+- confirmation modal
+
+--------------------------------------------------
+SIGN OUT CONFIRMATION
+--------------------------------------------------
+
+Before signing out:
+show confirmation popup:
+
+“Are you sure you want to sign out?”
+
+Buttons:
+- Cancel
+- Sign Out
+
+Prevent accidental logout.
+
+--------------------------------------------------
+MAIN LANDING PAGE SYSTEM
+--------------------------------------------------
+
+When users sign out:
+they should return to a dedicated MAIN LANDING PAGE.
+
+--------------------------------------------------
+LANDING PAGE REQUIREMENTS
+--------------------------------------------------
+
+The landing page should feel:
+- cinematic
+- premium
+- welcoming
+- polished
+
+Include:
+- CHIP SOCIETY logo
+- animated neon background
+- soft synthwave atmosphere
+- smooth transitions
+
+--------------------------------------------------
+LANDING PAGE BUTTONS
+--------------------------------------------------
+
+Landing page should contain:
+
+PRIMARY:
+- Enter Chip Society
+
+SECONDARY:
+- Continue as Guest
+
+TERTIARY:
+- Sign In
+
+The page should:
+- scale correctly on all iPhones
+- respect safe areas
+- avoid clipping
+
+--------------------------------------------------
+ACHIEVEMENT SYSTEM OVERHAUL
+--------------------------------------------------
+
+Implement a FULL poker achievement progression system.
+
+Players should unlock achievements for:
+- poker hands
+- milestones
+- gameplay accomplishments
+- social progression
+- bankroll growth
+
+Achievements should:
+- reward chips
+- reward XP
+- create long-term goals
+- increase retention
+
+--------------------------------------------------
+POKER HAND ACHIEVEMENTS
+--------------------------------------------------
+
+Create achievements for:
+
+- Pair
+- Two Pair
+- Three of a Kind
+- Straight
+- Flush
+- Full House
+- Four of a Kind
+- Straight Flush
+- Royal Flush
+
+--------------------------------------------------
+SPECIAL ACHIEVEMENTS
+--------------------------------------------------
+
+Add achievements for:
+- winning all-ins
+- bluff wins
+- win streaks
+- tournament victories
+- comeback wins
+- massive pots
+- daily streaks
+- ranked promotions
+
+--------------------------------------------------
+ACHIEVEMENT REWARDS
+--------------------------------------------------
+
+Achievements should award:
+- chips
+- XP
+- profile badges
+- cosmetic unlocks
+- table effects
+
+Example:
+Royal Flush:
+- 100K chips
+- rare badge
+- neon celebration animation
+
+--------------------------------------------------
+ACHIEVEMENT RARITY SYSTEM
+--------------------------------------------------
+
+Create rarity tiers:
+
+COMMON
+RARE
+EPIC
+LEGENDARY
+
+Higher rarity achievements should:
+- glow differently
+- have premium animations
+- feel exciting to unlock
+
+--------------------------------------------------
+ACHIEVEMENT COLLECTION PAGE
+--------------------------------------------------
+
+Create a dedicated:
+“Achievements” page under PLAYER PROFILE.
+
+The page should display:
+- unlocked achievements
+- locked achievements
+- completion progress
+- rarity
+- reward values
+
+--------------------------------------------------
+ACHIEVEMENT UI DESIGN
+--------------------------------------------------
+
+The achievement screen should feel:
+- premium
+- luxurious
+- futuristic
+
+Use:
+- neon borders
+- glowing icons
+- holographic card styling
+- smooth animations
+
+NOT:
+- cluttered
+- generic mobile UI
+- cheap casino visuals
+
+--------------------------------------------------
+ACHIEVEMENT UNLOCK FLOW
+--------------------------------------------------
+
+When an achievement unlocks:
+show premium animated popup.
+
+Include:
+- achievement icon
+- rarity color
+- reward amount
+- XP gained
+- smooth synthwave sound effect
+
+The unlock should feel:
+- satisfying
+- rewarding
+- collectible
+
+--------------------------------------------------
+PLAYER PROGRESSION SYSTEM
+--------------------------------------------------
+
+Achievements should contribute to:
+- player level
+- XP progression
+- social prestige
+- profile status
+
+Profiles should showcase:
+- rare achievements
+- legendary poker moments
+- completion percentage
+
+--------------------------------------------------
+SERVER VALIDATION
+--------------------------------------------------
+
+ALL achievements and rewards must validate:
+SERVER SIDE ONLY.
+
+Prevent:
+- fake unlocks
+- reward exploits
+- duplicated rewards
+- client-side manipulation
+
+--------------------------------------------------
+NOTIFICATION SYSTEM
+--------------------------------------------------
+
+Add subtle notifications for:
+- achievement progress
+- unlocked rewards
+- new milestones
+- rare hand alerts
+
+Notifications should feel:
+- elegant
+- smooth
+- premium
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The final CHIP SOCIETY experience should now feel like:
+- a premium social poker platform
+- a nostalgic synthwave casino universe
+- a highly polished App Store experience
+
+The app should feel:
+- addictive
+- immersive
+- rewarding
+- luxurious
+- socially engaging
+- production ready
+
+NOT:
+- generic poker software
+- placeholder audio
+- unfinished progression systems.

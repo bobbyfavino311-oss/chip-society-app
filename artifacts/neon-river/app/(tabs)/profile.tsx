@@ -1,9 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
   Image,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -19,6 +21,8 @@ import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
 import { CASINO_AVATARS, getAvatar } from '@/components/CasinoAvatars';
 import { useSoundSettings } from '@/context/SoundContext';
+import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
+import { ALL_ACHIEVEMENTS } from '@/lib/achievements';
 
 const RANK_COLORS: Record<string, string> = {
   'Neon Bronze': '#cd7f32',
@@ -208,10 +212,14 @@ function SoundSettingsCard() {
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
-  const { profile, updateProfile, winRate } = useUser();
+  const { profile, updateProfile, winRate, signOut } = useUser();
+  const { unlockedIds } = useAchievements();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.username);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
+
+  const completion = achievementCompletion(unlockedIds);
 
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const rankIdx = RANK_ORDER.indexOf(profile.rank);
@@ -386,6 +394,27 @@ export default function ProfileScreen() {
 
         <SoundSettingsCard />
 
+        {/* Achievements link */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={() => router.push('/achievements')}
+        >
+          <LinearGradient
+            colors={['rgba(191,95,255,0.12)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={achStyles.iconWrap}>
+            <Text style={achStyles.icon}>🏆</Text>
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>ACHIEVEMENTS</Text>
+            <Text style={achStyles.achSub}>{unlockedIds.size} / {ALL_ACHIEVEMENTS.length} unlocked · {completion}% complete</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.7)" />
+        </TouchableOpacity>
+
         <Text style={styles.sectionTitle}>STREAK</Text>
         <View style={styles.card}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -396,10 +425,176 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+
+        {/* Sign out */}
+        <TouchableOpacity
+          style={achStyles.signOutBtn}
+          activeOpacity={0.8}
+          onPress={() => setShowSignOutModal(true)}
+        >
+          <Ionicons name="log-out-outline" size={18} color="#ff4466" />
+          <Text style={achStyles.signOutText}>SIGN OUT</Text>
+        </TouchableOpacity>
       </ScrollView>
+
+      {/* Sign-out confirmation modal */}
+      <Modal
+        visible={showSignOutModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSignOutModal(false)}
+      >
+        <View style={achStyles.overlay}>
+          <View style={achStyles.modalCard}>
+            <Text style={achStyles.modalTitle}>SIGN OUT?</Text>
+            <Text style={achStyles.modalBody}>Your progress is saved. You can sign back in at any time.</Text>
+            <View style={achStyles.modalBtns}>
+              <TouchableOpacity
+                style={achStyles.cancelBtn}
+                onPress={() => setShowSignOutModal(false)}
+              >
+                <Text style={achStyles.cancelText}>CANCEL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={achStyles.confirmBtn}
+                onPress={async () => {
+                  setShowSignOutModal(false);
+                  await signOut();
+                }}
+              >
+                <Text style={achStyles.confirmText}>SIGN OUT</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+
+const achStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(191,95,255,0.25)',
+    backgroundColor: 'rgba(191,95,255,0.05)',
+    padding: 16,
+    overflow: 'hidden',
+  },
+  iconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(191,95,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(191,95,255,0.3)',
+  },
+  icon: { fontSize: 22 },
+  achInfo: { flex: 1 },
+  achLabel: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 11,
+    color: '#bf5fff',
+    letterSpacing: 2,
+  },
+  achSub: {
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.45)',
+    letterSpacing: 0.5,
+    marginTop: 2,
+  },
+  signOutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,68,102,0.3)',
+    backgroundColor: 'rgba(255,68,102,0.06)',
+    paddingVertical: 14,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  signOutText: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 12,
+    color: '#ff4466',
+    letterSpacing: 2,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    backgroundColor: '#09001e',
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,68,102,0.3)',
+    padding: 28,
+    width: '100%',
+    maxWidth: 340,
+    gap: 14,
+  },
+  modalTitle: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 18,
+    color: '#ff4466',
+    letterSpacing: 3,
+    textAlign: 'center',
+  },
+  modalBody: {
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.6)',
+    textAlign: 'center',
+    lineHeight: 18,
+    letterSpacing: 0.5,
+  },
+  modalBtns: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 6,
+  },
+  cancelBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+  },
+  cancelText: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.6)',
+    letterSpacing: 1.5,
+  },
+  confirmBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,68,102,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,68,102,0.5)',
+    alignItems: 'center',
+  },
+  confirmText: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 11,
+    color: '#ff4466',
+    letterSpacing: 1.5,
+  },
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },

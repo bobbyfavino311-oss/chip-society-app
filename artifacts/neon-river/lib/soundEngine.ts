@@ -35,19 +35,21 @@ async function ensureAudio() {
 // ── Static asset map (Metro requires static require calls) ───────────────────
 
 const ASSETS = {
-  deal:         require('../assets/sounds/deal.wav'),
-  chip_click:   require('../assets/sounds/chip_click.wav'),
-  chip_collect: require('../assets/sounds/chip_collect.wav'),
-  fold:         require('../assets/sounds/fold.wav'),
-  check:        require('../assets/sounds/check.wav'),
-  call:         require('../assets/sounds/call.wav'),
-  raise:        require('../assets/sounds/raise.wav'),
-  allin:        require('../assets/sounds/allin.wav'),
-  win:          require('../assets/sounds/win.wav'),
-  lose:         require('../assets/sounds/lose.wav'),
-  button:       require('../assets/sounds/button.wav'),
-  notification: require('../assets/sounds/notification.wav'),
-  card_flip:    require('../assets/sounds/card_flip.wav'),
+  deal:               require('../assets/sounds/deal.wav'),
+  chip_click:         require('../assets/sounds/chip_click.wav'),
+  chip_collect:       require('../assets/sounds/chip_collect.wav'),
+  fold:               require('../assets/sounds/fold.wav'),
+  check:              require('../assets/sounds/check.wav'),
+  call:               require('../assets/sounds/call.wav'),
+  raise:              require('../assets/sounds/raise.wav'),
+  allin:              require('../assets/sounds/allin.wav'),
+  win:                require('../assets/sounds/win.wav'),
+  lose:               require('../assets/sounds/lose.wav'),
+  button:             require('../assets/sounds/button.wav'),
+  notification:       require('../assets/sounds/notification.wav'),
+  card_flip:          require('../assets/sounds/card_flip.wav'),
+  achievement_unlock: require('../assets/sounds/achievement_unlock.wav'),
+  level_up:           require('../assets/sounds/level_up.wav'),
 } as const;
 
 type SoundName = keyof typeof ASSETS;
@@ -286,6 +288,26 @@ export const SoundEngine = {
     if (Platform.OS !== 'web') { playNative('notification'); return; }
     tone(880, 'sine', 0.08, 0.18);
     tone(1100, 'sine', 0.07, 0.14, 0.09);
+  },
+
+  achievementUnlock() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    if (_muted) return;
+    if (Platform.OS !== 'web') { playNative('achievement_unlock'); return; }
+    [523, 659, 784, 1047].forEach((f, i) => {
+      tone(f, 'sawtooth', 0.22, 0.18 + i * 0.01, i * 0.08);
+    });
+    noise(0.10, 0.06, 1500, 6000, 0.3);
+  },
+
+  levelUp() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    if (_muted) return;
+    if (Platform.OS !== 'web') { playNative('level_up'); return; }
+    [261, 329, 392, 523, 659, 784].forEach((f, i) => {
+      tone(f, 'sawtooth', 0.30, 0.20, i * 0.085);
+    });
+    noise(0.15, 0.08, 2000, 8000, 0.50);
   },
 
   neonBuzz() {

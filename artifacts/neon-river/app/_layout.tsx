@@ -20,6 +20,8 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { UserProvider, useUser } from '@/context/UserContext';
 import { TermsProvider, useTerms } from '@/context/TermsContext';
 import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
+import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
+import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import { SoundEngine } from '@/lib/soundEngine';
 
 SplashScreen.preventAutoHideAsync();
@@ -61,6 +63,14 @@ function GateController() {
   return null;
 }
 
+// ─── Global achievement popup ─────────────────────────────────────────────────
+
+function AchievementPopupRenderer() {
+  const { pendingUnlock, dismissPending } = useAchievements();
+  if (!pendingUnlock) return null;
+  return <AchievementUnlockPopup achievement={pendingUnlock} onDismiss={dismissPending} />;
+}
+
 // ─── Navigation stack ─────────────────────────────────────────────────────────
 
 function RootLayoutNav() {
@@ -68,6 +78,7 @@ function RootLayoutNav() {
     <>
       <SoundSyncer />
       <GateController />
+      <AchievementPopupRenderer />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="entry"         options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="auth/signup"   options={{ headerShown: false, animation: 'slide_from_right' }} />
@@ -79,6 +90,7 @@ function RootLayoutNav() {
           name="game"
           options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
         />
+        <Stack.Screen name="achievements"  options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="rewards/wheel"    options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
         <Stack.Screen name="rewards/scratch"  options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
         <Stack.Screen name="rewards/streak"   options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
@@ -117,11 +129,13 @@ export default function RootLayout() {
             <UserProvider>
               <TermsProvider>
                 <SoundProvider>
-                  <GestureHandlerRootView style={{ flex: 1 }}>
-                    <KeyboardProvider>
-                      <RootLayoutNav />
-                    </KeyboardProvider>
-                  </GestureHandlerRootView>
+                  <AchievementProvider>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                      <KeyboardProvider>
+                        <RootLayoutNav />
+                      </KeyboardProvider>
+                    </GestureHandlerRootView>
+                  </AchievementProvider>
                 </SoundProvider>
               </TermsProvider>
             </UserProvider>

@@ -21,6 +21,7 @@ import PlayerSeat from '@/components/PlayerSeat';
 import DotTimer from '@/components/DotTimer';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { useAchievements } from '@/context/AchievementContext';
 import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame, TableConfig } from '@/hooks/usePokerGame';
 import { SoundEngine } from '@/lib/soundEngine';
@@ -474,10 +475,33 @@ export default function PracticeScreen() {
 
   const showRunItOut = isAllIn && !isHandOver && state.phase !== 'idle';
 
+  const { onHandWon, onWinStreak, onChipBalance } = useAchievements();
+  const winStreakRef = useRef(0);
+  const prevLostRef  = useRef(false);
+
   const onHandOver = async () => {
     const didWin = state.winnerIds.includes('human');
-    if (didWin) await recordWin(0);
-    else await recordLoss();
+    if (didWin) {
+      await recordWin(0);
+      winStreakRef.current += 1;
+      onWinStreak(winStreakRef.current);
+
+      // Determine winning hand description (only meaningful if human won)
+      const human = state.players.find(p => p.isHuman);
+      let handDesc = state.winnerHand ?? '';
+      if (!handDesc && human && human.holeCards.length === 2) {
+        const best = getBestHand(human.holeCards, state.communityCards);
+        handDesc = describeHand(best);
+      }
+      const wasAllIn = human?.status === 'allIn' || isAllIn;
+      onHandWon(handDesc, wasAllIn, state.pot, prevLostRef.current);
+      onChipBalance((humanPlayer?.chips ?? 0) + state.winnerPot);
+      prevLostRef.current = false;
+    } else {
+      await recordLoss();
+      winStreakRef.current = 0;
+      prevLostRef.current = true;
+    }
     setHandCount(h => h + 1);
     continueAfterHand();
     SoundEngine.deal();

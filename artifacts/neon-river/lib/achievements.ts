@@ -1,0 +1,313 @@
+export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary';
+export type AchievementCategory = 'hands' | 'milestone' | 'streak' | 'bankroll';
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  rarity: AchievementRarity;
+  icon: string;
+  chipReward: number;
+  xpReward: number;
+  category: AchievementCategory;
+}
+
+export const RARITY_COLORS: Record<AchievementRarity, string> = {
+  common:    '#00d4ff',
+  rare:      '#bf5fff',
+  epic:      '#ff0090',
+  legendary: '#ffd700',
+};
+
+export const RARITY_LABELS: Record<AchievementRarity, string> = {
+  common:    'COMMON',
+  rare:      'RARE',
+  epic:      'EPIC',
+  legendary: 'LEGENDARY',
+};
+
+export const ALL_ACHIEVEMENTS: Achievement[] = [
+  // ── Poker hands ────────────────────────────────────────────────────────────
+  {
+    id: 'hand_pair',
+    name: 'Pocket Rockets',
+    description: 'Win a hand with One Pair.',
+    rarity: 'common',
+    icon: '🃏',
+    chipReward: 500,
+    xpReward: 50,
+    category: 'hands',
+  },
+  {
+    id: 'hand_two_pair',
+    name: 'Double Down',
+    description: 'Win a hand with Two Pair.',
+    rarity: 'common',
+    icon: '✌️',
+    chipReward: 1_000,
+    xpReward: 100,
+    category: 'hands',
+  },
+  {
+    id: 'hand_three_kind',
+    name: 'Set the Table',
+    description: 'Win a hand with Three of a Kind.',
+    rarity: 'common',
+    icon: '🎰',
+    chipReward: 2_000,
+    xpReward: 200,
+    category: 'hands',
+  },
+  {
+    id: 'hand_straight',
+    name: 'Straight Shooter',
+    description: 'Win a hand with a Straight.',
+    rarity: 'rare',
+    icon: '➡️',
+    chipReward: 5_000,
+    xpReward: 500,
+    category: 'hands',
+  },
+  {
+    id: 'hand_flush',
+    name: 'Suited Up',
+    description: 'Win a hand with a Flush.',
+    rarity: 'rare',
+    icon: '♠️',
+    chipReward: 5_000,
+    xpReward: 500,
+    category: 'hands',
+  },
+  {
+    id: 'hand_full_house',
+    name: 'Full House',
+    description: 'Win a hand with a Full House.',
+    rarity: 'rare',
+    icon: '🏠',
+    chipReward: 10_000,
+    xpReward: 1_000,
+    category: 'hands',
+  },
+  {
+    id: 'hand_four_kind',
+    name: 'Quad Squad',
+    description: 'Win a hand with Four of a Kind.',
+    rarity: 'epic',
+    icon: '💎',
+    chipReward: 25_000,
+    xpReward: 2_500,
+    category: 'hands',
+  },
+  {
+    id: 'hand_straight_flush',
+    name: 'Straight to Glory',
+    description: 'Win a hand with a Straight Flush.',
+    rarity: 'epic',
+    icon: '⚡',
+    chipReward: 50_000,
+    xpReward: 5_000,
+    category: 'hands',
+  },
+  {
+    id: 'hand_royal_flush',
+    name: 'Neon Royalty',
+    description: 'Win a hand with a Royal Flush.',
+    rarity: 'legendary',
+    icon: '👑',
+    chipReward: 100_000,
+    xpReward: 10_000,
+    category: 'hands',
+  },
+
+  // ── Milestones ─────────────────────────────────────────────────────────────
+  {
+    id: 'first_win',
+    name: 'First Blood',
+    description: 'Win your very first hand.',
+    rarity: 'common',
+    icon: '🏆',
+    chipReward: 1_000,
+    xpReward: 100,
+    category: 'milestone',
+  },
+  {
+    id: 'wins_10',
+    name: 'On a Roll',
+    description: 'Win 10 hands total.',
+    rarity: 'common',
+    icon: '🎯',
+    chipReward: 5_000,
+    xpReward: 500,
+    category: 'milestone',
+  },
+  {
+    id: 'wins_50',
+    name: 'Neon Hustler',
+    description: 'Win 50 hands total.',
+    rarity: 'rare',
+    icon: '🔥',
+    chipReward: 20_000,
+    xpReward: 2_000,
+    category: 'milestone',
+  },
+  {
+    id: 'wins_100',
+    name: 'Syndicate Pro',
+    description: 'Win 100 hands total.',
+    rarity: 'epic',
+    icon: '🌟',
+    chipReward: 75_000,
+    xpReward: 7_500,
+    category: 'milestone',
+  },
+  {
+    id: 'allin_win',
+    name: 'All or Nothing',
+    description: 'Win a hand while all-in.',
+    rarity: 'rare',
+    icon: '💥',
+    chipReward: 10_000,
+    xpReward: 1_000,
+    category: 'milestone',
+  },
+  {
+    id: 'comeback',
+    name: 'Comeback Kid',
+    description: 'Win a hand with a negative chip delta in the previous hand.',
+    rarity: 'rare',
+    icon: '⬆️',
+    chipReward: 10_000,
+    xpReward: 1_000,
+    category: 'milestone',
+  },
+  {
+    id: 'big_pot',
+    name: 'Neon Pot',
+    description: 'Win a pot of 50,000 chips or more.',
+    rarity: 'epic',
+    icon: '💰',
+    chipReward: 20_000,
+    xpReward: 2_000,
+    category: 'milestone',
+  },
+
+  // ── Win streaks ────────────────────────────────────────────────────────────
+  {
+    id: 'streak_3',
+    name: 'Hot Hand',
+    description: 'Win 3 hands in a row.',
+    rarity: 'common',
+    icon: '🌡️',
+    chipReward: 2_000,
+    xpReward: 200,
+    category: 'streak',
+  },
+  {
+    id: 'streak_5',
+    name: 'Neon Streak',
+    description: 'Win 5 hands in a row.',
+    rarity: 'rare',
+    icon: '⚡',
+    chipReward: 10_000,
+    xpReward: 1_000,
+    category: 'streak',
+  },
+  {
+    id: 'streak_10',
+    name: 'Unstoppable',
+    description: 'Win 10 hands in a row.',
+    rarity: 'legendary',
+    icon: '🔱',
+    chipReward: 50_000,
+    xpReward: 5_000,
+    category: 'streak',
+  },
+  {
+    id: 'daily_3',
+    name: '3-Day Player',
+    description: 'Log in 3 days in a row.',
+    rarity: 'common',
+    icon: '📅',
+    chipReward: 3_000,
+    xpReward: 300,
+    category: 'streak',
+  },
+  {
+    id: 'daily_7',
+    name: 'Weekly Warrior',
+    description: 'Log in 7 days in a row.',
+    rarity: 'rare',
+    icon: '🗓️',
+    chipReward: 15_000,
+    xpReward: 1_500,
+    category: 'streak',
+  },
+  {
+    id: 'daily_30',
+    name: 'Monthly Master',
+    description: 'Log in 30 days in a row.',
+    rarity: 'epic',
+    icon: '🏅',
+    chipReward: 100_000,
+    xpReward: 10_000,
+    category: 'streak',
+  },
+
+  // ── Bankroll ───────────────────────────────────────────────────────────────
+  {
+    id: 'chips_100k',
+    name: 'Six Figures',
+    description: 'Reach a chip balance of 100,000.',
+    rarity: 'common',
+    icon: '💵',
+    chipReward: 5_000,
+    xpReward: 500,
+    category: 'bankroll',
+  },
+  {
+    id: 'chips_500k',
+    name: 'High Roller',
+    description: 'Reach a chip balance of 500,000.',
+    rarity: 'rare',
+    icon: '💳',
+    chipReward: 25_000,
+    xpReward: 2_500,
+    category: 'bankroll',
+  },
+  {
+    id: 'chips_1m',
+    name: 'Neon Millionaire',
+    description: 'Reach a chip balance of 1,000,000.',
+    rarity: 'epic',
+    icon: '💎',
+    chipReward: 100_000,
+    xpReward: 10_000,
+    category: 'bankroll',
+  },
+  {
+    id: 'chips_10m',
+    name: 'Neon Legend',
+    description: 'Reach a chip balance of 10,000,000.',
+    rarity: 'legendary',
+    icon: '🌌',
+    chipReward: 500_000,
+    xpReward: 50_000,
+    category: 'bankroll',
+  },
+];
+
+export const ACHIEVEMENT_MAP: Record<string, Achievement> =
+  Object.fromEntries(ALL_ACHIEVEMENTS.map(a => [a.id, a]));
+
+// Map winning hand description strings → achievement IDs
+export const HAND_TO_ACHIEVEMENT: Record<string, string> = {
+  'One Pair':        'hand_pair',
+  'Two Pair':        'hand_two_pair',
+  'Three of a Kind': 'hand_three_kind',
+  'Straight':        'hand_straight',
+  'Flush':           'hand_flush',
+  'Full House':      'hand_full_house',
+  'Four of a Kind':  'hand_four_kind',
+  'Straight Flush':  'hand_straight_flush',
+  'Royal Flush':     'hand_royal_flush',
+};
