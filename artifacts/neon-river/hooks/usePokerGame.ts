@@ -4,6 +4,24 @@ import { Card, createDeck, describeHand, determineWinners, getPreflopStrength, g
 
 const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
+
+/**
+ * Generates a realistic bot chip stack for the given table minimum buy-in.
+ * Bots span an exponential spread (1.1× → 10×) so each seat looks like a real
+ * player with their own history at this stake level. Jitter ensures stacks
+ * differ between game sessions.
+ */
+function generateBotStack(minBuyIn: number, botIndex: number): number {
+  const MULTIPLIERS = [1.12, 1.65, 2.73, 4.15, 10.2];
+  const base = MULTIPLIERS[botIndex % MULTIPLIERS.length];
+  const jitter = 0.82 + Math.random() * 0.36;
+  const raw = minBuyIn * base * jitter;
+  const denom =
+    minBuyIn >= 100_000 ? 10_000 :
+    minBuyIn >= 10_000  ? 1_000 :
+    minBuyIn >= 1_000   ? 500 : 100;
+  return Math.max(minBuyIn, Math.round(raw / denom) * denom);
+}
 const TIMER_SECONDS = 20;
 const AI_NAMES = ['Ace', 'Blaze', 'Shadow', 'Vegas', 'Ghost'];
 
@@ -618,12 +636,9 @@ export function usePokerGame(
       ...AI_NAMES.slice(0, numAI).map((name, i) => ({
         id: `ai_${i}`,
         name,
-        // AI stacks scale proportionally to the human stack and table minimum.
-        // Range: ~60% → ~150% of stackBase for natural variety.
-        chips: Math.max(
-          tableConfig.minBuyIn,
-          Math.round(Math.max(tableConfig.minBuyIn, humanChips * 0.8) * (0.6 + i * 0.22))
-        ),
+        // Exponential spread: bots span 1.1× → 10× the min buy-in so each seat
+        // looks like a real player with their own history at this stake level.
+        chips: generateBotStack(tableConfig.minBuyIn, i),
         holeCards: [] as Card[],
         betInRound: 0,
         chipDelta: 0,

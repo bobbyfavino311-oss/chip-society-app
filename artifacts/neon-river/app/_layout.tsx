@@ -19,10 +19,22 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { UserProvider, useUser } from '@/context/UserContext';
 import { TermsProvider, useTerms } from '@/context/TermsContext';
+import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
+import { SoundEngine } from '@/lib/soundEngine';
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
+
+// ─── Sound syncer — keeps SoundEngine in sync with SoundContext ───────────────
+
+function SoundSyncer() {
+  const { masterVolume, effectsVolume, isMuted, isVibrationEnabled } = useSoundSettings();
+  React.useEffect(() => {
+    SoundEngine.configure({ masterVolume, effectsVolume, muted: isMuted, vibration: isVibrationEnabled });
+  }, [masterVolume, effectsVolume, isMuted, isVibrationEnabled]);
+  return null;
+}
 
 // ─── Auth gate — redirects new users to entry, and unaccepted terms to /terms ─
 
@@ -54,6 +66,7 @@ function GateController() {
 function RootLayoutNav() {
   return (
     <>
+      <SoundSyncer />
       <GateController />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="entry"         options={{ headerShown: false, animation: 'fade' }} />
@@ -103,11 +116,13 @@ export default function RootLayout() {
           <QueryClientProvider client={queryClient}>
             <UserProvider>
               <TermsProvider>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <KeyboardProvider>
-                    <RootLayoutNav />
-                  </KeyboardProvider>
-                </GestureHandlerRootView>
+                <SoundProvider>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <KeyboardProvider>
+                      <RootLayoutNav />
+                    </KeyboardProvider>
+                  </GestureHandlerRootView>
+                </SoundProvider>
               </TermsProvider>
             </UserProvider>
           </QueryClientProvider>

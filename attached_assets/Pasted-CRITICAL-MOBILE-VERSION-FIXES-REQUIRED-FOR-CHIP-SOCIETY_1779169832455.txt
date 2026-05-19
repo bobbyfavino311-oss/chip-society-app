@@ -1,0 +1,348 @@
+CRITICAL MOBILE VERSION FIXES REQUIRED FOR CHIP SOCIETY
+
+The current iOS/mobile build still contains multiple major flaws that make the app feel unfinished and not App Store ready.
+
+The following issues MUST be fixed immediately:
+
+1. No Privacy Policy implementation
+2. Pink border still surrounding gameplay table
+3. No real player account system
+4. Sound effects do not work
+5. AI bots all spawn with identical chip stacks
+6. Ranked gameplay bankroll logic is broken
+
+These issues damage:
+- realism
+- polish
+- App Store quality
+- immersion
+- player trust
+- onboarding experience
+
+The app must now feel:
+- premium
+- stable
+- polished
+- realistic
+- professionally engineered
+
+--------------------------------------------------
+PRIVACY POLICY IMPLEMENTATION
+--------------------------------------------------
+
+The app currently has NO working Privacy Policy system.
+
+Implement a complete privacy agreement flow.
+
+REQUIREMENTS:
+- users must accept policy before entering app
+- scrollable agreement screen
+- neon-themed design
+- checkbox confirmation
+- “Accept & Continue” button
+- “Decline” button logs user out
+- save acceptance timestamp server-side
+- save agreement version number
+
+The policy must explain:
+- account storage
+- usernames
+- gameplay tracking
+- chip balances
+- social feed usage
+- virtual currency disclaimer
+
+The screen must:
+- support all iPhone sizes
+- scroll correctly
+- never clip content
+- respect safe areas
+
+--------------------------------------------------
+REMOVE PINK GAMEPLAY BORDER
+--------------------------------------------------
+
+The gameplay table STILL has the bright pink outer border.
+
+REMOVE IT COMPLETELY.
+
+The border currently:
+- crowds the gameplay
+- looks outdated
+- reduces realism
+- cheapens the UI
+
+--------------------------------------------------
+NEW TABLE EDGE DESIGN
+--------------------------------------------------
+
+Replace the pink border with:
+- subtle neon ambient lighting
+- soft cyan/purple glow
+- luxury shadow gradients
+- clean rounded table edges
+
+The gameplay should feel:
+- immersive
+- elegant
+- premium
+- modern
+
+NOT:
+- boxed in
+- arcade-like
+- visually overwhelming
+
+--------------------------------------------------
+ACCOUNT SYSTEM IMPLEMENTATION
+--------------------------------------------------
+
+The app currently has NO proper player account system.
+
+Implement FULL ACCOUNT SUPPORT.
+
+Users should be able to:
+- create accounts
+- sign in
+- save progression
+- store chip balances
+- access multiplayer later
+- maintain stats
+- use social systems
+
+--------------------------------------------------
+LOGIN METHODS
+--------------------------------------------------
+
+Support:
+- Email + Password
+- Sign in with Apple
+- Google Login
+- Guest Mode
+
+Guest Mode:
+- temporary account
+- limited features
+- 25K starting chips
+
+Registered users:
+- permanent progression
+- 50K starting chips
+
+--------------------------------------------------
+ACCOUNT FEATURES
+--------------------------------------------------
+
+Each account should store:
+- username
+- avatar
+- chip balance
+- XP
+- rank
+- match history
+- achievements
+- tournament stats
+- social feed activity
+
+--------------------------------------------------
+AUTO LOGIN
+--------------------------------------------------
+
+Users should remain signed in securely.
+
+Implement:
+- persistent sessions
+- secure token storage
+- automatic login restoration
+
+--------------------------------------------------
+SOUND EFFECT SYSTEM FIX
+--------------------------------------------------
+
+Sound effects currently do NOT work properly.
+
+This breaks immersion heavily.
+
+Fix ALL audio systems.
+
+--------------------------------------------------
+REQUIRED GAMEPLAY AUDIO
+--------------------------------------------------
+
+Implement working sound effects for:
+- card dealing
+- chip betting
+- chip collection
+- folds
+- check actions
+- button presses
+- all-in actions
+- notifications
+- reward claims
+- wheel spins
+
+--------------------------------------------------
+AUDIO QUALITY REQUIREMENTS
+--------------------------------------------------
+
+Sounds should feel:
+- crisp
+- premium
+- modern
+- casino-inspired
+
+NOT:
+- cheap
+- distorted
+- delayed
+- overly loud
+
+--------------------------------------------------
+AUDIO SETTINGS MENU
+--------------------------------------------------
+
+Add:
+- master volume slider
+- effects volume slider
+- mute toggle
+- vibration toggle
+
+Settings should save persistently.
+
+--------------------------------------------------
+BOT CHIP STACK FIX
+--------------------------------------------------
+
+Currently ALL AI bots spawn with identical chip balances.
+
+This feels:
+- fake
+- unrealistic
+- repetitive
+- low quality
+
+Rebuild AI bankroll generation entirely.
+
+--------------------------------------------------
+RANKED GAMEPLAY BANKROLL LOGIC
+--------------------------------------------------
+
+Bots and players MUST meet minimum buy-in requirements.
+
+Example:
+
+25K minimum table:
+ALL players and bots MUST have:
+25K OR MORE.
+
+Bots should NEVER spawn:
+- under minimum buy-in
+- with unrealistic tiny stacks
+- with identical balances every game
+
+--------------------------------------------------
+DYNAMIC AI BANKROLL GENERATION
+--------------------------------------------------
+
+Generate realistic bankroll ranges based on:
+- stakes
+- game mode
+- difficulty
+- progression level
+
+Example:
+25K table:
+- 28K
+- 41K
+- 67K
+- 102K
+- 250K
+
+NOT:
+- every bot having identical chip counts
+
+--------------------------------------------------
+HIGH STAKES REALISM
+--------------------------------------------------
+
+Higher stakes tables should naturally feature:
+- larger stacks
+- stronger AI
+- more aggressive gameplay
+- deeper bankrolls
+
+Low stakes should feature:
+- beginner AI
+- smaller bankrolls
+- softer gameplay
+
+--------------------------------------------------
+TABLE MATCHMAKING VALIDATION
+--------------------------------------------------
+
+Prevent:
+- underfunded players entering tables
+- bots below minimum stakes
+- unrealistic seating
+
+The ecosystem should feel:
+like a real online poker platform.
+
+--------------------------------------------------
+MOBILE UI OPTIMIZATION PASS
+--------------------------------------------------
+
+Run a COMPLETE mobile optimization pass across:
+- login screens
+- onboarding
+- gameplay
+- ranked mode
+- tournaments
+- profile pages
+- social feed
+- rewards
+- store
+
+Fix:
+- clipping
+- overlap
+- broken scaling
+- hidden buttons
+- safe area violations
+
+--------------------------------------------------
+PERFORMANCE REQUIREMENTS
+--------------------------------------------------
+
+Maintain:
+- smooth FPS
+- fast UI response
+- stable gameplay
+- optimized animations
+
+Avoid:
+- excessive glow rendering
+- laggy transitions
+- oversized UI assets
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The CHIP SOCIETY mobile app should now feel like:
+- a professional social poker platform
+- a premium multiplayer casino experience
+- a polished App Store-ready game
+
+The app should feel:
+- realistic
+- immersive
+- elegant
+- trustworthy
+- responsive
+- production quality
+
+NOT:
+- like a buggy prototype
+- unfinished beta software
+- placeholder mobile UI.

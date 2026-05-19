@@ -18,6 +18,7 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
 import { CASINO_AVATARS, getAvatar } from '@/components/CasinoAvatars';
+import { useSoundSettings } from '@/context/SoundContext';
 
 const RANK_COLORS: Record<string, string> = {
   'Neon Bronze': '#cd7f32',
@@ -67,6 +68,142 @@ const statStyles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+const snd = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+  },
+  rowLabel: {
+    flex: 1,
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.75)',
+    letterSpacing: 1.5,
+  },
+  toggle: {
+    width: 38,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  toggleOn: {
+    backgroundColor: 'rgba(0,212,255,0.18)',
+    borderColor: 'rgba(0,212,255,0.45)',
+  },
+  toggleKnob: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+  toggleKnobOn: {
+    backgroundColor: '#00d4ff',
+    alignSelf: 'flex-end',
+  },
+  sliderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 6,
+  },
+  sliderLabel: {
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 1,
+    width: 90,
+  },
+  dotsRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dot: {
+    flex: 1,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  dotActive: {
+    backgroundColor: '#00d4ff',
+  },
+  sliderPct: {
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 9,
+    color: 'rgba(0,212,255,0.7)',
+    width: 30,
+    textAlign: 'right',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginVertical: 4,
+  },
+});
+
+// ─── Sound settings card ───────────────────────────────────────────────────────
+
+function SoundSettingsCard() {
+  const { masterVolume, effectsVolume, isMuted, isVibrationEnabled,
+          setMasterVolume, setEffectsVolume, toggleMute, toggleVibration } = useSoundSettings();
+
+  const Row = ({ label, value, onToggle, icon }: {
+    label: string; value: boolean; onToggle: () => void; icon: string;
+  }) => (
+    <TouchableOpacity style={snd.row} onPress={onToggle} activeOpacity={0.8}>
+      <Ionicons name={icon as 'volume-high'} size={16} color={value ? '#00d4ff' : 'rgba(255,255,255,0.3)'} />
+      <Text style={[snd.rowLabel, !value && { color: 'rgba(255,255,255,0.3)' }]}>{label}</Text>
+      <View style={[snd.toggle, value && snd.toggleOn]}>
+        <View style={[snd.toggleKnob, value && snd.toggleKnobOn]} />
+      </View>
+    </TouchableOpacity>
+  );
+
+  const SliderRow = ({ label, value, onChange, disabled }: {
+    label: string; value: number; onChange: (v: number) => void; disabled?: boolean;
+  }) => {
+    const steps = [0, 0.25, 0.5, 0.75, 1];
+    return (
+      <View style={snd.sliderRow}>
+        <Text style={[snd.sliderLabel, disabled && { opacity: 0.35 }]}>{label}</Text>
+        <View style={snd.dotsRow}>
+          {steps.map(s => (
+            <TouchableOpacity
+              key={s}
+              disabled={disabled}
+              onPress={() => onChange(s)}
+              style={[snd.dot, value >= s && !disabled && snd.dotActive]}
+            />
+          ))}
+        </View>
+        <Text style={[snd.sliderPct, disabled && { opacity: 0.35 }]}>{Math.round(value * 100)}%</Text>
+      </View>
+    );
+  };
+
+  return (
+    <View>
+      <Text style={styles.sectionTitle}>AUDIO & HAPTICS</Text>
+      <View style={styles.card}>
+        <Row label="Sound Effects" value={!isMuted} onToggle={toggleMute}
+          icon={isMuted ? 'volume-mute' : 'volume-high'} />
+        <SliderRow label="Master Volume" value={masterVolume} onChange={setMasterVolume} disabled={isMuted} />
+        <SliderRow label="Effects Volume" value={effectsVolume} onChange={setEffectsVolume} disabled={isMuted} />
+        <View style={snd.divider} />
+        <Row label="Vibration / Haptics" value={isVibrationEnabled} onToggle={toggleVibration}
+          icon={isVibrationEnabled ? 'phone-portrait' : 'phone-portrait-outline'} />
+      </View>
+    </View>
+  );
+}
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -246,6 +383,8 @@ export default function ProfileScreen() {
           </Text>
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
         </View>
+
+        <SoundSettingsCard />
 
         <Text style={styles.sectionTitle}>STREAK</Text>
         <View style={styles.card}>
