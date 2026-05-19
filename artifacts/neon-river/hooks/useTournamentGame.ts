@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AIDifficulty, AIAction, getAIDecision, getAIDelay, getRaiseAmount } from '../lib/aiBot';
-import { Card, createDeck, describeHand, determineWinners, shuffleDeck } from '../lib/pokerEngine';
+import { AIDifficulty, AIAction, AIPersonality, getAIDecision, getAIDelay, getRaiseAmount, getBotPersonality, analyzeBoardTexture } from '../lib/aiBot';
+import { Card, createDeck, describeHand, determineWinners, getPreflopStrength, getPostflopStrength, shuffleDeck } from '../lib/pokerEngine';
 import { GamePlayer, GameState, SidePot, PlayerStatus } from './usePokerGame';
 
 // ─── Tournament constants ─────────────────────────────────────────────────────
@@ -305,15 +305,26 @@ function applyAction(state: GameState, action: AIAction, raiseAmount?: number): 
 function executeAIAction(prev: GameState): GameState {
   const player = prev.players[prev.currentPlayerIndex];
   if (!player || player.isHuman || player.status !== 'active') return prev;
+  const playerCount = prev.players.length;
+  const relPos = (prev.currentPlayerIndex - prev.dealerIndex + playerCount) % playerCount;
+  const positionAdvantage = Math.min(2, (relPos / Math.max(1, playerCount - 1)) * 2);
+  const board = analyzeBoardTexture(prev.communityCards);
+  const handStrength = prev.phase === 'preflop'
+    ? getPreflopStrength(player.holeCards)
+    : getPostflopStrength(player.holeCards, prev.communityCards);
+
   const decision = getAIDecision({
     holeCards: player.holeCards, communityCards: prev.communityCards,
     myChips: player.chips, pot: prev.pot, currentBet: prev.currentBet,
     myBetInRound: player.betInRound, minRaise: prev.minRaise,
-    difficulty: player.difficulty, phase: prev.phase as 'preflop' | 'flop' | 'turn' | 'river',
+    difficulty: player.difficulty, personality: player.personality,
+    phase: prev.phase as 'preflop' | 'flop' | 'turn' | 'river',
     numActivePlayers: getActivePlayers(prev.players).length,
+    positionAdvantage,
   });
   const raiseAmt = decision === 'raise'
-    ? getRaiseAmount(player.difficulty, prev.pot, player.chips, prev.minRaise, 0.5)
+    ? getRaiseAmount(player.difficulty, prev.pot, player.chips, prev.minRaise,
+        handStrength, player.personality, board.wetness)
     : undefined;
   return applyAction(prev, decision, raiseAmt);
 }
@@ -427,14 +438,14 @@ export function useTournamentGame(humanName: string, numPlayers: 4 | 5 | 6 = 6) 
     const players: GamePlayer[] = [
       {
         id: 'human', name: humanName, chips: STARTING_CHIPS, holeCards: [], betInRound: 0, chipDelta: 0,
-        status: 'active', isHuman: true, difficulty: 'competitive', seatIndex: 0,
-        isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: 0,
+        status: 'active', isHuman: true, difficulty: 'competitive', personality: 'passive' as AIPersonality,
+        seatIndex: 0, isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: 0,
       },
       ...bots.map((b, i) => ({
         id: `ai_${i}`, name: b.name, chips: STARTING_CHIPS, holeCards: [] as Card[],
         betInRound: 0, chipDelta: 0, status: 'active' as PlayerStatus,
-        isHuman: false, difficulty: b.diff, seatIndex: i + 1,
-        isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: i + 1,
+        isHuman: false, difficulty: b.diff, personality: getBotPersonality(i),
+        seatIndex: i + 1, isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: i + 1,
       })),
     ];
 

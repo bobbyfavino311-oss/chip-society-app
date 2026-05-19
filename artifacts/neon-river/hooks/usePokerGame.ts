@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AIDifficulty, AIAction, getAIDecision, getAIDelay, getRaiseAmount } from '../lib/aiBot';
-import { Card, createDeck, describeHand, determineWinners, shuffleDeck } from '../lib/pokerEngine';
+import { AIDifficulty, AIAction, AIPersonality, getAIDecision, getAIDelay, getRaiseAmount, getBotPersonality, analyzeBoardTexture } from '../lib/aiBot';
+import { Card, createDeck, describeHand, determineWinners, getPreflopStrength, getPostflopStrength, shuffleDeck } from '../lib/pokerEngine';
 
 const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
@@ -37,6 +37,7 @@ export interface GamePlayer {
   isSmallBlind: boolean;
   isBigBlind: boolean;
   avatarIndex: number;
+  personality: AIPersonality;
   lastAction?: string; // last action label for seat display ('FOLD' | 'CHECK' | 'CALL' | 'RAISE' | 'ALL IN')
   chipDelta: number; // chips won/lost this hand (shown at handover)
 }
@@ -481,6 +482,14 @@ function executeAIAction(prev: GameState): GameState {
   if (!player || player.isHuman) return prev;
   if (player.status !== 'active') return prev;
 
+  const playerCount = prev.players.length;
+  const relPos = (prev.currentPlayerIndex - prev.dealerIndex + playerCount) % playerCount;
+  const positionAdvantage = Math.min(2, (relPos / Math.max(1, playerCount - 1)) * 2);
+  const board = analyzeBoardTexture(prev.communityCards);
+  const handStrength = prev.phase === 'preflop'
+    ? getPreflopStrength(player.holeCards)
+    : getPostflopStrength(player.holeCards, prev.communityCards);
+
   const decision = getAIDecision({
     holeCards: player.holeCards,
     communityCards: prev.communityCards,
@@ -490,13 +499,18 @@ function executeAIAction(prev: GameState): GameState {
     myBetInRound: player.betInRound,
     minRaise: prev.minRaise,
     difficulty: player.difficulty,
+    personality: player.personality,
     phase: prev.phase as 'preflop' | 'flop' | 'turn' | 'river',
     numActivePlayers: getActivePlayers(prev.players).length,
+    positionAdvantage,
   });
 
   let raiseAmt: number | undefined;
   if (decision === 'raise') {
-    raiseAmt = getRaiseAmount(player.difficulty, prev.pot, player.chips, prev.minRaise, 0.5);
+    raiseAmt = getRaiseAmount(
+      player.difficulty, prev.pot, player.chips, prev.minRaise,
+      handStrength, player.personality, board.wetness,
+    );
   }
 
   return applyAction(prev, decision, raiseAmt);
@@ -594,6 +608,7 @@ export function usePokerGame(
         status: 'active',
         isHuman: true,
         difficulty,
+        personality: 'passive' as AIPersonality,
         seatIndex: 0,
         isDealer: false,
         isSmallBlind: false,
@@ -615,6 +630,7 @@ export function usePokerGame(
         status: 'active' as PlayerStatus,
         isHuman: false,
         difficulty,
+        personality: getBotPersonality(i),
         seatIndex: i + 1,
         isDealer: false,
         isSmallBlind: false,
