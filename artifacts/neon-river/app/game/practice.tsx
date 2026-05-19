@@ -243,9 +243,9 @@ const SEAT_ACTION_COLORS: Record<string, string> = {
 };
 
 function CompactAISeat({
-  player, isCurrentTurn, isWinner, timer,
+  player, isCurrentTurn, isWinner, timer, showCards,
 }: {
-  player: any; isCurrentTurn: boolean; isWinner: boolean; timer: number;
+  player: any; isCurrentTurn: boolean; isWinner: boolean; timer: number; showCards?: boolean;
 }) {
   const avatar = SEAT_AVATARS[player.avatarIndex % SEAT_AVATARS.length];
   const avatarColor = SEAT_AVATAR_COLORS[player.avatarIndex % SEAT_AVATAR_COLORS.length];
@@ -282,6 +282,20 @@ function CompactAISeat({
       {actionColor && (
         <View style={[g.actionBadge, { borderColor: actionColor, backgroundColor: `${actionColor}18` }]}>
           <Text style={[g.actionText, { color: actionColor }]}>{player.lastAction}</Text>
+        </View>
+      )}
+      {/* Hole cards — face-down during play, revealed on showdown for non-folded players */}
+      {player.holeCards.length > 0 && !folded && (
+        <View style={g.holeCardRow}>
+          {player.holeCards.map((card: any, i: number) => (
+            <PlayingCard
+              key={i}
+              card={card}
+              faceDown={!showCards}
+              size="sm"
+              animated={false}
+            />
+          ))}
         </View>
       )}
     </View>
@@ -325,6 +339,7 @@ const g = StyleSheet.create({
   betLabel: { color: colors.primary, fontSize: 9, fontWeight: '700' },
   actionBadge: { borderRadius: 4, borderWidth: 1, paddingHorizontal: 5, paddingVertical: 2 },
   actionText: { fontSize: 8, fontWeight: '700', letterSpacing: 0.5 },
+  holeCardRow: { flexDirection: 'row', gap: 3, marginTop: 2 },
 });
 
 // ─── Main game screen ─────────────────────────────────────────────────────────
@@ -579,6 +594,7 @@ export default function PracticeScreen() {
             isCurrentTurn={state.players[state.currentPlayerIndex]?.id === player.id}
             isWinner={state.winnerIds.includes(player.id)}
             timer={state.timer}
+            showCards={isHandOver && player.status !== 'folded'}
           />
         ))}
       </View>
