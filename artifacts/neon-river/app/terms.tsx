@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTerms } from '@/context/TermsContext';
-import { colors } from '@/constants/colors';
+import colors from '@/constants/colors';
 import { TERMS_VERSION } from '@/lib/termsStorage';
 
 const EFFECTIVE_DATE = 'May 19, 2025';

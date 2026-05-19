@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { GuestBanner, GuestLockOverlay } from '@/components/GuestBanner';
 
 // ─── Table stakes ─────────────────────────────────────────────────────────────
 const TABLE_STAKES = [
@@ -90,6 +91,7 @@ function LiveModeCard({ icon, title, description, color, stat, statIcon, badge, 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
+  const [guestLockFeature, setGuestLockFeature] = React.useState<string | null>(null);
 
   const onlinePlayers = useMemo(() => {
     const m = Math.floor(Date.now() / 60_000);
@@ -108,6 +110,16 @@ export default function PlayScreen() {
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
+
+      {/* Guest banner */}
+      {profile.isGuest && (
+        <GuestBanner message="Guest mode — create a free account to unlock Ranked, Tournaments & cloud saves" />
+      )}
+
+      {/* Guest lock overlay */}
+      {guestLockFeature && (
+        <GuestLockOverlay feature={guestLockFeature} />
+      )}
 
       <ScrollView
         contentContainerStyle={[
@@ -150,7 +162,7 @@ export default function PlayScreen() {
           description="Instantly join an active table — real players or AI bots fill seats"
           color="#00d4ff"
           stat={`${onlinePlayers.toLocaleString()} online · ${activeTables} active tables`}
-          onPress={() => router.push('/modes/quickmatch')}
+          onPress={() => profile.isGuest ? setGuestLockFeature('Quick Match') : router.push('/modes/quickmatch')}
         />
 
         <LiveModeCard
@@ -160,7 +172,7 @@ export default function PlayScreen() {
           color="#ffd700"
           stat={`${rankLabel} · ${rp.toLocaleString()} RP`}
           badge="COMPETITIVE"
-          onPress={() => router.push('/modes/ranked')}
+          onPress={() => profile.isGuest ? setGuestLockFeature('Ranked Mode') : router.push('/modes/ranked')}
         />
 
         <LiveModeCard
@@ -170,7 +182,7 @@ export default function PlayScreen() {
           color="#bf5fff"
           stat="Sit & Go · Scheduled events · Big prize pools"
           badge="SIT & GO"
-          onPress={() => router.push('/modes/tournament')}
+          onPress={() => profile.isGuest ? setGuestLockFeature('Tournaments') : router.push('/modes/tournament')}
         />
 
         <LiveModeCard
@@ -179,7 +191,7 @@ export default function PlayScreen() {
           description="Create a room with an invite code, or join a friend's table"
           color="#ff0090"
           stat="Generate a code like NEON-742 · Invite friends"
-          onPress={() => router.push('/modes/private')}
+          onPress={() => profile.isGuest ? setGuestLockFeature('Private Tables') : router.push('/modes/private')}
         />
 
         {/* Table stakes */}
