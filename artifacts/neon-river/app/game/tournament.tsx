@@ -807,7 +807,7 @@ const lobby = StyleSheet.create({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   tableArea: { flex: 1 },
-  tableSurface: { flex: 1, margin: 8, borderRadius: 60, overflow: 'hidden', borderWidth: 3, borderColor: '#cc0088' },
+  tableSurface: { flex: 1, margin: 8, borderRadius: 60, overflow: 'hidden' },
   tableInner: { flex: 1, position: 'relative', alignItems: 'center', justifyContent: 'center', paddingBottom: '18%' },
   aiSeat: { position: 'absolute' },
   centerCol: { alignItems: 'center', gap: 16 },
