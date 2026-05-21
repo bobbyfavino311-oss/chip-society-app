@@ -15,71 +15,100 @@ import {
 } from '@/lib/achievements';
 import { useUser } from '@/context/UserContext';
 
-const STORAGE_KEY = '@chipsociety_achievements_v1';
+const STORAGE_KEY = '@chipsociety_achievements_v2';
 
 interface PersistedState {
   unlockedIds: string[];
+  claimedIds: string[];
   totalWins: number;
+  winStreak: number;
+  lastHandLost: boolean;
 }
 
 interface AchievementContextValue {
   unlockedIds: Set<string>;
+  claimedIds: Set<string>;
   pendingUnlock: Achievement | null;
   dismissPending: () => void;
-  onHandWon: (handDescription: string, wasAllIn: boolean, potSize: number, prevLost: boolean) => void;
-  onWinStreak: (streak: number) => void;
+  /** Call after a human win in-game */
+  recordGameWin: (handDesc: string, wasAllIn: boolean, potSize: number) => void;
+  /** Call after a human loss in-game */
+  recordGameLoss: () => void;
+  /** Call when chip balance changes */
   onChipBalance: (chips: number) => void;
+  /** Call on login-streak check */
   onLoginStreak: (days: number) => void;
+  /** Claim a pending (unlocked but unclaimed) achievement */
+  claim: (id: string) => Promise<void>;
   totalWins: number;
+  winStreak: number;
 }
 
 const AchievementContext = createContext<AchievementContextValue>({
   unlockedIds: new Set(),
+  claimedIds: new Set(),
   pendingUnlock: null,
   dismissPending: () => {},
-  onHandWon: () => {},
-  onWinStreak: () => {},
+  recordGameWin: () => {},
+  recordGameLoss: () => {},
   onChipBalance: () => {},
   onLoginStreak: () => {},
+  claim: async () => {},
   totalWins: 0,
+  winStreak: 0,
 });
 
 export function AchievementProvider({ children }: { children: React.ReactNode }) {
-  const { profile, updateProfile } = useUser();
+  const { profile, addChips, updateProfile } = useUser();
+
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
-  const [totalWins, setTotalWins] = useState(0);
+  const [claimedIds,  setClaimedIds]  = useState<Set<string>>(new Set());
+  const [totalWins,   setTotalWins]   = useState(0);
+  const [winStreak,   setWinStreak]   = useState(0);
+  const [lastHandLost, setLastHandLost] = useState(false);
   const [queue, setQueue] = useState<Achievement[]>([]);
   const [pendingUnlock, setPendingUnlock] = useState<Achievement | null>(null);
 
-  const unlockedRef = useRef<Set<string>>(new Set());
-  const profileRef  = useRef(profile);
-  profileRef.current = profile;
+  // Refs for synchronous reads inside callbacks
+  const unlockedRef    = useRef<Set<string>>(new Set());
+  const claimedRef     = useRef<Set<string>>(new Set());
+  const totalWinsRef   = useRef(0);
+  const winStreakRef   = useRef(0);
+  const lastHandLostRef = useRef(false);
+  const profileRef     = useRef(profile);
+  profileRef.current   = profile;
+  const loaded         = useRef(false);
 
-  const loaded = useRef(false);
-
+  // ── Load from AsyncStorage ────────────────────────────────────────────────
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then(raw => {
       if (raw) {
         try {
           const saved = JSON.parse(raw) as Partial<PersistedState>;
-          if (saved.unlockedIds) {
-            const s = new Set(saved.unlockedIds);
-            setUnlockedIds(s);
-            unlockedRef.current = s;
-          }
-          if (typeof saved.totalWins === 'number') setTotalWins(saved.totalWins);
+          if (saved.unlockedIds)   { const s = new Set(saved.unlockedIds);   setUnlockedIds(s);   unlockedRef.current = s; }
+          if (saved.claimedIds)    { const s = new Set(saved.claimedIds);    setClaimedIds(s);    claimedRef.current  = s; }
+          if (typeof saved.totalWins  === 'number') { setTotalWins(saved.totalWins);   totalWinsRef.current  = saved.totalWins;   }
+          if (typeof saved.winStreak  === 'number') { setWinStreak(saved.winStreak);   winStreakRef.current   = saved.winStreak;   }
+          if (typeof saved.lastHandLost === 'boolean') { setLastHandLost(saved.lastHandLost); lastHandLostRef.current = saved.lastHandLost; }
         } catch {}
       }
       loaded.current = true;
     });
   }, []);
 
-  const persist = useCallback((ids: Set<string>, wins: number) => {
-    const state: PersistedState = { unlockedIds: Array.from(ids), totalWins: wins };
+  const persist = useCallback(() => {
+    if (!loaded.current) return;
+    const state: PersistedState = {
+      unlockedIds:  Array.from(unlockedRef.current),
+      claimedIds:   Array.from(claimedRef.current),
+      totalWins:    totalWinsRef.current,
+      winStreak:    winStreakRef.current,
+      lastHandLost: lastHandLostRef.current,
+    };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).catch(() => {});
   }, []);
 
-  // Show one popup at a time
+  // ── Show one popup at a time ──────────────────────────────────────────────
   useEffect(() => {
     if (pendingUnlock || queue.length === 0) return;
     const [next, ...rest] = queue;
@@ -87,69 +116,91 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     setQueue(rest);
   }, [pendingUnlock, queue]);
 
+  const dismissPending = useCallback(() => setPendingUnlock(null), []);
+
+  // ── unlock — marks as unlocked but does NOT award chips yet ──────────────
   const unlock = useCallback((id: string) => {
     if (unlockedRef.current.has(id)) return;
     const achievement = ACHIEVEMENT_MAP[id];
     if (!achievement) return;
 
-    // Mark unlocked immediately via ref to prevent double-fire
-    const nextSet = new Set(unlockedRef.current);
-    nextSet.add(id);
-    unlockedRef.current = nextSet;
+    const next = new Set(unlockedRef.current);
+    next.add(id);
+    unlockedRef.current = next;
+    setUnlockedIds(next);
 
-    setUnlockedIds(nextSet);
+    // Queue popup — player must claim to receive reward
+    setQueue(q => [...q, achievement]);
+    persist();
+  }, [persist]);
+
+  // ── claim — awards chips/XP and marks as claimed ─────────────────────────
+  const claim = useCallback(async (id: string) => {
+    if (claimedRef.current.has(id)) return;
+    if (!unlockedRef.current.has(id)) return;
+    const achievement = ACHIEVEMENT_MAP[id];
+    if (!achievement) return;
+
+    const next = new Set(claimedRef.current);
+    next.add(id);
+    claimedRef.current = next;
+    setClaimedIds(next);
 
     // Award chips + XP
-    const p = profileRef.current;
-    void updateProfile({
-      chips: p.chips + achievement.chipReward,
-      xp: p.xp + achievement.xpReward,
-    });
+    await addChips(achievement.chipReward);
+    await updateProfile({ xp: profileRef.current.xp + achievement.xpReward });
+    persist();
+  }, [addChips, updateProfile, persist]);
 
-    // Queue popup
-    setQueue(q => [...q, achievement]);
+  // ── recordGameWin ─────────────────────────────────────────────────────────
+  const recordGameWin = useCallback((handDesc: string, wasAllIn: boolean, potSize: number) => {
+    // Update streak
+    const newStreak = winStreakRef.current + 1;
+    winStreakRef.current = newStreak;
+    setWinStreak(newStreak);
 
-    persist(nextSet, totalWins);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateProfile, persist]);
+    // Update total wins
+    const newTotal = totalWinsRef.current + 1;
+    totalWinsRef.current = newTotal;
+    setTotalWins(newTotal);
 
-  const dismissPending = useCallback(() => setPendingUnlock(null), []);
+    const wasComeback = lastHandLostRef.current;
+    lastHandLostRef.current = false;
+    setLastHandLost(false);
 
-  const onHandWon = useCallback((
-    handDescription: string,
-    wasAllIn: boolean,
-    potSize: number,
-    prevLost: boolean,
-  ) => {
-    setTotalWins(prev => {
-      const next = prev + 1;
+    // Hand type achievement
+    const handAchId = HAND_TO_ACHIEVEMENT[handDesc];
+    if (handAchId) unlock(handAchId);
 
-      // Hand type achievement
-      const handAchId = HAND_TO_ACHIEVEMENT[handDescription];
-      if (handAchId) unlock(handAchId);
+    // Win count milestones
+    if (newTotal === 1)    unlock('first_win');
+    if (newTotal >= 10)    unlock('wins_10');
+    if (newTotal >= 50)    unlock('wins_50');
+    if (newTotal >= 100)   unlock('wins_100');
 
-      // Win count milestones
-      if (next === 1)   unlock('first_win');
-      if (next >= 10)   unlock('wins_10');
-      if (next >= 50)   unlock('wins_50');
-      if (next >= 100)  unlock('wins_100');
+    // Situational
+    if (wasAllIn)           unlock('allin_win');
+    if (wasComeback)        unlock('comeback');
+    if (potSize >= 50_000)  unlock('big_pot');
 
-      // Situational
-      if (wasAllIn)  unlock('allin_win');
-      if (prevLost)  unlock('comeback');
-      if (potSize >= 50_000) unlock('big_pot');
+    // Consecutive win streaks
+    if (newStreak >= 3)    unlock('streak_3');
+    if (newStreak >= 5)    unlock('streak_5');
+    if (newStreak >= 10)   unlock('streak_10');
 
-      persist(unlockedRef.current, next);
-      return next;
-    });
+    persist();
   }, [unlock, persist]);
 
-  const onWinStreak = useCallback((streak: number) => {
-    if (streak >= 3)  unlock('streak_3');
-    if (streak >= 5)  unlock('streak_5');
-    if (streak >= 10) unlock('streak_10');
-  }, [unlock]);
+  // ── recordGameLoss ────────────────────────────────────────────────────────
+  const recordGameLoss = useCallback(() => {
+    winStreakRef.current = 0;
+    lastHandLostRef.current = true;
+    setWinStreak(0);
+    setLastHandLost(true);
+    persist();
+  }, [persist]);
 
+  // ── onChipBalance ─────────────────────────────────────────────────────────
   const onChipBalance = useCallback((chips: number) => {
     if (chips >= 100_000)    unlock('chips_100k');
     if (chips >= 500_000)    unlock('chips_500k');
@@ -157,30 +208,35 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     if (chips >= 10_000_000) unlock('chips_10m');
   }, [unlock]);
 
+  // ── onLoginStreak ─────────────────────────────────────────────────────────
   const onLoginStreak = useCallback((days: number) => {
     if (days >= 3)  unlock('daily_3');
     if (days >= 7)  unlock('daily_7');
     if (days >= 30) unlock('daily_30');
   }, [unlock]);
 
-  // Check login streak once on load
-  const streakChecked = useRef(false);
+  // Check login streak once after load, keyed on streakDays value
+  const streakChecked = useRef(0);
   useEffect(() => {
-    if (!loaded.current || streakChecked.current || profile.streakDays <= 0) return;
-    streakChecked.current = true;
+    if (!loaded.current || profile.streakDays <= 0 || streakChecked.current === profile.streakDays) return;
+    streakChecked.current = profile.streakDays;
     onLoginStreak(profile.streakDays);
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.streakDays]);
 
   return (
     <AchievementContext.Provider value={{
       unlockedIds,
+      claimedIds,
       pendingUnlock,
       dismissPending,
-      onHandWon,
-      onWinStreak,
+      recordGameWin,
+      recordGameLoss,
       onChipBalance,
       onLoginStreak,
+      claim,
       totalWins,
+      winStreak,
     }}>
       {children}
     </AchievementContext.Provider>

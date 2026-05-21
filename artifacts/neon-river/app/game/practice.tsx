@@ -462,9 +462,7 @@ export default function PracticeScreen() {
   }, [state.phase, state.winnerIds]);
 
   // ── Achievement hooks (must be above every early return) ─────────────────
-  const { onHandWon, onWinStreak, onChipBalance } = useAchievements();
-  const winStreakRef = useRef(0);
-  const prevLostRef  = useRef(false);
+  const { recordGameWin, recordGameLoss, onChipBalance } = useAchievements();
 
   // ── Setup screen (early return — hooks are all above this) ────────────────
   if (!gameStarted) {
@@ -499,10 +497,7 @@ export default function PracticeScreen() {
     const didWin = state.winnerIds.includes('human');
     if (didWin) {
       await recordWin(0);
-      winStreakRef.current += 1;
-      onWinStreak(winStreakRef.current);
 
-      // Determine winning hand description (only meaningful if human won)
       const human = state.players.find(p => p.isHuman);
       let handDesc = state.winnerHand ?? '';
       if (!handDesc && human && human.holeCards.length === 2) {
@@ -510,13 +505,11 @@ export default function PracticeScreen() {
         handDesc = describeHand(best);
       }
       const wasAllIn = human?.status === 'allIn' || isAllIn;
-      onHandWon(handDesc, wasAllIn, state.pot, prevLostRef.current);
+      recordGameWin(handDesc, wasAllIn, state.pot);
       onChipBalance((humanPlayer?.chips ?? 0) + state.winnerPot);
-      prevLostRef.current = false;
     } else {
       await recordLoss();
-      winStreakRef.current = 0;
-      prevLostRef.current = true;
+      recordGameLoss();
     }
     setHandCount(h => h + 1);
     continueAfterHand();

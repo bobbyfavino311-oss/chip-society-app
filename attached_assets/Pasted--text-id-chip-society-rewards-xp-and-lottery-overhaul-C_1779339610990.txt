@@ -1,0 +1,453 @@
+```text id="chip_society_rewards_xp_and_lottery_overhaul"
+CRITICAL REWARDS / XP / LOTTERY / ACHIEVEMENT SYSTEM OVERHAUL REQUIRED FOR CHIP SOCIETY
+
+The current progression and rewards systems feel:
+- inaccurate
+- unfinished
+- inflated
+- low quality
+- inconsistent
+- prototype-level
+
+The achievement logic is broken, the lucky wheel lacks polish, the scratch ticket system is non-functional, and the XP system currently feels meaningless.
+
+These systems MUST now be rebuilt into:
+- premium
+- rewarding
+- addictive
+- polished
+- App Store quality
+
+The final experience should feel comparable to:
+top-tier modern mobile progression systems.
+
+--------------------------------------------------
+ACHIEVEMENT SYSTEM OVERHAUL
+--------------------------------------------------
+
+The achievement system currently:
+- gives inaccurate achievements
+- rewards too many chips
+- lacks proper claiming flow
+- breaks player trust
+
+This entire system must be rebuilt.
+
+--------------------------------------------------
+ACHIEVEMENT TRACKING FIXES
+--------------------------------------------------
+
+Achievements MUST ONLY unlock when:
+the required condition ACTUALLY occurred.
+
+Current bug example:
+Player received:
+“Win 3 Hands in a Row”
+
+when the player DID NOT actually win 3 consecutive hands.
+
+This is unacceptable.
+
+--------------------------------------------------
+REBUILD ACHIEVEMENT VALIDATION
+--------------------------------------------------
+
+All achievements must validate:
+- server-side
+- accurately
+- in real-time
+
+Track properly:
+- consecutive wins
+- bluff wins
+- tournament victories
+- hand streaks
+- all-ins
+- fold streaks
+- hand rankings
+- social milestones
+
+Prevent:
+- false unlocks
+- duplicate rewards
+- fake progression
+
+--------------------------------------------------
+ACHIEVEMENT CLAIM BUTTON SYSTEM
+--------------------------------------------------
+
+Achievements should NOT instantly grant rewards automatically.
+
+Instead:
+ALL achievements must include:
+“CLAIM REWARD” button.
+
+FLOW:
+1. Achievement unlocked
+2. Player sees notification
+3. Achievement enters “Claimable” state
+4. Player manually presses “Claim”
+5. Chips / XP animate into balance
+
+--------------------------------------------------
+ACHIEVEMENT UI DESIGN
+--------------------------------------------------
+
+Achievement cards should display:
+- achievement icon
+- title
+- description
+- progress bar
+- reward amount
+- claim button
+- completed state
+
+Completed achievements should:
+- glow subtly
+- animate elegantly
+- feel satisfying
+
+--------------------------------------------------
+ACHIEVEMENT REWARD REBALANCE
+--------------------------------------------------
+
+Current achievement rewards are FAR TOO HIGH.
+
+Lower all rewards significantly.
+
+Achievements should feel:
+- meaningful
+- sustainable
+- balanced
+
+NOT:
+- economy-breaking
+- inflated
+- unrealistic
+
+--------------------------------------------------
+NEW REWARD BALANCE STRUCTURE
+--------------------------------------------------
+
+SMALL ACHIEVEMENTS:
+- 1K–5K chips
+
+MEDIUM ACHIEVEMENTS:
+- 10K–25K chips
+
+RARE ACHIEVEMENTS:
+- 50K MAXIMUM
+
+NO achievement should:
+- instantly flood the economy
+- give massive unrealistic payouts
+
+--------------------------------------------------
+XP SYSTEM COMPLETE OVERHAUL
+--------------------------------------------------
+
+The XP system currently feels:
+- empty
+- pointless
+- disconnected from gameplay
+
+XP needs REAL rewards and progression incentives.
+
+--------------------------------------------------
+XP REWARD SYSTEM
+--------------------------------------------------
+
+Players should earn XP from:
+- winning hands
+- tournaments
+- login streaks
+- achievements
+- social engagement
+- challenges
+
+--------------------------------------------------
+XP LEVEL REWARDS
+--------------------------------------------------
+
+Every few levels should unlock:
+- chips
+- profile cosmetics
+- table themes
+- avatars
+- card backs
+- badges
+- emotes
+
+Example:
+LEVEL 5:
+Unlock Neon Card Back
+
+LEVEL 10:
+Unlock Cyan Table Theme
+
+LEVEL 15:
+Unlock Rare Avatar
+
+--------------------------------------------------
+LEVEL-UP EXPERIENCE
+--------------------------------------------------
+
+Level-ups should feel:
+- exciting
+- rewarding
+- polished
+
+Include:
+- smooth XP bar animation
+- neon pulse effects
+- level-up overlay
+- reward showcase
+
+--------------------------------------------------
+LUCKY WHEEL COMPLETE REDESIGN
+--------------------------------------------------
+
+The current lucky wheel feels:
+- unfinished
+- lifeless
+- silent
+- low quality
+
+This entire system must be redesigned.
+
+--------------------------------------------------
+LUCKY WHEEL AUDIO
+--------------------------------------------------
+
+The wheel MUST include:
+- realistic spinning sound
+- clicking peg sounds
+- slowing momentum audio
+- reward celebration sound
+
+The wheel should feel:
+- tactile
+- satisfying
+- exciting
+
+--------------------------------------------------
+LUCKY WHEEL VISUAL REDESIGN
+--------------------------------------------------
+
+Redesign the wheel using:
+- luxury neon styling
+- glowing slices
+- realistic wheel physics
+- polished spin animations
+- premium gradients
+
+Avoid:
+- cartoon visuals
+- cheap casino aesthetics
+- oversized clutter
+
+--------------------------------------------------
+LUCKY WHEEL REWARD BALANCING
+--------------------------------------------------
+
+Reduce inflated rewards.
+
+Wheel rewards should remain:
+- exciting
+- balanced
+- sustainable
+
+Example rewards:
+- 2K
+- 5K
+- 10K
+- 25K
+- XP boosts
+- cosmetic tokens
+- scratch tickets
+
+Rare jackpot:
+- 100K MAXIMUM
+
+--------------------------------------------------
+SCRATCH TICKET SYSTEM COMPLETE REBUILD
+--------------------------------------------------
+
+The current lottery ticket system does NOT work correctly.
+
+Rebuild the entire feature from scratch.
+
+--------------------------------------------------
+REMOVE TACKY MOVIE TICKET ICON
+--------------------------------------------------
+
+The current movie-ticket emoji/icon looks:
+- cheap
+- tacky
+- off-brand
+
+Replace it with:
+- premium neon scratch card icon
+- holographic casino ticket design
+- luxury synthwave styling
+
+The scratch ticket should visually feel:
+- expensive
+- premium
+- collectible
+
+--------------------------------------------------
+REAL SCRATCH-OFF INTERACTION
+--------------------------------------------------
+
+Implement REAL scratch-off gameplay.
+
+Players must:
+- drag finger across ticket
+- physically reveal symbols underneath
+- remove silver coating interactively
+
+This should feel:
+- tactile
+- satisfying
+- smooth
+- premium
+
+--------------------------------------------------
+SCRATCH EFFECT REQUIREMENTS
+--------------------------------------------------
+
+Include:
+- scratch particles
+- reveal effects
+- smooth finger tracking
+- realistic coating removal
+- neon glow reveals
+
+The scratch mechanic should feel:
+like a real mobile scratch-off ticket.
+
+--------------------------------------------------
+SCRATCH TICKET REWARD FLOW
+--------------------------------------------------
+
+FLOW:
+1. Open ticket
+2. Scratch manually
+3. Reveal symbols
+4. Detect win/loss
+5. Show reward animation
+6. Allow player to claim reward
+
+DO NOT:
+- instantly reveal everything
+- fake reward animations
+- auto-add chips incorrectly
+
+--------------------------------------------------
+SCRATCH TICKET WIN VALIDATION
+--------------------------------------------------
+
+Fix current reward bugs.
+
+The system must:
+- ONLY add chips if player ACTUALLY won
+- NEVER show fake “added to balance” messages
+- synchronize balances instantly
+
+All winnings must:
+- validate server-side
+- update globally
+- animate accurately
+
+--------------------------------------------------
+REWARD ECONOMY BALANCE
+--------------------------------------------------
+
+The ENTIRE rewards ecosystem must now prioritize:
+- sustainability
+- long-term retention
+- progression pacing
+- chip value preservation
+
+Avoid:
+- massive giveaways
+- runaway inflation
+- meaningless balances
+
+--------------------------------------------------
+REWARD CLAIM ANIMATION SYSTEM
+--------------------------------------------------
+
+ALL rewards should use:
+manual claim flow.
+
+Examples:
+- achievements
+- XP rewards
+- wheel prizes
+- scratch tickets
+
+When claimed:
+- chips animate into balance
+- XP bars animate smoothly
+- reward card fades elegantly
+
+--------------------------------------------------
+NOTIFICATION SYSTEM IMPROVEMENTS
+--------------------------------------------------
+
+Notifications should feel:
+- subtle
+- premium
+- polished
+
+NOT:
+- spammy
+- intrusive
+- cheap casino popups
+
+--------------------------------------------------
+AUDIO DESIGN IMPROVEMENTS
+--------------------------------------------------
+
+Add subtle premium sound design for:
+- wheel spins
+- scratch reveals
+- level-ups
+- achievements
+- reward claims
+
+Use:
+- synthwave-inspired UI sounds
+- soft casino ambiance
+- elegant reward tones
+
+DO NOT:
+- use loud arcade sounds
+- use cheesy casino jingles
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The CHIP SOCIETY progression ecosystem should now feel like:
+- a modern premium mobile game
+- a luxury social poker platform
+- a polished App Store-ready experience
+
+The systems should feel:
+- rewarding
+- balanced
+- immersive
+- visually stunning
+- addictive
+- trustworthy
+
+NOT:
+- buggy
+- inflated
+- fake
+- tacky
+- prototype-quality.
+```
