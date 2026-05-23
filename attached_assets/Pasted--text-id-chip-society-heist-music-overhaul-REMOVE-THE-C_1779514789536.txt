@@ -1,0 +1,173 @@
+```text id="chip_society_heist_music_overhaul"
+REMOVE THE CURRENT SYNTHWAVE-STYLE GAMEPLAY MUSIC COMPLETELY.
+
+The current soundtrack does NOT fit the atmosphere of CHIP SOCIETY.
+
+The music currently feels:
+- too retro
+- too electronic
+- too soft
+- too “arcade”
+- too relaxed
+
+I want the gameplay atmosphere to feel:
+INTENSE.
+SERIOUS.
+HIGH-STAKES.
+CINEMATIC.
+
+The vibe should resemble:
+a professional underground poker game during a high-risk heist movie.
+
+--------------------------------------------------
+NEW MUSIC DIRECTION
+--------------------------------------------------
+
+The soundtrack should now feel inspired by:
+
+- modern heist films
+- underground casinos
+- tense poker scenes
+- crime thrillers
+- elite high-stakes gambling
+- late-night luxury tension
+
+Think:
+controlled pressure and suspense.
+
+--------------------------------------------------
+TARGET MUSIC FEELING
+--------------------------------------------------
+
+The music should create:
+- tension
+- focus
+- suspense
+- anticipation
+- seriousness
+
+The player should feel:
+like every hand matters.
+
+--------------------------------------------------
+MUSIC STYLE REQUIREMENTS
+--------------------------------------------------
+
+The soundtrack should include:
+- dark cinematic bass
+- subtle pulsing percussion
+- restrained strings
+- atmospheric tension
+- deep low-end textures
+- slow-building intensity
+- modern thriller pacing
+
+DO NOT use:
+- synthwave melodies
+- upbeat electronic music
+- EDM
+- arcade sounds
+- happy casino music
+- retro wave leads
+- cheesy saxophone vibes
+
+--------------------------------------------------
+REFERENCE VIBE
+--------------------------------------------------
+
+The atmosphere should feel similar to:
+- high-stakes poker scenes in crime films
+- modern heist movie tension
+- luxury underground casino energy
+- elite secret poker clubs
+
+The music should feel:
+clean, mature, expensive, dangerous.
+
+--------------------------------------------------
+GAMEPLAY MUSIC STRUCTURE
+--------------------------------------------------
+
+NORMAL TABLE PLAY:
+- subtle tension ambience
+- low cinematic pulse
+- restrained background energy
+
+BIG POTS / ALL-INS:
+- increase suspense slightly
+- elevate intensity subtly
+- add pressure without overpowering gameplay
+
+SHOWDOWN:
+- brief dramatic tension rise
+
+WIN MOMENTS:
+- restrained premium reward accent
+- NOT celebratory casino jingles
+
+--------------------------------------------------
+AUDIO MIXING REQUIREMENTS
+--------------------------------------------------
+
+Music should NEVER overpower:
+- card sounds
+- chip sounds
+- betting actions
+- timers
+- gameplay effects
+
+The soundtrack should sit:
+behind the gameplay naturally.
+
+--------------------------------------------------
+OVERALL ATMOSPHERE GOAL
+--------------------------------------------------
+
+Chip Society should now feel like:
+- an elite underground poker network
+- a high-stakes late-night casino
+- a tense competitive environment
+- a cinematic poker thriller
+
+NOT:
+- retro arcade poker
+- neon dance club
+- casual party game
+
+--------------------------------------------------
+MUSIC LOOP REQUIREMENTS
+--------------------------------------------------
+
+Tracks must:
+- loop seamlessly
+- avoid repetitive melodies
+- maintain immersion over long sessions
+- feel smooth during extended gameplay
+
+--------------------------------------------------
+PLAYER CONTROL SETTINGS
+--------------------------------------------------
+
+Add settings for:
+- Music Volume
+- Sound FX Volume
+- Mute Music
+- Mute All Audio
+
+Allow instant toggling during gameplay.
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The soundtrack should now feel:
+- cinematic
+- immersive
+- intense
+- professional
+- premium
+- suspenseful
+
+The gameplay atmosphere should feel:
+like sitting at a real high-stakes poker table in a luxury underground casino during a heist movie.
+```
