@@ -25,6 +25,7 @@ import { useAchievements } from '@/context/AchievementContext';
 import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame, TableConfig } from '@/hooks/usePokerGame';
 import { SoundEngine } from '@/lib/soundEngine';
+import { MusicEngine } from '@/lib/musicEngine';
 import { getBestHand, describeHand } from '@/lib/pokerEngine';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -463,6 +464,23 @@ export default function PracticeScreen() {
 
   // ── Achievement hooks (must be above every early return) ─────────────────
   const { recordGameWin, recordGameLoss, onChipBalance } = useAchievements();
+
+  // ── Ambient music — start when game begins, stop when it ends ────────────
+  React.useEffect(() => {
+    if (!gameStarted) { MusicEngine.stop(); return; }
+    MusicEngine.play();
+    return () => { MusicEngine.stop(); };
+  }, [gameStarted]);
+
+  React.useEffect(() => {
+    if (!gameStarted) return;
+    const isHandOver = state.phase === 'handover' || state.phase === 'showdown';
+    const humanAllIn = state.players.find((p: { isHuman: boolean; status: string }) => p.isHuman)?.status === 'allIn';
+    if (isHandOver) MusicEngine.setIntensity('showdown');
+    else if (humanAllIn) MusicEngine.setIntensity('tense');
+    else MusicEngine.setIntensity('normal');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameStarted, state.phase, state.players]);
 
   // ── Setup screen (early return — hooks are all above this) ────────────────
   if (!gameStarted) {

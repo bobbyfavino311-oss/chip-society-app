@@ -76,8 +76,9 @@ export default function WheelScreen() {
   const [spinning, setSpinning]   = useState(false);
   const [winner,   setWinner]     = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const resultScale = useRef(new Animated.Value(0)).current;
-  const glowAnim   = useRef(new Animated.Value(0.3)).current;
+  const resultScale   = useRef(new Animated.Value(0)).current;
+  const glowAnim      = useRef(new Animated.Value(0.3)).current;
+  const pointerBounce = useRef(new Animated.Value(1)).current;
 
   // Tick sound during spin
   const tickInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -137,6 +138,14 @@ export default function WheelScreen() {
         await updateProfile({ xp: profile.xp + seg.xp });
       }
       SoundEngine.win();
+      // Pointer bounce — tactile landing feel
+      Animated.sequence([
+        Animated.timing(pointerBounce, { toValue: 1.6, duration: 100, useNativeDriver: false }),
+        Animated.timing(pointerBounce, { toValue: 0.7, duration: 80,  useNativeDriver: false }),
+        Animated.timing(pointerBounce, { toValue: 1.3, duration: 60,  useNativeDriver: false }),
+        Animated.timing(pointerBounce, { toValue: 0.9, duration: 50,  useNativeDriver: false }),
+        Animated.timing(pointerBounce, { toValue: 1.0, duration: 40,  useNativeDriver: false }),
+      ]).start();
       setShowResult(true);
       resultScale.setValue(0);
       Animated.spring(resultScale, { toValue: 1, tension: 60, friction: 8, useNativeDriver: false }).start();
@@ -147,7 +156,7 @@ export default function WheelScreen() {
         ]), { iterations: 6 }
       ).start();
     });
-  }, [canClaimWheel, spinning, rotAnim, claimWheelSpin, resultScale, glowAnim, profile.xp, updateProfile]);
+  }, [canClaimWheel, spinning, rotAnim, claimWheelSpin, resultScale, glowAnim, pointerBounce, profile.xp, updateProfile]);
 
   const seg = winner !== null ? SEGMENTS[winner] : null;
 
@@ -174,7 +183,7 @@ export default function WheelScreen() {
 
       {/* Pointer */}
       <View style={s.pointerWrap}>
-        <View style={s.pointer} />
+        <Animated.View style={[s.pointer, { transform: [{ scaleY: pointerBounce }] }]} />
       </View>
 
       {/* Spinning wheel */}

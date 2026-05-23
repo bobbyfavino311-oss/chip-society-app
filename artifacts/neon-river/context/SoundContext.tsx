@@ -7,39 +7,46 @@ import React, {
   useState,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 
 const STORAGE_KEY = '@chipsociety_sound_settings';
 
 interface SoundSettings {
-  masterVolume: number;
-  effectsVolume: number;
-  isMuted: boolean;
+  masterVolume:   number;
+  effectsVolume:  number;
+  isMuted:        boolean;
   isVibrationEnabled: boolean;
+  musicVolume:    number;
+  isMusicMuted:   boolean;
 }
 
 interface SoundContextValue extends SoundSettings {
-  setMasterVolume: (v: number) => void;
+  setMasterVolume:  (v: number) => void;
   setEffectsVolume: (v: number) => void;
-  toggleMute: () => void;
-  toggleVibration: () => void;
-  effectiveVolume: number;
+  toggleMute:       () => void;
+  toggleVibration:  () => void;
+  setMusicVolume:   (v: number) => void;
+  toggleMusicMute:  () => void;
+  effectiveVolume:  number;
 }
 
 const DEFAULT: SoundSettings = {
-  masterVolume: 0.8,
-  effectsVolume: 0.9,
-  isMuted: false,
+  masterVolume:       0.80,
+  effectsVolume:      0.90,
+  isMuted:            false,
   isVibrationEnabled: true,
+  musicVolume:        0.40,
+  isMusicMuted:       false,
 };
 
 const SoundContext = createContext<SoundContextValue>({
   ...DEFAULT,
-  setMasterVolume: () => {},
+  setMasterVolume:  () => {},
   setEffectsVolume: () => {},
-  toggleMute: () => {},
-  toggleVibration: () => {},
-  effectiveVolume: DEFAULT.masterVolume * DEFAULT.effectsVolume,
+  toggleMute:       () => {},
+  toggleVibration:  () => {},
+  setMusicVolume:   () => {},
+  toggleMusicMute:  () => {},
+  effectiveVolume:  DEFAULT.masterVolume * DEFAULT.effectsVolume,
 });
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
@@ -65,7 +72,7 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setMasterVolume = useCallback((v: number) => {
-    setSettings(s => { const n = { ...s, masterVolume: Math.max(0, Math.min(1, v)) }; save(n); return n; });
+    setSettings(s => { const n = { ...s, masterVolume:  Math.max(0, Math.min(1, v)) }; save(n); return n; });
   }, [save]);
 
   const setEffectsVolume = useCallback((v: number) => {
@@ -80,6 +87,14 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
     setSettings(s => { const n = { ...s, isVibrationEnabled: !s.isVibrationEnabled }; save(n); return n; });
   }, [save]);
 
+  const setMusicVolume = useCallback((v: number) => {
+    setSettings(s => { const n = { ...s, musicVolume: Math.max(0, Math.min(1, v)) }; save(n); return n; });
+  }, [save]);
+
+  const toggleMusicMute = useCallback(() => {
+    setSettings(s => { const n = { ...s, isMusicMuted: !s.isMusicMuted }; save(n); return n; });
+  }, [save]);
+
   const effectiveVolume = settings.isMuted
     ? 0
     : settings.masterVolume * settings.effectsVolume;
@@ -91,6 +106,8 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
       setEffectsVolume,
       toggleMute,
       toggleVibration,
+      setMusicVolume,
+      toggleMusicMute,
       effectiveVolume,
     }}>
       {children}

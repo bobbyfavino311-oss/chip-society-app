@@ -1,0 +1,393 @@
+CRITICAL IOS GAMEPLAY AUDIO + REWARDS SYSTEM OVERHAUL REQUIRED FOR CHIP SOCIETY
+
+The current iOS gameplay experience feels dramatically lower quality than the preview/demo version.
+
+The atmosphere, sound design, wheel system, and reward interactions currently feel:
+- basic
+- lifeless
+- inconsistent
+- unfinished
+- low immersion
+
+This must now be rebuilt into a PREMIUM mobile poker atmosphere.
+
+The app should feel:
+- cinematic
+- smooth
+- immersive
+- intense
+- luxurious
+- modern
+
+The experience should resemble:
+a high-end neon poker lounge with subtle heist-style tension.
+
+--------------------------------------------------
+IOS GAMEPLAY AUDIO OVERHAUL
+--------------------------------------------------
+
+The current iOS gameplay sounds NOTHING like the preview version.
+
+This is unacceptable.
+
+Audio consistency between:
+- preview build
+- live gameplay
+- iOS production version
+
+must now be corrected.
+
+--------------------------------------------------
+NEW BACKGROUND MUSIC SYSTEM
+--------------------------------------------------
+
+Add subtle ambient poker music during gameplay.
+
+The music should feel:
+- serious
+- stylish
+- immersive
+- tense
+- luxurious
+
+DO NOT use:
+- upbeat EDM
+- cheesy casino music
+- arcade music
+- happy lounge music
+- generic royalty-free sounding tracks
+
+--------------------------------------------------
+TARGET MUSIC VIBE
+--------------------------------------------------
+
+The soundtrack should feel inspired by:
+- luxury casino lounges
+- neon Miami nightlife
+- late-night poker tension
+- subtle heist movie energy
+- synthwave noir atmosphere
+
+Think:
+slow-burning intensity.
+
+The music should feel:
+focused and immersive WITHOUT distracting from gameplay.
+
+--------------------------------------------------
+MUSIC STYLE REQUIREMENTS
+--------------------------------------------------
+
+Music should include:
+- subtle synth textures
+- low bass pulses
+- atmospheric pads
+- restrained percussion
+- cinematic tension
+- elegant rhythm
+
+DO NOT:
+- overpower gameplay
+- dominate sound effects
+- become repetitive too quickly
+
+--------------------------------------------------
+DYNAMIC MUSIC SYSTEM
+--------------------------------------------------
+
+Music should dynamically adjust based on gameplay.
+
+EXAMPLES:
+
+NORMAL TABLE PLAY:
+- subtle ambient synthwave tension
+
+BIG ALL-IN MOMENTS:
+- slightly elevated intensity
+
+SHOWDOWN:
+- heightened suspense layer
+
+WIN MOMENTS:
+- restrained reward accent
+
+DO NOT:
+turn the game into an arcade experience.
+
+Keep everything:
+- mature
+- sleek
+- premium
+
+--------------------------------------------------
+AUDIO SETTINGS MENU
+--------------------------------------------------
+
+Add full audio controls inside settings.
+
+Allow users to:
+- mute music
+- mute sound effects
+- adjust music volume
+- adjust gameplay sound volume
+
+Include:
+- smooth sliders
+- neon toggle switches
+- premium UI styling
+
+--------------------------------------------------
+TABLE SOUND DESIGN IMPROVEMENTS
+--------------------------------------------------
+
+Improve ALL gameplay sounds:
+- card dealing
+- chip betting
+- folds
+- all-ins
+- timer countdowns
+- winner reveals
+
+The sounds should feel:
+- crisp
+- realistic
+- premium
+- satisfying
+
+--------------------------------------------------
+LUCKY WHEEL COMPLETE VISUAL REDESIGN
+--------------------------------------------------
+
+The current lucky wheel looks:
+- too basic
+- too flat
+- too generic
+- low quality
+
+The wheel must be COMPLETELY redesigned.
+
+--------------------------------------------------
+NEW WHEEL DESIGN STYLE
+--------------------------------------------------
+
+The wheel should feel:
+- luxurious
+- neon-lit
+- premium
+- modern
+- exciting
+
+Use:
+- glowing segmented slices
+- realistic wheel depth
+- polished lighting
+- smooth reflections
+- animated neon accents
+- premium casino materials
+
+DO NOT:
+- use cartoon visuals
+- use cheap casino aesthetics
+- use oversized UI clutter
+
+--------------------------------------------------
+WHEEL ANIMATION IMPROVEMENTS
+--------------------------------------------------
+
+Improve:
+- wheel physics
+- spin momentum
+- slowing behavior
+- pointer bounce
+- reward landing effects
+
+The wheel should feel:
+REAL and SATISFYING.
+
+--------------------------------------------------
+LUCKY WHEEL AUDIO
+--------------------------------------------------
+
+The wheel currently has NO spin sound.
+
+Add:
+- wheel spinning audio
+- clicking peg sounds
+- slowing momentum effects
+- reward landing sound
+- reward claim sound
+
+The wheel should now feel:
+tactile and immersive.
+
+--------------------------------------------------
+CLAIM BUTTON SYSTEM OVERHAUL
+--------------------------------------------------
+
+ALL rewards systems must now use:
+manual CLAIM buttons.
+
+This applies to:
+- wheel rewards
+- lottery prizes
+- daily login rewards
+- achievement rewards
+- XP rewards
+
+--------------------------------------------------
+CLAIM BUTTON REQUIREMENTS
+--------------------------------------------------
+
+When a player wins a reward:
+DO NOT instantly auto-add chips.
+
+Instead:
+1. Show reward card
+2. Display reward amount
+3. Show glowing “CLAIM” button
+4. Player taps claim
+5. Chips animate into balance
+
+This creates:
+- better reward pacing
+- stronger dopamine feedback
+- more satisfying progression
+
+--------------------------------------------------
+CLAIM BUTTON SOUND DESIGN
+--------------------------------------------------
+
+Add premium audio when rewards are claimed.
+
+Examples:
+- soft chip collection sound
+- elegant neon pulse
+- subtle reward chime
+
+DO NOT:
+- use loud slot machine sounds
+- use cheesy casino jingles
+
+--------------------------------------------------
+DAILY REWARD SYSTEM IMPROVEMENTS
+--------------------------------------------------
+
+Daily rewards should:
+- animate smoothly
+- show streak progression
+- use claim buttons
+- include reward sounds
+- feel rewarding
+
+The current system feels:
+too plain and static.
+
+--------------------------------------------------
+LOTTERY SYSTEM OVERHAUL
+--------------------------------------------------
+
+The scratch-off ticket system still feels unfinished.
+
+Improve:
+- scratch interaction smoothness
+- reveal animations
+- reward presentation
+- ticket visuals
+- tactile feedback
+
+--------------------------------------------------
+NEW LOTTERY TICKET DESIGN
+--------------------------------------------------
+
+The scratch tickets should feel:
+- luxury
+- holographic
+- collectible
+- premium
+
+Use:
+- metallic neon textures
+- elegant casino styling
+- futuristic synthwave visuals
+
+REMOVE:
+- tacky ticket emoji visuals
+- cheap placeholders
+- cartoon ticket appearance
+
+--------------------------------------------------
+SCRATCH REVEAL AUDIO
+--------------------------------------------------
+
+Add:
+- realistic scratching sounds
+- reveal effects
+- subtle reward suspense
+- win confirmation audio
+
+--------------------------------------------------
+REWARD PRESENTATION SYSTEM
+--------------------------------------------------
+
+ALL rewards throughout the app should now feel:
+- polished
+- exciting
+- satisfying
+- premium
+
+Every reward flow should include:
+- reward card
+- animation
+- sound
+- claim interaction
+- smooth balance update
+
+--------------------------------------------------
+BALANCE UPDATE IMPROVEMENTS
+--------------------------------------------------
+
+When rewards are claimed:
+- chips should animate smoothly into balance
+- balance color should update correctly
+- balances should sync instantly
+
+NO fake reward messages.
+
+NO delayed balance updates.
+
+--------------------------------------------------
+OVERALL ATMOSPHERE GOAL
+--------------------------------------------------
+
+Chip Society should now feel like:
+- a luxury neon poker lounge
+- a modern cinematic casino app
+- a premium late-night poker experience
+
+The game should feel:
+- tense
+- immersive
+- smooth
+- atmospheric
+- sophisticated
+
+NOT:
+- arcade-like
+- loud
+- tacky
+- generic
+- low-budget
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+The iOS version of CHIP SOCIETY should now feel:
+- visually premium
+- sonically immersive
+- App Store quality
+- emotionally engaging
+- polished at every interaction
+
+The gameplay atmosphere should now rival:
+top-tier premium mobile casino and poker apps.

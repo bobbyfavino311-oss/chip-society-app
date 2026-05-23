@@ -157,7 +157,8 @@ const snd = StyleSheet.create({
 
 function SoundSettingsCard() {
   const { masterVolume, effectsVolume, isMuted, isVibrationEnabled,
-          setMasterVolume, setEffectsVolume, toggleMute, toggleVibration } = useSoundSettings();
+          setMasterVolume, setEffectsVolume, toggleMute, toggleVibration,
+          musicVolume, isMusicMuted, setMusicVolume, toggleMusicMute } = useSoundSettings();
 
   const Row = ({ label, value, onToggle, icon }: {
     label: string; value: boolean; onToggle: () => void; icon: string;
@@ -201,6 +202,10 @@ function SoundSettingsCard() {
           icon={isMuted ? 'volume-mute' : 'volume-high'} />
         <SliderRow label="Master Volume" value={masterVolume} onChange={setMasterVolume} disabled={isMuted} />
         <SliderRow label="Effects Volume" value={effectsVolume} onChange={setEffectsVolume} disabled={isMuted} />
+        <View style={snd.divider} />
+        <Row label="Table Music" value={!isMusicMuted} onToggle={toggleMusicMute}
+          icon={isMusicMuted ? 'musical-note-outline' : 'musical-notes'} />
+        <SliderRow label="Music Volume" value={musicVolume} onChange={setMusicVolume} disabled={isMusicMuted} />
         <View style={snd.divider} />
         <Row label="Vibration / Haptics" value={isVibrationEnabled} onToggle={toggleVibration}
           icon={isVibrationEnabled ? 'phone-portrait' : 'phone-portrait-outline'} />

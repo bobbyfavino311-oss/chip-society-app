@@ -23,6 +23,7 @@ import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
 import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import { SoundEngine } from '@/lib/soundEngine';
+import { MusicEngine } from '@/lib/musicEngine';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,10 +32,13 @@ const queryClient = new QueryClient();
 // ─── Sound syncer — keeps SoundEngine in sync with SoundContext ───────────────
 
 function SoundSyncer() {
-  const { masterVolume, effectsVolume, isMuted, isVibrationEnabled } = useSoundSettings();
+  const { masterVolume, effectsVolume, isMuted, isVibrationEnabled, musicVolume, isMusicMuted } = useSoundSettings();
   React.useEffect(() => {
     SoundEngine.configure({ masterVolume, effectsVolume, muted: isMuted, vibration: isVibrationEnabled });
   }, [masterVolume, effectsVolume, isMuted, isVibrationEnabled]);
+  React.useEffect(() => {
+    MusicEngine.configure({ volume: musicVolume, muted: isMusicMuted });
+  }, [musicVolume, isMusicMuted]);
   return null;
 }
 
