@@ -1,15 +1,37 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import colors from '@/constants/colors';
+import { useSocial } from '@/context/SocialContext';
 
 function TabBarBg() {
   if (Platform.OS === 'ios') {
     return <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />;
   }
   return <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,0,16,0.97)' }]} />;
+}
+
+function FeedTabIcon({ color, size }: { color: string; size: number }) {
+  const { unreadCount } = useSocial();
+  return (
+    <View style={{ position: 'relative' }}>
+      <Ionicons name="people" size={size} color={color} />
+      {unreadCount > 0 && (
+        <View style={{
+          position: 'absolute', top: -3, right: -6,
+          minWidth: 14, height: 14, borderRadius: 7,
+          backgroundColor: '#ff0090', alignItems: 'center', justifyContent: 'center',
+          paddingHorizontal: 2,
+        }}>
+          <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
 }
 
 export default function TabLayout() {
@@ -61,9 +83,7 @@ export default function TabLayout() {
         name="feed"
         options={{
           title: 'Feed',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <FeedTabIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen

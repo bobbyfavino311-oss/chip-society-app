@@ -1,0 +1,341 @@
+COMPLETE SOCIAL SYSTEM OVERHAUL REQUIRED FOR CHIP SOCIETY
+
+The current social media/feed system feels:
+- empty
+- basic
+- lifeless
+- disconnected
+- non-interactive
+
+Chip Society should feel like:
+a real poker social network.
+
+The app should encourage:
+- competition
+- social interaction
+- rivalries
+- community engagement
+- player identity
+- progression status
+
+The social system must now become a CORE FEATURE of the app.
+
+--------------------------------------------------
+MAIN SOCIAL GOAL
+--------------------------------------------------
+
+Players should feel like they are part of:
+- an active poker community
+- a competitive poker scene
+- a real social poker network
+
+The social features should increase:
+- retention
+- replay value
+- player engagement
+- social addiction loops
+
+--------------------------------------------------
+ADD FOLLOW / FOLLOWING SYSTEM
+--------------------------------------------------
+
+Players must now be able to:
+- follow other players
+- gain followers
+- view following lists
+- view follower counts
+
+Add:
+- Follow button on profiles
+- Following tab
+- Followers tab
+- Mutual followers display
+
+--------------------------------------------------
+PLAYER SEARCH SYSTEM
+--------------------------------------------------
+
+Add a global player search feature.
+
+Allow players to search by:
+- username
+- rank
+- level
+- player ID
+
+Search should include:
+- profile previews
+- chip count
+- rank badge
+- XP level
+- online status
+
+--------------------------------------------------
+PLAYER PROFILE OVERHAUL
+--------------------------------------------------
+
+Player profiles should now include:
+
+- profile banner
+- avatar
+- XP level
+- current chip balance
+- total hands played
+- win percentage
+- biggest pot won
+- tournament wins
+- achievement count
+- followers/following
+- recent activity
+
+--------------------------------------------------
+ONLINE STATUS SYSTEM
+--------------------------------------------------
+
+Show:
+- Online
+- In Game
+- Offline
+
+Allow players to:
+- invite online friends
+- spectate games
+- join private tables
+
+--------------------------------------------------
+SOCIAL FEED OVERHAUL
+--------------------------------------------------
+
+The feed should now feel active and alive.
+
+Players should be able to post:
+- big wins
+- hand screenshots
+- achievement unlocks
+- level ups
+- lucky wheel jackpots
+- tournament wins
+
+--------------------------------------------------
+AUTO-GENERATED FEED POSTS
+--------------------------------------------------
+
+Automatically create social posts when players:
+- win big pots
+- hit jackpots
+- level up
+- unlock achievements
+- go on win streaks
+- win tournaments
+
+Example:
+“NeonPlayer just won a 250K pot!”
+
+--------------------------------------------------
+LIKE + REACTION SYSTEM
+--------------------------------------------------
+
+Allow players to:
+- like posts
+- react to posts
+- comment on posts
+
+Use poker-themed reactions:
+- 🔥
+- ♠️
+- 💰
+- 😮
+- 👑
+
+--------------------------------------------------
+COMMENTS SYSTEM
+--------------------------------------------------
+
+Players should be able to:
+- leave comments
+- reply to comments
+- mention players
+
+Include:
+- moderation filtering
+- cooldown spam prevention
+
+--------------------------------------------------
+PLAYER STATS LEADERBOARDS
+--------------------------------------------------
+
+Add global leaderboards for:
+- highest chip count
+- biggest pots won
+- tournament wins
+- XP level
+- win percentage
+- hottest win streaks
+
+Allow:
+- daily
+- weekly
+- all-time rankings
+
+--------------------------------------------------
+FRIENDS SYSTEM
+--------------------------------------------------
+
+Players should now be able to:
+- add friends
+- remove friends
+- invite friends to tables
+- challenge friends
+
+--------------------------------------------------
+PRIVATE TABLE INVITES
+--------------------------------------------------
+
+Allow players to:
+- create invite-only tables
+- invite followers/friends
+- share invite codes
+
+--------------------------------------------------
+PLAYER CARD FEATURE
+--------------------------------------------------
+
+Add tap-to-view player cards.
+
+When tapping a player:
+show:
+- profile
+- level
+- rank
+- chip balance
+- follow button
+- stats
+
+--------------------------------------------------
+SOCIAL NOTIFICATIONS SYSTEM
+--------------------------------------------------
+
+Add notifications for:
+- new followers
+- likes
+- comments
+- friend requests
+- tournament invites
+- jackpot wins
+- achievement unlocks
+
+--------------------------------------------------
+DIRECT MESSAGES (PHASE 2 READY)
+--------------------------------------------------
+
+Build the backend structure for future:
+- player messaging
+- table invites
+- social chat
+
+Even if messaging is disabled initially,
+prepare the system architecture now.
+
+--------------------------------------------------
+PROFILE CUSTOMIZATION
+--------------------------------------------------
+
+Allow players to unlock:
+- profile frames
+- animated avatars
+- custom banners
+- rank cosmetics
+- rare visual effects
+
+--------------------------------------------------
+PLAYER VERIFICATION / BADGES
+--------------------------------------------------
+
+Add special badges such as:
+- Tournament Winner
+- VIP
+- Early Beta Player
+- Top Ranked
+- High Roller
+
+--------------------------------------------------
+SOCIAL TAB UI OVERHAUL
+--------------------------------------------------
+
+The social feed UI should feel:
+- modern
+- premium
+- smooth
+- active
+- visually alive
+
+Use:
+- animated transitions
+- neon glow accents
+- premium cards
+- dynamic feed spacing
+
+DO NOT:
+- make it look like generic social media
+- use flat boring layouts
+
+--------------------------------------------------
+HOME SCREEN SOCIAL BUTTON
+--------------------------------------------------
+
+The social feed button should now be:
+- permanently visible on the home screen
+- top left corner
+- redesigned with premium icon styling
+
+The button should feel:
+important and interactive.
+
+--------------------------------------------------
+PROFILE TAP INTERACTIONS
+--------------------------------------------------
+
+Players should be able to tap ANY username throughout the app to:
+- open profile
+- follow player
+- view stats
+- invite to table
+
+--------------------------------------------------
+LIVE ACTIVITY FEATURES
+--------------------------------------------------
+
+Add live feed notifications like:
+- “Shadow won a 500K pot”
+- “Vegas hit a jackpot”
+- “Ace reached Diamond Rank”
+
+This makes the app feel active even during solo play.
+
+--------------------------------------------------
+ENGAGEMENT GOAL
+--------------------------------------------------
+
+The social system should now:
+- dramatically increase retention
+- make players emotionally invested
+- encourage competition
+- create poker rivalries
+- encourage repeat app opens
+
+--------------------------------------------------
+FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+Chip Society should now feel like:
+- a social poker platform
+- a competitive poker network
+- a living poker community
+
+NOT:
+- a single-player poker app
+- a basic AI casino game
+- an empty feed system
+
+The social features should now rival:
+modern mobile gaming communities and social casino apps.

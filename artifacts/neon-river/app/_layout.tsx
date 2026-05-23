@@ -21,6 +21,7 @@ import { UserProvider, useUser } from '@/context/UserContext';
 import { TermsProvider, useTerms } from '@/context/TermsContext';
 import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
 import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
+import { SocialProvider } from '@/context/SocialContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import { SoundEngine } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
@@ -101,7 +102,8 @@ function RootLayoutNav() {
         <Stack.Screen name="modes/quickmatch" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="modes/ranked"     options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="modes/tournament" options={{ headerShown: false, animation: 'slide_from_right' }} />
-        <Stack.Screen name="modes/private"    options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen name="modes/private"       options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen name="social/player-profile" options={{ headerShown: false, animation: 'slide_from_right' }} />
       </Stack>
     </>
   );
@@ -134,11 +136,13 @@ export default function RootLayout() {
               <TermsProvider>
                 <SoundProvider>
                   <AchievementProvider>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                      <KeyboardProvider>
-                        <RootLayoutNav />
-                      </KeyboardProvider>
-                    </GestureHandlerRootView>
+                    <SocialProvider>
+                      <GestureHandlerRootView style={{ flex: 1 }}>
+                        <KeyboardProvider>
+                          <RootLayoutNav />
+                        </KeyboardProvider>
+                      </GestureHandlerRootView>
+                    </SocialProvider>
                   </AchievementProvider>
                 </SoundProvider>
               </TermsProvider>

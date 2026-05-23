@@ -1,6 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState, useRef } from 'react';
+import { router } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -16,369 +18,748 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
+import { useSocial } from '@/context/SocialContext';
+import {
+  SOCIAL_POSTS, MOCK_PLAYERS, LIVE_EVENTS, POKER_REACTIONS, POST_TAG_COLORS,
+  AVATAR_SYMBOLS, AVATAR_COLORS, getLeaderboard,
+  type SocialPost, type PostTag,
+} from '@/lib/socialData';
 
-// ─── Types & constants ────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-type PostType = 'WIN' | 'BLUFF' | 'BAD BEAT' | 'ALL-IN' | 'HIGHLIGHT';
-
-const POST_TYPE_COLORS: Record<PostType, string> = {
-  WIN: colors.success,
-  BLUFF: colors.accent,
-  'BAD BEAT': colors.warning,
-  'ALL-IN': colors.secondary,
-  HIGHLIGHT: colors.primary,
-};
-
-const POST_TYPE_ICONS: Record<PostType, React.ComponentProps<typeof Ionicons>['name']> = {
-  WIN: 'trophy-outline',
-  BLUFF: 'glasses-outline',
+const POST_TYPE_ICONS: Record<PostTag, React.ComponentProps<typeof Ionicons>['name']> = {
+  WIN:        'trophy-outline',
+  BLUFF:      'glasses-outline',
   'BAD BEAT': 'sad-outline',
-  'ALL-IN': 'flame-outline',
-  HIGHLIGHT: 'star-outline',
+  'ALL-IN':   'flame-outline',
+  HIGHLIGHT:  'star-outline',
+  JACKPOT:    'gift-outline',
+  'LEVEL UP': 'trending-up-outline',
+  TOURNAMENT: 'medal-outline',
 };
 
-const ALL_POST_TYPES: PostType[] = ['WIN', 'BLUFF', 'BAD BEAT', 'ALL-IN', 'HIGHLIGHT'];
 const MAX_CHARS = 280;
-
-interface FeedPost {
-  id: string;
-  user: string;
-  handle: string;
-  avatar: string;
-  avatarColor: string;
-  type: PostType;
-  content: string;
-  pot?: string;
-  handRank?: string;
-  likes: number;
-  comments: number;
-  timeAgo: string;
-  tab: 'following' | 'trending' | 'pots' | 'highlights';
-}
-
-interface MePost {
-  id: string;
-  type: PostType;
-  content: string;
-  pot?: string;
-  handRank?: string;
-  likes: number;
-  comments: number;
-  timeAgo: string;
-  repostedFrom?: string;
-}
-
-const ALL_POSTS: FeedPost[] = [
-  {
-    id: '1', user: 'NightShark99', handle: '@nightshark99',
-    avatar: '♠', avatarColor: colors.primary, type: 'WIN',
-    content: 'Royal Flush on the river. The whole table went silent. 🃏🔥 I just sat there and let it breathe.',
-    pot: '42,400', handRank: 'Royal Flush', likes: 1240, comments: 87, timeAgo: '2h',
-    tab: 'trending',
-  },
-  {
-    id: '2', user: 'VegasMirage', handle: '@vegasmirage',
-    avatar: '♥', avatarColor: colors.secondary, type: 'BLUFF',
-    content: 'Triple-barrel bluffed with 7-2 offsuit on a KQ4 paired board. They had a set and they folded it. This is art.',
-    pot: '18,200', handRank: '7-2 Offsuit', likes: 887, comments: 142, timeAgo: '4h',
-    tab: 'trending',
-  },
-  {
-    id: '3', user: 'NeonAce_', handle: '@neonace_',
-    avatar: '♦', avatarColor: colors.gold, type: 'BAD BEAT',
-    content: 'Quad Aces cracked by a straight flush. I need a moment. The odds of that happening are 0.000000001%.',
-    pot: '91,000', handRank: 'Quad Aces', likes: 2103, comments: 318, timeAgo: '6h',
-    tab: 'pots',
-  },
-  {
-    id: '4', user: 'ShadowKing', handle: '@shadowking',
-    avatar: '♣', avatarColor: colors.accent, type: 'ALL-IN',
-    content: 'Five-way all-in pre-flop. I had AA. Flopped a set. Turned quads. River was irrelevant.',
-    pot: '62,500', handRank: 'Quad Aces', likes: 1876, comments: 204, timeAgo: '8h',
-    tab: 'pots',
-  },
-  {
-    id: '5', user: 'MiamiDreams', handle: '@miamidreams',
-    avatar: '★', avatarColor: colors.success, type: 'HIGHLIGHT',
-    content: 'Finished 3rd in the Neon Championship last night. 128-player field. Proud of the run. Thanks for the rail!',
-    pot: '15,000', likes: 432, comments: 56, timeAgo: '12h',
-    tab: 'highlights',
-  },
-  {
-    id: '6', user: 'BlazeFire77', handle: '@blazefire77',
-    avatar: '♥', avatarColor: colors.warning, type: 'WIN',
-    content: 'Coolered the table captain with KK vs QQ. He had 3-bet/4-bet/shoved and I snap called. GG.',
-    pot: '28,800', handRank: 'Pair of Kings', likes: 654, comments: 91, timeAgo: '1d',
-    tab: 'following',
-  },
-  {
-    id: '7', user: 'PokerPhantom', handle: '@pokerphantom',
-    avatar: '♠', avatarColor: colors.accent, type: 'BLUFF',
-    content: 'Check-raised the flop, barrel turned, went all-in river with air. They tanked for 3 minutes and folded top pair top kicker. 😤',
-    pot: '33,600', likes: 1109, comments: 177, timeAgo: '1d',
-    tab: 'following',
-  },
-  {
-    id: '8', user: 'GlacierGhost', handle: '@glacierghost',
-    avatar: '♦', avatarColor: colors.primary, type: 'HIGHLIGHT',
-    content: 'Won a 5-hour session grinding cash. Up 12 buy-ins. The patience game is everything.',
-    pot: '48,000', likes: 789, comments: 63, timeAgo: '2d',
-    tab: 'highlights',
-  },
-];
-
-const INITIAL_MY_POSTS: MePost[] = [
-  {
-    id: 'mp1', type: 'WIN',
-    content: 'Picked up Aces UTG, ran it up to a 3-way all-in and held. First Royal Flush of my career tonight. 🃏',
-    pot: '24,800', handRank: 'Royal Flush', likes: 312, comments: 28, timeAgo: '3h',
-  },
-  {
-    id: 'mp2', type: 'ALL-IN',
-    content: 'Short-stacked on the bubble. Shoved A9s, got called by KK, hit an ace on the flop. Still alive. 🙏',
-    pot: '9,600', handRank: 'Pair of Aces', likes: 144, comments: 19, timeAgo: '1d',
-  },
-  {
-    id: 'mp3', type: 'BAD BEAT',
-    content: 'Flopped a straight flush draw with the nut flush. Turn gave me the straight flush. River counterfeited everything somehow. Table erupted.',
-    pot: '41,200', handRank: 'Straight Flush', likes: 876, comments: 104, timeAgo: '3d',
-  },
-];
-
-const MY_REPOSTS: MePost[] = [
-  {
-    id: 'mr1', type: 'WIN',
-    content: 'Royal Flush on the river. The whole table went silent. 🃏🔥 I just sat there and let it breathe.',
-    pot: '42,400', handRank: 'Royal Flush', likes: 1240, comments: 87, timeAgo: '2h',
-    repostedFrom: 'NightShark99',
-  },
-  {
-    id: 'mr2', type: 'BLUFF',
-    content: 'Check-raised the flop, barrel turned, went all-in river with air. They tanked for 3 minutes and folded top pair top kicker. 😤',
-    pot: '33,600', likes: 1109, comments: 177, timeAgo: '1d',
-    repostedFrom: 'PokerPhantom',
-  },
-  {
-    id: 'mr3', type: 'HIGHLIGHT',
-    content: 'Finished 3rd in the Neon Championship last night. 128-player field. Proud of the run. Thanks for the rail!',
-    pot: '15,000', likes: 432, comments: 56, timeAgo: '12h',
-    repostedFrom: 'MiamiDreams',
-  },
-];
-
-const MY_LIKES: MePost[] = [
-  {
-    id: 'ml1', type: 'BAD BEAT',
-    content: 'Quad Aces cracked by a straight flush. I need a moment. The odds of that happening are 0.000000001%.',
-    pot: '91,000', handRank: 'Quad Aces', likes: 2103, comments: 318, timeAgo: '6h',
-    repostedFrom: 'NeonAce_',
-  },
-  {
-    id: 'ml2', type: 'ALL-IN',
-    content: 'Five-way all-in pre-flop. I had AA. Flopped a set. Turned quads. River was irrelevant.',
-    pot: '62,500', handRank: 'Quad Aces', likes: 1876, comments: 204, timeAgo: '8h',
-    repostedFrom: 'ShadowKing',
-  },
-  {
-    id: 'ml3', type: 'WIN',
-    content: 'Won a 5-hour session grinding cash. Up 12 buy-ins. The patience game is everything.',
-    pot: '48,000', likes: 789, comments: 63, timeAgo: '2d',
-    repostedFrom: 'GlacierGhost',
-  },
-  {
-    id: 'ml4', type: 'BLUFF',
-    content: 'Triple-barrel bluffed with 7-2 offsuit on a KQ4 paired board. They had a set and they folded it. This is art.',
-    pot: '18,200', handRank: '7-2 Offsuit', likes: 887, comments: 142, timeAgo: '4h',
-    repostedFrom: 'VegasMirage',
-  },
-];
+const ALL_TAGS: PostTag[] = ['WIN', 'BLUFF', 'BAD BEAT', 'ALL-IN', 'HIGHLIGHT', 'JACKPOT', 'TOURNAMENT'];
 
 const FEED_TABS = [
-  { id: 'trending',   label: 'Trending',     icon: 'flame' as const },
-  { id: 'following',  label: 'Following',    icon: 'people' as const },
-  { id: 'pots',       label: 'Biggest Pots', icon: 'cash' as const },
-  { id: 'highlights', label: 'Highlights',   icon: 'star' as const },
-  { id: 'me',         label: 'Me',           icon: 'person-circle' as const },
+  { id: 'trending',    label: 'Trending',     icon: 'flame' as const },
+  { id: 'following',   label: 'Following',    icon: 'people' as const },
+  { id: 'pots',        label: 'Biggest Pots', icon: 'cash' as const },
+  { id: 'highlights',  label: 'Highlights',   icon: 'star' as const },
+  { id: 'leaderboard', label: 'Leaderboard',  icon: 'podium' as const },
+  { id: 'search',      label: 'Search',       icon: 'search' as const },
+  { id: 'me',          label: 'Me',           icon: 'person-circle' as const },
 ];
 
 const ME_SUBTABS = [
-  { id: 'posts', label: 'Posts', icon: 'create-outline' as const },
+  { id: 'posts',   label: 'Posts',   icon: 'create-outline' as const },
   { id: 'reposts', label: 'Reposts', icon: 'repeat' as const },
-  { id: 'likes', label: 'Likes', icon: 'heart-outline' as const },
+  { id: 'likes',   label: 'Likes',   icon: 'heart-outline' as const },
 ];
 
-// ─── Compose Sheet (inline overlay — works on web & native) ──────────────────
+// ─── Live Ticker ─────────────────────────────────────────────────────────────
 
-interface ComposeSheetProps {
-  visible: boolean;
-  onClose: () => void;
-  onPost: (post: MePost) => void;
-  bottomInset: number;
+function LiveTicker() {
+  const [idx, setIdx] = useState(0);
+  const opacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const cycle = () => {
+      Animated.timing(opacity, { toValue: 0, duration: 400, useNativeDriver: false }).start(() => {
+        setIdx(i => (i + 1) % LIVE_EVENTS.length);
+        Animated.timing(opacity, { toValue: 1, duration: 400, useNativeDriver: false }).start();
+      });
+    };
+    const timer = setInterval(cycle, 3500);
+    return () => clearInterval(timer);
+  }, [opacity]);
+
+  const ev = LIVE_EVENTS[idx];
+
+  return (
+    <View style={tickerStyle.wrap}>
+      <View style={tickerStyle.dot} />
+      <Text style={tickerStyle.label}>LIVE</Text>
+      <Animated.Text style={[tickerStyle.text, { opacity, color: ev.color }]} numberOfLines={1}>
+        {ev.text}
+      </Animated.Text>
+    </View>
+  );
 }
 
-function ComposeSheet({ visible, onClose, onPost, bottomInset }: ComposeSheetProps) {
+const tickerStyle = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: 14, paddingVertical: 8,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  dot: {
+    width: 6, height: 6, borderRadius: 3, backgroundColor: '#ff0090',
+  },
+  label: {
+    color: '#ff0090', fontSize: 9, fontWeight: '800', letterSpacing: 1.5,
+    fontFamily: 'Orbitron_700Bold',
+  },
+  text: { flex: 1, fontSize: 12, fontWeight: '600' },
+});
+
+// ─── Notification Bell ───────────────────────────────────────────────────────
+
+function NotifBell({ onPress }: { onPress: () => void }) {
+  const { unreadCount } = useSocial();
+  return (
+    <TouchableOpacity style={hdrStyle.bell} onPress={onPress}>
+      <Ionicons name="notifications-outline" size={20} color={colors.textMuted} />
+      {unreadCount > 0 && (
+        <View style={hdrStyle.badge}>
+          <Text style={hdrStyle.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+}
+
+const hdrStyle = StyleSheet.create({
+  bell: { position: 'relative', padding: 4 },
+  badge: {
+    position: 'absolute', top: 0, right: 0,
+    minWidth: 16, height: 16, borderRadius: 8,
+    backgroundColor: '#ff0090', alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeText: { color: '#fff', fontSize: 9, fontWeight: '800' },
+});
+
+// ─── Notifications panel ──────────────────────────────────────────────────────
+
+function NotificationsPanel({ onClose }: { onClose: () => void }) {
+  const { notifications, markAllRead } = useSocial();
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    markAllRead();
+  }, [markAllRead]);
+
+  const NOTIF_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+    follow:      'person-add',
+    like:        'heart',
+    reaction:    'happy',
+    comment:     'chatbubble',
+    achievement: 'trophy',
+  };
+  const NOTIF_COLORS: Record<string, string> = {
+    follow: '#00d4ff', like: '#ff0090', reaction: '#ffd700',
+    comment: '#bf5fff', achievement: '#00ff88',
+  };
+
+  function timeStr(ts: number) {
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h / 24)}d ago`;
+  }
+
+  return (
+    <View style={[notifStyle.panel, { paddingTop: insets.top + 8 }]}>
+      <LinearGradient colors={['#0e0025', '#050010']} style={StyleSheet.absoluteFill} />
+      <View style={notifStyle.header}>
+        <Text style={notifStyle.title}>NOTIFICATIONS</Text>
+        <TouchableOpacity onPress={onClose}>
+          <Ionicons name="close" size={22} color={colors.textMuted} />
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        data={notifications}
+        keyExtractor={n => n.id}
+        contentContainerStyle={{ padding: 14, gap: 10 }}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item: n }) => {
+          const ic = NOTIF_ICONS[n.type] ?? 'notifications';
+          const col = NOTIF_COLORS[n.type] ?? colors.primary;
+          return (
+            <View style={[notifStyle.row, !n.read && notifStyle.rowUnread]}>
+              <View style={[notifStyle.icon, { backgroundColor: `${col}20`, borderColor: `${col}40` }]}>
+                <Ionicons name={ic} size={14} color={col} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={notifStyle.msg}>{n.message}</Text>
+                <Text style={notifStyle.time}>{timeStr(n.timestamp)}</Text>
+              </View>
+              {!n.read && <View style={notifStyle.unreadDot} />}
+            </View>
+          );
+        }}
+        ListEmptyComponent={
+          <View style={{ alignItems: 'center', paddingTop: 48, gap: 10 }}>
+            <Ionicons name="notifications-off-outline" size={36} color={colors.textDim} />
+            <Text style={{ color: colors.textDim, fontSize: 13 }}>No notifications yet</Text>
+          </View>
+        }
+      />
+    </View>
+  );
+}
+
+const notifStyle = StyleSheet.create({
+  panel: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 900,
+  },
+  header: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingBottom: 12,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  title: {
+    color: colors.primary, fontSize: 16, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
+  },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1,
+    borderColor: colors.border, padding: 12,
+  },
+  rowUnread: { borderColor: `${colors.primary}30`, backgroundColor: `${colors.primary}08` },
+  icon: {
+    width: 32, height: 32, borderRadius: 16, borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  msg: { color: colors.text, fontSize: 13, fontWeight: '600', lineHeight: 18 },
+  time: { color: colors.textDim, fontSize: 11, marginTop: 2 },
+  unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary },
+});
+
+// ─── Post Card ───────────────────────────────────────────────────────────────
+
+function PostCard({ post }: { post: SocialPost }) {
+  const { isFollowing, follow, unfollow, isLiked, toggleLike, setReaction, getReaction } = useSocial();
+  const [showReactions, setShowReactions] = useState(false);
+  const player = MOCK_PLAYERS.find(p => p.id === post.playerId);
+  const typeColor = POST_TAG_COLORS[post.tag];
+  const myReaction = getReaction(post.id);
+  const liked = isLiked(post.id);
+  const following = isFollowing(post.playerId);
+
+  function handleFollow() {
+    if (!player) return;
+    if (following) unfollow(post.playerId);
+    else follow(post.playerId, player.username);
+  }
+
+  return (
+    <View style={cd.wrap}>
+      <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+
+      {/* Header */}
+      <View style={cd.header}>
+        <TouchableOpacity
+          style={cd.avatarWrap}
+          onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}
+        >
+          <View style={[cd.avatar, { borderColor: player?.avatarColor ?? colors.primary }]}>
+            <Text style={[cd.avatarText, { color: player?.avatarColor ?? colors.primary }]}>
+              {player?.avatar ?? '♠'}
+            </Text>
+          </View>
+          {player?.status === 'online' && <View style={cd.onlineDot} />}
+          {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
+        </TouchableOpacity>
+
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}>
+            <Text style={cd.username}>{player?.username ?? 'Unknown'}</Text>
+          </TouchableOpacity>
+          <Text style={cd.handle}>{player?.handle ?? ''} · {post.timeAgo}</Text>
+        </View>
+
+        <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
+          <Ionicons name={POST_TYPE_ICONS[post.tag]} size={9} color={typeColor} />
+          <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+        </View>
+
+        <TouchableOpacity
+          style={[cd.followBtn, following && cd.followBtnActive]}
+          onPress={handleFollow}
+        >
+          <Text style={[cd.followText, following && cd.followTextActive]}>
+            {following ? 'Following' : 'Follow'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Content */}
+      <Text style={cd.content}>{post.content}</Text>
+
+      {/* Stats chips */}
+      {(post.pot || post.handRank) && (
+        <View style={cd.statsRow}>
+          {post.pot && (
+            <View style={cd.statChip}>
+              <Ionicons name="layers" size={10} color={colors.gold} />
+              <Text style={cd.statText}>Pot: <Text style={{ color: colors.gold }}>{post.pot}</Text></Text>
+            </View>
+          )}
+          {post.handRank && (
+            <View style={cd.statChip}>
+              <Ionicons name="card" size={10} color={colors.primary} />
+              <Text style={cd.statText}><Text style={{ color: colors.primary }}>{post.handRank}</Text></Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Reactions strip */}
+      {(showReactions || myReaction) && (
+        <View style={cd.reactionsRow}>
+          {POKER_REACTIONS.map(r => {
+            const active = myReaction === r.key;
+            const count = post.reactions[r.key] + (active ? 1 : 0);
+            return (
+              <TouchableOpacity
+                key={r.key}
+                style={[cd.reactionBtn, active && { backgroundColor: `${r.color}25`, borderColor: `${r.color}60` }]}
+                onPress={() => setReaction(post.id, r.key)}
+              >
+                <Text style={cd.reactionEmoji}>{r.emoji}</Text>
+                <Text style={[cd.reactionCount, active && { color: r.color }]}>{count}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+
+      {/* Actions */}
+      <View style={cd.actions}>
+        <TouchableOpacity style={cd.actionBtn} onPress={() => toggleLike(post.id)}>
+          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={17} color={liked ? '#ff0090' : colors.textMuted} />
+          <Text style={[cd.actionCount, liked && { color: '#ff0090' }]}>{liked ? post.likes + 1 : post.likes}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={cd.actionBtn}>
+          <Ionicons name="chatbubble-outline" size={15} color={colors.textMuted} />
+          <Text style={cd.actionCount}>{post.comments}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={cd.actionBtn} onPress={() => setShowReactions(v => !v)}>
+          <Text style={{ fontSize: 14 }}>🔥</Text>
+          <Text style={cd.actionCount}>React</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[cd.actionBtn, { marginLeft: 'auto' }]}>
+          <Ionicons name="share-outline" size={17} color={colors.textMuted} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const cd = StyleSheet.create({
+  wrap: {
+    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
+    overflow: 'hidden', padding: 14, gap: 10,
+  },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  avatarWrap: { position: 'relative' },
+  avatar: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: colors.surface, borderWidth: 2,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  avatarText: { fontSize: 18, fontWeight: '700' },
+  onlineDot: {
+    position: 'absolute', bottom: 0, right: 0,
+    width: 10, height: 10, borderRadius: 5,
+    backgroundColor: '#00ff88', borderWidth: 1.5, borderColor: '#080018',
+  },
+  username: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  handle: { color: colors.textDim, fontSize: 10, marginTop: 1 },
+  typeBadge: { borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 3, flexDirection: 'row', alignItems: 'center', gap: 3 },
+  typeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.3 },
+  followBtn: {
+    borderWidth: 1, borderColor: colors.primary, borderRadius: 14,
+    paddingHorizontal: 10, paddingVertical: 5,
+  },
+  followBtnActive: { backgroundColor: `${colors.primary}20`, borderColor: `${colors.primary}60` },
+  followText: { color: colors.primary, fontSize: 10, fontWeight: '700' },
+  followTextActive: { color: `${colors.primary}90` },
+  content: { color: colors.textMuted, fontSize: 13, lineHeight: 20 },
+  statsRow: { flexDirection: 'row', gap: 8 },
+  statChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: colors.surface, borderRadius: 6, borderWidth: 1,
+    borderColor: colors.border, paddingHorizontal: 8, paddingVertical: 4,
+  },
+  statText: { color: colors.textMuted, fontSize: 11 },
+  reactionsRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  reactionBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+  },
+  reactionEmoji: { fontSize: 13 },
+  reactionCount: { color: colors.textMuted, fontSize: 11, fontWeight: '600' },
+  actions: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    paddingTop: 6, borderTopWidth: 1, borderTopColor: colors.border,
+  },
+  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  actionCount: { color: colors.textMuted, fontSize: 12 },
+});
+
+// ─── Leaderboard Section ─────────────────────────────────────────────────────
+
+const LB_CATS = [
+  { id: 'chips' as const,       label: 'Chips',      icon: '💰' },
+  { id: 'winrate' as const,     label: 'Win Rate',   icon: '🎯' },
+  { id: 'pots' as const,        label: 'Biggest Pot',icon: '♠️' },
+  { id: 'xp' as const,          label: 'XP Level',   icon: '⚡' },
+  { id: 'tournaments' as const, label: 'Tourney Wins',icon: '🏆' },
+];
+
+function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
+  const [cat, setCat] = useState<typeof LB_CATS[number]['id']>('chips');
+  const entries = getLeaderboard(cat).slice(0, 10);
+
+  const medalColors = ['#ffd700', '#a0a8c0', '#cd7f32'];
+
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomInset + 100 }}>
+      <View style={{ padding: 14, gap: 12 }}>
+        <Text style={lb.sectionTitle}>GLOBAL LEADERBOARD</Text>
+
+        {/* Category tabs */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          {LB_CATS.map(c => {
+            const active = cat === c.id;
+            return (
+              <TouchableOpacity
+                key={c.id}
+                style={[lb.catBtn, active && lb.catBtnActive]}
+                onPress={() => setCat(c.id)}
+              >
+                <Text style={lb.catEmoji}>{c.icon}</Text>
+                <Text style={[lb.catText, active && lb.catTextActive]}>{c.label}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        {/* Entries */}
+        {entries.map((entry, i) => {
+          const medal = i < 3 ? medalColors[i] : null;
+          return (
+            <TouchableOpacity
+              key={entry.player.id}
+              style={lb.row}
+              onPress={() => router.push(`/social/player-profile?id=${entry.player.id}`)}
+            >
+              <LinearGradient
+                colors={medal ? [`${medal}18`, 'transparent'] : ['transparent', 'transparent']}
+                style={StyleSheet.absoluteFill}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              />
+              <View style={lb.rank}>
+                {medal
+                  ? <Text style={{ fontSize: 16 }}>{['🥇', '🥈', '🥉'][i]}</Text>
+                  : <Text style={lb.rankNum}>{i + 1}</Text>
+                }
+              </View>
+              <View style={[lb.avatar, { borderColor: entry.player.avatarColor }]}>
+                <Text style={[lb.avatarText, { color: entry.player.avatarColor }]}>{entry.player.avatar}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={lb.username}>{entry.player.username}</Text>
+                <Text style={lb.rankLabel}>{entry.player.rank}</Text>
+              </View>
+              <View style={[lb.statusDot, {
+                backgroundColor: entry.player.status === 'online' ? '#00ff88'
+                  : entry.player.status === 'in_game' ? '#ffd700' : colors.border,
+              }]} />
+              <Text style={[lb.value, medal ? { color: medal } : {}]}>{entry.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </ScrollView>
+  );
+}
+
+const lb = StyleSheet.create({
+  sectionTitle: {
+    color: colors.primary, fontSize: 12, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 3, marginBottom: 4,
+  },
+  catBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 12, paddingVertical: 8,
+    borderRadius: 20, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  catBtnActive: { borderColor: colors.primary, backgroundColor: `${colors.primary}15` },
+  catEmoji: { fontSize: 13 },
+  catText: { color: colors.textDim, fontSize: 11, fontWeight: '600' },
+  catTextActive: { color: colors.primary, fontWeight: '800' },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    padding: 12, borderRadius: 14, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, overflow: 'hidden',
+  },
+  rank: { width: 28, alignItems: 'center' },
+  rankNum: { color: colors.textDim, fontSize: 14, fontWeight: '700' },
+  avatar: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#0e0025', borderWidth: 2,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  avatarText: { fontSize: 15, fontWeight: '700' },
+  username: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  rankLabel: { color: colors.textDim, fontSize: 10, marginTop: 1 },
+  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  value: { color: colors.gold, fontSize: 12, fontWeight: '700', textAlign: 'right', maxWidth: 110 },
+});
+
+// ─── Search Section ──────────────────────────────────────────────────────────
+
+function SearchSection({ bottomInset }: { bottomInset: number }) {
+  const [query, setQuery] = useState('');
+  const { isFollowing, follow, unfollow } = useSocial();
+
+  const results = query.trim().length === 0
+    ? MOCK_PLAYERS
+    : MOCK_PLAYERS.filter(p =>
+        p.username.toLowerCase().includes(query.toLowerCase()) ||
+        p.handle.toLowerCase().includes(query.toLowerCase()) ||
+        p.rank.toLowerCase().includes(query.toLowerCase()),
+      );
+
+  const STATUS_LABEL: Record<string, string> = {
+    online: 'Online', in_game: 'In Game', offline: 'Offline',
+  };
+  const STATUS_COLOR: Record<string, string> = {
+    online: '#00ff88', in_game: '#ffd700', offline: colors.textDim,
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      {/* Search bar */}
+      <View style={srch.inputWrap}>
+        <Ionicons name="search" size={16} color={colors.textDim} />
+        <TextInput
+          style={srch.input}
+          placeholder="Search players, ranks..."
+          placeholderTextColor={colors.textDim}
+          value={query}
+          onChangeText={setQuery}
+          selectionColor={colors.primary}
+        />
+        {query.length > 0 && (
+          <TouchableOpacity onPress={() => setQuery('')}>
+            <Ionicons name="close-circle" size={16} color={colors.textDim} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <FlatList
+        data={results}
+        keyExtractor={p => p.id}
+        contentContainerStyle={{ padding: 14, gap: 10, paddingBottom: bottomInset + 100 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        renderItem={({ item: p }) => {
+          const following = isFollowing(p.id);
+          return (
+            <TouchableOpacity
+              style={srch.card}
+              onPress={() => router.push(`/social/player-profile?id=${p.id}`)}
+            >
+              <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
+              <View style={[srch.avatar, { borderColor: p.avatarColor }]}>
+                <Text style={[srch.avatarText, { color: p.avatarColor }]}>{p.avatar}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text style={srch.username}>{p.username}</Text>
+                  <View style={[srch.statusDot, { backgroundColor: STATUS_COLOR[p.status] }]} />
+                  <Text style={[srch.statusLabel, { color: STATUS_COLOR[p.status] }]}>
+                    {STATUS_LABEL[p.status]}
+                  </Text>
+                </View>
+                <Text style={srch.handle}>{p.handle} · {p.rank}</Text>
+                <Text style={srch.chips}>{(p.chips / 1000).toFixed(0)}K chips · Lv.{p.level}</Text>
+              </View>
+              <TouchableOpacity
+                style={[srch.followBtn, following && srch.followBtnActive]}
+                onPress={() => following ? unfollow(p.id) : follow(p.id, p.username)}
+              >
+                <Text style={[srch.followText, following && srch.followTextActive]}>
+                  {following ? 'Following' : 'Follow'}
+                </Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </View>
+  );
+}
+
+const srch = StyleSheet.create({
+  inputWrap: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1,
+    borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 10, margin: 14,
+  },
+  input: { flex: 1, color: colors.text, fontSize: 14 },
+  card: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    borderRadius: 14, borderWidth: 1, borderColor: colors.border,
+    padding: 12, overflow: 'hidden',
+  },
+  avatar: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: '#0e0025', borderWidth: 2,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  avatarText: { fontSize: 20, fontWeight: '700' },
+  username: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  handle: { color: colors.textDim, fontSize: 11, marginTop: 2 },
+  chips: { color: colors.gold, fontSize: 11, marginTop: 1 },
+  statusDot: { width: 7, height: 7, borderRadius: 3.5 },
+  statusLabel: { fontSize: 10, fontWeight: '600' },
+  followBtn: {
+    borderWidth: 1, borderColor: colors.primary, borderRadius: 16,
+    paddingHorizontal: 12, paddingVertical: 6,
+  },
+  followBtnActive: { backgroundColor: `${colors.primary}20`, borderColor: `${colors.primary}50` },
+  followText: { color: colors.primary, fontSize: 11, fontWeight: '700' },
+  followTextActive: { color: `${colors.primary}80` },
+});
+
+// ─── Compose Sheet ───────────────────────────────────────────────────────────
+
+interface MePost {
+  id: string; tag: PostTag; content: string;
+  pot?: string; handRank?: string; likes: number; comments: number;
+  timeAgo: string; repostedFrom?: string;
+}
+
+function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
+  visible: boolean; onClose: () => void; onPost: (p: MePost) => void; bottomInset: number;
+}) {
   const { profile } = useUser();
   const [text, setText] = useState('');
-  const [postType, setPostType] = useState<PostType>('WIN');
+  const [postType, setPostType] = useState<PostTag>('WIN');
   const [pot, setPot] = useState('');
-  const [handRank, setHandRank] = useState('');
-  const [showOptionals, setShowOptionals] = useState(false);
+  const [hand, setHand] = useState('');
+  const [showOpts, setShowOpts] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
-  const AVATAR_SYMBOLS = ['♠', '♥', '♦', '♣', '★'];
-  const AVATAR_COLORS = [colors.primary, colors.secondary, colors.gold, colors.accent, colors.success];
-  const avatarSymbol = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
-  const avatarColor = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
-
+  const sym = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
+  const col = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
   const remaining = MAX_CHARS - text.length;
   const canPost = text.trim().length > 0 && remaining >= 0;
 
   function handlePost() {
     if (!canPost) return;
-    const newPost: MePost = {
-      id: `up_${Date.now()}`,
-      type: postType,
-      content: text.trim(),
-      pot: pot.trim() || undefined,
-      handRank: handRank.trim() || undefined,
-      likes: 0,
-      comments: 0,
-      timeAgo: 'just now',
-    };
-    onPost(newPost);
-    setText('');
-    setPot('');
-    setHandRank('');
-    setPostType('WIN');
-    setShowOptionals(false);
+    onPost({
+      id: `up_${Date.now()}`, tag: postType, content: text.trim(),
+      pot: pot.trim() || undefined, handRank: hand.trim() || undefined,
+      likes: 0, comments: 0, timeAgo: 'just now',
+    });
+    setText(''); setPot(''); setHand(''); setPostType('WIN'); setShowOpts(false);
     onClose();
   }
 
-  function handleClose() {
-    setText('');
-    setPot('');
-    setHandRank('');
-    setPostType('WIN');
-    setShowOptionals(false);
-    onClose();
+  function reset() {
+    setText(''); setPot(''); setHand(''); setPostType('WIN'); setShowOpts(false);
   }
 
   if (!visible) return null;
-
-  const typeColor = POST_TYPE_COLORS[postType];
+  const typeColor = POST_TAG_COLORS[postType];
 
   return (
-    <View style={compose.overlay} pointerEvents="box-none">
-      {/* Dim backdrop — only occupies space ABOVE the sheet, never overlaps it */}
-      <TouchableOpacity style={compose.backdrop} activeOpacity={1} onPress={handleClose} />
-
-      {/* Sheet */}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={compose.kvSheet}>
-        <View style={[compose.sheet, { paddingBottom: bottomInset + 12 }]}>
+    <View style={cmp.overlay} pointerEvents="box-none">
+      <TouchableOpacity style={cmp.backdrop} activeOpacity={1} onPress={() => { reset(); onClose(); }} />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={cmp.kvSheet}>
+        <View style={[cmp.sheet, { paddingBottom: bottomInset + 12 }]}>
           <LinearGradient colors={['#160030', '#080018']} style={StyleSheet.absoluteFill} />
-
-          {/* Handle bar */}
-          <View style={compose.handle} />
-
-          {/* Top bar */}
-          <View style={compose.topBar}>
-            <TouchableOpacity style={compose.cancelBtn} onPress={handleClose}>
-              <Text style={compose.cancelText}>Cancel</Text>
+          <View style={cmp.handle} />
+          <View style={cmp.topBar}>
+            <TouchableOpacity onPress={() => { reset(); onClose(); }}>
+              <Text style={cmp.cancelText}>Cancel</Text>
             </TouchableOpacity>
-            <Text style={compose.sheetTitle}>New Post</Text>
+            <Text style={cmp.sheetTitle}>New Post</Text>
             <TouchableOpacity
-              style={[compose.postBtn, !canPost && compose.postBtnDisabled]}
+              style={[cmp.postBtn, !canPost && cmp.postBtnDis]}
               onPress={handlePost}
             >
-              <Text style={[compose.postBtnText, !canPost && compose.postBtnTextDisabled]}>Post</Text>
+              <Text style={[cmp.postBtnText, !canPost && cmp.postBtnTextDis]}>Post</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Author row */}
-          <View style={compose.authorRow}>
-            <View style={[compose.avatar, { borderColor: avatarColor }]}>
-              <Text style={[compose.avatarText, { color: avatarColor }]}>{avatarSymbol}</Text>
+          <View style={cmp.authorRow}>
+            <View style={[cmp.avatar, { borderColor: col }]}>
+              <Text style={[cmp.avatarText, { color: col }]}>{sym}</Text>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={compose.authorName}>{profile.username}</Text>
-              <Text style={compose.authorHandle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
+            <View>
+              <Text style={cmp.authorName}>{profile.username}</Text>
+              <Text style={cmp.authorHandle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
             </View>
           </View>
-
-          {/* Text input */}
           <TextInput
             ref={inputRef}
-            style={compose.input}
+            style={cmp.input}
             placeholder="What happened at the table?"
             placeholderTextColor={colors.textDim}
-            multiline
-            maxLength={MAX_CHARS + 10}
-            value={text}
-            onChangeText={setText}
+            multiline maxLength={MAX_CHARS + 10}
+            value={text} onChangeText={setText}
             selectionColor={colors.primary}
             autoFocus={Platform.OS !== 'web'}
           />
-
-          {/* Post type chips */}
-          <Text style={compose.sectionLabel}>Tag your hand</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={compose.typeRow}>
-            {ALL_POST_TYPES.map(t => {
+          <Text style={cmp.sectionLabel}>Tag your hand</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={cmp.typeRow}>
+            {ALL_TAGS.map(t => {
               const active = postType === t;
-              const c = POST_TYPE_COLORS[t];
+              const c = POST_TAG_COLORS[t];
               return (
                 <TouchableOpacity
                   key={t}
-                  style={[compose.typeChip, { borderColor: active ? c : `${c}40`, backgroundColor: active ? `${c}22` : 'transparent' }]}
+                  style={[cmp.typeChip, { borderColor: active ? c : `${c}40`, backgroundColor: active ? `${c}22` : 'transparent' }]}
                   onPress={() => setPostType(t)}
                 >
-                  <Ionicons name={POST_TYPE_ICONS[t]} size={12} color={active ? c : colors.textDim} />
-                  <Text style={[compose.typeChipText, { color: active ? c : colors.textDim }]}>{t}</Text>
+                  <Ionicons name={POST_TYPE_ICONS[t]} size={11} color={active ? c : colors.textDim} />
+                  <Text style={[cmp.typeChipText, { color: active ? c : colors.textDim }]}>{t}</Text>
                 </TouchableOpacity>
               );
             })}
           </ScrollView>
-
-          {/* Optional hand stats toggle */}
-          <TouchableOpacity style={compose.optionalToggle} onPress={() => setShowOptionals(v => !v)}>
-            <Ionicons name="layers-outline" size={14} color={colors.primary} />
-            <Text style={compose.optionalToggleText}>Add hand stats (optional)</Text>
-            <Ionicons name={showOptionals ? 'chevron-up' : 'chevron-down'} size={14} color={colors.textDim} />
+          <TouchableOpacity style={cmp.optToggle} onPress={() => setShowOpts(v => !v)}>
+            <Ionicons name="layers-outline" size={13} color={colors.primary} />
+            <Text style={cmp.optToggleText}>Add hand stats (optional)</Text>
+            <Ionicons name={showOpts ? 'chevron-up' : 'chevron-down'} size={13} color={colors.textDim} />
           </TouchableOpacity>
-
-          {showOptionals && (
-            <View style={compose.optionalFields}>
-              <View style={compose.fieldRow}>
-                <Ionicons name="layers" size={13} color={colors.gold} />
-                <TextInput
-                  style={compose.fieldInput}
-                  placeholder="Pot size (e.g. 42,000)"
-                  placeholderTextColor={colors.textDim}
-                  value={pot}
-                  onChangeText={setPot}
-                  selectionColor={colors.primary}
-                />
+          {showOpts && (
+            <View style={cmp.optFields}>
+              <View style={cmp.fieldRow}>
+                <Ionicons name="layers" size={12} color={colors.gold} />
+                <TextInput style={cmp.fieldInput} placeholder="Pot size (e.g. 42,000)"
+                  placeholderTextColor={colors.textDim} value={pot} onChangeText={setPot} selectionColor={colors.primary} />
               </View>
-              <View style={[compose.fieldRow, { marginTop: 8 }]}>
-                <Ionicons name="card" size={13} color={colors.primary} />
-                <TextInput
-                  style={compose.fieldInput}
-                  placeholder="Best hand (e.g. Full House)"
-                  placeholderTextColor={colors.textDim}
-                  value={handRank}
-                  onChangeText={setHandRank}
-                  selectionColor={colors.primary}
-                />
+              <View style={[cmp.fieldRow, { marginTop: 8 }]}>
+                <Ionicons name="card" size={12} color={colors.primary} />
+                <TextInput style={cmp.fieldInput} placeholder="Best hand (e.g. Full House)"
+                  placeholderTextColor={colors.textDim} value={hand} onChangeText={setHand} selectionColor={colors.primary} />
               </View>
             </View>
           )}
-
-          {/* Char counter + type preview */}
-          <View style={compose.footer}>
-            <View style={[compose.selectedType, { borderColor: `${typeColor}50`, backgroundColor: `${typeColor}15` }]}>
-              <Ionicons name={POST_TYPE_ICONS[postType]} size={11} color={typeColor} />
-              <Text style={[compose.selectedTypeText, { color: typeColor }]}>{postType}</Text>
+          <View style={cmp.footer}>
+            <View style={[cmp.selType, { borderColor: `${typeColor}50`, backgroundColor: `${typeColor}15` }]}>
+              <Ionicons name={POST_TYPE_ICONS[postType]} size={10} color={typeColor} />
+              <Text style={[cmp.selTypeText, { color: typeColor }]}>{postType}</Text>
             </View>
-            <Text style={[compose.counter, remaining < 20 && { color: remaining < 0 ? colors.secondary : colors.warning }]}>
+            <Text style={[cmp.counter, remaining < 20 && { color: remaining < 0 ? colors.secondary : colors.warning }]}>
               {remaining}
             </Text>
           </View>
@@ -388,310 +769,255 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: ComposeSheetPro
   );
 }
 
-// ─── Post card (community feed) ───────────────────────────────────────────────
+const cmp = StyleSheet.create({
+  overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999, justifyContent: 'flex-end' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' },
+  kvSheet: { width: '100%' },
+  sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, borderWidth: 1, borderBottomWidth: 0, borderColor: colors.border, overflow: 'hidden', paddingTop: 8 },
+  handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center', marginBottom: 4 },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
+  sheetTitle: { color: colors.text, fontSize: 14, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  cancelText: { color: colors.textDim, fontSize: 14, fontWeight: '600' },
+  postBtn: { backgroundColor: colors.primary, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 7 },
+  postBtnDis: { backgroundColor: `${colors.primary}40` },
+  postBtnText: { color: colors.background, fontSize: 12, fontWeight: '800' },
+  postBtnTextDis: { color: `${colors.background}70` },
+  authorRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4 },
+  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.surface, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: 19, fontWeight: '700' },
+  authorName: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  authorHandle: { color: colors.textDim, fontSize: 10 },
+  input: { color: colors.text, fontSize: 15, lineHeight: 23, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 10, minHeight: 90, textAlignVertical: 'top' },
+  sectionLabel: { color: colors.textDim, fontSize: 10, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 16, marginBottom: 8 },
+  typeRow: { paddingHorizontal: 16, gap: 8 },
+  typeChip: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 6 },
+  typeChipText: { fontSize: 10, fontWeight: '700' },
+  optToggle: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 },
+  optToggleText: { color: colors.primary, fontSize: 11, fontWeight: '600', flex: 1 },
+  optFields: { paddingHorizontal: 16, paddingTop: 4 },
+  fieldRow: { flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: colors.surface },
+  fieldInput: { flex: 1, color: colors.text, fontSize: 13 },
+  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 12 },
+  selType: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3 },
+  selTypeText: { fontSize: 9, fontWeight: '800' },
+  counter: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
+});
 
-function PostCard({ post }: { post: FeedPost }) {
-  const [liked, setLiked] = useState(false);
-  const [reposted, setReposted] = useState(false);
-  const typeColor = POST_TYPE_COLORS[post.type];
+// ─── Me Section ──────────────────────────────────────────────────────────────
 
-  return (
-    <View style={card.wrap}>
-      <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
-      <View style={card.header}>
-        <View style={[card.avatar, { borderColor: post.avatarColor }]}>
-          <Text style={[card.avatarText, { color: post.avatarColor }]}>{post.avatar}</Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={card.username}>{post.user}</Text>
-          <Text style={card.handle}>{post.handle} · {post.timeAgo}</Text>
-        </View>
-        <View style={[card.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
-          <Text style={[card.typeText, { color: typeColor }]}>{post.type}</Text>
-        </View>
-      </View>
-      <Text style={card.content}>{post.content}</Text>
-      {(post.pot || post.handRank) && (
-        <View style={card.statsRow}>
-          {post.pot && (
-            <View style={card.statChip}>
-              <Ionicons name="layers" size={10} color={colors.gold} />
-              <Text style={card.statText}>Pot: <Text style={{ color: colors.gold }}>{post.pot}</Text></Text>
-            </View>
-          )}
-          {post.handRank && (
-            <View style={card.statChip}>
-              <Ionicons name="card" size={10} color={colors.primary} />
-              <Text style={card.statText}><Text style={{ color: colors.primary }}>{post.handRank}</Text></Text>
-            </View>
-          )}
-        </View>
-      )}
-      <View style={card.actions}>
-        <TouchableOpacity style={card.actionBtn} onPress={() => setLiked(l => !l)}>
-          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? colors.secondary : colors.textMuted} />
-          <Text style={[card.actionCount, liked && { color: colors.secondary }]}>{liked ? post.likes + 1 : post.likes}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={card.actionBtn}>
-          <Ionicons name="chatbubble-outline" size={16} color={colors.textMuted} />
-          <Text style={card.actionCount}>{post.comments}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={card.actionBtn} onPress={() => setReposted(r => !r)}>
-          <Ionicons name="repeat" size={18} color={reposted ? colors.success : colors.textMuted} />
-          <Text style={[card.actionCount, reposted && { color: colors.success }]}>{reposted ? 'Reposted' : 'Repost'}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[card.actionBtn, { marginLeft: 'auto' }]}>
-          <Ionicons name="share-outline" size={18} color={colors.textMuted} />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
+const MY_REPOSTS: MePost[] = [
+  { id: 'mr1', tag: 'WIN', content: 'Royal Flush on the river. The whole table went silent. 🃏🔥', pot: '42,400', handRank: 'Royal Flush', likes: 1240, comments: 87, timeAgo: '2h', repostedFrom: 'NightShark99' },
+  { id: 'mr2', tag: 'BLUFF', content: 'Check-raised the flop, barreled turn, went all-in river with air. They folded top pair. 😤', pot: '33,600', likes: 1109, comments: 177, timeAgo: '1d', repostedFrom: 'PokerPhantom' },
+];
+const MY_LIKES: MePost[] = [
+  { id: 'ml1', tag: 'BAD BEAT', content: 'Quad Aces cracked by a straight flush. The odds are 0.000000001%.', pot: '91,000', handRank: 'Quad Aces', likes: 2103, comments: 318, timeAgo: '6h', repostedFrom: 'NeonAce_' },
+  { id: 'ml2', tag: 'ALL-IN', content: 'Five-way all-in pre-flop. I had AA. Flopped a set. Turned quads.', pot: '62,500', handRank: 'Quad Aces', likes: 1876, comments: 204, timeAgo: '8h', repostedFrom: 'ShadowKing' },
+];
+const INITIAL_MY_POSTS: MePost[] = [
+  { id: 'mp1', tag: 'WIN', content: 'Picked up Aces UTG, ran it up to a 3-way all-in and held. First Royal Flush of my career. 🃏', pot: '24,800', handRank: 'Royal Flush', likes: 312, comments: 28, timeAgo: '3h' },
+  { id: 'mp2', tag: 'ALL-IN', content: 'Short-stacked on the bubble. Shoved A9s, got called by KK, hit an ace on the flop. Still alive. 🙏', pot: '9,600', handRank: 'Pair of Aces', likes: 144, comments: 19, timeAgo: '1d' },
+];
 
-// ─── Me post card ─────────────────────────────────────────────────────────────
-
-function MePostCard({ post, username, avatarSymbol, avatarColor, subTab }: {
-  post: MePost; username: string; avatarSymbol: string; avatarColor: string; subTab: string;
-}) {
-  const [liked, setLiked] = useState(subTab === 'likes');
-  const typeColor = POST_TYPE_COLORS[post.type];
-  const isRepost = subTab === 'reposts' || subTab === 'likes';
-
-  return (
-    <View style={card.wrap}>
-      <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
-
-      {isRepost && post.repostedFrom && (
-        <View style={meCard.repostBanner}>
-          <Ionicons name={subTab === 'likes' ? 'heart' : 'repeat'} size={11} color={subTab === 'likes' ? colors.secondary : colors.success} />
-          <Text style={[meCard.repostLabel, { color: subTab === 'likes' ? colors.secondary : colors.success }]}>
-            {subTab === 'likes' ? 'You liked' : 'You reposted'} · @{post.repostedFrom}
-          </Text>
-        </View>
-      )}
-
-      <View style={card.header}>
-        <View style={[card.avatar, { borderColor: isRepost ? colors.textDim : avatarColor }]}>
-          <Text style={[card.avatarText, { color: isRepost ? colors.textDim : avatarColor }]}>
-            {isRepost ? '♠' : avatarSymbol}
-          </Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={card.username}>{isRepost ? (post.repostedFrom ?? username) : username}</Text>
-          <Text style={card.handle}>
-            {isRepost
-              ? `@${(post.repostedFrom ?? username).toLowerCase().replace(/\s/g, '')}`
-              : `@${username.toLowerCase().replace(/\s/g, '')}`} · {post.timeAgo}
-          </Text>
-        </View>
-        <View style={[card.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
-          <Text style={[card.typeText, { color: typeColor }]}>{post.type}</Text>
-        </View>
-      </View>
-
-      <Text style={card.content}>{post.content}</Text>
-
-      {(post.pot || post.handRank) && (
-        <View style={card.statsRow}>
-          {post.pot && (
-            <View style={card.statChip}>
-              <Ionicons name="layers" size={10} color={colors.gold} />
-              <Text style={card.statText}>Pot: <Text style={{ color: colors.gold }}>{post.pot}</Text></Text>
-            </View>
-          )}
-          {post.handRank && (
-            <View style={card.statChip}>
-              <Ionicons name="card" size={10} color={colors.primary} />
-              <Text style={card.statText}><Text style={{ color: colors.primary }}>{post.handRank}</Text></Text>
-            </View>
-          )}
-        </View>
-      )}
-
-      <View style={card.actions}>
-        <TouchableOpacity style={card.actionBtn} onPress={() => setLiked(l => !l)}>
-          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? colors.secondary : colors.textMuted} />
-          <Text style={[card.actionCount, liked && { color: colors.secondary }]}>{liked ? post.likes + 1 : post.likes}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={card.actionBtn}>
-          <Ionicons name="chatbubble-outline" size={16} color={colors.textMuted} />
-          <Text style={card.actionCount}>{post.comments}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={card.actionBtn}>
-          <Ionicons name="repeat" size={18} color={colors.textMuted} />
-          <Text style={card.actionCount}>Repost</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[card.actionBtn, { marginLeft: 'auto' }]}>
-          <Ionicons name="share-outline" size={18} color={colors.textMuted} />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
-
-// ─── Me section ───────────────────────────────────────────────────────────────
-
-function MeSection({
-  myPosts, bottomInset,
-}: { myPosts: MePost[]; bottomInset: number }) {
+function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: number }) {
   const { profile, winRate } = useUser();
+  const { following, notifications } = useSocial();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
 
-  const AVATAR_SYMBOLS = ['♠', '♥', '♦', '♣', '★'];
-  const AVATAR_COLORS = [colors.primary, colors.secondary, colors.gold, colors.accent, colors.success];
-  const avatarSymbol = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
-  const avatarColor = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
-
+  const sym = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
+  const col = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
   const data = subTab === 'posts' ? myPosts : subTab === 'reposts' ? MY_REPOSTS : MY_LIKES;
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomInset + 90 }}>
-      {/* Profile header */}
-      <View style={meCard.profileHeader}>
+      {/* Profile mini-header */}
+      <View style={me.profileHeader}>
         <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
-        <View style={meCard.avatarWrap}>
-          <View style={[meCard.bigAvatar, { borderColor: avatarColor }]}>
-            <Text style={[meCard.bigAvatarText, { color: avatarColor }]}>{avatarSymbol}</Text>
+        <View style={me.avatarWrap}>
+          <View style={[me.bigAvatar, { borderColor: col }]}>
+            <Text style={[me.bigAvatarText, { color: col }]}>{sym}</Text>
           </View>
-          <LinearGradient colors={[`${avatarColor}40`, 'transparent']} style={meCard.avatarGlow} />
+          <LinearGradient colors={[`${col}40`, 'transparent']} style={me.glow} />
         </View>
-        <View style={meCard.profileInfo}>
-          <Text style={meCard.username}>{profile.username}</Text>
-          <Text style={meCard.handle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
-          <View style={[meCard.rankBadge, { borderColor: `${colors.accent}60` }]}>
-            <Ionicons name="star" size={10} color={colors.accent} />
-            <Text style={meCard.rankText}>{profile.rank}</Text>
+        <View style={me.profileInfo}>
+          <Text style={me.username}>{profile.username}</Text>
+          <Text style={me.handle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
+          <View style={[me.rankBadge, { borderColor: `${colors.accent}60` }]}>
+            <Ionicons name="star" size={9} color={colors.accent} />
+            <Text style={me.rankText}>{profile.rank}</Text>
           </View>
         </View>
-        <TouchableOpacity style={meCard.editBtn}>
-          <Ionicons name="pencil-outline" size={14} color={colors.primary} />
-          <Text style={meCard.editText}>Edit</Text>
+        <TouchableOpacity style={me.editBtn} onPress={() => router.push('/(tabs)/profile')}>
+          <Ionicons name="pencil-outline" size={13} color={colors.primary} />
+          <Text style={me.editText}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
 
       {/* Stats strip */}
-      <View style={meCard.statsStrip}>
-        <View style={meCard.stat}>
-          <Text style={meCard.statVal}>{myPosts.length}</Text>
-          <Text style={meCard.statLabel}>Posts</Text>
-        </View>
-        <View style={meCard.statDivider} />
-        <View style={meCard.stat}>
-          <Text style={meCard.statVal}>{MY_REPOSTS.length}</Text>
-          <Text style={meCard.statLabel}>Reposts</Text>
-        </View>
-        <View style={meCard.statDivider} />
-        <View style={meCard.stat}>
-          <Text style={meCard.statVal}>{MY_LIKES.length}</Text>
-          <Text style={meCard.statLabel}>Likes</Text>
-        </View>
-        <View style={meCard.statDivider} />
-        <View style={meCard.stat}>
-          <Text style={[meCard.statVal, { color: colors.success }]}>{winRate}%</Text>
-          <Text style={meCard.statLabel}>Win rate</Text>
-        </View>
+      <View style={me.statsStrip}>
+        <View style={me.stat}><Text style={me.statVal}>{myPosts.length}</Text><Text style={me.statLabel}>Posts</Text></View>
+        <View style={me.statDiv} />
+        <View style={me.stat}><Text style={me.statVal}>{following.size}</Text><Text style={me.statLabel}>Following</Text></View>
+        <View style={me.statDiv} />
+        <View style={me.stat}><Text style={[me.statVal, { color: colors.secondary }]}>{notifications.filter(n => !n.read).length}</Text><Text style={me.statLabel}>Notifs</Text></View>
+        <View style={me.statDiv} />
+        <View style={me.stat}><Text style={[me.statVal, { color: colors.success }]}>{winRate}%</Text><Text style={me.statLabel}>Win Rate</Text></View>
       </View>
 
       {/* Sub-tabs */}
-      <View style={meCard.subTabBar}>
+      <View style={me.subTabBar}>
         {ME_SUBTABS.map(t => {
           const active = subTab === t.id;
           return (
-            <TouchableOpacity
-              key={t.id}
-              style={meCard.subTab}
-              onPress={() => setSubTab(t.id as typeof subTab)}
-            >
-              <Ionicons name={t.icon} size={14} color={active ? colors.primary : colors.textDim} />
-              <Text style={[meCard.subTabText, active && meCard.subTabTextActive]}>{t.label}</Text>
-              {active && <View style={meCard.subTabIndicator} />}
+            <TouchableOpacity key={t.id} style={me.subTab} onPress={() => setSubTab(t.id as typeof subTab)}>
+              <Ionicons name={t.icon} size={13} color={active ? colors.primary : colors.textDim} />
+              <Text style={[me.subTabText, active && me.subTabActive]}>{t.label}</Text>
+              {active && <View style={me.indicator} />}
             </TouchableOpacity>
           );
         })}
       </View>
 
-      {/* Posts list */}
+      {/* Posts */}
       <View style={{ paddingHorizontal: 14, paddingTop: 12, gap: 12 }}>
         {data.length === 0 ? (
-          <View style={meCard.empty}>
-            <Ionicons name="albums-outline" size={36} color={colors.textDim} />
-            <Text style={meCard.emptyText}>Nothing here yet</Text>
+          <View style={me.empty}>
+            <Ionicons name="albums-outline" size={34} color={colors.textDim} />
+            <Text style={me.emptyText}>Nothing here yet</Text>
           </View>
-        ) : (
-          data.map(post => (
-            <MePostCard
-              key={post.id}
-              post={post}
-              username={profile.username}
-              avatarSymbol={avatarSymbol}
-              avatarColor={avatarColor}
-              subTab={subTab}
-            />
-          ))
-        )}
+        ) : data.map(post => {
+          const typeColor = POST_TAG_COLORS[post.tag];
+          const isRepost = subTab === 'reposts' || subTab === 'likes';
+          return (
+            <View key={post.id} style={me.postCard}>
+              <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
+              {isRepost && post.repostedFrom && (
+                <View style={me.repostBanner}>
+                  <Ionicons name={subTab === 'likes' ? 'heart' : 'repeat'} size={10} color={subTab === 'likes' ? colors.secondary : colors.success} />
+                  <Text style={[me.repostLabel, { color: subTab === 'likes' ? colors.secondary : colors.success }]}>
+                    {subTab === 'likes' ? 'You liked' : 'You reposted'} · @{post.repostedFrom}
+                  </Text>
+                </View>
+              )}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View style={[me.postAvatar, { borderColor: isRepost ? colors.textDim : col }]}>
+                  <Text style={[{ fontSize: 14, fontWeight: '700' }, { color: isRepost ? colors.textDim : col }]}>
+                    {isRepost ? '♠' : sym}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={me.postUser}>{isRepost ? post.repostedFrom : profile.username}</Text>
+                  <Text style={me.postTime}>{post.timeAgo}</Text>
+                </View>
+                <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
+                  <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+                </View>
+              </View>
+              <Text style={cd.content}>{post.content}</Text>
+              <View style={cd.actions}>
+                <View style={cd.actionBtn}>
+                  <Ionicons name="heart-outline" size={16} color={colors.textMuted} />
+                  <Text style={cd.actionCount}>{post.likes}</Text>
+                </View>
+                <View style={cd.actionBtn}>
+                  <Ionicons name="chatbubble-outline" size={14} color={colors.textMuted} />
+                  <Text style={cd.actionCount}>{post.comments}</Text>
+                </View>
+              </View>
+            </View>
+          );
+        })}
       </View>
     </ScrollView>
   );
 }
 
-// ─── Main screen ──────────────────────────────────────────────────────────────
+const me = StyleSheet.create({
+  profileHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 18, overflow: 'hidden', borderBottomWidth: 1, borderBottomColor: colors.border },
+  avatarWrap: { position: 'relative' },
+  bigAvatar: { width: 60, height: 60, borderRadius: 30, backgroundColor: colors.surface, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  bigAvatarText: { fontSize: 28, fontWeight: '700' },
+  glow: { position: 'absolute', top: -4, left: -4, right: -4, bottom: -4, borderRadius: 34 },
+  profileInfo: { flex: 1, gap: 4 },
+  username: { color: colors.text, fontSize: 16, fontWeight: '800' },
+  handle: { color: colors.textDim, fontSize: 11 },
+  rankBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, alignSelf: 'flex-start', borderWidth: 1, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3, backgroundColor: `${colors.accent}10` },
+  rankText: { color: colors.accent, fontSize: 9, fontWeight: '700' },
+  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: colors.primary, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 6 },
+  editText: { color: colors.primary, fontSize: 10, fontWeight: '700' },
+  statsStrip: { flexDirection: 'row', alignItems: 'center', paddingVertical: 13, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: colors.border },
+  stat: { flex: 1, alignItems: 'center', gap: 2 },
+  statVal: { color: colors.text, fontSize: 16, fontWeight: '800' },
+  statLabel: { color: colors.textDim, fontSize: 9 },
+  statDiv: { width: 1, height: 26, backgroundColor: colors.border },
+  subTabBar: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border },
+  subTab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 11, position: 'relative' },
+  subTabText: { color: colors.textDim, fontSize: 11, fontWeight: '600' },
+  subTabActive: { color: colors.primary, fontWeight: '800' },
+  indicator: { position: 'absolute', bottom: 0, left: '15%', right: '15%', height: 2, backgroundColor: colors.primary, borderRadius: 1 },
+  repostBanner: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingBottom: 5 },
+  repostLabel: { fontSize: 10, fontWeight: '600' },
+  postCard: { borderRadius: 14, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', padding: 12, gap: 8 },
+  postAvatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.surface, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  postUser: { color: colors.text, fontSize: 12, fontWeight: '700' },
+  postTime: { color: colors.textDim, fontSize: 10 },
+  empty: { alignItems: 'center', paddingVertical: 44, gap: 10 },
+  emptyText: { color: colors.textDim, fontSize: 13 },
+});
+
+// ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
-  const colors = useColors();
-  const [activeTab, setActiveTab] = useState<string>('trending');
+  const cls = useColors();
+  const [activeTab, setActiveTab] = useState('trending');
   const [composeVisible, setComposeVisible] = useState(false);
   const [myPosts, setMyPosts] = useState<MePost[]>(INITIAL_MY_POSTS);
+  const [notifVisible, setNotifVisible] = useState(false);
 
-  const filteredPosts = ALL_POSTS.filter(p =>
-    activeTab === 'trending' ? true : p.tab === activeTab
-  );
-
-  function handleNewPost(post: MePost) {
-    setMyPosts(prev => [post, ...prev]);
-  }
+  const filteredPosts = useCallback(() => {
+    if (activeTab === 'trending') return SOCIAL_POSTS;
+    return SOCIAL_POSTS.filter(p => p.tab === activeTab);
+  }, [activeTab]);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={[colors.background, colors.surfaceElevated]} style={StyleSheet.absoluteFill} />
+    <View style={[ss.container, { backgroundColor: cls.background }]}>
+      <LinearGradient colors={[cls.background, cls.surfaceElevated]} style={StyleSheet.absoluteFill} />
 
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
-        <Text style={styles.headerTitle}>FEED</Text>
-        {activeTab !== 'me' && (
-          <TouchableOpacity style={styles.newPostBtn} onPress={() => setComposeVisible(true)}>
-            <Ionicons name="add" size={18} color={colors.primary} />
-            <Text style={styles.newPostText}>Post</Text>
-          </TouchableOpacity>
-        )}
+      <View style={[ss.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
+        <Text style={ss.headerTitle}>FEED</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <NotifBell onPress={() => setNotifVisible(true)} />
+          {activeTab !== 'me' && (
+            <TouchableOpacity style={ss.newPostBtn} onPress={() => setComposeVisible(true)}>
+              <Ionicons name="add" size={16} color={colors.primary} />
+              <Text style={ss.newPostText}>Post</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
-      {/* Main tab bar */}
+      {/* Live ticker */}
+      <LiveTicker />
+
+      {/* Tab bar */}
       <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabBarScroll}
-        contentContainerStyle={styles.tabBarContent}
+        horizontal showsHorizontalScrollIndicator={false}
+        style={ss.tabBarScroll} contentContainerStyle={ss.tabBarContent}
       >
         {FEED_TABS.map(tab => {
           const active = activeTab === tab.id;
           const isMe = tab.id === 'me';
-          const activeColor = isMe ? colors.secondary : colors.primary;
+          const ac = isMe ? colors.secondary : colors.primary;
           return (
             <TouchableOpacity
               key={tab.id}
-              style={[styles.tab, active && [styles.tabActive, { borderColor: activeColor, backgroundColor: isMe ? 'rgba(255,0,144,0.12)' : 'rgba(0,212,255,0.12)' }]]}
+              style={[ss.tab, active && [ss.tabActive, { borderColor: ac, backgroundColor: isMe ? 'rgba(255,0,144,0.12)' : 'rgba(0,212,255,0.12)' }]]}
               onPress={() => setActiveTab(tab.id)}
               activeOpacity={0.75}
             >
-              <Ionicons
-                name={tab.icon}
-                size={13}
-                color={active ? activeColor : colors.textDim}
-              />
-              <Text style={[styles.tabText, active && { color: activeColor, fontWeight: '800' }]}>
-                {tab.label}
-              </Text>
+              <Ionicons name={tab.icon} size={12} color={active ? ac : colors.textDim} />
+              <Text style={[ss.tabText, active && { color: ac, fontWeight: '800' }]}>{tab.label}</Text>
             </TouchableOpacity>
           );
         })}
@@ -700,246 +1026,45 @@ export default function FeedScreen() {
       {/* Content */}
       {activeTab === 'me' ? (
         <MeSection myPosts={myPosts} bottomInset={insets.bottom} />
+      ) : activeTab === 'leaderboard' ? (
+        <LeaderboardSection bottomInset={insets.bottom} />
+      ) : activeTab === 'search' ? (
+        <SearchSection bottomInset={insets.bottom} />
       ) : (
         <FlatList
-          data={filteredPosts}
+          data={filteredPosts()}
           keyExtractor={item => item.id}
           renderItem={({ item }) => <PostCard post={item} />}
-          contentContainerStyle={{
-            paddingHorizontal: 14,
-            paddingTop: 10,
-            paddingBottom: insets.bottom + 90,
-            gap: 12,
-          }}
+          contentContainerStyle={{ paddingHorizontal: 14, paddingTop: 10, paddingBottom: insets.bottom + 90, gap: 12 }}
           showsVerticalScrollIndicator={false}
         />
       )}
 
-      {/* Compose sheet */}
       <ComposeSheet
         visible={composeVisible}
         onClose={() => setComposeVisible(false)}
-        onPost={handleNewPost}
+        onPost={p => setMyPosts(prev => [p, ...prev])}
         bottomInset={insets.bottom}
       />
+
+      {notifVisible && <NotificationsPanel onClose={() => setNotifVisible(false)} />}
     </View>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const card = StyleSheet.create({
-  wrap: {
-    borderRadius: colors.radiusLg, borderWidth: 1,
-    borderColor: colors.border, overflow: 'hidden', padding: 14, gap: 10,
-  },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  avatar: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: colors.surface, borderWidth: 2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { fontSize: 18, fontWeight: '700' },
-  username: { color: colors.text, fontSize: 14, fontWeight: '700' },
-  handle: { color: colors.textDim, fontSize: 11, marginTop: 1 },
-  typeBadge: { borderRadius: 6, borderWidth: 1, paddingHorizontal: 7, paddingVertical: 3 },
-  typeText: { fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
-  content: { color: colors.textMuted, fontSize: 13, lineHeight: 20 },
-  statsRow: { flexDirection: 'row', gap: 8 },
-  statChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: colors.surface, borderRadius: 6, borderWidth: 1,
-    borderColor: colors.border, paddingHorizontal: 8, paddingVertical: 4,
-  },
-  statText: { color: colors.textMuted, fontSize: 11 },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingTop: 4, borderTopWidth: 1, borderTopColor: colors.border },
-  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  actionCount: { color: colors.textMuted, fontSize: 12 },
-});
-
-const compose = StyleSheet.create({
-  overlay: {
-    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    zIndex: 999, justifyContent: 'flex-end',
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-  },
-  kvSheet: { width: '100%' },
-  sheet: {
-    borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    borderWidth: 1, borderBottomWidth: 0, borderColor: colors.border,
-    overflow: 'hidden', paddingTop: 8,
-  },
-  handle: {
-    width: 36, height: 4, borderRadius: 2,
-    backgroundColor: colors.border, alignSelf: 'center', marginBottom: 4,
-  },
-  topBar: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-  },
-  sheetTitle: {
-    color: colors.text, fontSize: 15, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
-  },
-  cancelBtn: { paddingVertical: 4, paddingHorizontal: 2 },
-  cancelText: { color: colors.textDim, fontSize: 14, fontWeight: '600' },
-  postBtn: {
-    backgroundColor: colors.primary, borderRadius: 20,
-    paddingHorizontal: 18, paddingVertical: 8,
-  },
-  postBtnDisabled: { backgroundColor: `${colors.primary}40` },
-  postBtnText: { color: colors.background, fontSize: 13, fontWeight: '800' },
-  postBtnTextDisabled: { color: `${colors.background}80` },
-  authorRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4,
-  },
-  avatar: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: colors.surface, borderWidth: 2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { fontSize: 20, fontWeight: '700' },
-  authorName: { color: colors.text, fontSize: 14, fontWeight: '700' },
-  authorHandle: { color: colors.textDim, fontSize: 11, marginTop: 1 },
-  input: {
-    color: colors.text, fontSize: 16, lineHeight: 24,
-    paddingHorizontal: 16, paddingTop: 10, paddingBottom: 10,
-    minHeight: 100, textAlignVertical: 'top',
-  },
-  sectionLabel: {
-    color: colors.textDim, fontSize: 11, fontWeight: '700',
-    letterSpacing: 1, paddingHorizontal: 16, marginBottom: 8,
-  },
-  typeRow: { paddingHorizontal: 16, gap: 8 },
-  typeChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderWidth: 1, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
-  },
-  typeChipText: { fontSize: 11, fontWeight: '700' },
-  optionalToggle: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4,
-  },
-  optionalToggleText: { color: colors.primary, fontSize: 12, fontWeight: '600', flex: 1 },
-  optionalFields: { paddingHorizontal: 16, paddingTop: 4 },
-  fieldRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    borderWidth: 1, borderColor: colors.border, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10,
-    backgroundColor: colors.surface,
-  },
-  fieldInput: { flex: 1, color: colors.text, fontSize: 13 },
-  footer: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingTop: 12,
-    borderTopWidth: 1, borderTopColor: colors.border, marginTop: 12,
-  },
-  selectedType: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    borderWidth: 1, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
-  },
-  selectedTypeText: { fontSize: 10, fontWeight: '800' },
-  counter: { color: colors.textDim, fontSize: 13, fontWeight: '600' },
-});
-
-const meCard = StyleSheet.create({
-  profileHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    paddingHorizontal: 16, paddingVertical: 20,
-    overflow: 'hidden',
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-  },
-  avatarWrap: { position: 'relative' },
-  bigAvatar: {
-    width: 64, height: 64, borderRadius: 32,
-    backgroundColor: colors.surface, borderWidth: 2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  bigAvatarText: { fontSize: 30, fontWeight: '700' },
-  avatarGlow: {
-    position: 'absolute', top: -4, left: -4, right: -4, bottom: -4,
-    borderRadius: 36,
-  },
-  profileInfo: { flex: 1, gap: 4 },
-  username: { color: colors.text, fontSize: 17, fontWeight: '800' },
-  handle: { color: colors.textDim, fontSize: 12 },
-  rankBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    alignSelf: 'flex-start', borderWidth: 1,
-    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3,
-    backgroundColor: `${colors.accent}10`,
-  },
-  rankText: { color: colors.accent, fontSize: 10, fontWeight: '700' },
-  editBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    borderWidth: 1, borderColor: colors.primary,
-    borderRadius: 14, paddingHorizontal: 10, paddingVertical: 6,
-  },
-  editText: { color: colors.primary, fontSize: 11, fontWeight: '700' },
-  statsStrip: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 14, paddingHorizontal: 16,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-  },
-  stat: { flex: 1, alignItems: 'center', gap: 2 },
-  statVal: { color: colors.text, fontSize: 17, fontWeight: '800' },
-  statLabel: { color: colors.textDim, fontSize: 10 },
-  statDivider: { width: 1, height: 28, backgroundColor: colors.border },
-  subTabBar: {
-    flexDirection: 'row',
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-  },
-  subTab: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 5, paddingVertical: 12, position: 'relative',
-  },
-  subTabText: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
-  subTabTextActive: { color: colors.primary, fontWeight: '800' },
-  subTabIndicator: {
-    position: 'absolute', bottom: 0, left: '15%', right: '15%',
-    height: 2, backgroundColor: colors.primary, borderRadius: 1,
-  },
-  repostBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 5, paddingBottom: 6,
-  },
-  repostLabel: { fontSize: 11, fontWeight: '600' },
-  empty: { alignItems: 'center', paddingVertical: 48, gap: 10 },
-  emptyText: { color: colors.textDim, fontSize: 14 },
-});
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const ss = StyleSheet.create({
+  container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingBottom: 12,
     borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  headerTitle: {
-    color: colors.primary, fontSize: 20, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 3,
-  },
-  newPostBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderWidth: 1, borderColor: colors.primary, borderRadius: 20,
-    paddingHorizontal: 12, paddingVertical: 6,
-  },
-  newPostText: { color: colors.primary, fontSize: 12, fontWeight: '700' },
-  tabBarScroll: { flexGrow: 0, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
-  tabBarContent: { paddingHorizontal: 12, gap: 8, flexDirection: 'row', alignItems: 'center' },
-  tab: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingHorizontal: 13, paddingVertical: 8,
-    borderRadius: 50, borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  tabActive: {
-    borderWidth: 1.5,
-  },
-  tabText: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
+  headerTitle: { color: colors.primary, fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 3 },
+  newPostBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 11, paddingVertical: 6 },
+  newPostText: { color: colors.primary, fontSize: 11, fontWeight: '700' },
+  tabBarScroll: { flexGrow: 0, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
+  tabBarContent: { paddingHorizontal: 12, gap: 7, flexDirection: 'row', alignItems: 'center' },
+  tab: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 11, paddingVertical: 7, borderRadius: 50, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+  tabActive: { borderWidth: 1.5 },
+  tabText: { color: colors.textDim, fontSize: 11, fontWeight: '600' },
 });

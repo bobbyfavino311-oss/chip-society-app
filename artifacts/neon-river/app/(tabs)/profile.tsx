@@ -22,6 +22,7 @@ import { useColors } from '@/hooks/useColors';
 import { CASINO_AVATARS, getAvatar } from '@/components/CasinoAvatars';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
+import { useSocial } from '@/context/SocialContext';
 import { ALL_ACHIEVEMENTS } from '@/lib/achievements';
 
 const RANK_COLORS: Record<string, string> = {
@@ -219,12 +220,15 @@ export default function ProfileScreen() {
   const colors = useColors();
   const { profile, updateProfile, winRate, signOut } = useUser();
   const { unlockedIds } = useAchievements();
+  const { following } = useSocial();
+  const socialFollowingCount = following.size;
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.username);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   const completion = achievementCompletion(unlockedIds);
+  const claimedCount = completion.unlocked;
 
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const rankIdx = RANK_ORDER.indexOf(profile.rank);
@@ -378,6 +382,12 @@ export default function ProfileScreen() {
           <StatBox label="WINS" value={profile.wins} color={colors.gold} />
           <StatBox label="LOSSES" value={profile.losses} color={colors.error} />
           <StatBox label="HANDS" value={profile.handsPlayed} />
+        </View>
+
+        <Text style={styles.sectionTitle}>SOCIAL</Text>
+        <View style={styles.statsGrid}>
+          <StatBox label="FOLLOWING" value={socialFollowingCount} color={colors.primary} />
+          <StatBox label="ACHIEVEMENTS" value={claimedCount} color={colors.accent} />
         </View>
 
         <Text style={styles.sectionTitle}>CHIP BALANCE</Text>
