@@ -1001,27 +1001,49 @@ export default function FeedScreen() {
       <LiveTicker />
 
       {/* Tab bar */}
-      <ScrollView
-        horizontal showsHorizontalScrollIndicator={false}
-        style={ss.tabBarScroll} contentContainerStyle={ss.tabBarContent}
-      >
-        {FEED_TABS.map(tab => {
-          const active = activeTab === tab.id;
-          const isMe = tab.id === 'me';
-          const ac = isMe ? colors.secondary : colors.primary;
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={[ss.tab, active && [ss.tabActive, { borderColor: ac, backgroundColor: isMe ? 'rgba(255,0,144,0.12)' : 'rgba(0,212,255,0.12)' }]]}
-              onPress={() => setActiveTab(tab.id)}
-              activeOpacity={0.75}
-            >
-              <Ionicons name={tab.icon} size={12} color={active ? ac : colors.textDim} />
-              <Text style={[ss.tabText, active && { color: ac, fontWeight: '800' }]}>{tab.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      <View style={ss.tabBarOuter}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={ss.tabBarScroll}
+          contentContainerStyle={ss.tabBarContent}
+        >
+          {FEED_TABS.map(tab => {
+            const active = activeTab === tab.id;
+            const isMe   = tab.id === 'me';
+            const ac     = isMe ? colors.secondary : colors.primary;
+            return (
+              <TouchableOpacity
+                key={tab.id}
+                style={[
+                  ss.tab,
+                  active && {
+                    borderColor: ac,
+                    backgroundColor: isMe ? 'rgba(255,0,144,0.15)' : 'rgba(0,212,255,0.13)',
+                    shadowColor: ac,
+                    shadowOpacity: 0.55,
+                    shadowRadius: 8,
+                    shadowOffset: { width: 0, height: 0 },
+                    elevation: 6,
+                  },
+                ]}
+                onPress={() => setActiveTab(tab.id)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={active ? tab.icon : (tab.icon + '-outline') as typeof tab.icon}
+                  size={13}
+                  color={active ? ac : colors.textDim}
+                />
+                <Text style={[ss.tabText, active && { color: ac, fontWeight: '800', fontFamily: 'Orbitron_700Bold' }]}>
+                  {tab.label}
+                </Text>
+                {active && <View style={[ss.tabDot, { backgroundColor: ac }]} />}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
 
       {/* Content */}
       {activeTab === 'me' ? (
@@ -1062,9 +1084,41 @@ const ss = StyleSheet.create({
   headerTitle: { color: colors.primary, fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 3 },
   newPostBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 11, paddingVertical: 6 },
   newPostText: { color: colors.primary, fontSize: 11, fontWeight: '700' },
-  tabBarScroll: { flexGrow: 0, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
-  tabBarContent: { paddingHorizontal: 12, gap: 7, flexDirection: 'row', alignItems: 'center' },
-  tab: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 11, paddingVertical: 7, borderRadius: 50, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
-  tabActive: { borderWidth: 1.5 },
-  tabText: { color: colors.textDim, fontSize: 11, fontWeight: '600' },
+  tabBarOuter: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  tabBarScroll: { flexGrow: 0 },
+  tabBarContent: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    gap: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    position: 'relative',
+    minWidth: 70,
+    justifyContent: 'center',
+  },
+  tabDot: {
+    position: 'absolute',
+    bottom: -1,
+    left: '50%',
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    marginLeft: -2,
+  },
+  tabText: { color: colors.textDim, fontSize: 11, fontWeight: '600', letterSpacing: 0.2 },
 });

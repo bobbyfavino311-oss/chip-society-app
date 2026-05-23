@@ -227,8 +227,7 @@ export default function ProfileScreen() {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
 
-  const completion = achievementCompletion(unlockedIds);
-  const claimedCount = completion.unlocked;
+  const claimedCount = achievementCompletion(unlockedIds);
 
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const rankIdx = RANK_ORDER.indexOf(profile.rank);
@@ -425,7 +424,7 @@ export default function ProfileScreen() {
           </View>
           <View style={achStyles.achInfo}>
             <Text style={achStyles.achLabel}>ACHIEVEMENTS</Text>
-            <Text style={achStyles.achSub}>{unlockedIds.size} / {ALL_ACHIEVEMENTS.length} unlocked · {completion}% complete</Text>
+            <Text style={achStyles.achSub}>{unlockedIds.size} / {ALL_ACHIEVEMENTS.length} unlocked · {claimedCount}% complete</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.7)" />
         </TouchableOpacity>

@@ -1,0 +1,378 @@
+CHIP SOCIETY — SCRATCH TICKET + SOCIAL FEED COMPLETE OVERHAUL
+PREMIUM CYBERPUNK VEGAS CASINO REDESIGN
+==============================================================
+
+Completely redesign and rebuild the ENTIRE scratch ticket lottery system and social feed system from the ground up. The current implementation feels cheap, broken, unfinished, and outdated. Replace it with a premium App Store quality experience that feels addictive, cinematic, futuristic, and visually spectacular.
+
+================================================================
+1. COMPLETE SCRATCH TICKET SYSTEM OVERHAUL
+================================================================
+
+The current scratch ticket system is unacceptable.
+
+CURRENT PROBLEMS:
+- player can only uncover one section
+- forced “Reveal All” interaction
+- feels fake and non-interactive
+- basic gray tile boxes
+- no suspense
+- no realism
+- no premium visual identity
+- no tactile satisfaction
+- feels like placeholder UI
+
+REMOVE the current tap-to-reveal system entirely.
+
+The new system must function like a REAL premium casino scratch-off ticket where the player manually scratches across the surface continuously with their finger.
+
+================================================================
+2. TRUE REAL-TIME SCRATCHING MECHANICS
+================================================================
+
+Implement a REAL scratch-off system using:
+- masking
+- shaders
+- alpha erase rendering
+- gesture tracking
+- dynamic reveal percentages
+
+The player must be able to:
+- drag finger across ticket
+- scratch freely anywhere
+- uncover multiple areas continuously
+- partially reveal sections
+- scratch slowly or aggressively
+- progressively expose hidden rewards underneath
+
+DO NOT:
+- instantly reveal symbols
+- use tap boxes
+- auto-reveal sections
+- force reveal interactions
+
+The scratching experience should feel:
+- tactile
+- smooth
+- suspenseful
+- satisfying
+- addictive
+- physical
+- luxurious
+
+================================================================
+3. REALISTIC SCRATCH MATERIAL FX
+================================================================
+
+The scratch surface should NOT instantly disappear.
+
+Instead:
+- metallic foil gradually peels away
+- holographic coating erodes naturally
+- dust particles appear while scratching
+- foil fragments scatter dynamically
+- scratch debris trails follow finger movement
+- subtle neon sparks emit during scratching
+- brushed metal textures distort realistically
+
+Add:
+- dynamic scratch trails
+- friction particles
+- shimmer distortion
+- animated foil reflections
+
+The ticket should visually feel layered and physical.
+
+================================================================
+4. PREMIUM SOUND + HAPTICS
+================================================================
+
+Add synchronized scratch audio:
+- textured scratch sound
+- foil scraping
+- layered friction tones
+- soft casino ambience underneath
+
+The sound should dynamically respond to:
+- scratch speed
+- drag direction
+- pressure intensity (if supported)
+
+Add haptic feedback:
+- micro vibration pulses
+- stronger jackpot vibration
+- progressive tactile response while scratching
+
+The player should FEEL the scratching interaction.
+
+================================================================
+5. TICKET RARITY SYSTEM
+================================================================
+
+Add collectible ticket rarities.
+
+RARITIES:
+- Common
+- Rare
+- Epic
+- Legendary
+
+Each rarity must have:
+- unique color palette
+- exclusive border design
+- different foil materials
+- unique animations
+- stronger glow effects
+- different reveal particles
+- distinct sound profile
+- jackpot tier balancing
+
+================================================================
+6. TICKET THEMES
+================================================================
+
+Create multiple premium ticket themes.
+
+THEMES:
+- Neon Nights
+- Vice Jackpot
+- Midnight Mirage
+- Diamond Rush
+- Tokyo Heat
+- Royal Flush Frenzy
+
+Each ticket should feel:
+- collectible
+- stylish
+- premium
+- high value
+
+Add:
+- chrome framing
+- holographic overlays
+- embossed typography
+- animated neon borders
+- casino side tabs
+- glowing rarity indicators
+- layered texture depth
+
+================================================================
+7. REWARD REVEAL SYSTEM
+================================================================
+
+Completely redesign prize reveals.
+
+Prize amounts should appear:
+- huge
+- glowing
+- animated
+- visually dominant
+- highly rewarding
+
+Winning reveals should trigger:
+- animated chip explosions
+- neon pulse waves
+- cinematic glow bursts
+- confetti particles
+- jackpot sirens
+- screen shake
+- reward counter animations
+- dramatic slowdowns
+- stacked haptic feedback
+
+LARGE WINS:
+- slow-motion reveal
+- enhanced lighting
+- intensified particles
+- bigger number animations
+
+The player should feel:
+“I just hit something massive.”
+
+================================================================
+8. REVEAL ALL SYSTEM FIX
+================================================================
+
+DO NOT show “Reveal All” immediately.
+
+Instead:
+- hide button initially
+- only unlock after significant scratching progress
+- require real interaction first
+
+Reveal All should feel secondary.
+
+PRIMARY gameplay MUST ALWAYS be:
+manual scratching.
+
+================================================================
+9. SUSPENSE + PACING
+================================================================
+
+The system should intentionally create:
+- tension
+- anticipation
+- excitement
+- reward buildup
+
+DO NOT reveal everything instantly.
+
+Use:
+- delayed reveals
+- suspense pauses
+- glowing build-ups
+- progressive animations
+
+The experience should psychologically encourage:
+“one more ticket.”
+
+================================================================
+10. SOCIAL FEED TAB OVERHAUL
+================================================================
+
+The current social feed bubble tabs look broken and unfinished.
+
+CURRENT ISSUES:
+- poor spacing
+- overlapping pills
+- weak contrast
+- unreadable transparency
+- inconsistent alignment
+- unclear active state
+- no polish
+
+Completely redesign the social feed tabs.
+
+================================================================
+11. NEW SOCIAL TAB DESIGN
+================================================================
+
+Create premium neon social category tabs.
+
+STYLE:
+- cyberpunk Vegas casino
+- neon blue/purple/pink glow
+- glassmorphism
+- chrome borders
+- soft bloom lighting
+
+FEATURES:
+- smooth horizontal scrolling
+- glowing active tab state
+- animated transitions
+- responsive touch feedback
+- proper spacing
+- readable labels
+- strong visual hierarchy
+
+Tabs should feel:
+modern
+clean
+premium
+interactive
+
+================================================================
+12. SOCIAL FEED EXPERIENCE OVERHAUL
+================================================================
+
+The social feed should feel alive and addictive.
+
+REFERENCE STYLE:
+Mix of:
+- Poker Twitter
+- TikTok energy
+- Vegas casino culture
+- livestream poker communities
+
+Add:
+- floating reaction emojis
+- live reaction bursts
+- animated counters
+- trending tags
+- hot streak indicators
+- viral jackpot clips
+- replayable big-win moments
+- social engagement animations
+
+================================================================
+13. SOCIAL FEATURES
+================================================================
+
+Add:
+- follow players
+- searchable usernames
+- trending players
+- player verification badges
+- hot table activity
+- viral hand highlights
+- like/comment/share system
+- replay clips
+- featured jackpots
+- biggest winners feed
+- streak indicators
+- “on fire” animations
+- live chip gain counters
+
+The feed should constantly feel active and populated.
+
+================================================================
+14. VISUAL DIRECTION
+================================================================
+
+OVERALL ART STYLE:
+High-end cyberpunk Vegas casino.
+
+PRIMARY COLORS:
+- neon blue
+- neon pink
+- purple
+- chrome silver
+- black glass UI
+- holographic gradients
+
+VISUAL STYLE:
+- realistic lighting
+- cinematic particles
+- premium glow effects
+- layered UI depth
+- modern luxury casino atmosphere
+- holographic reflections
+- neon bloom
+- chrome trim
+- futuristic motion design
+
+================================================================
+15. ANIMATION QUALITY
+================================================================
+
+All interactions should have:
+- smooth easing
+- 60 FPS animations
+- realistic momentum
+- responsive touch physics
+- premium transitions
+- layered particle FX
+
+NOT:
+- stiff
+- flat
+- instant
+- robotic
+- placeholder feeling
+
+================================================================
+16. FINAL GOAL
+================================================================
+
+The entire scratch ticket + social feed system should feel:
+- modern
+- addictive
+- luxurious
+- cinematic
+- tactile
+- social
+- viral
+- premium
+- visually stunning
+
+This should now feel comparable to:
+top-tier App Store social casino games with AAA mobile polish.
