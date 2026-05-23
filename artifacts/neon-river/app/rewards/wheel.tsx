@@ -137,7 +137,7 @@ export default function WheelScreen() {
       if (seg.xp > 0) {
         await updateProfile({ xp: profile.xp + seg.xp });
       }
-      SoundEngine.win();
+      SoundEngine.claim();
       // Pointer bounce — tactile landing feel
       Animated.sequence([
         Animated.timing(pointerBounce, { toValue: 1.6, duration: 100, useNativeDriver: false }),

@@ -50,6 +50,7 @@ const ASSETS = {
   card_flip:          require('../assets/sounds/card_flip.wav'),
   achievement_unlock: require('../assets/sounds/achievement_unlock.wav'),
   level_up:           require('../assets/sounds/level_up.wav'),
+  claim_sound:        require('../assets/sounds/claim_sound.mp3'),
 } as const;
 
 type SoundName = keyof typeof ASSETS;
@@ -325,5 +326,34 @@ export const SoundEngine = {
     if (Math.random() < 0.5) {
       tone(3200 + Math.random() * 1800, 'sine', 0.012, 0.04, Math.random() * dur * 0.5);
     }
+  },
+
+  /**
+   * Reward claim sound — pitch-shifted down 5 semitones (rate ≈ 0.749)
+   * from the original file to create a distinct, premium feel.
+   * Works on both native and web via expo-av.
+   */
+  claim() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    if (_muted || _volume <= 0) return;
+    void (async () => {
+      try {
+        await ensureAudio();
+        const { sound } = await Audio.Sound.createAsync(
+          ASSETS.claim_sound,
+          {
+            shouldPlay:         true,
+            volume:             Math.min(1, _volume),
+            rate:               0.749,   // −5 semitones: 2^(−5/12)
+            shouldCorrectPitch: false,   // we want pitch to shift with rate
+          },
+        );
+        sound.setOnPlaybackStatusUpdate(status => {
+          if (status.isLoaded && status.didJustFinish) {
+            void sound.unloadAsync();
+          }
+        });
+      } catch {}
+    })();
   },
 };

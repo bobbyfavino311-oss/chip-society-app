@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { formatChips } from '@/utils/chipColor';
+import { SoundEngine } from '@/lib/soundEngine';
 
 const STREAK_REWARDS = [
   { day: 1, chips:  5_000, label:  '5K', color: '#00d4aa' },
@@ -49,6 +50,7 @@ export default function StreakScreen() {
       Animated.timing(claimScale, { toValue: 1, duration: 100, useNativeDriver: false }),
     ]).start();
     const amount = await claimDailyReward();
+    SoundEngine.claim();
     setClaimedAmount(amount);
     setJustClaimed(true);
     setClaiming(false);

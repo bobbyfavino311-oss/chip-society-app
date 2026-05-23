@@ -14,6 +14,7 @@ import {
   HAND_TO_ACHIEVEMENT,
 } from '@/lib/achievements';
 import { useUser } from '@/context/UserContext';
+import { SoundEngine } from '@/lib/soundEngine';
 
 const STORAGE_KEY = '@chipsociety_achievements_v2';
 
@@ -147,6 +148,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     setClaimedIds(next);
 
     // Award chips + XP
+    SoundEngine.claim();
     await addChips(achievement.chipReward);
     await updateProfile({ xp: profileRef.current.xp + achievement.xpReward });
     persist();

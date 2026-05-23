@@ -139,7 +139,7 @@ export default function ScratchScreen() {
     setClaimed(true);
     if (won && ticket.prize > 0) {
       await addChips(ticket.prize);
-      SoundEngine.chipCollect();
+      SoundEngine.claim();
     }
     await useScratchTicket();
   };
