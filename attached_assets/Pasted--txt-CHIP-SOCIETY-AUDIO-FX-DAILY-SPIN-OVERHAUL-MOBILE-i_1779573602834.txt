@@ -1,0 +1,310 @@
+```txt
+CHIP SOCIETY — AUDIO FX + DAILY SPIN OVERHAUL
+MOBILE iOS REDESIGN PATCH
+========================================
+
+The current gameplay audio on iOS sounds weak and different from the web version. The Daily Spin wheel is also visually broken and unfinished. Completely redesign and rebuild BOTH systems.
+
+-----------------------------------
+1. GAMEPLAY SOUND EFFECTS OVERHAUL
+-----------------------------------
+
+The gameplay should sound premium, modern, cinematic, and satisfying — similar to a high-end poker app mixed with a subtle heist movie atmosphere.
+
+DO NOT use synthwave.
+DO NOT use retro arcade sounds.
+DO NOT use deep ambient drones.
+
+The vibe should feel:
+- tense
+- clean
+- classy
+- strategic
+- competitive
+- modern casino energy
+
+REFERENCE STYLE:
+Think:
+- Ocean’s Eleven
+- high-stakes poker room
+- luxury casino
+- subtle tension
+- dark modern lounge energy
+
+IMPORTANT:
+DO NOT replace or modify the existing background music system.
+Only rebuild and improve the SOUND EFFECTS system.
+
+-----------------------------------
+2. GAMEPLAY SOUND EFFECTS
+-----------------------------------
+
+Rebuild ALL gameplay sound effects.
+
+Each sound should have:
+- punch
+- clarity
+- stereo depth
+- realistic tactile feel
+
+Add sound effects for:
+
+CARD DEAL:
+- fast casino card flick
+- layered paper/card texture
+
+CHIP BET:
+- satisfying chip stack click
+
+CALL:
+- short clean chip slide
+
+RAISE:
+- heavier aggressive chip sound
+
+ALL-IN:
+- dramatic chip slam impact
+
+WIN:
+- short premium casino success sound
+- NOT cheesy slot machine
+
+FOLD:
+- soft card toss
+
+BUTTON TAP:
+- subtle UI click
+
+SHOWDOWN:
+- low cinematic impact tone
+
+WHEEL SPIN:
+- spinning tick sounds
+- acceleration + slowdown
+
+SCRATCH TICKET:
+- realistic scratch texture audio
+
+CLAIM BUTTON:
+- satisfying reward confirmation sound
+
+-----------------------------------
+3. SOUND SETTINGS BUTTON
+-----------------------------------
+
+Add a SOUND FX toggle button inside gameplay UI.
+
+Placement:
+TOP RIGHT CORNER near settings icon.
+
+Design:
+- neon cyan outline
+- speaker icon
+- glowing effect when ON
+- muted faded style when OFF
+
+Features:
+- tap once = mute all sound effects
+- tap again = enable sound effects
+- save preference permanently
+
+Store user preference locally:
+soundEffectsEnabled: true / false
+
+DO NOT affect background music.
+
+-----------------------------------
+4. DAILY SPIN WHEEL REDESIGN
+-----------------------------------
+
+The current wheel is broken and renders as a giant white circle.
+
+Completely rebuild it from scratch.
+
+-----------------------------------
+5. NEW WHEEL DESIGN
+-----------------------------------
+
+The wheel should look premium and fully rendered.
+
+STYLE:
+- neon casino
+- modern Vegas
+- dark luxury
+- high contrast
+
+WHEEL COLORS:
+- cyan
+- neon pink
+- purple
+- gold
+- dark navy background
+
+WHEEL STRUCTURE:
+- 12 evenly spaced segments
+- glowing neon borders
+- glossy finish
+- inner shadow depth
+- metallic center cap
+
+Each segment contains:
+- reward icon
+- reward amount
+- proper text alignment
+
+-----------------------------------
+6. WHEEL REWARDS
+-----------------------------------
+
+Rewards should include:
+
+- 2K Chips
+- 5K Chips
+- 10K Chips
+- 25K Chips
+- 50K Chips
+- 100K Chips
+- XP Bonus
+- Scratch Ticket
+
+Probability balancing:
+- common rewards weighted heavily
+- large rewards rare
+
+-----------------------------------
+7. WHEEL ANIMATION
+-----------------------------------
+
+The wheel must:
+- ACTUALLY spin
+- rotate smoothly
+- accelerate naturally
+- decelerate naturally
+- stop accurately on selected reward
+
+Add:
+- glowing reward highlight
+- confetti burst for large wins
+- subtle vibration/haptic feedback
+- wheel tick sound while spinning
+
+DO NOT instantly stop the wheel.
+
+Spin duration:
+4–6 seconds.
+
+-----------------------------------
+8. CLAIM REWARD SYSTEM
+-----------------------------------
+
+After wheel stops:
+show large reward card.
+
+Example:
++25,000 CHIPS WON
+
+Add:
+- CLAIM button
+- glowing animation
+- reward sound
+
+ONLY add chips AFTER claim button is pressed.
+
+Then:
+- update player balance instantly
+- animate chip count increasing
+
+-----------------------------------
+9. DAILY SPIN TIMER
+-----------------------------------
+
+Add proper 24-hour countdown.
+
+Example:
+Next spin in:
+23h 18m 42s
+
+When unavailable:
+disable spin button.
+
+When available:
+enable glowing SPIN button.
+
+-----------------------------------
+10. SCRATCH TICKET SYSTEM
+-----------------------------------
+
+Redesign scratch ticket system completely.
+
+The player should:
+- physically drag finger
+- reveal reward underneath
+
+Use realistic scratch masking.
+
+Possible rewards:
+- no win
+- chips
+- XP
+- bonus ticket
+
+IMPORTANT:
+Do NOT show:
+“added to balance”
+unless reward > 0.
+
+Rewards must correctly update balances.
+
+-----------------------------------
+11. MOBILE UI FIXES
+-----------------------------------
+
+Fix wheel modal spacing on iPhone.
+
+Current problems:
+- oversized empty wheel
+- bad scaling
+- too much blank space
+- poor reward alignment
+
+Correct layout:
+- centered wheel
+- balanced margins
+- reward legend beneath wheel
+- fixed safe-area spacing
+- responsive scaling
+
+-----------------------------------
+12. PERFORMANCE
+-----------------------------------
+
+Wheel and audio must:
+- run at 60 FPS
+- avoid lag
+- preload assets
+- avoid audio delay
+- support all modern iPhones
+
+-----------------------------------
+13. FINAL POLISH
+-----------------------------------
+
+Add:
+- subtle neon glow particles
+- animated background gradients
+- premium transitions
+- smooth opacity fades
+- responsive button press animations
+- haptic feedback throughout reward systems
+
+The entire experience should feel:
+“App Store featured quality”
+
+NOT:
+cheap
+unfinished
+placeholder
+prototype-like
+
+This should now feel like a polished premium poker app worthy of public beta launch.
+```

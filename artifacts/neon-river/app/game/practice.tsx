@@ -1,7 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Animated,
   Dimensions,
@@ -355,6 +356,23 @@ export default function PracticeScreen() {
   const [exitConfirm, setExitConfirm] = useState(false);
   const [handCount, setHandCount] = useState(0);
   const [numPlayers, setNumPlayers] = useState(5);
+  const [fxEnabled, setFxEnabled] = useState(true);
+
+  useEffect(() => {
+    AsyncStorage.getItem('soundFxEnabled').then(v => {
+      const enabled = v === null ? true : v === 'true';
+      setFxEnabled(enabled);
+      SoundEngine.setFxEnabled(enabled);
+    }).catch(() => {});
+  }, []);
+
+  const toggleFx = useCallback(() => {
+    const next = !fxEnabled;
+    setFxEnabled(next);
+    SoundEngine.setFxEnabled(next);
+    AsyncStorage.setItem('soundFxEnabled', String(next)).catch(() => {});
+    if (next) SoundEngine.button();
+  }, [fxEnabled]);
 
   const { state, startNewHand, handleAction, skipBotTurn, skipToShowdown, continueAfterHand } = usePokerGame(
     difficulty,
@@ -558,6 +576,23 @@ export default function PracticeScreen() {
         activeOpacity={0.8}
       >
         <Ionicons name="chevron-back" size={20} color={colors.text} />
+      </TouchableOpacity>
+
+      {/* Sound FX toggle — top right */}
+      <TouchableOpacity
+        style={[
+          styles.fxBtn,
+          { top: insets.top + (Platform.OS === 'web' ? 20 : 10) },
+          fxEnabled && styles.fxBtnOn,
+        ]}
+        onPress={toggleFx}
+        activeOpacity={0.75}
+      >
+        <Ionicons
+          name={fxEnabled ? 'volume-high' : 'volume-mute'}
+          size={17}
+          color={fxEnabled ? colors.primary : colors.textDim}
+        />
       </TouchableOpacity>
 
       {/* Phase label */}
@@ -972,6 +1007,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center', justifyContent: 'center',
+  },
+  fxBtn: {
+    position: 'absolute', right: 12, zIndex: 20,
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  fxBtnOn: {
+    borderColor: 'rgba(0,212,255,0.45)',
+    backgroundColor: 'rgba(0,212,255,0.08)',
+    shadowColor: '#00d4ff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
   },
 
   // ── Phase label ────────────────────────────────────────────────────────────
