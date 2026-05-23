@@ -1,0 +1,182 @@
+```text id="chip_society_music_direction_rework"
+REMOVE THE CURRENT GAMEPLAY MUSIC COMPLETELY.
+
+The previous soundtrack attempts were:
+- too cinematic
+- too ambient
+- too slow
+- too empty
+- lacking rhythm and momentum
+
+The game needs music with:
+- an actual beat
+- subtle groove
+- energy
+- tension
+- rhythm
+
+BUT it still needs to feel:
+- stylish
+- mature
+- premium
+- focused
+
+--------------------------------------------------
+NEW MUSIC DIRECTION
+--------------------------------------------------
+
+The music should now feel like:
+
+- late-night luxury driving music
+- sleek modern casino lounge energy
+- stylish underground poker club atmosphere
+- smooth but intense nightlife energy
+
+Think:
+“cool under pressure.”
+
+--------------------------------------------------
+TARGET MUSIC FEEL
+--------------------------------------------------
+
+The soundtrack should have:
+- a steady beat
+- subtle bounce/groove
+- clean modern percussion
+- dark bassline
+- stylish rhythm
+- smooth momentum
+
+The game should feel:
+alive and moving.
+
+--------------------------------------------------
+MUSIC STYLE REQUIREMENTS
+--------------------------------------------------
+
+Include:
+- modern trap-inspired percussion
+- restrained electronic drums
+- smooth bass grooves
+- low-key atmospheric melodies
+- subtle tension layers
+- rhythmic pacing
+
+The music should feel:
+focused and confident.
+
+--------------------------------------------------
+IMPORTANT:
+--------------------------------------------------
+
+DO NOT make it:
+- overly cinematic
+- orchestral
+- slow ambient background noise
+- empty atmospheric drones
+- aggressive rap beats
+- loud EDM
+- club music
+
+The beat should exist,
+but remain smooth and subtle.
+
+--------------------------------------------------
+TARGET VIBE
+--------------------------------------------------
+
+The atmosphere should feel like:
+- a luxury rooftop poker game at night
+- expensive nightlife energy
+- cool confidence
+- stylish pressure
+- modern Vegas after midnight
+
+Think:
+high-end lounge rhythm mixed with poker tension.
+
+--------------------------------------------------
+GAMEPLAY ENERGY
+--------------------------------------------------
+
+NORMAL TABLE PLAY:
+- steady stylish groove
+- smooth beat
+- subtle movement
+
+BIG POTS / ALL-INS:
+- slightly stronger percussion
+- elevated tension
+- increased momentum
+
+SHOWDOWN:
+- quick suspense layer
+- controlled intensity
+
+WIN MOMENTS:
+- clean stylish reward tone
+- subtle satisfaction
+
+--------------------------------------------------
+AUDIO STYLE REFERENCES
+--------------------------------------------------
+
+The soundtrack should resemble:
+- modern luxury lounge beats
+- stylish poker montage music
+- sleek nightlife instrumentals
+- smooth heist pacing WITH rhythm
+
+NOT:
+- movie trailer music
+- retro synthwave
+- arcade casino sounds
+- generic stock music
+
+--------------------------------------------------
+SOUND DESIGN BALANCE
+--------------------------------------------------
+
+The music must blend naturally with:
+- chip sounds
+- card dealing
+- betting
+- timer sounds
+- UI interactions
+
+DO NOT overpower gameplay.
+
+--------------------------------------------------
+PLAYER SETTINGS
+--------------------------------------------------
+
+Allow:
+- Music Volume
+- SFX Volume
+- Mute Music
+- Mute All
+
+--------------------------------------------------
+FINAL ATMOSPHERE GOAL
+--------------------------------------------------
+
+Chip Society should now feel like:
+- a premium modern poker app
+- a luxury social casino
+- a stylish late-night poker lounge
+
+The soundtrack should feel:
+- smooth
+- rhythmic
+- addictive
+- modern
+- stylish
+- confident
+
+The game should NO LONGER feel:
+- empty
+- slow
+- overly dramatic
+- retro
+- lifeless.
+```

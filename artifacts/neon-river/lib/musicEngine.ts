@@ -1,57 +1,49 @@
 /**
- * CHIP SOCIETY — Music Engine
+ * CHIP SOCIETY — Music Engine v3
  *
- * Cinematic heist-thriller atmosphere using Web Audio API.
- * All sine waves — zero sawtooth/retro electronics.
- * D-minor voicing: sub-bass rumble + dark pad + irregular heartbeat pulse.
+ * Late-night luxury lounge groove — smooth, rhythmic, premium.
+ * 85 BPM trap-inspired beat: 808 kick, subtle snare, hi-hats,
+ * rolling bass groove. Never overpowers gameplay audio.
  *
- * configure() — called by SoundContext whenever volume/mute settings change.
- * play()      — start music when a game begins.
- * stop()      — fade out and clean up.
- * setIntensity() — smoothly transition between mood layers.
+ * Uses the Web Audio "lookahead scheduler" pattern for tight timing.
+ * All sound is synthesized — no audio files needed.
+ *
+ * configure(opts)    — sync volume/mute from SoundContext.
+ * play()             — start groove when a game begins.
+ * stop()             — graceful fade-out.
+ * setIntensity(lvl)  — shift groove energy based on game state.
  */
 
 import { Platform } from 'react-native';
 
 // ── Runtime state ─────────────────────────────────────────────────────────────
 
-let _vol    = 0.40;
-let _muted  = false;
+let _vol     = 0.40;
+let _muted   = false;
 let _session = 0;
 let _active: number | null = null;
+let _intensity: 'normal' | 'tense' | 'showdown' = 'normal';
 
-// ── Persistent Audio graph ────────────────────────────────────────────────────
+// ── Scheduler state ───────────────────────────────────────────────────────────
 
-let _ctx:    AudioContext     | null = null;
-let _master: GainNode         | null = null;
-let _filter: BiquadFilterNode | null = null;
-let _padOscs: Array<{ osc: OscillatorNode; gainNode: GainNode }> = [];
-let _pulseTimer: ReturnType<typeof setTimeout> | null = null;
-let _swellTimer: ReturnType<typeof setTimeout> | null = null;
+const BPM            = 85;
+const BEAT           = 60 / BPM;          // seconds per quarter note
+const EIGHTH         = BEAT / 2;          // seconds per 8th note
+const LOOKAHEAD_MS   = 50;               // setTimeout interval
+const SCHEDULE_AHEAD = 0.13;             // how far ahead to schedule (seconds)
 
-// ── D-minor cinematic voicing ─────────────────────────────────────────────────
-//
-//  D1  36.7 Hz — sub-bass rumble (felt more than heard)
-//  D2  73.4 Hz — bass foundation
-//  D2+ 74.0 Hz — slight chorus detune
-//  F2  87.3 Hz — minor third (darkness)
-//  A2 110.0 Hz — perfect fifth (changes to A♭2 103.8 Hz at showdown)
-//  D3 146.8 Hz — octave breathe
-//  D3+ 147.5 Hz — subtle chorus shimmer
-//
-const PADS = [
-  { freq: 36.7,  baseGain: 0.09 }, // sub-bass
-  { freq: 73.4,  baseGain: 0.13 }, // D2
-  { freq: 74.0,  baseGain: 0.06 }, // D2 chorus
-  { freq: 87.3,  baseGain: 0.07 }, // F2 (minor 3rd)
-  { freq: 110.0, baseGain: 0.05 }, // A2 (5th) — swapped in showdown
-  { freq: 146.8, baseGain: 0.04 }, // D3
-  { freq: 147.5, baseGain: 0.03 }, // D3 chorus
-] as const;
+let _ctx:          AudioContext | null = null;
+let _masterGain:   GainNode    | null = null;
+let _nextNoteTime  = 0;
+let _currentStep   = 0;   // 0..7 (eight 8th-note steps per bar)
+let _schedTimer:   ReturnType<typeof setTimeout> | null = null;
 
-const FIFTH_IDX = 4; // index of the 5th — its frequency changes per intensity
+// ── Pre-generated noise buffers (created once per play session) ───────────────
 
-// ── Internal helpers ──────────────────────────────────────────────────────────
+let _snareBuffer: AudioBuffer | null = null;
+let _hihatBuffer: AudioBuffer | null = null;
+
+// ── Internal AudioContext helper ──────────────────────────────────────────────
 
 function getCtx(): AudioContext | null {
   if (Platform.OS !== 'web') return null;
@@ -69,34 +61,164 @@ function getCtx(): AudioContext | null {
   } catch { return null; }
 }
 
-function teardown() {
-  if (_pulseTimer) { clearTimeout(_pulseTimer); _pulseTimer = null; }
-  if (_swellTimer) { clearTimeout(_swellTimer); _swellTimer = null; }
-  for (const { osc, gainNode } of _padOscs) {
-    try { osc.stop(); osc.disconnect(); } catch {}
-    try { gainNode.disconnect(); } catch {}
-  }
-  _padOscs = [];
-  if (_filter) { try { _filter.disconnect(); } catch {} _filter = null; }
-  if (_master) { try { _master.disconnect(); } catch {} _master = null; }
-  _active = null;
+// ── Percussion primitives ─────────────────────────────────────────────────────
+
+/** 808-style kick: sine sweep 150 → 45 Hz, punchy but smooth */
+function kick(ctx: AudioContext, dest: AudioNode, t: number, vol: number) {
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, t);
+  osc.frequency.exponentialRampToValueAtTime(44, t + 0.38);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(vol * 0.88, t + 0.007);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.48);
+  osc.connect(gain);
+  gain.connect(dest);
+  osc.start(t);
+  osc.stop(t + 0.50);
+  osc.onended = () => { try { osc.disconnect(); gain.disconnect(); } catch {} };
 }
 
-/** Short bass impulse — used for heartbeat lub/dub */
-function impulse(ctx: AudioContext, dest: AudioNode, freq: number, vol: number, dur: number, delay = 0) {
-  const t   = ctx.currentTime + delay;
-  const osc = ctx.createOscillator();
-  const g   = ctx.createGain();
+/** Clap/snare: bandpass noise burst */
+function snare(ctx: AudioContext, dest: AudioNode, t: number, vol: number) {
+  if (!_snareBuffer) return;
+  const src    = ctx.createBufferSource();
+  src.buffer   = _snareBuffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type  = 'bandpass';
+  filter.frequency.value = 1100;
+  filter.Q.value = 0.65;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(vol * 0.30, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(dest);
+  src.start(t);
+  src.stop(t + 0.14);
+  src.onended = () => { try { src.disconnect(); filter.disconnect(); gain.disconnect(); } catch {} };
+}
+
+/** Closed hi-hat: highpass noise burst */
+function hihat(ctx: AudioContext, dest: AudioNode, t: number, vol: number) {
+  if (!_hihatBuffer) return;
+  const src    = ctx.createBufferSource();
+  src.buffer   = _hihatBuffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type  = 'highpass';
+  filter.frequency.value = 7500;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(vol * 0.10, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.050);
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(dest);
+  src.start(t);
+  src.stop(t + 0.06);
+  src.onended = () => { try { src.disconnect(); filter.disconnect(); gain.disconnect(); } catch {} };
+}
+
+/** Bass note: smooth sine, medium attack */
+function bass(ctx: AudioContext, dest: AudioNode, t: number, freq: number, vol: number, dur: number) {
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
   osc.type = 'sine';
   osc.frequency.value = freq;
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(_muted ? 0 : vol, t + 0.025);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  osc.connect(g);
-  g.connect(dest);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(vol, t + 0.035);
+  gain.gain.setValueAtTime(vol, t + dur - 0.07);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  osc.connect(gain);
+  gain.connect(dest);
   osc.start(t);
-  osc.stop(t + dur + 0.02);
-  osc.onended = () => { try { osc.disconnect(); g.disconnect(); } catch {} };
+  osc.stop(t + dur + 0.01);
+  osc.onended = () => { try { osc.disconnect(); gain.disconnect(); } catch {} };
+}
+
+// ── Beat pattern ──────────────────────────────────────────────────────────────
+//
+//  Step  Beat  Element
+//   0     1    Kick + Hi-hat
+//   1    1.5   Hi-hat (offbeat)
+//   2     2    Snare + Hi-hat
+//   3    2.5   Hi-hat (offbeat)
+//   4     3    Kick + Hi-hat  (+ 2nd kick for tense)
+//   5    3.5   Hi-hat (offbeat)
+//   6     4    Snare + Hi-hat
+//   7    4.5   Hi-hat (offbeat)  ← last 8th of bar
+//
+// Bass groove (D2 = 73.4 Hz, A1 = 55.0 Hz, E2 = 82.4 Hz):
+//  Steps 0-3: D2 walking to A1
+//  Steps 4-7: A1 walking back to D2
+
+const BASS_FREQS = [73.4, 65.4, 55.0, 58.3, 55.0, 58.3, 65.4, 73.4] as const;
+
+function scheduleStep(step: number, t: number) {
+  const ctx = _ctx;
+  const dest = _masterGain;
+  if (!ctx || !dest) return;
+
+  const vol = _muted ? 0 : 1;
+
+  if (_intensity === 'showdown') {
+    // Half-time feel: only kick on step 0, deep snare on step 4, no hi-hats
+    if (step === 0) kick(ctx, dest, t, vol * 0.55);
+    if (step === 4) snare(ctx, dest, t, vol * 0.22);
+    // Sub-bass pulse every bar
+    if (step === 0) bass(ctx, dest, t, 36.7, vol * 0.18, BEAT * 2);
+    return;
+  }
+
+  // ── Kick (beats 1 and 3) ────────────────────────────────────────────────
+  if (step === 0) kick(ctx, dest, t, vol * 0.55);
+  if (step === 4) kick(ctx, dest, t, vol * (_intensity === 'tense' ? 0.62 : 0.50));
+
+  // ── Snare (beats 2 and 4) ───────────────────────────────────────────────
+  if (step === 2) snare(ctx, dest, t, vol * 0.85);
+  if (step === 6) snare(ctx, dest, t, vol * 0.85);
+
+  // ── Hi-hat pattern ───────────────────────────────────────────────────────
+  // All 8th notes; downbeat hats slightly louder
+  const hatVol = step % 2 === 0 ? 0.9 : 0.5;
+  hihat(ctx, dest, t, vol * hatVol * (_intensity === 'tense' ? 1.25 : 1.0));
+
+  // Ghost hi-hat triplet on tense (16th note before snare)
+  if (_intensity === 'tense' && (step === 1 || step === 5)) {
+    hihat(ctx, dest, t + EIGHTH * 0.5, vol * 0.25);
+  }
+
+  // ── Bass groove ──────────────────────────────────────────────────────────
+  if (step % 2 === 0) {
+    const freq = BASS_FREQS[step];
+    const bVol = vol * (_intensity === 'tense' ? 0.20 : 0.16);
+    bass(ctx, dest, t, freq, bVol, BEAT * 0.85);
+  }
+}
+
+// ── Lookahead scheduler ───────────────────────────────────────────────────────
+
+function runScheduler(sid: number) {
+  if (_active !== sid) return;
+  const ctx = getCtx();
+  if (!ctx) return;
+
+  while (_nextNoteTime < ctx.currentTime + SCHEDULE_AHEAD) {
+    scheduleStep(_currentStep, _nextNoteTime);
+    _nextNoteTime += EIGHTH;
+    _currentStep   = (_currentStep + 1) % 8;
+  }
+  _schedTimer = setTimeout(() => runScheduler(sid), LOOKAHEAD_MS);
+}
+
+// ── Teardown ──────────────────────────────────────────────────────────────────
+
+function teardown() {
+  if (_schedTimer) { clearTimeout(_schedTimer); _schedTimer = null; }
+  if (_masterGain) { try { _masterGain.disconnect(); } catch {} _masterGain = null; }
+  _snareBuffer = null;
+  _hihatBuffer = null;
+  _active      = null;
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -106,8 +228,8 @@ export const MusicEngine = {
   configure(opts: { volume?: number; muted?: boolean }) {
     if (opts.volume !== undefined) _vol   = Math.max(0, Math.min(1, opts.volume));
     if (opts.muted  !== undefined) _muted = opts.muted;
-    if (_master && _ctx) {
-      _master.gain.setTargetAtTime(_muted ? 0 : _vol, _ctx.currentTime, 0.5);
+    if (_masterGain && _ctx) {
+      _masterGain.gain.setTargetAtTime(_muted ? 0 : _vol, _ctx.currentTime, 0.4);
     }
   },
 
@@ -119,120 +241,50 @@ export const MusicEngine = {
 
     const sid = ++_session;
     _active = sid;
+    _intensity = 'normal';
+    _currentStep = 0;
 
-    // Master gain — 8-second slow fade-in for cinematic entrance
-    _master = ctx.createGain();
-    _master.gain.setValueAtTime(0, ctx.currentTime);
-    _master.gain.linearRampToValueAtTime(_vol, ctx.currentTime + 8);
-    _master.connect(ctx.destination);
+    // Pre-generate noise buffers (reused every beat)
+    const snareLen = Math.ceil(ctx.sampleRate * 0.15);
+    _snareBuffer   = ctx.createBuffer(1, snareLen, ctx.sampleRate);
+    const sd       = _snareBuffer.getChannelData(0);
+    for (let i = 0; i < snareLen; i++) sd[i] = Math.random() * 2 - 1;
 
-    // Dark low-pass filter — deliberately narrow for that underground-casino feel
-    _filter = ctx.createBiquadFilter();
-    _filter.type = 'lowpass';
-    _filter.frequency.setValueAtTime(420, ctx.currentTime);
-    _filter.Q.value = 0.6;
-    _filter.connect(_master);
+    const hihatLen = Math.ceil(ctx.sampleRate * 0.06);
+    _hihatBuffer   = ctx.createBuffer(1, hihatLen, ctx.sampleRate);
+    const hd       = _hihatBuffer.getChannelData(0);
+    for (let i = 0; i < hihatLen; i++) hd[i] = Math.random() * 2 - 1;
 
-    // Very slow, barely perceptible filter breath — 0.04 Hz ≈ 25 s period
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 80; // ±80 Hz — subtle, not sweepy
-    lfo.type = 'sine';
-    lfo.frequency.value = 0.04;
-    lfo.connect(lfoGain);
-    lfoGain.connect(_filter.frequency);
-    lfo.start();
-    // Store lfo so teardown can stop it
-    const lfoEntry = { osc: lfo, gainNode: lfoGain };
+    // Master gain — 3-second fade-in so groove enters smoothly
+    _masterGain = ctx.createGain();
+    _masterGain.gain.setValueAtTime(0, ctx.currentTime);
+    _masterGain.gain.linearRampToValueAtTime(_vol, ctx.currentTime + 3.0);
+    _masterGain.connect(ctx.destination);
 
-    // Build the D-minor pad oscillators
-    _padOscs = [lfoEntry];
-    for (const { freq, baseGain } of PADS) {
-      const osc  = ctx.createOscillator();
-      const g    = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      g.gain.value = baseGain;
-      osc.connect(g);
-      g.connect(_filter);
-      osc.start();
-      _padOscs.push({ osc, gainNode: g });
-    }
-
-    // ── Irregular heartbeat pulse (lub-dub pattern) ───────────────────────────
-    const heartbeat = () => {
-      if (_active !== sid) return;
-      const c = getCtx();
-      if (!c || !_master) return;
-      // lub — primary beat
-      impulse(c, _master, 58, 0.16, 0.22);
-      // dub — softer echo, 155 ms later
-      impulse(c, _master, 72, 0.09, 0.16, 0.155);
-      // next heartbeat: 1050–1450 ms (irregular, like real tension)
-      const next = 1050 + Math.random() * 400;
-      _pulseTimer = setTimeout(heartbeat, next);
-    };
-    // First heartbeat after pads have had time to establish
-    _pulseTimer = setTimeout(heartbeat, 3000);
-
-    // ── Occasional sub-bass swell (Inception-style rumble) ───────────────────
-    const swell = () => {
-      if (_active !== sid) return;
-      const c = getCtx();
-      if (!c || !_master) return;
-      const t = c.currentTime;
-      const swellOsc  = c.createOscillator();
-      const swellGain = c.createGain();
-      swellOsc.type = 'sine';
-      swellOsc.frequency.setValueAtTime(28, t);
-      swellOsc.frequency.exponentialRampToValueAtTime(52, t + 5);
-      swellGain.gain.setValueAtTime(0, t);
-      swellGain.gain.linearRampToValueAtTime(_muted ? 0 : 0.12, t + 2.5);
-      swellGain.gain.linearRampToValueAtTime(0, t + 8);
-      swellOsc.connect(swellGain);
-      swellGain.connect(_master);
-      swellOsc.start(t);
-      swellOsc.stop(t + 9);
-      swellOsc.onended = () => { try { swellOsc.disconnect(); swellGain.disconnect(); } catch {} };
-      // Next swell: 12–22 seconds
-      _swellTimer = setTimeout(swell, 12000 + Math.random() * 10000);
-    };
-    _swellTimer = setTimeout(swell, 8000 + Math.random() * 6000);
+    // Kick off the scheduler one beat from now (lets fade-in settle)
+    _nextNoteTime = ctx.currentTime + BEAT;
+    runScheduler(sid);
   },
 
   stop() {
     if (_active === null) return;
-    if (_pulseTimer) { clearTimeout(_pulseTimer); _pulseTimer = null; }
-    if (_swellTimer) { clearTimeout(_swellTimer); _swellTimer = null; }
-    // Graceful 2.5-second cinematic fade-out
-    if (_master && _ctx) {
-      _master.gain.setTargetAtTime(0, _ctx.currentTime, 0.7);
+    if (_schedTimer) { clearTimeout(_schedTimer); _schedTimer = null; }
+    // Smooth 1.5 s fade-out — groove trails off naturally
+    if (_masterGain && _ctx) {
+      _masterGain.gain.setTargetAtTime(0, _ctx.currentTime, 0.4);
     }
     const sid = _active;
     _active = null;
-    setTimeout(() => { if (_active !== sid) teardown(); }, 3000);
+    setTimeout(() => { if (_active !== sid) teardown(); }, 2000);
   },
 
   setIntensity(level: 'normal' | 'tense' | 'showdown') {
-    if (!_filter || !_ctx) return;
+    _intensity = level;
+    if (!_masterGain || !_ctx) return;
     const t = _ctx.currentTime;
-
-    // Filter frequency per mood
-    const filterFreqs = { normal: 420, tense: 620, showdown: 300 };
-    _filter.frequency.setTargetAtTime(filterFreqs[level], t, 1.2);
-
-    // Master volume adjustment (subtle — never dominate SFX)
-    if (_master && !_muted) {
-      const volMult = { normal: 1.00, tense: 1.20, showdown: 0.80 };
-      _master.gain.setTargetAtTime(_vol * volMult[level], t, 1.5);
-    }
-
-    // Fifth interval switch: perfect fifth (110 Hz) ↔ tritone (103.8 Hz)
-    // Tritone = "devil's interval" — maximum cinematic dread for showdowns
-    const fifthEntry = _padOscs[FIFTH_IDX + 1]; // +1 because [0] is the LFO
-    if (fifthEntry) {
-      const fifthFreqs = { normal: 110.0, tense: 110.0, showdown: 103.8 };
-      fifthEntry.osc.frequency.setTargetAtTime(fifthFreqs[level], t, 0.8);
+    const volMult = { normal: 1.00, tense: 1.18, showdown: 0.70 };
+    if (!_muted) {
+      _masterGain.gain.setTargetAtTime(_vol * volMult[level], t, 0.6);
     }
   },
 };
