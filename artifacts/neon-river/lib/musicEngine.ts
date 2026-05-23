@@ -61,9 +61,11 @@ export const MusicEngine = {
         const { sound } = await Audio.Sound.createAsync(
           MUSIC_ASSET,
           {
-            shouldPlay: true,
-            isLooping:  true,
-            volume:     _muted ? 0 : _vol,
+            shouldPlay:         true,
+            isLooping:          true,
+            volume:             _muted ? 0 : _vol,
+            rate:               0.75,   // −5 semitones + 25% slower
+            shouldCorrectPitch: false,  // let pitch drop with speed
           },
         );
         // Apply current settings in case they changed while loading
