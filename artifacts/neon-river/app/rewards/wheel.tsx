@@ -343,8 +343,7 @@ export default function WheelScreen() {
                     x={p.xi} y={p.yi + 5}
                     textAnchor="middle"
                     fontSize={11}
-                    rotation={p.rot}
-                    origin={`${p.xi},${p.yi}`}
+                    transform={`rotate(${p.rot}, ${p.xi}, ${p.yi})`}
                   >{sg.emoji}</SvgText>
                   {/* Label */}
                   <SvgText
@@ -354,8 +353,7 @@ export default function WheelScreen() {
                     fillOpacity={isW ? 1 : 0.85}
                     fontSize={sg.label.length > 4 ? 7.5 : 9.5}
                     fontWeight="bold"
-                    rotation={p.rot}
-                    origin={`${p.x},${p.y}`}
+                    transform={`rotate(${p.rot}, ${p.x}, ${p.y})`}
                   >{sg.label}</SvgText>
                 </G>
               );
