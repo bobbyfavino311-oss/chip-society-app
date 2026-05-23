@@ -359,19 +359,19 @@ export default function PracticeScreen() {
   const [fxEnabled, setFxEnabled] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem('soundFxEnabled').then(v => {
+    AsyncStorage.getItem('musicEnabled').then(v => {
       const enabled = v === null ? true : v === 'true';
       setFxEnabled(enabled);
-      SoundEngine.setFxEnabled(enabled);
+      MusicEngine.configure({ muted: !enabled });
     }).catch(() => {});
   }, []);
 
   const toggleFx = useCallback(() => {
     const next = !fxEnabled;
     setFxEnabled(next);
-    SoundEngine.setFxEnabled(next);
-    AsyncStorage.setItem('soundFxEnabled', String(next)).catch(() => {});
-    if (next) SoundEngine.button();
+    MusicEngine.configure({ muted: !next });
+    AsyncStorage.setItem('musicEnabled', String(next)).catch(() => {});
+    SoundEngine.button();
   }, [fxEnabled]);
 
   const { state, startNewHand, handleAction, skipBotTurn, skipToShowdown, continueAfterHand } = usePokerGame(
@@ -589,7 +589,7 @@ export default function PracticeScreen() {
         activeOpacity={0.75}
       >
         <Ionicons
-          name={fxEnabled ? 'volume-high' : 'volume-mute'}
+          name={fxEnabled ? 'musical-notes' : 'musical-notes-outline'}
           size={17}
           color={fxEnabled ? colors.primary : colors.textDim}
         />
