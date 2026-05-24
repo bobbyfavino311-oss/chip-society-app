@@ -1,0 +1,189 @@
+```txt id="pkcm9t"
+CHIP SOCIETY — TITLE SCREEN + BRANDING + AUDIO + SOCIAL UPDATE
+PREMIUM APP INTRO OVERHAUL
+==============================================================
+
+Update the entire first-launch/title-screen experience to better reflect the app’s identity as BOTH:
+- a premium poker game
+AND
+- a social poker community platform.
+
+The current subtitle:
+“The Neon Table”
+
+does NOT properly communicate:
+- multiplayer interaction
+- poker community features
+- social feed systems
+- player networking
+- competitive social atmosphere
+
+This needs to be replaced immediately.
+
+==============================================================
+1. NEW SUBTITLE / TAGLINE SYSTEM
+==============================================================
+
+Replace:
+“The Neon Table”
+
+WITH:
+“POKER COMMUNITY”
+
+This should become the official subtitle directly under the CHIP SOCIETY logo/title.
+
+Final layout:
+--------------------------------
+CHIP SOCIETY
+Poker Community
+
+[ ENTER ]
+[ Continue as Guest ]
+--------------------------------
+
+==============================================================
+2. TITLE SCREEN REDESIGN
+==============================================================
+
+The first screen players see should feel:
+- premium
+- luxurious
+- modern
+- social
+- cinematic
+- high-end
+
+The title/subtitle spacing should feel:
+- balanced
+- clean
+- centered
+- elegant
+
+Typography style:
+- smooth luxury casino font
+- modern neon-inspired styling
+- subtle chrome/neon glow
+- highly readable on iPhone screens
+
+==============================================================
+3. TITLE SCREEN ATMOSPHERE
+==============================================================
+
+The intro screen should visually communicate:
+- social interaction
+- competitive poker
+- luxury nightlife
+- modern Vegas energy
+
+Add subtle animated background elements:
+- moving neon lights
+- soft casino glow
+- distant skyline lighting
+- animated particles
+- slow ambient motion
+
+DO NOT:
+- overcrowd the screen
+- make it look arcade-like
+- make it look cartoonish
+
+==============================================================
+4. SOCIAL BRANDING INTEGRATION
+==============================================================
+
+The app should now consistently reinforce that Chip Society is:
+- a poker game
+- a poker social network
+- a competitive poker community
+
+Add subtle social references throughout onboarding.
+
+Examples:
+- “Connect with players worldwide.”
+- “Share your biggest hands.”
+- “Build your poker reputation.”
+- “Follow top players.”
+- “Join the community.”
+
+==============================================================
+5. TUTORIAL UPDATE
+==============================================================
+
+Update the first-time tutorial to include:
+- social feed walkthrough
+- following players
+- posting big wins
+- reacting to community posts
+- viewing trending poker moments
+
+Tutorial prompts should now include:
+“Share your biggest hands with the community.”
+“Build your reputation on the live poker feed.”
+“Follow players and grow your poker network.”
+
+==============================================================
+6. AUDIO FLOW UPDATE
+==============================================================
+
+The main menu music should:
+- begin at launch screen
+- continue through onboarding
+- continue into home menu
+- stop during gameplay
+
+The soundtrack should:
+- maintain identical speed
+- NEVER change BPM
+- NEVER speed up
+- NEVER slow down
+
+Loop exactly six times before fading out.
+
+==============================================================
+7. MAIN MENU MUSIC TOGGLE
+==============================================================
+
+Add music toggle button directly on:
+- login screen
+- home screen
+
+Features:
+- instant mute/unmute
+- smooth fade transition
+- persistent saved preference
+
+==============================================================
+8. GAMEPLAY AUDIO REPLACEMENT
+==============================================================
+
+Completely remove:
+- tacky 8-bit sounds
+- arcade-style noises
+- retro beeps
+- cheap poker effects
+
+Replace with:
+- realistic casino chip sounds
+- premium card dealing
+- cinematic table ambience
+- subtle luxury poker audio
+
+==============================================================
+9. FINAL BRAND DIRECTION
+==============================================================
+
+Chip Society should now feel like:
+- a luxury poker platform
+- a social poker network
+- a competitive poker community
+- a modern Vegas social experience
+
+The app should NO LONGER feel like:
+- a basic poker simulator
+- a single-player casino game
+- an arcade poker app
+- a generic mobile gambling clone
+
+FINAL EXPERIENCE GOAL:
+A premium social poker ecosystem with modern luxury casino aesthetics and strong community identity.
+```

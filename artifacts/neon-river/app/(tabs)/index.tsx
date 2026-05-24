@@ -19,8 +19,10 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
+import { useSoundSettings } from '@/context/SoundContext';
 import { useColors } from '@/hooks/useColors';
 import { getAvatar } from '@/components/CasinoAvatars';
+import { MusicEngine } from '@/lib/musicEngine';
 
 const { width } = Dimensions.get('window');
 
@@ -464,9 +466,15 @@ export default function HomeScreen() {
   const { profile, isLoaded } = useUser();
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
+  const { isMusicMuted, toggleMusicMute } = useSoundSettings();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const dropAnim = useRef(new Animated.Value(0)).current;
+
+  // Resume menu music when home screen mounts (e.g. returning from a game)
+  useEffect(() => {
+    MusicEngine.play();
+  }, []);
 
   useEffect(() => {
     if (isLoaded && profile.isNewUser) {
@@ -541,9 +549,19 @@ export default function HomeScreen() {
         <View style={styles.feedPip} />
       </TouchableOpacity>
 
-      {/* Top-right: gear + avatar */}
+      {/* Top-right: music + gear + avatar */}
       <View style={[styles.topCorner, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          {/* Music toggle */}
+          <TouchableOpacity onPress={toggleMusicMute} activeOpacity={0.8}>
+            <View style={[styles.topAvatar, { borderColor: isMusicMuted ? colors.border : colors.primary + '60', backgroundColor: colors.surface }]}>
+              <Ionicons
+                name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
+                size={17}
+                color={isMusicMuted ? colors.textMuted : colors.primary}
+              />
+            </View>
+          </TouchableOpacity>
           {/* Settings gear */}
           <TouchableOpacity onPress={settingsOpen ? closeSettings : openSettings} activeOpacity={0.8}>
             <View style={[styles.topAvatar, { borderColor: settingsOpen ? colors.primary : colors.border, backgroundColor: colors.surface }]}>
