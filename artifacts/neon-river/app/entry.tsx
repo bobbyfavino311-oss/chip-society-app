@@ -57,12 +57,15 @@ const mt = StyleSheet.create({
 // ─── Main screen ─────────────────────────────────────────────────────────────
 
 export default function EntryScreen() {
-  const fadeIn    = useRef(new Animated.Value(0)).current;
-  const logoGlow  = useRef(new Animated.Value(0.6)).current;
-  const slideUp   = useRef(new Animated.Value(40)).current;
-  const particle1 = useRef(new Animated.Value(0)).current;
-  const particle2 = useRef(new Animated.Value(0)).current;
-  const particle3 = useRef(new Animated.Value(0)).current;
+  const fadeIn       = useRef(new Animated.Value(0)).current;
+  const logoGlow     = useRef(new Animated.Value(0.6)).current;
+  const slideUp      = useRef(new Animated.Value(40)).current;
+  const particle1    = useRef(new Animated.Value(0)).current;
+  const particle2    = useRef(new Animated.Value(0)).current;
+  const particle3    = useRef(new Animated.Value(0)).current;
+  const neonFlicker  = useRef(new Animated.Value(1)).current;
+  const scanlineY    = useRef(new Animated.Value(-12)).current;
+  const flickerAlive = useRef(true);
 
   // Rotating taglines
   const [taglineIdx, setTaglineIdx] = useState(0);
@@ -78,7 +81,7 @@ export default function EntryScreen() {
       ]),
     ]).start();
 
-    // Logo glow pulse
+    // Logo glow pulse (slow breathe — keep as-is)
     Animated.loop(
       Animated.sequence([
         Animated.timing(logoGlow, { toValue: 1,   duration: 1800, useNativeDriver: true }),
@@ -106,6 +109,52 @@ export default function EntryScreen() {
       ])
     ).start();
 
+    // Scanline — slow drift from top to bottom of logo, loops
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scanlineY, { toValue: 220, duration: 4200, useNativeDriver: true }),
+        Animated.delay(1800),
+        Animated.timing(scanlineY, { toValue: -12, duration: 0,    useNativeDriver: true }),
+      ])
+    ).start();
+
+    // Neon-tube flicker — random stutters at irregular intervals
+    flickerAlive.current = true;
+    function scheduleFlicker() {
+      if (!flickerAlive.current) return;
+      const delay = 2800 + Math.random() * 5200;
+      setTimeout(() => {
+        if (!flickerAlive.current) return;
+        const kind = Math.random();
+        if (kind < 0.45) {
+          // Single quick dip — subtle
+          Animated.sequence([
+            Animated.timing(neonFlicker, { toValue: 0.18, duration: 45,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 1,    duration: 35,  useNativeDriver: true }),
+          ]).start(() => scheduleFlicker());
+        } else if (kind < 0.78) {
+          // Classic double-flicker — "no vacancy" stutter
+          Animated.sequence([
+            Animated.timing(neonFlicker, { toValue: 0.22, duration: 50,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 0.88, duration: 35,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 0.08, duration: 48,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 1,    duration: 55,  useNativeDriver: true }),
+          ]).start(() => scheduleFlicker());
+        } else {
+          // Triple buzz — rare, dramatic neon fault
+          Animated.sequence([
+            Animated.timing(neonFlicker, { toValue: 0.28, duration: 38,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 0.9,  duration: 28,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 0.05, duration: 42,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 0.82, duration: 32,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 0.08, duration: 38,  useNativeDriver: true }),
+            Animated.timing(neonFlicker, { toValue: 1,    duration: 60,  useNativeDriver: true }),
+          ]).start(() => scheduleFlicker());
+        }
+      }, delay);
+    }
+    scheduleFlicker();
+
     // Start menu music
     MusicEngine.play();
 
@@ -117,7 +166,10 @@ export default function EntryScreen() {
       });
     }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      flickerAlive.current = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -144,8 +196,8 @@ export default function EntryScreen() {
 
         <Animated.View style={[s.content, { opacity: fadeIn, transform: [{ translateY: slideUp }] }]}>
 
-          {/* Logo area */}
-          <View style={s.logoArea}>
+          {/* Logo area — neonFlicker wraps everything for tube-stutter effect */}
+          <Animated.View style={[s.logoArea, { opacity: neonFlicker }]}>
             <Animated.Text style={[s.logoSub, { opacity: logoGlow }]}>
               ♠ ♥ ♦ ♣
             </Animated.Text>
@@ -153,6 +205,12 @@ export default function EntryScreen() {
               CHIP{'\n'}SOCIETY
             </Animated.Text>
             <Text style={s.logoTagline}>POKER COMMUNITY</Text>
+
+            {/* Scanline — drifts slowly down logo like CRT / no-vacancy neon */}
+            <Animated.View
+              pointerEvents="none"
+              style={[s.scanline, { transform: [{ translateY: scanlineY }] }]}
+            />
 
             {/* Rotating social tagline */}
             <Animated.Text style={[s.tagline, { opacity: taglineOpacity }]}>
@@ -164,7 +222,7 @@ export default function EntryScreen() {
               <View style={s.dividerDot} />
               <View style={s.dividerLine} />
             </View>
-          </View>
+          </Animated.View>
 
           {/* Auth buttons */}
           <View style={s.buttons}>
@@ -250,7 +308,16 @@ const s = StyleSheet.create({
   blobPurple: { width: 300, height: 300, backgroundColor: 'rgba(191,95,255,0.05)', top: height * 0.3, left: width * 0.2 },
   blobGold:   { width: 180, height: 180, backgroundColor: 'rgba(255,215,0,0.03)',  top: height * 0.1, right: -40 },
 
-  logoArea: { alignItems: 'center', paddingTop: Platform.OS === 'ios' ? 12 : 10 },
+  logoArea: { alignItems: 'center', paddingTop: Platform.OS === 'ios' ? 12 : 10, overflow: 'hidden' },
+  scanline: {
+    position: 'absolute',
+    left: -40,
+    right: -40,
+    height: 3,
+    backgroundColor: 'rgba(0,212,255,0.07)',
+    borderRadius: 1,
+    top: 0,
+  },
   logoSub:  { fontSize: 20, color: 'rgba(0,212,255,0.5)', letterSpacing: 12, marginBottom: 10 },
   logoMain: {
     fontFamily: 'Orbitron_900Black',
