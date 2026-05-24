@@ -198,21 +198,35 @@ export default function EntryScreen() {
 
           {/* Logo area — neonFlicker wraps everything for tube-stutter effect */}
           <Animated.View style={[s.logoArea, { opacity: neonFlicker }]}>
+
+            {/* Suit symbols above the sign */}
             <Animated.Text style={[s.logoSub, { opacity: logoGlow }]}>
               ♠ ♥ ♦ ♣
             </Animated.Text>
-            <Animated.Text style={[s.logoMain, { opacity: logoGlow }]}>
-              CHIP{'\n'}SOCIETY
-            </Animated.Text>
-            <Text style={s.logoTagline}>POKER COMMUNITY</Text>
 
-            {/* Scanline — drifts slowly down logo like CRT / no-vacancy neon */}
+            {/* Nightlife neon sign frame — pulses with logoGlow */}
+            <Animated.View style={[s.signFrame, { opacity: logoGlow }]}>
+              {/* Corner brackets */}
+              <View style={s.cornerTL} /><View style={s.cornerTR} />
+              <View style={s.cornerBL} /><View style={s.cornerBR} />
+
+              {/* Main logo text */}
+              <Text style={s.logoMain}>CHIP{'\n'}SOCIETY</Text>
+
+              {/* Inner divider */}
+              <View style={s.signDivider} />
+
+              {/* Tagline inside the sign */}
+              <Text style={s.logoTagline}>POKER COMMUNITY</Text>
+            </Animated.View>
+
+            {/* Scanline — drifts slowly across the sign like a real neon tube */}
             <Animated.View
               pointerEvents="none"
               style={[s.scanline, { transform: [{ translateY: scanlineY }] }]}
             />
 
-            {/* Rotating social tagline */}
+            {/* Rotating social tagline below sign */}
             <Animated.Text style={[s.tagline, { opacity: taglineOpacity }]}>
               {TAGLINES[taglineIdx]}
             </Animated.Text>
@@ -311,30 +325,108 @@ const s = StyleSheet.create({
   logoArea: { alignItems: 'center', paddingTop: Platform.OS === 'ios' ? 12 : 10, overflow: 'hidden' },
   scanline: {
     position: 'absolute',
-    left: -40,
-    right: -40,
-    height: 3,
-    backgroundColor: 'rgba(0,212,255,0.07)',
-    borderRadius: 1,
+    left: -60,
+    right: -60,
+    height: 4,
+    backgroundColor: 'rgba(0,212,255,0.09)',
+    borderRadius: 2,
     top: 0,
   },
-  logoSub:  { fontSize: 20, color: 'rgba(0,212,255,0.5)', letterSpacing: 12, marginBottom: 10 },
+
+  // ── Nightlife neon sign frame ──────────────────────────────────────────────
+  signFrame: {
+    alignItems: 'center',
+    paddingHorizontal: 28,
+    paddingVertical: 20,
+    borderWidth: 1.5,
+    borderColor: '#00d4ff',
+    borderRadius: 6,
+    backgroundColor: 'rgba(0,212,255,0.03)',
+    marginBottom: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#00d4ff',
+        shadowOpacity: 1,
+        shadowRadius: 22,
+        shadowOffset: { width: 0, height: 0 },
+      },
+      web: {
+        // @ts-ignore web only
+        boxShadow: '0 0 24px rgba(0,212,255,0.55), inset 0 0 18px rgba(0,212,255,0.08)',
+      },
+    }),
+  },
+  // Corner bracket accents — neon pink L-shapes over each corner
+  cornerTL: {
+    position: 'absolute', top: -2, left: -2,
+    width: 14, height: 14,
+    borderTopWidth: 3, borderLeftWidth: 3,
+    borderColor: '#ff0090', borderRadius: 1,
+  },
+  cornerTR: {
+    position: 'absolute', top: -2, right: -2,
+    width: 14, height: 14,
+    borderTopWidth: 3, borderRightWidth: 3,
+    borderColor: '#ff0090', borderRadius: 1,
+  },
+  cornerBL: {
+    position: 'absolute', bottom: -2, left: -2,
+    width: 14, height: 14,
+    borderBottomWidth: 3, borderLeftWidth: 3,
+    borderColor: '#ff0090', borderRadius: 1,
+  },
+  cornerBR: {
+    position: 'absolute', bottom: -2, right: -2,
+    width: 14, height: 14,
+    borderBottomWidth: 3, borderRightWidth: 3,
+    borderColor: '#ff0090', borderRadius: 1,
+  },
+  signDivider: {
+    width: '80%',
+    height: 1,
+    backgroundColor: 'rgba(0,212,255,0.25)',
+    marginVertical: 10,
+  },
+  // ──────────────────────────────────────────────────────────────────────────
+
+  logoSub:  { fontSize: 20, color: 'rgba(0,212,255,0.5)', letterSpacing: 12, marginBottom: 12 },
   logoMain: {
     fontFamily: 'Orbitron_900Black',
-    fontSize: 52,
-    color: colors.primary,
+    fontSize: 54,
+    color: '#00d4ff',
     textAlign: 'center',
-    lineHeight: 56,
-    letterSpacing: 4,
-    ...Platform.select({ ios: { shadowColor: colors.primary, shadowOpacity: 0.7, shadowRadius: 20, shadowOffset: { width: 0, height: 0 } } }),
+    lineHeight: 60,
+    letterSpacing: 6,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#00d4ff',
+        shadowOpacity: 1,
+        shadowRadius: 28,
+        shadowOffset: { width: 0, height: 0 },
+      },
+      web: {
+        // @ts-ignore web only
+        textShadow: '0 0 20px #00d4ff, 0 0 40px rgba(0,212,255,0.6)',
+      },
+    }),
   },
   logoTagline: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 11,
-    color: colors.secondary,
-    letterSpacing: 6,
-    marginTop: 10,
-    ...Platform.select({ ios: { shadowColor: colors.secondary, shadowOpacity: 0.8, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } } }),
+    color: '#ff0090',
+    letterSpacing: 7,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#ff0090',
+        shadowOpacity: 1,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 0 },
+      },
+      web: {
+        // @ts-ignore web only
+        textShadow: '0 0 10px #ff0090, 0 0 20px rgba(255,0,144,0.5)',
+      },
+    }),
   },
   tagline: {
     fontSize: 11,
