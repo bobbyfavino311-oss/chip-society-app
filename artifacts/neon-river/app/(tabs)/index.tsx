@@ -199,66 +199,91 @@ function TournamentCard({ t }: { t: LiveTournament }) {
 
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
+// Per-letter neon color palettes
+const CHIP_COLORS    = ['#00d4ff', '#ff0090', '#bf5fff', '#ffd700'] as const;
+const SOCIETY_COLORS = ['#ff0090', '#00d4ff', '#bf5fff', '#ffd700', '#ff0090', '#00d4ff', '#bf5fff'] as const;
+
+function NeonLetter({ ch, color, style }: { ch: string; color: string; style?: object }) {
+  return (
+    <Text
+      style={[
+        logo.letter,
+        {
+          color,
+          textShadowColor: color,
+          textShadowRadius: 18,
+          textShadowOffset: { width: 0, height: 0 },
+        },
+        style,
+      ]}
+      allowFontScaling={false}
+    >
+      {ch}
+    </Text>
+  );
+}
+
 function ChipSocietyLogo() {
-  const aceOpacity = useRef(new Animated.Value(1)).current;
-  const socialOpacity = useRef(new Animated.Value(1)).current;
-  const aceGlow = useRef(new Animated.Value(1)).current;
-  const socialGlow = useRef(new Animated.Value(0.82)).current;
-  const [acePink, setAcePink] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const chipOpacity   = useRef(new Animated.Value(1)).current;
+  const socOpacity    = useRef(new Animated.Value(1)).current;
+  const chipGlow      = useRef(new Animated.Value(1)).current;
+  const socGlow       = useRef(new Animated.Value(0.82)).current;
+  const timeoutRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // Slow alternating breathe between the two words
     Animated.loop(
       Animated.sequence([
-        Animated.timing(aceGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
-        Animated.timing(aceGlow, { toValue: 1, duration: 2200, useNativeDriver: true }),
+        Animated.timing(chipGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
+        Animated.timing(chipGlow, { toValue: 1,    duration: 2200, useNativeDriver: true }),
       ])
     ).start();
     Animated.loop(
       Animated.sequence([
-        Animated.timing(socialGlow, { toValue: 1, duration: 2200, useNativeDriver: true }),
-        Animated.timing(socialGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
+        Animated.timing(socGlow, { toValue: 1,    duration: 2200, useNativeDriver: true }),
+        Animated.timing(socGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
       ])
     ).start();
 
+    // Neon-tube stutter on one word at a time
     function flicker(anim: Animated.Value, cb: () => void) {
       Animated.sequence([
         Animated.timing(anim, { toValue: 0.08, duration: 35, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0.9, duration: 55, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0.9,  duration: 55, useNativeDriver: true }),
         Animated.timing(anim, { toValue: 0.15, duration: 25, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 1, duration: 70, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0, duration: 30, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 1, duration: 90, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1,    duration: 70, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 0,    duration: 30, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1,    duration: 90, useNativeDriver: true }),
       ]).start(() => cb());
     }
 
     function scheduleNext() {
       const delay = 2500 + Math.random() * 4000;
       timeoutRef.current = setTimeout(() => {
-        const doAce = Math.random() > 0.5;
-        flicker(doAce ? aceOpacity : socialOpacity, () => {
-          setAcePink(p => !p);
-          scheduleNext();
-        });
+        flicker(Math.random() > 0.5 ? chipOpacity : socOpacity, scheduleNext);
       }, delay);
     }
-
     scheduleNext();
+
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, []);
-
-  const aceColor = acePink ? colors.secondary : colors.primary;
-  const socialColor = acePink ? colors.primary : colors.secondary;
 
   return (
     <View style={logo.wrap}>
       <View style={logo.wordGroup}>
-        <Animated.Text style={[logo.word, { color: aceColor, lineHeight: LOGO_LINE_HEIGHT, opacity: Animated.multiply(aceOpacity, aceGlow) }]} allowFontScaling={false}>
-          Chip
-        </Animated.Text>
-        <Animated.Text style={[logo.word, { color: socialColor, lineHeight: LOGO_LINE_HEIGHT, opacity: Animated.multiply(socialOpacity, socialGlow) }]} allowFontScaling={false}>
-          Society
-        </Animated.Text>
+        {/* "Chip" — each letter its own neon color */}
+        <Animated.View style={{ flexDirection: 'row', opacity: Animated.multiply(chipOpacity, chipGlow) }}>
+          {'Chip'.split('').map((ch, i) => (
+            <NeonLetter key={i} ch={ch} color={CHIP_COLORS[i]} style={{ lineHeight: LOGO_LINE_HEIGHT }} />
+          ))}
+        </Animated.View>
+
+        {/* "Society" — each letter its own neon color */}
+        <Animated.View style={{ flexDirection: 'row', opacity: Animated.multiply(socOpacity, socGlow) }}>
+          {'Society'.split('').map((ch, i) => (
+            <NeonLetter key={i} ch={ch} color={SOCIETY_COLORS[i]} style={{ lineHeight: LOGO_LINE_HEIGHT }} />
+          ))}
+        </Animated.View>
       </View>
       <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
@@ -768,11 +793,9 @@ const tc = StyleSheet.create({
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
   wordGroup: { alignItems: 'center', paddingBottom: 22 },
-  word: {
+  letter: {
     fontFamily: 'Pacifico_400Regular',
     fontSize: LOGO_SIZE,
-    textShadowRadius: 20,
-    textShadowOffset: { width: 0, height: 0 },
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',

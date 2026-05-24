@@ -199,30 +199,13 @@ export default function EntryScreen() {
           {/* Logo area — neonFlicker wraps everything for tube-stutter effect */}
           <Animated.View style={[s.logoArea, { opacity: neonFlicker }]}>
 
-            {/* Suit symbols above the sign */}
             <Animated.Text style={[s.logoSub, { opacity: logoGlow }]}>
               ♠ ♥ ♦ ♣
             </Animated.Text>
-
-            {/* Nightlife neon sign frame — full opacity border, text pulses inside */}
-            <View style={s.signFrame}>
-              {/* Corner brackets */}
-              <View style={s.cornerTL} /><View style={s.cornerTR} />
-              <View style={s.cornerBL} /><View style={s.cornerBR} />
-
-              {/* Main logo text — pulses with logoGlow */}
-              <Animated.Text style={[s.logoMain, { opacity: logoGlow }]}>
-                CHIP{'\n'}SOCIETY
-              </Animated.Text>
-
-              {/* Inner divider */}
-              <View style={s.signDivider} />
-
-              {/* Tagline inside the sign */}
-              <Animated.Text style={[s.logoTagline, { opacity: logoGlow }]}>
-                POKER COMMUNITY
-              </Animated.Text>
-            </View>
+            <Animated.Text style={[s.logoMain, { opacity: logoGlow }]}>
+              CHIP{'\n'}SOCIETY
+            </Animated.Text>
+            <Text style={s.logoTagline}>POKER COMMUNITY</Text>
 
             {/* Scanline — drifts slowly across the sign like a real neon tube */}
             <Animated.View
@@ -337,103 +320,23 @@ const s = StyleSheet.create({
     top: 0,
   },
 
-  // ── Nightlife neon sign frame ──────────────────────────────────────────────
-  signFrame: {
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    paddingVertical: 22,
-    borderWidth: 2.5,
-    borderColor: '#00d4ff',
-    borderRadius: 8,
-    backgroundColor: 'rgba(0,212,255,0.06)',
-    marginBottom: 4,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#00d4ff',
-        shadowOpacity: 1,
-        shadowRadius: 30,
-        shadowOffset: { width: 0, height: 0 },
-      },
-      android: {
-        elevation: 20,
-      },
-      web: {
-        // @ts-ignore web only
-        boxShadow: '0 0 18px 4px rgba(0,212,255,0.7), 0 0 40px 8px rgba(0,212,255,0.35), inset 0 0 20px rgba(0,212,255,0.12)',
-      },
-    }),
-  },
-  // Corner bracket accents — neon pink L-shapes over each corner
-  cornerTL: {
-    position: 'absolute', top: -3, left: -3,
-    width: 18, height: 18,
-    borderTopWidth: 4, borderLeftWidth: 4,
-    borderColor: '#ff0090', borderRadius: 2,
-  },
-  cornerTR: {
-    position: 'absolute', top: -3, right: -3,
-    width: 18, height: 18,
-    borderTopWidth: 4, borderRightWidth: 4,
-    borderColor: '#ff0090', borderRadius: 2,
-  },
-  cornerBL: {
-    position: 'absolute', bottom: -3, left: -3,
-    width: 18, height: 18,
-    borderBottomWidth: 4, borderLeftWidth: 4,
-    borderColor: '#ff0090', borderRadius: 2,
-  },
-  cornerBR: {
-    position: 'absolute', bottom: -3, right: -3,
-    width: 18, height: 18,
-    borderBottomWidth: 4, borderRightWidth: 4,
-    borderColor: '#ff0090', borderRadius: 2,
-  },
-  signDivider: {
-    width: '85%',
-    height: 1.5,
-    backgroundColor: 'rgba(0,212,255,0.4)',
-    marginVertical: 10,
-  },
-  // ──────────────────────────────────────────────────────────────────────────
-
-  logoSub:  { fontSize: 20, color: 'rgba(0,212,255,0.5)', letterSpacing: 12, marginBottom: 12 },
+  logoSub:  { fontSize: 20, color: 'rgba(0,212,255,0.5)', letterSpacing: 12, marginBottom: 10 },
   logoMain: {
     fontFamily: 'Orbitron_900Black',
-    fontSize: 54,
-    color: '#00d4ff',
+    fontSize: 52,
+    color: colors.primary,
     textAlign: 'center',
-    lineHeight: 60,
-    letterSpacing: 6,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#00d4ff',
-        shadowOpacity: 1,
-        shadowRadius: 28,
-        shadowOffset: { width: 0, height: 0 },
-      },
-      web: {
-        // @ts-ignore web only
-        textShadow: '0 0 20px #00d4ff, 0 0 40px rgba(0,212,255,0.6)',
-      },
-    }),
+    lineHeight: 56,
+    letterSpacing: 4,
+    ...Platform.select({ ios: { shadowColor: colors.primary, shadowOpacity: 0.7, shadowRadius: 20, shadowOffset: { width: 0, height: 0 } } }),
   },
   logoTagline: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 11,
-    color: '#ff0090',
-    letterSpacing: 7,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#ff0090',
-        shadowOpacity: 1,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 0 },
-      },
-      web: {
-        // @ts-ignore web only
-        textShadow: '0 0 10px #ff0090, 0 0 20px rgba(255,0,144,0.5)',
-      },
-    }),
+    color: colors.secondary,
+    letterSpacing: 6,
+    marginTop: 10,
+    ...Platform.select({ ios: { shadowColor: colors.secondary, shadowOpacity: 0.8, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } } }),
   },
   tagline: {
     fontSize: 11,
