@@ -432,20 +432,24 @@ export default function PracticeScreen() {
     const anims = chipAnims.map(({ pos, opacity }, i) => {
       const tx = (i - N_CHIP / 2 + 0.5) * 4;
       return Animated.sequence([
-        Animated.delay(i * 55),
+        Animated.delay(i * 85),
         Animated.parallel([
-          Animated.timing(opacity, { toValue: 1, duration: 80, useNativeDriver: true }),
-          Animated.timing(pos.x, { toValue: tx, duration: 320, useNativeDriver: true }),
-          Animated.timing(pos.y, { toValue: -18, duration: 320, useNativeDriver: true }),
+          Animated.timing(opacity, { toValue: 1, duration: 100, useNativeDriver: true }),
+          Animated.timing(pos.x, { toValue: tx, duration: 480, useNativeDriver: true }),
+          Animated.timing(pos.y, { toValue: -18, duration: 480, useNativeDriver: true }),
         ]),
-        Animated.timing(opacity, { toValue: 0, duration: 130, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0, duration: 160, useNativeDriver: true }),
       ]);
     });
     Animated.parallel(anims).start();
-    Animated.sequence([
-      Animated.timing(potPulse, { toValue: 1.3, duration: 110, useNativeDriver: true }),
-      Animated.timing(potPulse, { toValue: 1, duration: 180, useNativeDriver: true }),
-    ]).start();
+    // Pot pulse fires when first chip arrives (~480ms into movement)
+    setTimeout(() => {
+      Animated.sequence([
+        Animated.timing(potPulse, { toValue: 1.25, duration: 120, useNativeDriver: true }),
+        Animated.timing(potPulse, { toValue: 1, duration: 200, useNativeDriver: true }),
+      ]).start();
+    }, 460);
+    // Chip sound fires when first chip starts sliding (immediate — auditory lead)
     SoundEngine.chip();
     prevPotRef.current = state.pot;
   }, [state.pot, state.phase]);

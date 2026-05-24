@@ -58,10 +58,10 @@ const PRIZE_COLS = ['#00d4ff', '#0099ee', '#bf5fff', '#00ccaa', '#ffd700', '#ff0
 interface ScratchCell { value: number; label: string; colorIdx: number }
 
 function buildTicket(): { cells: ScratchCell[]; prize: number } {
-  const win  = Math.random() < 0.38;
   const cells: ScratchCell[] = [];
 
-  if (win) {
+  // Every ticket wins — guaranteed prize
+  {
     const tier = Math.floor(Math.random() * PRIZES.length);
     const matchPos = new Set<number>();
     while (matchPos.size < 3) matchPos.add(Math.floor(Math.random() * 9));
@@ -74,16 +74,9 @@ function buildTicket(): { cells: ScratchCell[]; prize: number } {
         cells.push({ value: PRIZES[d], label: PRIZE_LBL[d], colorIdx: d });
       }
     }
-  } else {
-    const counts: Record<number, number> = {};
-    for (let i = 0; i < 9; i++) {
-      let t = Math.floor(Math.random() * PRIZES.length), att = 0;
-      while ((counts[t] ?? 0) >= 2 && att < 20) { t = Math.floor(Math.random() * PRIZES.length); att++; }
-      counts[t] = (counts[t] ?? 0) + 1;
-      cells.push({ value: PRIZES[t], label: PRIZE_LBL[t], colorIdx: t });
-    }
   }
 
+  // Prize is always the matching value (guaranteed 3-match above)
   const vc: Record<number, number> = {};
   cells.forEach(c => { vc[c.value] = (vc[c.value] ?? 0) + 1; });
   const match = Object.entries(vc).find(([, n]) => n >= 3);

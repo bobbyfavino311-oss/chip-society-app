@@ -1,0 +1,350 @@
+```txt id="q7fz2x"
+CHIP SOCIETY — CRITICAL ECONOMY + WHEEL + LOTTERY + CHIP ANIMATION FIX
+HIGH PRIORITY SYSTEM REBUILD
+==============================================================
+
+Several core systems are STILL fundamentally broken and damaging the quality and credibility of the app. These issues directly affect:
+- player trust
+- reward integrity
+- gameplay polish
+- economy accuracy
+- premium feel
+
+These systems must now be rebuilt PROPERLY and permanently.
+
+This update focuses ONLY on:
+1. Daily Wheel rendering + reward integrity
+2. Lottery ticket prize logic
+3. Lottery ticket economy redesign
+4. Exact chip balance tracking
+5. Chip animation timing + realism
+6. Audio synchronization with chip movement
+
+==============================================================
+1. DAILY WHEEL — CRITICAL MOBILE RENDER FIX
+==============================================================
+
+The wheel is STILL rendering as:
+- a giant white circle
+- blank
+- textureless
+- invisible
+
+This is completely unacceptable for a production-ready app.
+
+==============================================================
+2. FULL MOBILE WHEEL REBUILD REQUIRED
+==============================================================
+
+Completely rebuild the wheel rendering system specifically for iOS/mobile.
+
+The current wheel likely suffers from:
+- broken canvas rendering
+- texture loading failure
+- clipping issues
+- failed masking
+- z-index conflicts
+- mobile GPU rendering problems
+- incorrect responsive scaling
+
+==============================================================
+3. NEW WHEEL RENDER REQUIREMENTS
+==============================================================
+
+The wheel MUST:
+- fully render on all iPhones
+- show visible reward slices
+- display readable reward labels
+- scale responsively
+- animate smoothly
+- support touch interaction
+- NEVER appear white or blank
+
+Use:
+- optimized SVG rendering
+OR
+- hardware accelerated rendering
+OR
+- properly layered canvas rendering
+
+DO NOT:
+- use oversized absolute containers
+- use broken masking layers
+- use white placeholder fallback objects
+
+==============================================================
+4. WHEEL VISUAL REQUIREMENTS
+==============================================================
+
+The wheel should visually include:
+- neon segmented slices
+- visible chip rewards
+- premium metallic center cap
+- glowing divider lines
+- animated reflections
+- realistic depth
+- polished Vegas styling
+
+==============================================================
+5. LOTTERY SYSTEM — FINAL FUNCTIONAL REBUILD
+==============================================================
+
+The scratch ticket system is improved,
+BUT still fundamentally broken.
+
+CURRENT ISSUES:
+- prizes do not match displayed winnings
+- rewards pay incorrect amounts
+- some scratch coverage still inconsistent
+- economy logic unreliable
+
+==============================================================
+6. PRIZE ACCURACY FIX (CRITICAL)
+==============================================================
+
+CURRENT BUG EXAMPLE:
+Ticket displays:
+50K WIN
+
+Actual reward given:
+10K
+
+This is a MAJOR trust-breaking issue.
+
+==============================================================
+7. REWARD VALIDATION REBUILD
+==============================================================
+
+Lottery rewards MUST:
+- EXACTLY match displayed prizes
+- validate correctly before payout
+- sync instantly to player balance
+- NEVER reduce displayed winnings
+- NEVER alter payout amounts
+
+Implement:
+- server-side reward validation
+- final payout verification
+- UI-to-backend prize consistency checks
+- reward checksum validation if necessary
+
+==============================================================
+8. ALL LOTTERY TICKETS MUST WIN
+==============================================================
+
+Remove losing tickets completely.
+
+NEW LOTTERY DESIGN RULE:
+EVERY scratch ticket awards a prize.
+
+There should NO LONGER be:
+- blank tickets
+- losing tickets
+- “better luck next time”
+- zero reward outcomes
+
+==============================================================
+9. NEW LOTTERY PRIZE STRUCTURE
+==============================================================
+
+Every ticket must award:
+- chips
+OR
+- XP
+OR
+- bonus multipliers
+
+Minimum reward always guaranteed.
+
+Example prize tiers:
+- 2K
+- 5K
+- 10K
+- 25K
+- 50K
+- 100K
+- XP Boost
+- Rare Ticket Upgrade
+
+==============================================================
+10. LOTTERY TICKET ECONOMY REDESIGN
+==============================================================
+
+Lottery tickets should NO LONGER be:
+- free daily rewards
+- handed out automatically
+
+REMOVE:
+- daily free ticket system entirely
+
+==============================================================
+11. NEW LOTTERY ACQUISITION SYSTEM
+==============================================================
+
+Lottery tickets can ONLY be:
+1. Won from the Daily Wheel
+2. Purchased in the Store
+
+This makes tickets feel:
+- premium
+- valuable
+- collectible
+- exciting
+
+==============================================================
+12. PLAYER CHIP BALANCE ACCURACY FIX
+==============================================================
+
+The player profile currently rounds balances incorrectly.
+
+CURRENT ISSUE:
+90,000 + 500 chips =
+91K
+
+This is unacceptable.
+
+==============================================================
+13. EXACT CHIP DISPLAY REQUIRED
+==============================================================
+
+Player balances MUST display:
+FULL EXACT VALUES.
+
+Examples:
+- 90,500
+- 124,250
+- 2,450,875
+
+DO NOT:
+- round to nearest thousand
+- abbreviate incorrectly
+- hide smaller amounts
+
+==============================================================
+14. BALANCE UPDATE SYSTEM
+==============================================================
+
+Balances must:
+- update instantly
+- animate correctly
+- reflect exact reward payouts
+- preserve precise values
+
+Examples:
+90,000 + 500 =
+90,500 EXACTLY
+
+NOT:
+91K
+
+==============================================================
+15. CHIP ANIMATION SPEED FIX
+==============================================================
+
+Chip movement animations during gameplay are:
+- too fast
+- unrealistic
+- visually disconnected
+- lacking weight
+
+The chips currently feel:
+fake and floaty.
+
+==============================================================
+16. NEW CHIP MOVEMENT SYSTEM
+==============================================================
+
+Chip animations should feel:
+- physical
+- weighted
+- smooth
+- satisfying
+- premium
+
+Chips should:
+- slide naturally across felt
+- stack realistically
+- move with believable momentum
+- ease in/out smoothly
+
+==============================================================
+17. ANIMATION TIMING REQUIREMENTS
+==============================================================
+
+Slow chip movement slightly.
+
+DO NOT:
+- instantly teleport chips
+- move chips unnaturally fast
+- snap stacks into place
+
+Chip movement should visually match:
+real casino chip behavior.
+
+==============================================================
+18. AUDIO + CHIP SYNC FIX
+==============================================================
+
+CURRENT ISSUE:
+Chip sounds do NOT match chip movement timing.
+
+This destroys immersion.
+
+==============================================================
+19. PERFECT AUDIO SYNCHRONIZATION
+==============================================================
+
+Chip sound effects MUST:
+- trigger exactly when chips collide
+- sync with chip movement frames
+- match stack landing timing
+- align with betting animations
+
+Examples:
+- CALL sound occurs during chip placement
+- RAISE sound matches stack motion
+- ALL-IN sound lands on final stack impact
+
+==============================================================
+20. NEW CHIP SOUND DESIGN
+==============================================================
+
+Use:
+- ceramic poker chip clicks
+- layered chip stacking
+- soft felt friction
+- realistic casino chip textures
+
+The sounds should feel:
+- premium
+- authentic
+- tactile
+- immersive
+
+NOT:
+- arcade-like
+- metallic
+- digital
+- tacky
+
+==============================================================
+21. FINAL QUALITY TARGET
+==============================================================
+
+The wheel, lottery, chip animations, and economy systems should now feel:
+- trustworthy
+- polished
+- premium
+- realistic
+- App Store featured quality
+
+The game should NO LONGER feel:
+- buggy
+- placeholder-quality
+- fake
+- inconsistent
+- low-budget
+
+These systems must now rival:
+top-tier mobile social casino games with fully polished reward ecosystems.
+```

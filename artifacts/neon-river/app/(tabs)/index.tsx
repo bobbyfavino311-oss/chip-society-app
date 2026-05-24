@@ -159,8 +159,7 @@ function TournamentCard({ t }: { t: LiveTournament }) {
     ? `${h}h ${m.toString().padStart(2, '0')}m`
     : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 
-  const fmtPrize = (n: number) =>
-    n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `${(n / 1_000).toFixed(0)}K` : String(n);
+  const fmtPrize = (n: number) => n.toLocaleString('en-US');
   const fmtBuy = (n: number) => n >= 1000 ? `${n / 1000}K` : String(n);
 
   const sc = STATUS_COLORS[t.status];
@@ -511,11 +510,7 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  const formatChips = (n: number) => {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-    return n.toLocaleString();
-  };
+  const formatChips = (n: number) => n.toLocaleString('en-US');
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

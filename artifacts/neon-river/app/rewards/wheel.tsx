@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Svg, { Path, Circle, G, Text as SvgText, Defs, RadialGradient, Stop, Line, Rect } from 'react-native-svg';
+import Svg, { Path, Circle, G, Text as SvgText, Line } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
@@ -304,20 +304,7 @@ export default function WheelScreen() {
             viewBox="0 0 300 300"
             style={{ backgroundColor: 'transparent' }}
           >
-            <Defs>
-              <RadialGradient id="hubGrad" cx="50%" cy="50%" r="50%">
-                <Stop offset="0%"  stopColor="#1a0035" />
-                <Stop offset="100%" stopColor="#07001a" />
-              </RadialGradient>
-              <RadialGradient id="rimGrad" cx="50%" cy="50%" r="50%">
-                <Stop offset="88%" stopColor="rgba(255,255,255,0.0)" />
-                <Stop offset="100%" stopColor="rgba(255,255,255,0.08)" />
-              </RadialGradient>
-            </Defs>
-
-            {/* Full background fill — covers SVG viewBox corners on iOS native */}
-            <Rect x="0" y="0" width="300" height="300" fill="#050010" />
-            {/* Background circle */}
+            {/* Background circle — solid fill, no gradients (iOS SVG gradient compat) */}
             <Circle cx={CX} cy={CY} r={R_OUTER + 2} fill="#050010" />
 
             {/* Segments */}
@@ -361,8 +348,6 @@ export default function WheelScreen() {
               );
             })}
 
-            {/* Outer rim glow */}
-            <Circle cx={CX} cy={CY} r={R_OUTER} fill="url(#rimGrad)" />
             {/* Outer ring */}
             <Circle cx={CX} cy={CY} r={R_OUTER} fill="none" stroke="rgba(191,95,255,0.4)" strokeWidth={1.5} />
             {/* Spoke dots */}
@@ -372,8 +357,9 @@ export default function WheelScreen() {
               const dy = CY + (R_OUTER - 2) * Math.sin(toRad(a));
               return <Circle key={i} cx={dx} cy={dy} r={2} fill={SEGMENTS[i].col} fillOpacity={0.7} />;
             })}
-            {/* Center hub */}
-            <Circle cx={CX} cy={CY} r={R_INNER} fill="url(#hubGrad)" stroke="rgba(191,95,255,0.5)" strokeWidth={2} />
+            {/* Center hub — solid colors, no gradient refs (iOS compat) */}
+            <Circle cx={CX} cy={CY} r={R_INNER} fill="#0d001a" stroke="rgba(191,95,255,0.5)" strokeWidth={2} />
+            <Circle cx={CX} cy={CY} r={R_INNER - 4} fill="#110025" />
             <Circle cx={CX} cy={CY} r={R_INNER - 8} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
             <SvgText x={CX} y={CY - 5}  textAnchor="middle" fill="#fff"     fontSize={8} fontWeight="bold">CHIP</SvgText>
             <SvgText x={CX} y={CY + 6}  textAnchor="middle" fill="#bf5fff"  fontSize={6}>SOCIETY</SvgText>

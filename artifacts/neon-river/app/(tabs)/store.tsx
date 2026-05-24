@@ -185,12 +185,7 @@ function DailyBonusCard() {
 
 // ─── Scratch & Win ─────────────────────────────────────────────────────────────
 function ScratchSection() {
-  const { profile, canClaimFreeScratch, addScratchTickets, updateProfile } = useUser();
-
-  const handleFreeTicket = async () => {
-    await addScratchTickets(1);
-    await updateProfile({ lastFreeScratch: new Date().toISOString() });
-  };
+  const { profile } = useUser();
 
   const handleBuyTickets = (count: number, label: string) => {
     Alert.alert(
@@ -239,31 +234,6 @@ function ScratchSection() {
         <View style={[styles.scratchPlayBtn, { backgroundColor: canPlay ? '#bf5fff' : colors.border }]}>
           <Text style={[styles.scratchPlayBtnText, { color: canPlay ? '#fff' : colors.textDim }]}>
             {canPlay ? 'PLAY' : 'LOCKED'}
-          </Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Free daily ticket */}
-      <TouchableOpacity
-        style={[styles.bonusCard, { borderColor: canClaimFreeScratch ? 'rgba(0,212,255,0.4)' : colors.border }]}
-        onPress={canClaimFreeScratch ? handleFreeTicket : undefined}
-        activeOpacity={0.8}
-      >
-        <LinearGradient
-          colors={canClaimFreeScratch ? ['rgba(0,212,255,0.08)', 'transparent'] : ['rgba(255,255,255,0.02)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-        />
-        <View style={styles.bonusLeft}>
-          <Text style={styles.bonusEmoji}>🆓</Text>
-          <View>
-            <Text style={styles.bonusTitle}>Free Daily Ticket</Text>
-            <Text style={styles.bonusSub}>{canClaimFreeScratch ? 'Ready to collect!' : 'Already claimed today'}</Text>
-          </View>
-        </View>
-        <View style={[styles.claimBtn, { backgroundColor: canClaimFreeScratch ? '#00d4ff' : colors.border }]}>
-          <Text style={[styles.claimBtnText, { color: canClaimFreeScratch ? '#050010' : colors.textDim }]}>
-            {canClaimFreeScratch ? 'CLAIM' : 'WAIT'}
           </Text>
         </View>
       </TouchableOpacity>

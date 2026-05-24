@@ -5,11 +5,9 @@ export function getChipColor(chips: number): string {
   return '#00d4aa';                     // healthy green
 }
 
-/** Compact chip formatter */
+/** Exact chip formatter — always shows full value with commas */
 export function formatChips(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
-  return n.toLocaleString();
+  return n.toLocaleString('en-US');
 }
 
 /** Returns the label tier for accessibility / display */
