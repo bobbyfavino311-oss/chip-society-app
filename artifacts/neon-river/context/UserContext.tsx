@@ -60,6 +60,7 @@ export interface UserProfile {
   scratchTickets: number;
   lastFreeScratch: string | null;
   createdAt: string;
+  tutorialCompleted: boolean;
 }
 
 // Stored account record (for sign-in lookup)
@@ -95,6 +96,7 @@ const DEFAULT_PROFILE: UserProfile = {
   scratchTickets: 1,
   lastFreeScratch: null,
   createdAt: new Date().toISOString(),
+  tutorialCompleted: false,
 };
 
 function getRankFromXP(xp: number): Rank {
@@ -124,6 +126,7 @@ interface UserContextValue {
   claimWheelSpin: (chips: number, tickets: number) => Promise<void>;
   useScratchTicket: () => Promise<boolean>;
   addScratchTickets: (n: number) => Promise<void>;
+  completeTutorial: () => Promise<void>;
   loginAsGuest: () => Promise<void>;
   registerAccount: (username: string, email: string, avatarIndex: number) => Promise<{ success: boolean; error?: string }>;
   signIn: (username: string) => Promise<{ success: boolean; error?: string }>;
@@ -204,6 +207,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             accountType: saved.accountType ?? 'registered',
             email: saved.email ?? '',
             createdAt: saved.createdAt ?? new Date().toISOString(),
+            tutorialCompleted: saved.tutorialCompleted ?? false,
           }));
         } catch {}
       }
@@ -324,6 +328,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     await updateProfile({ scratchTickets: profile.scratchTickets + n });
   }, [profile, updateProfile]);
 
+  const completeTutorial = useCallback(async () => {
+    await updateProfile({ tutorialCompleted: true });
+  }, [updateProfile]);
+
   // ── Auth functions ────────────────────────────────────────────────────────────
 
   const loginAsGuest = useCallback(async () => {
@@ -437,7 +445,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       profile, updateProfile, addChips, removeChips, recordWin, recordLoss,
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
       awardRankedPoints, claimWheelSpin, useScratchTicket, addScratchTickets,
-      loginAsGuest, registerAccount, signIn, signOut, checkUsernameAvailable,
+      completeTutorial, loginAsGuest, registerAccount, signIn, signOut, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount,
     }}>

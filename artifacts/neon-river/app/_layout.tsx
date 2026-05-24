@@ -23,6 +23,7 @@ import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
 import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
 import { SocialProvider } from '@/context/SocialContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
+import TutorialOverlay from '@/components/TutorialOverlay';
 import { SoundEngine } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 
@@ -84,6 +85,7 @@ function RootLayoutNav() {
       <SoundSyncer />
       <GateController />
       <AchievementPopupRenderer />
+      <TutorialOverlay />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="entry"         options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="auth/signup"   options={{ headerShown: false, animation: 'slide_from_right' }} />

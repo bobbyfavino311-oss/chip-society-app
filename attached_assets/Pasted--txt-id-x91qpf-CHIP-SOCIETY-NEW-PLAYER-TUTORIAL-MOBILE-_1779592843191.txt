@@ -1,0 +1,319 @@
+```txt id="x91qpf"
+CHIP SOCIETY — NEW PLAYER TUTORIAL + MOBILE WHEEL + SCRATCH FIX PATCH
+CRITICAL GAMEPLAY SYSTEM REPAIR
+==============================================================
+
+The app now needs a polished onboarding experience and critical fixes to the wheel + scratch ticket systems on iOS mobile. The current implementation still feels broken and unfinished.
+
+This update should focus ONLY on:
+1. New Player Tutorial System
+2. Daily Wheel Mobile Fixes
+3. Scratch Ticket Full Functionality Fixes
+
+==============================================================
+1. DYNAMIC NEW PLAYER TUTORIAL SYSTEM
+==============================================================
+
+Add a fully interactive first-time player tutorial system.
+
+The tutorial should automatically launch ONLY the first time a user opens the app.
+
+DO NOT make the tutorial feel:
+- cheap
+- intrusive
+- overly long
+- robotic
+- text heavy
+
+The tutorial should feel:
+- cinematic
+- modern
+- smooth
+- interactive
+- premium
+- easy to follow
+
+==============================================================
+2. TUTORIAL FLOW
+==============================================================
+
+Create a guided walkthrough introducing players to:
+
+- Home Screen
+- Chip Balance
+- Game Modes
+- Poker Table UI
+- Betting Controls
+- Daily Wheel
+- Scratch Tickets
+- Social Feed
+- Store
+- XP + Rank System
+- Achievements
+- Profile Area
+
+The tutorial should highlight UI elements one at a time using:
+
+- glowing outlines
+- pulsing indicators
+- dimmed background overlays
+- animated arrows
+- smooth camera focus transitions
+
+==============================================================
+3. INTERACTIVE TUTORIAL STEPS
+==============================================================
+
+DO NOT use static popup boxes only.
+
+Require players to:
+- tap buttons
+- spin wheel
+- scratch ticket
+- place a poker bet
+- open social feed
+
+The tutorial should teach through interaction.
+
+Example:
+“Swipe across the ticket to scratch.”
+“Tap CALL to stay in the hand.”
+“Spin the wheel to claim your daily reward.”
+
+==============================================================
+4. TUTORIAL REWARDS
+==============================================================
+
+At the end of tutorial:
+reward the player with:
+- starter chips
+- XP bonus
+- one free scratch ticket
+
+Add animated reward sequence.
+
+==============================================================
+5. SKIP + REPLAY OPTIONS
+==============================================================
+
+Add:
+- SKIP tutorial button
+- replay tutorial option in settings
+
+Store completion status:
+tutorialCompleted = true
+
+==============================================================
+6. MOBILE DAILY WHEEL FIX
+==============================================================
+
+The wheel is STILL broken on iOS mobile.
+
+CURRENT PROBLEMS:
+- giant white circle
+- wheel graphics not rendering
+- broken scaling
+- incorrect layering
+- no visible segments
+- feels unfinished
+
+Completely rebuild the wheel rendering system specifically for mobile compatibility.
+
+==============================================================
+7. DAILY WHEEL REBUILD
+==============================================================
+
+The wheel MUST:
+- render properly on all iPhones
+- scale responsively
+- display all reward segments correctly
+- rotate smoothly
+- stop accurately
+- support touch interaction
+
+Use:
+- canvas rendering
+OR
+- SVG wheel rendering
+OR
+- performant GPU accelerated transforms
+
+DO NOT use:
+- broken overflow masking
+- oversized containers
+- white placeholder layers
+
+==============================================================
+8. WHEEL LAYOUT FIXES
+==============================================================
+
+Fix:
+- spacing
+- alignment
+- clipping
+- safe area padding
+- oversized wheel scaling
+
+Correct layout:
+- centered wheel
+- visible reward slices
+- readable text
+- balanced margins
+- proper neon styling
+
+==============================================================
+9. WHEEL VISUAL DESIGN
+==============================================================
+
+Redesign the wheel to feel:
+- premium
+- futuristic
+- Vegas casino style
+- neon cyberpunk
+
+Add:
+- segmented neon rewards
+- glowing dividers
+- metallic center cap
+- animated lights
+- dynamic shadows
+- glossy reflections
+
+==============================================================
+10. WHEEL FUNCTIONALITY FIX
+==============================================================
+
+Wheel must:
+- ACTUALLY spin
+- animate smoothly
+- accelerate naturally
+- decelerate naturally
+- stop on valid reward
+
+Add:
+- ticking sound
+- haptic feedback
+- glow burst on win
+- claim reward animation
+
+==============================================================
+11. SCRATCH TICKET SYSTEM FIX
+==============================================================
+
+The scratch ticket system is STILL broken.
+
+CURRENT ISSUE:
+Players can only scratch a small portion of the ticket.
+
+The scratch area stops responding after limited movement.
+
+This completely breaks the experience.
+
+==============================================================
+12. FULL SCRATCH COVERAGE FIX
+==============================================================
+
+Players MUST be able to scratch:
+- the ENTIRE ticket
+- continuously
+- without invisible limits
+- without dead zones
+- without interruption
+
+Fix:
+- gesture boundaries
+- touch tracking
+- mask rendering area
+- coordinate mapping
+- canvas clipping
+- touch event scaling on iOS
+
+==============================================================
+13. SCRATCH ENGINE FIX
+==============================================================
+
+Implement:
+FULL dynamic scratch rendering system.
+
+Requirements:
+- unlimited scratch movement
+- real-time erase masking
+- proper alpha transparency
+- smooth brush strokes
+- multi-directional gestures
+- progressive reveal tracking
+
+The player should be able to:
+- scratch every corner
+- reveal entire ticket manually
+- continue scratching until fully uncovered
+
+==============================================================
+14. SCRATCH PERFORMANCE FIX
+==============================================================
+
+Optimize for:
+- iPhone touch responsiveness
+- 60 FPS
+- low latency
+- smooth rendering
+- accurate gesture tracking
+
+Fix:
+- laggy scratch response
+- skipped touch inputs
+- partial render failures
+- broken mobile gesture detection
+
+==============================================================
+15. SCRATCH VISUAL FX
+==============================================================
+
+Enhance scratch visuals with:
+- metallic foil removal
+- scratch debris particles
+- neon dust
+- spark effects
+- progressive reveal shading
+- realistic material erosion
+
+The scratch surface should feel:
+physical
+tactile
+premium
+
+==============================================================
+16. MOBILE UX POLISH
+==============================================================
+
+Ensure ALL systems properly support:
+- iPhone safe areas
+- notch spacing
+- responsive scaling
+- portrait orientation
+- different screen sizes
+
+Nothing should:
+- overflow
+- clip
+- stretch
+- misalign
+- disappear off-screen
+
+==============================================================
+17. FINAL QUALITY TARGET
+==============================================================
+
+The onboarding, wheel, and scratch systems should now feel:
+- App Store featured quality
+- premium social casino quality
+- visually addictive
+- highly polished
+- responsive
+- modern
+- smooth
+- rewarding
+
+The experience should feel comparable to:
+top-tier Vegas social casino mobile games.
+```

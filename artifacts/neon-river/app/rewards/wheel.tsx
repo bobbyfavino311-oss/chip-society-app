@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Svg, { Path, Circle, G, Text as SvgText, Defs, RadialGradient, Stop, Line } from 'react-native-svg';
+import Svg, { Path, Circle, G, Text as SvgText, Defs, RadialGradient, Stop, Line, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
@@ -315,7 +315,9 @@ export default function WheelScreen() {
               </RadialGradient>
             </Defs>
 
-            {/* Background circle (prevents white flash) */}
+            {/* Full background fill — covers SVG viewBox corners on iOS native */}
+            <Rect x="0" y="0" width="300" height="300" fill="#050010" />
+            {/* Background circle */}
             <Circle cx={CX} cy={CY} r={R_OUTER + 2} fill="#050010" />
 
             {/* Segments */}
@@ -490,7 +492,7 @@ const s = StyleSheet.create({
   pointerWrap: { alignItems: 'center', marginBottom: -10, zIndex: 10 },
   pointer: { width: 0, height: 0, borderLeftWidth: 10, borderRightWidth: 10, borderTopWidth: 20, borderStyle: 'solid', borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: '#ffffff' },
   pointerShadow: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 12, borderStyle: 'solid', borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: 'rgba(191,95,255,0.5)', alignSelf: 'center', marginTop: -6 },
-  wheelAnim: { width: WHEEL_SIZE, height: WHEEL_SIZE },
+  wheelAnim: { width: WHEEL_SIZE, height: WHEEL_SIZE, backgroundColor: 'transparent', overflow: 'hidden', borderRadius: WHEEL_SIZE / 2 },
   resultCard: {
     width: '88%', borderRadius: 18, borderWidth: 1.5,
     padding: 20, alignItems: 'center', gap: 10,

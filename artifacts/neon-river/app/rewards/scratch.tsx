@@ -214,6 +214,9 @@ export default function ScratchScreen() {
   const canRevealAll = coverage >= 0.35;
   const hasTickets   = profile.scratchTickets > 0;
 
+  // Prevents parent ScrollView from stealing the scratch gesture
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+
   // Win label
   const vc: Record<string, number> = {};
   ticket.cells.forEach(c => { vc[c.label] = (vc[c.label] ?? 0) + 1; });
@@ -240,10 +243,13 @@ export default function ScratchScreen() {
   // PanResponder
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => !done && hasTickets,
-      onMoveShouldSetPanResponder:  () => !done && hasTickets,
+      onStartShouldSetPanResponder:        () => !done && hasTickets,
+      onMoveShouldSetPanResponder:         () => !done && hasTickets,
+      onStartShouldSetPanResponderCapture: () => !done && hasTickets,
+      onMoveShouldSetPanResponderCapture:  () => !done && hasTickets,
 
       onPanResponderGrant: (evt) => {
+        setScrollEnabled(false);
         const { locationX: x, locationY: y } = evt.nativeEvent;
         currentRef.current = [{ x, y }];
         setScratchTip({ x, y });
@@ -289,6 +295,7 @@ export default function ScratchScreen() {
       },
 
       onPanResponderRelease: () => {
+        setScrollEnabled(true);
         if (currentRef.current.length > 0) {
           strokesRef.current = [...strokesRef.current, currentRef.current];
           currentRef.current = [];
@@ -298,6 +305,7 @@ export default function ScratchScreen() {
       },
 
       onPanResponderTerminate: () => {
+        setScrollEnabled(true);
         if (currentRef.current.length > 0) {
           strokesRef.current = [...strokesRef.current, currentRef.current];
           currentRef.current = [];
@@ -339,6 +347,7 @@ export default function ScratchScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={[st.scroll, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 16) }]}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={scrollEnabled}
       >
         {/* Header */}
         <View style={st.header}>
