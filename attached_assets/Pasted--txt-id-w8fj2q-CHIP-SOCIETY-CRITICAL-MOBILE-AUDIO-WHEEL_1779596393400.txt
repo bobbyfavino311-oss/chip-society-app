@@ -1,0 +1,352 @@
+```txt id="w8fj2q"
+CHIP SOCIETY — CRITICAL MOBILE AUDIO + WHEEL + SCRATCH SYSTEM FIX
+HIGH PRIORITY QUALITY PATCH
+==============================================================
+
+Several core systems are STILL broken or low quality on the iOS/mobile version and need immediate rebuilding.
+
+Current problems:
+- gameplay sound effects still sound like cheap 8-bit arcade noises
+- wheel is STILL rendering as a giant white blank circle
+- wheel spin audio sounds broken/laggy/distorted
+- scratch ticket still cannot be fully scratched off
+- systems still feel prototype-quality instead of App Store quality
+
+This patch should focus ONLY on:
+1. Gameplay sound effect replacement
+2. Wheel rendering + wheel audio repair
+3. Scratch system completion + full gesture support
+
+==============================================================
+1. COMPLETE GAMEPLAY SOUND EFFECT REPLACEMENT
+==============================================================
+
+The gameplay sound effects are STILL using low-quality placeholder sounds.
+
+CURRENT PROBLEMS:
+- sounds like retro arcade effects
+- sounds 8-bit
+- cheap beeps
+- tacky casino sounds
+- unrealistic poker audio
+- immersion-breaking
+- no depth
+- no realism
+
+REMOVE ALL EXISTING GAMEPLAY SOUND EFFECTS COMPLETELY.
+
+DO NOT reuse:
+- current raise sound
+- current chip sound
+- current reveal sound
+- current button sounds
+- current win sound
+
+==============================================================
+2. NEW AUDIO DIRECTION
+==============================================================
+
+New audio style:
+- realistic
+- modern
+- cinematic
+- tactile
+- subtle
+- premium
+- grounded
+
+The table should sound like:
+- a luxury poker room
+- ceramic poker chips
+- real cards on felt
+- modern casino ambience
+
+NOT:
+- arcade game
+- retro app
+- pixel casino
+- cheap slot machine
+
+==============================================================
+3. REBUILD ALL TABLE AUDIO
+==============================================================
+
+CARD DEAL:
+Replace with:
+- realistic card flick
+- layered card texture
+- subtle stereo movement
+
+CARD REVEAL:
+Replace with:
+- satisfying clean reveal slide
+- premium table texture sound
+
+CHECK:
+- soft felt tap
+
+CALL:
+- clean controlled chip movement
+
+RAISE:
+- heavier ceramic chip stack sound
+- deeper tactile impact
+
+ALL-IN:
+- dramatic chip shove
+- controlled bass impact
+- premium casino tension
+
+FOLD:
+- realistic card toss onto felt
+
+BUTTON PRESS:
+- smooth modern UI tap
+
+WIN:
+- elegant casino success tone
+- restrained and classy
+- NOT slot-machine style
+
+LOSS:
+- subtle muted tone
+
+SHOWDOWN:
+- slight cinematic impact hit
+
+==============================================================
+4. AUDIO QUALITY REQUIREMENTS
+==============================================================
+
+ALL sounds must:
+- be high fidelity
+- stereo mixed
+- volume balanced
+- non-distorted
+- professionally layered
+
+NO:
+- retro sounds
+- 8-bit sounds
+- harsh digital beeps
+- arcade tones
+- stock placeholder audio
+
+==============================================================
+5. MOBILE DAILY WHEEL FIX
+==============================================================
+
+The wheel is STILL broken on mobile.
+
+CURRENT ISSUE:
+- giant white circle
+- invisible wheel graphics
+- wheel slices missing
+- broken rendering
+- blank UI
+- unusable appearance
+
+This is likely:
+- canvas rendering failure
+- z-index issue
+- texture loading problem
+- masking issue
+- incorrect mobile scaling
+
+==============================================================
+6. FULL WHEEL REBUILD
+==============================================================
+
+Rebuild the wheel from scratch specifically for iOS/mobile compatibility.
+
+The wheel MUST:
+- render correctly on all iPhones
+- show all reward slices
+- scale properly
+- animate smoothly
+- support responsive touch interaction
+
+Use:
+- GPU accelerated transforms
+- responsive SVG rendering
+OR
+- optimized canvas rendering
+
+DO NOT use:
+- broken clipping masks
+- oversized absolute containers
+- white placeholder layers
+
+==============================================================
+7. NEW WHEEL VISUAL DESIGN
+==============================================================
+
+Wheel should feature:
+- premium neon slice segments
+- visible rewards
+- metallic center cap
+- glowing divider lines
+- glossy finish
+- realistic shadows
+- modern Vegas styling
+
+NO:
+- white empty wheel
+- flat colors
+- placeholder graphics
+
+==============================================================
+8. WHEEL SPIN AUDIO FIX
+==============================================================
+
+The current wheel sound is TERRIBLE.
+
+CURRENT PROBLEMS:
+- sounds laggy
+- distorted
+- repetitive
+- stuttering
+- annoying
+- low quality
+
+REMOVE the current wheel spin audio completely.
+
+==============================================================
+9. NEW WHEEL AUDIO
+==============================================================
+
+Replace with:
+- smooth mechanical spin sound
+- subtle casino wheel ticks
+- natural acceleration/deceleration
+- polished momentum audio
+
+The wheel should sound:
+- smooth
+- satisfying
+- premium
+- realistic
+
+NOT:
+- broken
+- glitchy
+- repetitive clicking spam
+- lagging audio loop
+
+==============================================================
+10. WHEEL ANIMATION FIX
+==============================================================
+
+Wheel must:
+- spin at stable FPS
+- accelerate naturally
+- decelerate smoothly
+- stop accurately
+- NEVER stutter
+
+Add:
+- subtle glow pulses
+- reward highlight animation
+- haptic feedback
+
+==============================================================
+11. SCRATCH TICKET FINAL FIX
+==============================================================
+
+The scratch ticket is improved,
+BUT players STILL cannot fully scratch the ticket off.
+
+CURRENT ISSUE:
+- scratch area still stops early
+- parts of ticket become unreachable
+- gesture boundaries still broken
+- invisible clipping zones remain
+
+==============================================================
+12. FULL SCRATCH COVERAGE REQUIRED
+==============================================================
+
+Players MUST be able to:
+- scratch EVERY part of the ticket
+- fully erase the foil layer
+- reach all edges and corners
+- continuously scratch without interruption
+
+Fix:
+- touch coordinate mapping
+- clipping boundaries
+- gesture area scaling
+- canvas size mismatch
+- mobile viewport calculations
+- alpha mask overflow
+
+==============================================================
+13. SCRATCH ENGINE REQUIREMENTS
+==============================================================
+
+Implement TRUE full-surface scratch rendering.
+
+Requirements:
+- unrestricted finger movement
+- full ticket coverage
+- real-time erase masking
+- unlimited scratch gestures
+- progressive reveal tracking
+- responsive touch input
+- proper iOS gesture handling
+
+The player should ALWAYS be able to:
+100% fully uncover the ticket manually.
+
+==============================================================
+14. SCRATCH PERFORMANCE OPTIMIZATION
+==============================================================
+
+Optimize scratch system for:
+- iPhone responsiveness
+- 60 FPS
+- low latency
+- smooth gesture tracking
+- no skipped inputs
+- no render lag
+
+==============================================================
+15. SCRATCH VISUAL POLISH
+==============================================================
+
+Enhance:
+- foil removal realism
+- metallic debris particles
+- neon dust effects
+- progressive erosion shading
+- scratch trail smoothness
+
+The scratch interaction should feel:
+- tactile
+- satisfying
+- premium
+- addictive
+
+==============================================================
+16. FINAL QUALITY TARGET
+==============================================================
+
+The audio, wheel, and scratch systems should now feel:
+- App Store featured quality
+- premium casino quality
+- modern
+- polished
+- immersive
+- responsive
+- luxurious
+
+NOT:
+- prototype-like
+- broken
+- placeholder quality
+- arcade-like
+- low-budget
+
+The experience should now rival:
+top-tier social casino mobile apps.
+```

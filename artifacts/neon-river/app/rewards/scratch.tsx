@@ -92,7 +92,7 @@ function buildTicket(): { cells: ScratchCell[]; prize: number } {
 
 // ─── SVG path helper ──────────────────────────────────────────────────────────
 
-const BRUSH_R = Platform.OS === 'web' ? 24 : 28;
+const BRUSH_R = Platform.OS === 'web' ? 22 : 32;
 
 function buildPath(strokes: Array<Array<{ x: number; y: number }>>): string {
   return strokes
@@ -189,6 +189,15 @@ export default function ScratchScreen() {
   const [svgW, setSvgW] = useState(TICKET_W);
   const [svgH, setSvgH] = useState(TICKET_H);
 
+  // Refs used inside PanResponder callbacks to avoid stale closures
+  const svgWRef       = useRef(TICKET_W);
+  const svgHRef       = useRef(TICKET_H);
+  const doneRef       = useRef(false);
+  const hasTicketsRef = useRef(true);
+  // Page-coordinate offset of the scratch grid (re-measured on each touch start)
+  const gridRef       = useRef<View>(null);
+  const gridOffsetRef = useRef({ x: 0, y: 0 });
+
   // Scratch state
   const strokesRef    = useRef<Array<Array<{ x: number; y: number }>>>([]);
   const currentRef    = useRef<Array<{ x: number; y: number }>>([]);
@@ -211,8 +220,13 @@ export default function ScratchScreen() {
   const [displayChips, setDisplayChips] = useState(0);
 
   const won      = ticket.prize > 0;
-  const canRevealAll = coverage >= 0.35;
+  const canRevealAll = coverage >= 0.30;
   const hasTickets   = profile.scratchTickets > 0;
+
+  // Keep refs in sync with state
+  useEffect(() => { doneRef.current = done; }, [done]);
+  useEffect(() => { hasTicketsRef.current = hasTickets; }, [hasTickets]);
+  useEffect(() => { svgWRef.current = svgW; svgHRef.current = svgH; }, [svgW, svgH]);
 
   // Prevents parent ScrollView from stealing the scratch gesture
   const [scrollEnabled, setScrollEnabled] = useState(true);
@@ -240,33 +254,49 @@ export default function ScratchScreen() {
     }
   }, [done]);
 
-  // PanResponder
+  // Measure the grid's page position so we can convert pageX/pageY → local coords
+  const measureGrid = useCallback(() => {
+    gridRef.current?.measure((_fx, _fy, _w, _h, px, py) => {
+      gridOffsetRef.current = { x: px ?? 0, y: py ?? 0 };
+    });
+  }, []);
+
+  // PanResponder — reads only refs so no stale-closure issues
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder:        () => !done && hasTickets,
-      onMoveShouldSetPanResponder:         () => !done && hasTickets,
-      onStartShouldSetPanResponderCapture: () => !done && hasTickets,
-      onMoveShouldSetPanResponderCapture:  () => !done && hasTickets,
+      onStartShouldSetPanResponder:        () => !doneRef.current && hasTicketsRef.current,
+      onMoveShouldSetPanResponder:         () => !doneRef.current && hasTicketsRef.current,
+      onStartShouldSetPanResponderCapture: () => !doneRef.current && hasTicketsRef.current,
+      onMoveShouldSetPanResponderCapture:  () => !doneRef.current && hasTicketsRef.current,
 
       onPanResponderGrant: (evt) => {
         setScrollEnabled(false);
-        const { locationX: x, locationY: y } = evt.nativeEvent;
+        // Re-measure page position on every touch start (scroll offset may have changed)
+        gridRef.current?.measure((_fx, _fy, _w, _h, px, py) => {
+          gridOffsetRef.current = { x: px ?? 0, y: py ?? 0 };
+        });
+        const { pageX, pageY } = evt.nativeEvent;
+        const x = Math.max(0, Math.min(pageX - gridOffsetRef.current.x, svgWRef.current));
+        const y = Math.max(0, Math.min(pageY - gridOffsetRef.current.y, svgHRef.current));
         currentRef.current = [{ x, y }];
         setScratchTip({ x, y });
         void Haptics.selectionAsync();
       },
 
       onPanResponderMove: (evt) => {
-        const { locationX: x, locationY: y } = evt.nativeEvent;
+        if (doneRef.current) return;
+        const { pageX, pageY } = evt.nativeEvent;
+        const x = Math.max(0, Math.min(pageX - gridOffsetRef.current.x, svgWRef.current));
+        const y = Math.max(0, Math.min(pageY - gridOffsetRef.current.y, svgHRef.current));
         currentRef.current.push({ x, y });
 
         // Throttled sound
         const now = Date.now();
-        if (now - lastSoundRef.current > 90) {
+        if (now - lastSoundRef.current > 85) {
           SoundEngine.chip();
           lastSoundRef.current = now;
         }
-        if (now - lastHapticRef.current > 60) {
+        if (now - lastHapticRef.current > 55) {
           void Haptics.selectionAsync();
           lastHapticRef.current = now;
         }
@@ -280,16 +310,16 @@ export default function ScratchScreen() {
 
         setScratchTip({ x, y });
 
-        // Coverage
-        const cov = computeCoverage(coveredRef.current, x, y, svgW, svgH);
+        // Coverage — uses refs so always reads current layout dimensions
+        const cov = computeCoverage(coveredRef.current, x, y, svgWRef.current, svgHRef.current);
         setCoverage(cov);
 
         // Path update
         const data = buildPath([...strokesRef.current, currentRef.current]);
         setPathData(data);
 
-        // Auto-done at 85%
-        if (cov >= 0.85) {
+        // Auto-done at 82%
+        if (cov >= 0.82) {
           finishScratch();
         }
       },
@@ -393,8 +423,14 @@ export default function ScratchScreen() {
 
           {/* Prize grid — visible underneath the foil */}
           <View
+            ref={gridRef}
             style={[st.prizeGrid, { width: TICKET_W, height: TICKET_H }]}
-            onLayout={e => { setSvgW(e.nativeEvent.layout.width); setSvgH(e.nativeEvent.layout.height); }}
+            onLayout={e => {
+              const { width, height } = e.nativeEvent.layout;
+              setSvgW(width); setSvgH(height);
+              // Measure page position after layout settles
+              setTimeout(measureGrid, 80);
+            }}
             {...panResponder.panHandlers}
           >
             {/* Prize cells */}
