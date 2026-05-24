@@ -204,21 +204,25 @@ export default function EntryScreen() {
               ♠ ♥ ♦ ♣
             </Animated.Text>
 
-            {/* Nightlife neon sign frame — pulses with logoGlow */}
-            <Animated.View style={[s.signFrame, { opacity: logoGlow }]}>
+            {/* Nightlife neon sign frame — full opacity border, text pulses inside */}
+            <View style={s.signFrame}>
               {/* Corner brackets */}
               <View style={s.cornerTL} /><View style={s.cornerTR} />
               <View style={s.cornerBL} /><View style={s.cornerBR} />
 
-              {/* Main logo text */}
-              <Text style={s.logoMain}>CHIP{'\n'}SOCIETY</Text>
+              {/* Main logo text — pulses with logoGlow */}
+              <Animated.Text style={[s.logoMain, { opacity: logoGlow }]}>
+                CHIP{'\n'}SOCIETY
+              </Animated.Text>
 
               {/* Inner divider */}
               <View style={s.signDivider} />
 
               {/* Tagline inside the sign */}
-              <Text style={s.logoTagline}>POKER COMMUNITY</Text>
-            </Animated.View>
+              <Animated.Text style={[s.logoTagline, { opacity: logoGlow }]}>
+                POKER COMMUNITY
+              </Animated.Text>
+            </View>
 
             {/* Scanline — drifts slowly across the sign like a real neon tube */}
             <Animated.View
@@ -336,55 +340,58 @@ const s = StyleSheet.create({
   // ── Nightlife neon sign frame ──────────────────────────────────────────────
   signFrame: {
     alignItems: 'center',
-    paddingHorizontal: 28,
-    paddingVertical: 20,
-    borderWidth: 1.5,
+    paddingHorizontal: 32,
+    paddingVertical: 22,
+    borderWidth: 2.5,
     borderColor: '#00d4ff',
-    borderRadius: 6,
-    backgroundColor: 'rgba(0,212,255,0.03)',
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,212,255,0.06)',
     marginBottom: 4,
     ...Platform.select({
       ios: {
         shadowColor: '#00d4ff',
         shadowOpacity: 1,
-        shadowRadius: 22,
+        shadowRadius: 30,
         shadowOffset: { width: 0, height: 0 },
+      },
+      android: {
+        elevation: 20,
       },
       web: {
         // @ts-ignore web only
-        boxShadow: '0 0 24px rgba(0,212,255,0.55), inset 0 0 18px rgba(0,212,255,0.08)',
+        boxShadow: '0 0 18px 4px rgba(0,212,255,0.7), 0 0 40px 8px rgba(0,212,255,0.35), inset 0 0 20px rgba(0,212,255,0.12)',
       },
     }),
   },
   // Corner bracket accents — neon pink L-shapes over each corner
   cornerTL: {
-    position: 'absolute', top: -2, left: -2,
-    width: 14, height: 14,
-    borderTopWidth: 3, borderLeftWidth: 3,
-    borderColor: '#ff0090', borderRadius: 1,
+    position: 'absolute', top: -3, left: -3,
+    width: 18, height: 18,
+    borderTopWidth: 4, borderLeftWidth: 4,
+    borderColor: '#ff0090', borderRadius: 2,
   },
   cornerTR: {
-    position: 'absolute', top: -2, right: -2,
-    width: 14, height: 14,
-    borderTopWidth: 3, borderRightWidth: 3,
-    borderColor: '#ff0090', borderRadius: 1,
+    position: 'absolute', top: -3, right: -3,
+    width: 18, height: 18,
+    borderTopWidth: 4, borderRightWidth: 4,
+    borderColor: '#ff0090', borderRadius: 2,
   },
   cornerBL: {
-    position: 'absolute', bottom: -2, left: -2,
-    width: 14, height: 14,
-    borderBottomWidth: 3, borderLeftWidth: 3,
-    borderColor: '#ff0090', borderRadius: 1,
+    position: 'absolute', bottom: -3, left: -3,
+    width: 18, height: 18,
+    borderBottomWidth: 4, borderLeftWidth: 4,
+    borderColor: '#ff0090', borderRadius: 2,
   },
   cornerBR: {
-    position: 'absolute', bottom: -2, right: -2,
-    width: 14, height: 14,
-    borderBottomWidth: 3, borderRightWidth: 3,
-    borderColor: '#ff0090', borderRadius: 1,
+    position: 'absolute', bottom: -3, right: -3,
+    width: 18, height: 18,
+    borderBottomWidth: 4, borderRightWidth: 4,
+    borderColor: '#ff0090', borderRadius: 2,
   },
   signDivider: {
-    width: '80%',
-    height: 1,
-    backgroundColor: 'rgba(0,212,255,0.25)',
+    width: '85%',
+    height: 1.5,
+    backgroundColor: 'rgba(0,212,255,0.4)',
     marginVertical: 10,
   },
   // ──────────────────────────────────────────────────────────────────────────
