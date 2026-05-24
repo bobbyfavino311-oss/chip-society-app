@@ -199,49 +199,18 @@ function TournamentCard({ t }: { t: LiveTournament }) {
 
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
-// Per-letter neon color palettes
-const CHIP_COLORS    = ['#00d4ff', '#ff0090', '#bf5fff', '#ffd700'] as const;
-const SOCIETY_COLORS = ['#ff0090', '#00d4ff', '#bf5fff', '#ffd700', '#ff0090', '#00d4ff', '#bf5fff'] as const;
-
-function NeonLetter({ ch, color, style }: { ch: string; color: string; style?: object }) {
-  return (
-    <Text
-      style={[
-        logo.letter,
-        {
-          color,
-          textShadowColor: color,
-          textShadowRadius: 18,
-          textShadowOffset: { width: 0, height: 0 },
-        },
-        style,
-      ]}
-      allowFontScaling={false}
-    >
-      {ch}
-    </Text>
-  );
-}
-
 function ChipSocietyLogo() {
-  const chipOpacity   = useRef(new Animated.Value(1)).current;
-  const socOpacity    = useRef(new Animated.Value(1)).current;
-  const chipGlow      = useRef(new Animated.Value(1)).current;
-  const socGlow       = useRef(new Animated.Value(0.82)).current;
-  const timeoutRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const chipOpacity = useRef(new Animated.Value(1)).current;
+  const socOpacity  = useRef(new Animated.Value(1)).current;
+  const glowPulse   = useRef(new Animated.Value(1)).current;
+  const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    // Slow alternating breathe between the two words
+    // Slow neon breathe on the whole logo
     Animated.loop(
       Animated.sequence([
-        Animated.timing(chipGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
-        Animated.timing(chipGlow, { toValue: 1,    duration: 2200, useNativeDriver: true }),
-      ])
-    ).start();
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(socGlow, { toValue: 1,    duration: 2200, useNativeDriver: true }),
-        Animated.timing(socGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
+        Animated.timing(glowPulse, { toValue: 0.78, duration: 2400, useNativeDriver: true }),
+        Animated.timing(glowPulse, { toValue: 1,    duration: 2400, useNativeDriver: true }),
       ])
     ).start();
 
@@ -270,21 +239,20 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
-      <View style={logo.wordGroup}>
-        {/* "Chip" — each letter its own neon color */}
-        <Animated.View style={{ flexDirection: 'row', opacity: Animated.multiply(chipOpacity, chipGlow) }}>
-          {'Chip'.split('').map((ch, i) => (
-            <NeonLetter key={i} ch={ch} color={CHIP_COLORS[i]} style={{ lineHeight: LOGO_LINE_HEIGHT }} />
-          ))}
-        </Animated.View>
-
-        {/* "Society" — each letter its own neon color */}
-        <Animated.View style={{ flexDirection: 'row', opacity: Animated.multiply(socOpacity, socGlow) }}>
-          {'Society'.split('').map((ch, i) => (
-            <NeonLetter key={i} ch={ch} color={SOCIETY_COLORS[i]} style={{ lineHeight: LOGO_LINE_HEIGHT }} />
-          ))}
-        </Animated.View>
-      </View>
+      <Animated.View style={[logo.wordGroup, { opacity: glowPulse }]}>
+        <Animated.Text
+          style={[logo.word, logo.neonCoat, { lineHeight: LOGO_LINE_HEIGHT, opacity: chipOpacity }]}
+          allowFontScaling={false}
+        >
+          Chip
+        </Animated.Text>
+        <Animated.Text
+          style={[logo.word, logo.neonCoat, { lineHeight: LOGO_LINE_HEIGHT, opacity: socOpacity }]}
+          allowFontScaling={false}
+        >
+          Society
+        </Animated.Text>
+      </Animated.View>
       <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
     </View>
   );
@@ -793,9 +761,23 @@ const tc = StyleSheet.create({
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
   wordGroup: { alignItems: 'center', paddingBottom: 22 },
-  letter: {
+  word: {
     fontFamily: 'Pacifico_400Regular',
     fontSize: LOGO_SIZE,
+    color: '#e8f4ff',
+  },
+  neonCoat: {
+    textShadowColor: '#0066ff',
+    textShadowRadius: 28,
+    textShadowOffset: { width: 0, height: 0 },
+    ...Platform.select({
+      ios: {
+        shadowColor: '#003cff',
+        shadowOpacity: 1,
+        shadowRadius: 32,
+        shadowOffset: { width: 0, height: 0 },
+      },
+    }),
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
