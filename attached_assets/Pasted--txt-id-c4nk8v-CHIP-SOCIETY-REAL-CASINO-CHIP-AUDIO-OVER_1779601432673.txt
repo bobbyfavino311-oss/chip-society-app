@@ -1,0 +1,261 @@
+```txt id="c4nk8v"
+CHIP SOCIETY — REAL CASINO CHIP AUDIO OVERHAUL
+FINAL GAMEPLAY SOUND DIRECTION
+==============================================================
+
+Completely redesign the gameplay sound effects around REALISTIC CASINO CHIP SOUNDS.
+
+The previous sound direction still feels:
+- too digital
+- too futuristic
+- too artificial
+- too arcade-like
+- too synthetic
+
+The gameplay should sound like:
+a REAL high-end poker table.
+
+==============================================================
+1. CORE AUDIO DIRECTION
+==============================================================
+
+The table audio should now focus heavily on:
+- ceramic poker chips
+- casino felt textures
+- realistic card handling
+- subtle casino table ambience
+
+The overall sound should feel:
+- authentic
+- premium
+- immersive
+- satisfying
+- grounded
+- smooth
+
+NOT:
+- futuristic beeps
+- electronic noises
+- arcade sounds
+- drum beats
+- metallic hits
+- synthetic UI sounds
+
+==============================================================
+2. REAL CASINO CHIP SOUND STYLE
+==============================================================
+
+Use realistic audio inspired by:
+- ceramic poker chips
+- clay casino chips
+- real casino tables
+- professional poker rooms
+
+Chip sounds should feel:
+- tactile
+- soft but satisfying
+- layered
+- clean
+- realistic
+
+==============================================================
+3. CALL SOUND
+==============================================================
+
+REMOVE the current drum-beat style sound completely.
+
+Replace with:
+- smooth chip slide onto felt
+- light ceramic chip stack click
+- subtle layered chip movement
+
+The CALL sound should feel:
+- natural
+- confident
+- satisfying
+- realistic
+
+==============================================================
+4. RAISE SOUND
+==============================================================
+
+RAISE should sound:
+- heavier than CALL
+- more impactful
+- more competitive
+
+Use:
+- multiple ceramic chips stacking
+- controlled chip toss
+- deeper tactile chip texture
+
+NOT:
+- loud impacts
+- fake bass hits
+- metallic noises
+
+==============================================================
+5. ALL-IN SOUND
+==============================================================
+
+ALL-IN should sound:
+- dramatic
+- premium
+- intense
+WITHOUT sounding cheesy.
+
+Use:
+- large chip stack shove
+- layered ceramic chip collision
+- realistic felt friction
+- subtle low-end impact
+
+The moment should feel:
+high-stakes and immersive.
+
+==============================================================
+6. CHECK SOUND
+==============================================================
+
+CHECK should use:
+- light felt tap
+- subtle chip touch
+- soft table interaction
+
+==============================================================
+7. FOLD SOUND
+==============================================================
+
+FOLD should sound:
+- soft card toss
+- realistic card slide on felt
+- restrained movement
+
+==============================================================
+8. CARD DEAL SOUND
+==============================================================
+
+Use:
+- clean professional card flick
+- realistic card texture
+- subtle stereo table movement
+
+The dealing should feel:
+smooth and authentic.
+
+==============================================================
+9. CARD REVEAL SOUND
+==============================================================
+
+Reveal sounds should:
+- feel clean
+- feel satisfying
+- stay subtle
+
+Use:
+- light card spread
+- gentle table texture
+- restrained reveal sound
+
+==============================================================
+10. POT WIN SOUND
+==============================================================
+
+Winning a hand should sound:
+- rewarding
+- classy
+- premium
+
+Use:
+- satisfying chip collection sounds
+- layered chip stacking
+- realistic pot movement
+
+DO NOT use:
+- jackpot alarms
+- slot machine noises
+- casino jingles
+- exaggerated celebrations
+
+==============================================================
+11. TURN SWITCH SOUND
+==============================================================
+
+Turn transitions should use:
+- subtle chip tap
+OR
+- soft table pulse
+
+NOT:
+- metallic clangs
+- futuristic zaps
+- drum hits
+- loud effects
+
+==============================================================
+12. BUTTON AUDIO
+==============================================================
+
+UI buttons should sound:
+- soft
+- modern
+- premium
+- responsive
+
+Use:
+- subtle felt/chip tactile clicks
+
+==============================================================
+13. TABLE AMBIENCE
+==============================================================
+
+Very subtle background ambience may include:
+- distant chip movement
+- soft casino room texture
+- quiet table atmosphere
+
+VERY LOW VOLUME ONLY.
+
+DO NOT overpower gameplay.
+
+==============================================================
+14. AUDIO MIXING RULES
+==============================================================
+
+ALL sounds should:
+- be volume balanced
+- feel realistic
+- avoid harsh frequencies
+- avoid repetition fatigue
+- avoid distortion
+
+The table should sound:
+- calm
+- immersive
+- premium
+- authentic
+
+==============================================================
+15. FINAL EXPERIENCE TARGET
+==============================================================
+
+Chip Society should now sound like:
+- a real luxury poker room
+- a premium casino poker table
+- a modern high-stakes poker experience
+
+The gameplay audio should finally feel:
+- authentic
+- realistic
+- immersive
+- satisfying
+- premium
+
+NOT:
+- arcade-like
+- futuristic sci-fi
+- digital
+- tacky
+- synthetic
+- low-budget mobile casino audio
+```
