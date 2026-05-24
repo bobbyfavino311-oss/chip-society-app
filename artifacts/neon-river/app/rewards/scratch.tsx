@@ -59,24 +59,18 @@ interface ScratchCell { value: number; label: string; colorIdx: number }
 
 function buildTicket(): { cells: ScratchCell[]; prize: number } {
   const cells: ScratchCell[] = [];
-
-  // Every ticket wins — guaranteed prize
-  {
-    const tier = Math.floor(Math.random() * PRIZES.length);
-    const matchPos = new Set<number>();
-    while (matchPos.size < 3) matchPos.add(Math.floor(Math.random() * 9));
-    for (let i = 0; i < 9; i++) {
-      if (matchPos.has(i)) {
-        cells.push({ value: PRIZES[tier], label: PRIZE_LBL[tier], colorIdx: tier });
-      } else {
-        let d = tier;
-        while (d === tier) d = Math.floor(Math.random() * PRIZES.length);
-        cells.push({ value: PRIZES[d], label: PRIZE_LBL[d], colorIdx: d });
-      }
+  const tier = Math.floor(Math.random() * PRIZES.length);
+  const matchPos = new Set<number>();
+  while (matchPos.size < 3) matchPos.add(Math.floor(Math.random() * 9));
+  for (let i = 0; i < 9; i++) {
+    if (matchPos.has(i)) {
+      cells.push({ value: PRIZES[tier], label: PRIZE_LBL[tier], colorIdx: tier });
+    } else {
+      let d = tier;
+      while (d === tier) d = Math.floor(Math.random() * PRIZES.length);
+      cells.push({ value: PRIZES[d], label: PRIZE_LBL[d], colorIdx: d });
     }
   }
-
-  // Prize is always the matching value (guaranteed 3-match above)
   const vc: Record<number, number> = {};
   cells.forEach(c => { vc[c.value] = (vc[c.value] ?? 0) + 1; });
   const match = Object.entries(vc).find(([, n]) => n >= 3);
@@ -85,7 +79,7 @@ function buildTicket(): { cells: ScratchCell[]; prize: number } {
 
 // ─── SVG path helper ──────────────────────────────────────────────────────────
 
-const BRUSH_R = Platform.OS === 'web' ? 22 : 32;
+const BRUSH_R = Platform.OS === 'web' ? 26 : 40;
 
 function buildPath(strokes: Array<Array<{ x: number; y: number }>>): string {
   return strokes
@@ -103,15 +97,15 @@ interface Confetti { x: number; y: number; color: string; rot: number; ty: Anima
 
 function spawnConfetti(cx: number, cy: number): Confetti[] {
   const cols = ['#ffd700', '#00d4ff', '#ff0090', '#bf5fff', '#00ff88', '#ff6600'];
-  return Array.from({ length: 20 }, (_, i) => {
+  return Array.from({ length: 30 }, (_, i) => {
     const ty = new Animated.Value(0);
     const op = new Animated.Value(1);
     Animated.parallel([
-      Animated.timing(ty, { toValue: 100 + Math.random() * 80, duration: 1400, useNativeDriver: false }),
-      Animated.timing(op, { toValue: 0, duration: 1400, useNativeDriver: false }),
+      Animated.timing(ty, { toValue: 120 + Math.random() * 100, duration: 1600, useNativeDriver: false }),
+      Animated.timing(op, { toValue: 0, duration: 1600, useNativeDriver: false }),
     ]).start();
     return {
-      x: cx + (Math.random() - 0.5) * 160,
+      x: cx + (Math.random() - 0.5) * 200,
       y: cy,
       color: cols[i % cols.length],
       rot: Math.random() * 360,
@@ -124,11 +118,11 @@ function spawnConfetti(cx: number, cy: number): Confetti[] {
 
 function ScratchSpark({ x, y, color }: { x: number; y: number; color: string }) {
   const scale = useRef(new Animated.Value(0.5)).current;
-  const op    = useRef(new Animated.Value(0.9)).current;
+  const op    = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(scale, { toValue: 1.6, duration: 220, useNativeDriver: false }),
-      Animated.timing(op,    { toValue: 0,   duration: 220, useNativeDriver: false }),
+      Animated.timing(scale, { toValue: 2.0, duration: 260, useNativeDriver: false }),
+      Animated.timing(op,    { toValue: 0,   duration: 260, useNativeDriver: false }),
     ]).start();
   }, []);
   return (
@@ -136,15 +130,60 @@ function ScratchSpark({ x, y, color }: { x: number; y: number; color: string }) 
       pointerEvents="none"
       style={{
         position: 'absolute',
-        left: x - 8, top: y - 8, width: 16, height: 16,
-        borderRadius: 8, backgroundColor: color,
+        left: x - 10, top: y - 10, width: 20, height: 20,
+        borderRadius: 10, backgroundColor: color,
         opacity: op, transform: [{ scale }],
       }}
     />
   );
 }
 
-// ─── Coverage tracker ─────────────────────────────────────────────────────────
+// ─── Per-cell coverage tracking ───────────────────────────────────────────────
+
+const CELL_SUBGRID          = 10;
+const CELL_REVEAL_THRESHOLD = 0.32;
+
+function markPerCellCoverage(
+  cellCovered: Set<string>[],
+  x: number, y: number,
+  svgW: number, svgH: number,
+  brushR: number,
+): number[] {
+  const cellW = svgW / 3;
+  const cellH = svgH / 3;
+  const revealed: number[] = [];
+  for (let ci = 0; ci < 3; ci++) {
+    for (let cj = 0; cj < 3; cj++) {
+      const idx   = cj * 3 + ci;
+      const x0    = ci * cellW;
+      const y0    = cj * cellH;
+      const clx   = Math.max(x0, Math.min(x, x0 + cellW));
+      const cly   = Math.max(y0, Math.min(y, y0 + cellH));
+      const dist  = Math.sqrt((x - clx) ** 2 + (y - cly) ** 2);
+      if (dist <= brushR + 6) {
+        const lx  = x - x0;
+        const ly  = y - y0;
+        const sW  = cellW / CELL_SUBGRID;
+        const sH  = cellH / CELL_SUBGRID;
+        const br  = Math.ceil(brushR / Math.min(sW, sH));
+        const cx  = Math.floor(lx / sW);
+        const cy  = Math.floor(ly / sH);
+        for (let dx = -br; dx <= br; dx++) {
+          for (let dy = -br; dy <= br; dy++) {
+            const nx = cx + dx, ny = cy + dy;
+            if (nx >= 0 && nx < CELL_SUBGRID && ny >= 0 && ny < CELL_SUBGRID)
+              cellCovered[idx].add(`${nx},${ny}`);
+          }
+        }
+        const cov = cellCovered[idx].size / (CELL_SUBGRID * CELL_SUBGRID);
+        if (cov >= CELL_REVEAL_THRESHOLD) revealed.push(idx);
+      }
+    }
+  }
+  return revealed;
+}
+
+// ─── Global coverage tracker ──────────────────────────────────────────────────
 
 const GRID = 22;
 
@@ -171,7 +210,7 @@ function computeCoverage(
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const TICKET_W = Math.min(SCREEN_W - 32, 360);
-const TICKET_H = Math.round(TICKET_W * 0.66);
+const TICKET_H = Math.round(TICKET_W * 0.9);
 
 export default function ScratchScreen() {
   const insets   = useSafeAreaInsets();
@@ -182,12 +221,10 @@ export default function ScratchScreen() {
   const [svgW, setSvgW] = useState(TICKET_W);
   const [svgH, setSvgH] = useState(TICKET_H);
 
-  // Refs used inside PanResponder callbacks to avoid stale closures
   const svgWRef       = useRef(TICKET_W);
   const svgHRef       = useRef(TICKET_H);
   const doneRef       = useRef(false);
   const hasTicketsRef = useRef(true);
-  // Page-coordinate offset of the scratch grid (re-measured on each touch start)
   const gridRef       = useRef<View>(null);
   const gridOffsetRef = useRef({ x: 0, y: 0 });
 
@@ -203,6 +240,21 @@ export default function ScratchScreen() {
   const lastSoundRef  = useRef(0);
   const lastHapticRef = useRef(0);
 
+  // Per-cell reveal state
+  const cellCoveredRef  = useRef<Set<string>[]>(Array.from({ length: 9 }, () => new Set()));
+  const [revealedCells, setRevealedCells] = useState<boolean[]>(Array(9).fill(false));
+  const revealedCellsRef = useRef<boolean[]>(Array(9).fill(false));
+  const cellGlowAnims   = useRef(Array.from({ length: 9 }, () => new Animated.Value(0))).current;
+  const [matchRevealCount, setMatchRevealCount] = useState(0);
+  const matchRevealRef  = useRef(0);
+
+  // Suspense / tension
+  const flashAnim       = useRef(new Animated.Value(0)).current;
+  const tensionPulse    = useRef(new Animated.Value(1)).current;
+  const tensionLoopRef  = useRef<Animated.CompositeAnimation | null>(null);
+  const tensionActiveRef = useRef(false);
+  const suspensePendingRef = useRef(false);
+
   // Result state
   const [done,    setDone]    = useState(false);
   const [claimed, setClaimed] = useState(false);
@@ -213,48 +265,121 @@ export default function ScratchScreen() {
   const [displayChips, setDisplayChips] = useState(0);
 
   const won      = ticket.prize > 0;
-  const canRevealAll = coverage >= 0.30;
+  const canRevealAll = coverage >= 0.50;
   const hasTickets   = profile.scratchTickets > 0;
 
-  // Keep refs in sync with state
-  useEffect(() => { doneRef.current = done; }, [done]);
-  useEffect(() => { hasTicketsRef.current = hasTickets; }, [hasTickets]);
-  useEffect(() => { svgWRef.current = svgW; svgHRef.current = svgH; }, [svgW, svgH]);
-
-  // Prevents parent ScrollView from stealing the scratch gesture
-  const [scrollEnabled, setScrollEnabled] = useState(true);
-
-  // Win label
   const vc: Record<string, number> = {};
   ticket.cells.forEach(c => { vc[c.label] = (vc[c.label] ?? 0) + 1; });
   const winLabel = won ? (Object.entries(vc).find(([, n]) => n >= 3)?.[0] ?? null) : null;
 
+  useEffect(() => { doneRef.current = done; }, [done]);
+  useEffect(() => { hasTicketsRef.current = hasTickets; }, [hasTickets]);
+  useEffect(() => { svgWRef.current = svgW; svgHRef.current = svgH; }, [svgW, svgH]);
+
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+
   // On done
   useEffect(() => {
     if (!done) return;
+    tensionLoopRef.current?.stop();
     Animated.spring(resultScale, { toValue: 1, tension: 55, friction: 7, useNativeDriver: false }).start();
     if (won) {
       setConfetti(spawnConfetti(SCREEN_W / 2, 200));
       Animated.loop(
         Animated.sequence([
-          Animated.timing(winPulse, { toValue: 1.06, duration: 500, useNativeDriver: false }),
+          Animated.timing(winPulse, { toValue: 1.08, duration: 500, useNativeDriver: false }),
           Animated.timing(winPulse, { toValue: 1.0,  duration: 500, useNativeDriver: false }),
         ]),
-        { iterations: 6 }
+        { iterations: 8 }
       ).start();
-      Animated.timing(chipCount, { toValue: ticket.prize, duration: 1200, useNativeDriver: false }).start();
+      Animated.timing(chipCount, { toValue: ticket.prize, duration: 1400, useNativeDriver: false }).start();
       chipCount.addListener(({ value }) => setDisplayChips(Math.round(value)));
     }
   }, [done]);
 
-  // Measure the grid's page position so we can convert pageX/pageY → local coords
   const measureGrid = useCallback(() => {
     gridRef.current?.measure((_fx, _fy, _w, _h, px, py) => {
       gridOffsetRef.current = { x: px ?? 0, y: py ?? 0 };
     });
   }, []);
 
-  // PanResponder — reads only refs so no stale-closure issues
+  const finishScratch = useCallback(() => {
+    if (doneRef.current) return;
+    const fullPath = `M 0 0 L ${svgWRef.current} 0 L ${svgWRef.current} ${svgHRef.current} L 0 ${svgHRef.current} Z`;
+    setPathData(fullPath);
+    setCoverage(1);
+    setDone(true);
+  }, []);
+
+  // Handle newly revealed cells — called from PanResponder to avoid stale state
+  const handleCellReveal = useCallback((newlyRevealedIdx: number[]) => {
+    const prev = revealedCellsRef.current;
+    const next = [...prev];
+    let anyNew = false;
+    for (const idx of newlyRevealedIdx) {
+      if (!next[idx]) {
+        next[idx] = true;
+        anyNew = true;
+        // Cell glow flash
+        const anim = cellGlowAnims[idx];
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1,   duration: 120, useNativeDriver: false }),
+          Animated.timing(anim, { toValue: 0.25, duration: 700, useNativeDriver: false }),
+        ]).start();
+      }
+    }
+    if (!anyNew) return;
+
+    revealedCellsRef.current = next;
+    setRevealedCells([...next]);
+
+    if (!winLabel) return;
+    const matchCount = next.reduce((acc, revealed, i) => {
+      if (revealed && ticket.cells[i].label === winLabel) return acc + 1;
+      return acc;
+    }, 0);
+
+    if (matchCount > matchRevealRef.current) {
+      matchRevealRef.current = matchCount;
+      setMatchRevealCount(matchCount);
+
+      if (matchCount === 1) {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }
+
+      if (matchCount === 2 && !tensionActiveRef.current) {
+        tensionActiveRef.current = true;
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        const loop = Animated.loop(
+          Animated.sequence([
+            Animated.timing(tensionPulse, { toValue: 1.1,  duration: 350, useNativeDriver: false }),
+            Animated.timing(tensionPulse, { toValue: 1.0,  duration: 350, useNativeDriver: false }),
+          ])
+        );
+        tensionLoopRef.current = loop;
+        loop.start();
+        // Screen flash
+        Animated.sequence([
+          Animated.timing(flashAnim, { toValue: 0.35, duration: 80,  useNativeDriver: false }),
+          Animated.timing(flashAnim, { toValue: 0,    duration: 400, useNativeDriver: false }),
+        ]).start();
+      }
+
+      if (matchCount >= 3 && !suspensePendingRef.current) {
+        suspensePendingRef.current = true;
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        // Big flash then dramatic pause
+        Animated.sequence([
+          Animated.timing(flashAnim, { toValue: 0.8,  duration: 60,  useNativeDriver: false }),
+          Animated.timing(flashAnim, { toValue: 0.15, duration: 200, useNativeDriver: false }),
+          Animated.timing(flashAnim, { toValue: 0.5,  duration: 80,  useNativeDriver: false }),
+          Animated.timing(flashAnim, { toValue: 0,    duration: 500, useNativeDriver: false }),
+        ]).start();
+        setTimeout(() => finishScratch(), 1400);
+      }
+    }
+  }, [winLabel, ticket.cells, finishScratch]);
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder:        () => !doneRef.current && hasTicketsRef.current,
@@ -264,7 +389,6 @@ export default function ScratchScreen() {
 
       onPanResponderGrant: (evt) => {
         setScrollEnabled(false);
-        // Re-measure page position on every touch start (scroll offset may have changed)
         gridRef.current?.measure((_fx, _fy, _w, _h, px, py) => {
           gridOffsetRef.current = { x: px ?? 0, y: py ?? 0 };
         });
@@ -283,38 +407,38 @@ export default function ScratchScreen() {
         const y = Math.max(0, Math.min(pageY - gridOffsetRef.current.y, svgHRef.current));
         currentRef.current.push({ x, y });
 
-        // Throttled sound
         const now = Date.now();
-        if (now - lastSoundRef.current > 85) {
+        if (now - lastSoundRef.current > 70) {
           SoundEngine.chip();
           lastSoundRef.current = now;
         }
-        if (now - lastHapticRef.current > 55) {
+        if (now - lastHapticRef.current > 45) {
           void Haptics.selectionAsync();
           lastHapticRef.current = now;
         }
 
-        // Sparks
-        if (Math.random() < 0.3) {
+        // More sparks — higher frequency, bigger
+        if (Math.random() < 0.55) {
           const id = ++sparkId.current;
-          setSparks(prev => [...prev.slice(-5), { id, x, y }]);
-          setTimeout(() => setSparks(prev => prev.filter(s => s.id !== id)), 300);
+          setSparks(prev => [...prev.slice(-8), { id, x, y }]);
+          setTimeout(() => setSparks(prev => prev.filter(s => s.id !== id)), 350);
         }
 
         setScratchTip({ x, y });
 
-        // Coverage — uses refs so always reads current layout dimensions
         const cov = computeCoverage(coveredRef.current, x, y, svgWRef.current, svgHRef.current);
         setCoverage(cov);
 
-        // Path update
         const data = buildPath([...strokesRef.current, currentRef.current]);
         setPathData(data);
 
-        // Auto-done at 82%
-        if (cov >= 0.82) {
-          finishScratch();
-        }
+        // Per-cell reveal
+        const nowRevealed = markPerCellCoverage(
+          cellCoveredRef.current, x, y, svgWRef.current, svgHRef.current, BRUSH_R
+        );
+        if (nowRevealed.length > 0) handleCellReveal(nowRevealed);
+
+        if (cov >= 0.88) finishScratch();
       },
 
       onPanResponderRelease: () => {
@@ -339,18 +463,7 @@ export default function ScratchScreen() {
     })
   ).current;
 
-  const finishScratch = useCallback(() => {
-    if (done) return;
-    // Fill remaining path
-    const fullPath = `M 0 0 L ${svgW} 0 L ${svgW} ${svgH} L 0 ${svgH} Z`;
-    setPathData(fullPath);
-    setCoverage(1);
-    setDone(true);
-  }, [done, svgW, svgH]);
-
-  const revealAll = useCallback(() => {
-    finishScratch();
-  }, [finishScratch]);
+  const revealAll = useCallback(() => { finishScratch(); }, [finishScratch]);
 
   const handleClaim = useCallback(async () => {
     if (claimed) return;
@@ -360,11 +473,31 @@ export default function ScratchScreen() {
     await useScratchTicket();
   }, [claimed, won, ticket.prize, addChips, useScratchTicket]);
 
+  // Match banner content
+  const matchBannerText = matchRevealCount >= 3
+    ? '🎰  WINNER WINNER  🎰'
+    : matchRevealCount >= 2
+      ? '⚡  ONE MORE!  ⚡'
+      : matchRevealCount === 1
+        ? `MATCH  1 / 3`
+        : '';
+  const matchBannerColor = matchRevealCount >= 3
+    ? '#ffd700'
+    : matchRevealCount >= 2
+      ? '#ff0090'
+      : theme.accent;
+
   return (
     <View style={st.root}>
       <LinearGradient colors={['#0a0020', '#050010', '#080018']} style={StyleSheet.absoluteFill} />
       <View style={st.glowLeft} />
       <View style={st.glowRight} />
+
+      {/* Full-screen flash overlay */}
+      <Animated.View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, { backgroundColor: theme.accent, opacity: flashAnim, zIndex: 99 }]}
+      />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -378,7 +511,7 @@ export default function ScratchScreen() {
             <Ionicons name="close" size={20} color={colors.textMuted} />
           </TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
-            <Text style={st.title}>SCRATCH & WIN</Text>
+            <Text style={st.title}>SCRATCH &amp; WIN</Text>
             <Text style={st.subtitle}>MATCH 3 SYMBOLS TO WIN</Text>
           </View>
           <View style={[st.ticketBadge]}>
@@ -386,6 +519,30 @@ export default function ScratchScreen() {
             <Text style={[st.ticketCount, { color: theme.accent }]}>×{profile.scratchTickets}</Text>
           </View>
         </View>
+
+        {/* Match progress banner */}
+        {matchRevealCount > 0 && !done && (
+          <Animated.View style={[
+            st.matchBanner,
+            { borderColor: matchBannerColor + '60', backgroundColor: matchBannerColor + '14' },
+            matchRevealCount >= 2 && { transform: [{ scale: tensionPulse }] },
+          ]}>
+            <Text style={[st.matchBannerText, { color: matchBannerColor }]}>
+              {matchBannerText}
+            </Text>
+            <View style={st.matchPips}>
+              {[0, 1, 2].map(i => (
+                <View
+                  key={i}
+                  style={[
+                    st.matchPip,
+                    i < matchRevealCount && { backgroundColor: matchBannerColor, borderColor: matchBannerColor },
+                  ]}
+                />
+              ))}
+            </View>
+          </Animated.View>
+        )}
 
         {/* Ticket */}
         <View style={[st.ticketWrap, { borderColor: RARITY_BORDER_COLORS[theme.rarity] + '55' }]}>
@@ -414,26 +571,38 @@ export default function ScratchScreen() {
             <Text style={st.jackpotLabel}>CHIPS</Text>
           </View>
 
-          {/* Prize grid — visible underneath the foil */}
+          {/* Prize grid */}
           <View
             ref={gridRef}
             style={[st.prizeGrid, { width: TICKET_W, height: TICKET_H }]}
             onLayout={e => {
               const { width, height } = e.nativeEvent.layout;
               setSvgW(width); setSvgH(height);
-              // Measure page position after layout settles
               setTimeout(measureGrid, 80);
             }}
             {...panResponder.panHandlers}
           >
             {/* Prize cells */}
             {ticket.cells.map((cell, i) => {
-              const col = PRIZE_COLS[cell.colorIdx];
+              const col     = PRIZE_COLS[cell.colorIdx];
               const isMatch = winLabel !== null && cell.label === winLabel;
-              const col_ = i; void col_;
+              const isRevealed = revealedCells[i];
               return (
-                <View key={i} style={[st.prizeCell, isMatch && { backgroundColor: col + '14', borderColor: col + '50' }]}>
-                  <Text style={[st.prizeEmoji]}>{isMatch ? '✨' : '💠'}</Text>
+                <View key={i} style={[
+                  st.prizeCell,
+                  isMatch && isRevealed && { backgroundColor: col + '14', borderColor: col + '50' },
+                ]}>
+                  {/* Per-cell glow flash on reveal */}
+                  <Animated.View
+                    pointerEvents="none"
+                    style={[
+                      StyleSheet.absoluteFill,
+                      { backgroundColor: col, opacity: cellGlowAnims[i] },
+                    ]}
+                  />
+                  <Text style={[st.prizeEmoji]}>
+                    {isMatch && isRevealed ? '✨' : '💠'}
+                  </Text>
                   <Text style={[st.prizeVal, { color: col }]}>{cell.label}</Text>
                   <Text style={st.prizeUnit}>chips</Text>
                 </View>
@@ -445,7 +614,6 @@ export default function ScratchScreen() {
               <Svg width={svgW} height={svgH} style={{ backgroundColor: 'transparent' }}>
                 <Defs>
                   <Mask id="foilMask">
-                    {/* White = show foil, Black = erase foil */}
                     <Rect x="0" y="0" width={svgW} height={svgH} fill="white" />
                     {pathData ? (
                       <Path
@@ -462,35 +630,26 @@ export default function ScratchScreen() {
 
                 {/* Foil layer */}
                 <G mask="url(#foilMask)">
-                  {/* Base foil */}
                   <Rect x="0" y="0" width={svgW} height={svgH} fill={theme.foilA} />
-
-                  {/* Metallic gradient streaks */}
                   {Array.from({ length: 8 }).map((_, i) => (
                     <Rect
                       key={i}
-                      x={0}
-                      y={(svgH / 8) * i}
-                      width={svgW}
-                      height={svgH / 8}
+                      x={0} y={(svgH / 8) * i}
+                      width={svgW} height={svgH / 8}
                       fill={i % 2 === 0 ? theme.foilB : theme.foilC}
                       opacity={0.8}
                     />
                   ))}
-
-                  {/* Holographic diagonal shimmer */}
-                  {Array.from({ length: 12 }).map((_, i) => (
+                  {Array.from({ length: 14 }).map((_, i) => (
                     <Path
                       key={i}
-                      d={`M ${-svgH + i * (svgW / 5)} 0 L ${i * (svgW / 5)} ${svgH}`}
+                      d={`M ${-svgH + i * (svgW / 5.5)} 0 L ${i * (svgW / 5.5)} ${svgH}`}
                       stroke={theme.accent}
                       strokeWidth={1.5}
                       strokeOpacity={0.12 + (i % 3) * 0.04}
                       fill="none"
                     />
                   ))}
-
-                  {/* Foil text watermark */}
                   {Array.from({ length: 3 }).map((_, row) =>
                     Array.from({ length: 4 }).map((_, col) => (
                       <SvgCircle
@@ -503,20 +662,38 @@ export default function ScratchScreen() {
                       />
                     ))
                   )}
-
-                  {/* Foil edge vignette */}
                   <Rect x="0" y="0" width={svgW} height={svgH}
                     fill="none" stroke={theme.accent} strokeWidth={2} strokeOpacity={0.3} />
+
+                  {/* Scratch hint text (only when no scratching yet) */}
+                  {pathData === '' && (
+                    <>
+                      <Rect x={svgW / 2 - 90} y={svgH / 2 - 18} width={180} height={36}
+                        rx={8} fill="rgba(0,0,0,0.4)" />
+                      <Path
+                        d={`M ${svgW / 2 - 70} ${svgH / 2} Q ${svgW / 2} ${svgH / 2 - 14} ${svgW / 2 + 70} ${svgH / 2}`}
+                        stroke={theme.accent} strokeWidth={2} fill="none" strokeOpacity={0.6}
+                      />
+                    </>
+                  )}
                 </G>
 
-                {/* Brush glow at current scratch tip */}
+                {/* Brush glow ring at scratch tip */}
                 {scratchTip && !done && (
-                  <SvgCircle
-                    cx={scratchTip.x} cy={scratchTip.y}
-                    r={BRUSH_R + 6}
-                    fill={theme.accent} fillOpacity={0.15}
-                    stroke={theme.accent} strokeWidth={1.5} strokeOpacity={0.4}
-                  />
+                  <>
+                    <SvgCircle
+                      cx={scratchTip.x} cy={scratchTip.y}
+                      r={BRUSH_R + 10}
+                      fill={theme.accent} fillOpacity={0.08}
+                      stroke={theme.accent} strokeWidth={2} strokeOpacity={0.5}
+                    />
+                    <SvgCircle
+                      cx={scratchTip.x} cy={scratchTip.y}
+                      r={BRUSH_R + 20}
+                      fill="none"
+                      stroke={theme.accent} strokeWidth={1} strokeOpacity={0.2}
+                    />
+                  </>
                 )}
               </Svg>
             </View>
@@ -527,7 +704,7 @@ export default function ScratchScreen() {
             ))}
           </View>
 
-          {/* Progress + reveal all */}
+          {/* Progress bar */}
           <View style={st.progressWrap}>
             <View style={st.progressTrack}>
               <Animated.View style={[st.progressFill, {
@@ -553,7 +730,7 @@ export default function ScratchScreen() {
                 </TouchableOpacity>
               ) : (
                 <Text style={[st.hintText, { color: theme.accent + '99' }]}>
-                  ← Scratch to reveal your prizes →
+                  ← Scratch the silver foil to reveal →
                 </Text>
               )}
             </View>
@@ -663,6 +840,21 @@ const st = StyleSheet.create({
   ticketIcon: { fontSize: 12 },
   ticketCount: { fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
 
+  matchBanner: {
+    width: '100%', borderRadius: 14, borderWidth: 1.5,
+    paddingVertical: 12, paddingHorizontal: 20,
+    alignItems: 'center', gap: 8,
+  },
+  matchBannerText: {
+    fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2,
+  },
+  matchPips: { flexDirection: 'row', gap: 10 },
+  matchPip: {
+    width: 14, height: 14, borderRadius: 7,
+    borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+
   ticketWrap: {
     width: '100%', borderRadius: 20, borderWidth: 1.5,
     backgroundColor: 'rgba(255,255,255,0.02)',
@@ -688,7 +880,7 @@ const st = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', gap: 2,
     backgroundColor: 'rgba(255,255,255,0.02)',
   },
-  prizeEmoji: { fontSize: 14 },
+  prizeEmoji: { fontSize: 16 },
   prizeVal: { fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_700Bold' },
   prizeUnit: { color: colors.textDim, fontSize: 7, letterSpacing: 0.5 },
 
