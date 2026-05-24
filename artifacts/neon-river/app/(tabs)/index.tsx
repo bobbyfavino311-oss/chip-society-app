@@ -767,12 +767,12 @@ const logo = StyleSheet.create({
     color: '#e8f4ff',
   },
   neonCoat: {
-    textShadowColor: '#0066ff',
+    textShadowColor: '#ff0090',
     textShadowRadius: 28,
     textShadowOffset: { width: 0, height: 0 },
     ...Platform.select({
       ios: {
-        shadowColor: '#003cff',
+        shadowColor: '#ff0090',
         shadowOpacity: 1,
         shadowRadius: 32,
         shadowOffset: { width: 0, height: 0 },
