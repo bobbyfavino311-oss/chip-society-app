@@ -118,7 +118,7 @@ export default function PlayScreen() {
 
       {/* Guest lock overlay */}
       {guestLockFeature && (
-        <GuestLockOverlay feature={guestLockFeature} />
+        <GuestLockOverlay feature={guestLockFeature} onDismiss={() => setGuestLockFeature(null)} />
       )}
 
       <ScrollView

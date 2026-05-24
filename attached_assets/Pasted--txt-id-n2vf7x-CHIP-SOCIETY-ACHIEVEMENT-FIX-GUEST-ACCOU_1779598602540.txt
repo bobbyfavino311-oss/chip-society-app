@@ -1,0 +1,313 @@
+```txt id="n2vf7x"
+CHIP SOCIETY — ACHIEVEMENT FIX + GUEST ACCOUNT FIX + FINAL AUDIO DIRECTION
+HIGH PRIORITY POLISH PATCH
+==============================================================
+
+Several systems still feel broken, frustrating, or low quality. This update focuses on:
+1. Achievement tracking accuracy
+2. Guest account private table flow
+3. FINAL gameplay sound direction overhaul
+
+The goal is to make the app feel:
+- polished
+- premium
+- smooth
+- professional
+- modern
+- immersive
+
+NOT:
+- buggy
+- tacky
+- noisy
+- arcade-like
+- prototype quality
+
+==============================================================
+1. ACHIEVEMENT COUNT BUG FIX
+==============================================================
+
+The achievement count shown on player profiles is incorrect.
+
+CURRENT ISSUE:
+The profile displays achievement totals that do NOT accurately reflect completed achievements.
+
+Examples:
+- achievements unlocked but not counted
+- incorrect totals
+- duplicate counting
+- delayed updates
+- mismatched progress
+
+==============================================================
+2. ACHIEVEMENT SYSTEM REBUILD
+==============================================================
+
+Fix achievement tracking logic completely.
+
+Requirements:
+- achievement count updates instantly
+- profile count always reflects actual unlocked achievements
+- no duplicate counting
+- no false unlocks
+- no delayed synchronization
+
+Achievement progress should:
+- validate correctly
+- sync in real time
+- persist correctly between sessions
+
+==============================================================
+3. ACHIEVEMENT VALIDATION FIX
+==============================================================
+
+Current system falsely awards achievements.
+
+Example:
+“Win 3 hands in a row”
+triggered incorrectly.
+
+Implement proper validation logic:
+- verify hand history
+- verify consecutive wins
+- verify actual conditions met
+- prevent false triggers
+
+ALL achievements must:
+- be accurate
+- properly verified
+- server validated if applicable
+
+==============================================================
+4. GUEST ACCOUNT PRIVATE TABLE FIX
+==============================================================
+
+Current issue:
+When guest users attempt to create a private table:
+- popup appears
+- no back/cancel button exists
+- player becomes trapped
+- app effectively soft-locks
+- user must restart the game
+
+This is unacceptable UX.
+
+==============================================================
+5. PRIVATE TABLE POPUP REDESIGN
+==============================================================
+
+When guest players attempt to access:
+- Private Tables
+- Friends Features
+- Social Posting
+- Multiplayer Features
+
+Show premium popup:
+
+--------------------------------
+CREATE AN ACCOUNT
+
+Private tables are available for registered players only.
+
+Create a free Chip Society account to:
+- host private games
+- add friends
+- save progress
+- access social features
+- compete in ranked play
+
+[ CREATE ACCOUNT ]
+[ CONTINUE AS GUEST ]
+--------------------------------
+
+==============================================================
+6. REQUIRED BUTTON FIXES
+==============================================================
+
+The popup MUST include:
+- visible BACK button
+- visible CLOSE button
+- “Continue as Guest” option
+
+The player should NEVER become trapped.
+
+Popup must:
+- dismiss cleanly
+- return player to previous screen
+- preserve app state
+
+==============================================================
+7. FINAL GAMEPLAY AUDIO DIRECTION
+==============================================================
+
+The current sound effects STILL sound terrible.
+
+CURRENT ISSUES:
+- static-like noises
+- metallic cup hitting sounds
+- cheap digital artifacts
+- tacky transitions
+- unpleasant table audio
+- distracting sound profile
+- fake casino noises
+
+The sounds should feel:
+CLEAN.
+SUBTLE.
+LUXURIOUS.
+SMOOTH.
+REALISTIC.
+
+==============================================================
+8. FINAL AUDIO STYLE TARGET
+==============================================================
+
+The table should sound like:
+- a modern luxury poker room
+- ceramic poker chips on felt
+- real casino table ambience
+- soft premium tactile feedback
+
+NOT:
+- arcade machine
+- slot machine
+- retro casino app
+- noisy mobile game
+
+==============================================================
+9. NEW AUDIO DESIGN PHILOSOPHY
+==============================================================
+
+IMPORTANT:
+Less is more.
+
+The game currently uses:
+- too many harsh sounds
+- overly dramatic effects
+- distracting transitions
+
+REMOVE:
+- metallic clangs
+- digital zaps
+- harsh clicks
+- exaggerated impacts
+- static noises
+- fake casino jingles
+
+The new sound design should feel:
+- understated
+- expensive
+- cinematic
+- natural
+- immersive
+
+==============================================================
+10. RECOMMENDED TABLE SOUND PROFILE
+==============================================================
+
+CARD DEAL:
+- soft realistic card slide
+- clean felt texture
+- subtle stereo motion
+
+CHIP BET:
+- ceramic chip click
+- soft stack movement
+- low-volume tactile detail
+
+CHECK:
+- gentle felt tap
+
+CALL:
+- smooth controlled chip placement
+
+RAISE:
+- slightly heavier chip stack movement
+- deeper tactile presence
+- controlled bass texture
+
+ALL-IN:
+- firm confident chip shove
+- subtle low-end impact
+- restrained tension sound
+
+FOLD:
+- soft card toss across felt
+
+TURN SWITCH:
+- VERY subtle UI pulse
+- soft ambient transition
+- NOT metallic
+- NOT dramatic
+
+BUTTON TAP:
+- smooth modern touch click
+- minimal and elegant
+
+WIN:
+- restrained premium success tone
+- elegant casino confirmation
+- subtle upward harmonic tone
+
+LOSS:
+- quiet muted table ambience
+
+SHOWDOWN:
+- low cinematic tension pulse
+- subtle reveal atmosphere
+
+==============================================================
+11. AUDIO MIXING REQUIREMENTS
+==============================================================
+
+ALL sound effects should:
+- be lower volume overall
+- avoid harsh frequencies
+- avoid clipping
+- avoid repetitive noise
+- avoid audio fatigue
+
+The table should sound:
+- smooth
+- calming
+- immersive
+- premium
+- believable
+
+==============================================================
+12. IMPORTANT AUDIO RULES
+==============================================================
+
+DO NOT:
+- stack multiple sounds aggressively
+- play sounds too frequently
+- use loud transitions
+- use exaggerated casino noises
+- use arcade-style feedback
+
+The gameplay should feel:
+clean and sophisticated.
+
+==============================================================
+13. FINAL EXPERIENCE TARGET
+==============================================================
+
+Chip Society should now feel like:
+- a premium poker platform
+- a luxury social poker experience
+- a polished App Store-quality game
+
+The audio should now feel:
+- subtle
+- realistic
+- cinematic
+- expensive
+- immersive
+
+NOT:
+- tacky
+- noisy
+- arcade-like
+- distorted
+- cheap mobile casino audio
+```

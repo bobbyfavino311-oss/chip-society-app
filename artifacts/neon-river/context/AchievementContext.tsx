@@ -90,7 +90,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
           if (saved.claimedIds)    { const s = new Set(saved.claimedIds);    setClaimedIds(s);    claimedRef.current  = s; }
           if (typeof saved.totalWins  === 'number') { setTotalWins(saved.totalWins);   totalWinsRef.current  = saved.totalWins;   }
           if (typeof saved.winStreak  === 'number') { setWinStreak(saved.winStreak);   winStreakRef.current   = saved.winStreak;   }
-          if (typeof saved.lastHandLost === 'boolean') { setLastHandLost(saved.lastHandLost); lastHandLostRef.current = saved.lastHandLost; }
+          // lastHandLost intentionally NOT restored — comeback must be earned within the same session
         } catch {}
       }
       loaded.current = true;
