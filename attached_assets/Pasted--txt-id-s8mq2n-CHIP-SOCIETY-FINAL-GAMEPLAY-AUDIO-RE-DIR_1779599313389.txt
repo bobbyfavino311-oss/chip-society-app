@@ -1,0 +1,294 @@
+```txt id="s8mq2n"
+CHIP SOCIETY — FINAL GAMEPLAY AUDIO RE-DIRECTION
+RETRO FUTURISTIC CASINO SOUND OVERHAUL
+==============================================================
+
+The gameplay sound effects STILL do not fit the identity of Chip Society.
+
+Current problems:
+- every CALL sounds like a drum beat
+- sounds are too aggressive
+- sounds feel tacky
+- audio feels noisy and distracting
+- transitions sound random
+- no futuristic luxury vibe
+- still feels arcade-like
+
+The gameplay should sound:
+- smooth
+- stylish
+- retro futuristic
+- luxurious
+- atmospheric
+- modern casino inspired
+
+The audio should feel like:
+a sleek neon poker lounge in the future.
+
+==============================================================
+1. NEW AUDIO DIRECTION
+==============================================================
+
+The sound design should combine:
+- luxury casino ambience
+- subtle retro-futuristic UI tones
+- smooth tactile poker sounds
+- soft synth-inspired textures
+- clean modern transitions
+
+IMPORTANT:
+This does NOT mean synthwave music.
+
+The gameplay audio should feel:
+- minimal
+- elegant
+- smooth
+- immersive
+- premium
+
+NOT:
+- loud
+- dramatic
+- arcade-like
+- overly cinematic
+- harsh
+
+==============================================================
+2. CORE AUDIO PHILOSOPHY
+==============================================================
+
+The gameplay should sound:
+soft, smooth, and futuristic.
+
+Every interaction should feel:
+- polished
+- tactile
+- expensive
+- calming
+- satisfying
+
+DO NOT use:
+- drum hits
+- metallic bangs
+- loud impacts
+- slot machine noises
+- arcade beeps
+- static effects
+- distorted transitions
+
+==============================================================
+3. NEW TABLE SOUND STYLE
+==============================================================
+
+CARD DEAL:
+- smooth clean card slide
+- soft felt movement
+- light stereo texture
+
+CARD REVEAL:
+- subtle futuristic swipe tone
+- elegant reveal sound
+- slight neon shimmer texture
+
+CHECK:
+- soft digital felt tap
+
+CALL:
+REMOVE the current drum beat entirely.
+
+Replace with:
+- smooth chip placement sound
+- soft futuristic click
+- subtle neon pulse texture
+- light ceramic chip movement
+
+The CALL sound should feel:
+confident and clean.
+
+==============================================================
+4. RAISE SOUND
+==============================================================
+
+RAISE should sound:
+- smooth
+- premium
+- controlled
+- slightly more powerful than CALL
+
+Use:
+- layered ceramic chip movement
+- low soft bass texture
+- futuristic tactile pulse
+
+NOT:
+- aggressive impacts
+- loud bass hits
+- metallic slams
+
+==============================================================
+5. ALL-IN SOUND
+==============================================================
+
+ALL-IN should feel:
+tense and premium,
+NOT explosive.
+
+Use:
+- smooth chip shove
+- restrained low-end pulse
+- subtle futuristic energy rise
+
+The moment should feel:
+high-stakes but classy.
+
+==============================================================
+6. TURN SWITCH SOUND
+==============================================================
+
+The current turn-switch sound feels:
+- metallic
+- awkward
+- distracting
+
+Replace with:
+- soft ambient transition pulse
+- futuristic UI glide tone
+- subtle neon movement sound
+
+Think:
+luxury sci-fi casino interface.
+
+==============================================================
+7. BUTTON PRESS AUDIO
+==============================================================
+
+Buttons should sound:
+- modern
+- responsive
+- glass-like
+- smooth
+
+Use:
+- soft tactile click
+- futuristic UI touch sound
+- subtle synth texture
+
+NOT:
+- hard clicks
+- arcade taps
+- sharp digital pops
+
+==============================================================
+8. WIN SOUND
+==============================================================
+
+Winning should feel:
+premium and satisfying,
+NOT loud or cheesy.
+
+Use:
+- soft harmonic rise
+- elegant casino confirmation
+- futuristic reward shimmer
+- subtle glow-style audio
+
+NO:
+- jackpot alarms
+- slot machine spam
+- loud celebration sounds
+
+==============================================================
+9. LOSS / FOLD SOUND
+==============================================================
+
+LOSS:
+- soft muted ambience fade
+
+FOLD:
+- subtle card sweep
+- light felt movement
+
+==============================================================
+10. SHOWDOWN SOUND
+==============================================================
+
+SHOWDOWN should sound:
+- tense
+- smooth
+- futuristic
+- cinematic
+
+Use:
+- restrained low atmospheric pulse
+- subtle reveal texture
+- elegant suspense tone
+
+==============================================================
+11. AUDIO TEXTURE STYLE
+==============================================================
+
+Overall sound textures should resemble:
+- luxury futuristic casino UI
+- retro-future technology
+- sleek neon interfaces
+- polished cyber-lounge ambience
+
+Think:
+“retro futuristic Vegas.”
+
+==============================================================
+12. AUDIO MIXING RULES
+==============================================================
+
+ALL sound effects should:
+- remain low-to-medium volume
+- blend naturally together
+- avoid audio fatigue
+- avoid repetition
+- avoid harsh frequencies
+
+The table should sound:
+- calming
+- immersive
+- cool
+- modern
+- stylish
+
+==============================================================
+13. IMPORTANT DESIGN RULE
+==============================================================
+
+DO NOT overdo the sound design.
+
+The app should feel:
+minimal and premium.
+
+Every sound should exist for a reason.
+
+Less clutter.
+More atmosphere.
+
+==============================================================
+14. FINAL EXPERIENCE TARGET
+==============================================================
+
+Chip Society should now sound like:
+- a futuristic luxury poker lounge
+- a modern neon casino
+- a high-end social poker platform
+
+The gameplay should finally feel:
+- smooth
+- immersive
+- premium
+- stylish
+- futuristic
+- addictive
+
+NOT:
+- tacky
+- noisy
+- arcade-like
+- generic mobile casino audio
+- cheap poker simulator sounds
+```
