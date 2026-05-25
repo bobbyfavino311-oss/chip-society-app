@@ -32,12 +32,13 @@ interface AchCardProps {
   ach: Achievement;
   unlocked: boolean;
   claimed: boolean;
-  progress: number;   // 0-1 for count-based, -1 for non-count
+  progress: number;          // 0-1 for count-based, -1 for non-count
+  progressLabel?: string;    // e.g. "3 / 10" for hand achievements
   onClaim: () => void;
   claiming: boolean;
 }
 
-function AchCard({ ach, unlocked, claimed, progress, onClaim, claiming }: AchCardProps) {
+function AchCard({ ach, unlocked, claimed, progress, progressLabel, onClaim, claiming }: AchCardProps) {
   const color     = RARITY_COLORS[ach.rarity];
   const showClaim = unlocked && !claimed;
   const hasProgress = progress >= 0 && !unlocked;
@@ -110,7 +111,7 @@ function AchCard({ ach, unlocked, claimed, progress, onClaim, claiming }: AchCar
               />
             </View>
             <Text style={[styles.progressTxt, { color }]}>
-              {Math.round(pct * 100)}%
+              {progressLabel ?? `${Math.round(pct * 100)}%`}
             </Text>
           </View>
         )}
@@ -150,7 +151,7 @@ function AchCard({ ach, unlocked, claimed, progress, onClaim, claiming }: AchCar
 
 export default function AchievementsScreen() {
   const insets = useSafeAreaInsets();
-  const { unlockedIds, claimedIds, claim, totalWins, winStreak } = useAchievements();
+  const { unlockedIds, claimedIds, claim, totalWins, winStreak, handCounts } = useAchievements();
   const { profile } = useUser();
   const completion = achievementCompletion(unlockedIds);
   const [claiming, setClaiming] = useState<Set<string>>(new Set());
@@ -166,6 +167,8 @@ export default function AchievementsScreen() {
     if (!ach.target) return -1;
     if (unlockedIds.has(ach.id)) return 1;
     switch (ach.category) {
+      case 'hands':
+        return (handCounts[ach.id] ?? 0) / ach.target;
       case 'milestone':
         if (ach.id.startsWith('wins_')) return totalWins / ach.target;
         break;
@@ -177,6 +180,14 @@ export default function AchievementsScreen() {
         return profile.chips / ach.target;
     }
     return -1;
+  };
+
+  const getProgressLabel = (ach: Achievement): string | undefined => {
+    if (ach.category === 'hands' && ach.target && !unlockedIds.has(ach.id)) {
+      const count = handCounts[ach.id] ?? 0;
+      return `${count} / ${ach.target}`;
+    }
+    return undefined;
   };
 
   const byCategory = useMemo(() => {
@@ -242,6 +253,7 @@ export default function AchievementsScreen() {
                 unlocked={unlockedIds.has(ach.id)}
                 claimed={claimedIds.has(ach.id)}
                 progress={getProgress(ach)}
+                progressLabel={getProgressLabel(ach)}
                 onClaim={() => handleClaim(ach.id)}
                 claiming={claiming.has(ach.id)}
               />
@@ -304,7 +316,7 @@ const styles = StyleSheet.create({
   progressWrap: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   progressBar: { flex: 1, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 1.5 },
-  progressTxt: { fontFamily: 'Inter_700Bold', fontSize: 8, letterSpacing: 0.5, minWidth: 28, textAlign: 'right' },
+  progressTxt: { fontFamily: 'Inter_700Bold', fontSize: 8, letterSpacing: 0.5, minWidth: 34, textAlign: 'right' },
   rewardRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
   rewardText: { fontFamily: 'Orbitron_400Regular', fontSize: 8.5, color: 'rgba(255,215,0,0.55)', letterSpacing: 0.3, flex: 1 },
   claimBtn: {

@@ -1,0 +1,321 @@
+CHIP SOCIETY — PROFILE STATS + DAILY STREAK + AVATAR + ACHIEVEMENT PROGRESSION PATCH
+==============================================================
+
+Update the player profile, daily streak system, avatar selection, and achievement tracking system.
+
+This patch must fix progression accuracy and make achievements harder to earn so players have stronger incentive to keep playing.
+
+==============================================================
+1. PLAYER PROFILE TOURNAMENT STATS
+==============================================================
+
+Add tournament win/loss stats to the player profile section.
+
+Profile should now display:
+
+- Tournament Wins
+- Tournament Losses
+- Tournament Win Rate
+- Total Tournaments Played
+- Best Tournament Finish
+- Biggest Tournament Prize Won
+
+These stats must update accurately after every completed tournament.
+
+Example display:
+
+Tournament Record:
+12 Wins / 8 Losses
+
+Win Rate:
+60%
+
+Best Finish:
+1st Place
+
+==============================================================
+2. DAILY STREAK COUNTDOWN TIMER
+==============================================================
+
+Add a 24-hour countdown timer to the daily streak reward feature.
+
+After a player claims the daily streak prize:
+
+- lock the next reward
+- start a visible 24-hour countdown
+- show exact time remaining
+
+Example:
+
+Next Daily Reward In:
+23h 14m 08s
+
+When the countdown reaches zero:
+
+- enable the next reward
+- show “CLAIM” button
+- trigger subtle notification badge
+
+The countdown must persist after closing and reopening the app.
+
+Use server time if available.
+If no backend exists yet, use local saved timestamp for beta.
+
+==============================================================
+3. RESTORE ORIGINAL SYMBOL AVATARS
+==============================================================
+
+Add the original symbol avatars back into the avatar selection system IN ADDITION to the new portrait avatars.
+
+Do NOT replace the new character avatars.
+
+The avatar selection should now include two categories:
+
+1. Character Avatars
+2. Classic Symbol Avatars
+
+Classic Symbol Avatars should include the original style icons such as:
+
+- Heart
+- Spade
+- Club
+- Diamond
+- Star
+- Crown
+- Lightning
+- Skull
+- Fire
+- Chip
+
+These should feel upgraded and polished with:
+
+- neon glow
+- clean borders
+- rarity frames
+- smooth selection animation
+- premium casino styling
+
+Players should be able to choose either:
+
+- portrait character avatar
+OR
+- original symbol avatar
+
+The selected avatar must display correctly across:
+
+- gameplay table
+- player profile
+- social feed
+- tournament lobby
+- comments
+- leaderboard
+
+==============================================================
+4. ACHIEVEMENT PROGRESSION OVERHAUL
+==============================================================
+
+The current achievements unlock too easily.
+
+All hand-related achievements should now require multiple completions before unlocking.
+
+Instead of unlocking after one time, each achievement should track progress.
+
+Example:
+
+Pocket Rockets
+Win a hand with One Pair.
+Progress: 1 / 10
+
+Double Down
+Win a hand with Two Pair.
+Progress: 2 / 10
+
+Set the Table
+Win a hand with Three of a Kind.
+Progress: 4 / 10
+
+==============================================================
+5. HAND-RELATED ACHIEVEMENTS REQUIRE 10 WINS
+==============================================================
+
+All hand-related achievements should require 10 successful completions.
+
+Apply 10-count requirement to:
+
+- One Pair
+- Two Pair
+- Three of a Kind
+- Straight
+- Flush
+- Full House
+- Four of a Kind
+- Straight Flush
+
+Each must show progress:
+
+0 / 10
+1 / 10
+2 / 10
+...
+10 / 10
+
+Achievement unlocks only at 10 / 10.
+
+==============================================================
+6. ROYAL FLUSH EXCEPTION
+==============================================================
+
+Royal Flush achievement should only require 1 completion.
+
+Royal Flush is rare enough and should remain a single-completion legendary achievement.
+
+Display:
+
+Neon Royalty
+Win a hand with a Royal Flush.
+Progress: 0 / 1
+
+When achieved once:
+
+Progress: 1 / 1
+Achievement unlocked.
+
+==============================================================
+7. ACHIEVEMENT UI UPDATE
+==============================================================
+
+Update achievement cards to display:
+
+- achievement name
+- description
+- rarity
+- reward
+- XP reward
+- lock/unlock state
+- progress counter
+- progress bar
+- claim button when complete
+
+Example:
+
+Full House
+Win a hand with a Full House.
+Progress: 3 / 10
+Reward: 3,000 chips · 400 XP
+
+[ progress bar ]
+
+Locked until 10 / 10.
+
+==============================================================
+8. CLAIM BUTTON REQUIREMENT
+==============================================================
+
+Achievements should NOT automatically pay rewards.
+
+When progress reaches required amount:
+
+- mark achievement as complete
+- show “CLAIM” button
+- player taps CLAIM
+- reward is added to balance
+- XP is added to profile
+- achievement count updates correctly
+
+This prevents confusion and improves reward pacing.
+
+==============================================================
+9. ACHIEVEMENT TRACKING ACCURACY
+==============================================================
+
+Achievements must only progress when the player actually earns the matching hand result.
+
+Example:
+
+If player wins with Two Pair:
+Only Double Down should increase.
+
+Do NOT increase:
+- One Pair
+- Straight
+- Flush
+- Full House
+
+The system must evaluate the final winning hand correctly.
+
+==============================================================
+10. ACHIEVEMENT COUNT MUST UPDATE PROFILE
+==============================================================
+
+Player profile achievement count must reflect actual completed achievements.
+
+Rules:
+
+- incomplete achievements do NOT count
+- claimable achievements may count only after unlocked
+- claimed achievements remain counted
+- no duplicate counting
+- no false achievements
+
+Example:
+
+If player completed 8 achievements:
+Profile must show exactly 8.
+
+==============================================================
+11. DATA PERSISTENCE
+==============================================================
+
+Achievement progress must persist across sessions.
+
+Save:
+
+- achievement ID
+- current progress
+- required progress
+- unlocked status
+- claimed status
+- reward amount
+- XP amount
+
+For beta:
+local persistence is acceptable.
+
+For launch:
+server-side persistence is preferred.
+
+==============================================================
+12. FINAL ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete, verify:
+
+1. Tournament wins/losses appear on profile.
+2. Tournament stats update after tournament results.
+3. Daily streak shows 24-hour countdown after claim.
+4. Countdown persists after app restart.
+5. Original symbol avatars are available again.
+6. New character avatars remain available.
+7. Avatar choice displays correctly everywhere.
+8. Hand achievements show progress like 1 / 10.
+9. Royal Flush shows progress like 0 / 1.
+10. Achievements only progress when truly earned.
+11. Claim button appears only when achievement is complete.
+12. Rewards pay exact chip amounts.
+13. XP rewards update correctly.
+14. Profile achievement count is accurate.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+The profile, avatar, daily streak, and achievement systems should now feel:
+
+- accurate
+- rewarding
+- harder to complete
+- progression-based
+- polished
+- launch ready
+
+Players should feel motivated to keep playing hands, chase milestones, and build a real Chip Society profile.

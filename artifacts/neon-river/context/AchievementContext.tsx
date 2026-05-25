@@ -16,7 +16,7 @@ import {
 import { useUser } from '@/context/UserContext';
 import { SoundEngine } from '@/lib/soundEngine';
 
-const STORAGE_KEY = '@chipsociety_achievements_v2';
+const STORAGE_KEY = '@chipsociety_achievements_v3';
 
 interface PersistedState {
   unlockedIds: string[];
@@ -24,6 +24,7 @@ interface PersistedState {
   totalWins: number;
   winStreak: number;
   lastHandLost: boolean;
+  handCounts: Record<string, number>;
 }
 
 interface AchievementContextValue {
@@ -43,6 +44,8 @@ interface AchievementContextValue {
   claim: (id: string) => Promise<void>;
   totalWins: number;
   winStreak: number;
+  /** Per-hand win counts for progress tracking */
+  handCounts: Record<string, number>;
 }
 
 const AchievementContext = createContext<AchievementContextValue>({
@@ -57,6 +60,7 @@ const AchievementContext = createContext<AchievementContextValue>({
   claim: async () => {},
   totalWins: 0,
   winStreak: 0,
+  handCounts: {},
 });
 
 export function AchievementProvider({ children }: { children: React.ReactNode }) {
@@ -67,6 +71,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
   const [totalWins,   setTotalWins]   = useState(0);
   const [winStreak,   setWinStreak]   = useState(0);
   const [lastHandLost, setLastHandLost] = useState(false);
+  const [handCounts,  setHandCounts]  = useState<Record<string, number>>({});
   const [queue, setQueue] = useState<Achievement[]>([]);
   const [pendingUnlock, setPendingUnlock] = useState<Achievement | null>(null);
 
@@ -76,6 +81,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
   const totalWinsRef   = useRef(0);
   const winStreakRef   = useRef(0);
   const lastHandLostRef = useRef(false);
+  const handCountsRef  = useRef<Record<string, number>>({});
   const profileRef     = useRef(profile);
   profileRef.current   = profile;
   const loaded         = useRef(false);
@@ -90,6 +96,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
           if (saved.claimedIds)    { const s = new Set(saved.claimedIds);    setClaimedIds(s);    claimedRef.current  = s; }
           if (typeof saved.totalWins  === 'number') { setTotalWins(saved.totalWins);   totalWinsRef.current  = saved.totalWins;   }
           if (typeof saved.winStreak  === 'number') { setWinStreak(saved.winStreak);   winStreakRef.current   = saved.winStreak;   }
+          if (saved.handCounts) { setHandCounts(saved.handCounts); handCountsRef.current = saved.handCounts; }
           // lastHandLost intentionally NOT restored — comeback must be earned within the same session
         } catch {}
       }
@@ -105,6 +112,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
       totalWins:    totalWinsRef.current,
       winStreak:    winStreakRef.current,
       lastHandLost: lastHandLostRef.current,
+      handCounts:   handCountsRef.current,
     };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).catch(() => {});
   }, []);
@@ -170,9 +178,18 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     lastHandLostRef.current = false;
     setLastHandLost(false);
 
-    // Hand type achievement
+    // Hand type achievement — count-based (10 wins required, except Royal Flush = 1)
     const handAchId = HAND_TO_ACHIEVEMENT[handDesc];
-    if (handAchId) unlock(handAchId);
+    if (handAchId && !unlockedRef.current.has(handAchId)) {
+      const ach = ACHIEVEMENT_MAP[handAchId];
+      const target = ach?.target ?? 10;
+      const prev = handCountsRef.current[handAchId] ?? 0;
+      const next = prev + 1;
+      const updated = { ...handCountsRef.current, [handAchId]: next };
+      handCountsRef.current = updated;
+      setHandCounts(updated);
+      if (next >= target) unlock(handAchId);
+    }
 
     // Win count milestones
     if (newTotal === 1)    unlock('first_win');
@@ -239,6 +256,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
       claim,
       totalWins,
       winStreak,
+      handCounts,
     }}>
       {children}
     </AchievementContext.Provider>

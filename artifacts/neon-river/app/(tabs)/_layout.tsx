@@ -1,16 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { BlurView } from 'expo-blur';
 import React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
-import { BlurView } from 'expo-blur';
-import colors from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
+import { useTheme } from '@/context/ThemeContext';
 import { useSocial } from '@/context/SocialContext';
 
 function TabBarBg() {
+  const { isDark } = useTheme();
+  const colors = useColors();
   if (Platform.OS === 'ios') {
-    return <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />;
+    return <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />;
   }
-  return <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,0,16,0.97)' }]} />;
+  return (
+    <View style={[
+      StyleSheet.absoluteFill,
+      { backgroundColor: isDark ? 'rgba(5,0,16,0.97)' : 'rgba(242,237,255,0.97)' },
+    ]} />
+  );
 }
 
 function FeedTabIcon({ color, size }: { color: string; size: number }) {
@@ -35,6 +43,8 @@ function FeedTabIcon({ color, size }: { color: string; size: number }) {
 }
 
 export default function TabLayout() {
+  const colors = useColors();
+
   return (
     <Tabs
       screenOptions={{
@@ -78,7 +88,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* Feed is now a primary tab — social feed is a core feature */}
       <Tabs.Screen
         name="feed"
         options={{
@@ -95,7 +104,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* Tournaments accessible from Home screen tournament section */}
       <Tabs.Screen
         name="tournaments"
         options={{ href: null }}

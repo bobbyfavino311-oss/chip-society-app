@@ -1,0 +1,347 @@
+CHIP SOCIETY — GLOBAL NOTIFICATION SYSTEM BUILD
+HOME SCREEN BELL + PLAYER ALERT CENTER
+==============================================================
+
+Build a complete notification system for Chip Society.
+
+The current home screen has a social icon in the top-left corner.
+
+Replace that top-left social icon with a notification bell.
+
+The notification bell should become the player’s main alert center for everything important happening in the app.
+
+==============================================================
+1. HOME SCREEN BELL PLACEMENT
+==============================================================
+
+Replace the current top-left social icon with:
+
+NOTIFICATION BELL ICON
+
+Placement:
+- top-left corner of main home screen
+- safe-area aware
+- visible immediately when opening app
+
+The bell should:
+- match the Chip Society visual style
+- use neon cyan / purple accents
+- glow subtly when notifications exist
+- show a badge count for unread notifications
+
+Example:
+Bell icon with red badge:
+3
+
+==============================================================
+2. NOTIFICATION CENTER
+==============================================================
+
+When player taps the bell:
+
+Open a full notification center panel.
+
+The panel should show:
+- unread notifications
+- recent notifications
+- categorized alerts
+- timestamps
+- action buttons
+
+Notification center should feel:
+- clean
+- premium
+- readable
+- modern
+- App Store quality
+
+==============================================================
+3. NOTIFICATION TYPES
+==============================================================
+
+Add notifications for:
+
+TOURNAMENTS:
+- tournament starting soon
+- registered tournament ready
+- tournament results posted
+- new tournament available
+- tournament prize paid
+- tournament registration closing soon
+
+FOLLOWERS / SOCIAL:
+- new follower
+- post liked
+- post commented on
+- player mentioned you
+- your hand post is trending
+- someone followed back
+- friend/private table invite
+
+REWARDS:
+- daily spin ready
+- daily streak reward ready
+- achievement reward ready to claim
+- XP level reward ready
+- scratch ticket won from wheel
+- store bonus available
+
+GAMEPLAY:
+- private table invite
+- friend joined a table
+- ranked reward available
+- leaderboard placement update
+- bankroll milestone reached
+
+SYSTEM:
+- profile update reminder
+- account verification reminder
+- new avatar unlocked
+- new feature available
+- app update notice
+
+==============================================================
+4. NOTIFICATION CARD DESIGN
+==============================================================
+
+Each notification card should include:
+
+- icon
+- title
+- short message
+- timestamp
+- unread indicator
+- action button if needed
+
+Examples:
+
+Daily Spin Ready
+Your free spin is ready.
+[SPIN NOW]
+
+New Follower
+VegasMirage followed you.
+[VIEW PROFILE]
+
+Tournament Starting
+Midnight Turbo starts in 10 minutes.
+[JOIN]
+
+Achievement Ready
+Full House achievement completed.
+[CLAIM]
+
+==============================================================
+5. BADGE COUNT LOGIC
+==============================================================
+
+The home screen bell should show:
+- unread count
+- maximum display 99+
+
+Unread count should update when:
+- new notification arrives
+- player opens notification center
+- player marks notifications as read
+- player performs notification action
+
+==============================================================
+6. NOTIFICATION ACTIONS
+==============================================================
+
+Notifications should be actionable.
+
+Examples:
+
+Daily Spin Ready:
+tap opens Daily Spin
+
+Daily Streak Ready:
+tap opens Daily Rewards
+
+Tournament Available:
+tap opens Tournament Lobby
+
+Tournament Starting:
+tap opens registered tournament
+
+New Follower:
+tap opens follower profile
+
+Post Liked:
+tap opens social post
+
+Achievement Ready:
+tap opens achievements screen
+
+Avatar Unlocked:
+tap opens avatar selection
+
+==============================================================
+7. CATEGORIES / FILTERS
+==============================================================
+
+Inside notification center add tabs:
+
+- All
+- Rewards
+- Social
+- Tournaments
+- System
+
+Tabs should:
+- be horizontally scrollable
+- have clear active state
+- use readable contrast in light/dark mode
+- match neon casino style
+
+==============================================================
+8. RETURNING PLAYER ALERTS
+==============================================================
+
+When player opens the app after being away:
+
+Generate notifications for important things they missed.
+
+Examples:
+
+- Daily spin is ready
+- Daily streak prize is ready
+- New tournaments are available
+- You gained followers
+- Someone liked your post
+- Achievement reward is ready
+- New avatar unlocked
+- Your tournament finished
+- Store bonus is available
+
+This should make the app feel alive when returning.
+
+==============================================================
+9. LOCAL NOTIFICATIONS / PUSH READY STRUCTURE
+==============================================================
+
+For beta:
+Use local in-app notifications.
+
+Prepare architecture for future push notifications.
+
+Notification data should include:
+
+- notificationId
+- userId
+- type
+- title
+- message
+- createdAt
+- readStatus
+- actionTarget
+- actionPayload
+- priority
+
+==============================================================
+10. NOTIFICATION PRIORITY
+==============================================================
+
+Add priority levels:
+
+HIGH:
+- tournament starting soon
+- reward ready
+- account/security notices
+
+MEDIUM:
+- social interactions
+- new follower
+- achievement ready
+
+LOW:
+- store bonus
+- new avatar preview
+- general updates
+
+High priority notifications should appear higher in the list.
+
+==============================================================
+11. READ / CLEAR SYSTEM
+==============================================================
+
+Add:
+
+- mark all as read
+- clear notification
+- clear all read
+- unread filter
+
+Do NOT delete important active notifications until completed.
+
+Example:
+Daily Spin Ready should disappear only after spin is used.
+
+==============================================================
+12. VISUAL DESIGN
+==============================================================
+
+The notification system should match Chip Society:
+
+- dark purple cards
+- neon cyan highlights
+- pink accent glow
+- gold reward icons
+- clean readable typography
+- smooth slide-in animation
+
+In light mode:
+- all text must remain readable
+- cards must use proper contrast
+- no washed-out transparency
+
+==============================================================
+13. SOCIAL ICON RELOCATION
+==============================================================
+
+Since the top-left home icon becomes notifications:
+
+Make sure Social Feed is still easy to access.
+
+Social Feed should remain available through:
+- bottom navigation Feed tab
+- tutorial
+- notification actions
+- profile/social links
+
+Do NOT remove the Feed tab.
+
+==============================================================
+14. FINAL ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete, confirm:
+
+1. Top-left home icon is now notification bell.
+2. Bell shows unread badge.
+3. Tapping bell opens notification center.
+4. Daily spin ready notification works.
+5. Daily streak ready notification works.
+6. Tournament notifications work.
+7. Follower notifications work.
+8. Social interaction notifications work.
+9. Achievement claim notifications work.
+10. Notifications open correct destination.
+11. Read/unread state works.
+12. Light mode remains readable.
+13. Feed tab still exists in bottom navigation.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+The notification system should make Chip Society feel alive when players return.
+
+Players should immediately know:
+- what rewards are ready
+- what tournaments are active
+- who interacted with them
+- what they should do next
+
+This system should feel like a polished social poker app, not a static poker game.

@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import colors from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
+import { useTheme } from '@/context/ThemeContext';
+import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { GuestBanner, GuestLockOverlay } from '@/components/GuestBanner';
 
@@ -24,6 +26,51 @@ const TABLE_STAKES = [
   { id: 'highroller', name: 'HIGH ROLLER', blinds: '2,500 / 5,000',  minChips: 250_000,     minChipsLabel: '250K',  color: '#ff8800' },
   { id: 'elite',      name: 'ELITE NEON',  blinds: '25K / 50K',      minChips: 2_500_000,   minChipsLabel: '2.5M',  color: '#ff0090' },
 ];
+
+function createStyles(c: Colors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: c.background },
+    scroll: { paddingHorizontal: 16, gap: 12 },
+    pageTitle: { color: c.text, fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
+    pageSub: { color: c.textMuted, fontSize: 13, marginTop: -6 },
+    quickPlayBtn: {
+      borderRadius: 16, overflow: 'hidden',
+      flexDirection: 'row', alignItems: 'center',
+      paddingVertical: 18, paddingHorizontal: 18,
+    },
+    quickPlayTitle: { color: '#050010', fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+    quickPlaySub: { color: 'rgba(5,0,16,0.55)', fontSize: 10, marginTop: 2 },
+    readyBadge: { backgroundColor: 'rgba(5,0,16,0.18)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+    readyText: { color: '#050010', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+    sectionTitle: { color: c.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular', marginBottom: -4 },
+    modeCard: {
+      borderRadius: 14, borderWidth: 1, backgroundColor: c.surface,
+      flexDirection: 'row', alignItems: 'center',
+      paddingVertical: 14, paddingRight: 14,
+      overflow: 'hidden', gap: 12,
+    },
+    accentBar: { width: 3, height: '100%', borderRadius: 2, marginLeft: 0, alignSelf: 'stretch' },
+    modeIconWrap: { width: 46, height: 46, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+    modeContent: { flex: 1, gap: 3 },
+    modeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    modeTitle: { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+    modeBadge: { borderRadius: 4, borderWidth: 1, paddingHorizontal: 5, paddingVertical: 1 },
+    modeBadgeText: { fontSize: 7, fontWeight: '900', letterSpacing: 1 },
+    modeDesc: { color: c.textMuted, fontSize: 10, lineHeight: 14 },
+    modeStatRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
+    statDot: { width: 5, height: 5, borderRadius: 2.5 },
+    modeStat: { fontSize: 10 },
+    stakesGrid: { gap: 8 },
+    stakeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 11, overflow: 'hidden', position: 'relative', backgroundColor: c.surface },
+    stakeDot: { width: 8, height: 8, borderRadius: 4 },
+    stakeName: { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+    stakeBlinds: { color: c.textMuted, fontSize: 10, marginTop: 1 },
+    stakeRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    stakeMin: { color: c.textDim, fontSize: 10 },
+    infoCard: { borderRadius: 12, borderWidth: 1, borderColor: c.primaryDim, padding: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 10, overflow: 'hidden', backgroundColor: c.surface },
+    infoText: { color: c.textMuted, fontSize: 11, lineHeight: 17, flex: 1 },
+  });
+}
 
 // ─── Live mode card ────────────────────────────────────────────────────────────
 interface LiveModeCardProps {
@@ -38,6 +85,8 @@ interface LiveModeCardProps {
 }
 
 function LiveModeCard({ icon, title, description, color, stat, statIcon, badge, onPress }: LiveModeCardProps) {
+  const colors = useColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const scale = useRef(new Animated.Value(1)).current;
   const pressIn  = () => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true }).start();
   const pressOut = () => Animated.spring(scale, { toValue: 1,    useNativeDriver: true }).start();
@@ -54,15 +103,10 @@ function LiveModeCard({ icon, title, description, color, stat, statIcon, badge, 
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         />
-        {/* Left color accent bar */}
         <View style={[styles.accentBar, { backgroundColor: color }]} />
-
-        {/* Icon */}
         <View style={[styles.modeIconWrap, { backgroundColor: `${color}20`, borderColor: `${color}40` }]}>
           <Ionicons name={icon} size={24} color={color} />
         </View>
-
-        {/* Content */}
         <View style={styles.modeContent}>
           <View style={styles.modeTitleRow}>
             <Text style={[styles.modeTitle, { color }]}>{title}</Text>
@@ -79,8 +123,6 @@ function LiveModeCard({ icon, title, description, color, stat, statIcon, badge, 
             <Text style={[styles.modeStat, { color: `${color}cc` }]}>{stat}</Text>
           </View>
         </View>
-
-        {/* Arrow */}
         <Ionicons name="chevron-forward" size={18} color={`${color}88`} />
       </TouchableOpacity>
     </Animated.View>
@@ -91,6 +133,9 @@ function LiveModeCard({ icon, title, description, color, stat, statIcon, badge, 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
+  const colors = useColors();
+  const { isDark } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [guestLockFeature, setGuestLockFeature] = React.useState<string | null>(null);
 
   const onlinePlayers = useMemo(() => {
@@ -103,20 +148,22 @@ export default function PlayScreen() {
   const rankLabel = profile.rank;
   const rp = profile.rankedPoints;
 
+  const bgGradient = isDark
+    ? ([colors.background, '#0a001e', colors.background] as const)
+    : ([colors.background, colors.surfaceElevated, colors.background] as const);
+
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[colors.background, '#0a001e', colors.background]}
+        colors={bgGradient}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
 
-      {/* Guest banner */}
       {profile.isGuest && (
         <GuestBanner message="Guest mode — create a free account to unlock Ranked, Tournaments & cloud saves" />
       )}
 
-      {/* Guest lock overlay */}
       {guestLockFeature && (
         <GuestLockOverlay feature={guestLockFeature} onDismiss={() => setGuestLockFeature(null)} />
       )}
@@ -131,7 +178,6 @@ export default function PlayScreen() {
         <Text style={styles.pageTitle}>SELECT MODE</Text>
         <Text style={styles.pageSub}>Choose how you want to play</Text>
 
-        {/* AI Practice — primary CTA */}
         <TouchableOpacity
           style={styles.quickPlayBtn}
           onPress={() => router.push('/game/practice')}
@@ -153,7 +199,6 @@ export default function PlayScreen() {
           <Ionicons name="chevron-forward" size={20} color="#050010" style={{ marginLeft: 8 }} />
         </TouchableOpacity>
 
-        {/* Live modes */}
         <Text style={styles.sectionTitle}>LIVE MODES</Text>
 
         <LiveModeCard
@@ -194,7 +239,6 @@ export default function PlayScreen() {
           onPress={() => profile.isGuest ? setGuestLockFeature('Private Tables') : router.push('/modes/private')}
         />
 
-        {/* Table stakes */}
         <Text style={styles.sectionTitle}>TABLE STAKES</Text>
         <View style={styles.stakesGrid}>
           {TABLE_STAKES.map(t => {
@@ -227,9 +271,8 @@ export default function PlayScreen() {
           })}
         </View>
 
-        {/* Info */}
         <View style={styles.infoCard}>
-          <LinearGradient colors={['rgba(0,212,255,0.05)', 'transparent']} style={StyleSheet.absoluteFill} />
+          <LinearGradient colors={[colors.primaryDim, 'transparent']} style={StyleSheet.absoluteFill} />
           <Ionicons name="information-circle-outline" size={16} color={colors.primary} />
           <Text style={styles.infoText}>
             AI Practice is always available offline. Live modes connect you to tables with real players and intelligent AI bots.
@@ -239,49 +282,3 @@ export default function PlayScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { paddingHorizontal: 16, gap: 12 },
-  pageTitle: { color: colors.text, fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
-  pageSub: { color: colors.textMuted, fontSize: 13, marginTop: -6 },
-  quickPlayBtn: {
-    borderRadius: 16, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 18, paddingHorizontal: 18,
-  },
-  quickPlayTitle: { color: '#050010', fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-  quickPlaySub: { color: 'rgba(5,0,16,0.55)', fontSize: 10, marginTop: 2 },
-  readyBadge: { backgroundColor: 'rgba(5,0,16,0.18)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  readyText: { color: '#050010', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
-  sectionTitle: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular', marginBottom: -4 },
-  // Live mode cards
-  modeCard: {
-    borderRadius: 14, borderWidth: 1,
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 14, paddingRight: 14,
-    overflow: 'hidden', gap: 12,
-  },
-  accentBar: { width: 3, height: '100%', borderRadius: 2, marginLeft: 0, alignSelf: 'stretch' },
-  modeIconWrap: { width: 46, height: 46, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  modeContent: { flex: 1, gap: 3 },
-  modeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  modeTitle: { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
-  modeBadge: { borderRadius: 4, borderWidth: 1, paddingHorizontal: 5, paddingVertical: 1 },
-  modeBadgeText: { fontSize: 7, fontWeight: '900', letterSpacing: 1 },
-  modeDesc: { color: colors.textMuted, fontSize: 10, lineHeight: 14 },
-  modeStatRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
-  statDot: { width: 5, height: 5, borderRadius: 2.5 },
-  modeStat: { fontSize: 10 },
-  // Table stakes
-  stakesGrid: { gap: 8 },
-  stakeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 11, overflow: 'hidden', position: 'relative' },
-  stakeDot: { width: 8, height: 8, borderRadius: 4 },
-  stakeName: { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
-  stakeBlinds: { color: colors.textMuted, fontSize: 10, marginTop: 1 },
-  stakeRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  stakeMin: { color: colors.textDim, fontSize: 10 },
-  // Info card
-  infoCard: { borderRadius: 12, borderWidth: 1, borderColor: colors.primaryDim, padding: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 10, overflow: 'hidden' },
-  infoText: { color: colors.textMuted, fontSize: 11, lineHeight: 17, flex: 1 },
-});

@@ -47,7 +47,8 @@ export interface UserProfile {
   handsPlayed: number;
   avatarIndex: number;
   avatarUri?: string;
-  profileImageType?: 'character' | 'custom';
+  profileImageType?: 'character' | 'custom' | 'symbol';
+  symbolIndex?: number;
   lastDailyReward: string | null;
   lastHourlyBonus: string | null;
   streakDays: number;
@@ -62,6 +63,11 @@ export interface UserProfile {
   lastFreeScratch: string | null;
   createdAt: string;
   tutorialCompleted: boolean;
+  // Tournament stats
+  tournamentWins: number;
+  tournamentLosses: number;
+  bestTournamentFinish: number;
+  biggestTournamentPrize: number;
 }
 
 // Stored account record (for sign-in lookup)
@@ -85,6 +91,7 @@ const DEFAULT_PROFILE: UserProfile = {
   handsPlayed: 0,
   avatarIndex: 0,
   profileImageType: 'character' as const,
+  symbolIndex: 0,
   lastDailyReward: null,
   lastHourlyBonus: null,
   streakDays: 0,
@@ -99,6 +106,10 @@ const DEFAULT_PROFILE: UserProfile = {
   lastFreeScratch: null,
   createdAt: new Date().toISOString(),
   tutorialCompleted: false,
+  tournamentWins: 0,
+  tournamentLosses: 0,
+  bestTournamentFinish: 0,
+  biggestTournamentPrize: 0,
 };
 
 function getRankFromXP(xp: number): Rank {
@@ -120,6 +131,7 @@ interface UserContextValue {
   removeChips: (amount: number) => Promise<void>;
   recordWin: (chipsWon: number) => Promise<void>;
   recordLoss: () => Promise<void>;
+  recordTournamentResult: (placement: number, prizeWon: number, isWin: boolean) => Promise<void>;
   claimDailyReward: () => Promise<number>;
   claimHourlyBonus: () => Promise<number>;
   claimComebackBonus: () => Promise<number>;
@@ -143,6 +155,7 @@ interface UserContextValue {
   canClaimHourly: boolean;
   nextHourlyIn: number;
   dailyRewardAmount: number;
+  nextDailyIn: number;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -211,6 +224,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             createdAt: saved.createdAt ?? new Date().toISOString(),
             tutorialCompleted: saved.tutorialCompleted ?? false,
             profileImageType: saved.profileImageType ?? (saved.avatarUri ? 'custom' : 'character'),
+            symbolIndex: saved.symbolIndex ?? 0,
+            tournamentWins: saved.tournamentWins ?? 0,
+            tournamentLosses: saved.tournamentLosses ?? 0,
+            bestTournamentFinish: saved.bestTournamentFinish ?? 0,
+            biggestTournamentPrize: saved.biggestTournamentPrize ?? 0,
           }));
         } catch {}
       }
@@ -268,6 +286,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const next = { ...prev, losses: prev.losses + 1, handsPlayed: prev.handsPlayed + 1, xp: prev.xp + 10 };
       next.rank  = getRankFromXP(next.xp);
       next.level = getLevelFromXP(next.xp);
+      save(next);
+      return next;
+    });
+  }, [save]);
+
+  const recordTournamentResult = useCallback(async (placement: number, prizeWon: number, isWin: boolean) => {
+    setProfile(prev => {
+      const next = {
+        ...prev,
+        tournamentWins:   isWin ? prev.tournamentWins + 1 : prev.tournamentWins,
+        tournamentLosses: !isWin ? prev.tournamentLosses + 1 : prev.tournamentLosses,
+        bestTournamentFinish: prev.bestTournamentFinish === 0
+          ? placement
+          : Math.min(prev.bestTournamentFinish, placement),
+        biggestTournamentPrize: Math.max(prev.biggestTournamentPrize, prizeWon),
+      };
       save(next);
       return next;
     });
@@ -398,7 +432,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const found = accounts.find(a => a.username.toLowerCase() === username.toLowerCase());
     if (!found) return { success: false, error: 'No account found with that username.' };
 
-    // Load saved profile but keep stored data
     const restored: UserProfile = { ...found.profile, isNewUser: false };
     setProfile(restored);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
@@ -443,14 +476,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const dailyRewardAmount = DAILY_REWARDS[Math.min(nextStreakDay, 7)] ?? DEFAULT_DAILY_REWARD;
   const winRate = profile.handsPlayed > 0 ? Math.round((profile.wins / profile.handsPlayed) * 100) : 0;
 
+  // Seconds until midnight (when daily resets)
+  const nextDailyIn = (() => {
+    if (canClaimDaily) return 0;
+    const n = new Date();
+    const midnight = new Date(n);
+    midnight.setHours(24, 0, 0, 0);
+    return Math.max(0, Math.ceil((midnight.getTime() - n.getTime()) / 1000));
+  })();
+
   return (
     <UserContext.Provider value={{
       profile, updateProfile, addChips, removeChips, recordWin, recordLoss,
+      recordTournamentResult,
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
       awardRankedPoints, claimWheelSpin, useScratchTicket, addScratchTickets,
       completeTutorial, loginAsGuest, registerAccount, signIn, signOut, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
-      canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount,
+      canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,
     }}>
       {children}
     </UserContext.Provider>

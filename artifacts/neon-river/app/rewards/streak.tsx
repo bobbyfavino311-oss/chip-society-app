@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Animated,
   Platform,
@@ -27,14 +27,44 @@ const STREAK_REWARDS = [
   { day: 7, chips: 35_000, label: '35K', color: '#ffd700', special: true },
 ];
 
+function formatCountdown(totalSeconds: number): string {
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return [
+    String(h).padStart(2, '0'),
+    String(m).padStart(2, '0'),
+    String(s).padStart(2, '0'),
+  ].join(':');
+}
+
 export default function StreakScreen() {
   const insets = useSafeAreaInsets();
   const { profile, canClaimDaily, claimDailyReward, dailyRewardAmount } = useUser();
   const [claiming, setClaiming] = useState(false);
   const [justClaimed, setJustClaimed] = useState(false);
   const [claimedAmount, setClaimedAmount] = useState(0);
+  const [countdown, setCountdown] = useState('');
   const claimScale = useRef(new Animated.Value(1)).current;
   const resultAnim = useRef(new Animated.Value(0)).current;
+
+  // Live 24h countdown until midnight (when daily resets)
+  useEffect(() => {
+    if (canClaimDaily) {
+      setCountdown('');
+      return;
+    }
+    const tick = () => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      const secs = Math.max(0, Math.floor((midnight.getTime() - now.getTime()) / 1000));
+      setCountdown(formatCountdown(secs));
+    };
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  }, [canClaimDaily]);
 
   const yesterday = new Date(Date.now() - 86_400_000).toDateString();
   const isOnStreak = profile.lastDailyReward === yesterday;
@@ -164,10 +194,12 @@ export default function StreakScreen() {
             />
             <View>
               <Text style={[st.claimBtnTitle, { color: canClaimDaily ? '#050010' : colors.textMuted }]}>
-                {canClaimDaily ? 'CLAIM TODAY\'S REWARD' : 'COME BACK TOMORROW'}
+                {canClaimDaily ? "CLAIM TODAY'S REWARD" : 'NEXT REWARD IN'}
               </Text>
-              {canClaimDaily && (
+              {canClaimDaily ? (
                 <Text style={st.claimBtnSub}>+{formatChips(dailyRewardAmount)} chips · Day {nextDay} bonus</Text>
+              ) : (
+                <Text style={st.claimBtnCountdown}>{countdown}</Text>
               )}
             </View>
           </TouchableOpacity>
@@ -178,7 +210,7 @@ export default function StreakScreen() {
           {[
             { label: 'CURRENT STREAK', value: `${profile.streakDays} days`, icon: '🔥' },
             { label: 'CHIPS TODAY', value: formatChips(dailyRewardAmount), icon: '💎' },
-            { label: 'NEXT RESET', value: canClaimDaily ? 'Now!' : 'Tomorrow', icon: '⏱' },
+            { label: 'RESETS IN', value: canClaimDaily ? 'Now!' : countdown || '--:--:--', icon: '⏱' },
           ].map(s => (
             <View key={s.label} style={st.statCard}>
               <LinearGradient colors={['rgba(255,215,0,0.06)', 'transparent']} style={StyleSheet.absoluteFill} />
@@ -229,13 +261,14 @@ const st = StyleSheet.create({
   claimResultEmoji: { fontSize: 40 },
   claimResultTitle: { color: '#ffd700', fontSize: 20, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
   claimResultAmount: { color: colors.success, fontSize: 22, fontWeight: '900', fontFamily: 'Inter_700Bold' },
-  claimBtn: { height: 60, borderRadius: 16, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, borderWidth: 1 },
+  claimBtn: { height: 66, borderRadius: 16, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, borderWidth: 1 },
   claimBtnTitle: { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
   claimBtnSub: { color: 'rgba(5,0,16,0.6)', fontSize: 10, marginTop: 1 },
+  claimBtnCountdown: { fontSize: 18, fontWeight: '900', fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.5)', marginTop: 1, letterSpacing: 2 },
   statsRow: { flexDirection: 'row', gap: 10 },
   statCard: { flex: 1, borderRadius: 12, borderWidth: 1, borderColor: colors.border, padding: 12, alignItems: 'center', gap: 3, overflow: 'hidden' },
   statIcon: { fontSize: 20 },
-  statValue: { color: colors.text, fontSize: 13, fontWeight: '800' },
+  statValue: { color: colors.text, fontSize: 11, fontWeight: '800', fontFamily: 'Inter_700Bold', textAlign: 'center' },
   statLabel: { color: colors.textDim, fontSize: 8, letterSpacing: 1, textAlign: 'center' },
   vipHint: { flexDirection: 'row', gap: 10, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,0,144,0.25)', padding: 14, alignItems: 'flex-start', overflow: 'hidden' },
   vipHintText: { color: colors.textMuted, fontSize: 11, lineHeight: 17, flex: 1 },

@@ -1,0 +1,268 @@
+CHIP SOCIETY — LIGHT MODE / DARK MODE THEME SYSTEM FIX
+GLOBAL READABILITY PATCH
+==============================================================
+
+The current light mode version of the app is broken visually.
+
+Major issue:
+Some text and UI elements become unreadable because dark-mode colors are being used on light backgrounds.
+
+This needs to be fixed globally across the entire app.
+
+IMPORTANT:
+This theme fix should apply to every screen EXCEPT live table gameplay.
+
+Live table gameplay should keep its current dark casino table style.
+
+==============================================================
+1. CURRENT LIGHT MODE PROBLEMS
+==============================================================
+
+The light mode currently has:
+
+- white text on pale backgrounds
+- low contrast labels
+- invisible section headers
+- unreadable card text
+- transparent gray overlays that wash out text
+- bottom navigation readability problems
+- feed category tabs with weak contrast
+- profile stats with poor color balance
+- tournament cards that clash with the background
+- daily spin / streak cards that fade into the page
+
+This makes the app feel unfinished and hard to use.
+
+==============================================================
+2. REQUIRED THEME SYSTEM
+==============================================================
+
+Build a proper theme system with two modes:
+
+DARK MODE:
+- current neon casino dark theme
+
+LIGHT MODE:
+- inverted clean casino light theme
+
+The theme system must use shared design tokens instead of hardcoded colors.
+
+Create global theme variables for:
+
+- background
+- surface
+- cardBackground
+- textPrimary
+- textSecondary
+- textMuted
+- border
+- accentCyan
+- accentPink
+- accentPurple
+- success
+- warning
+- danger
+- navBackground
+- tabActive
+- tabInactive
+
+==============================================================
+3. LIGHT MODE DESIGN DIRECTION
+==============================================================
+
+Light mode should NOT simply turn the background white.
+
+It should feel like:
+- premium frosted casino glass
+- soft lavender luxury UI
+- clean neon mobile interface
+- readable modern social app
+
+Use:
+
+BACKGROUND:
+soft lavender / off-white
+
+CARDS:
+deep purple or frosted white surfaces
+
+TEXT:
+dark navy / deep purple for primary text
+
+ACCENTS:
+cyan, pink, purple, gold
+
+BORDERS:
+soft purple / cyan outlines
+
+==============================================================
+4. READABILITY RULES
+==============================================================
+
+Every screen must pass readability rules:
+
+- dark text on light backgrounds
+- light text on dark cards
+- no washed-out transparency
+- no white text on pale lavender
+- no gray text below readable contrast
+- no icons disappearing into background
+
+All UI must remain readable at normal phone brightness.
+
+==============================================================
+5. APPLY TO ALL NON-GAMEPLAY SCREENS
+==============================================================
+
+Apply the theme fix to:
+
+- home screen
+- profile screen
+- feed screen
+- store
+- tournaments lobby
+- achievements
+- avatar selection
+- daily rewards
+- daily spin
+- scratch tickets
+- settings
+- login screen
+- onboarding
+- popups / modals
+- bottom navigation
+
+DO NOT apply this to:
+
+- live poker table gameplay
+
+The poker table should remain dark and immersive.
+
+==============================================================
+6. HOME SCREEN FIXES
+==============================================================
+
+Fix home screen readability:
+
+- Daily Spin card text must be visible
+- Streak card text must be visible
+- section headers must use darker text
+- trending cards must maintain strong contrast
+- tournament cards must remain readable
+- bottom navigation labels must be visible
+
+The home screen should feel bright but still premium.
+
+==============================================================
+7. PROFILE SCREEN FIXES
+==============================================================
+
+Fix profile screen:
+
+- username must be readable
+- XP text must be readable
+- stat labels must be readable
+- chip balance must not disappear behind nav bar
+- achievement count must be visible
+- profile cards must contrast correctly
+
+Dark cards on light background are acceptable as long as text is readable.
+
+==============================================================
+8. SOCIAL FEED FIXES
+==============================================================
+
+Fix feed screen:
+
+- top ticker bar must not use unreadable gray transparency
+- category tabs must have clear active / inactive states
+- post cards must be readable
+- usernames must stand out
+- post text must have correct contrast
+- follow buttons must remain visible
+- bottom nav must not cover post content
+
+Social feed should feel clean and premium in light mode.
+
+==============================================================
+9. BOTTOM NAVIGATION FIX
+==============================================================
+
+Bottom navigation currently blocks and darkens content.
+
+Fix:
+
+- add proper safe-area padding
+- ensure scroll content ends above nav
+- bottom nav background should adapt to theme
+- active tab should glow clearly
+- inactive tabs should remain readable
+- no text should hide underneath nav
+
+==============================================================
+10. MODAL + CARD TRANSPARENCY FIX
+==============================================================
+
+Current transparency makes some UI unreadable.
+
+Fix:
+
+- reduce excessive opacity
+- avoid pale text on translucent cards
+- use solid readable surfaces when needed
+- add blur only if contrast remains strong
+
+==============================================================
+11. THEME TOGGLE BEHAVIOR
+==============================================================
+
+If user switches theme:
+
+- update instantly
+- animate smoothly
+- preserve screen state
+- save preference permanently
+
+Use smooth fade transition:
+200–300ms.
+
+==============================================================
+12. TABLE GAMEPLAY EXCEPTION
+==============================================================
+
+Live poker table gameplay should remain dark mode always.
+
+Reason:
+Poker table needs immersive casino lighting and consistent card visibility.
+
+Even if user has light mode enabled:
+table gameplay should use dark table theme.
+
+Only surrounding non-gameplay screens should change.
+
+==============================================================
+13. FINAL ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete, verify:
+
+1. Every light mode screen is readable.
+2. No white text appears on pale backgrounds.
+3. No gray text disappears.
+4. Bottom nav does not cover content.
+5. Profile chip balance is visible.
+6. Feed tabs are readable.
+7. Tournament cards are readable.
+8. Daily spin and streak text are visible.
+9. Modals are readable.
+10. Table gameplay remains dark.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+Light mode should feel intentional, premium, and polished.
+
+It should NOT feel like dark mode colors pasted onto a white background.
+
+The final theme system should feel App Store ready across the entire app.
