@@ -24,6 +24,8 @@ import {
   AVATAR_SYMBOLS, AVATAR_COLORS, getLeaderboard,
   type SocialPost, type PostTag,
 } from '@/lib/socialData';
+import AvatarFrame from '@/components/AvatarFrame';
+import { getAvatar } from '@/constants/premiumAvatars';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -259,11 +261,15 @@ function PostCard({ post }: { post: SocialPost }) {
           style={cd.avatarWrap}
           onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}
         >
-          <View style={[cd.avatar, { borderColor: player?.avatarColor ?? colors.primary }]}>
-            <Text style={[cd.avatarText, { color: player?.avatarColor ?? colors.primary }]}>
-              {player?.avatar ?? '♠'}
-            </Text>
-          </View>
+          {player?.avatarId != null ? (
+            <AvatarFrame avatar={getAvatar(player.avatarId)} size={44} />
+          ) : (
+            <View style={[cd.avatar, { borderColor: player?.avatarColor ?? colors.primary }]}>
+              <Text style={[cd.avatarText, { color: player?.avatarColor ?? colors.primary }]}>
+                {player?.avatar ?? '♠'}
+              </Text>
+            </View>
+          )}
           {player?.status === 'online' && <View style={cd.onlineDot} />}
           {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
         </TouchableOpacity>

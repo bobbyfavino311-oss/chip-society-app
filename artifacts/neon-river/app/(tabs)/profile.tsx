@@ -19,7 +19,8 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
-import { CASINO_AVATARS, getAvatar } from '@/components/CasinoAvatars';
+import { getAvatar } from '@/constants/premiumAvatars';
+import AvatarFrame from '@/components/AvatarFrame';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
 import { useSocial } from '@/context/SocialContext';
@@ -224,7 +225,6 @@ export default function ProfileScreen() {
   const socialFollowingCount = following.size;
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.username);
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   const claimedCount = achievementCompletion(unlockedIds);
@@ -279,18 +279,19 @@ export default function ProfileScreen() {
         <View style={styles.avatarSection}>
           <View style={{ position: 'relative' }}>
             <TouchableOpacity
-              style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}
-              onPress={() => setShowAvatarPicker(p => !p)}
-              activeOpacity={0.8}
+              onPress={() => router.push('/profile/avatar-select')}
+              activeOpacity={0.85}
             >
               {profile.avatarUri ? (
-                <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
+                <View style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}>
+                  <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
+                </View>
               ) : (
-                getAvatar(profile.avatarIndex).render(82)
+                <AvatarFrame avatar={getAvatar(profile.avatarIndex)} size={90} isEquipped />
               )}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cameraOverlay} onPress={pickAvatar}>
-              <Ionicons name="camera" size={14} color={colors.background} />
+            <TouchableOpacity style={styles.changeAvatarBtn} onPress={() => router.push('/profile/avatar-select')}>
+              <Ionicons name="color-palette" size={13} color="#050010" />
             </TouchableOpacity>
           </View>
 
@@ -320,41 +321,6 @@ export default function ProfileScreen() {
             <Text style={[styles.rankText, { color: rankColor }]}>{profile.rank}</Text>
           </View>
 
-          {/* Avatar picker grid */}
-          {showAvatarPicker && (
-            <View style={styles.avatarPickerWrap}>
-              <Text style={styles.avatarPickerTitle}>CHOOSE AVATAR</Text>
-              <View style={styles.avatarGrid}>
-                {CASINO_AVATARS.map(av => {
-                  const isSelected = !profile.avatarUri && profile.avatarIndex === av.id;
-                  return (
-                    <TouchableOpacity
-                      key={av.id}
-                      style={[
-                        styles.avatarGridCell,
-                        isSelected && { borderColor: av.accentColor, shadowColor: av.accentColor, shadowOpacity: 0.7, shadowRadius: 8 },
-                      ]}
-                      onPress={async () => {
-                        await updateProfile({ avatarIndex: av.id, avatarUri: undefined });
-                        setShowAvatarPicker(false);
-                      }}
-                      activeOpacity={0.75}
-                    >
-                      {av.render(48)}
-                      {isSelected && (
-                        <View style={[styles.avatarGridCheck, { backgroundColor: av.accentColor }]}>
-                          <Ionicons name="checkmark" size={8} color="#050010" />
-                        </View>
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-              <TouchableOpacity style={styles.closePickerBtn} onPress={() => setShowAvatarPicker(false)}>
-                <Text style={styles.closePickerText}>DONE</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
 
         <View style={styles.card}>
@@ -735,56 +701,17 @@ const styles = StyleSheet.create({
     padding: 14,
     marginTop: 6,
   },
-  avatarPickerTitle: {
-    color: colors.textMuted,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 2,
-    fontFamily: 'Orbitron_400Regular',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  avatarGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    justifyContent: 'center',
-  },
-  avatarGridCell: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: colors.background,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  avatarGridCheck: {
+  changeAvatarBtn: {
     position: 'absolute',
-    bottom: 1,
-    right: 1,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    bottom: 0,
+    right: 0,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  closePickerBtn: {
-    marginTop: 12,
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  closePickerText: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 2,
-    fontFamily: 'Orbitron_400Regular',
+    borderWidth: 2,
+    borderColor: colors.background,
   },
 });

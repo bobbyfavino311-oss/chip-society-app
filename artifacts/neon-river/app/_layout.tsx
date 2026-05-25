@@ -106,6 +106,7 @@ function RootLayoutNav() {
         <Stack.Screen name="modes/tournament" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="modes/private"       options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="social/player-profile" options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen name="profile/avatar-select" options={{ headerShown: false, animation: 'slide_from_right' }} />
       </Stack>
     </>
   );

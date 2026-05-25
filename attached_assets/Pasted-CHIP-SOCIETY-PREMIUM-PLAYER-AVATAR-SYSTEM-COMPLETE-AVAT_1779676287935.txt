@@ -1,0 +1,235 @@
+CHIP SOCIETY — PREMIUM PLAYER AVATAR SYSTEM
+COMPLETE AVATAR SELECTION OVERHAUL
+==============================================================
+
+Create a massive premium avatar selection system for Chip Society that fits the game’s:
+- luxury poker atmosphere
+- neon Vegas aesthetic
+- social poker community vibe
+- retro-futuristic casino identity
+
+The avatars should feel:
+- stylish
+- collectible
+- high-end
+- social-media ready
+- unique
+- recognizable
+
+NOT:
+- cartoonish
+- childish
+- generic mobile game avatars
+- low-detail placeholders
+
+==============================================================
+1. AVATAR ART STYLE
+==============================================================
+
+Use a consistent visual style inspired by:
+- retro Vegas nightlife
+- cyberpunk casinos
+- luxury poker culture
+- neon Miami aesthetics
+- high-stakes underground poker rooms
+
+Visual direction:
+- neon blue/purple/pink highlights
+- chrome accents
+- luxury fashion
+- moody lighting
+- cinematic shadows
+- premium portrait composition
+
+Each avatar should feel:
+- iconic
+- memorable
+- premium
+- social-profile worthy
+
+==============================================================
+2. AVATAR CATEGORIES
+==============================================================
+
+Create avatars across multiple themes:
+
+- High Rollers
+- Poker Sharks
+- Casino Bosses
+- Neon Cyberpunk Players
+- Luxury VIP Characters
+- Underground Poker Legends
+- Retro 80s Gamblers
+- Modern Casino Influencers
+- Elite Bluff Masters
+- Vegas Nightlife Icons
+
+==============================================================
+3. 100 AVATAR CONCEPTS
+==============================================================
+
+Generate the following avatars as selectable player profile portraits:
+
+1. Neon Aviator
+2. High-Stakes CEO
+3. Miami Vice Dealer
+4. Cyber Poker King
+5. Velvet Suit Shark
+6. Midnight Gambler
+7. Luxury Casino Host
+8. Retro Card Hustler
+9. Neon Cowboy
+10. Diamond Syndicate Boss
+
+11. Silver Fox High Roller
+12. Underground Poker Pro
+13. Gold Chain Gambler
+14. Vegas Phantom
+15. Crimson Blazer Player
+16. Black Suit Assassin
+17. Royal Flush Gentleman
+18. Ocean Drive Millionaire
+19. Futuristic Casino Tycoon
+20. Chrome Jacket Card Shark
+
+21. Neon Samurai
+22. Cyberpunk Millionaire
+23. Poker Night Racer
+24. Sunset Boulevard Hustler
+25. Elite Tournament Grinder
+26. Luxury Yacht Gambler
+27. Midnight Lounge Owner
+28. Vintage Mob Boss
+29. Ice-Cold Bluff Master
+30. Retro Ferrari Driver
+
+31. Pink Neon Dealer
+32. Purple Smoke Gambler
+33. Holographic Card Master
+34. Diamond Ring High Roller
+35. All-In Maverick
+36. Shadow Syndicate Boss
+37. The River King
+38. Casino Penthouse VIP
+39. Jetsetter Poker Pro
+40. Neon Skyline Millionaire
+
+41. Gold Watch Shark
+42. Luxury Club Owner
+43. Modern Mafia Gambler
+44. Crypto Casino King
+45. Tokyo Heat Card Player
+46. Royal Velvet Gambler
+47. Billionaire Bluff Artist
+48. The Silent Caller
+49. Neon Mirage VIP
+50. Sunset Strip Hustler
+
+51. Chrome Shades Gambler
+52. Palm Beach Millionaire
+53. Casino Rebel
+54. Black Card Elite
+55. Cyber Lounge King
+56. Neon Tiger Gambler
+57. Platinum Roller
+58. Luxury Penthouse Player
+59. High Society Hustler
+60. Nightlife Syndicate Boss
+
+61. Gold Tooth Gambler
+62. Electric Blue Card Shark
+63. Red Velvet Kingpin
+64. The Last River
+65. Poker Prince
+66. The Neon Baron
+67. Casino Architect
+68. Underground High Roller
+69. VIP Lounge Dealer
+70. Future Vegas Icon
+
+71. The Ice Bluff
+72. Diamond Club President
+73. Neon Cigar Boss
+74. Luxury Suit Legend
+75. Billion Dollar Gambler
+76. Royal Casino Emperor
+77. Skyline Syndicate
+78. Velvet Rope VIP
+79. Chrome Casino Phantom
+80. Poker Empire Founder
+
+81. Hologram Hustler
+82. Infinite Chips Tycoon
+83. Sunset Casino Hero
+84. Neon Noir Gambler
+85. Card Room King
+86. Future Fortune Player
+87. Platinum Bluff Artist
+88. Casino Legend 1987
+89. The Neon Collector
+90. Midnight Ace
+
+91. Royal Syndicate Boss
+92. Crimson Neon Hustler
+93. Diamond Bluff Master
+94. Oceanfront High Roller
+95. Poker Night Phantom
+96. Vice Lounge Millionaire
+97. Sapphire Table King
+98. Retro Luxury Gambler
+99. Neon Empire Shark
+100. Chip Society Founder
+
+==============================================================
+4. AVATAR CUSTOMIZATION SYSTEM
+==============================================================
+
+Allow players to:
+- select avatars
+- preview avatars
+- unlock premium avatars
+- equip favorites
+- display avatars across social feed and gameplay
+
+==============================================================
+5. RARITY SYSTEM
+==============================================================
+
+Add avatar rarities:
+- Common
+- Rare
+- Epic
+- Legendary
+
+Legendary avatars should feature:
+- animated glow
+- neon aura
+- holographic FX
+- premium frames
+
+==============================================================
+6. SOCIAL INTEGRATION
+==============================================================
+
+Avatars should appear in:
+- gameplay tables
+- social feed posts
+- player profiles
+- comments
+- reactions
+- leaderboards
+- tournaments
+
+==============================================================
+7. FINAL VISUAL GOAL
+==============================================================
+
+The avatar system should feel:
+- premium
+- addictive
+- collectible
+- stylish
+- App Store quality
+
+The avatars should feel comparable to:
+high-end social gaming platforms and luxury casino brands.

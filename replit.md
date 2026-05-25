@@ -20,6 +20,16 @@ A premium iOS multiplayer Texas Hold'em poker app with a retro 1980s synthwave /
 - **Fonts**: Orbitron (neon display), Inter (body)
 - **Libraries**: expo-linear-gradient, react-native-svg, @react-native-async-storage/async-storage
 
+## Avatar System
+
+- `constants/premiumAvatars.ts` — 100 avatar definitions (id, name, emoji, category, rarity, gradient, accentColor, unlockXP)
+- `components/AvatarFrame.tsx` — reusable avatar display with rarity glow, Legendary animated pulse, lock overlay, equipped dot
+- `app/profile/avatar-select.tsx` — full avatar selection screen (category tabs, rarity filter, 3-col grid, XP-gated unlocks)
+- Avatars used in: Profile tab, Social Feed posts; feed PostCard uses `avatarId` from MOCK_PLAYERS
+- Rarity tiers: COMMON (0 XP), RARE (500 XP), EPIC (2000 XP), LEGENDARY (8000 XP)
+- 10 categories × 10 avatars: High Rollers, Poker Sharks, Casino Bosses, Neon Cyberpunk, Luxury VIP, Underground Legends, Retro 80s, Modern Influencers, Elite Bluff Masters, Vegas Nightlife
+- Profile avatar tap navigates to `/profile/avatar-select`
+
 ## Where things live
 
 - `artifacts/neon-river/` — the full Expo mobile app
