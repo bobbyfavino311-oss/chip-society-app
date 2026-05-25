@@ -1,8 +1,9 @@
-// ─── CharacterUnlockModal — cinematic new character reveal ────────────────────
+// ─── CharacterUnlockModal — cinematic full-screen character reveal ─────────────
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import {
   Animated,
+  Image,
   Modal,
   StyleSheet,
   Text,
@@ -10,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { Character, RARITY_COLORS } from '@/constants/characters';
-import CharacterPortrait from '@/components/CharacterPortrait';
+import CHARACTER_IMAGES from '@/constants/characterImages';
 
 interface CharacterUnlockModalProps {
   character: Character | null;
@@ -27,25 +28,28 @@ export default function CharacterUnlockModal({
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const glowAnim    = useRef(new Animated.Value(0.3)).current;
   const titleAnim   = useRef(new Animated.Value(0)).current;
+  const imgScaleAnim = useRef(new Animated.Value(1.08)).current;
 
   useEffect(() => {
     if (visible && character) {
       scaleAnim.setValue(0.4);
       opacityAnim.setValue(0);
       titleAnim.setValue(0);
+      imgScaleAnim.setValue(1.1);
 
       Animated.sequence([
         Animated.parallel([
-          Animated.spring(scaleAnim,   { toValue: 1, friction: 5, tension: 60, useNativeDriver: true }),
-          Animated.timing(opacityAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+          Animated.spring(scaleAnim,    { toValue: 1,   friction: 5, tension: 60, useNativeDriver: true }),
+          Animated.timing(opacityAnim,  { toValue: 1,   duration: 300, useNativeDriver: true }),
+          Animated.timing(imgScaleAnim, { toValue: 1,   duration: 600, useNativeDriver: true }),
         ]),
         Animated.timing(titleAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
       ]).start();
 
       Animated.loop(
         Animated.sequence([
-          Animated.timing(glowAnim, { toValue: 1,   duration: 800, useNativeDriver: false }),
-          Animated.timing(glowAnim, { toValue: 0.3, duration: 800, useNativeDriver: false }),
+          Animated.timing(glowAnim, { toValue: 1,   duration: 900, useNativeDriver: false }),
+          Animated.timing(glowAnim, { toValue: 0.3, duration: 900, useNativeDriver: false }),
         ])
       ).start();
     }
@@ -54,25 +58,23 @@ export default function CharacterUnlockModal({
   if (!character) return null;
 
   const rarityColor = RARITY_COLORS[character.rarity];
+  const img = CHARACTER_IMAGES[character.id];
 
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
       <View style={styles.overlay}>
-        {/* Dark backdrop */}
+        {/* Dark cinematic backdrop */}
         <LinearGradient
-          colors={['rgba(0,0,0,0.92)', 'rgba(5,0,16,0.97)', 'rgba(0,0,0,0.92)']}
+          colors={['rgba(0,0,0,0.95)', 'rgba(5,0,16,0.98)', 'rgba(0,0,0,0.95)']}
           style={StyleSheet.absoluteFill}
         />
 
-        {/* Animated glow background ring */}
+        {/* Rarity glow orb */}
         <Animated.View
           pointerEvents="none"
           style={[
             styles.glowRing,
-            {
-              backgroundColor: character.accentColor,
-              opacity: glowAnim,
-            },
+            { backgroundColor: rarityColor, opacity: glowAnim },
           ]}
         />
 
@@ -80,41 +82,59 @@ export default function CharacterUnlockModal({
         <Animated.View
           style={[
             styles.content,
-            {
-              opacity: opacityAnim,
-              transform: [{ scale: scaleAnim }],
-            },
+            { opacity: opacityAnim, transform: [{ scale: scaleAnim }] },
           ]}
         >
-          {/* Unlock label */}
-          <Animated.View style={{ opacity: titleAnim, alignItems: 'center', marginBottom: 20 }}>
-            <View style={[styles.unlockBadge, { borderColor: rarityColor + '88', backgroundColor: rarityColor + '22' }]}>
+          {/* Unlock badge */}
+          <Animated.View style={{ opacity: titleAnim, alignItems: 'center', marginBottom: 18 }}>
+            <View style={[styles.unlockBadge, { borderColor: rarityColor + '88', backgroundColor: rarityColor + '1a' }]}>
               <Text style={[styles.unlockLabel, { color: rarityColor }]}>
-                NEW CHARACTER UNLOCKED
+                CHARACTER UNLOCKED
               </Text>
             </View>
           </Animated.View>
 
-          {/* Portrait — large */}
-          <CharacterPortrait
-            character={character}
-            size={160}
-            isEquipped={false}
-            isLocked={false}
-          />
+          {/* Portrait — large cinematic */}
+          <View style={[styles.portraitWrap, { borderColor: rarityColor }]}>
+            {/* Background gradient matching character */}
+            <LinearGradient
+              colors={[character.portraitColors[0], character.portraitColors[1], character.portraitColors[2]]}
+              style={StyleSheet.absoluteFill}
+            />
+
+            {/* Portrait image with Ken Burns zoom */}
+            {img ? (
+              <Animated.Image
+                source={img}
+                style={[styles.portraitImg, { transform: [{ scale: imgScaleAnim }] }]}
+                resizeMode="cover"
+              />
+            ) : null}
+
+            {/* Bottom fade */}
+            <LinearGradient
+              colors={['transparent', 'rgba(5,0,16,0.55)']}
+              style={styles.portraitBottomFade}
+            />
+
+            {/* Rarity glow at bottom edge */}
+            <View style={[styles.rarityBar, { backgroundColor: rarityColor }]} />
+          </View>
 
           {/* Rarity tag */}
-          <View style={[styles.rarityTag, { borderColor: rarityColor + '66', backgroundColor: rarityColor + '22' }]}>
+          <View style={[styles.rarityTag, { borderColor: rarityColor + '66', backgroundColor: rarityColor + '1a' }]}>
             <Text style={[styles.rarityText, { color: rarityColor }]}>{character.rarity}</Text>
           </View>
 
           {/* Character name */}
-          <Text style={styles.characterName}>{character.name}</Text>
+          <Animated.Text style={[styles.characterName, { opacity: titleAnim }]}>
+            {character.name}
+          </Animated.Text>
 
           {/* Bio */}
           <Text style={styles.bio}>{character.bio}</Text>
 
-          {/* Equip / dismiss button */}
+          {/* CTA */}
           <TouchableOpacity
             style={[styles.equipBtn, { borderColor: rarityColor, backgroundColor: rarityColor + '22' }]}
             onPress={onClose}
@@ -140,76 +160,87 @@ const styles = StyleSheet.create({
   },
   glowRing: {
     position: 'absolute',
-    width: 400,
-    height: 400,
-    borderRadius: 200,
+    width: 420,
+    height: 420,
+    borderRadius: 210,
     alignSelf: 'center',
+    opacity: 0.12,
   },
   content: {
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 28,
     gap: 0,
+    width: '100%',
   },
   unlockBadge: {
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    borderWidth: 1, borderRadius: 6,
+    paddingHorizontal: 16, paddingVertical: 6,
   },
   unlockLabel: {
     fontFamily: 'Orbitron_700Bold',
-    fontSize: 11,
+    fontSize: 10,
     letterSpacing: 3,
-    fontWeight: '900',
+  },
+  portraitWrap: {
+    width: 200,
+    height: 240,
+    borderRadius: 16,
+    borderWidth: 2.5,
+    overflow: 'hidden',
+    backgroundColor: '#0a0020',
+    position: 'relative',
+  },
+  portraitImg: {
+    width: '100%',
+    height: '100%',
+  },
+  portraitBottomFade: {
+    position: 'absolute',
+    bottom: 0, left: 0, right: 0,
+    height: 60,
+  },
+  rarityBar: {
+    position: 'absolute',
+    bottom: 0, left: 0, right: 0,
+    height: 3,
+    opacity: 0.9,
   },
   rarityTag: {
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    marginTop: 18,
+    borderWidth: 1, borderRadius: 5,
+    paddingHorizontal: 12, paddingVertical: 3,
+    marginTop: 16,
   },
   rarityText: {
     fontFamily: 'Orbitron_700Bold',
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 2,
+    fontSize: 9, letterSpacing: 2,
   },
   characterName: {
     fontFamily: 'Orbitron_700Bold',
     fontSize: 22,
-    fontWeight: '900',
     color: '#ffffff',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
     textAlign: 'center',
     marginTop: 10,
   },
   bio: {
     fontFamily: 'Orbitron_400Regular',
-    fontSize: 11,
-    color: '#8090a8',
+    fontSize: 10,
+    color: '#7080a8',
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 17,
     marginTop: 10,
     maxWidth: 280,
   },
   equipBtn: {
-    marginTop: 28,
-    paddingHorizontal: 40,
-    paddingVertical: 14,
-    borderRadius: 30,
-    borderWidth: 1.5,
+    marginTop: 24,
+    paddingHorizontal: 40, paddingVertical: 14,
+    borderRadius: 30, borderWidth: 1.5,
   },
   equipBtnText: {
     fontFamily: 'Orbitron_700Bold',
-    fontSize: 13,
-    fontWeight: '900',
-    letterSpacing: 3,
+    fontSize: 13, letterSpacing: 3,
   },
-  skipBtn: {
-    marginTop: 14,
-    paddingVertical: 8,
-  },
+  skipBtn: { marginTop: 14, paddingVertical: 8 },
   skipText: {
     color: '#445566',
     fontSize: 12,

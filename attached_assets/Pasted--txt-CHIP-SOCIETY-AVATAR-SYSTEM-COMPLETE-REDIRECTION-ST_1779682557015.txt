@@ -1,0 +1,252 @@
+```txt
+CHIP SOCIETY — AVATAR SYSTEM COMPLETE REDIRECTION
+STOP GENERATING SVG ICONS, EMOJIS, AND GENERIC AVATARS
+
+CRITICAL DESIGN FAILURE
+
+The current avatar system is not acceptable.
+
+The avatars currently look like:
+- emoji faces
+- educational app mascots
+- Duolingo characters
+- Bitmoji clones
+- generic SVG icons
+- placeholder profile pictures
+
+This completely breaks the premium feel of Chip Society.
+
+I DO NOT WANT:
+- emojis
+- cartoon heads
+- oversized heads
+- tiny facial features
+- flat vector art
+- generic smiling faces
+- initials
+- profile icons
+- placeholder artwork
+
+DELETE THE ENTIRE CURRENT AVATAR SYSTEM.
+
+==================================================
+NEW AVATAR DESIGN DIRECTION
+==================================================
+
+These should NOT feel like avatars.
+
+These should feel like:
+CHARACTERS.
+
+The player should feel like they are unlocking personalities from the Chip Society universe.
+
+Every character should look like someone you would actually remember sitting at a poker table.
+
+==================================================
+VISUAL STYLE
+==================================================
+
+Art Style:
+
+- Semi-realistic illustration
+- Premium character art
+- Luxury casino atmosphere
+- Modern poker personalities
+- Nightlife culture
+- Miami and Vegas energy
+- Cinematic lighting
+- High-end mobile game quality
+
+Visual Inspiration:
+
+- GTA loading screen artwork
+- Modern poker advertisements
+- Luxury nightlife photography
+- Casino marketing campaigns
+- Character cards from AAA games
+
+NOT:
+- cartoons
+- anime
+- emojis
+- childish artwork
+- low-detail vectors
+
+==================================================
+CHARACTER PORTRAIT REQUIREMENTS
+==================================================
+
+Every character should have:
+
+- Unique facial structure
+- Unique hairstyle
+- Unique age range
+- Unique clothing
+- Unique expression
+- Unique personality
+- Unique lighting setup
+- Unique background environment
+
+No two characters should look similar.
+
+The player should immediately recognize them.
+
+==================================================
+CHARACTER PRESENTATION
+==================================================
+
+Do NOT display characters as tiny square icons.
+
+Replace with:
+
+Large premium portrait cards.
+
+Each card should contain:
+
+- Full portrait
+- Character name
+- Rarity
+- Unlock requirement
+- Progress bar
+
+Portrait should take up 80% of the card.
+
+The artwork is the focus.
+
+==================================================
+CHARACTER PERSONALITY EXAMPLES
+==================================================
+
+Instead of generic people, create iconic archetypes.
+
+Examples:
+
+The Rookie
+Young grinder trying to build a bankroll.
+
+The Bookie
+Sports betting operator with a tailored suit.
+
+The Yacht Gambler
+Miami luxury lifestyle player.
+
+The Poker Streamer
+Modern social media poker celebrity.
+
+The Underground King
+Owner of an exclusive private poker club.
+
+The Vegas Phantom
+Legendary high-stakes mystery player.
+
+The Diamond Emperor
+Ultra-wealthy casino magnate.
+
+The Godfather
+Most respected poker figure in Chip Society.
+
+==================================================
+UNLOCK SCREEN OVERHAUL
+==================================================
+
+When a character is unlocked:
+
+Show:
+
+FULL SCREEN CHARACTER REVEAL
+
+Display:
+
+- Character portrait
+- Character name
+- Character story
+- Unlock requirement completed
+- Rarity effects
+- Neon reveal animation
+
+The unlock should feel valuable.
+
+Not like unlocking another emoji.
+
+==================================================
+LOCKED CHARACTERS
+==================================================
+
+DO NOT show all locked characters immediately.
+
+Instead:
+
+Show silhouettes.
+
+Display:
+
+LOCKED
+
+Unlock at Level 25
+
+or
+
+Win 250 Hands
+
+or
+
+Earn 100,000 XP
+
+This creates mystery and progression.
+
+==================================================
+RARITY SYSTEM
+==================================================
+
+COMMON
+Clean portraits.
+No animation.
+
+RARE
+Luxury styling.
+Subtle animated border.
+
+EPIC
+Animated lighting.
+Premium backgrounds.
+
+LEGENDARY
+Fully animated portrait card.
+Moving glow effects.
+Reactive borders.
+Exclusive visual treatment.
+
+==================================================
+SOCIAL FEED INTEGRATION
+==================================================
+
+Character portraits should appear:
+
+- Social posts
+- Comments
+- Player profiles
+- Tournament leaderboards
+- Gameplay tables
+
+Legendary characters should instantly stand out.
+
+==================================================
+IMPORTANT RULE
+==================================================
+
+STOP generating:
+- SVG faces
+- emojis
+- simple vector heads
+- educational-app artwork
+
+START generating:
+- premium character portraits
+- luxury poker personalities
+- cinematic character cards
+- collectible social identities
+
+FINAL GOAL:
+
+The avatar system should feel like a premium collectible character roster from a top-tier mobile game, not a profile icon generator.
+```
