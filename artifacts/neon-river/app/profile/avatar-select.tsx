@@ -36,8 +36,9 @@ const COLS = 2;
 const H_PAD = 16;
 const GAP = 10;
 const CARD_W = Math.floor((Math.min(SCREEN_W, 420) - H_PAD * 2 - GAP) / COLS);
-const CARD_H = Math.round(CARD_W * 1.38);
-const IMG_H  = Math.round(CARD_H * 0.78);
+const IMG_H  = Math.round(CARD_W * 4 / 3);   // exact 3:4 portrait ratio
+const INFO_H = 40;
+const CARD_H = IMG_H + INFO_H;
 
 const RARITY_FILTERS = ['ALL', 'COMMON', 'RARE', 'EPIC', 'LEGENDARY'] as const;
 type RarityFilter = typeof RARITY_FILTERS[number];
@@ -345,7 +346,7 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   heroImgWrap: {
-    width: 90, height: 110,
+    width: 84, height: 112,
     borderRadius: 10,
     borderWidth: 2,
     overflow: 'hidden',
