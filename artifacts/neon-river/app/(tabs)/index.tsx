@@ -348,6 +348,7 @@ const TRENDING_POSTS: TrendPost[] = [
 // ─── Reward quick-access row (Spin + Streak only — Scratch is in Store) ───────
 function RewardRow() {
   const { canClaimWheel, nextWheelIn, canClaimDaily, profile } = useUser();
+  const c = useColors();
 
   const buttons = [
     {
@@ -369,40 +370,39 @@ function RewardRow() {
   ];
 
   return (
-    <View style={rr.row}>
+    <View style={{ flexDirection: 'row', gap: 10 }}>
       {buttons.map((b) => (
         <TouchableOpacity
           key={b.label}
-          style={[rr.card, { borderColor: b.badgeActive ? `${b.color}55` : 'rgba(255,255,255,0.08)' }]}
+          style={[
+            {
+              flex: 1, borderRadius: 14, borderWidth: 1, overflow: 'hidden',
+              paddingVertical: 12, paddingHorizontal: 8,
+              alignItems: 'center', gap: 5,
+              backgroundColor: c.surface,
+              borderColor: b.badgeActive ? `${b.color}55` : c.border,
+            },
+          ]}
           onPress={() => router.push(b.route as any)}
           activeOpacity={0.8}
         >
           {b.badgeActive && (
-            <LinearGradient colors={[`${b.color}18`, 'transparent']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={[`${b.color}22`, 'transparent']} style={StyleSheet.absoluteFill} />
           )}
-          <Text style={rr.icon}>{b.icon}</Text>
-          <Text style={[rr.label, { color: b.badgeActive ? b.color : 'rgba(255,255,255,0.45)' }]}>{b.label}</Text>
-          <View style={[rr.badge, { backgroundColor: b.badgeActive ? b.color : 'rgba(255,255,255,0.1)' }]}>
-            <Text style={[rr.badgeText, { color: b.badgeActive ? '#050010' : 'rgba(255,255,255,0.4)' }]}>{b.badge}</Text>
+          <Text style={{ fontSize: 24 }}>{b.icon}</Text>
+          <Text style={{ fontSize: 8, fontWeight: '800', letterSpacing: 0.8, color: b.badgeActive ? b.color : c.textMuted }}>
+            {b.label}
+          </Text>
+          <View style={{ borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3, backgroundColor: b.badgeActive ? b.color : c.surfaceElevated }}>
+            <Text style={{ fontSize: 8, fontWeight: '900', letterSpacing: 0.5, color: b.badgeActive ? '#050010' : c.textMuted }}>
+              {b.badge}
+            </Text>
           </View>
         </TouchableOpacity>
       ))}
     </View>
   );
 }
-
-const rr = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 10 },
-  card: {
-    flex: 1, borderRadius: 14, borderWidth: 1,
-    paddingVertical: 12, paddingHorizontal: 8,
-    alignItems: 'center', gap: 5, overflow: 'hidden',
-  },
-  icon: { fontSize: 24 },
-  label: { fontSize: 8, fontWeight: '800', letterSpacing: 0.8 },
-  badge: { borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3 },
-  badgeText: { fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
-});
 
 function TrendCard({ post }: { post: TrendPost }) {
   const [liked, setLiked] = useState(false);
@@ -614,15 +614,6 @@ export default function HomeScreen() {
               />
             </View>
           </TouchableOpacity>
-          {/* Profile avatar */}
-          <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} activeOpacity={0.8}>
-            <View style={[styles.topAvatar, { borderColor: rankColor, backgroundColor: colors.surface }]}>
-              {profile.avatarUri
-                ? <Image source={{ uri: profile.avatarUri }} style={{ width: 38, height: 38, borderRadius: 19 }} />
-                : <CharacterPortrait character={getCharacter(profile.avatarIndex ?? 1)} size={38} />
-              }
-            </View>
-          </TouchableOpacity>
         </View>
 
         {/* Settings dropdown panel */}
@@ -704,9 +695,9 @@ export default function HomeScreen() {
 
         {/* Trending now */}
         <View style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>TRENDING NOW</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>TRENDING NOW</Text>
           <TouchableOpacity onPress={() => router.push('/(tabs)/feed')}>
-            <Text style={styles.seeAll}>See all</Text>
+            <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
           </TouchableOpacity>
         </View>
 
@@ -720,9 +711,9 @@ export default function HomeScreen() {
 
         {/* Featured Tournament */}
         <View style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>FEATURED TOURNAMENT</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>FEATURED TOURNAMENT</Text>
           <TouchableOpacity onPress={() => router.push('/(tabs)/tournaments')}>
-            <Text style={styles.seeAll}>See all</Text>
+            <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
           </TouchableOpacity>
         </View>
 
@@ -730,7 +721,7 @@ export default function HomeScreen() {
 
         {/* Live Tournaments — scrolling pool */}
         <View style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>LIVE TOURNAMENTS</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>LIVE TOURNAMENTS</Text>
           <View style={styles.activeBadge}>
             <View style={styles.activeDot} />
             <Text style={styles.activeCount}>{tournaments.length} ACTIVE</Text>

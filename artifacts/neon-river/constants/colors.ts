@@ -49,47 +49,47 @@ const darkColors = {
 };
 
 const lightColors = {
-  background: '#f2edff',
-  surface: '#ffffff',
-  surfaceElevated: '#ece4ff',
-  surfaceCard: '#e4d8ff',
+  background: '#F7F7FB',
+  surface: '#FFFFFF',
+  surfaceElevated: '#EFEFF6',
+  surfaceCard: '#E8E8F2',
 
   tableFelt: '#0d1638',
   tableRing: '#1a0040',
   tableBorder: '#cc0088',
 
-  primary: '#0099cc',
-  primaryDim: 'rgba(0,153,204,0.2)',
-  primaryGlow: 'rgba(0,153,204,0.35)',
+  primary: '#0088bb',
+  primaryDim: 'rgba(0,136,187,0.12)',
+  primaryGlow: 'rgba(0,136,187,0.28)',
 
-  secondary: '#cc006e',
-  secondaryDim: 'rgba(204,0,110,0.2)',
-  secondaryGlow: 'rgba(204,0,110,0.35)',
+  secondary: '#bf0060',
+  secondaryDim: 'rgba(191,0,96,0.12)',
+  secondaryGlow: 'rgba(191,0,96,0.28)',
 
-  accent: '#8833dd',
-  accentDim: 'rgba(136,51,221,0.2)',
-  accentGlow: 'rgba(136,51,221,0.35)',
+  accent: '#7722cc',
+  accentDim: 'rgba(119,34,204,0.12)',
+  accentGlow: 'rgba(119,34,204,0.28)',
 
-  gold: '#b8860b',
-  goldDim: '#8a6308',
+  gold: '#996600',
+  goldDim: '#7a5200',
   chrome: '#6a6888',
 
-  text: '#0d0020',
-  textMuted: '#4e4070',
-  textDim: '#8878a8',
+  text: '#121212',
+  textMuted: '#4F4F5E',
+  textDim: '#7A7A8A',
 
   cardBg: '#f2ead8',
   heartDiamond: '#d42020',
   spadeClub: '#1a1a30',
 
-  success: '#007a40',
-  successDim: 'rgba(0,122,64,0.2)',
-  error: '#cc2222',
-  errorDim: 'rgba(204,34,34,0.2)',
-  warning: '#aa6600',
+  success: '#006633',
+  successDim: 'rgba(0,102,51,0.12)',
+  error: '#bb1111',
+  errorDim: 'rgba(187,17,17,0.12)',
+  warning: '#885500',
 
-  border: '#cbbef0',
-  borderBright: '#8844dd',
+  border: '#D9D9E6',
+  borderBright: '#7722cc',
 
   radius: 12,
   radiusLg: 20,

@@ -1,0 +1,317 @@
+CHIP SOCIETY — LIGHT MODE REBUILD + HEADER CLEANUP + NOTIFICATION SIMPLIFICATION
+CRITICAL PRE-LAUNCH UI FIX
+
+The current light mode is still difficult to read and should not be considered complete.
+
+==============================================================
+1. COMPLETE LIGHT MODE REBUILD
+==============================================================
+
+Current problem:
+
+The app is not using a true light theme.
+
+It currently looks like:
+- white background
+- dark mode cards
+- faded text
+- washed out icons
+- weak contrast
+- invisible secondary information
+
+This creates eye strain and makes important information difficult to see.
+
+==============================================================
+NEW LIGHT MODE DESIGN DIRECTION
+==============================================================
+
+Light mode should feel like:
+
+Apple Wallet
+Apple Sports
+Instagram Light Mode
+Robinhood Light Mode
+
+NOT a white version of dark mode.
+
+==============================================================
+LIGHT MODE COLORS
+==============================================================
+
+Background:
+#F7F7FB
+
+Secondary Background:
+#EFEFF6
+
+Primary Text:
+#121212
+
+Secondary Text:
+#4F4F5E
+
+Muted Text:
+#7A7A8A
+
+Card Background:
+#FFFFFF
+
+Borders:
+#D9D9E6
+
+Accent Colors:
+Keep existing:
+- Cyan
+- Pink
+- Purple
+- Gold
+
+==============================================================
+2. DAILY SPIN + STREAK FIX
+==============================================================
+
+Current issue:
+
+Daily Spin and Daily Streak information is nearly invisible.
+
+The text is fading into the background.
+
+Fix:
+
+Use darker text.
+
+Examples:
+
+DAILY SPIN
+21h 58m
+
+STREAK
+DAY 2
+
+must remain readable at all times.
+
+No transparency.
+
+No faded text.
+
+==============================================================
+3. HOME SCREEN FIXES
+==============================================================
+
+Section headers should be darker.
+
+Current:
+TRENDING NOW
+FEATURED TOURNAMENT
+
+are difficult to see.
+
+Make them:
+
+- darker
+- slightly bolder
+- higher contrast
+
+==============================================================
+4. PLAYER PROFILE CLEANUP
+==============================================================
+
+REMOVE PLAYER ICON FROM TOP RIGHT
+
+Reason:
+
+The profile button already exists in the bottom navigation.
+
+The top-right profile picture is redundant.
+
+Remove it completely.
+
+Current top bar should become:
+
+[ Notifications ]     [ Music ]     [ Settings ]
+
+Only.
+
+No profile image.
+
+No duplicate navigation.
+
+==============================================================
+5. PROFILE SCREEN IMPROVEMENTS
+==============================================================
+
+Current profile screen feels sparse.
+
+Add:
+
+Tournament Record
+Tournament Win Rate
+Best Tournament Finish
+Biggest Tournament Prize
+
+under the existing statistics section.
+
+Keep all text highly visible.
+
+==============================================================
+6. NOTIFICATION SYSTEM SIMPLIFICATION
+==============================================================
+
+The notification center is over-engineered.
+
+Remove:
+
+- All tab
+- Rewards tab
+- Social tab
+- Tournament tab
+- System tab
+
+There should be NO categories.
+
+==============================================================
+NEW NOTIFICATION DESIGN
+==============================================================
+
+Tap Bell →
+Open One Simple Scrollable Feed
+
+Just like:
+
+Instagram notifications
+Facebook notifications
+Twitter notifications
+
+Single list.
+
+Newest notifications first.
+
+No tabs.
+
+No filtering.
+
+No categories.
+
+==============================================================
+7. NOTIFICATION CARD LAYOUT
+==============================================================
+
+Each notification should display:
+
+Icon
+Title
+Message
+Timestamp
+
+Examples:
+
+🎯 Daily Spin Ready
+Your free spin is available.
+
+🏆 Neon Championship Open
+Registration is now open.
+
+🔥 New Follower
+VegasMirage followed you.
+
+🎉 Achievement Complete
+Full House unlocked.
+
+🎡 Daily Streak Ready
+Claim today's reward.
+
+Simple.
+
+Fast.
+
+Readable.
+
+==============================================================
+8. NOTIFICATION ACTION BUTTONS
+==============================================================
+
+Only show action buttons when necessary.
+
+Examples:
+
+Daily Spin Ready
+[SPIN]
+
+Tournament Open
+[VIEW]
+
+Achievement Complete
+[CLAIM]
+
+Follower notifications:
+No button required.
+
+Keep interface clean.
+
+==============================================================
+9. NOTIFICATION BADGE LOGIC
+==============================================================
+
+Bell should only display:
+
+Unread count.
+
+Example:
+
+Bell (4)
+
+When player opens notification center:
+
+Automatically mark viewed notifications as read.
+
+No complicated management system.
+
+==============================================================
+10. REMOVE VISUAL CLUTTER
+==============================================================
+
+Remove:
+
+Priority labels:
+HIGH
+MED
+LOW
+
+Remove:
+
+Colored dots for priority.
+
+Remove:
+
+Multiple notification categories.
+
+The system should feel simple and elegant.
+
+==============================================================
+11. FINAL ACCEPTANCE TEST
+==============================================================
+
+Before marking complete:
+
+✓ Light mode text readable everywhere
+✓ Daily Spin visible
+✓ Daily Streak visible
+✓ Section headers visible
+✓ Profile icon removed from top-right
+✓ Notification bell remains
+✓ Notifications are one simple feed
+✓ No tabs
+✓ No priority badges
+✓ No unreadable text
+✓ App feels clean and modern
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+Light mode should feel like a premium social app.
+
+Notification center should feel like Instagram/Twitter:
+simple, fast, clean, scrollable.
+
+The app should feel less like a prototype and more like a finished App Store product.
