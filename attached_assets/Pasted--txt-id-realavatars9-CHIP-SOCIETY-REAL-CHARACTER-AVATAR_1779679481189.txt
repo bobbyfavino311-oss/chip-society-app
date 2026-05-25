@@ -1,0 +1,290 @@
+```txt id="realavatars9"
+CHIP SOCIETY — REAL CHARACTER AVATAR SYSTEM REBUILD
+CRITICAL AVATAR GENERATION FIX
+==============================================================
+
+The avatar system is STILL completely wrong.
+
+The AI misunderstood the instructions and generated:
+- initials
+- letters
+- symbols
+- placeholder icons
+
+This is NOT acceptable.
+
+I do NOT want:
+- emojis
+- text icons
+- initials
+- monograms
+- letters
+- profile placeholders
+- generic circles with text
+
+I want:
+FULLY DESIGNED HUMAN CHARACTER PORTRAITS.
+
+REAL CHARACTERS.
+
+The avatars should look like actual people from a luxury neon poker world.
+
+==============================================================
+1. REMOVE ALL INITIAL-BASED ICONS
+==============================================================
+
+Delete ALL:
+- letter avatars
+- initials
+- acronym profile icons
+- emoji faces
+- text-based placeholders
+
+NONE of these belong in the final app.
+
+==============================================================
+2. WHAT THE AVATARS SHOULD ACTUALLY BE
+==============================================================
+
+Each avatar must be:
+- a full illustrated portrait
+- a realistic human character
+- waist-up or shoulder-up composition
+- professionally lit
+- highly detailed
+- unique visually
+- socially recognizable
+
+Think:
+real poker personalities.
+
+==============================================================
+3. ART STYLE DIRECTION
+==============================================================
+
+Visual style should resemble:
+- luxury casino advertisements
+- cyberpunk nightlife photography
+- neon Vegas portrait art
+- modern poker celebrities
+- retro-futuristic nightlife fashion
+
+NOT:
+- cartoons
+- anime
+- emojis
+- Bitmoji style
+- Roblox style
+- generic mobile game art
+
+==============================================================
+4. CHARACTER VISUAL DETAILS
+==============================================================
+
+Each character should have:
+- unique facial structure
+- unique hairstyle
+- unique fashion
+- unique accessories
+- unique lighting setup
+- unique personality
+
+Examples:
+- chrome sunglasses
+- velvet suits
+- leather jackets
+- gold jewelry
+- neon reflections
+- casino lounge lighting
+- futuristic nightlife outfits
+
+==============================================================
+5. CHARACTER PRESENTATION
+==============================================================
+
+The avatars should visually feel like:
+- elite poker players
+- Vegas VIPs
+- underground gamblers
+- nightlife millionaires
+- social poker celebrities
+
+Each portrait should communicate personality instantly.
+
+==============================================================
+6. COMMON TIER DESIGN STYLE (20)
+==============================================================
+
+Common characters:
+- simpler fashion
+- cleaner backgrounds
+- subtle neon lighting
+- beginner poker personalities
+
+Examples:
+- young grinder in bomber jacket
+- casual Vegas tourist
+- low-stakes poker regular
+- nightlife beginner
+- rookie poker player
+
+Unlock difficulty:
+easy.
+
+==============================================================
+7. RARE TIER DESIGN STYLE (20)
+==============================================================
+
+Rare characters should look:
+- wealthier
+- more stylish
+- more experienced
+
+Visual upgrades:
+- luxury suits
+- stronger neon lighting
+- premium accessories
+- upscale casino environments
+
+Examples:
+- penthouse gambler
+- chrome blazer shark
+- nightclub poker VIP
+- diamond lounge member
+
+Unlock difficulty:
+moderate.
+
+==============================================================
+8. EPIC TIER DESIGN STYLE (20)
+==============================================================
+
+Epic characters should feel:
+- prestigious
+- intimidating
+- highly recognizable
+
+Visual upgrades:
+- animated lighting effects
+- holographic accents
+- cinematic backgrounds
+- stronger personality
+
+Examples:
+- poker empire owner
+- neon syndicate boss
+- underground casino king
+- elite tournament legend
+
+Unlock difficulty:
+hard.
+
+==============================================================
+9. LEGENDARY TIER DESIGN STYLE (20)
+==============================================================
+
+Legendary characters should feel:
+ICONIC.
+
+These should look like:
+the absolute elite of the Chip Society universe.
+
+Visual features:
+- animated neon aura
+- holographic profile frame
+- dynamic lighting
+- premium motion FX
+- cinematic portrait composition
+
+Examples:
+- Neon Godfather
+- Casino Empire Founder
+- The Final Bluff
+- Royal Flush Emperor
+
+Unlock difficulty:
+extreme.
+
+==============================================================
+10. FUNCTIONAL XP CHARACTER SYSTEM
+==============================================================
+
+The avatar system MUST function as a REAL progression system.
+
+Characters unlock through:
+- XP gain
+- achievements
+- tournament wins
+- ranked milestones
+- chip milestones
+- social engagement
+
+NOT RANDOMLY.
+
+==============================================================
+11. CHARACTER UNLOCK FLOW
+==============================================================
+
+When players unlock a character:
+
+Show:
+--------------------------------
+NEW CHARACTER UNLOCKED
+[ LARGE ANIMATED PORTRAIT ]
+RARITY DISPLAY
+UNLOCK REQUIREMENT COMPLETED
+--------------------------------
+
+Add:
+- glow animation
+- cinematic lighting
+- premium reward sound
+- rarity FX
+
+The unlock should feel:
+valuable and exciting.
+
+==============================================================
+12. PROFILE INTEGRATION
+==============================================================
+
+Character portraits should appear:
+- at poker tables
+- social feed
+- comments
+- profiles
+- leaderboards
+- tournaments
+
+Legendary characters should immediately stand out visually.
+
+==============================================================
+13. IMPORTANT DESIGN RULE
+==============================================================
+
+These are NOT icons.
+
+These are NOT emojis.
+
+These are NOT initials.
+
+These are:
+FULL CHARACTER IDENTITIES.
+
+Players should become attached to them.
+
+==============================================================
+14. FINAL EXPERIENCE TARGET
+==============================================================
+
+The avatar system should now feel like:
+- a premium collectible character roster
+- a AAA mobile progression system
+- a luxury social poker universe
+
+The app should NO LONGER look:
+cheap
+placeholder
+generic
+or unfinished.
+```
