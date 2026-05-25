@@ -20,15 +20,17 @@ A premium iOS multiplayer Texas Hold'em poker app with a retro 1980s synthwave /
 - **Fonts**: Orbitron (neon display), Inter (body)
 - **Libraries**: expo-linear-gradient, react-native-svg, @react-native-async-storage/async-storage
 
-## Avatar System
+## Character Portrait System
 
-- `constants/premiumAvatars.ts` — 100 avatar definitions (id, name, emoji, category, rarity, gradient, accentColor, unlockXP)
-- `components/AvatarFrame.tsx` — reusable avatar display with rarity glow, Legendary animated pulse, lock overlay, equipped dot
-- `app/profile/avatar-select.tsx` — full avatar selection screen (category tabs, rarity filter, 3-col grid, XP-gated unlocks)
-- Avatars used in: Profile tab, Social Feed posts; feed PostCard uses `avatarId` from MOCK_PLAYERS
-- Rarity tiers: COMMON (0 XP), RARE (500 XP), EPIC (2000 XP), LEGENDARY (8000 XP)
-- 10 categories × 10 avatars: High Rollers, Poker Sharks, Casino Bosses, Neon Cyberpunk, Luxury VIP, Underground Legends, Retro 80s, Modern Influencers, Elite Bluff Masters, Vegas Nightlife
-- Profile avatar tap navigates to `/profile/avatar-select`
+- `constants/characters.ts` — 80 cinematic character definitions (20 COMMON / 20 RARE / 20 EPIC / 20 LEGENDARY)
+- `components/CharacterPortrait.tsx` — premium portrait renderer: atmospheric gradient bg, diagonal light beam, Orbitron monogram, SVG corner accents, rarity glow, Legendary animated pulse
+- `components/CharacterUnlockModal.tsx` — cinematic full-screen unlock animation (scale-in, glow pulse, character reveal)
+- `app/profile/avatar-select.tsx` — character selection screen (rarity filter tabs, 3-col grid, XP progress bar, preview panel with bio)
+- Characters appear in: Profile tab, Social Feed PostCards (all 12 mock players have assigned character IDs), Home screen top bar, Signup step 2
+- Rarity tiers (XP thresholds): COMMON 0–4 500 XP · RARE 5 000–25 000 XP · EPIC 30 000–80 000 XP · LEGENDARY 100 000–500 000 XP
+- Each character has: name, 2-char initials, bio, portraitColors[3], lightColor, accentColor, unlockCondition description
+- NO emoji — all portraits rendered programmatically using layered LinearGradients + SVG geometry + Orbitron typography
+- Profile avatar tap navigates to `/profile/avatar-select`; signup screen shows 8 Common starters
 
 ## Where things live
 

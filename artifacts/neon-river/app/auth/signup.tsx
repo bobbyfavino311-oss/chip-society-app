@@ -16,7 +16,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
-import { CASINO_AVATARS } from '@/components/CasinoAvatars';
+import { CHARACTERS, RARITY_COLORS } from '@/constants/characters';
+import CharacterPortrait from '@/components/CharacterPortrait';
+
+const STARTER_CHARS = CHARACTERS.filter(c => c.rarity === 'COMMON').slice(0, 8);
 
 const STEPS = ['USERNAME', 'AVATAR', 'WELCOME'];
 
@@ -193,20 +196,24 @@ export default function SignupScreen() {
                   <Text style={s.stepDesc}>Your face at the table. More avatars unlock as you level up.</Text>
 
                   <View style={s.avatarGrid}>
-                    {CASINO_AVATARS.map((av, i) => (
-                      <Pressable
-                        key={av.id}
-                        style={[s.avatarTile, avatarIndex === i && { borderColor: av.accentColor, backgroundColor: `${av.accentColor}15` }]}
-                        onPress={() => setAvatarIndex(i)}
-                      >
-                        {av.render(52)}
-                        {avatarIndex === i && (
-                          <View style={[s.avatarCheck, { backgroundColor: av.accentColor }]}>
-                            <Ionicons name="checkmark" size={10} color="#000" />
-                          </View>
-                        )}
-                      </Pressable>
-                    ))}
+                    {STARTER_CHARS.map((char, i) => {
+                      const rc = RARITY_COLORS[char.rarity];
+                      const selected = avatarIndex === char.id;
+                      return (
+                        <Pressable
+                          key={char.id}
+                          style={[s.avatarTile, selected && { borderColor: rc, backgroundColor: `${rc}18` }]}
+                          onPress={() => setAvatarIndex(char.id)}
+                        >
+                          <CharacterPortrait character={char} size={52} isEquipped={selected} />
+                          {selected && (
+                            <View style={[s.avatarCheck, { backgroundColor: rc }]}>
+                              <Ionicons name="checkmark" size={10} color="#000" />
+                            </View>
+                          )}
+                        </Pressable>
+                      );
+                    })}
                   </View>
 
                   {error ? <Text style={s.errorText}>{error}</Text> : null}

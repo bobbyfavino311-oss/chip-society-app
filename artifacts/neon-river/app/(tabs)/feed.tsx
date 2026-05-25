@@ -24,8 +24,8 @@ import {
   AVATAR_SYMBOLS, AVATAR_COLORS, getLeaderboard,
   type SocialPost, type PostTag,
 } from '@/lib/socialData';
-import AvatarFrame from '@/components/AvatarFrame';
-import { getAvatar } from '@/constants/premiumAvatars';
+import CharacterPortrait from '@/components/CharacterPortrait';
+import { getCharacter } from '@/constants/characters';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -262,7 +262,7 @@ function PostCard({ post }: { post: SocialPost }) {
           onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}
         >
           {player?.avatarId != null ? (
-            <AvatarFrame avatar={getAvatar(player.avatarId)} size={44} />
+            <CharacterPortrait character={getCharacter(player.avatarId)} size={44} />
           ) : (
             <View style={[cd.avatar, { borderColor: player?.avatarColor ?? colors.primary }]}>
               <Text style={[cd.avatarText, { color: player?.avatarColor ?? colors.primary }]}>

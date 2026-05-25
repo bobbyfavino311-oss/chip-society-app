@@ -19,8 +19,8 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
-import { getAvatar } from '@/constants/premiumAvatars';
-import AvatarFrame from '@/components/AvatarFrame';
+import { getCharacter } from '@/constants/characters';
+import CharacterPortrait from '@/components/CharacterPortrait';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
 import { useSocial } from '@/context/SocialContext';
@@ -287,7 +287,7 @@ export default function ProfileScreen() {
                   <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
                 </View>
               ) : (
-                <AvatarFrame avatar={getAvatar(profile.avatarIndex)} size={90} isEquipped />
+                <CharacterPortrait character={getCharacter(profile.avatarIndex ?? 1)} size={90} isEquipped />
               )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.changeAvatarBtn} onPress={() => router.push('/profile/avatar-select')}>

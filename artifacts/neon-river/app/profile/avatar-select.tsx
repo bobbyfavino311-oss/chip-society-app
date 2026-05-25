@@ -1,3 +1,4 @@
+// ─── Character Select Screen ─────────────────────────────────────────────────
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState, useMemo, useRef } from 'react';
@@ -5,7 +6,6 @@ import {
   Animated,
   Dimensions,
   FlatList,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,247 +18,250 @@ import * as Haptics from 'expo-haptics';
 
 import colors from '@/constants/colors';
 import {
-  PREMIUM_AVATARS,
-  AVATAR_CATEGORIES,
+  CHARACTERS,
   RARITY_COLORS,
-  AvatarCategory,
-  PremiumAvatar,
-  isAvatarUnlocked,
-  getAvatar,
-} from '@/constants/premiumAvatars';
-import AvatarFrame from '@/components/AvatarFrame';
+  getCharacter,
+  isUnlocked,
+  type Character,
+  type Rarity,
+} from '@/constants/characters';
+import CharacterPortrait from '@/components/CharacterPortrait';
+import CharacterUnlockModal from '@/components/CharacterUnlockModal';
 import { useUser } from '@/context/UserContext';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const COL = 3;
 const CELL_W = Math.floor((Math.min(SCREEN_W, 420) - 32 - (COL - 1) * 10) / COL);
 
-const ALL_CATEGORIES = ['All', ...AVATAR_CATEGORIES] as const;
 const RARITY_FILTERS = ['All', 'COMMON', 'RARE', 'EPIC', 'LEGENDARY'] as const;
 type RarityFilter = typeof RARITY_FILTERS[number];
 
-export default function AvatarSelectScreen() {
+const RARITY_LABEL_COLOR: Record<string, string> = {
+  All:       '#8090a8',
+  COMMON:    RARITY_COLORS.COMMON,
+  RARE:      RARITY_COLORS.RARE,
+  EPIC:      RARITY_COLORS.EPIC,
+  LEGENDARY: RARITY_COLORS.LEGENDARY,
+};
+
+export default function CharacterSelectScreen() {
   const insets = useSafeAreaInsets();
   const { profile, updateProfile } = useUser();
 
-  const [selectedCategory, setSelectedCategory] = useState<typeof ALL_CATEGORIES[number]>('All');
   const [rarityFilter, setRarityFilter] = useState<RarityFilter>('All');
-  const [previewId, setPreviewId] = useState<number>(profile.avatarIndex);
+  const [previewId,    setPreviewId]    = useState<number>(profile.avatarIndex ?? 1);
   const [justEquipped, setJustEquipped] = useState(false);
+  const [unlockChar,   setUnlockChar]   = useState<Character | null>(null);
+  const [showUnlock,   setShowUnlock]   = useState(false);
 
   const previewScale = useRef(new Animated.Value(1)).current;
 
-  const equippedAvatar  = getAvatar(profile.avatarIndex);
-  const previewAvatar   = getAvatar(previewId);
-  const isUnlocked      = isAvatarUnlocked(previewAvatar, profile.xp);
-  const isPreviewing    = previewId !== profile.avatarIndex;
+  const equippedChar  = getCharacter(profile.avatarIndex ?? 1);
+  const previewChar   = getCharacter(previewId);
+  const canUnlock     = isUnlocked(previewChar, profile.xp);
+  const isPreviewing  = previewId !== (profile.avatarIndex ?? 1);
 
-  const filteredAvatars = useMemo(() => {
-    return PREMIUM_AVATARS.filter(a => {
-      const catMatch = selectedCategory === 'All' || a.category === selectedCategory;
-      const rarMatch = rarityFilter === 'All' || a.rarity === rarityFilter;
-      return catMatch && rarMatch;
-    });
-  }, [selectedCategory, rarityFilter]);
+  const filtered = useMemo(() =>
+    CHARACTERS.filter(c =>
+      rarityFilter === 'All' || c.rarity === (rarityFilter as Rarity)
+    ),
+  [rarityFilter]);
 
-  const handlePreview = (avatar: PremiumAvatar) => {
-    void Haptics.selectionAsync();
-    setPreviewId(avatar.id);
-    setJustEquipped(false);
+  function handleSelect(char: Character) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setPreviewId(char.id);
     Animated.sequence([
-      Animated.timing(previewScale, { toValue: 0.85, duration: 80, useNativeDriver: true }),
-      Animated.spring(previewScale, { toValue: 1, tension: 160, friction: 8, useNativeDriver: true }),
+      Animated.timing(previewScale, { toValue: 0.92, duration: 80,  useNativeDriver: true }),
+      Animated.spring(previewScale,  { toValue: 1,    friction: 4,   useNativeDriver: true }),
     ]).start();
-  };
+  }
 
-  const handleEquip = async () => {
-    if (!isUnlocked) return;
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  async function handleEquip() {
+    if (!canUnlock) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    const wasNew = (profile.avatarIndex ?? 1) !== previewId;
     await updateProfile({ avatarIndex: previewId });
     setJustEquipped(true);
-    Animated.sequence([
-      Animated.timing(previewScale, { toValue: 1.12, duration: 120, useNativeDriver: true }),
-      Animated.spring(previewScale, { toValue: 1, tension: 120, friction: 6, useNativeDriver: true }),
-    ]).start();
-  };
+    setTimeout(() => setJustEquipped(false), 1400);
+    if (wasNew && previewChar.unlockXP === 0) {
+      // show unlock modal for newly equipped chars
+    }
+  }
 
-  const rarityColor = RARITY_COLORS[previewAvatar.rarity];
-  const xpNeeded    = Math.max(0, previewAvatar.unlockXP - profile.xp);
-
-  const renderAvatar = ({ item }: { item: PremiumAvatar }) => {
-    const unlocked    = isAvatarUnlocked(item, profile.xp);
-    const isEquipped  = item.id === profile.avatarIndex;
-    const isPrev      = item.id === previewId;
-    return (
-      <TouchableOpacity
-        style={[
-          s.cell,
-          isPrev && { borderColor: item.accentColor + 'aa', backgroundColor: item.accentColor + '12' },
-        ]}
-        onPress={() => handlePreview(item)}
-        activeOpacity={0.75}
-      >
-        <AvatarFrame
-          avatar={item}
-          size={CELL_W - 20}
-          isEquipped={isEquipped}
-          isLocked={!unlocked}
-          showRarity={true}
-        />
-        <Text
-          style={[s.cellName, { color: unlocked ? '#ccc' : '#444' }]}
-          numberOfLines={2}
-          allowFontScaling={false}
-        >
-          {item.name}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
+  // Progress bar for XP
+  const xpPct = Math.min(1, previewChar.unlockXP > 0 ? profile.xp / previewChar.unlockXP : 1);
+  const rarityColor = RARITY_COLORS[previewChar.rarity];
 
   return (
-    <View style={s.root}>
-      <LinearGradient colors={['#0a0020', '#050010', '#050010']} style={StyleSheet.absoluteFill} />
-
-      {/* Ambient glow blobs */}
-      <View style={[s.glow, { top: -60, left: -60, backgroundColor: 'rgba(0,212,255,0.05)' }]} />
-      <View style={[s.glow, { bottom: 80, right: -40, width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(255,0,144,0.05)' }]} />
+    <View style={{ flex: 1, backgroundColor: '#050010' }}>
+      <LinearGradient colors={['#0a0025', '#050010']} style={StyleSheet.absoluteFill} />
 
       {/* Header */}
-      <View style={[s.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 12) }]}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
-          <Ionicons name="chevron-back" size={22} color={colors.textMuted} />
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={22} color={colors.primary} />
         </TouchableOpacity>
-        <View style={{ alignItems: 'center' }}>
-          <Text style={s.headerTitle}>CHOOSE AVATAR</Text>
-          <Text style={s.headerSub}>{PREMIUM_AVATARS.length} PORTRAITS AVAILABLE</Text>
-        </View>
-        <View style={{ width: 42 }} />
+        <Text style={styles.title}>CHARACTERS</Text>
+        <View style={{ width: 38 }} />
       </View>
 
       {/* Preview panel */}
-      <View style={s.previewPanel}>
+      <View style={styles.previewPanel}>
         <LinearGradient
-          colors={[previewAvatar.gradient[0], previewAvatar.gradient[1], previewAvatar.gradient[2]]}
-          style={[StyleSheet.absoluteFill, { opacity: 0.6 }]}
+          colors={[previewChar.portraitColors[0] + 'cc', '#050010']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
         />
+
         <Animated.View style={{ transform: [{ scale: previewScale }] }}>
-          <AvatarFrame
-            avatar={previewAvatar}
-            size={100}
-            isEquipped={!isPreviewing || justEquipped}
-            isLocked={!isUnlocked}
+          <CharacterPortrait
+            character={previewChar}
+            size={108}
+            isEquipped={previewId === (profile.avatarIndex ?? 1)}
+            isLocked={!canUnlock}
           />
         </Animated.View>
-        <View style={s.previewInfo}>
-          <View style={[s.rarityPill, { borderColor: rarityColor + '55', backgroundColor: rarityColor + '18' }]}>
-            <Text style={[s.rarityPillText, { color: rarityColor }]}>{previewAvatar.rarity}</Text>
+
+        <View style={styles.previewInfo}>
+          <View style={[styles.rarityPill, { borderColor: rarityColor + '66', backgroundColor: rarityColor + '22' }]}>
+            <Text style={[styles.rarityPillText, { color: rarityColor }]}>{previewChar.rarity}</Text>
           </View>
-          <Text style={s.previewName}>{previewAvatar.name}</Text>
-          <Text style={s.previewCategory}>{previewAvatar.category}</Text>
-          {!isUnlocked && (
-            <Text style={s.lockInfo}>🔒  Requires {previewAvatar.unlockXP.toLocaleString()} XP  ({xpNeeded.toLocaleString()} more)</Text>
+          <Text style={styles.previewName}>{previewChar.name}</Text>
+          <Text style={styles.previewBio} numberOfLines={2}>{previewChar.bio}</Text>
+
+          {/* XP bar */}
+          {!canUnlock ? (
+            <View style={styles.xpWrap}>
+              <View style={styles.xpBarBg}>
+                <View style={[styles.xpBarFill, { width: `${xpPct * 100}%` as any, backgroundColor: rarityColor }]} />
+              </View>
+              <Text style={[styles.xpLabel, { color: rarityColor }]}>
+                {profile.xp.toLocaleString()} / {previewChar.unlockXP.toLocaleString()} XP
+              </Text>
+            </View>
+          ) : (
+            <Text style={[styles.unlockCondition, { color: rarityColor + 'cc' }]}>
+              ✓ {previewChar.unlockCondition}
+            </Text>
           )}
+
+          <TouchableOpacity
+            style={[
+              styles.equipBtn,
+              {
+                borderColor: canUnlock ? rarityColor : '#333',
+                backgroundColor: justEquipped
+                  ? rarityColor + '33'
+                  : canUnlock
+                  ? rarityColor + '22'
+                  : '#111',
+                opacity: !canUnlock ? 0.5 : 1,
+              },
+            ]}
+            onPress={handleEquip}
+            disabled={!canUnlock || previewId === (profile.avatarIndex ?? 1)}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.equipBtnText, { color: canUnlock ? rarityColor : '#444' }]}>
+              {!canUnlock
+                ? `LOCKED — ${(previewChar.unlockXP - profile.xp).toLocaleString()} XP NEEDED`
+                : previewId === (profile.avatarIndex ?? 1)
+                ? '✓ EQUIPPED'
+                : justEquipped
+                ? '✓ EQUIPPED!'
+                : 'EQUIP CHARACTER'}
+            </Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[
-            s.equipBtn,
-            {
-              backgroundColor: isUnlocked ? previewAvatar.accentColor : 'rgba(255,255,255,0.06)',
-              borderColor: isUnlocked ? previewAvatar.accentColor : 'rgba(255,255,255,0.12)',
-              opacity: (profile.avatarIndex === previewId && !justEquipped) ? 0.5 : 1,
-            },
-          ]}
-          onPress={handleEquip}
-          disabled={!isUnlocked || (profile.avatarIndex === previewId)}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name={justEquipped && profile.avatarIndex === previewId ? 'checkmark-circle' : 'shirt'}
-            size={15}
-            color={isUnlocked ? '#050010' : colors.textMuted}
-          />
-          <Text style={[s.equipBtnText, { color: isUnlocked ? '#050010' : colors.textMuted }]}>
-            {justEquipped && profile.avatarIndex === previewId
-              ? 'EQUIPPED'
-              : profile.avatarIndex === previewId
-                ? 'CURRENT'
-                : isUnlocked
-                  ? 'EQUIP'
-                  : 'LOCKED'}
-          </Text>
-        </TouchableOpacity>
       </View>
 
-      {/* Category filter */}
+      {/* Rarity filter tabs */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={s.categoryBar}
-        style={s.categoryScroll}
+        contentContainerStyle={styles.filterRow}
+        style={styles.filterScroll}
       >
-        {ALL_CATEGORIES.map(cat => (
-          <TouchableOpacity
-            key={cat}
-            style={[
-              s.catChip,
-              selectedCategory === cat && { borderColor: colors.primary + '99', backgroundColor: colors.primary + '18' },
-            ]}
-            onPress={() => setSelectedCategory(cat)}
-            activeOpacity={0.7}
-          >
-            <Text style={[s.catChipText, selectedCategory === cat && { color: colors.primary }]}>
-              {cat}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Rarity filter */}
-      <View style={s.rarityBar}>
         {RARITY_FILTERS.map(r => {
-          const col = r === 'All' ? '#888' : RARITY_COLORS[r as keyof typeof RARITY_COLORS];
           const active = rarityFilter === r;
+          const rc = RARITY_LABEL_COLOR[r];
           return (
             <TouchableOpacity
               key={r}
-              style={[s.rarityChip, active && { borderColor: col, backgroundColor: col + '18' }]}
+              style={[
+                styles.filterChip,
+                { borderColor: active ? rc : '#2a2a40', backgroundColor: active ? rc + '22' : 'transparent' },
+              ]}
               onPress={() => setRarityFilter(r)}
               activeOpacity={0.7}
             >
-              <Text style={[s.rarityChipText, { color: active ? col : '#666' }]}>{r}</Text>
+              <Text style={[styles.filterText, { color: active ? rc : '#556' }]}>
+                {r === 'All' ? `ALL  ${CHARACTERS.length}` : `${r}  ${CHARACTERS.filter(c => c.rarity === r).length}`}
+              </Text>
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
 
-      {/* Count */}
-      <View style={s.countRow}>
-        <Text style={s.countText}>{filteredAvatars.length} avatars</Text>
-        <Text style={s.xpText}>Your XP: {profile.xp.toLocaleString()}</Text>
-      </View>
-
-      {/* Avatar grid */}
+      {/* Character grid */}
       <FlatList
-        data={filteredAvatars}
-        keyExtractor={a => String(a.id)}
-        renderItem={renderAvatar}
+        data={filtered}
+        keyExtractor={c => String(c.id)}
         numColumns={COL}
-        columnWrapperStyle={s.row}
-        contentContainerStyle={[s.grid, { paddingBottom: insets.bottom + 24 }]}
-        showsVerticalScrollIndicator={false}
-        initialNumToRender={18}
-        maxToRenderPerBatch={12}
-        windowSize={5}
+        contentContainerStyle={styles.grid}
+        columnWrapperStyle={{ gap: 10 }}
+        renderItem={({ item }) => {
+          const locked    = !isUnlocked(item, profile.xp);
+          const equipped  = item.id === (profile.avatarIndex ?? 1);
+          const selected  = item.id === previewId;
+          const rc        = RARITY_COLORS[item.rarity];
+
+          return (
+            <TouchableOpacity
+              style={[
+                styles.cell,
+                {
+                  width: CELL_W,
+                  borderColor: selected ? rc : equipped ? rc + '77' : '#1a1a2e',
+                  backgroundColor: selected ? rc + '12' : '#0a0a1e',
+                },
+              ]}
+              onPress={() => handleSelect(item)}
+              activeOpacity={0.75}
+            >
+              <CharacterPortrait
+                character={item}
+                size={CELL_W - 20}
+                isEquipped={equipped}
+                isLocked={locked}
+              />
+              <Text
+                style={[styles.cellName, { color: locked ? '#334' : selected ? rc : '#7080a0' }]}
+                numberOfLines={2}
+              >
+                {item.name}
+              </Text>
+              {locked && (
+                <Text style={styles.cellXP}>
+                  {(item.unlockXP / 1000).toFixed(0)}K XP
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        }}
+      />
+
+      <CharacterUnlockModal
+        character={unlockChar}
+        visible={showUnlock}
+        onClose={() => { setShowUnlock(false); setUnlockChar(null); }}
       />
     </View>
   );
 }
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#050010' },
-  glow: { position: 'absolute', width: 240, height: 240, borderRadius: 120 },
-
+const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -267,95 +270,130 @@ const s = StyleSheet.create({
     paddingBottom: 12,
   },
   backBtn: {
-    width: 42, height: 42, borderRadius: 21,
-    alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: colors.border,
-  },
-  headerTitle: {
-    color: '#fff', fontSize: 15, fontWeight: '900',
-    fontFamily: 'Orbitron_900Black', letterSpacing: 2,
-  },
-  headerSub: {
-    color: colors.textDim, fontSize: 8, letterSpacing: 2, marginTop: 2,
-  },
-
-  previewPanel: {
-    marginHorizontal: 16,
-    borderRadius: 20,
+    width: 38, height: 38,
+    borderRadius: 19,
+    backgroundColor: '#0f0f2a',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: 16,
+    borderColor: '#1a1a40',
+  },
+  title: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 13,
+    color: '#ffffff',
+    letterSpacing: 4,
+  },
+  previewPanel: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     gap: 14,
     overflow: 'hidden',
-    marginBottom: 12,
+    marginBottom: 6,
   },
-  previewInfo: { flex: 1, gap: 4 },
+  previewInfo: {
+    flex: 1,
+    gap: 5,
+  },
   rarityPill: {
     alignSelf: 'flex-start',
-    borderRadius: 5, borderWidth: 1,
-    paddingHorizontal: 7, paddingVertical: 2,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
   },
   rarityPillText: {
-    fontSize: 7, fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1.5,
   },
   previewName: {
-    color: '#fff', fontSize: 14, fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5,
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 13,
+    color: '#ffffff',
+    letterSpacing: 0.5,
   },
-  previewCategory: { color: colors.textDim, fontSize: 9, letterSpacing: 0.5 },
-  lockInfo: { color: '#aa6600', fontSize: 8, marginTop: 2 },
+  previewBio: {
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 9,
+    color: '#6070a0',
+    lineHeight: 14,
+  },
+  xpWrap: { gap: 3 },
+  xpBarBg: {
+    height: 3,
+    backgroundColor: '#1a1a3a',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  xpBarFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  xpLabel: {
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 8,
+    letterSpacing: 0.5,
+  },
+  unlockCondition: {
+    fontFamily: 'Orbitron_400Regular',
+    fontSize: 8,
+    letterSpacing: 0.5,
+  },
   equipBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    borderRadius: 12, borderWidth: 1,
-    paddingHorizontal: 14, paddingVertical: 9,
+    marginTop: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
   },
-  equipBtnText: { fontSize: 10, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-
-  categoryScroll: { maxHeight: 40, marginBottom: 6 },
-  categoryBar: { paddingHorizontal: 16, gap: 6 },
-  catChip: {
-    borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
-    paddingHorizontal: 12, paddingVertical: 6,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+  equipBtnText: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 2,
   },
-  catChipText: { fontSize: 9, color: '#888', fontWeight: '700', letterSpacing: 0.5 },
-
-  rarityBar: {
-    flexDirection: 'row', gap: 5, paddingHorizontal: 16, marginBottom: 8, flexWrap: 'wrap',
+  filterScroll: { flexGrow: 0, marginBottom: 8 },
+  filterRow: { paddingHorizontal: 16, gap: 8, paddingVertical: 4 },
+  filterChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
   },
-  rarityChip: {
-    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-    paddingHorizontal: 9, paddingVertical: 4,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+  filterText: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1.5,
   },
-  rarityChipText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
-
-  countRow: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    paddingHorizontal: 16, marginBottom: 8,
+  grid: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    gap: 10,
   },
-  countText: { color: colors.textDim, fontSize: 9 },
-  xpText: { color: colors.primary, fontSize: 9, fontFamily: 'Orbitron_400Regular' },
-
-  grid: { paddingHorizontal: 16 },
-  row: { gap: 10, marginBottom: 10 },
   cell: {
-    width: CELL_W,
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 10,
     alignItems: 'center',
     gap: 6,
-    padding: 10,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-    backgroundColor: 'rgba(255,255,255,0.02)',
   },
   cellName: {
-    fontSize: 8, textAlign: 'center',
     fontFamily: 'Orbitron_400Regular',
-    letterSpacing: 0.2, lineHeight: 12,
+    fontSize: 7.5,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+    lineHeight: 11,
+  },
+  cellXP: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 7,
+    color: '#445566',
+    letterSpacing: 0.5,
   },
 });

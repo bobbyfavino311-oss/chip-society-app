@@ -1,0 +1,504 @@
+```txt id="avatarxp2"
+CHIP SOCIETY — COMPLETE AVATAR XP SYSTEM OVERHAUL
+PREMIUM CHARACTER PROGRESSION SYSTEM
+==============================================================
+
+The current avatar system is unacceptable.
+
+CURRENT PROBLEMS:
+- avatars are basically emojis
+- looks cheap
+- feels low effort
+- no personality
+- no progression satisfaction
+- no prestige
+- no identity system
+- no excitement when unlocking characters
+
+REMOVE the current emoji avatar system entirely.
+
+This app needs a REAL premium avatar progression system built around:
+- unique character portraits
+- XP progression
+- rarity tiers
+- prestige unlocks
+- long-term grinding
+- social identity
+
+The avatar system should feel like:
+a premium collectible character system from a AAA mobile game.
+
+==============================================================
+1. CORE AVATAR SYSTEM REBUILD
+==============================================================
+
+Avatars are NO LONGER:
+- emojis
+- icons
+- symbols
+- cartoons
+- simplistic faces
+
+Replace them with:
+FULLY DESIGNED CHARACTER PORTRAITS.
+
+Each avatar should feel:
+- realistic
+- cinematic
+- stylish
+- memorable
+- socially recognizable
+- high-end
+
+==============================================================
+2. ART STYLE DIRECTION
+==============================================================
+
+Visual style:
+- luxury neon Vegas
+- retro-futuristic poker nightlife
+- cyber-lounge aesthetics
+- cinematic lighting
+- moody shadows
+- chrome accents
+- premium fashion
+- realistic human portraits
+
+NOT:
+- anime
+- cartoon
+- emojis
+- childish art
+- pixel art
+- generic mobile icons
+
+==============================================================
+3. TOTAL CHARACTER SYSTEM
+==============================================================
+
+Create EXACTLY:
+80 UNIQUE CHARACTERS
+
+Divided into:
+- 20 Common
+- 20 Rare
+- 20 Epic
+- 20 Legendary
+
+Each tier should become:
+MORE difficult to unlock.
+
+==============================================================
+4. CHARACTER UNLOCK SYSTEM
+==============================================================
+
+Characters MUST unlock through:
+- XP progression
+- achievements
+- gameplay milestones
+- ranked progression
+- social engagement
+- tournament success
+
+Characters should NEVER:
+- unlock randomly
+- all be available instantly
+- feel meaningless
+
+==============================================================
+5. CHARACTER EARNING FLOW
+==============================================================
+
+When players unlock a character:
+- trigger cinematic unlock animation
+- display character portrait large on screen
+- show rarity glow FX
+- play premium reward sound
+- add “NEW CHARACTER UNLOCKED” animation
+
+The unlock should feel:
+REWARDING.
+
+==============================================================
+6. COMMON TIER CHARACTERS (20)
+==============================================================
+
+COMMON characters are:
+- entry-level
+- stylish but simpler
+- early progression rewards
+
+Unlock difficulty:
+VERY EASY
+
+Unlock examples:
+- complete tutorial
+- play first game
+- win first hand
+- reach level 3
+- social post creation
+
+CHARACTER CONCEPTS:
+
+1. Neon Rookie
+Young poker newcomer in a black bomber jacket with soft neon blue lighting.
+
+2. Sunset Dealer
+Professional casino dealer with pink/purple Vegas lighting.
+
+3. Midnight Tourist
+Stylish traveler exploring underground poker lounges.
+
+4. Rookie Card Shark
+Low-level grinder wearing casual retro nightlife fashion.
+
+5. Ocean Drive Player
+Miami-inspired poker enthusiast with chrome sunglasses.
+
+6. Neon Hoodie Gambler
+Street-style player with glowing neon trim hoodie.
+
+7. The Beginner Bluff
+Young confident low-stakes player.
+
+8. Velvet Lounge Visitor
+Casino nightlife socialite.
+
+9. Casual High Roller
+Modern poker fan with luxury casualwear.
+
+10. Skyline Grinder
+Small-stakes online poker climber.
+
+11. Neon Shades Player
+Classic retro sunglasses + nightlife aesthetic.
+
+12. Downtown Gambler
+Vegas-inspired poker tourist.
+
+13. Low Stakes Legend
+Early progression poker personality.
+
+14. Blue Glow Dealer
+Minimalist casino dealer portrait.
+
+15. Rookie Syndicate Member
+Entry-level underground poker group member.
+
+16. Silver Card Player
+Stylish modern beginner player.
+
+17. The Quiet Caller
+Reserved poker player with dark neon tones.
+
+18. Midnight Regular
+Casino regular with retro nightlife style.
+
+19. Vice Lounge Rookie
+Miami lounge-inspired poker player.
+
+20. Poker Community Member
+Default social poker community character.
+
+==============================================================
+7. RARE TIER CHARACTERS (20)
+==============================================================
+
+RARE characters should:
+- look more luxurious
+- include stronger visual identity
+- feature animated profile glow
+
+Unlock difficulty:
+MODERATE
+
+Unlock examples:
+- 100 hands played
+- 50 wins
+- level 10
+- win streaks
+- social engagement milestones
+
+CHARACTER CONCEPTS:
+
+21. Neon Syndicate Boss
+Luxury underground poker organizer.
+
+22. Chrome Blazer Shark
+Sharp chrome-lined luxury suit.
+
+23. Tokyo Heat Gambler
+Japanese cyber-lounge poker legend.
+
+24. Diamond Club Member
+Elite casino VIP personality.
+
+25. Black Card Player
+Luxury casino status holder.
+
+26. Skyline High Roller
+Penthouse poker grinder.
+
+27. Velvet Suit Hustler
+Elegant nightlife poker manipulator.
+
+28. The River Hunter
+Calculated late-round specialist.
+
+29. Gold Chain Gambler
+Luxury street-casino aesthetic.
+
+30. Mirage Casino VIP
+High-end resort poker player.
+
+31. Sapphire Lounge King
+Elegant nightlife kingpin.
+
+32. Crimson Bluff Artist
+Aggressive stylish bluffer.
+
+33. Neon Cigar Player
+Classic Vegas-inspired high roller.
+
+34. Platinum Table Grinder
+Mid-tier poker veteran.
+
+35. Midnight Executive
+Corporate high-stakes poker regular.
+
+36. Luxury Penthouse Gambler
+Ultra-modern nightlife millionaire.
+
+37. Cyber Lounge Dealer
+Futuristic casino dealer.
+
+38. Oceanfront Millionaire
+Luxury yacht poker icon.
+
+39. Vice Syndicate Player
+Underground social poker elite.
+
+40. Neon Skyline Boss
+City nightlife poker celebrity.
+
+==============================================================
+8. EPIC TIER CHARACTERS (20)
+==============================================================
+
+EPIC characters should:
+- feel prestigious
+- include animated lighting
+- feature holographic effects
+- visually stand out heavily
+
+Unlock difficulty:
+HARD
+
+Unlock examples:
+- level 25+
+- tournament wins
+- ranked milestones
+- massive chip milestones
+- viral social feed moments
+
+CHARACTER CONCEPTS:
+
+41. Diamond Syndicate King
+Massive underground poker empire leader.
+
+42. The Neon Emperor
+Futuristic Vegas poker ruler.
+
+43. Royal Flush Assassin
+Cold calculated poker killer.
+
+44. Crimson Casino Ghost
+Mysterious high-stakes legend.
+
+45. Midnight Penthouse Boss
+Luxury nightlife poker mogul.
+
+46. Cyber Mirage Tycoon
+Futuristic casino billionaire.
+
+47. Chrome Phantom
+Legendary underground poker identity.
+
+48. The Silent Shark
+Emotionless elite grinder.
+
+49. Holographic Kingpin
+Luxury cyber-casino overlord.
+
+50. Neon Fortune Collector
+Massive social poker influencer.
+
+51. Platinum Bluff Master
+Elite psychological poker manipulator.
+
+52. Royal Skyline Gambler
+High-rise luxury poker legend.
+
+53. Diamond Lounge Predator
+Aggressive high-stakes tournament hunter.
+
+54. Ocean Drive Emperor
+Luxury nightlife poker icon.
+
+55. The Velvet Baron
+Elegant high-stakes manipulator.
+
+56. Blackout Syndicate Leader
+Dark underground poker boss.
+
+57. Future Vegas Legend
+Retro-futuristic casino celebrity.
+
+58. Sapphire Card Assassin
+Elite precision poker player.
+
+59. Neon Noir Millionaire
+Dark cinematic poker personality.
+
+60. Chip Society Elite
+Recognized top-level community figure.
+
+==============================================================
+9. LEGENDARY TIER CHARACTERS (20)
+==============================================================
+
+LEGENDARY characters should:
+- feel iconic
+- extremely difficult to earn
+- instantly recognizable socially
+- visually spectacular
+
+Unlock difficulty:
+EXTREME
+
+Unlock examples:
+- leaderboard finishes
+- level 50+
+- massive XP totals
+- huge chip milestones
+- tournament championships
+- social influence achievements
+
+LEGENDARY characters should include:
+- animated portraits
+- glowing neon borders
+- holographic FX
+- reactive lighting
+- premium animated profile frames
+
+CHARACTER CONCEPTS:
+
+61. The Neon Godfather
+Ultimate underground poker ruler.
+
+62. Casino Empire Founder
+Luxury Vegas empire creator.
+
+63. The Final Bluff
+Mythical undefeated poker icon.
+
+64. Diamond Phantom King
+Legendary casino ghost personality.
+
+65. Royal Flush Emperor
+Highest prestige poker champion.
+
+66. Hologram Syndicate Boss
+Cyberpunk poker overlord.
+
+67. Black Diamond Shark
+Elite high-stakes predator.
+
+68. Neon Casino Monarch
+Retro Vegas ruler.
+
+69. Infinite Chip Tycoon
+Massive poker wealth legend.
+
+70. Crimson Skyline King
+Legendary city poker ruler.
+
+71. Vice City Legend
+Ultimate retro nightlife poker icon.
+
+72. Sapphire Mirage Emperor
+Luxury holographic casino elite.
+
+73. The Last High Roller
+Mythical poker veteran.
+
+74. Platinum Empire Boss
+World-famous poker empire owner.
+
+75. Cyber Vegas Overlord
+Futuristic casino ruler.
+
+76. The River Master
+Legendary endgame poker genius.
+
+77. Neon Throne Holder
+Highest social poker prestige.
+
+78. The Midnight Emperor
+Dark luxury poker mastermind.
+
+79. Chip Society Founder
+Ultimate prestige community character.
+
+80. The Poker Community Legend
+The rarest and most difficult character in the entire game.
+
+==============================================================
+10. XP + CHARACTER PROGRESSION SYSTEM
+==============================================================
+
+Characters should unlock ONLY after:
+- XP requirements met
+- achievement validation complete
+- milestone verification successful
+
+Add:
+- XP progress bars
+- character progression tree
+- unlock notifications
+- rarity showcase page
+
+==============================================================
+11. SOCIAL PROFILE INTEGRATION
+==============================================================
+
+Character portraits should appear in:
+- gameplay tables
+- social feed posts
+- player profiles
+- leaderboards
+- tournaments
+- reactions/comments
+
+Legendary avatars should instantly stand out socially.
+
+==============================================================
+12. FINAL EXPERIENCE TARGET
+==============================================================
+
+The avatar system should now feel:
+- collectible
+- prestigious
+- premium
+- progression-driven
+- socially competitive
+
+This should NO LONGER feel like:
+- emojis
+- cheap icons
+- placeholders
+- generic mobile avatars
+
+The system should rival:
+AAA competitive mobile progression systems.
+```

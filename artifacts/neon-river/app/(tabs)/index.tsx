@@ -21,7 +21,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useColors } from '@/hooks/useColors';
-import { getAvatar } from '@/components/CasinoAvatars';
+import { getCharacter } from '@/constants/characters';
+import CharacterPortrait from '@/components/CharacterPortrait';
 import { MusicEngine } from '@/lib/musicEngine';
 
 const { width } = Dimensions.get('window');
@@ -600,7 +601,7 @@ export default function HomeScreen() {
             <View style={[styles.topAvatar, { borderColor: rankColor, backgroundColor: colors.surface }]}>
               {profile.avatarUri
                 ? <Image source={{ uri: profile.avatarUri }} style={{ width: 38, height: 38, borderRadius: 19 }} />
-                : getAvatar(profile.avatarIndex).render(38)
+                : <CharacterPortrait character={getCharacter(profile.avatarIndex ?? 1)} size={38} />
               }
             </View>
           </TouchableOpacity>
