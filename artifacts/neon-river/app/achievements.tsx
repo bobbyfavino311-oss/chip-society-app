@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   progressWrap: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   progressBar: { flex: 1, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 1.5 },
-  progressTxt: { fontFamily: 'Orbitron_700Bold', fontSize: 8, letterSpacing: 0.5, minWidth: 28, textAlign: 'right' },
+  progressTxt: { fontFamily: 'Inter_700Bold', fontSize: 8, letterSpacing: 0.5, minWidth: 28, textAlign: 'right' },
   rewardRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
   rewardText: { fontFamily: 'Orbitron_400Regular', fontSize: 8.5, color: 'rgba(255,215,0,0.55)', letterSpacing: 0.3, flex: 1 },
   claimBtn: {

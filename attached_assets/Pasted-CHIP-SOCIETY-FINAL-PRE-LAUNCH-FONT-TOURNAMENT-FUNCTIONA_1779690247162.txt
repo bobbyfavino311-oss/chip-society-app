@@ -1,0 +1,489 @@
+CHIP SOCIETY — FINAL PRE-LAUNCH FONT + TOURNAMENT FUNCTIONALITY FIX
+CRITICAL BLOCKER PATCH
+==============================================================
+
+This is now a launch-blocking issue.
+
+The app still has two unresolved major problems:
+
+1. Zeroes still appear with lines/slashes through them.
+2. Tournament mode looks built visually, but the actual buttons and logic do not work.
+
+These must be fixed permanently before launch.
+
+==============================================================
+SECTION 1 — ZERO FONT ISSUE STILL NOT FIXED
+==============================================================
+
+The zeroes “0” across the app STILL have lines through them.
+
+This means the previous font update did not apply globally or the app is still using a slashed-zero font in some components.
+
+This must be fixed everywhere.
+
+==============================================================
+REQUIRED FONT FIX
+==============================================================
+
+Remove the current number font completely if it uses slashed zeroes.
+
+Replace all numeric text with a readable font where zeroes are plain hollow oval zeroes.
+
+The zero character must look like:
+0
+
+NOT:
+- slashed zero
+- dotted zero
+- crossed zero
+- line-through zero
+
+==============================================================
+WHERE TO FIX
+==============================================================
+
+Audit and update EVERY component that renders numbers:
+
+- chip balances
+- player bankrolls
+- pot values
+- tournament buy-ins
+- tournament prize pools
+- XP values
+- profile stats
+- achievement rewards
+- lucky wheel prizes
+- scratch ticket prizes
+- daily rewards
+- timers
+- player counts
+- hand numbers
+- leaderboards
+- ranked points
+- store prices
+- table stakes
+
+No screen should still use the slashed-zero font.
+
+==============================================================
+TECHNICAL FONT REQUIREMENTS
+==============================================================
+
+Search the codebase for all font usage.
+
+Remove or replace any font that creates slashed zeroes.
+
+Specifically check:
+- global theme typography
+- numeric components
+- chip balance components
+- tournament cards
+- custom Text components
+- SVG text
+- canvas-rendered numbers
+- CSS font-family overrides
+- React Native / Expo font imports
+
+If needed, create one global number component:
+
+<ReadableNumber />
+
+This component must:
+- use a plain-zero font
+- render exact values
+- be reused everywhere numbers appear
+
+==============================================================
+SECTION 2 — TOURNAMENT MODE IS NOT FUNCTIONAL
+==============================================================
+
+The tournament system currently appears visually built, but buttons do not actually work.
+
+Current issue:
+- Register button exists but does nothing meaningful
+- Join button exists but does not start a tournament
+- Tournament cards are basically placeholders
+- No real registration flow
+- No buy-in deduction
+- No player seating
+- No tournament table launch
+- No elimination system
+- No prize payout
+- No results screen
+
+This is unacceptable.
+
+Tournament mode must now become a fully functional playable feature.
+
+==============================================================
+TOURNAMENT MODE GOAL
+==============================================================
+
+Build a complete beta-ready tournament feature using:
+- the human player
+- AI bots
+- virtual chips only
+- newest redesigned table UI
+- real tournament flow
+
+This must work BEFORE real multiplayer server launch.
+
+==============================================================
+REQUIRED TOURNAMENT FLOW
+==============================================================
+
+When player taps REGISTER:
+
+1. Check if player has enough virtual chips.
+2. Show confirmation modal.
+3. Display buy-in amount.
+4. Player confirms entry.
+5. Deduct buy-in from player balance.
+6. Register player into tournament.
+7. Fill remaining seats with AI bots.
+8. Show registered status.
+9. Enable JOIN / START button.
+
+When player taps JOIN / START:
+
+1. Create tournament session.
+2. Assign seats.
+3. Load newest gameplay table.
+4. Start tournament hand.
+5. Run full tournament until winner.
+
+==============================================================
+TOURNAMENT BUTTON FUNCTIONALITY
+==============================================================
+
+Buttons must be fully wired.
+
+REGISTER button:
+- validates balance
+- opens confirmation modal
+- deducts buy-in after confirmation
+- registers player
+- updates UI state
+
+JOIN / START button:
+- only activates after registration
+- creates tournament match
+- loads gameplay table
+- starts tournament
+
+CANCEL REGISTRATION button:
+- available before tournament begins
+- refunds buy-in
+- removes player from tournament
+
+BACK button:
+- returns safely to tournament lobby
+
+No button should be decorative only.
+
+==============================================================
+TOURNAMENT BUY-IN VALIDATION
+==============================================================
+
+If tournament buy-in is 25,000 chips:
+
+Player must have:
+25,000+ chips
+
+If player has enough:
+allow registration.
+
+If player does not have enough:
+show clear modal:
+
+“Not enough virtual chips to enter this tournament.”
+
+Options:
+- Visit Store
+- Choose Lower Buy-In
+- Back
+
+==============================================================
+AI BOT FILL SYSTEM
+==============================================================
+
+Since real multiplayer is not live yet:
+
+Every tournament must fill open seats with AI bots.
+
+AI bots must have:
+- names
+- avatars
+- tournament chip stacks
+- skill level
+- realistic behavior
+
+Do NOT require real players for beta tournaments.
+
+==============================================================
+BETA TOURNAMENT TYPES
+==============================================================
+
+Create functional tournaments:
+
+1. Beginner Sit & Go
+- 5 players
+- buy-in: 5,000
+- starting stack: 10,000
+
+2. Midnight Turbo
+- 5 players
+- buy-in: 10,000
+- starting stack: 20,000
+- faster blind increases
+
+3. Neon Championship
+- 10 players
+- buy-in: 25,000
+- starting stack: 50,000
+
+4. High Roller Trial
+- 10 players
+- buy-in: 100,000
+- starting stack: 200,000
+
+==============================================================
+TOURNAMENT GAMEPLAY RULES
+==============================================================
+
+Tournament play must include:
+
+- fixed starting stacks
+- blind levels
+- blind increases
+- eliminations
+- final placement tracking
+- prize pool calculation
+- winner determination
+- payout distribution
+
+Tournament chips are separate from bankroll chips.
+
+Player bankroll is affected only by:
+- buy-in deduction
+- final prize payout
+
+==============================================================
+BLIND STRUCTURE
+==============================================================
+
+Implement blind levels.
+
+Example:
+
+Level 1: 25 / 50
+Level 2: 50 / 100
+Level 3: 100 / 200
+Level 4: 250 / 500
+Level 5: 500 / 1,000
+Level 6: 1,000 / 2,000
+Level 7: 2,500 / 5,000
+
+Blind increases every:
+- 5 hands for normal tournaments
+- 3 hands for turbo tournaments
+
+Display:
+- current blind level
+- next blind level
+- hands until blinds increase
+
+==============================================================
+ELIMINATION SYSTEM
+==============================================================
+
+Players are eliminated when:
+their tournament stack reaches 0.
+
+When eliminated:
+- remove from active table
+- update placement
+- continue tournament with remaining players
+
+If human player eliminated:
+show result screen immediately.
+
+If AI eliminated:
+continue tournament flow.
+
+==============================================================
+PAYOUT SYSTEM
+==============================================================
+
+Prize pool =
+total buy-ins from all tournament seats.
+
+5-player payout:
+- 1st: 70%
+- 2nd: 30%
+
+10-player payout:
+- 1st: 50%
+- 2nd: 30%
+- 3rd: 20%
+
+Payouts must:
+- calculate exactly
+- add to bankroll after tournament ends
+- display clearly
+- update profile balance instantly
+
+==============================================================
+TOURNAMENT RESULTS SCREEN
+==============================================================
+
+At the end of tournament show:
+
+- placement
+- prize won
+- buy-in spent
+- net result
+- XP earned
+- hands won
+- players eliminated
+- biggest pot
+
+Buttons:
+- Play Again
+- Back to Tournament Lobby
+- Share Result
+
+==============================================================
+TOURNAMENT TABLE UI
+==============================================================
+
+Tournament mode must use the NEWEST poker table design only.
+
+Do NOT use old table UI.
+
+Tournament table should display:
+
+- tournament name
+- current blind level
+- players remaining
+- current position
+- prize pool
+- tournament stack
+- next blind increase
+
+==============================================================
+TOURNAMENT AI BEHAVIOR
+==============================================================
+
+AI should behave like tournament players:
+
+Early stage:
+- tighter
+- avoids reckless all-ins
+
+Middle stage:
+- more aggressive
+- steals blinds occasionally
+
+Short stack:
+- shove/fold strategy
+
+Near payout:
+- cautious bubble play
+
+==============================================================
+TOURNAMENT STATE MACHINE
+==============================================================
+
+Build a real tournament state system:
+
+TOURNAMENT_LOBBY
+REGISTERING
+REGISTERED
+STARTING
+IN_PROGRESS
+PLAYER_ELIMINATED
+FINAL_TABLE
+COMPLETED
+RESULTS
+
+Every state must:
+- update UI
+- persist progress
+- prevent broken navigation
+- avoid dead buttons
+
+==============================================================
+DATA PERSISTENCE
+==============================================================
+
+Save tournament data:
+
+- tournament ID
+- buy-in
+- prize pool
+- player list
+- AI bot list
+- blind level
+- placements
+- results
+- payouts
+
+Store locally for beta if backend is not ready.
+
+==============================================================
+QUALITY REQUIREMENTS
+==============================================================
+
+Test every tournament button:
+
+- Register
+- Confirm Entry
+- Cancel Registration
+- Join / Start
+- Back
+- Play Again
+- Share Result
+- Return to Lobby
+
+No button should fail silently.
+
+No screen should trap the user.
+
+No tournament should start without proper state.
+
+==============================================================
+FINAL ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete, confirm:
+
+1. Zeroes are hollow everywhere.
+2. No slashed zero appears anywhere.
+3. Register button works.
+4. Buy-in deducts correctly.
+5. Cancel registration refunds correctly.
+6. Join / Start launches tournament gameplay.
+7. AI bots fill empty seats.
+8. Blinds increase properly.
+9. Players eliminate correctly.
+10. Prize pool calculates correctly.
+11. Payouts update player bankroll.
+12. Tournament results screen appears.
+13. Tournament uses newest table design.
+14. No decorative placeholder buttons remain.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+This update should make Tournament Mode feel like a real playable feature.
+
+The app should now feel ready for beta launch with:
+- readable numbers
+- working tournaments
+- accurate economy
+- functional buttons
+- polished gameplay flow
+
+This is one of the final major systems before launch.

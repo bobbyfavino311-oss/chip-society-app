@@ -493,7 +493,7 @@ const s = StyleSheet.create({
     shadowRadius: 20,
   },
   resultEmoji: { fontSize: 44 },
-  resultAmount: { fontSize: 22, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  resultAmount: { fontSize: 22, fontWeight: '900', fontFamily: 'Inter_700Bold', letterSpacing: 1 },
   claimBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     borderWidth: 1.5, borderRadius: 24, overflow: 'hidden',

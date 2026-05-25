@@ -130,7 +130,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,0,144,0.06)', padding: 18, alignItems: 'center', gap: 2,
   },
   chipsLabel:  { fontFamily: 'Orbitron_400Regular', fontSize: 8, color: 'rgba(255,0,144,0.6)', letterSpacing: 2 },
-  chipsAmount: { fontFamily: 'Orbitron_900Black', fontSize: 34, color: colors.secondary },
+  chipsAmount: { fontFamily: 'Inter_700Bold', fontSize: 34, color: colors.secondary },
   chipsUnit:   { fontFamily: 'Orbitron_400Regular', fontSize: 8, color: 'rgba(255,0,144,0.5)', letterSpacing: 2 },
   chipsNote:   { fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 4 },
 

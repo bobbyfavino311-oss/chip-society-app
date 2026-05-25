@@ -64,7 +64,7 @@ const statStyles = StyleSheet.create({
   value: {
     fontSize: 22,
     fontWeight: '700',
-    fontFamily: 'Orbitron_700Bold',
+    fontFamily: 'Inter_700Bold',
   },
   label: {
     color: colors.textDim,
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     color: colors.gold,
     fontSize: 32,
     fontWeight: '700',
-    fontFamily: 'Orbitron_700Bold',
+    fontFamily: 'Inter_700Bold',
   },
   chipLabel: { color: colors.textMuted, fontSize: 10, letterSpacing: 2, fontWeight: '600' },
   streakNum: { color: colors.text, fontSize: 18, fontWeight: '700' },

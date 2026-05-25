@@ -336,7 +336,7 @@ const g = StyleSheet.create({
   posBadgeText: { fontSize: 7, fontWeight: '900', color: '#000' },
   seatName: { color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: '600', maxWidth: 68, textAlign: 'center' },
   seatNameWinner: { color: colors.gold, fontWeight: '700' },
-  seatChips: { color: colors.text, fontSize: 10, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
+  seatChips: { color: colors.text, fontSize: 10, fontWeight: '700', fontFamily: 'Inter_700Bold' },
   dimText: { color: colors.textMuted },
   betLabel: { color: colors.primary, fontSize: 9, fontWeight: '700' },
   actionBadge: { borderRadius: 4, borderWidth: 1, paddingHorizontal: 5, paddingVertical: 2 },
@@ -1098,7 +1098,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted, fontSize: 7, fontWeight: '700',
     letterSpacing: 1.5, fontFamily: 'Orbitron_400Regular',
   },
-  sidePotAmt: { color: colors.gold, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  sidePotAmt: { color: colors.gold, fontSize: 13, fontWeight: '800', fontFamily: 'Inter_700Bold' },
   potPill: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     backgroundColor: 'rgba(10,5,20,0.75)', borderRadius: 16,
@@ -1106,7 +1106,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 5,
   },
   potLabel: { color: 'rgba(255,215,0,0.6)', fontSize: 8, fontWeight: '600', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
-  potAmount: { color: colors.gold, fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold', lineHeight: 24 },
+  potAmount: { color: colors.gold, fontSize: 20, fontWeight: '800', fontFamily: 'Inter_700Bold', lineHeight: 24 },
 
   // ── All-in overlay ─────────────────────────────────────────────────────────
   allInOverlay: { alignItems: 'center', gap: 1 },
@@ -1164,7 +1164,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
   },
   sidePotHandoverLabel: { color: colors.textMuted, fontSize: 9, fontWeight: '700', letterSpacing: 1, fontFamily: 'Orbitron_400Regular' },
-  sidePotHandoverAmt: { color: colors.gold, fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  sidePotHandoverAmt: { color: colors.gold, fontSize: 12, fontWeight: '800', fontFamily: 'Inter_700Bold' },
 
   // ── Handover panel ─────────────────────────────────────────────────────────
   handoverPanel: {

@@ -838,7 +838,7 @@ const st = StyleSheet.create({
   subtitle: { color: colors.textDim, fontSize: 8, letterSpacing: 2, fontWeight: '700', marginTop: 2 },
   ticketBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(191,95,255,0.12)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(191,95,255,0.3)', paddingHorizontal: 10, paddingVertical: 5 },
   ticketIcon: { fontSize: 12 },
-  ticketCount: { fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  ticketCount: { fontSize: 13, fontWeight: '800', fontFamily: 'Inter_700Bold' },
 
   matchBanner: {
     width: '100%', borderRadius: 14, borderWidth: 1.5,
@@ -867,7 +867,7 @@ const st = StyleSheet.create({
 
   jackpotStrip: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 10, borderWidth: 1, paddingHorizontal: 16, paddingVertical: 8, overflow: 'hidden' },
   jackpotLabel: { color: colors.textDim, fontSize: 9, letterSpacing: 1 },
-  jackpotAmt: { fontSize: 20, fontWeight: '900', fontFamily: 'Orbitron_700Bold' },
+  jackpotAmt: { fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
 
   prizeGrid: {
     flexDirection: 'row', flexWrap: 'wrap',
@@ -881,13 +881,13 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.02)',
   },
   prizeEmoji: { fontSize: 16 },
-  prizeVal: { fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_700Bold' },
+  prizeVal: { fontSize: 17, fontWeight: '900', fontFamily: 'Inter_700Bold' },
   prizeUnit: { color: colors.textDim, fontSize: 7, letterSpacing: 0.5 },
 
   progressWrap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   progressTrack: { flex: 1, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 2 },
-  progressPct: { fontSize: 10, fontWeight: '700', fontFamily: 'Orbitron_700Bold', minWidth: 32, textAlign: 'right' },
+  progressPct: { fontSize: 10, fontWeight: '700', fontFamily: 'Inter_700Bold', minWidth: 32, textAlign: 'right' },
 
   actionRow: { alignItems: 'center', minHeight: 32, justifyContent: 'center' },
   revealBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 20, paddingHorizontal: 18, paddingVertical: 8 },
@@ -900,7 +900,7 @@ const st = StyleSheet.create({
   },
   resultEmoji: { fontSize: 44 },
   winTitle: { color: '#ffd700', fontSize: 22, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
-  winAmt: { color: '#ffd700', fontSize: 26, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  winAmt: { color: '#ffd700', fontSize: 26, fontWeight: '900', fontFamily: 'Inter_700Bold', letterSpacing: 1 },
   winSub: { color: colors.textDim, fontSize: 10, letterSpacing: 1, marginTop: 2 },
   loseTitle: { color: colors.textMuted, fontSize: 18, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
   loseSub: { color: colors.textDim, fontSize: 12 },

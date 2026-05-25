@@ -343,7 +343,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,215,0,0.06)', padding: 20, alignItems: 'center', gap: 4,
   },
   chipsLabel:  { fontFamily: 'Orbitron_400Regular', fontSize: 9, color: 'rgba(255,215,0,0.6)', letterSpacing: 3 },
-  chipsAmount: { fontFamily: 'Orbitron_900Black', fontSize: 38, color: colors.gold, letterSpacing: 2 },
+  chipsAmount: { fontFamily: 'Inter_700Bold', fontSize: 38, color: colors.gold, letterSpacing: 0 },
   chipsUnit:   { fontFamily: 'Orbitron_400Regular', fontSize: 9, color: 'rgba(255,215,0,0.5)', letterSpacing: 3 },
 
   perksRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },

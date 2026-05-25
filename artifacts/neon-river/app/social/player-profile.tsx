@@ -98,7 +98,7 @@ function StatItem({ label, value, color, icon }: { label: string; value: string;
 
 const si = StyleSheet.create({
   box: { flex: 1, alignItems: 'center', gap: 3, paddingVertical: 12, backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border },
-  value: { color: colors.text, fontSize: 18, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  value: { color: colors.text, fontSize: 18, fontWeight: '800', fontFamily: 'Inter_700Bold' },
   label: { color: colors.textDim, fontSize: 8, letterSpacing: 1, fontWeight: '600' },
 });
 

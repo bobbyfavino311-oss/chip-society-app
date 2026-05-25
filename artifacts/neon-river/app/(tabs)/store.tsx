@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   },
   balanceText: {
     color: '#00d4ff', fontSize: 13, fontWeight: '700',
-    fontFamily: 'Orbitron_700Bold',
+    fontFamily: 'Inter_700Bold',
   },
 
   sectionLabel: {
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   bonusEmoji: { fontSize: 28 },
   bonusTitle: { color: colors.text, fontSize: 14, fontWeight: '700' },
   bonusSub: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
-  bonusAmount: { fontSize: 18, fontWeight: '900', fontFamily: 'Orbitron_700Bold', textAlign: 'right' },
+  bonusAmount: { fontSize: 18, fontWeight: '900', fontFamily: 'Inter_700Bold', textAlign: 'right' },
   claimBtn: {
     marginTop: 4, borderRadius: 6,
     paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-end',
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
   packageBadgeText: { color: '#050010', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
   packageLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   packageName: { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
-  packageChips: { fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_900Black', marginTop: 1 },
+  packageChips: { fontSize: 16, fontWeight: '900', fontFamily: 'Inter_700Bold', marginTop: 1 },
   packageRate: { color: colors.textDim, fontSize: 10, marginTop: 1 },
   packagePriceBtn: {
     borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8,
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Orbitron_700Bold', flex: 1,
   },
   vipPrice: { alignItems: 'flex-end' },
-  vipPriceText: { color: '#bf5fff', fontSize: 20, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  vipPriceText: { color: '#bf5fff', fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
   vipPriceSub: { color: colors.textMuted, fontSize: 10 },
   vipBenefits: { gap: 8 },
   vipBenefitRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -530,6 +530,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6, paddingVertical: 2,
   },
   ticketPackBestText: { color: '#050010', fontSize: 7, fontWeight: '900', letterSpacing: 0.5 },
-  ticketPackCount: { fontSize: 20, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  ticketPackCount: { fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
   ticketPackPrice: { fontSize: 11, fontWeight: '700' },
 });
