@@ -1,0 +1,245 @@
+CHIP SOCIETY — TOURNAMENT GAMEPLAY TABLE STYLE FIX
+CRITICAL UI CONSISTENCY PATCH
+==============================================================
+
+Major issue:
+
+Tournament gameplay is still using the OLD poker table layout.
+
+This is unacceptable because the main table gameplay has already been redesigned into a cleaner, simpler, more modern style.
+
+Tournament tables must now use the SAME NEW TABLE SYSTEM as the regular gameplay mode.
+
+==============================================================
+CURRENT TOURNAMENT PROBLEMS
+==============================================================
+
+The current tournament table still has:
+
+- old giant neon pink border
+- old oversized oval table frame
+- old player spacing
+- old betting controls
+- old card layout
+- old HUD structure
+- old crowded visual style
+- outdated table proportions
+- inconsistent design compared to the main game
+
+This makes tournament mode feel:
+- unfinished
+- disconnected
+- older than the rest of the app
+- visually inconsistent
+- prototype-like
+
+==============================================================
+REQUIRED FIX
+==============================================================
+
+Remove the old tournament table UI completely.
+
+Tournament gameplay must inherit the newest simple table gameplay design.
+
+Do NOT maintain two separate table designs.
+
+There should be ONE shared reusable poker table component used by:
+
+- Quick Match
+- AI Practice
+- Ranked
+- Private Tables
+- Tournament Mode
+
+==============================================================
+NEW TOURNAMENT TABLE STYLE
+==============================================================
+
+Tournament mode should use the new simplified table style:
+
+- no thick pink outer border
+- no giant glowing oval frame
+- cleaner dark background
+- subtle neon accents
+- compact player HUDs
+- centered community card area
+- modern bottom action controls
+- simplified table surface
+- cleaner spacing
+- readable chip balances
+- responsive mobile-first layout
+
+==============================================================
+TOURNAMENT-SPECIFIC UI OVERLAY
+==============================================================
+
+Tournament mode should only add a small clean tournament HUD overlay.
+
+Add tournament info without changing the table style.
+
+Tournament overlay should display:
+
+- tournament name
+- current blind level
+- players remaining
+- player position
+- prize pool
+- next blind increase
+
+Keep this overlay compact.
+
+Do NOT make it dominate the table.
+
+Suggested placement:
+top center or small collapsible panel near the top.
+
+Example:
+
+MIDNIGHT TURBO
+Blinds: 100 / 200
+Players: 4 / 10
+Next level: 3 hands
+
+==============================================================
+SHARED COMPONENT REQUIREMENT
+==============================================================
+
+Refactor table gameplay into one reusable component:
+
+<PokerTableScreen />
+
+This component should receive a mode prop:
+
+mode = "quick"
+mode = "ranked"
+mode = "private"
+mode = "tournament"
+
+The visual design should remain the same.
+
+Only mode-specific overlays should change.
+
+Tournament mode should NOT load:
+
+- OldTournamentTable
+- LegacyTable
+- NeonOvalTable
+- TournamentTableOld
+- any previous table screen
+
+Delete or stop using legacy table components.
+
+==============================================================
+BETTING CONTROLS FIX
+==============================================================
+
+Tournament betting controls must match the newest table gameplay controls.
+
+Use the same:
+
+- Fold button
+- Call button
+- Raise button
+- All In button
+- raise slider
+- quick bet buttons
+- player hand layout
+
+Do NOT use old oversized betting panel.
+
+==============================================================
+PLAYER HUD FIX
+==============================================================
+
+Tournament player HUDs must match the new gameplay HUD.
+
+Use:
+
+- compact avatars
+- small chip stack display
+- clean action badges
+- dealer / small blind / big blind indicators
+- subtle active-player glow
+
+Do NOT use old oversized circular icons or thick neon rings.
+
+==============================================================
+CARD LAYOUT FIX
+==============================================================
+
+Tournament cards must match the new gameplay card layout.
+
+Use:
+
+- current card size
+- current card spacing
+- current community card placement
+- current player hand placement
+
+Do NOT use old card backs or old card placeholder layout.
+
+==============================================================
+RESPONSIVE MOBILE REQUIREMENTS
+==============================================================
+
+Tournament gameplay must fit perfectly on:
+
+- iPhone 16 Pro Max
+- iPhone 15
+- iPhone 14
+- smaller iPhones
+
+No clipping.
+No overflow.
+No giant border.
+No old layout.
+
+==============================================================
+GAMEPLAY LOGIC MUST REMAIN TOURNAMENT-SPECIFIC
+==============================================================
+
+Only the visual table should be shared.
+
+Tournament logic must still include:
+
+- tournament stacks
+- blind levels
+- blind increases
+- eliminations
+- placements
+- payouts
+- players remaining
+
+But visually it must look like the new simplified table.
+
+==============================================================
+FINAL ACCEPTANCE CHECK
+==============================================================
+
+Before marking complete, confirm:
+
+1. Tournament table no longer shows the old pink border.
+2. Tournament table no longer uses the old oval layout.
+3. Tournament table matches the new simple gameplay table.
+4. Betting controls match regular gameplay.
+5. Player HUDs match regular gameplay.
+6. Tournament info appears only as a clean compact overlay.
+7. No legacy table components are still used.
+8. All modes use one shared PokerTableScreen component.
+9. Tournament gameplay still functions correctly.
+10. Table layout is consistent across every mode.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+Tournament mode should now feel like part of the same finished app.
+
+The player should NOT feel like they entered an older version of the game.
+
+Tournament gameplay should feel:
+- clean
+- modern
+- premium
+- consistent
+- launch ready
