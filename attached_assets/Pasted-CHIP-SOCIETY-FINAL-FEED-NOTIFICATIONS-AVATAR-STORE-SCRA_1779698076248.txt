@@ -1,0 +1,349 @@
+CHIP SOCIETY — FINAL FEED / NOTIFICATIONS / AVATAR / STORE / SCRATCH PATCH
+CRITICAL PRE-LAUNCH BUG FIXES
+==============================================================
+
+Fix the following remaining bugs and unfinished systems. These are launch-blocking issues.
+
+==============================================================
+1. FEED TAB “ME” DROPDOWN PROFILE ICON FIX
+==============================================================
+
+Current issue:
+The “ME” dropdown in the Feed tab does NOT reflect the player’s selected profile image.
+
+It should display whichever profile image the player is currently using.
+
+This includes:
+
+- uploaded custom profile photo
+- selected character avatar
+- selected classic symbol avatar
+
+Fix the Feed “ME” dropdown so it pulls from the same global profile image source as:
+
+- player profile
+- gameplay table
+- comments
+- social posts
+- leaderboard
+- tournament lobby
+
+There should be ONE shared profile image state.
+
+No duplicate placeholder images.
+
+No outdated default icons.
+
+==============================================================
+2. NOTIFICATION TOURNAMENT ROUTING FIX
+==============================================================
+
+Current issue:
+When tapping a tournament notification, the app incorrectly routes to the player profile.
+
+This is wrong.
+
+Tournament notifications must route to the Tournament tab / Tournament Lobby.
+
+Fix actionTarget routing.
+
+Tournament notification examples:
+
+- Neon Championship Open
+- Tournament Starting Soon
+- Tournament Registration Available
+- Prize Pool Updated
+
+These should open:
+
+Tournament Tab / Tournament Lobby
+
+NOT:
+
+Player Profile
+
+Acceptance test:
+Tap tournament notification → Tournament tab opens.
+
+==============================================================
+3. AVATAR IMAGE QUALITY FIX
+==============================================================
+
+Current issue:
+Avatar illustrations look blurry on mobile.
+
+Fix image quality immediately.
+
+Requirements:
+
+- use high-resolution assets
+- export avatars individually
+- avoid compressed screenshots
+- avoid low-res cropped sprites
+- avoid scaling small images upward
+- support Retina / high-DPI display
+- use proper image caching
+
+Each avatar should be a clear individual image asset.
+
+Recommended asset size:
+
+1024 x 1365 minimum
+or
+1080 x 1440 portrait ratio
+
+Use @2x / @3x resolution if needed.
+
+Do NOT use cropped screenshots from a large character sheet.
+
+==============================================================
+4. AVATAR CROPPING BUG FIX
+==============================================================
+
+Current issue:
+Several avatar cards still show parts of other characters inside the same box.
+
+This means the app is still slicing from a larger sheet incorrectly.
+
+This must stop.
+
+Requirements:
+
+- every avatar must be a separate standalone portrait file
+- no character sheet slicing
+- no neighboring character bleed
+- no partial card borders inside image
+- no visible numbers
+- no embedded UI labels
+- no adjacent portraits showing
+
+Each avatar image must contain ONLY:
+
+- one character
+- one background
+- no UI overlays
+
+Cropping rules:
+
+- full head visible
+- shoulders visible
+- upper chest visible
+- no forehead clipping
+- no chin clipping
+- no neighboring characters
+- centered composition
+- consistent portrait framing
+
+==============================================================
+5. ADD 10 MORE NEON SYMBOL AVATARS
+==============================================================
+
+The Classic Symbol Avatar tab needs more variety.
+
+Add 10 new premium neon symbol avatars.
+
+These should feel:
+- sleek
+- casino-inspired
+- futuristic
+- collectible
+- clean
+- premium
+
+New symbol concepts:
+
+1. Neon Dice
+Two glowing dice with cyan edges and pink pips.
+
+2. Chrome Ace
+A metallic ace card symbol with electric blue glow.
+
+3. Jackpot 777
+Three neon sevens with gold casino lighting.
+
+4. Lucky Horseshoe
+Chrome horseshoe with purple neon rim.
+
+5. Snake Eyes
+Two dice showing ones, surrounded by green neon smoke.
+
+6. Neon Martini
+Luxury cocktail glass with pink glow and casino sparkle.
+
+7. Flaming Chip
+Poker chip with blue flame wrapping around it.
+
+8. Diamond Eye
+A glowing diamond with an eye-shaped neon reflection inside.
+
+9. Midnight Crown
+Black chrome crown with cyan and purple highlights.
+
+10. Electric Joker
+Stylized joker mask outline with pink lightning accents.
+
+Each symbol should include:
+
+- clean centered icon
+- dark circular or square background
+- neon glow border
+- rarity frame support
+- no emojis
+- no flat stock icons
+- no childish style
+
+==============================================================
+6. CHIP STORE DUPLICATE DAILY GIFT FIX
+==============================================================
+
+Current issue:
+Chip Store has duplicate daily reward systems.
+
+There should only be ONE daily reward system:
+
+DAILY BONUS STREAK
+
+Remove the second “Daily Gift” feature with the gift box.
+
+Keep:
+
+- Daily Bonus Streak
+- countdown timer
+- claim button
+- streak progression
+
+Remove:
+
+- duplicate gift box daily gift
+- duplicate reward claim
+- duplicate store daily free gift card
+
+The store should not confuse players with two daily gift systems.
+
+==============================================================
+7. SCRATCH TICKET LAG FIX
+==============================================================
+
+Current issue:
+Scratch reveal is still laggy and not smooth.
+
+Optimize the scratch system for mobile.
+
+Requirements:
+
+- smooth 60 FPS scratching
+- low-latency touch tracking
+- no skipped gesture points
+- no stuttering
+- no delayed reveal
+- no large render freezes
+
+Technical fixes:
+
+- reduce particle overdraw
+- throttle excessive visual effects
+- optimize canvas redraw area
+- use requestAnimationFrame properly
+- avoid full-screen rerenders per scratch movement
+- use offscreen canvas/mask layer if available
+- simplify scratch debris if performance drops
+- preload textures
+
+The scratch interaction must feel smooth and responsive.
+
+==============================================================
+8. SCRATCH TICKET BLOCK ARTIFACT BUG FIX
+==============================================================
+
+Current issue:
+After scratching/revealing the ticket, a large block remains in the middle of the ticket that looks like the original scratch layer.
+
+This ruins the feature.
+
+Fix immediately.
+
+The scratch overlay must fully disappear once revealed.
+
+There should be:
+
+- no leftover rectangle
+- no opaque block
+- no scratch layer artifact
+- no centered mask remnant
+- no frozen texture panel
+
+When the ticket is fully scratched:
+
+- all foil/mask layers should be hidden or removed
+- final prize layout should be clean
+- reward should be fully visible
+- claim button should appear clearly
+
+==============================================================
+9. SCRATCH REVEAL COMPLETION LOGIC
+==============================================================
+
+When scratch progress reaches the reveal threshold:
+
+Example:
+75% scratched
+
+Then:
+
+- auto-clear remaining scratch overlay smoothly
+- show full ticket result
+- remove all mask artifacts
+- trigger win animation
+- show CLAIM button
+
+Do NOT leave partial scratch blocks.
+
+Do NOT force the user to fight the remaining overlay.
+
+==============================================================
+10. SCRATCH PRIZE ACCURACY CHECK
+==============================================================
+
+While fixing scratch, also verify prize payout integrity.
+
+The displayed prize must equal the claimed prize exactly.
+
+Example:
+
+Ticket shows:
+50,000 chips
+
+Claim adds:
+50,000 chips
+
+NOT:
+10,000
+NOT:
+rounded amount
+NOT:
+incorrect tier payout
+
+==============================================================
+FINAL ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete, verify:
+
+1. Feed “ME” dropdown shows current player profile image.
+2. Tournament notifications open Tournament tab, not profile.
+3. Avatars are sharp on mobile.
+4. No avatar shows another character inside the same box.
+5. All avatar assets are individual images.
+6. 10 new neon symbols are added.
+7. Duplicate Daily Gift is removed from Store.
+8. Only Daily Bonus Streak remains.
+9. Scratch ticket runs smoothly.
+10. Scratch ticket can fully reveal.
+11. No block artifact remains after reveal.
+12. Scratch prize payout matches displayed prize exactly.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+This patch should make the remaining profile, notification, avatar, store, and scratch systems feel polished, accurate, smooth, and launch-ready.

@@ -236,9 +236,10 @@ export default function ScratchScreen() {
   const [coverage,    setCoverage]    = useState(0);
   const [scratchTip,  setScratchTip]  = useState<{ x: number; y: number } | null>(null);
   const [sparks,      setSparks]      = useState<Array<{ id: number; x: number; y: number }>>([]);
-  const sparkId       = useRef(0);
-  const lastSoundRef  = useRef(0);
-  const lastHapticRef = useRef(0);
+  const sparkId          = useRef(0);
+  const lastSoundRef     = useRef(0);
+  const lastHapticRef    = useRef(0);
+  const coveredStateRef  = useRef(0);
 
   // Per-cell reveal state
   const cellCoveredRef  = useRef<Set<string>[]>(Array.from({ length: 9 }, () => new Set()));
@@ -305,8 +306,6 @@ export default function ScratchScreen() {
 
   const finishScratch = useCallback(() => {
     if (doneRef.current) return;
-    const fullPath = `M 0 0 L ${svgWRef.current} 0 L ${svgWRef.current} ${svgHRef.current} L 0 ${svgHRef.current} Z`;
-    setPathData(fullPath);
     setCoverage(1);
     setDone(true);
   }, []);
@@ -417,17 +416,20 @@ export default function ScratchScreen() {
           lastHapticRef.current = now;
         }
 
-        // More sparks — higher frequency, bigger
-        if (Math.random() < 0.55) {
+        // Lightweight sparks — low frequency to stay smooth
+        if (Math.random() < 0.18) {
           const id = ++sparkId.current;
-          setSparks(prev => [...prev.slice(-8), { id, x, y }]);
-          setTimeout(() => setSparks(prev => prev.filter(s => s.id !== id)), 350);
+          setSparks(prev => [...prev.slice(-3), { id, x, y }]);
         }
 
         setScratchTip({ x, y });
 
         const cov = computeCoverage(coveredRef.current, x, y, svgWRef.current, svgHRef.current);
-        setCoverage(cov);
+        // Throttle coverage state updates to reduce re-renders
+        if (cov - coveredStateRef.current >= 0.02 || cov >= 1) {
+          coveredStateRef.current = cov;
+          setCoverage(cov);
+        }
 
         const data = buildPath([...strokesRef.current, currentRef.current]);
         setPathData(data);
@@ -438,7 +440,7 @@ export default function ScratchScreen() {
         );
         if (nowRevealed.length > 0) handleCellReveal(nowRevealed);
 
-        if (cov >= 0.88) finishScratch();
+        if (cov >= 0.75) finishScratch();
       },
 
       onPanResponderRelease: () => {
@@ -449,6 +451,7 @@ export default function ScratchScreen() {
           setPathData(buildPath(strokesRef.current));
         }
         setScratchTip(null);
+        setSparks([]);
       },
 
       onPanResponderTerminate: () => {
@@ -459,6 +462,7 @@ export default function ScratchScreen() {
           setPathData(buildPath(strokesRef.current));
         }
         setScratchTip(null);
+        setSparks([]);
       },
     })
   ).current;
@@ -609,8 +613,8 @@ export default function ScratchScreen() {
               );
             })}
 
-            {/* SVG foil overlay — scratched away by mask */}
-            <View style={StyleSheet.absoluteFill} pointerEvents="none">
+            {/* SVG foil overlay — hidden entirely once ticket is done */}
+            {!done && <View style={StyleSheet.absoluteFill} pointerEvents="none">
               <Svg width={svgW} height={svgH} style={{ backgroundColor: 'transparent' }}>
                 <Defs>
                   <Mask id="foilMask">
@@ -696,7 +700,7 @@ export default function ScratchScreen() {
                   </>
                 )}
               </Svg>
-            </View>
+            </View>}
 
             {/* Scratch sparks */}
             {sparks.map(s => (

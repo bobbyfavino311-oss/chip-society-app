@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -26,6 +27,7 @@ import {
 } from '@/lib/socialData';
 import CharacterPortrait from '@/components/CharacterPortrait';
 import { getCharacter } from '@/constants/characters';
+import SymbolPortrait from '@/components/SymbolPortrait';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -831,6 +833,7 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
 
   const sym = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
   const col = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
+  const avatarType = profile.profileImageType ?? 'character';
   const data = subTab === 'posts' ? myPosts : subTab === 'reposts' ? MY_REPOSTS : MY_LIKES;
 
   return (
@@ -839,9 +842,13 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
       <View style={me.profileHeader}>
         <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
         <View style={me.avatarWrap}>
-          <View style={[me.bigAvatar, { borderColor: col }]}>
-            <Text style={[me.bigAvatarText, { color: col }]}>{sym}</Text>
-          </View>
+          {avatarType === 'symbol' ? (
+            <SymbolPortrait symbolIndex={profile.symbolIndex ?? 0} size={60} showGlow />
+          ) : avatarType === 'custom' && profile.avatarUri ? (
+            <Image source={{ uri: profile.avatarUri }} style={[me.bigAvatar, { borderColor: colors.primary }]} />
+          ) : (
+            <CharacterPortrait character={getCharacter(profile.avatarIndex)} size={60} />
+          )}
           <LinearGradient colors={[`${col}40`, 'transparent']} style={me.glow} />
         </View>
         <View style={me.profileInfo}>

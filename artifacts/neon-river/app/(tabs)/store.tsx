@@ -167,11 +167,10 @@ function PackageCard({ pkg, onPress }: { pkg: ChipPackage; onPress: () => void }
 
 // ─── DailyBonusCard ───────────────────────────────────────────────────────────
 function DailyBonusCard() {
-  const { canClaimDaily, dailyRewardAmount, claimDailyReward, profile, canClaimHourly, claimHourlyBonus, nextHourlyIn } = useUser();
+  const { canClaimDaily, dailyRewardAmount, claimDailyReward, profile } = useUser();
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [claiming, setClaiming] = useState(false);
-  const [claimingHourly, setClaimingHourly] = useState(false);
 
   const handleDaily = async () => {
     if (!canClaimDaily || claiming) return;
@@ -181,18 +180,10 @@ function DailyBonusCard() {
     if (reward > 0) Alert.alert('Daily Bonus!', `You received ${formatChips(reward)} chips!`);
   };
 
-  const handleHourly = async () => {
-    if (!canClaimHourly || claimingHourly) return;
-    setClaimingHourly(true);
-    const bonus = await claimHourlyBonus();
-    setClaimingHourly(false);
-    if (bonus > 0) Alert.alert('Hourly Bonus!', `You received ${formatChips(bonus)} chips!`);
-  };
-
   return (
     <View style={styles.freeSection}>
       <Text style={styles.sectionLabel}>FREE CHIPS</Text>
-      {/* Daily */}
+      {/* Daily Bonus Streak */}
       <TouchableOpacity
         style={[styles.bonusCard, { borderColor: canClaimDaily ? '#ffd70066' : colors.border }]}
         onPress={handleDaily} activeOpacity={0.8}
@@ -213,33 +204,6 @@ function DailyBonusCard() {
           <View style={[styles.claimBtn, { backgroundColor: canClaimDaily ? '#ffd700' : colors.border }]}>
             <Text style={[styles.claimBtnText, { color: canClaimDaily ? '#050010' : colors.textDim }]}>
               {canClaimDaily ? 'CLAIM' : 'CLAIMED'}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-      {/* Hourly */}
-      <TouchableOpacity
-        style={[styles.bonusCard, { borderColor: canClaimHourly ? '#00d4ff44' : colors.border }]}
-        onPress={handleHourly} activeOpacity={0.8}
-      >
-        <LinearGradient
-          colors={canClaimHourly ? ['rgba(0,212,255,0.1)', 'transparent'] : ['rgba(0,0,0,0.01)', 'transparent']}
-          style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-        />
-        <View style={styles.bonusLeft}>
-          <Text style={styles.bonusEmoji}>🎁</Text>
-          <View>
-            <Text style={styles.bonusTitle}>Daily Gift</Text>
-            <Text style={styles.bonusSub}>
-              {canClaimHourly ? 'Ready to collect!' : `Next in ${Math.floor(nextHourlyIn / 60)}h ${nextHourlyIn % 60}m`}
-            </Text>
-          </View>
-        </View>
-        <View>
-          <Text style={[styles.bonusAmount, { color: '#00d4ff' }]}>+5K</Text>
-          <View style={[styles.claimBtn, { backgroundColor: canClaimHourly ? '#00d4ff' : colors.border }]}>
-            <Text style={[styles.claimBtnText, { color: canClaimHourly ? '#050010' : colors.textDim }]}>
-              {canClaimHourly ? 'CLAIM' : 'WAIT'}
             </Text>
           </View>
         </View>

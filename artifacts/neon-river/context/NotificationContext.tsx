@@ -168,7 +168,7 @@ const SEED_NOTIFICATIONS: Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'd
     priority: 'medium',
     title: 'Neon Championship Open',
     message: 'The Neon Championship is now registering. 500K chip prize pool — limited seats.',
-    actionRoute: '/(tabs)/profile',
+    actionRoute: '/(tabs)/tournaments',
     actionLabel: 'VIEW',
     icon: 'ribbon',
     iconColor: '#bf5fff',
