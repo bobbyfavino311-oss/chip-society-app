@@ -1,0 +1,317 @@
+CHIP SOCIETY — CHARACTER AVATAR SYSTEM FINAL OVERHAUL
+CRITICAL FIXES + PROFILE IMAGE SYSTEM
+==============================================================
+
+The current avatar system is improved, but it is still NOT production ready.
+
+This update is intended to finalize the character system and prepare it for launch quality.
+
+==============================================================
+SECTION 1 — REMOVE BROKEN CROPPING
+==============================================================
+
+Current Problems:
+
+- Character numbers are visible inside portrait artwork.
+- Character names are partially embedded into images.
+- Several portraits are cropped incorrectly.
+- Some portraits show parts of neighboring character cards.
+- The last Legendary characters are visibly sliced from a larger image sheet.
+- Portrait framing is inconsistent.
+
+This makes the entire system feel unfinished.
+
+==============================================================
+FIX
+==============================================================
+
+STOP slicing portraits from a master image sheet.
+
+Every character portrait must be generated and exported as an INDIVIDUAL asset.
+
+Each portrait should be:
+
+1080 x 1440
+3:4 ratio
+Portrait orientation
+
+Each image should contain ONLY:
+
+- Character portrait
+- Background
+- Lighting
+- Clothing
+- Character personality
+
+Do NOT include:
+
+- Numbers
+- Character names
+- XP requirements
+- Lock icons
+- UI overlays
+- Rarity badges
+
+All of those elements must be rendered separately by the UI layer.
+
+==============================================================
+SECTION 2 — PORTRAIT CROPPING RULES
+==============================================================
+
+Every portrait must follow identical framing.
+
+Required Composition:
+
+- Full head visible
+- Hair visible
+- Shoulders visible
+- Upper chest visible
+- Face centered
+- Eyes positioned in upper third
+
+Do NOT allow:
+
+- forehead clipping
+- chin clipping
+- cut-off hats
+- cut-off shoulders
+- half faces
+- neighboring portraits visible
+
+Character should occupy:
+60–70% of frame.
+
+The portrait should still be recognizable when scaled down.
+
+==============================================================
+SECTION 3 — CHARACTER DIVERSITY FIX
+==============================================================
+
+The current roster still contains too many characters that look alike.
+
+Examples:
+
+- similar hairstyles
+- similar age ranges
+- similar facial structures
+- similar clothing
+- similar expressions
+
+This must be fixed.
+
+Every character should be instantly recognizable by silhouette.
+
+==============================================================
+REQUIREMENTS
+==============================================================
+
+Create maximum visual diversity.
+
+Mix:
+
+- men
+- women
+- younger players
+- older players
+- different ethnicities
+- different body types
+- different professions
+- different lifestyles
+
+Examples:
+
+- retired Vegas legend
+- casino hostess
+- poker streamer
+- nightclub owner
+- crypto investor
+- yacht millionaire
+- former boxer
+- celebrity gambler
+- sports bettor
+- luxury watch dealer
+
+No two characters should feel remotely similar.
+
+==============================================================
+SECTION 4 — CHARACTER UNLOCK SYSTEM
+==============================================================
+
+The first 10 Common characters should be unlocked immediately.
+
+Do NOT lock beginner characters.
+
+New players need customization options from day one.
+
+Automatically unlocked:
+
+1. The Rookie
+2. The Sports Bettor
+3. The Waitress
+4. The College Grinder
+5. The Club Promoter
+6. The Poker Blogger
+7. The Local Regular
+8. The Side Hustler
+9. The Bartender
+10. The Weekend Warrior
+
+These should be selectable immediately.
+
+==============================================================
+SECTION 5 — XP PROGRESSION
+==============================================================
+
+Character progression should begin after Character #10.
+
+Rare Characters:
+Unlock via XP milestones and gameplay achievements.
+
+Epic Characters:
+Unlock via tournaments, ranked progression, social activity, and major achievements.
+
+Legendary Characters:
+Unlock via extremely difficult progression milestones.
+
+Examples:
+
+- Level 50+
+- Tournament championships
+- Massive XP milestones
+- Social prestige milestones
+- High leaderboard finishes
+
+==============================================================
+SECTION 6 — PROFILE PHOTO UPLOAD SYSTEM
+==============================================================
+
+Add a completely new profile image system.
+
+Players should have TWO profile options.
+
+==============================================================
+OPTION 1
+==============================================================
+
+Use Chip Society Character Avatar
+
+Players can:
+
+- equip unlocked character
+- browse character collection
+- preview locked characters
+- view unlock requirements
+
+==============================================================
+OPTION 2
+==============================================================
+
+Upload Personal Profile Photo
+
+Players can:
+
+- upload from gallery
+- upload from camera
+- crop image
+- zoom image
+- reposition image
+
+Export format:
+
+512 x 512 profile image
+
+==============================================================
+SECTION 7 — PROFILE IMAGE CROPPER
+==============================================================
+
+Create a modern image cropper.
+
+Features:
+
+- drag image
+- zoom controls
+- rotate controls
+- circular preview
+- save button
+- cancel button
+
+The cropper should feel App Store quality.
+
+==============================================================
+SECTION 8 — PROFILE DISPLAY LOGIC
+==============================================================
+
+If player chooses:
+
+Character Avatar
+
+Display:
+- avatar portrait
+
+If player chooses:
+
+Custom Photo
+
+Display:
+- uploaded image
+
+This applies across:
+
+- gameplay tables
+- social feed
+- comments
+- player profiles
+- tournament screens
+- leaderboards
+
+==============================================================
+SECTION 9 — IMAGE MODERATION
+==============================================================
+
+Add basic moderation checks.
+
+Prevent:
+
+- nudity
+- hate symbols
+- offensive imagery
+- explicit content
+
+Flag inappropriate uploads.
+
+==============================================================
+SECTION 10 — SOCIAL FEED INTEGRATION
+==============================================================
+
+The social feed should support both:
+
+- Character Avatars
+- Uploaded Profile Photos
+
+All feed interactions should display whichever profile image the player has selected.
+
+==============================================================
+SECTION 11 — FINAL GOAL
+==============================================================
+
+The avatar system should feel like:
+
+- a premium collectible progression feature
+- a social identity system
+- a long-term unlock grind
+- a polished App Store quality experience
+
+The final system should NOT feel like:
+
+- emojis
+- SVG faces
+- placeholders
+- image-sheet slices
+- generic mobile game icons
+
+Players should become attached to both:
+
+- their unlocked characters
+- their personal uploaded profile image
+
+This system should feel comparable to top-tier social casino and competitive mobile games.

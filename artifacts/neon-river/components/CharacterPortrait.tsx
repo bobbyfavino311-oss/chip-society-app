@@ -20,6 +20,7 @@ interface Props {
   isEquipped?: boolean;
   isLocked?: boolean;
   style?: object;
+  customPhotoUri?: string;
 }
 
 function LockIcon({ size, color }: { size: number; color: string }) {
@@ -40,6 +41,7 @@ export default function CharacterPortrait({
   isEquipped = false,
   isLocked = false,
   style,
+  customPhotoUri,
 }: Props) {
   const rarityColor  = RARITY_COLORS[character.rarity];
   const borderWidth  = RARITY_BORDER_WIDTH[character.rarity];
@@ -101,7 +103,13 @@ export default function CharacterPortrait({
         }}
       >
         {/* Portrait image */}
-        {img ? (
+        {customPhotoUri && !isLocked ? (
+          <Image
+            source={{ uri: customPhotoUri }}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
+        ) : img ? (
           <Image
             source={img}
             style={{ width: '100%', height: '100%' }}

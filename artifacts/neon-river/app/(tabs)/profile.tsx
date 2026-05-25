@@ -279,10 +279,10 @@ export default function ProfileScreen() {
         <View style={styles.avatarSection}>
           <View style={{ position: 'relative' }}>
             <TouchableOpacity
-              onPress={() => router.push('/profile/avatar-select')}
+              onPress={() => router.push('/profile/photo-select')}
               activeOpacity={0.85}
             >
-              {profile.avatarUri ? (
+              {profile.profileImageType === 'custom' && profile.avatarUri ? (
                 <View style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}>
                   <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
                 </View>
@@ -290,7 +290,7 @@ export default function ProfileScreen() {
                 <CharacterPortrait character={getCharacter(profile.avatarIndex ?? 1)} size={90} isEquipped />
               )}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.changeAvatarBtn} onPress={() => router.push('/profile/avatar-select')}>
+            <TouchableOpacity style={styles.changeAvatarBtn} onPress={() => router.push('/profile/photo-select')}>
               <Ionicons name="color-palette" size={13} color="#050010" />
             </TouchableOpacity>
           </View>

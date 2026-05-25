@@ -47,6 +47,7 @@ export interface UserProfile {
   handsPlayed: number;
   avatarIndex: number;
   avatarUri?: string;
+  profileImageType?: 'character' | 'custom';
   lastDailyReward: string | null;
   lastHourlyBonus: string | null;
   streakDays: number;
@@ -83,6 +84,7 @@ const DEFAULT_PROFILE: UserProfile = {
   losses: 0,
   handsPlayed: 0,
   avatarIndex: 0,
+  profileImageType: 'character' as const,
   lastDailyReward: null,
   lastHourlyBonus: null,
   streakDays: 0,
@@ -208,6 +210,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             email: saved.email ?? '',
             createdAt: saved.createdAt ?? new Date().toISOString(),
             tutorialCompleted: saved.tutorialCompleted ?? false,
+            profileImageType: saved.profileImageType ?? (saved.avatarUri ? 'custom' : 'character'),
           }));
         } catch {}
       }
