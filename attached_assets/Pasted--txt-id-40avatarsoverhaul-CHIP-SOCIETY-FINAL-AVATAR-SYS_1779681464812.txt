@@ -1,0 +1,368 @@
+```txt id="40avatarsoverhaul"
+CHIP SOCIETY — FINAL AVATAR SYSTEM RESTRUCTURE
+40 PREMIUM UNLOCKABLE CHARACTERS
+==============================================================
+
+The current avatar system is too bloated and unfocused.
+
+Reduce the roster down to:
+40 TOTAL CHARACTERS
+
+This will:
+- improve quality
+- improve memorability
+- strengthen progression
+- make rare characters feel more prestigious
+- prevent visual clutter
+- create stronger player identity
+
+==============================================================
+1. FINAL CHARACTER STRUCTURE
+==============================================================
+
+Create:
+- 10 Common
+- 10 Rare
+- 10 Epic
+- 10 Legendary
+
+Each tier should feel:
+visually and socially more impressive than the previous one.
+
+==============================================================
+2. IMPORTANT AVATAR RULE
+==============================================================
+
+These are NOT:
+- emojis
+- initials
+- icons
+- symbols
+- profile placeholders
+
+These MUST be:
+FULL HUMAN CHARACTER PORTRAITS.
+
+Each character should feel:
+- cinematic
+- memorable
+- stylish
+- realistic
+- socially recognizable
+
+==============================================================
+3. VISUAL STYLE
+==============================================================
+
+The avatars should resemble:
+- luxury nightlife personalities
+- underground poker legends
+- Vegas VIP culture
+- Miami after-hours energy
+- social media poker celebrities
+
+Visual direction:
+- realistic portrait art
+- premium clothing
+- moody lighting
+- cinematic shadows
+- luxury fashion
+- nightlife atmosphere
+
+==============================================================
+4. COMMON CHARACTERS (10)
+==============================================================
+
+COMMON characters should feel:
+- grounded
+- beginner-level
+- relatable
+- socially approachable
+
+Unlock difficulty:
+easy.
+
+==============================================================
+CHARACTERS
+==============================================================
+
+1. The Rookie
+Young first-time poker grinder in a dark hoodie.
+
+2. The Bartender
+Casino lounge bartender entering poker culture.
+
+3. The Tourist
+Vegas vacation player with flashy nightlife style.
+
+4. The Club Kid
+Young nightlife regular trying poker.
+
+5. The College Grinder
+Online poker student with casual modern style.
+
+6. The Sports Fan
+Sports bettor exploring poker.
+
+7. The Side Hustler
+Street-smart low-stakes grinder.
+
+8. The Local Regular
+Familiar casino face.
+
+9. The Poker Blogger
+Social-feed-focused poker content creator.
+
+10. The Community Player
+Friendly social poker personality.
+
+==============================================================
+COMMON UNLOCK REQUIREMENTS
+==============================================================
+
+Unlocked through:
+- tutorial completion
+- first wins
+- level 1–5
+- first social post
+- beginner milestones
+
+==============================================================
+5. RARE CHARACTERS (10)
+==============================================================
+
+RARE characters should feel:
+- wealthier
+- more experienced
+- more stylish
+- more socially known
+
+Unlock difficulty:
+moderate.
+
+==============================================================
+CHARACTERS
+==============================================================
+
+11. The Bookie
+Sports betting operator with sharp tailored suit.
+
+12. The VIP Hostess
+Luxury nightlife personality.
+
+13. The Crypto Bro
+Modern gambling investor.
+
+14. The Lounge Owner
+High-end nightclub businessman.
+
+15. The Yacht Gambler
+Miami luxury lifestyle poker player.
+
+16. The Ex-Athlete
+Former sports player turned poker grinder.
+
+17. The Poker Streamer
+Growing social poker influencer.
+
+18. The Miami Hustler
+Fast-talking nightlife manipulator.
+
+19. The Car Dealer
+Luxury exotic-car salesman.
+
+20. The Poolside Millionaire
+Resort-style poker VIP.
+
+==============================================================
+RARE UNLOCK REQUIREMENTS
+==============================================================
+
+Unlocked through:
+- 100+ hands played
+- 50 wins
+- level 10–15
+- win streaks
+- social engagement milestones
+
+==============================================================
+6. EPIC CHARACTERS (10)
+==============================================================
+
+EPIC characters should feel:
+- prestigious
+- intimidating
+- cinematic
+- highly recognizable
+
+Unlock difficulty:
+hard.
+
+==============================================================
+CHARACTERS
+==============================================================
+
+21. The Casino Shark
+Elite high-stakes poker predator.
+
+22. The Penthouse Millionaire
+Luxury skyline poker icon.
+
+23. The Underground King
+Secret poker club ruler.
+
+24. The Poker Influencer
+Massive social poker celebrity.
+
+25. The Diamond Club VIP
+Exclusive casino elite member.
+
+26. The Bluff Master
+Legendary psychological player.
+
+27. The Syndicate Boss
+Underground gambling organizer.
+
+28. The High Roller Queen
+Luxury nightlife poker icon.
+
+29. The Tournament Killer
+Feared competitive grinder.
+
+30. The Society Elite
+Top-level Chip Society personality.
+
+==============================================================
+EPIC UNLOCK REQUIREMENTS
+==============================================================
+
+Unlocked through:
+- tournament wins
+- ranked progression
+- level 25+
+- massive chip milestones
+- achievement completion
+- social popularity milestones
+
+==============================================================
+7. LEGENDARY CHARACTERS (10)
+==============================================================
+
+LEGENDARY characters should feel:
+ICONIC.
+
+These should be:
+extremely difficult to earn.
+
+==============================================================
+CHARACTERS
+==============================================================
+
+31. The Godfather
+Ultimate underground poker ruler.
+
+32. The Vegas Phantom
+Mysterious undefeated poker legend.
+
+33. The Black Card Boss
+Highest-level casino executive.
+
+34. The Diamond Emperor
+Legendary poker empire owner.
+
+35. The Society Founder
+Original Chip Society icon.
+
+36. The Final Bluff
+Mythical poker mastermind.
+
+37. The Casino Emperor
+Luxury gambling kingpin.
+
+38. The Billionaire Whale
+Massive high-stakes poker titan.
+
+39. The Neon Legend
+Most recognizable poker personality.
+
+40. The Poker Community Legend
+The rarest and hardest character in the entire game.
+
+==============================================================
+LEGENDARY UNLOCK REQUIREMENTS
+==============================================================
+
+Unlocked ONLY through:
+- level 50+
+- leaderboard placements
+- massive XP milestones
+- tournament championships
+- ranked elite status
+- long-term progression
+- social prestige milestones
+
+==============================================================
+8. XP + CHARACTER PROGRESSION SYSTEM
+==============================================================
+
+Create a REAL character progression system.
+
+Characters unlock through:
+- XP gain
+- hand milestones
+- achievements
+- ranked wins
+- tournament success
+- social engagement
+
+The higher the tier:
+the harder the grind.
+
+==============================================================
+9. CHARACTER UNLOCK EXPERIENCE
+==============================================================
+
+When a character unlocks:
+
+Show:
+- full-screen portrait reveal
+- rarity glow animation
+- cinematic lighting
+- premium reward sound
+- unlock requirement completed
+
+The moment should feel:
+important and rewarding.
+
+==============================================================
+10. SOCIAL STATUS SYSTEM
+==============================================================
+
+Character rarity should function as:
+- social status
+- prestige
+- identity
+- flex value
+
+Legendary characters should instantly stand out:
+- at poker tables
+- on profiles
+- on social posts
+- on leaderboards
+
+==============================================================
+11. FINAL EXPERIENCE TARGET
+==============================================================
+
+The avatar system should now feel like:
+- a premium collectible progression system
+- a luxury poker social universe
+- a polished AAA mobile feature
+
+The app should NO LONGER feel:
+- cheap
+- placeholder quality
+- emoji-based
+- generic
+- random cyberpunk nonsense
+```
