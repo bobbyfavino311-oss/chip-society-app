@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   Platform,
@@ -13,7 +13,9 @@ import {
 import Svg, { Circle, Line } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import colors from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
+import { useTheme } from '@/context/ThemeContext';
+import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { formatChips, getChipColor } from '@/utils/chipColor';
 
@@ -43,38 +45,105 @@ function MiniChip({ size = 20, color = '#00d4ff' }: { size?: number; color?: str
 
 // ─── Chip packages ─────────────────────────────────────────────────────────────
 interface ChipPackage {
-  id: string;
-  name: string;
-  chips: number;
-  price: string;
-  priceNum: number;
-  color: string;
-  highlight?: boolean;
-  badge?: string;
+  id: string; name: string; chips: number; price: string;
+  priceNum: number; color: string; highlight?: boolean; badge?: string;
 }
 
 const PACKAGES: ChipPackage[] = [
-  { id: 'starter',    name: 'STARTER STACK',   chips: 100_000,     price: '$1.99',  priceNum: 1.99,  color: '#00d4ff' },
-  { id: 'neon',       name: 'NEON STACK',       chips: 500_000,     price: '$4.99',  priceNum: 4.99,  color: '#bf5fff' },
-  { id: 'highroller', name: 'HIGH ROLLER',      chips: 2_000_000,   price: '$19.99', priceNum: 19.99, color: '#ffd700', highlight: true, badge: 'BEST VALUE' },
-  { id: 'vault',      name: 'VAULT STACK',      chips: 10_000_000,  price: '$49.99', priceNum: 49.99, color: '#ff0090' },
-  { id: 'legend',     name: 'LEGEND STACK',     chips: 50_000_000,  price: '$99.99', priceNum: 99.99, color: '#ff6600', badge: 'ULTIMATE' },
+  { id: 'starter',    name: 'STARTER STACK',  chips: 100_000,    price: '$1.99',  priceNum: 1.99,  color: '#00d4ff' },
+  { id: 'neon',       name: 'NEON STACK',      chips: 500_000,    price: '$4.99',  priceNum: 4.99,  color: '#bf5fff' },
+  { id: 'highroller', name: 'HIGH ROLLER',     chips: 2_000_000,  price: '$19.99', priceNum: 19.99, color: '#ffd700', highlight: true, badge: 'BEST VALUE' },
+  { id: 'vault',      name: 'VAULT STACK',     chips: 10_000_000, price: '$49.99', priceNum: 49.99, color: '#ff0090' },
+  { id: 'legend',     name: 'LEGEND STACK',    chips: 50_000_000, price: '$99.99', priceNum: 99.99, color: '#ff6600', badge: 'ULTIMATE' },
 ];
 
-function PackageCard({ pkg, onPress }: { pkg: ChipPackage; onPress: () => void }) {
-  const chipsPerDollar = Math.floor(pkg.chips / pkg.priceNum / 1000);
+// ─── Shared styles factory ─────────────────────────────────────────────────────
+function createStyles(c: Colors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: c.background },
+    scroll:    { paddingHorizontal: 16, gap: 16 },
 
+    header:      { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    headerTitle: { color: c.text, fontSize: 22, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
+    headerSub:   { color: c.textMuted, fontSize: 10, fontFamily: 'Orbitron_400Regular', letterSpacing: 2, marginTop: 2 },
+    balanceChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: c.primaryDim, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: c.primaryGlow },
+    balanceText: { fontSize: 13, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+
+    sectionLabel: { color: c.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
+    sectionSub:   { color: c.textDim, fontSize: 11, marginTop: -6 },
+    sectionRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+
+    freeSection:  { gap: 10 },
+    bonusCard:    { borderRadius: 14, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: c.surface },
+    bonusLeft:    { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    bonusEmoji:   { fontSize: 28 },
+    bonusTitle:   { color: c.text, fontSize: 14, fontWeight: '700' },
+    bonusSub:     { color: c.textMuted, fontSize: 11, marginTop: 2 },
+    bonusAmount:  { fontSize: 18, fontWeight: '900', fontFamily: 'Inter_700Bold', textAlign: 'right' },
+    claimBtn:     { marginTop: 4, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-end' },
+    claimBtnText: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+
+    packagesSection: { gap: 10 },
+    packageCard: { borderRadius: 14, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, position: 'relative', backgroundColor: c.surface },
+    packageHighlight: { borderWidth: 1.5 },
+    packageBadge: { position: 'absolute', top: 0, right: 0, borderBottomLeftRadius: 10, borderTopRightRadius: 12, paddingHorizontal: 8, paddingVertical: 3 },
+    packageBadgeText: { color: '#050010', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+    packageLeft:  { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+    packageName:  { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+    packageChips: { fontSize: 16, fontWeight: '900', fontFamily: 'Inter_700Bold', marginTop: 1 },
+    packageRate:  { color: c.textDim, fontSize: 10, marginTop: 1 },
+    packagePriceBtn: { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, minWidth: 64, alignItems: 'center' },
+    packagePrice: { color: '#050010', fontSize: 14, fontWeight: '900' },
+
+    vipCard:      { borderRadius: 18, borderWidth: 1.5, borderColor: 'rgba(191,95,255,0.4)', overflow: 'hidden', position: 'relative', backgroundColor: c.surface },
+    vipBadge:     { position: 'absolute', top: 0, left: 0, backgroundColor: '#bf5fff', borderBottomRightRadius: 10, borderTopLeftRadius: 16, paddingHorizontal: 14, paddingVertical: 4 },
+    vipBadgeText: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 2 },
+    vipContent:   { padding: 20, paddingTop: 40, gap: 14 },
+    vipHeader:    { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    vipTitle:     { color: c.text, fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_700Bold', flex: 1 },
+    vipPrice:     { alignItems: 'flex-end' },
+    vipPriceText: { color: '#bf5fff', fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
+    vipPriceSub:  { color: c.textMuted, fontSize: 10 },
+    vipBenefits:  { gap: 8 },
+    vipBenefitRow:{ flexDirection: 'row', alignItems: 'center', gap: 8 },
+    vipBenefitText:{ color: c.textMuted, fontSize: 13 },
+    vipCta:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4, borderTopWidth: 1, borderTopColor: 'rgba(191,95,255,0.2)', paddingTop: 14 },
+    vipCtaText:   { color: '#bf5fff', fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+
+    legal: { color: c.textDim, fontSize: 10, textAlign: 'center', lineHeight: 16 },
+
+    scratchSection: { gap: 10 },
+    ticketBadge:    { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(191,95,255,0.15)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(191,95,255,0.3)', paddingHorizontal: 8, paddingVertical: 3 },
+    ticketBadgeText:{ color: '#bf5fff', fontSize: 10, fontWeight: '800' },
+    scratchPlayCard:{ borderRadius: 14, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: c.surface },
+    scratchPlayLeft:{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+    scratchPlayEmoji:   { fontSize: 30 },
+    scratchPlayTitle:   { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+    scratchPlaySub:     { color: c.textMuted, fontSize: 11, marginTop: 2 },
+    scratchPlayBtn:     { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, minWidth: 64, alignItems: 'center' },
+    scratchPlayBtnText: { fontSize: 12, fontWeight: '900', letterSpacing: 1 },
+    ticketPackRow: { flexDirection: 'row', gap: 8 },
+    ticketPack:    { flex: 1, borderRadius: 12, borderWidth: 1, overflow: 'hidden', paddingVertical: 12, alignItems: 'center', gap: 4, position: 'relative', backgroundColor: c.surface },
+    ticketPackBest:    { position: 'absolute', top: 0, right: 0, borderBottomLeftRadius: 8, borderTopRightRadius: 10, paddingHorizontal: 6, paddingVertical: 2 },
+    ticketPackBestText:{ color: '#050010', fontSize: 7, fontWeight: '900', letterSpacing: 0.5 },
+    ticketPackCount: { fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
+    ticketPackPrice: { fontSize: 11, fontWeight: '700' },
+  });
+}
+
+// ─── PackageCard ──────────────────────────────────────────────────────────────
+function PackageCard({ pkg, onPress }: { pkg: ChipPackage; onPress: () => void }) {
+  const colors = useColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const chipsPerDollar = Math.floor(pkg.chips / pkg.priceNum / 1000);
   return (
     <TouchableOpacity
       style={[styles.packageCard, pkg.highlight && styles.packageHighlight, { borderColor: `${pkg.color}44` }]}
-      onPress={onPress}
-      activeOpacity={0.8}
+      onPress={onPress} activeOpacity={0.8}
     >
       <LinearGradient
         colors={pkg.highlight ? [`${pkg.color}22`, `${pkg.color}08`] : [`${pkg.color}12`, 'transparent']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
       {pkg.badge && (
         <View style={[styles.packageBadge, { backgroundColor: pkg.color }]}>
@@ -85,9 +154,7 @@ function PackageCard({ pkg, onPress }: { pkg: ChipPackage; onPress: () => void }
         <MiniChip size={32} color={pkg.color} />
         <View style={{ gap: 2 }}>
           <Text style={[styles.packageName, { color: pkg.highlight ? pkg.color : colors.text }]}>{pkg.name}</Text>
-          <Text style={[styles.packageChips, { color: pkg.color }]}>
-            {formatChips(pkg.chips)} chips
-          </Text>
+          <Text style={[styles.packageChips, { color: pkg.color }]}>{formatChips(pkg.chips)} chips</Text>
           <Text style={styles.packageRate}>{chipsPerDollar}K chips / $1</Text>
         </View>
       </View>
@@ -98,9 +165,11 @@ function PackageCard({ pkg, onPress }: { pkg: ChipPackage; onPress: () => void }
   );
 }
 
-// ─── Daily bonus card ──────────────────────────────────────────────────────────
+// ─── DailyBonusCard ───────────────────────────────────────────────────────────
 function DailyBonusCard() {
   const { canClaimDaily, dailyRewardAmount, claimDailyReward, profile, canClaimHourly, claimHourlyBonus, nextHourlyIn } = useUser();
+  const colors = useColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [claiming, setClaiming] = useState(false);
   const [claimingHourly, setClaimingHourly] = useState(false);
 
@@ -109,7 +178,7 @@ function DailyBonusCard() {
     setClaiming(true);
     const reward = await claimDailyReward();
     setClaiming(false);
-    if (reward > 0) Alert.alert('Daily Bonus!', `You received ${formatChips(reward)} chips! 🔥`);
+    if (reward > 0) Alert.alert('Daily Bonus!', `You received ${formatChips(reward)} chips!`);
   };
 
   const handleHourly = async () => {
@@ -126,13 +195,11 @@ function DailyBonusCard() {
       {/* Daily */}
       <TouchableOpacity
         style={[styles.bonusCard, { borderColor: canClaimDaily ? '#ffd70066' : colors.border }]}
-        onPress={handleDaily}
-        activeOpacity={0.8}
+        onPress={handleDaily} activeOpacity={0.8}
       >
         <LinearGradient
-          colors={canClaimDaily ? ['rgba(255,215,0,0.12)', 'rgba(255,215,0,0.04)'] : ['rgba(255,255,255,0.03)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          colors={canClaimDaily ? ['rgba(255,215,0,0.12)', 'rgba(255,215,0,0.04)'] : ['rgba(0,0,0,0.01)', 'transparent']}
+          style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
         />
         <View style={styles.bonusLeft}>
           <Text style={styles.bonusEmoji}>🔥</Text>
@@ -153,13 +220,11 @@ function DailyBonusCard() {
       {/* Hourly */}
       <TouchableOpacity
         style={[styles.bonusCard, { borderColor: canClaimHourly ? '#00d4ff44' : colors.border }]}
-        onPress={handleHourly}
-        activeOpacity={0.8}
+        onPress={handleHourly} activeOpacity={0.8}
       >
         <LinearGradient
-          colors={canClaimHourly ? ['rgba(0,212,255,0.1)', 'transparent'] : ['rgba(255,255,255,0.03)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          colors={canClaimHourly ? ['rgba(0,212,255,0.1)', 'transparent'] : ['rgba(0,0,0,0.01)', 'transparent']}
+          style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
         />
         <View style={styles.bonusLeft}>
           <Text style={styles.bonusEmoji}>🎁</Text>
@@ -183,19 +248,16 @@ function DailyBonusCard() {
   );
 }
 
-// ─── Scratch & Win ─────────────────────────────────────────────────────────────
+// ─── ScratchSection ───────────────────────────────────────────────────────────
 function ScratchSection() {
   const { profile } = useUser();
+  const colors = useColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const canPlay = profile.scratchTickets > 0;
 
   const handleBuyTickets = (count: number, label: string) => {
-    Alert.alert(
-      'SCRATCH TICKETS',
-      `${label} will be available when the app launches on the App Store.\n\nTickets let you scratch & win up to 250K chips!`,
-      [{ text: 'Got it' }]
-    );
+    Alert.alert('SCRATCH TICKETS', `${label} will be available when the app launches on the App Store.\n\nTickets let you scratch & win up to 250K chips!`, [{ text: 'Got it' }]);
   };
-
-  const canPlay = profile.scratchTickets > 0;
 
   return (
     <View style={styles.scratchSection}>
@@ -208,17 +270,13 @@ function ScratchSection() {
       </View>
       <Text style={[styles.sectionSub, { marginTop: -8 }]}>Match 3 symbols · Win up to 250K chips</Text>
 
-      {/* Play now card */}
       <TouchableOpacity
         style={[styles.scratchPlayCard, { borderColor: canPlay ? 'rgba(191,95,255,0.55)' : colors.border }]}
-        onPress={() => router.push('/rewards/scratch')}
-        activeOpacity={0.82}
-        disabled={!canPlay}
+        onPress={() => router.push('/rewards/scratch')} activeOpacity={0.82} disabled={!canPlay}
       >
         <LinearGradient
-          colors={canPlay ? ['rgba(191,95,255,0.18)', 'rgba(191,95,255,0.05)'] : ['rgba(255,255,255,0.03)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+          colors={canPlay ? ['rgba(191,95,255,0.18)', 'rgba(191,95,255,0.05)'] : ['rgba(0,0,0,0.01)', 'transparent']}
+          style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         />
         <View style={styles.scratchPlayLeft}>
           <Text style={styles.scratchPlayEmoji}>🎫</Text>
@@ -238,18 +296,16 @@ function ScratchSection() {
         </View>
       </TouchableOpacity>
 
-      {/* Ticket packs */}
       <View style={styles.ticketPackRow}>
         {[
-          { label: '3 TICKETS', count: 3, price: '$0.99', color: '#00d4ff' },
+          { label: '3 TICKETS',  count: 3,  price: '$0.99', color: '#00d4ff' },
           { label: '10 TICKETS', count: 10, price: '$2.99', color: '#bf5fff', best: true },
           { label: '25 TICKETS', count: 25, price: '$5.99', color: '#ffd700' },
         ].map(tp => (
           <TouchableOpacity
             key={tp.label}
             style={[styles.ticketPack, { borderColor: `${tp.color}44` }, tp.best && { borderWidth: 1.5 }]}
-            onPress={() => handleBuyTickets(tp.count, tp.label)}
-            activeOpacity={0.8}
+            onPress={() => handleBuyTickets(tp.count, tp.label)} activeOpacity={0.8}
           >
             <LinearGradient colors={[`${tp.color}18`, 'transparent']} style={StyleSheet.absoluteFill} />
             {tp.best && <View style={[styles.ticketPackBest, { backgroundColor: tp.color }]}><Text style={styles.ticketPackBestText}>BEST</Text></View>}
@@ -266,31 +322,25 @@ function ScratchSection() {
 export default function StoreScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
+  const colors = useColors();
+  const { isDark } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const handlePurchase = (pkg: ChipPackage) => {
-    Alert.alert(
-      `${pkg.name}`,
-      `${formatChips(pkg.chips)} chips for ${pkg.price}\n\nIn-app purchases will be available when the app launches on the App Store.`,
-      [{ text: 'Got it', style: 'default' }]
-    );
+    Alert.alert(`${pkg.name}`, `${formatChips(pkg.chips)} chips for ${pkg.price}\n\nIn-app purchases will be available when the app launches on the App Store.`, [{ text: 'Got it' }]);
   };
 
   const handleVIP = () => {
-    Alert.alert(
-      'CHIP SOCIETY VIP',
-      'VIP membership will be available when the app launches on the App Store.\n\nBenefits include daily chip bonuses, exclusive tables, VIP badge, and more.',
-      [{ text: 'Got it', style: 'default' }]
-    );
+    Alert.alert('CHIP SOCIETY VIP', 'VIP membership will be available when the app launches on the App Store.\n\nBenefits include daily chip bonuses, exclusive tables, VIP badge, and more.', [{ text: 'Got it' }]);
   };
 
+  const bgGrad = isDark
+    ? (['#0e0030', '#050010', '#000520'] as const)
+    : ([colors.background, colors.surfaceElevated, colors.background] as const);
+
   return (
-    <View style={[styles.container]}>
-      <LinearGradient
-        colors={['#0e0030', '#050010', '#000520']}
-        style={StyleSheet.absoluteFill}
-      />
-      <View style={[styles.glowPink]} />
-      <View style={[styles.glowBlue]} />
+    <View style={styles.container}>
+      <LinearGradient colors={bgGrad} style={StyleSheet.absoluteFill} />
 
       <ScrollView
         contentContainerStyle={[
@@ -299,7 +349,6 @@ export default function StoreScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.headerTitle}>CHIP STORE</Text>
@@ -311,13 +360,9 @@ export default function StoreScreen() {
           </View>
         </View>
 
-        {/* Daily / Hourly bonuses */}
         <DailyBonusCard />
-
-        {/* Scratch & Win */}
         <ScratchSection />
 
-        {/* Chip packages */}
         <View style={styles.packagesSection}>
           <Text style={styles.sectionLabel}>CHIP PACKAGES</Text>
           <Text style={styles.sectionSub}>Virtual chips · No real-money value</Text>
@@ -326,12 +371,10 @@ export default function StoreScreen() {
           ))}
         </View>
 
-        {/* VIP Membership */}
         <TouchableOpacity style={styles.vipCard} onPress={handleVIP} activeOpacity={0.85}>
           <LinearGradient
             colors={['rgba(191,95,255,0.22)', 'rgba(255,0,144,0.12)', 'transparent']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
           />
           <View style={styles.vipBadge}>
             <Text style={styles.vipBadgeText}>VIP</Text>
@@ -366,7 +409,6 @@ export default function StoreScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Legal */}
         <Text style={styles.legal}>
           CHIP SOCIETY is a social poker entertainment game. All chips are virtual and
           have no real-money value. No cash payouts. No real gambling.{'\n'}
@@ -376,160 +418,3 @@ export default function StoreScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { paddingHorizontal: 16, gap: 16 },
-  glowPink: {
-    position: 'absolute', width: 300, height: 300,
-    borderRadius: 150, top: -50, right: -80,
-    backgroundColor: 'rgba(255,0,144,0.06)',
-  },
-  glowBlue: {
-    position: 'absolute', width: 260, height: 260,
-    borderRadius: 130, bottom: 200, left: -60,
-    backgroundColor: 'rgba(0,212,255,0.05)',
-  },
-
-  header: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-  },
-  headerTitle: {
-    color: colors.text, fontSize: 22, fontWeight: '900',
-    fontFamily: 'Orbitron_900Black', letterSpacing: 3,
-  },
-  headerSub: {
-    color: colors.textMuted, fontSize: 10, fontFamily: 'Orbitron_400Regular',
-    letterSpacing: 2, marginTop: 2,
-  },
-  balanceChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(0,212,255,0.1)',
-    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6,
-    borderWidth: 1, borderColor: 'rgba(0,212,255,0.25)',
-  },
-  balanceText: {
-    color: '#00d4ff', fontSize: 13, fontWeight: '700',
-    fontFamily: 'Inter_700Bold',
-  },
-
-  sectionLabel: {
-    color: colors.textMuted, fontSize: 10, fontWeight: '700',
-    letterSpacing: 2, fontFamily: 'Orbitron_400Regular',
-  },
-  sectionSub: { color: colors.textDim, fontSize: 11, marginTop: -6 },
-
-  freeSection: { gap: 10 },
-  bonusCard: {
-    borderRadius: 14, borderWidth: 1, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
-  },
-  bonusLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  bonusEmoji: { fontSize: 28 },
-  bonusTitle: { color: colors.text, fontSize: 14, fontWeight: '700' },
-  bonusSub: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
-  bonusAmount: { fontSize: 18, fontWeight: '900', fontFamily: 'Inter_700Bold', textAlign: 'right' },
-  claimBtn: {
-    marginTop: 4, borderRadius: 6,
-    paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-end',
-  },
-  claimBtnText: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-
-  packagesSection: { gap: 10 },
-  packageCard: {
-    borderRadius: 14, borderWidth: 1, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14, position: 'relative',
-  },
-  packageHighlight: {
-    borderWidth: 1.5,
-  },
-  packageBadge: {
-    position: 'absolute', top: 0, right: 0,
-    borderBottomLeftRadius: 10, borderTopRightRadius: 12,
-    paddingHorizontal: 8, paddingVertical: 3,
-  },
-  packageBadgeText: { color: '#050010', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
-  packageLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
-  packageName: { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
-  packageChips: { fontSize: 16, fontWeight: '900', fontFamily: 'Inter_700Bold', marginTop: 1 },
-  packageRate: { color: colors.textDim, fontSize: 10, marginTop: 1 },
-  packagePriceBtn: {
-    borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8,
-    minWidth: 64, alignItems: 'center',
-  },
-  packagePrice: { color: '#050010', fontSize: 14, fontWeight: '900' },
-
-  vipCard: {
-    borderRadius: 18, borderWidth: 1.5, borderColor: 'rgba(191,95,255,0.4)',
-    overflow: 'hidden', position: 'relative',
-  },
-  vipBadge: {
-    position: 'absolute', top: 0, left: 0,
-    backgroundColor: '#bf5fff',
-    borderBottomRightRadius: 10, borderTopLeftRadius: 16,
-    paddingHorizontal: 14, paddingVertical: 4,
-  },
-  vipBadgeText: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 2 },
-  vipContent: { padding: 20, paddingTop: 40, gap: 14 },
-  vipHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  vipTitle: {
-    color: colors.text, fontSize: 16, fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold', flex: 1,
-  },
-  vipPrice: { alignItems: 'flex-end' },
-  vipPriceText: { color: '#bf5fff', fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
-  vipPriceSub: { color: colors.textMuted, fontSize: 10 },
-  vipBenefits: { gap: 8 },
-  vipBenefitRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  vipBenefitText: { color: 'rgba(255,255,255,0.7)', fontSize: 13 },
-  vipCta: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 6, marginTop: 4,
-    borderTopWidth: 1, borderTopColor: 'rgba(191,95,255,0.2)',
-    paddingTop: 14,
-  },
-  vipCtaText: {
-    color: '#bf5fff', fontSize: 13, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
-  },
-  legal: {
-    color: 'rgba(255,255,255,0.2)', fontSize: 10,
-    textAlign: 'center', lineHeight: 16,
-  },
-
-  scratchSection: { gap: 10 },
-  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  ticketBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: 'rgba(191,95,255,0.15)', borderRadius: 10,
-    borderWidth: 1, borderColor: 'rgba(191,95,255,0.3)',
-    paddingHorizontal: 8, paddingVertical: 3,
-  },
-  ticketBadgeText: { color: '#bf5fff', fontSize: 10, fontWeight: '800' },
-  scratchPlayCard: {
-    borderRadius: 14, borderWidth: 1, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
-  },
-  scratchPlayLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
-  scratchPlayEmoji: { fontSize: 30 },
-  scratchPlayTitle: { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
-  scratchPlaySub: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
-  scratchPlayBtn: { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, minWidth: 64, alignItems: 'center' },
-  scratchPlayBtnText: { fontSize: 12, fontWeight: '900', letterSpacing: 1 },
-  ticketPackRow: { flexDirection: 'row', gap: 8 },
-  ticketPack: {
-    flex: 1, borderRadius: 12, borderWidth: 1, overflow: 'hidden',
-    paddingVertical: 12, alignItems: 'center', gap: 4, position: 'relative',
-  },
-  ticketPackBest: {
-    position: 'absolute', top: 0, right: 0,
-    borderBottomLeftRadius: 8, borderTopRightRadius: 10,
-    paddingHorizontal: 6, paddingVertical: 2,
-  },
-  ticketPackBestText: { color: '#050010', fontSize: 7, fontWeight: '900', letterSpacing: 0.5 },
-  ticketPackCount: { fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
-  ticketPackPrice: { fontSize: 11, fontWeight: '700' },
-});

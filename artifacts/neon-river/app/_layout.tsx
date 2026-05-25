@@ -24,6 +24,7 @@ import { TermsProvider, useTerms } from '@/context/TermsContext';
 import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
 import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
 import { SocialProvider } from '@/context/SocialContext';
+import { NotificationProvider } from '@/context/NotificationContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import TutorialOverlay from '@/components/TutorialOverlay';
 import { SoundEngine } from '@/lib/soundEngine';
@@ -79,6 +80,25 @@ function AchievementPopupRenderer() {
   return <AchievementUnlockPopup achievement={pendingUnlock} onDismiss={dismissPending} />;
 }
 
+// ─── Notification bridge — connects UserContext → NotificationProvider ────────
+
+function NotificationBridge({ children }: { children: React.ReactNode }) {
+  const { canClaimWheel, canClaimDaily, profile } = useUser();
+  const { unlockedIds, claimedIds } = useAchievements();
+  const pendingAchievements = [...unlockedIds].filter(id => !claimedIds.has(id)).length;
+
+  return (
+    <NotificationProvider
+      canClaimWheel={canClaimWheel}
+      canClaimDaily={canClaimDaily}
+      pendingAchievements={pendingAchievements}
+      streakDays={profile.streakDays}
+    >
+      {children}
+    </NotificationProvider>
+  );
+}
+
 // ─── Navigation stack ─────────────────────────────────────────────────────────
 
 function RootLayoutNav() {
@@ -100,6 +120,7 @@ function RootLayoutNav() {
           options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
         />
         <Stack.Screen name="achievements"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen name="notifications/index" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="rewards/wheel"    options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
         <Stack.Screen name="rewards/scratch"  options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
         <Stack.Screen name="rewards/streak"   options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }} />
@@ -145,11 +166,13 @@ export default function RootLayout() {
                 <SoundProvider>
                   <AchievementProvider>
                     <SocialProvider>
-                      <GestureHandlerRootView style={{ flex: 1 }}>
-                        <KeyboardProvider>
-                          <RootLayoutNav />
-                        </KeyboardProvider>
-                      </GestureHandlerRootView>
+                      <NotificationBridge>
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                          <KeyboardProvider>
+                            <RootLayoutNav />
+                          </KeyboardProvider>
+                        </GestureHandlerRootView>
+                      </NotificationBridge>
                     </SocialProvider>
                   </AchievementProvider>
                 </SoundProvider>

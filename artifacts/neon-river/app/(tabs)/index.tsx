@@ -21,6 +21,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useColors } from '@/hooks/useColors';
+import { useNotifications } from '@/context/NotificationContext';
 import { getCharacter } from '@/constants/characters';
 import CharacterPortrait from '@/components/CharacterPortrait';
 import { MusicEngine } from '@/lib/musicEngine';
@@ -495,6 +496,7 @@ export default function HomeScreen() {
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
   const { isMusicMuted, toggleMusicMute } = useSoundSettings();
+  const { unreadCount } = useNotifications();
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const dropAnim = useRef(new Animated.Value(0)).current;
@@ -561,16 +563,32 @@ export default function HomeScreen() {
         />
       )}
 
-      {/* Top-left: social feed */}
+      {/* Top-left: notification bell */}
       <TouchableOpacity
         style={[styles.topLeft, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}
-        onPress={() => router.push('/(tabs)/feed')}
+        onPress={() => router.push('/notifications' as any)}
         activeOpacity={0.8}
       >
-        <View style={[styles.topIconBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}>
-          <Ionicons name="people" size={18} color={colors.textMuted} />
+        <View style={[
+          styles.topIconBtn,
+          {
+            borderColor: unreadCount > 0 ? `${colors.primary}80` : colors.border,
+            backgroundColor: colors.surface,
+          },
+        ]}>
+          <Ionicons
+            name={unreadCount > 0 ? 'notifications' : 'notifications-outline'}
+            size={18}
+            color={unreadCount > 0 ? colors.primary : colors.textMuted}
+          />
         </View>
-        <View style={styles.feedPip} />
+        {unreadCount > 0 && (
+          <View style={[styles.notifBadge, { backgroundColor: '#ff0090', borderColor: colors.background }]}>
+            <Text style={styles.notifBadgeText}>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </Text>
+          </View>
+        )}
       </TouchableOpacity>
 
       {/* Top-right: music + gear + avatar */}
@@ -879,11 +897,14 @@ const styles = StyleSheet.create({
     width: 40, height: 40, borderRadius: 20,
     borderWidth: 1.5, alignItems: 'center', justifyContent: 'center',
   },
-  feedPip: {
-    position: 'absolute', top: 0, right: 0,
-    width: 9, height: 9, borderRadius: 5,
-    backgroundColor: '#00d4ff',
-    borderWidth: 1.5, borderColor: '#050010',
+  notifBadge: {
+    position: 'absolute', top: -2, right: -2,
+    minWidth: 18, height: 18, borderRadius: 9,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, paddingHorizontal: 3,
+  },
+  notifBadgeText: {
+    color: '#fff', fontSize: 9, fontWeight: '900', lineHeight: 12,
   },
   settingsDropdown: {
     position: 'absolute',
