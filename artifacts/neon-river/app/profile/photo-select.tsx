@@ -23,7 +23,7 @@ import { getCharacter } from '@/constants/characters';
 import CHARACTER_IMAGES from '@/constants/characterImages';
 
 const PORTRAIT_W = 168;
-const PORTRAIT_H = Math.round(PORTRAIT_W * 4 / 3);
+const PORTRAIT_H = Math.round(PORTRAIT_W * 152 / 134); // match source portrait ratio 134:152
 
 export default function PhotoSelectScreen() {
   const insets = useSafeAreaInsets();

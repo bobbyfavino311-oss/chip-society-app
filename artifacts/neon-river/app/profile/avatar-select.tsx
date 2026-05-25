@@ -36,7 +36,7 @@ const COLS = 2;
 const H_PAD = 16;
 const GAP = 10;
 const CARD_W = Math.floor((Math.min(SCREEN_W, 420) - H_PAD * 2 - GAP) / COLS);
-const IMG_H  = Math.round(CARD_W * 4 / 3);   // exact 3:4 portrait ratio
+const IMG_H  = Math.round(CARD_W * 152 / 134); // match source portrait ratio 134:152
 const INFO_H = 40;
 const CARD_H = IMG_H + INFO_H;
 
@@ -346,7 +346,7 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   heroImgWrap: {
-    width: 84, height: 112,
+    width: 84, height: Math.round(84 * 152 / 134),
     borderRadius: 10,
     borderWidth: 2,
     overflow: 'hidden',
