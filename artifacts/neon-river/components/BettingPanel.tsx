@@ -273,6 +273,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 11,
     fontWeight: '800',
+    fontFamily: 'Inter_700Bold',
   },
 
   sliderSection: {
@@ -295,7 +296,7 @@ const styles = StyleSheet.create({
     color: colors.gold,
     fontSize: 22,
     fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold',
+    fontFamily: 'Inter_700Bold',
     lineHeight: 26,
   },
 
@@ -405,6 +406,7 @@ const styles = StyleSheet.create({
   callAmt: {
     fontSize: 13,
     fontWeight: '900',
+    fontFamily: 'Inter_700Bold',
   },
 
   raiseBtn: {
@@ -422,6 +424,7 @@ const styles = StyleSheet.create({
   raiseInlineAmt: {
     fontSize: 12,
     fontWeight: '900',
+    fontFamily: 'Inter_700Bold',
   },
 
   allInBtn: {

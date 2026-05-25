@@ -1,9 +1,11 @@
+import './global.css';
 import {
   Orbitron_400Regular,
   Orbitron_700Bold,
   Orbitron_900Black,
   useFonts,
 } from '@expo-google-fonts/orbitron';
+import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
@@ -120,6 +122,8 @@ export default function RootLayout() {
     Orbitron_400Regular,
     Orbitron_700Bold,
     Orbitron_900Black,
+    Inter_400Regular,
+    Inter_700Bold,
     Pacifico_400Regular,
     BebasNeue_400Regular,
     Righteous_400Regular,

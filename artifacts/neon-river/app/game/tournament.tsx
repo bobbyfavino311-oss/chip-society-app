@@ -16,7 +16,9 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { SoundEngine } from '@/lib/soundEngine';
 import { getBestHand } from '@/lib/pokerEngine';
+import { useLocalSearchParams } from 'expo-router';
 import { useTournamentGame, BLIND_LEVELS, Standing, Prize } from '@/hooks/useTournamentGame';
+import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType } from '@/constants/tournaments';
 
 const { width } = Dimensions.get('window');
 const SEAT_CX = Math.round(width / 2 - 36);
@@ -210,9 +212,11 @@ function ordinal(n: number) {
 
 // ─── Lobby ────────────────────────────────────────────────────────────────────
 
-function LobbyScreen({ numPlayers, setNumPlayers, onStart, prizes }:
-  { numPlayers: 4 | 5 | 6; setNumPlayers: (n: 4 | 5 | 6) => void; onStart: () => void; prizes: Prize[] }) {
+function LobbyScreen({ tConfig, userChips, onStart, prizes }:
+  { tConfig: TournamentConfig; userChips: number; onStart: () => void; prizes: Prize[] }) {
   const insets = useSafeAreaInsets();
+  const canAfford = userChips >= tConfig.buyIn;
+  const handsPerLevel = tConfig.handsPerLevel;
   return (
     <View style={[lobby.screen, { paddingTop: insets.top }]}>
       <LinearGradient colors={['#0d0030', '#050010']} style={StyleSheet.absoluteFill} />
@@ -221,25 +225,32 @@ function LobbyScreen({ numPlayers, setNumPlayers, onStart, prizes }:
         <Text style={lobby.backText}>TOURNAMENTS</Text>
       </TouchableOpacity>
       <ScrollView contentContainerStyle={lobby.content} showsVerticalScrollIndicator={false}>
-        <Text style={lobby.title}>AI TOURNAMENT</Text>
-        <Text style={lobby.subtitle}>Texas Hold'em · Single Table</Text>
+        <View style={[lobby.typeHeader, { borderColor: `${tConfig.color}40` }]}>
+          <Ionicons name={tConfig.icon as any} size={28} color={tConfig.color} />
+          <Text style={[lobby.title, { color: tConfig.color }]}>{tConfig.name}</Text>
+        </View>
+        <Text style={lobby.subtitle}>{tConfig.subtitle}</Text>
+        <Text style={lobby.description}>{tConfig.description}</Text>
 
-        <View style={lobby.section}>
-          <Text style={lobby.sectionLabel}>TABLE SIZE</Text>
-          <View style={lobby.sizeRow}>
-            {([4, 5, 6] as const).map(n => (
-              <TouchableOpacity
-                key={n} style={[lobby.sizeBtn, numPlayers === n && lobby.sizeBtnActive]}
-                onPress={() => setNumPlayers(n)} activeOpacity={0.8}
-              >
-                {numPlayers === n && (
-                  <LinearGradient colors={[colors.accent, '#8833cc']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-                )}
-                <Text style={[lobby.sizeBtnNum, numPlayers === n && { color: colors.text }]}>{n}</Text>
-                <Text style={[lobby.sizeBtnLabel, numPlayers === n && { color: 'rgba(255,255,255,0.8)' }]}>players</Text>
-              </TouchableOpacity>
-            ))}
+        {/* Buy-in + Balance */}
+        <View style={[lobby.buyInCard, !canAfford && lobby.buyInCardError]}>
+          <View style={lobby.buyInRow}>
+            <Text style={lobby.buyInLabel}>TOURNAMENT BUY-IN</Text>
+            <Text style={[lobby.buyInAmt, { color: canAfford ? colors.gold : colors.error }]}>
+              {formatChips(tConfig.buyIn)} chips
+            </Text>
           </View>
+          <View style={lobby.buyInRow}>
+            <Text style={lobby.buyInLabel}>YOUR BALANCE</Text>
+            <Text style={[lobby.buyInAmt, { color: canAfford ? colors.success : colors.error }]}>
+              {formatChips(userChips)} chips
+            </Text>
+          </View>
+          {!canAfford && (
+            <Text style={lobby.buyInError}>
+              Not enough chips. You need {formatChips(tConfig.buyIn - userChips)} more.
+            </Text>
+          )}
         </View>
 
         <View style={lobby.section}>
@@ -267,7 +278,7 @@ function LobbyScreen({ numPlayers, setNumPlayers, onStart, prizes }:
               <View key={i} style={lobby.blindRow}>
                 <Text style={lobby.blindLevel}>LVL {i + 1}</Text>
                 <Text style={lobby.blindAmt}>{lvl.sb} / {lvl.bb}</Text>
-                <Text style={lobby.blindHands}>hands {i * 4 + 1}–{(i + 1) * 4}</Text>
+                <Text style={lobby.blindHands}>~{handsPerLevel} hands each</Text>
               </View>
             ))}
           </View>
@@ -275,13 +286,23 @@ function LobbyScreen({ numPlayers, setNumPlayers, onStart, prizes }:
 
         <View style={lobby.infoBox}>
           <Ionicons name="information-circle" size={16} color={colors.primary} />
-          <Text style={lobby.infoText}>Buy-in: 1,500 chips · All AI opponents have mixed difficulty levels</Text>
+          <Text style={lobby.infoText}>
+            {tConfig.numPlayers} players total · {tConfig.numPlayers - 1} AI opponents · Mixed skill levels
+          </Text>
         </View>
 
-        <TouchableOpacity style={lobby.startBtn} onPress={onStart} activeOpacity={0.85}>
-          <LinearGradient colors={[colors.accent, '#8833cc']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-          <Ionicons name="trophy" size={20} color={colors.text} />
-          <Text style={lobby.startText}>START TOURNAMENT</Text>
+        <TouchableOpacity
+          style={[lobby.startBtn, !canAfford && lobby.startBtnDisabled]}
+          onPress={canAfford ? onStart : undefined}
+          activeOpacity={canAfford ? 0.85 : 1}
+        >
+          {canAfford && (
+            <LinearGradient colors={[tConfig.color, `${tConfig.color}99`]} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+          )}
+          <Ionicons name={canAfford ? 'trophy' : 'lock-closed'} size={20} color={canAfford ? colors.background : colors.textDim} />
+          <Text style={[lobby.startText, !canAfford && lobby.startTextDisabled]}>
+            {canAfford ? `ENTER · ${formatChips(tConfig.buyIn)} CHIPS` : 'NOT ENOUGH CHIPS'}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -291,16 +312,24 @@ function LobbyScreen({ numPlayers, setNumPlayers, onStart, prizes }:
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export default function TournamentScreen() {
-  const { profile, recordWin, recordLoss } = useUser();
-  const [numPlayers, setNumPlayers] = useState<4 | 5 | 6>(6);
+  const { profile, recordWin, recordLoss, removeChips, addChips } = useUser();
+  const params = useLocalSearchParams<{ type?: string }>();
+  const tType = ((params.type as TournamentType) in TOURNAMENT_CONFIGS ? params.type as TournamentType : 'sitandgo');
+  const tConfig = TOURNAMENT_CONFIGS[tType];
+
   const [exitConfirm, setExitConfirm] = useState(false);
   const [humanElimOverlay, setHumanElimOverlay] = useState(false);
+  const prizeAwardedRef = useRef(false);
 
   const {
     gameState: state, tournament,
     startTournament, handleAction, nextHand,
     skipBotTurn, skipToShowdown, clearPendingEliminations,
-  } = useTournamentGame(profile.username, numPlayers);
+  } = useTournamentGame(profile.username, tConfig.numPlayers, {
+    startingChips: tConfig.startingChips,
+    buyIn: tConfig.buyIn,
+    handsPerLevel: tConfig.handsPerLevel,
+  });
 
   const insets = useSafeAreaInsets();
 
@@ -406,17 +435,32 @@ export default function TournamentScreen() {
     }
   }, [tournament.pendingEliminations]);
 
+  // Award prize chips when tournament ends
+  useEffect(() => {
+    if (tournament.phase !== 'ended') { prizeAwardedRef.current = false; return; }
+    if (prizeAwardedRef.current) return;
+    prizeAwardedRef.current = true;
+    const prize = tournament.myPrize ?? 0;
+    const place = tournament.myPlace ?? 99;
+    if (prize > 0) {
+      if (place === 1) recordWin(prize);
+      else addChips(prize);
+    }
+  }, [tournament.phase, tournament.myPrize, tournament.myPlace]);
+
   const prizes = useMemo(() => {
-    if (numPlayers <= 3) return [
-      { place: 1, pct: 60, amount: Math.round(numPlayers * 1500 * 0.6) },
-      { place: 2, pct: 40, amount: Math.round(numPlayers * 1500 * 0.4) },
+    const n = tConfig.numPlayers;
+    const pool = n * tConfig.buyIn;
+    if (n <= 3) return [
+      { place: 1, pct: 70, amount: Math.round(pool * 0.7) },
+      { place: 2, pct: 30, amount: Math.round(pool * 0.3) },
     ];
     return [
-      { place: 1, pct: 50, amount: Math.round(numPlayers * 1500 * 0.5) },
-      { place: 2, pct: 30, amount: Math.round(numPlayers * 1500 * 0.3) },
-      { place: 3, pct: 20, amount: Math.round(numPlayers * 1500 * 0.2) },
+      { place: 1, pct: 50, amount: Math.round(pool * 0.5) },
+      { place: 2, pct: 30, amount: Math.round(pool * 0.3) },
+      { place: 3, pct: 20, amount: Math.round(pool * 0.2) },
     ];
-  }, [numPlayers]);
+  }, [tConfig]);
 
   const humanPlayer = state.players.find(p => p.isHuman);
   const isHumanTurn = state.players[state.currentPlayerIndex]?.isHuman ?? false;
@@ -435,7 +479,8 @@ export default function TournamentScreen() {
 
   // ── Lobby ──────────────────────────────────────────────────────────────────
   if (tournament.phase === 'idle') {
-    return <LobbyScreen numPlayers={numPlayers} setNumPlayers={setNumPlayers} onStart={startTournament} prizes={prizes} />;
+    const onStartWithDeduct = () => { removeChips(tConfig.buyIn); startTournament(); };
+    return <LobbyScreen tConfig={tConfig} userChips={profile.chips} onStart={onStartWithDeduct} prizes={prizes} />;
   }
 
   // ── Results ────────────────────────────────────────────────────────────────
@@ -725,7 +770,7 @@ const hud = StyleSheet.create({
   },
   segment: { flex: 1, alignItems: 'center' },
   label: { color: colors.textMuted, fontSize: 8, fontWeight: '700', letterSpacing: 1 },
-  value: { color: colors.text, fontSize: 11, fontWeight: '800', fontFamily: 'Orbitron_700Bold', marginTop: 1 },
+  value: { color: colors.text, fontSize: 11, fontWeight: '800', fontFamily: 'Inter_700Bold', marginTop: 1 },
   divider: { width: 1, height: 24, backgroundColor: colors.border },
 });
 
@@ -757,14 +802,14 @@ const results = StyleSheet.create({
   subtitle: { fontFamily: 'Orbitron_700Bold', fontSize: 14, color: colors.accent, letterSpacing: 6, marginTop: 2 },
   myResult: { marginHorizontal: 24, borderRadius: 16, borderWidth: 2, backgroundColor: 'rgba(255,255,255,0.05)', padding: 20, alignItems: 'center', gap: 6, marginBottom: 16 },
   myPlace: { fontFamily: 'Orbitron_700Bold', fontSize: 20, letterSpacing: 3 },
-  myPrize: { fontFamily: 'Orbitron_700Bold', fontSize: 22, color: colors.gold },
+  myPrize: { fontFamily: 'Inter_700Bold', fontSize: 22, color: colors.gold },
   list: { flex: 1, paddingHorizontal: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderColor: colors.border },
   rowHuman: { backgroundColor: 'rgba(0,212,255,0.05)', borderRadius: 10, paddingHorizontal: 8 },
   rowPlace: { fontSize: 18, fontWeight: '800', width: 36, textAlign: 'center' },
   rowName: { color: colors.text, fontSize: 14, fontWeight: '700' },
   rowHand: { color: colors.textMuted, fontSize: 11, marginTop: 1 },
-  rowPrize: { fontFamily: 'Orbitron_700Bold', fontSize: 14, fontWeight: '800' },
+  rowPrize: { fontFamily: 'Inter_700Bold', fontSize: 14, fontWeight: '800' },
   btns: { flexDirection: 'row', gap: 12, paddingHorizontal: 20, paddingTop: 16 },
   btnSecondary: { flex: 1, paddingVertical: 14, borderRadius: 50, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
   btnSecondaryText: { color: colors.textMuted, fontWeight: '700', letterSpacing: 1 },
@@ -801,7 +846,23 @@ const lobby = StyleSheet.create({
   infoBox: { flexDirection: 'row', gap: 8, backgroundColor: colors.primaryDim, borderRadius: 10, padding: 12, alignItems: 'center' },
   infoText: { color: colors.primary, fontSize: 12, flex: 1, lineHeight: 18 },
   startBtn: { borderRadius: 50, paddingVertical: 18, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10, overflow: 'hidden' },
-  startText: { color: colors.text, fontFamily: 'Orbitron_700Bold', fontSize: 14, letterSpacing: 2 },
+  startText: { color: colors.background, fontFamily: 'Orbitron_700Bold', fontSize: 14, letterSpacing: 2 },
+  startTextDisabled: { color: colors.textDim },
+  startBtnDisabled: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  typeHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, justifyContent: 'center',
+    borderRadius: 14, borderWidth: 1, padding: 14, backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  description: { color: colors.textDim, fontSize: 12, textAlign: 'center', lineHeight: 18 },
+  buyInCard: {
+    borderRadius: 12, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: 'rgba(255,255,255,0.03)', padding: 14, gap: 8,
+  },
+  buyInCardError: { borderColor: 'rgba(255,68,68,0.4)', backgroundColor: 'rgba(255,68,68,0.06)' },
+  buyInRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  buyInLabel: { color: colors.textMuted, fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  buyInAmt: { fontSize: 14, fontWeight: '800', fontFamily: 'Inter_700Bold' },
+  buyInError: { color: colors.error, fontSize: 11, textAlign: 'center' },
 });
 
 const styles = StyleSheet.create({
@@ -817,7 +878,7 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 10, fontWeight: '800', letterSpacing: 2 },
   potOnTable: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.5)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.3)', alignItems: 'center' },
   potOnTableLabel: { color: colors.textMuted, fontSize: 8, fontWeight: '700', letterSpacing: 2 },
-  potOnTableAmount: { color: colors.gold, fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold', lineHeight: 24 },
+  potOnTableAmount: { color: colors.gold, fontSize: 20, fontWeight: '800', fontFamily: 'Inter_700Bold', lineHeight: 24 },
   sidePotRow: { flexDirection: 'row', gap: 6 },
   sidePotChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.5)', borderWidth: 1, borderColor: 'rgba(191,95,255,0.4)', alignItems: 'center' },
   sidePotLabel: { color: colors.accent, fontSize: 7, fontWeight: '700', letterSpacing: 1 },

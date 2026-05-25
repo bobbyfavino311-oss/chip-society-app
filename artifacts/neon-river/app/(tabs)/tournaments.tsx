@@ -1,7 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import {
+  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -13,236 +14,176 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useColors } from '@/hooks/useColors';
+import { useUser } from '@/context/UserContext';
+import {
+  TOURNAMENT_CONFIGS,
+  TournamentConfig,
+  TournamentType,
+  getPrizePool,
+} from '@/constants/tournaments';
+import { BLIND_LEVELS } from '@/hooks/useTournamentGame';
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type TStatus = 'registering' | 'live' | 'upcoming' | 'completed';
-
-interface Tournament {
-  id: string;
-  name: string;
-  subtitle: string;
-  prizePool: string;
-  buyin: string;
-  players: number;
-  maxPlayers: number;
-  startsIn: string;
-  status: TStatus;
-  color: string;
-  featured?: boolean;
+function formatChips(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}K`;
+  return `${n}`;
 }
 
-const TOURNAMENTS: Tournament[] = [
-  {
-    id: '1',
-    name: 'NEON CHAMPIONSHIP',
-    subtitle: 'Sunday Night Special',
-    prizePool: '500K',
-    buyin: '1,000',
-    players: 128,
-    maxPlayers: 256,
-    startsIn: '3h 20m',
-    status: 'registering',
-    color: colors.accent,
-    featured: true,
-  },
-  {
-    id: '2',
-    name: 'MIDNIGHT GRIND',
-    subtitle: 'Nightly Turbo',
-    prizePool: '100K',
-    buyin: '200',
-    players: 64,
-    maxPlayers: 64,
-    startsIn: 'IN PROGRESS',
-    status: 'live',
-    color: colors.secondary,
-  },
-  {
-    id: '3',
-    name: 'BLUE CHIP OPEN',
-    subtitle: 'Deep Stack · 6-Max',
-    prizePool: '250K',
-    buyin: '500',
-    players: 12,
-    maxPlayers: 128,
-    startsIn: 'Tomorrow 8PM',
-    status: 'upcoming',
-    color: colors.primary,
-  },
-  {
-    id: '4',
-    name: 'NEON FREEROLL',
-    subtitle: 'Free Entry · All Welcome',
-    prizePool: '25K',
-    buyin: 'FREE',
-    players: 201,
-    maxPlayers: 500,
-    startsIn: '6h 45m',
-    status: 'registering',
-    color: colors.success,
-  },
-  {
-    id: '5',
-    name: 'HIGH ROLLER ELITE',
-    subtitle: 'VIP Only · High Stakes',
-    prizePool: '2M',
-    buyin: '10,000',
-    players: 8,
-    maxPlayers: 32,
-    startsIn: 'Saturday 10PM',
-    status: 'upcoming',
-    color: colors.gold,
-  },
-  {
-    id: '6',
-    name: 'NEON BRONZE CUP',
-    subtitle: 'Bronze Rank Only',
-    prizePool: '50K',
-    buyin: '100',
-    players: 256,
-    maxPlayers: 256,
-    startsIn: 'ENDED',
-    status: 'completed',
-    color: '#cd7f32',
-  },
-];
+// ─── Tournament type card ────────────────────────────────────────────────────
 
-const STATUS_CONFIG: Record<TStatus, { label: string; color: string; bg: string }> = {
-  registering: { label: 'REGISTERING', color: colors.success, bg: 'rgba(0,255,136,0.1)' },
-  live: { label: 'LIVE NOW', color: colors.secondary, bg: 'rgba(255,0,144,0.1)' },
-  upcoming: { label: 'UPCOMING', color: colors.primary, bg: 'rgba(0,212,255,0.1)' },
-  completed: { label: 'ENDED', color: colors.textDim, bg: 'rgba(80,80,104,0.1)' },
-};
+function TournamentTypeCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {
+  const prizePool = getPrizePool(config);
+  const canAfford = userChips >= config.buyIn;
+  const isHighRoller = config.type === 'highroller';
 
-// ─── Featured card ────────────────────────────────────────────────────────────
-
-function FeaturedCard({ t }: { t: Tournament }) {
-  const sc = STATUS_CONFIG[t.status];
-  const pct = t.players / t.maxPlayers;
+  const handlePlay = () => {
+    if (!canAfford) {
+      Alert.alert(
+        'Not Enough Chips',
+        `You need ${formatChips(config.buyIn)} chips to enter this tournament.\n\nVisit the Store to get more chips.`,
+        [
+          { text: 'Visit Store', onPress: () => router.push('/store' as any) },
+          { text: 'Play Lower Stakes', style: 'cancel' },
+        ],
+      );
+      return;
+    }
+    router.push({ pathname: '/game/tournament', params: { type: config.type } } as any);
+  };
 
   return (
-    <View style={feat.card}>
+    <View style={[card.wrap, isHighRoller && card.wrapGold]}>
       <LinearGradient
-        colors={['#2a0060', '#0d0028', '#050010']}
+        colors={[`${config.color}18`, `${config.color}06`, 'transparent']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      <View style={feat.topRow}>
-        <View style={[feat.statusBadge, { backgroundColor: sc.bg, borderColor: `${sc.color}44` }]}>
-          {t.status === 'live' && <View style={[feat.liveDot, { backgroundColor: sc.color }]} />}
-          <Text style={[feat.statusText, { color: sc.color }]}>{sc.label}</Text>
+      <View style={[card.accent, { backgroundColor: config.color }]} />
+
+      {/* Header row */}
+      <View style={card.headerRow}>
+        <View style={[card.iconWrap, { borderColor: `${config.color}50`, backgroundColor: `${config.color}15` }]}>
+          <Ionicons name={config.icon as any} size={20} color={config.color} />
         </View>
-        <Text style={feat.prize}>{t.prizePool} <Text style={feat.prizeLabel}>CHIPS</Text></Text>
+        <View style={{ flex: 1 }}>
+          <Text style={[card.name, { color: config.color }]}>{config.name}</Text>
+          <Text style={card.subtitle}>{config.subtitle}</Text>
+        </View>
+        {isHighRoller && (
+          <View style={card.vipBadge}>
+            <Text style={card.vipText}>VIP</Text>
+          </View>
+        )}
       </View>
 
-      <Text style={feat.name}>{t.name}</Text>
-      <Text style={feat.sub}>{t.subtitle}</Text>
-
-      <View style={feat.metaRow}>
-        <View style={feat.metaItem}>
-          <Ionicons name="people" size={13} color={colors.textMuted} />
-          <Text style={feat.metaText}>{t.players} / {t.maxPlayers}</Text>
+      {/* Stats row */}
+      <View style={card.statsRow}>
+        <View style={card.statItem}>
+          <Text style={card.statLabel}>BUY-IN</Text>
+          <Text style={[card.statValue, { color: canAfford ? colors.text : colors.error }]}>
+            {formatChips(config.buyIn)}
+          </Text>
         </View>
-        <View style={feat.metaItem}>
-          <Ionicons name="ticket" size={13} color={colors.textMuted} />
-          <Text style={feat.metaText}>{t.buyin} buy-in</Text>
+        <View style={card.statDivider} />
+        <View style={card.statItem}>
+          <Text style={card.statLabel}>PRIZE POOL</Text>
+          <Text style={[card.statValue, { color: config.color }]}>{formatChips(prizePool)}</Text>
         </View>
-        <View style={feat.metaItem}>
-          <Ionicons name="time-outline" size={13} color={colors.textMuted} />
-          <Text style={feat.metaText}>{t.startsIn}</Text>
+        <View style={card.statDivider} />
+        <View style={card.statItem}>
+          <Text style={card.statLabel}>PLAYERS</Text>
+          <Text style={card.statValue}>{config.numPlayers}</Text>
+        </View>
+        <View style={card.statDivider} />
+        <View style={card.statItem}>
+          <Text style={card.statLabel}>STACKS</Text>
+          <Text style={card.statValue}>{formatChips(config.startingChips)}</Text>
         </View>
       </View>
 
-      {/* Progress bar */}
-      <View style={feat.progressBg}>
-        <View style={[feat.progressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: t.color }]} />
-      </View>
-      <Text style={feat.progressLabel}>{Math.round(pct * 100)}% full</Text>
+      {/* Prize label */}
+      <Text style={card.prizeLabel}>{config.prizeLabel}</Text>
 
-      <TouchableOpacity style={[feat.regBtn, { backgroundColor: t.color }]} activeOpacity={0.85}>
-        <Ionicons name="trophy" size={15} color={colors.background} />
-        <Text style={feat.regText}>
-          {t.status === 'live' ? 'SPECTATE' : t.status === 'completed' ? 'VIEW RESULTS' : 'REGISTER'}
+      {/* Insufficient chips warning */}
+      {!canAfford && (
+        <View style={card.insufficientRow}>
+          <Ionicons name="warning-outline" size={12} color={colors.error} />
+          <Text style={card.insufficientText}>
+            Need {formatChips(config.buyIn - userChips)} more chips
+          </Text>
+        </View>
+      )}
+
+      {/* Play button */}
+      <TouchableOpacity
+        style={[card.playBtn, !canAfford && card.playBtnDisabled]}
+        onPress={handlePlay}
+        activeOpacity={0.85}
+      >
+        {canAfford ? (
+          <LinearGradient
+            colors={[config.color, `${config.color}99`]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        ) : null}
+        <Ionicons
+          name={canAfford ? 'trophy' : 'lock-closed'}
+          size={14}
+          color={canAfford ? colors.background : colors.textDim}
+        />
+        <Text style={[card.playBtnText, !canAfford && card.playBtnTextDisabled]}>
+          {canAfford ? 'PLAY NOW' : 'NOT ENOUGH CHIPS'}
         </Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-// ─── List card ────────────────────────────────────────────────────────────────
+// ─── Blind schedule preview ───────────────────────────────────────────────────
 
-function TournamentRow({ t }: { t: Tournament }) {
-  const sc = STATUS_CONFIG[t.status];
-  const pct = t.players / t.maxPlayers;
-
+function BlindSchedule({ handsPerLevel }: { handsPerLevel: number }) {
+  const levels = BLIND_LEVELS.slice(0, 4);
   return (
-    <View style={row.card}>
-      <LinearGradient
-        colors={[`${t.color}12`, 'transparent']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-      />
-      <View style={[row.accent, { backgroundColor: t.color }]} />
-      <View style={{ flex: 1, gap: 4 }}>
-        <View style={row.nameRow}>
-          <Text style={row.name} numberOfLines={1}>{t.name}</Text>
-          <View style={[row.statusBadge, { backgroundColor: sc.bg, borderColor: `${sc.color}40` }]}>
-            {t.status === 'live' && <View style={[row.liveDot, { backgroundColor: sc.color }]} />}
-            <Text style={[row.statusText, { color: sc.color }]}>{sc.label}</Text>
+    <View style={blind.wrap}>
+      <Text style={blind.title}>BLIND STRUCTURE (first 4 levels)</Text>
+      <View style={blind.grid}>
+        {levels.map((lvl, i) => (
+          <View key={i} style={blind.row}>
+            <Text style={blind.level}>LVL {i + 1}</Text>
+            <Text style={blind.blinds}>{lvl.sb} / {lvl.bb}</Text>
+            <Text style={blind.hands}>{handsPerLevel} hands</Text>
           </View>
-        </View>
-        <Text style={row.sub}>{t.subtitle}</Text>
-        <View style={row.metaRow}>
-          <Text style={row.meta}>
-            <Text style={{ color: t.color }}>{t.prizePool}</Text> pool
-          </Text>
-          <Text style={row.metaDot}>·</Text>
-          <Text style={row.meta}>{t.buyin} buy-in</Text>
-          <Text style={row.metaDot}>·</Text>
-          <Text style={row.meta}>{t.players}/{t.maxPlayers} players</Text>
-        </View>
-        <View style={row.progressBg}>
-          <View style={[row.progressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: t.color }]} />
-        </View>
+        ))}
       </View>
-      <Ionicons name="chevron-forward" size={16} color={colors.textDim} />
     </View>
   );
 }
 
-// ─── Main screen ─────────────────────────────────────────────────────────────
+// ─── Main screen ──────────────────────────────────────────────────────────────
 
-const FILTER_TABS = [
-  { id: 'all', label: 'All' },
-  { id: 'registering', label: 'Open' },
-  { id: 'live', label: 'Live' },
-  { id: 'upcoming', label: 'Upcoming' },
-];
+const TYPE_ORDER: TournamentType[] = ['beginner', 'sitandgo', 'turbo', 'highroller'];
 
 export default function TournamentsScreen() {
   const insets = useSafeAreaInsets();
-  const colors = useColors();
-  const [filter, setFilter] = useState('all');
-
-  const featured = TOURNAMENTS.find(t => t.featured);
-  const listed = TOURNAMENTS.filter(t =>
-    !t.featured && (filter === 'all' || t.status === filter)
-  );
+  const dynColors = useColors();
+  const { profile } = useUser();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: dynColors.background }]}>
       <LinearGradient
-        colors={[colors.background, colors.surfaceElevated]}
+        colors={[dynColors.background, dynColors.surfaceElevated]}
         style={StyleSheet.absoluteFill}
       />
 
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
-          { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 16), paddingBottom: insets.bottom + 90 },
+          { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 16), paddingBottom: insets.bottom + 100 },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -250,68 +191,43 @@ export default function TournamentsScreen() {
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.pageTitle}>TOURNAMENTS</Text>
-            <Text style={styles.pageSub}>{TOURNAMENTS.filter(t => t.status === 'registering').length} open for registration</Text>
+            <Text style={styles.pageSub}>Single-table · AI-filled · Virtual chips only</Text>
           </View>
-          <View style={styles.prizeHeaderBadge}>
-            <Ionicons name="trophy" size={12} color={colors.gold} />
-            <Text style={styles.prizeHeaderText}>Up to 2M</Text>
+          <View style={styles.balanceBadge}>
+            <Ionicons name="wallet-outline" size={12} color={colors.gold} />
+            <Text style={styles.balanceText}>{formatChips(profile.chips)}</Text>
           </View>
         </View>
 
-        {/* Featured */}
-        {featured && (
-          <>
-            <Text style={styles.sectionLabel}>FEATURED</Text>
-            <FeaturedCard t={featured} />
-          </>
-        )}
+        {/* Beta notice */}
+        <View style={styles.betaNotice}>
+          <Ionicons name="information-circle-outline" size={14} color={colors.primary} />
+          <Text style={styles.betaText}>
+            Tournament Mode · AI opponents fill all seats · No real money
+          </Text>
+        </View>
 
-        {/* AI Tournament CTA */}
-        <TouchableOpacity
-          style={styles.aiTournamentCard}
-          onPress={() => router.push('/game/practice' as any)}
-          activeOpacity={0.85}
-        >
-          <LinearGradient
-            colors={['#3300aa', '#1a0060', '#050010']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+        {/* Tournament type cards */}
+        <Text style={styles.sectionLabel}>CHOOSE YOUR TOURNAMENT</Text>
+
+        {TYPE_ORDER.map(type => (
+          <TournamentTypeCard
+            key={type}
+            config={TOURNAMENT_CONFIGS[type]}
+            userChips={profile.chips}
           />
-          <View style={styles.aiTournamentLeft}>
-            <View style={styles.aiTournamentBadge}>
-              <Text style={styles.aiTournamentBadgeText}>🤖 AI</Text>
-            </View>
-            <View>
-              <Text style={styles.aiTournamentTitle}>QUICK TOURNAMENT</Text>
-              <Text style={styles.aiTournamentSub}>Single-table · Mixed AI · Play now</Text>
-            </View>
-          </View>
-          <View style={styles.aiTournamentRight}>
-            <Text style={styles.aiTournamentPrize}>4,500</Text>
-            <Text style={styles.aiTournamentPrizeLabel}>MAX PRIZE</Text>
-            <Ionicons name="chevron-forward" size={16} color={colors.accent} />
-          </View>
-        </TouchableOpacity>
+        ))}
 
-        {/* Filter */}
-        <View style={styles.filterRow}>
-          {FILTER_TABS.map(f => (
-            <TouchableOpacity
-              key={f.id}
-              style={[styles.filterBtn, filter === f.id && styles.filterBtnActive]}
-              onPress={() => setFilter(f.id)}
-            >
-              <Text style={[styles.filterText, filter === f.id && styles.filterTextActive]}>
-                {f.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        {/* Blind structure reference */}
+        <BlindSchedule handsPerLevel={4} />
+
+        {/* Info footer */}
+        <View style={styles.footerNote}>
+          <Ionicons name="shield-checkmark-outline" size={13} color={colors.textMuted} />
+          <Text style={styles.footerText}>
+            All buy-ins and prizes are virtual chips only and have no real-world value.
+          </Text>
         </View>
-
-        <Text style={styles.sectionLabel}>ALL TOURNAMENTS</Text>
-
-        {listed.map(t => <TournamentRow key={t.id} t={t} />)}
       </ScrollView>
     </View>
   );
@@ -319,80 +235,252 @@ export default function TournamentsScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const feat = StyleSheet.create({
-  card: {
-    borderRadius: colors.radiusLg, borderWidth: 1, borderColor: colors.borderBright,
-    overflow: 'hidden', padding: 18, gap: 8,
+const card = StyleSheet.create({
+  wrap: {
+    borderRadius: colors.radiusLg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+    padding: 16,
+    gap: 12,
+    position: 'relative',
   },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  statusBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: 6, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4 },
-  liveDot: { width: 6, height: 6, borderRadius: 3 },
-  statusText: { fontSize: 9, fontWeight: '800', letterSpacing: 1 },
-  prize: { color: colors.gold, fontSize: 26, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
-  prizeLabel: { color: colors.gold, fontSize: 12, fontWeight: '600' },
-  name: { color: colors.text, fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-  sub: { color: colors.textMuted, fontSize: 12 },
-  metaRow: { flexDirection: 'row', gap: 16, marginTop: 4 },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  metaText: { color: colors.textMuted, fontSize: 12 },
-  progressBg: { height: 4, backgroundColor: colors.border, borderRadius: 2 },
-  progressFill: { height: 4, borderRadius: 2 },
-  progressLabel: { color: colors.textDim, fontSize: 10 },
-  regBtn: {
-    borderRadius: colors.radius, flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'center', paddingVertical: 14, gap: 8, marginTop: 4,
+  wrapGold: {
+    borderColor: 'rgba(255,215,0,0.3)',
   },
-  regText: { color: colors.background, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  accent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 1.5,
+  },
+  subtitle: {
+    color: colors.textMuted,
+    fontSize: 11,
+    marginTop: 2,
+  },
+  vipBadge: {
+    backgroundColor: 'rgba(255,215,0,0.15)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.4)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  vipText: {
+    color: colors.gold,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 10,
+    padding: 10,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 3,
+  },
+  statDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: colors.border,
+  },
+  statLabel: {
+    color: colors.textMuted,
+    fontSize: 7,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  statValue: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '800',
+    fontFamily: 'Inter_700Bold',
+  },
+  prizeLabel: {
+    color: colors.textDim,
+    fontSize: 10,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  insufficientRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255,68,68,0.08)',
+    borderRadius: 8,
+    padding: 8,
+  },
+  insufficientText: {
+    color: colors.error,
+    fontSize: 11,
+    flex: 1,
+  },
+  playBtn: {
+    borderRadius: 50,
+    paddingVertical: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    overflow: 'hidden',
+    marginTop: 2,
+  },
+  playBtnDisabled: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  playBtnText: {
+    color: colors.background,
+    fontSize: 12,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 1.5,
+  },
+  playBtnTextDisabled: {
+    color: colors.textDim,
+  },
 });
 
-const row = StyleSheet.create({
-  card: {
-    borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border,
-    overflow: 'hidden', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12,
+const blind = StyleSheet.create({
+  wrap: {
+    borderRadius: colors.radius,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    gap: 10,
   },
-  accent: { width: 3, height: '100%', borderRadius: 2, position: 'absolute', left: 0, top: 0, bottom: 0 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  name: { color: colors.text, fontSize: 13, fontWeight: '700', fontFamily: 'Orbitron_700Bold', flex: 1 },
-  statusBadge: { borderRadius: 4, borderWidth: 1, paddingHorizontal: 5, paddingVertical: 2, flexDirection: 'row', alignItems: 'center', gap: 4 },
-  liveDot: { width: 4, height: 4, borderRadius: 2 },
-  statusText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
-  sub: { color: colors.textMuted, fontSize: 11 },
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  meta: { color: colors.textDim, fontSize: 11 },
-  metaDot: { color: colors.textDim, fontSize: 11 },
-  progressBg: { height: 3, backgroundColor: colors.border, borderRadius: 2, marginTop: 2 },
-  progressFill: { height: 3, borderRadius: 2 },
+  title: {
+    color: colors.textMuted,
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  grid: { gap: 4 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  level: {
+    color: colors.accent,
+    fontSize: 9,
+    fontWeight: '700',
+    width: 44,
+  },
+  blinds: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+    flex: 1,
+  },
+  hands: {
+    color: colors.textMuted,
+    fontSize: 10,
+  },
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1 },
   scroll: { paddingHorizontal: 16, gap: 14 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  pageTitle: { color: colors.text, fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
-  pageSub: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
-  prizeHeaderBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(255,215,0,0.1)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(255,215,0,0.25)' },
-  prizeHeaderText: { color: colors.gold, fontSize: 12, fontWeight: '700' },
-  sectionLabel: { color: colors.textMuted, fontSize: 9, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
-  filterRow: { flexDirection: 'row', gap: 8 },
-  filterBtn: { borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
-  filterBtnActive: { borderColor: colors.primary, backgroundColor: 'rgba(0,212,255,0.1)' },
-  filterText: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
-  filterTextActive: { color: colors.primary, fontWeight: '700' },
-  aiTournamentCard: {
-    borderRadius: colors.radiusLg, borderWidth: 1, borderColor: 'rgba(191,95,255,0.5)',
-    overflow: 'hidden', padding: 16,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  aiTournamentLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
-  aiTournamentBadge: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: 'rgba(191,95,255,0.2)', borderWidth: 1, borderColor: colors.accent,
-    alignItems: 'center', justifyContent: 'center',
+  pageTitle: {
+    color: colors.text,
+    fontSize: 22,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_900Black',
+    letterSpacing: 3,
   },
-  aiTournamentBadgeText: { fontSize: 18 },
-  aiTournamentTitle: { color: colors.text, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-  aiTournamentSub: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
-  aiTournamentRight: { alignItems: 'flex-end', gap: 2 },
-  aiTournamentPrize: { color: colors.gold, fontSize: 18, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
-  aiTournamentPrizeLabel: { color: colors.textMuted, fontSize: 8, fontWeight: '700', letterSpacing: 1 },
+  pageSub: {
+    color: colors.textMuted,
+    fontSize: 11,
+    marginTop: 2,
+  },
+  balanceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255,215,0,0.1)',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.25)',
+  },
+  balanceText: {
+    color: colors.gold,
+    fontSize: 12,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+  },
+  betaNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.primaryDim,
+    borderRadius: 10,
+    padding: 10,
+  },
+  betaText: {
+    color: colors.primary,
+    fontSize: 11,
+    flex: 1,
+  },
+  sectionLabel: {
+    color: colors.textMuted,
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  footerNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 7,
+    padding: 12,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  footerText: {
+    color: colors.textMuted,
+    fontSize: 10,
+    flex: 1,
+    lineHeight: 15,
+  },
 });

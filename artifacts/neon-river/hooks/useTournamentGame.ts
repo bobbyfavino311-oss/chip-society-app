@@ -62,11 +62,16 @@ export interface TournamentMeta {
   blindJustIncreased: boolean;
 }
 
-function buildPrizes(numPlayers: number): Prize[] {
-  const pool = numPlayers * BUY_IN;
+function buildPrizes(numPlayers: number, buyIn: number): Prize[] {
+  const pool = numPlayers * buyIn;
   if (numPlayers <= 3) return [
-    { place: 1, pct: 60, amount: Math.round(pool * 0.6) },
-    { place: 2, pct: 40, amount: Math.round(pool * 0.4) },
+    { place: 1, pct: 70, amount: Math.round(pool * 0.7) },
+    { place: 2, pct: 30, amount: Math.round(pool * 0.3) },
+  ];
+  if (numPlayers <= 5) return [
+    { place: 1, pct: 50, amount: Math.round(pool * 0.5) },
+    { place: 2, pct: 30, amount: Math.round(pool * 0.3) },
+    { place: 3, pct: 20, amount: Math.round(pool * 0.2) },
   ];
   return [
     { place: 1, pct: 50, amount: Math.round(pool * 0.5) },
@@ -372,7 +377,15 @@ const INITIAL_META: TournamentMeta = {
   myPlace: null, myPrize: null, blindJustIncreased: false,
 };
 
-export function useTournamentGame(humanName: string, numPlayers: 4 | 5 | 6 = 6) {
+export function useTournamentGame(
+  humanName: string,
+  numPlayers: 4 | 5 | 6 = 6,
+  config?: { startingChips?: number; buyIn?: number; handsPerLevel?: number },
+) {
+  const startingChips = config?.startingChips ?? STARTING_CHIPS;
+  const buyIn         = config?.buyIn         ?? BUY_IN;
+  const handsPerLevel = config?.handsPerLevel  ?? HANDS_PER_LEVEL;
+
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME);
   const [tournament, setTournament] = useState<TournamentMeta>(INITIAL_META);
 
@@ -432,17 +445,17 @@ export function useTournamentGame(humanName: string, numPlayers: 4 | 5 | 6 = 6) 
     clearTimer(); clearAI();
     const numBots = numPlayers - 1;
     const bots = BOT_ROSTER.slice(0, numBots);
-    const prizes = buildPrizes(numPlayers);
+    const prizes = buildPrizes(numPlayers, buyIn);
     const blinds = BLIND_LEVELS[0];
 
     const players: GamePlayer[] = [
       {
-        id: 'human', name: humanName, chips: STARTING_CHIPS, holeCards: [], betInRound: 0, chipDelta: 0,
+        id: 'human', name: humanName, chips: startingChips, holeCards: [], betInRound: 0, chipDelta: 0,
         status: 'active', isHuman: true, difficulty: 'competitive', personality: 'passive' as AIPersonality,
         seatIndex: 0, isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: 0,
       },
       ...bots.map((b, i) => ({
-        id: `ai_${i}`, name: b.name, chips: STARTING_CHIPS, holeCards: [] as Card[],
+        id: `ai_${i}`, name: b.name, chips: startingChips, holeCards: [] as Card[],
         betInRound: 0, chipDelta: 0, status: 'active' as PlayerStatus,
         isHuman: false, difficulty: b.diff, personality: getBotPersonality(i),
         seatIndex: i + 1, isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: i + 1,
@@ -452,7 +465,7 @@ export function useTournamentGame(humanName: string, numPlayers: 4 | 5 | 6 = 6) 
     setTournament({
       phase: 'playing', blindLevel: 1, smallBlind: blinds.sb, bigBlind: blinds.bb,
       handsPlayed: 0, handsThisLevel: 0, activePlayers: numPlayers,
-      totalPrizePool: numPlayers * BUY_IN, prizes, standings: [], pendingEliminations: [],
+      totalPrizePool: numPlayers * buyIn, prizes, standings: [], pendingEliminations: [],
       myPlace: null, myPrize: null, blindJustIncreased: false,
     });
     setGameState(dealAndPostBlinds(players, 0, blinds.sb, blinds.bb));
@@ -542,7 +555,7 @@ export function useTournamentGame(humanName: string, numPlayers: 4 | 5 | 6 = 6) 
         let blindLevel = prevT.blindLevel;
         let newHandsThisLevel = handsThisLevel;
         let blindJustIncreased = false;
-        if (handsThisLevel >= HANDS_PER_LEVEL && blindLevel < BLIND_LEVELS.length) {
+        if (handsThisLevel >= handsPerLevel && blindLevel < BLIND_LEVELS.length) {
           blindLevel = Math.min(prevT.blindLevel, BLIND_LEVELS.length - 1) + 1;
           newHandsThisLevel = 0;
           blindJustIncreased = true;
@@ -575,7 +588,7 @@ export function useTournamentGame(humanName: string, numPlayers: 4 | 5 | 6 = 6) 
       // Return idle state while we schedule the real deal above
       return { ...prev, phase: 'idle' };
     });
-  }, [clearTimer, clearAI, humanName]);
+  }, [clearTimer, clearAI, humanName, numPlayers, startingChips, buyIn]);
 
   const clearPendingEliminations = useCallback(() => {
     setTournament(prev => ({ ...prev, pendingEliminations: [], blindJustIncreased: false }));
