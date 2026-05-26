@@ -979,9 +979,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 18, paddingVertical: 14,
     borderRadius: 20,
-    borderWidth: 1, borderColor: 'rgba(255,59,186,0.28)',
+    borderWidth: 1, borderColor: 'rgba(220,0,210,0.34)',
     backgroundColor: 'rgba(0,0,8,0.52)',
-    shadowColor: '#FF3BBA', shadowOpacity: 0.25, shadowRadius: 22, shadowOffset: { width: 0, height: 0 },
+    shadowColor: '#FF00C8', shadowOpacity: 0.22, shadowRadius: 22, shadowOffset: { width: 0, height: 0 },
     overflow: 'hidden',
   },
   tableCenterGlow: {

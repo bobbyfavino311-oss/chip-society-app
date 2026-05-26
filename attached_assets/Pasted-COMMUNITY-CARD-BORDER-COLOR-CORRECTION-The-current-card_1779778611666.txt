@@ -1,0 +1,139 @@
+COMMUNITY CARD BORDER COLOR CORRECTION
+
+The current card glow is too bright and too cyan.
+
+It looks turquoise and washes out the cards.
+
+I want a DARK ELECTRIC BLUE instead.
+
+==================================================
+NEW COLOR DIRECTION
+==================================================
+
+Remove:
+
+- cyan
+- aqua
+- turquoise
+- light blue
+- ice blue
+
+Replace with:
+
+Primary Border:
+#0066FF
+
+Primary Glow:
+#0050D4
+
+Secondary Glow:
+#003C9E
+
+Deep Accent:
+#001F5C
+
+These colors should resemble:
+
+- luxury casino LEDs
+- high-end gaming PCs
+- deep neon electricity
+- futuristic cobalt lighting
+
+==================================================
+INDIVIDUAL CARD GLOWS
+==================================================
+
+Every community card should have its own border.
+
+Each card should look individually illuminated.
+
+Not a single glow around the entire board.
+
+Apply:
+
+2px border
+Dark electric blue glow
+Soft shadow
+
+The glow should hug the card closely.
+
+==================================================
+GLOW INTENSITY
+==================================================
+
+Reduce glow radius by 30%.
+
+Current glow spills too far.
+
+New effect should be:
+
+tighter
+cleaner
+sharper
+more premium
+
+Think:
+
+illuminated poker card
+
+NOT:
+
+card floating in blue fog
+
+==================================================
+COMMUNITY CARD TRAY
+==================================================
+
+Keep the tray darker.
+
+The tray should remain:
+
+black glass
+dark navy
+subtle purple tint
+
+Do not make the tray glow brighter than the cards.
+
+The cards must remain the visual focus.
+
+==================================================
+OUTER BOARD BORDER
+==================================================
+
+Increase outer border brightness slightly.
+
+Only 15-20%.
+
+Current border gets lost against the background.
+
+Use:
+
+#FF00C8
+and
+#A000FF
+
+Keep opacity low.
+
+Luxury glow.
+
+Not arcade glow.
+
+==================================================
+FINAL VISUAL GOAL
+==================================================
+
+The table should feel like:
+
+a high-end Vegas poker table under nightclub lighting.
+
+The cards should appear to sit on individual dark-electric-blue LED platforms.
+
+Deep blue.
+
+Not cyan.
+
+Not turquoise.
+
+Not ice blue.
+
+Premium dark electric blue.
