@@ -234,12 +234,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   highlightInner: {
-    shadowColor: '#ff0090',
+    shadowColor: '#00d4ff',
     shadowOpacity: 1,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 0 },
     borderWidth: 2,
-    borderColor: '#ff0090',
+    borderColor: '#00d4ff',
   },
   cardValue: {
     fontWeight: '800',
