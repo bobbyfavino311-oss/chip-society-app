@@ -1,0 +1,212 @@
+CHIP SOCIETY — GAMEPLAY VISUAL REBALANCE
+RESTORE ATMOSPHERE WITHOUT RESTORING CLUTTER
+
+The new gameplay layout is the correct direction.
+
+DO NOT revert back to the old layout.
+
+Keep:
+
+- new player positioning
+- new card positioning
+- new spacing
+- new action button placement
+- new cleaner layout
+- new simplified gameplay structure
+
+However:
+
+The new version lost too much atmosphere and now feels empty.
+
+We need a hybrid of both versions.
+
+==================================================
+1. RESTORE BACKGROUND ATMOSPHERE
+==================================================
+
+The new background is too flat.
+
+The old version had more visual depth.
+
+Bring back a refined version of the old background.
+
+DO NOT simply copy the old one.
+
+Create a premium upgraded version.
+
+Requirements:
+
+- deep midnight blue base
+- subtle purple gradient
+- faint cyan glow accents
+- soft transparent atmospheric circles
+- blurred neon lighting
+- darker center play area
+
+Keep effects subtle.
+
+The background should feel:
+
+luxury
+nightlife
+Vegas
+after-hours poker
+
+NOT:
+
+cartoonish
+busy
+distracting
+
+==================================================
+2. RESTORE CARD BOARD CONTAINER
+==================================================
+
+The community card area now feels disconnected.
+
+Bring back a cleaner version of the old community card container.
+
+Requirements:
+
+- dark glass appearance
+- subtle neon edge glow
+- very low opacity
+- soft rounded corners
+
+Community cards should feel like they belong to a dedicated board area.
+
+==================================================
+3. RESTORE COMMUNITY CARD BORDERS
+==================================================
+
+The old cards had stronger visual presence.
+
+Restore the neon border around community cards.
+
+Use:
+
+- subtle pink neon outline
+- soft glow
+- thin stroke
+
+Do NOT make borders thick.
+
+Cards should feel premium.
+
+==================================================
+4. PLAYER CARD BORDERS
+==================================================
+
+Restore slight visual framing around player hole cards.
+
+Current cards feel like they float in space.
+
+Add:
+
+- subtle glow edge
+- premium card shadow
+- slight neon rim
+
+Very minimal.
+
+==================================================
+5. POT DISPLAY
+==================================================
+
+The new pot display is too plain.
+
+Create a middle ground.
+
+Requirements:
+
+- floating dark glass capsule
+- gold typography
+- subtle neon border
+- premium casino styling
+
+The pot should feel important.
+
+==================================================
+6. TABLE CENTER
+==================================================
+
+The center of the table currently feels empty.
+
+Add:
+
+- subtle atmospheric glow behind community cards
+- very faint lighting effect
+- low-opacity gradient
+
+Do NOT add large table graphics.
+
+==================================================
+7. PLAYER HUDS
+==================================================
+
+Keep new HUD positioning.
+
+However:
+
+Increase visual hierarchy slightly.
+
+Requirements:
+
+- brighter chip counts
+- stronger avatar glow
+- improved active-player highlight
+
+Do NOT increase size.
+
+Only improve readability.
+
+==================================================
+8. ACTION AREA
+==================================================
+
+Keep current action layout.
+
+Do not return to the old crowded controls.
+
+However:
+
+Improve visual polish:
+
+- better button shadows
+- better neon accents
+- improved glass styling
+
+==================================================
+9. OVERALL DESIGN GOAL
+==================================================
+
+The current version feels:
+
+too empty
+
+The old version felt:
+
+too busy
+
+The final version should sit directly in the middle.
+
+Target:
+
+70% new layout
+30% old atmosphere
+
+==================================================
+10. FINAL RESULT
+==================================================
+
+When players open a hand they should feel:
+
+clean modern poker app
+
+combined with
+
+luxury neon casino atmosphere.
+
+The layout should remain minimalist.
+
+The atmosphere should return.

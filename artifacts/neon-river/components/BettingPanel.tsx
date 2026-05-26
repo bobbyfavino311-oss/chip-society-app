@@ -236,9 +236,12 @@ export default function BettingPanel({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 14,
-    paddingTop: 8,
+    paddingTop: 10,
     paddingBottom: 6,
     gap: 8,
+    backgroundColor: 'rgba(3,0,12,0.95)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,150,200,0.18)',
   },
 
   quickRow: {
@@ -356,10 +359,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 48,
     overflow: 'hidden',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
   },
 
   foldBtn: {
     backgroundColor: 'rgba(255,60,60,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,60,60,0.28)',
+    shadowColor: '#ff3c3c',
   },
   foldText: {
     color: '#ff5555',
@@ -371,6 +380,9 @@ const styles = StyleSheet.create({
 
   checkBtn: {
     backgroundColor: 'rgba(0,200,100,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(0,200,100,0.28)',
+    shadowColor: '#00c864',
   },
   checkText: {
     color: '#00e887',
@@ -382,6 +394,9 @@ const styles = StyleSheet.create({
 
   callBtn: {
     backgroundColor: 'rgba(0,200,100,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(0,200,100,0.28)',
+    shadowColor: '#00c864',
   },
   callText: {
     color: '#00e887',
@@ -399,6 +414,9 @@ const styles = StyleSheet.create({
 
   raiseBtn: {
     backgroundColor: 'rgba(0,180,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(0,180,255,0.28)',
+    shadowColor: '#00b4ff',
   },
   raiseText: {
     color: '#00d4ff',
@@ -416,6 +434,9 @@ const styles = StyleSheet.create({
 
   allInBtn: {
     backgroundColor: 'rgba(255,0,144,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,0,144,0.28)',
+    shadowColor: '#ff0090',
     maxWidth: 60,
   },
   allInText: {

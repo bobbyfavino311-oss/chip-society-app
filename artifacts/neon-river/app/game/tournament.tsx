@@ -140,16 +140,19 @@ const g = StyleSheet.create({
   seatFolded: { opacity: 0.2 },
   avatarRing: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center', justifyContent: 'center',
   },
   avatarRingActive: {
+    borderColor: 'rgba(0,212,255,0.65)',
     shadowColor: '#00d4ff',
-    shadowOpacity: 0.9, shadowRadius: 10, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1, shadowRadius: 16, shadowOffset: { width: 0, height: 0 },
   },
   avatarRingWinner: {
+    borderColor: 'rgba(255,215,0,0.75)',
     shadowColor: '#ffd700',
-    shadowOpacity: 1, shadowRadius: 12, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1, shadowRadius: 20, shadowOffset: { width: 0, height: 0 },
   },
   avatarSymbol: { fontSize: 18, lineHeight: 22 },
   posBadge: {
@@ -160,9 +163,9 @@ const g = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   posBadgeText: { fontSize: 6, fontWeight: '900', color: '#ffd700' },
-  seatName: { color: 'rgba(255,255,255,0.45)', fontSize: 9, fontWeight: '500', maxWidth: 62, textAlign: 'center' },
+  seatName: { color: 'rgba(255,255,255,0.5)', fontSize: 9, fontWeight: '500', maxWidth: 62, textAlign: 'center' },
   seatNameWinner: { color: '#ffd700' },
-  seatChips: { color: 'rgba(255,255,255,0.6)', fontSize: 9, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+  seatChips: { color: 'rgba(255,255,255,0.85)', fontSize: 9, fontWeight: '700', fontFamily: 'Inter_700Bold' },
   dimText: { color: 'rgba(255,255,255,0.2)' },
   holeCardRow: { flexDirection: 'row', gap: 2, marginTop: 1 },
 });
@@ -582,11 +585,17 @@ export default function TournamentScreen() {
   // ── Game table ─────────────────────────────────────────────────────────────
   return (
     <View style={styles.screen}>
-      {/* Minimal dark background */}
+      {/* Atmospheric background */}
       <LinearGradient
-        colors={['#07001e', '#050010', '#040015']}
+        colors={['#0a0028', '#05001a', '#030010', '#05001a', '#0a0028']}
+        locations={[0, 0.25, 0.5, 0.75, 1]}
         style={StyleSheet.absoluteFill}
+        start={{ x: 0.3, y: 0 }} end={{ x: 0.7, y: 1 }}
       />
+      {/* Ambient glow blobs */}
+      <View style={styles.glowPurple} />
+      <View style={styles.glowCyan} />
+      <View style={styles.glowCenter} />
 
       {/* Exit confirmation */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -672,8 +681,11 @@ export default function TournamentScreen() {
           }]} />
         ))}
 
-        {/* Community cards — no wrapping surface */}
-        <CommunityCards cards={state.communityCards} holeCards={humanPlayer?.holeCards ?? []} />
+        {/* Community card board — dark glass surface */}
+        <View style={styles.tableSurface}>
+          <View style={styles.tableCenterGlow} />
+          <CommunityCards cards={state.communityCards} holeCards={humanPlayer?.holeCards ?? []} />
+        </View>
 
         {/* Floating pot */}
         {state.sidePots.length > 1 ? (
@@ -983,6 +995,20 @@ const lobby = StyleSheet.create({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#050010' },
 
+  // ── Background glows
+  glowPurple: {
+    position: 'absolute', top: '18%', left: -70, width: 200, height: 200, borderRadius: 100,
+    backgroundColor: 'rgba(110,0,170,0.07)',
+  },
+  glowCyan: {
+    position: 'absolute', top: '45%', right: -60, width: 180, height: 180, borderRadius: 90,
+    backgroundColor: 'rgba(0,160,210,0.06)',
+  },
+  glowCenter: {
+    position: 'absolute', top: '25%', left: '10%', right: '10%', height: 220, borderRadius: 110,
+    backgroundColor: 'rgba(0,40,25,0.12)',
+  },
+
   // ── AI row
   aiRow: {
     flexDirection: 'row', alignItems: 'flex-start',
@@ -990,7 +1016,23 @@ const styles = StyleSheet.create({
   },
 
   // ── Center game area
-  gameCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
+  gameCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14 },
+
+  // ── Card board surface
+  tableSurface: {
+    alignItems: 'center',
+    paddingHorizontal: 18, paddingVertical: 14,
+    borderRadius: 20,
+    borderWidth: 1, borderColor: 'rgba(0,180,220,0.12)',
+    backgroundColor: 'rgba(0,0,8,0.52)',
+    shadowColor: '#00b4dc', shadowOpacity: 0.18, shadowRadius: 18, shadowOffset: { width: 0, height: 0 },
+    overflow: 'hidden',
+  },
+  tableCenterGlow: {
+    position: 'absolute', top: '10%', left: '5%', right: '5%', bottom: '10%',
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,60,35,0.18)',
+  },
 
   // ── Chip animations
   chipToken: {
@@ -1002,24 +1044,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffd700', zIndex: 20,
   },
 
-  // ── Floating pot
-  potFloat: { alignItems: 'center', gap: 1 },
+  // ── Floating pot capsule
+  potFloat: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: 'rgba(4,0,14,0.85)',
+    borderRadius: 20, paddingHorizontal: 16, paddingVertical: 7,
+    borderWidth: 1, borderColor: 'rgba(255,215,0,0.3)',
+    shadowColor: '#ffd700', shadowOpacity: 0.22, shadowRadius: 10, shadowOffset: { width: 0, height: 0 },
+  },
   potLabel: {
-    color: 'rgba(255,255,255,0.28)', fontSize: 8, fontWeight: '700',
+    color: 'rgba(255,215,0,0.5)', fontSize: 8, fontWeight: '700',
     letterSpacing: 3, fontFamily: 'Orbitron_400Regular',
   },
   potAmount: {
-    color: 'rgba(255,255,255,0.82)', fontSize: 20, fontWeight: '800',
+    color: '#ffd700', fontSize: 18, fontWeight: '900',
     fontFamily: 'Inter_700Bold',
   },
-  potSideRow: { flexDirection: 'row', gap: 14, alignItems: 'center' },
-  potSideItem: { alignItems: 'center', gap: 1 },
+  potSideRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  potSideItem: {
+    alignItems: 'center', gap: 1,
+    backgroundColor: 'rgba(4,0,14,0.85)',
+    borderRadius: 14, paddingHorizontal: 12, paddingVertical: 5,
+    borderWidth: 1, borderColor: 'rgba(255,215,0,0.25)',
+  },
   potSideLabel: {
-    color: 'rgba(255,255,255,0.28)', fontSize: 7, fontWeight: '700',
+    color: 'rgba(255,215,0,0.45)', fontSize: 7, fontWeight: '700',
     letterSpacing: 2, fontFamily: 'Orbitron_400Regular',
   },
   potSideAmt: {
-    color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: '800',
+    color: '#ffd700', fontSize: 13, fontWeight: '800',
     fontFamily: 'Inter_700Bold',
   },
 
@@ -1047,14 +1100,14 @@ const styles = StyleSheet.create({
   },
   humanDotActive: {
     backgroundColor: '#00d4ff',
-    shadowColor: '#00d4ff', shadowOpacity: 0.8, shadowRadius: 6, shadowOffset: { width: 0, height: 0 },
+    shadowColor: '#00d4ff', shadowOpacity: 1, shadowRadius: 10, shadowOffset: { width: 0, height: 0 },
   },
   humanDotWinner: {
     backgroundColor: '#ffd700',
-    shadowColor: '#ffd700', shadowOpacity: 0.9, shadowRadius: 8, shadowOffset: { width: 0, height: 0 },
+    shadowColor: '#ffd700', shadowOpacity: 1, shadowRadius: 12, shadowOffset: { width: 0, height: 0 },
   },
-  humanName: { color: 'rgba(255,255,255,0.72)', fontSize: 12, fontWeight: '600' },
-  humanChips: { color: 'rgba(255,255,255,0.45)', fontSize: 12, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+  humanName: { color: 'rgba(255,255,255,0.88)', fontSize: 12, fontWeight: '600' },
+  humanChips: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '700', fontFamily: 'Inter_700Bold' },
   dimText: { opacity: 0.3 },
   dealerBadge: {
     width: 16, height: 16, borderRadius: 8,
