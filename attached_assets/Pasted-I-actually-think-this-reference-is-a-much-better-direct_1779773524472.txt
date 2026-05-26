@@ -1,0 +1,348 @@
+I actually think this reference is a much better direction than where Chip Society currently is.
+
+The biggest problem with the current Chip Society table is that it still feels like a *UI screen pretending to be a poker table*. The reference feels like an actual poker game because of the amount of empty space.
+
+### What's better about this reference
+
+**1. Massive negative space**
+
+* 60-70% of the screen is empty
+* Eyes immediately focus on the cards
+* No visual clutter
+* Feels premium
+
+**Current Chip Society issue:**
+
+* Too many neon elements
+* Too many borders
+* Too many labels
+* Too many glowing containers
+
+---
+
+**2. Cards are the hero**
+In the reference:
+
+* Community cards dominate the center
+* Cards are larger
+* Nothing competes with them
+
+In Chip Society:
+
+* Pot
+* Tournament overlays
+* Blind labels
+* Neon borders
+* Status indicators
+
+All fight for attention.
+
+---
+
+**3. Players feel secondary**
+Reference:
+
+Players are small and tucked away.
+
+You only care about:
+
+* Cards
+* Pot
+* Action
+
+Chip Society currently gives equal visual weight to:
+
+* Players
+* Controls
+* Cards
+* Pot
+* Background effects
+
+Which creates noise.
+
+---
+
+**4. Cleaner action area**
+Reference:
+
+One simple action area.
+
+Chip Society:
+
+* Raise buttons
+* Quick bet buttons
+* Slider
+* Pot shortcuts
+* Multiple labels
+
+Too much happening.
+
+---
+
+# Prompt for Complete Gameplay Redesign
+
+```txt
+CHIP SOCIETY — MINIMAL TABLE GAMEPLAY REDESIGN
+REFERENCE STYLE OVERHAUL
+
+The current table gameplay still feels crowded.
+
+I want the gameplay rebuilt using the attached reference image as the structural inspiration.
+
+IMPORTANT:
+
+Do NOT copy the design directly.
+
+Apply Chip Society branding, colors, typography, cards, and visual style.
+
+Use the reference ONLY for layout philosophy and spacing.
+
+==================================================
+DESIGN GOAL
+==================================================
+
+The table should feel:
+
+- premium
+- minimalist
+- modern
+- mobile first
+- social poker focused
+
+Think:
+
+PokerStars Mobile
+ClubGG
+WSOP Mobile
+
+combined with
+
+Chip Society neon styling.
+
+==================================================
+BIGGEST CHANGE:
+ADD MORE EMPTY SPACE
+==================================================
+
+Current gameplay is overcrowded.
+
+Reduce visual density by at least 40%.
+
+The table should breathe.
+
+Allow large areas of negative space.
+
+Not every area needs UI.
+
+==================================================
+PLAYER POSITIONS
+==================================================
+
+Reduce player avatar size.
+
+Reduce player name size.
+
+Reduce stack size.
+
+Move players closer to screen edges.
+
+Players should become supporting information.
+
+The cards should become the primary focus.
+
+==================================================
+COMMUNITY CARDS
+==================================================
+
+Increase community card size by 20%.
+
+Place community cards in the visual center.
+
+Community cards should be the first thing players notice.
+
+Cards should feel premium and important.
+
+==================================================
+POT DISPLAY
+==================================================
+
+Make pot display simpler.
+
+Current pot container feels oversized.
+
+New design:
+
+POT
+25,000
+
+Small elegant floating display.
+
+Minimal border.
+
+No giant container.
+
+==================================================
+BACKGROUND
+==================================================
+
+Reduce background effects.
+
+Current gameplay has too many circles and overlays.
+
+Keep:
+
+- subtle dark gradient
+- faint neon lighting
+- slight atmosphere
+
+Remove:
+
+- excessive bubbles
+- oversized gradients
+- distracting shapes
+
+==================================================
+ACTION FEED
+==================================================
+
+Player actions should appear as:
+
+Vegas raises 2,000
+
+Vegas folds
+
+Ace calls
+
+Small floating text.
+
+Fade away after 2 seconds.
+
+No giant banners.
+
+==================================================
+BOTTOM ACTION AREA
+==================================================
+
+Simplify controls.
+
+Current controls feel busy.
+
+Keep:
+
+Fold
+Call
+Raise
+All-In
+
+Remove unnecessary visual weight.
+
+Buttons should feel clean and modern.
+
+==================================================
+RAISE SYSTEM
+==================================================
+
+Use one clean slider.
+
+Quick bet shortcuts:
+
+0.5x Pot
+Pot
+2x Pot
+
+Keep these small.
+
+Do not dominate screen space.
+
+==================================================
+PLAYER INFORMATION
+==================================================
+
+Show:
+
+Avatar
+Name
+Stack
+
+Only.
+
+Hide unnecessary information until needed.
+
+==================================================
+TABLE BORDERS
+==================================================
+
+Remove remaining large borders.
+
+Remove anything that resembles the old table style.
+
+No giant pink outlines.
+
+No oval table.
+
+No giant neon frame.
+
+==================================================
+SOCIAL FEATURES
+==================================================
+
+Keep social interaction available.
+
+Do not show social UI permanently.
+
+Show only when:
+
+- player taps avatar
+- player taps social button
+- player opens profile
+
+Gameplay should stay focused on poker.
+
+==================================================
+TOURNAMENT MODE
+==================================================
+
+Tournament mode must use this exact redesign.
+
+Tournament tables should NOT use separate layouts.
+
+Only add:
+
+Tournament Name
+Blind Level
+Players Remaining
+
+as a small compact header.
+
+==================================================
+ANIMATION STYLE
+==================================================
+
+Slow down chip animations.
+
+Use:
+
+- realistic chip movement
+- smoother motion
+- better spacing
+
+Less arcade.
+
+More premium casino.
+
+==================================================
+FINAL GOAL
+==================================================
+
+When someone opens a hand, they should immediately notice:
+
+1. Cards
+2. Pot
+3. Their decision
+
+Everything else should feel secondary.
+
+The table should feel calm, premium, modern, and much closer to a real poker app instead of a neon UI showcase.
+```
+
+One more thing I'd strongly recommend: remove **at least half** of the glowing outlines currently used throughout gameplay. The strongest poker apps look expensive because they exercise restraint. The neon theme works best when it's used as an accent, not on every element.
