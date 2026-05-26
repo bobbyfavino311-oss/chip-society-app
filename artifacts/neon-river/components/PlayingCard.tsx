@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#ff0090',
+    shadowColor: '#00b4ff',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     gap: 1,
     borderWidth: 1,
-    borderColor: 'rgba(255,20,100,0.2)',
+    borderColor: 'rgba(0,180,255,0.2)',
   },
   highlightOuter: {
     shadowColor: '#00d4ff',
