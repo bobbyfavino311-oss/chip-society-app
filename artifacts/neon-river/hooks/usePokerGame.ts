@@ -201,27 +201,34 @@ function makeWinnerLabel(players: GamePlayer[], winnerIds: string[]): string {
 }
 
 function doShowdown(state: GameState): GameState {
-  const s = runOutBoard(state);
-  const eligible = s.players.filter(p => p.status === 'active' || p.status === 'allIn');
-  if (eligible.length === 0) return { ...s, phase: 'handover', sidePots: [], isSplitPot: false };
+  // Check single-survivor BEFORE running out the board — fold wins must not
+  // reveal community cards that were never dealt in the real hand.
+  const eligible = state.players.filter(p => p.status === 'active' || p.status === 'allIn');
+  if (eligible.length === 0) return { ...state, phase: 'handover', sidePots: [], isSplitPot: false };
 
-  const potSize = s.pot;
-
-  // ── Single survivor (everyone else folded) ──────────────────────────────
+  // ── Single survivor — everyone else folded, no board runout ────────────
   if (eligible.length === 1) {
     const winner = eligible[0];
-    const players = s.players.map(p =>
+    const potSize = state.pot;
+    const players = state.players.map(p =>
       p.id === winner.id
         ? { ...p, chips: p.chips + potSize, chipDelta: p.chipDelta + potSize }
         : p
     );
+    const msg = winner.isHuman
+      ? 'Everyone folded — you win!'
+      : `Everyone folded — ${winner.name} wins!`;
     return {
-      ...s, players, phase: 'handover', showCards: true, allInRunout: false,
+      ...state, players, phase: 'handover', showCards: false, allInRunout: false,
       winnerIds: [winner.id], winnerHand: '', winnerPot: potSize,
-      message: winner.isHuman ? 'You won!' : `${winner.name} wins!`,
+      message: msg,
       pot: 0, sidePots: [], isSplitPot: false,
     };
   }
+
+  // ── 2+ eligible players — run remaining board cards then evaluate ───────
+  const s = runOutBoard(state);
+  const potSize = s.pot;
 
   // ── Compute side pots ──────────────────────────────────────────────────
   const sidePots = computeSidePots(s.players);

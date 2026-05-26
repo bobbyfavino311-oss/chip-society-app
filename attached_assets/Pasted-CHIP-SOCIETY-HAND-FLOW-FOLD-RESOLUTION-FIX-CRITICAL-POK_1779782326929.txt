@@ -1,0 +1,155 @@
+CHIP SOCIETY — HAND FLOW / FOLD RESOLUTION FIX
+CRITICAL POKER RULE LOGIC PATCH
+==============================================================
+
+The poker engine currently reveals remaining community cards even after all other players have folded.
+
+This is incorrect for real Texas Hold’em gameplay.
+
+Example issue:
+If everyone folds on the turn, the river card should NOT be revealed.
+
+Once only one player remains active in the hand, the hand must end immediately.
+
+==============================================================
+CORE RULE FIX
+==============================================================
+
+In Texas Hold’em:
+
+If all players except one fold, the remaining player wins the pot immediately.
+
+The game should NOT:
+- reveal the next community card
+- continue to river
+- continue betting rounds
+- force showdown
+- expose unused board cards
+
+This prevents controversy and matches real poker behavior.
+
+==============================================================
+HAND END CONDITIONS
+==============================================================
+
+After every player action, check active players.
+
+If activePlayers.length === 1:
+
+1. Stop the hand immediately
+2. Award pot to the remaining player
+3. Do not reveal additional community cards
+4. Do not run showdown
+5. Do not evaluate final hands
+6. Show winner message
+7. Move to hand summary / next hand
+
+==============================================================
+STREET-SPECIFIC EXAMPLES
+==============================================================
+
+PREFLOP:
+If everyone folds preflop except one player:
+- do not reveal flop
+- award pot immediately
+
+FLOP:
+If everyone folds on flop except one player:
+- do not reveal turn
+- award pot immediately
+
+TURN:
+If everyone folds on turn except one player:
+- do not reveal river
+- award pot immediately
+
+RIVER:
+If everyone folds on river except one player:
+- no showdown needed
+- award pot immediately
+
+==============================================================
+SHOWDOWN RULE
+==============================================================
+
+Only reveal all remaining cards and evaluate hands if:
+
+- at least 2 players remain active after final river betting round
+OR
+- multiple all-in players are required to run the board
+
+==============================================================
+ALL-IN EXCEPTION
+==============================================================
+
+If players are all-in and no further betting is possible, then the board may run out normally ONLY IF multiple players are still contesting the pot.
+
+Example:
+Player A all-in
+Player B calls
+Both remain active
+
+Then:
+- reveal remaining community cards
+- run full board
+- evaluate showdown
+
+But if everyone folds to one player:
+- stop immediately
+- do not reveal unused cards
+
+==============================================================
+UI BEHAVIOR
+==============================================================
+
+When hand ends by fold:
+
+Display:
+“Everyone folded”
+“[PlayerName] wins the pot”
+
+Do NOT display:
+- unrevealed board cards
+- final hand ranking from unrevealed cards
+- river card
+- showdown result
+
+==============================================================
+HAND HISTORY
+==============================================================
+
+Hand history should record:
+
+- street where hand ended
+- winning player
+- reason: won by fold
+- pot amount
+- final visible board only
+
+Example:
+“Shadow won 3,500 chips on the turn after all opponents folded.”
+
+==============================================================
+ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete, verify:
+
+1. If everyone folds preflop, flop is not revealed.
+2. If everyone folds on flop, turn is not revealed.
+3. If everyone folds on turn, river is not revealed.
+4. If one player remains, pot is awarded instantly.
+5. Showdown only happens when 2+ players remain.
+6. All-in called hands still run out correctly.
+7. Hand history does not expose unused community cards.
+8. No final hand evaluation uses unrevealed cards.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+Chip Society must follow real Texas Hold’em hand flow.
+
+Unused community cards should remain hidden when the hand ends by fold.
+
+This makes gameplay fair, realistic, and trustworthy.
