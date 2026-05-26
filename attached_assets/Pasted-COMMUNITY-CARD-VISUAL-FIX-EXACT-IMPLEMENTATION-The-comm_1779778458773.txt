@@ -1,0 +1,150 @@
+COMMUNITY CARD VISUAL FIX — EXACT IMPLEMENTATION
+
+The community cards are still not correct.
+
+The current design applies a glow around the entire community card container.
+
+THIS IS NOT WHAT I WANT.
+
+==================================================
+INDIVIDUAL CARD GLOWS
+==================================================
+
+Each community card must have its OWN border and glow.
+
+Example:
+
+[7♠]
+[10♣]
+[2♦]
+[6♠]
+[A♥]
+
+Every single card should have:
+
+- thin electric blue outline
+- individual neon glow
+- separate shadow
+- separate border
+
+NOT:
+
+one large glow surrounding the entire group.
+
+The glow should appear around each card independently.
+
+==================================================
+COLOR
+==================================================
+
+Use:
+
+Border:
+#42CFFF
+
+Outer Glow:
+#00C8FF
+
+Secondary Glow:
+#7AE7FF
+
+The effect should resemble:
+
+electric neon
+arc reactor blue
+luxury casino LED lighting
+
+NOT:
+
+cyan fog
+white glow
+generic blue blur
+
+==================================================
+CARD BORDER SETTINGS
+==================================================
+
+Each card should have:
+
+2px electric blue border
+
+Soft glow radius:
+12px
+
+Outer glow opacity:
+55%
+
+Inner glow opacity:
+25%
+
+Border corners:
+12px
+
+Cards should look illuminated individually.
+
+==================================================
+COMMUNITY CARD CONTAINER
+==================================================
+
+Keep the dark glass community card tray.
+
+HOWEVER:
+
+Reduce tray glow by 50%.
+
+The tray should be secondary.
+
+The individual cards should become the focus.
+
+==================================================
+OUTER TABLE BORDER
+==================================================
+
+The pink/purple outer border is too dark.
+
+Increase brightness by approximately 20%.
+
+Do NOT increase thickness.
+
+Do NOT make it flashy.
+
+Maintain subtle luxury styling.
+
+Target colors:
+
+Inner Glow:
+#C600FF
+
+Outer Glow:
+#FF3BBA
+
+Opacity:
+20-30%
+
+The border should be more visible while still feeling premium.
+
+==================================================
+VISUAL GOAL
+==================================================
+
+When looking at the board:
+
+The first thing visible should be five individually illuminated cards.
+
+Each card should appear as if it is sitting on its own electric-blue LED pedestal.
+
+The tray remains dark.
+
+The cards glow.
+
+Not the container.
+
+==================================================
+ACCEPTANCE TEST
+==================================================
+
+If I hide 4 cards and leave only 1 card visible:
+
+That single card should still have a full electric-blue border and glow around itself.
+
+If the glow disappears because it belongs to the container, the implementation is wrong.
