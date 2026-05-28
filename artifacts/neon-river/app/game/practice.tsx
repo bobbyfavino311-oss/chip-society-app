@@ -29,6 +29,7 @@ import { SoundEngine } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 import { getBestHandVariant, describeHand } from '@/lib/pokerEngine';
 import type { GameVariant } from '@/constants/gameVariants';
+import NeonAvatarSeat from '@/components/NeonAvatar';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -241,8 +242,6 @@ function CommunityCards({
 
 // ─── Compact AI seat (top row) ────────────────────────────────────────────────
 
-const SEAT_AVATARS = ['♠', '♥', '♦', '♣', '★'];
-const SEAT_AVATAR_COLORS = [colors.primary, colors.secondary, '#bf5fff', colors.gold, colors.success];
 const SEAT_ACTION_COLORS: Record<string, string> = {
   FOLD: '#ff4444', CHECK: '#00ff88', CALL: '#00d4ff', RAISE: '#bf5fff', 'ALL IN': '#ff0090',
 };
@@ -278,9 +277,8 @@ function CompactAISeat({
 }: {
   player: any; isCurrentTurn: boolean; isWinner: boolean; timer: number; showCards?: boolean;
 }) {
-  const avatar = SEAT_AVATARS[player.avatarIndex % SEAT_AVATARS.length];
-  const avatarColor = SEAT_AVATAR_COLORS[player.avatarIndex % SEAT_AVATAR_COLORS.length];
   const folded = player.status === 'folded';
+  const avatarId = player.avatarIndex > 0 ? player.avatarIndex : 1;
 
   return (
     <View style={[g.seat, folded && g.seatFolded]}>
@@ -289,7 +287,7 @@ function CompactAISeat({
         isCurrentTurn && g.avatarRingActive,
         isWinner && g.avatarRingWinner,
       ]}>
-        <Text style={[g.avatarSymbol, { color: folded ? 'rgba(255,255,255,0.15)' : avatarColor }]}>{avatar}</Text>
+        <NeonAvatarSeat avatarId={avatarId} size={30} />
         {player.isDealer && <View style={g.posBadge}><Text style={g.posBadgeText}>D</Text></View>}
         {player.isSmallBlind && !player.isDealer && (
           <View style={[g.posBadge, { backgroundColor: 'rgba(0,212,255,0.2)', borderColor: '#00d4ff' }]}>

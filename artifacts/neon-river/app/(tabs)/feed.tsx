@@ -28,6 +28,7 @@ import {
   type SocialPost, type PostTag,
 } from '@/lib/socialData';
 import NeonAvatar from '@/components/NeonAvatar';
+import { getNeonAvatar } from '@/constants/neonAvatars';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -665,8 +666,7 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
   const [showOpts, setShowOpts] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
-  const sym = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
-  const col = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
+  const meAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
   const remaining = MAX_CHARS - text.length;
   const canPost = text.trim().length > 0 && remaining >= 0;
 
@@ -708,9 +708,7 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
             </TouchableOpacity>
           </View>
           <View style={cmp.authorRow}>
-            <View style={[cmp.avatar, { borderColor: col }]}>
-              <Text style={[cmp.avatarText, { color: col }]}>{sym}</Text>
-            </View>
+            <NeonAvatar avatarId={meAvatarId} size={36} />
             <View>
               <Text style={cmp.authorName}>{profile.username}</Text>
               <Text style={cmp.authorHandle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
@@ -831,9 +829,9 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
   const { following, notifications } = useSocial();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
 
-  const sym = AVATAR_SYMBOLS[profile.avatarIndex % AVATAR_SYMBOLS.length];
-  const col = AVATAR_COLORS[profile.avatarIndex % AVATAR_COLORS.length];
-  const avatarType = profile.profileImageType ?? 'character';
+  const meAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
+  const neonCol = getNeonAvatar(meAvatarId).color;
+  const avatarType = profile.profileImageType ?? 'symbol';
   const data = subTab === 'posts' ? myPosts : subTab === 'reposts' ? MY_REPOSTS : MY_LIKES;
 
   return (
@@ -851,7 +849,7 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
               isEquipped
             />
           )}
-          <LinearGradient colors={[`${col}40`, 'transparent']} style={me.glow} />
+          <LinearGradient colors={[`${neonCol}40`, 'transparent']} style={me.glow} />
         </View>
         <View style={me.profileInfo}>
           <Text style={me.username}>{profile.username}</Text>
@@ -914,11 +912,7 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
                 </View>
               )}
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <View style={[me.postAvatar, { borderColor: isRepost ? colors.textDim : col }]}>
-                  <Text style={[{ fontSize: 14, fontWeight: '700' }, { color: isRepost ? colors.textDim : col }]}>
-                    {isRepost ? '♠' : sym}
-                  </Text>
-                </View>
+                <NeonAvatar avatarId={isRepost ? 4 : meAvatarId} size={28} />
                 <View style={{ flex: 1 }}>
                   <Text style={me.postUser}>{isRepost ? post.repostedFrom : profile.username}</Text>
                   <Text style={me.postTime}>{post.timeAgo}</Text>

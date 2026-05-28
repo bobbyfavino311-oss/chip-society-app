@@ -76,8 +76,8 @@ export function getNeonAvatar(id: number): NeonAvatar {
   return NEON_AVATARS.find(a => a.id === id) ?? NEON_AVATARS[0];
 }
 
-export function isNeonAvatarUnlocked(avatar: NeonAvatar, xp: number): boolean {
-  return xp >= avatar.unlockXP;
+export function isNeonAvatarUnlocked(_avatar: NeonAvatar, _xp: number): boolean {
+  return true; // All avatars unlocked — XP gating re-enabled later
 }
 
 export const COMMON_AVATARS  = NEON_AVATARS.filter(a => a.rarity === 'COMMON');

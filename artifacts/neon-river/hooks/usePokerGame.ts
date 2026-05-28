@@ -663,7 +663,7 @@ export function usePokerGame(
         isDealer: false,
         isSmallBlind: false,
         isBigBlind: false,
-        avatarIndex: i + 1,
+        avatarIndex: [9, 13, 20, 25, 7][i % 5],
       })),
     ];
 

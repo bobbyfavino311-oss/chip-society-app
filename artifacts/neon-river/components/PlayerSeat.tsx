@@ -2,13 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import PlayingCard from './PlayingCard';
 import ArcTimer from './ArcTimer';
+import NeonAvatarView from './NeonAvatar';
+import { getNeonAvatar } from '../constants/neonAvatars';
 import { Card } from '../lib/pokerEngine';
 import colors from '../constants/colors';
 
 export type SeatStatus = 'active' | 'folded' | 'allIn' | 'empty' | 'winner';
-
-const AVATARS = ['♠', '♥', '♦', '♣', '★'];
-const AVATAR_COLORS = [colors.primary, colors.secondary, colors.accent, colors.gold, colors.success];
 
 const ACTION_COLORS: Record<string, string> = {
   FOLD: '#ff4444',
@@ -51,7 +50,7 @@ export default function PlayerSeat({
   betInRound,
   timer,
   showCards,
-  avatarIndex = 0,
+  avatarIndex = 1,
   isHuman = false,
   lastAction,
   handName,
@@ -59,8 +58,10 @@ export default function PlayerSeat({
   const isFolded = status === 'folded';
   const isAllIn = status === 'allIn';
   const isWinner = status === 'winner';
-  const avatarColor = AVATAR_COLORS[avatarIndex % AVATAR_COLORS.length];
-  const avatarSymbol = AVATARS[avatarIndex % AVATARS.length];
+
+  const avatarId = avatarIndex > 0 ? avatarIndex : 1;
+  const avatarDef = getNeonAvatar(avatarId);
+  const avatarColor = avatarDef.color;
 
   const glowBorderColor = isWinner
     ? colors.gold
@@ -170,9 +171,10 @@ export default function PlayerSeat({
             { borderColor: glowBorderColor },
             isCurrentTurn && { borderWidth: 2.5 },
             isWinner && { borderColor: colors.gold, borderWidth: 2.5 },
+            isFolded && { opacity: 0.4 },
           ]}
         >
-          <Text style={[styles.avatarText, { color: isFolded ? colors.textDim : avatarColor }]}>{avatarSymbol}</Text>
+          <NeonAvatarView avatarId={avatarId} size={AVATAR_SIZE - 4} />
         </View>
 
         {/* Position badge */}
@@ -288,14 +290,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 6,
     elevation: 4,
-  },
-  avatarText: {
-    fontSize: 13,
-    fontWeight: '700',
   },
   posBadge: {
     position: 'absolute',

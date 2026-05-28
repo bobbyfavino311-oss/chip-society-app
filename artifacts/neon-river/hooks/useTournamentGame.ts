@@ -459,7 +459,7 @@ export function useTournamentGame(
         id: `ai_${i}`, name: b.name, chips: startingChips, holeCards: [] as Card[],
         betInRound: 0, chipDelta: 0, status: 'active' as PlayerStatus,
         isHuman: false, difficulty: b.diff, personality: getBotPersonality(i),
-        seatIndex: i + 1, isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: i + 1,
+        seatIndex: i + 1, isDealer: false, isSmallBlind: false, isBigBlind: false, avatarIndex: [9, 13, 20, 25, 7][i % 5],
       })),
     ];
 
