@@ -405,17 +405,19 @@ function TrendCard({ post }: { post: TrendPost }) {
 // ─── Main screen ─────────────────────────────────────────────────────────────
 
 export default function HomeScreen() {
+  // ─── All hooks at the top, before any non-hook code ───────────────────────
   const insets = useSafeAreaInsets();
   const { profile, isLoaded } = useUser();
   const colors = useColors();
   const { isDark, toggleTheme } = useTheme();
   const { isMusicMuted, toggleMusicMute } = useSoundSettings();
   const { unreadCount } = useNotifications();
-  const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
+  const { posts: aiPosts } = useAISocial();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const dropAnim = useRef(new Animated.Value(0)).current;
+  const [tournaments, setTournaments] = useState<LiveTournament[]>(initTournamentPool);
 
-  // Resume menu music when home screen mounts (e.g. returning from a game)
+  // ─── Effects ──────────────────────────────────────────────────────────────
   useEffect(() => {
     MusicEngine.play();
   }, []);
@@ -425,29 +427,6 @@ export default function HomeScreen() {
       router.replace('/onboarding');
     }
   }, [isLoaded, profile.isNewUser]);
-
-  const openSettings = () => {
-    setSettingsOpen(true);
-    Animated.spring(dropAnim, { toValue: 1, useNativeDriver: true, tension: 80, friction: 10 }).start();
-  };
-  const closeSettings = () => {
-    Animated.timing(dropAnim, { toValue: 0, duration: 140, useNativeDriver: true }).start(() => setSettingsOpen(false));
-  };
-
-  const { posts: aiPosts } = useAISocial();
-  const trendingPosts: TrendPost[] = aiPosts.slice(0, 5).map(p => ({
-    id: p.id,
-    user: p.personality.username,
-    avatar: p.personality.avatarInitials[0],
-    avatarColor: p.personality.avatarColor,
-    type: p.tag,
-    typeColor: p.tagColor,
-    content: p.content,
-    likes: p.likes,
-    pot: p.pot,
-  }));
-
-  const [tournaments, setTournaments] = useState<LiveTournament[]>(initTournamentPool);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -461,14 +440,37 @@ export default function HomeScreen() {
             used.add(next.name);
             return next;
           }
-          return { ...t }; // new ref so countdown re-renders
+          return { ...t };
         });
       });
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
+  // ─── Derived values ────────────────────────────────────────────────────────
+  const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
+
+  const trendingPosts: TrendPost[] = aiPosts.slice(0, 5).map(p => ({
+    id: p.id,
+    user: p.personality.username,
+    avatar: p.personality.avatarInitials[0],
+    avatarColor: p.personality.avatarColor,
+    type: p.tag,
+    typeColor: p.tagColor,
+    content: p.content,
+    likes: p.likes,
+    pot: p.pot,
+  }));
+
   const formatChips = (n: number) => n.toLocaleString('en-US');
+
+  const openSettings = () => {
+    setSettingsOpen(true);
+    Animated.spring(dropAnim, { toValue: 1, useNativeDriver: true, tension: 80, friction: 10 }).start();
+  };
+  const closeSettings = () => {
+    Animated.timing(dropAnim, { toValue: 0, duration: 140, useNativeDriver: true }).start(() => setSettingsOpen(false));
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
