@@ -1,0 +1,212 @@
+ATTACHMENT PROMPT:
+
+THE NEON AVATAR SYSTEM IS STILL BROKEN.
+
+Right now the avatar slots are appearing as:
+
+* empty dark squares
+* blank placeholders
+* missing artwork
+
+The actual neon symbols are NOT rendering.
+
+This completely defeats the purpose of the new avatar identity system.
+
+==============================================================
+CORE ISSUE
+==========
+
+The avatar framework exists,
+BUT the actual neon symbol artwork/icons are missing.
+
+Currently:
+
+* the cards load
+* the containers load
+* rarity tags load
+* equip buttons load
+
+BUT:
+the actual neon avatar symbols themselves do not display.
+
+==============================================================
+REQUIRED FIX
+============
+
+Every avatar card MUST contain:
+
+* a fully rendered neon icon/symbol
+* centered properly
+* glowing correctly
+* high contrast
+* crisp at mobile resolution
+
+NO EMPTY BOXES.
+
+==============================================================
+NEON AVATAR DESIGN STYLE
+========================
+
+The avatars should feel:
+
+* iconic
+* nightlife themed
+* synthwave
+* poker-lounge inspired
+* 80s luxury nightlife
+* casino aesthetic
+* retro-futuristic
+
+NOT:
+
+* generic emojis
+* flat icons
+* corporate UI symbols
+
+==============================================================
+RENDERING REQUIREMENTS
+======================
+
+Each avatar should include:
+
+BACKGROUND:
+
+* deep navy/purple gradient
+* subtle glow haze
+* premium dark finish
+
+SYMBOL:
+
+* centered
+* large
+* clean vector style
+* neon illuminated
+* sharp edges
+* high readability at small sizes
+
+GLOW:
+
+* soft outer glow
+* color-matched
+* subtle bloom
+* premium lighting
+
+BORDER:
+
+* thin neon border
+* rarity-based colors
+
+==============================================================
+FIX MOBILE BLUR
+===============
+
+Current avatars appear:
+
+* blurry
+* low resolution
+* improperly scaled
+
+All avatar artwork must:
+
+* render at high resolution
+* use vector-quality scaling
+* remain sharp on retina/mobile screens
+* avoid pixelation
+
+==============================================================
+THE SYMBOLS SHOULD ACTUALLY EXIST
+=================================
+
+The following avatars need REAL artwork/icons:
+
+COMMON:
+
+* Martini Glass
+* Lightning Bolt
+* Poker Chip
+* Ace Card
+* Dice Stack
+* Moon Phase
+* Fire
+* Crown
+* Neon Palm
+
+And all additional avatars.
+
+==============================================================
+EXAMPLE VISUAL DIRECTION
+========================
+
+MARTINI GLASS:
+
+* cyan neon cocktail glass
+* glowing outline
+* tiny neon olive
+* luxury lounge aesthetic
+
+LIGHTNING BOLT:
+
+* electric cyan bolt
+* sharp geometric styling
+* synthwave glow
+
+POKER CHIP:
+
+* futuristic casino chip
+* neon edge accents
+* premium metallic look
+
+MOON PHASE:
+
+* vaporwave crescent moon
+* purple-blue glow
+* dreamy nightlife feel
+
+NEON PALM:
+
+* Miami-style palm tree
+* magenta/cyan lighting
+* retro sunset feel
+
+==============================================================
+IMPORTANT
+=========
+
+These should NOT just be:
+
+* labels
+* placeholders
+* colored squares
+
+They must be:
+FULLY ILLUSTRATED NEON SYMBOL AVATARS.
+
+==============================================================
+PLAYER PROFILE BUG
+==================
+
+The equipped avatar is also not rendering properly
+on the Player Profile screen.
+
+The selected avatar MUST appear:
+
+* inside the profile image container
+* fully visible
+* centered
+* glowing
+* matching the equipped avatar
+
+==============================================================
+FINAL GOAL
+==========
+
+The avatar system should become:
+
+* one of the strongest visual features in the game
+* instantly recognizable
+* stylish
+* premium
+* memorable
+
+The neon avatar artwork should feel:
+like collectible icons from a futuristic casino social network.
