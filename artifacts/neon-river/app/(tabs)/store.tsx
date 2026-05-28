@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Svg, { Circle, Line } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
@@ -18,30 +17,8 @@ import { useTheme } from '@/context/ThemeContext';
 import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { formatChips, getChipColor } from '@/utils/chipColor';
+import ChipIcon from '@/components/ChipIcon';
 
-// ─── SVG chip icon ─────────────────────────────────────────────────────────────
-function MiniChip({ size = 20, color = '#00d4ff' }: { size?: number; color?: string }) {
-  const r = size / 2;
-  const outerR = r - 1;
-  const N = 6;
-  const segLen = r * 0.22;
-  const segs = Array.from({ length: N }, (_, i) => {
-    const a = (i * (360 / N) - 90) * (Math.PI / 180);
-    return {
-      x1: r + outerR * Math.cos(a), y1: r + outerR * Math.sin(a),
-      x2: r + (outerR - segLen) * Math.cos(a), y2: r + (outerR - segLen) * Math.sin(a),
-    };
-  });
-  return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <Circle cx={r} cy={r} r={outerR} fill={`${color}20`} stroke={color} strokeWidth={1.5} />
-      <Circle cx={r} cy={r} r={outerR * 0.5} fill={`${color}25`} />
-      {segs.map((s, i) => (
-        <Line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      ))}
-    </Svg>
-  );
-}
 
 // ─── Chip packages ─────────────────────────────────────────────────────────────
 interface ChipPackage {
@@ -151,7 +128,7 @@ function PackageCard({ pkg, onPress }: { pkg: ChipPackage; onPress: () => void }
         </View>
       )}
       <View style={styles.packageLeft}>
-        <MiniChip size={32} color={pkg.color} />
+        <ChipIcon variant="gold" size={32} />
         <View style={{ gap: 2 }}>
           <Text style={[styles.packageName, { color: pkg.highlight ? pkg.color : colors.text }]}>{pkg.name}</Text>
           <Text style={[styles.packageChips, { color: pkg.color }]}>{formatChips(pkg.chips)} chips</Text>
@@ -319,7 +296,7 @@ export default function StoreScreen() {
             <Text style={styles.headerSub}>CHIP SOCIETY</Text>
           </View>
           <View style={[styles.balanceChip, { borderColor: `${getChipColor(profile.chips)}44` }]}>
-            <MiniChip size={18} color={getChipColor(profile.chips)} />
+            <ChipIcon variant={profile.chips < 5_000 ? 'red' : profile.chips < 30_000 ? 'gold' : 'green'} size={20} />
             <Text style={[styles.balanceText, { color: getChipColor(profile.chips) }]}>{formatChips(profile.chips)}</Text>
           </View>
         </View>

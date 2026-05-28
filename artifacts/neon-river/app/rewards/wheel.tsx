@@ -19,6 +19,8 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { SoundEngine } from '@/lib/soundEngine';
 import { formatChips } from '@/utils/chipColor';
+import ChipIcon from '@/components/ChipIcon';
+import ChipAmount from '@/components/ChipAmount';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -285,7 +287,7 @@ export default function WheelScreen() {
 
         {/* Balance row */}
         <View style={s.balanceRow}>
-          <Ionicons name="logo-bitcoin" size={13} color="#ffd700" />
+          <ChipIcon variant="gold" size={16} />
           <Text style={s.balanceText}>{formatChips(profile.chips)} chips</Text>
         </View>
 
@@ -375,15 +377,17 @@ export default function WheelScreen() {
             <LinearGradient colors={[`${seg.col}28`, `${seg.col}06`]} style={StyleSheet.absoluteFill} />
             <Animated.View style={[s.resultGlow, { opacity: glowAnim, shadowColor: seg.col }]} />
             <Text style={s.resultEmoji}>{seg.emoji}</Text>
-            <Text style={[s.resultAmount, { color: seg.col }]}>
-              {seg.chips > 0
-                ? `+${formatChips(seg.chips)} CHIPS`
-                : seg.ticket
-                ? '+1 SCRATCH TICKET'
-                : seg.xp > 0
-                ? `+${seg.xp} XP`
-                : 'REWARD'}
-            </Text>
+            {seg.chips > 0 ? (
+              <ChipAmount amount={seg.chips} variant="green" prefix="+" size="lg" />
+            ) : (
+              <Text style={[s.resultAmount, { color: seg.col }]}>
+                {seg.ticket
+                  ? '+1 SCRATCH TICKET'
+                  : seg.xp > 0
+                  ? `+${seg.xp} XP`
+                  : 'REWARD'}
+              </Text>
+            )}
             {!claimed ? (
               <TouchableOpacity style={[s.claimBtn, { borderColor: seg.col }]} onPress={handleClaim}>
                 <LinearGradient colors={[`${seg.col}50`, `${seg.col}20`]} style={StyleSheet.absoluteFill} />

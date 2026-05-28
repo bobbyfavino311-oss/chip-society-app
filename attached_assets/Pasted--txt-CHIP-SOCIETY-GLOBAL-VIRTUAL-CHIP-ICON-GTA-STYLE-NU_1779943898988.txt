@@ -1,0 +1,234 @@
+```txt
+CHIP SOCIETY — GLOBAL VIRTUAL CHIP ICON + GTA-STYLE NUMBER FONT PATCH
+==============================================================
+
+Fix the currency display across the entire game.
+
+The wheel spin feature currently shows virtual money with a yellow Bitcoin-style symbol.
+
+This is wrong.
+
+Chip Society should NEVER use:
+- Bitcoin symbols
+- dollar signs
+- crypto icons
+- real-money symbols
+- cash-style currency icons
+
+All virtual currency must be represented by a custom Chip Society chip icon.
+
+==============================================================
+1. REMOVE BITCOIN / MONEY SYMBOLS
+==============================================================
+
+Remove the yellow Bitcoin-style symbol from:
+
+- Daily Spin wheel rewards
+- reward cards
+- scratch tickets
+- achievement rewards
+- daily streak rewards
+- chip store
+- player balance
+- tournament prizes
+- social feed pot amounts
+- profile chip balance
+- gameplay pot displays
+
+Replace every currency symbol with:
+
+CUSTOM CHIP SOCIETY CHIP ICON
+
+==============================================================
+2. CUSTOM CHIP ICON STYLE
+==============================================================
+
+Create a custom chip icon inspired by the attached reference.
+
+The icon should resemble:
+- stacked casino poker chips
+- bold black outline
+- clean flat readable shape
+- premium arcade/casino styling
+- simple enough to read at small sizes
+
+Use color variants:
+
+GREEN CHIP:
+positive chip gains / rewards
+
+RED CHIP:
+losses / deductions
+
+WHITE CHIP:
+neutral balance / total chips
+
+GOLD CHIP:
+premium rewards / jackpots
+
+==============================================================
+3. CHIP AMOUNT DISPLAY STYLE
+==============================================================
+
+Use this format:
+
+[chip icon] 50,000
+
+NOT:
+
+₿ 50,000
+$50,000
+BTC 50K
+
+Examples:
+
++ [green chip icon] 20,000
+- [red chip icon] 5,000
+[white chip icon] 30,000
+
+==============================================================
+4. GLOBAL FONT CHANGE FOR DIGITAL NUMBERS
+==============================================================
+
+Update all chip amounts and numeric reward text to match the bold GTA-style font shown in the reference image.
+
+The number font should feel:
+- bold
+- blocky
+- arcade-casino
+- readable
+- high-impact
+- thick black outline
+- slightly rounded
+- retro game inspired
+
+Do NOT use:
+- thin futuristic font
+- slashed zero font
+- hard-to-read digital font
+- tiny condensed sci-fi numbers
+
+==============================================================
+5. ZERO READABILITY REQUIREMENT
+==============================================================
+
+All zeroes must be hollow and readable.
+
+No slashed zeroes.
+
+No crossed zeroes.
+
+No line-through zeroes.
+
+The number 0 should look like a clean rounded zero.
+
+==============================================================
+6. WHERE TO APPLY THIS FONT
+==============================================================
+
+Apply this new GTA-style chip-number font to:
+
+- wheel prizes
+- scratch ticket rewards
+- achievement rewards
+- daily streak rewards
+- chip balances
+- player profile chip balance
+- tournament prize pools
+- tournament buy-ins
+- gameplay pots
+- table stakes
+- social feed pot amounts
+- store chip bundles
+- win/loss chip result screens
+
+==============================================================
+7. WHEEL SPIN FIX
+==============================================================
+
+In the wheel spin feature:
+
+Remove the yellow Bitcoin icon completely.
+
+Wheel segments should show:
+
+[chip icon] 2,000
+[chip icon] 5,000
+[chip icon] 10,000
+[chip icon] 25,000
+[chip icon] 50,000
+[chip icon] 100,000
+
+If the reward is XP, use XP icon.
+
+If the reward is a scratch ticket, use scratch ticket icon.
+
+No Bitcoin symbol anywhere.
+
+==============================================================
+8. REWARD RESULT CARD FIX
+==============================================================
+
+When the wheel lands on a chip prize:
+
+Display:
+
+YOU WON
+[green chip icon] 50,000
+
+[CLAIM]
+
+Use the new bold GTA-style font.
+
+Make it feel like the attached reference:
+- thick black outline
+- high contrast
+- readable
+- satisfying
+
+==============================================================
+9. CHIP STORE FIX
+==============================================================
+
+The chip store should also use the custom chip symbol.
+
+Do not use money symbols except for actual Apple in-app purchase prices.
+
+Virtual chip amounts:
+use chip icon.
+
+Real purchase price:
+use Apple price format.
+
+Example:
+
+[chip icon] 100,000
+$1.99
+
+==============================================================
+10. FINAL ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete, verify:
+
+1. No Bitcoin symbol appears anywhere.
+2. No dollar symbol is used for virtual chips.
+3. Every virtual chip amount uses the custom chip icon.
+4. Wheel rewards use chip icons.
+5. Scratch rewards use chip icons.
+6. Achievement rewards use chip icons.
+7. Store virtual balances use chip icons.
+8. GTA-style bold number font is applied.
+9. Zeroes are hollow and readable.
+10. All chip gain/loss numbers match the attached reference style.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+Chip Society should have its own visual currency identity.
+
+The app should feel like it uses custom casino chips, not Bitcoin or real money.
+
+All reward numbers should feel bold, satisfying, readable, and premium.
+```

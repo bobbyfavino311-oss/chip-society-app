@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import ChipAmount from '@/components/ChipAmount';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
@@ -424,10 +425,11 @@ export default function ProfileScreen() {
             colors={['rgba(255,215,0,0.1)', 'transparent']}
             style={StyleSheet.absoluteFill}
           />
-          <MaterialCommunityIcons name="poker-chip" size={40} color={c.gold} />
-          <Text style={[styles.chipAmount, { color: profile.chips < 5_000 ? '#ff4444' : profile.chips < 30_000 ? '#ffd700' : '#00d4aa' }]}>
-            {profile.chips.toLocaleString('en-US')}
-          </Text>
+          <ChipAmount
+            amount={profile.chips}
+            variant={profile.chips < 5_000 ? 'red' : profile.chips < 30_000 ? 'gold' : 'green'}
+            size="xl"
+          />
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
         </View>
 

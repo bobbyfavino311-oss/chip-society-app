@@ -20,6 +20,7 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { SoundEngine } from '@/lib/soundEngine';
 import { formatChips } from '@/utils/chipColor';
+import ChipIcon from '@/components/ChipIcon';
 
 // ─── Ticket themes ────────────────────────────────────────────────────────────
 
@@ -772,9 +773,10 @@ export default function ScratchScreen() {
               <>
                 <Text style={st.resultEmoji}>🎉</Text>
                 <Text style={st.winTitle}>YOU WON!</Text>
-                <Animated.Text style={[st.winAmt, { transform: [{ scale: winPulse }] }]}>
-                  +{formatChips(displayChips)} CHIPS
-                </Animated.Text>
+                <Animated.View style={[st.winAmtRow, { transform: [{ scale: winPulse }] }]}>
+                  <ChipIcon variant="green" size={28} />
+                  <Text style={st.winAmt}>+{formatChips(displayChips)}</Text>
+                </Animated.View>
                 <Text style={st.winSub}>{theme.icon}  {theme.name}</Text>
               </>
             ) : (
@@ -904,7 +906,8 @@ const st = StyleSheet.create({
   },
   resultEmoji: { fontSize: 44 },
   winTitle: { color: '#ffd700', fontSize: 22, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
-  winAmt: { color: '#ffd700', fontSize: 26, fontWeight: '900', fontFamily: 'Inter_700Bold', letterSpacing: 1 },
+  winAmtRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  winAmt: { color: '#22c55e', fontSize: 28, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1, textShadowColor: '#000', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2 },
   winSub: { color: colors.textDim, fontSize: 10, letterSpacing: 1, marginTop: 2 },
   loseTitle: { color: colors.textMuted, fontSize: 18, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
   loseSub: { color: colors.textDim, fontSize: 12 },

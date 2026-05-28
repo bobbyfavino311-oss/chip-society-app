@@ -16,6 +16,7 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { formatChips } from '@/utils/chipColor';
 import { SoundEngine } from '@/lib/soundEngine';
+import ChipAmount from '@/components/ChipAmount';
 
 const STREAK_REWARDS = [
   { day: 1, chips:  5_000, label:  '5K', color: '#00d4aa' },
@@ -166,7 +167,7 @@ export default function StreakScreen() {
             <LinearGradient colors={['rgba(255,215,0,0.15)', 'transparent']} style={StyleSheet.absoluteFill} />
             <Text style={st.claimResultEmoji}>🎁</Text>
             <Text style={st.claimResultTitle}>CLAIMED!</Text>
-            <Text style={st.claimResultAmount}>+{formatChips(claimedAmount)} chips</Text>
+            <ChipAmount amount={claimedAmount} variant="green" prefix="+" size="lg" />
           </Animated.View>
         )}
 
