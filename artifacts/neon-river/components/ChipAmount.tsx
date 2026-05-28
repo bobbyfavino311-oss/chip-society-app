@@ -24,6 +24,7 @@ const VARIANT_COLORS: Record<ChipVariant, string> = {
   red:   '#ef4444',
   white: '#e2e8f0',
   gold:  '#ffd700',
+  cyan:  '#00d4ff',
 };
 
 export default function ChipAmount({
@@ -47,9 +48,9 @@ export default function ChipAmount({
           {
             fontSize: d.font,
             color,
-            textShadowColor: '#000',
+            textShadowColor: 'rgba(0,0,0,0.8)',
             textShadowOffset: { width: 1, height: 1 },
-            textShadowRadius: 2,
+            textShadowRadius: 3,
           },
         ]}
       >
@@ -65,8 +66,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   amount: {
-    fontFamily: 'Orbitron_700Bold',
+    fontFamily: 'Inter_700Bold',
     fontWeight: '900',
-    letterSpacing: 0.5,
+    letterSpacing: 0,
   },
 });

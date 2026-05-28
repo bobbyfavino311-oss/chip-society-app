@@ -1,0 +1,237 @@
+CHIP SOCIETY — FINAL CHIP ICON + FONT CORRECTION
+CRITICAL VISUAL BRANDING FIX
+==============================================================
+
+The previous chip icon and font implementation are incorrect.
+
+The app reverted back to the slanted futuristic font and generic chip icon.
+
+This is NOT the direction.
+
+Use the attached reference image as the new foundation for the virtual chip icon style.
+
+==============================================================
+1. NEW OFFICIAL CHIP ICON STYLE
+==============================================================
+
+The custom virtual currency icon should now resemble the attached reference image.
+
+Design direction:
+
+- casino chip combined with motion/speed lines
+- bold black silhouette style
+- clean geometric shape
+- modern casino branding
+- minimal but recognizable
+- premium arcade poker feel
+
+The icon should look like:
+a poker chip moving at high speed.
+
+==============================================================
+2. CHIP ICON REQUIREMENTS
+==============================================================
+
+Create a clean vector version inspired by the attached image.
+
+Requirements:
+
+- circular poker chip base
+- segmented chip detailing
+- horizontal speed lines extending right
+- thick bold shape
+- highly readable at tiny sizes
+- recognizable instantly
+
+Do NOT:
+- use Bitcoin symbols
+- use dollar signs
+- use generic casino emojis
+- use crypto branding
+- use thin line art
+
+==============================================================
+3. COLOR VERSIONS
+==============================================================
+
+Generate multiple color versions:
+
+WHITE CHIP
+neutral balances
+
+GREEN CHIP
+chip gains / rewards
+
+RED CHIP
+losses / deductions
+
+GOLD CHIP
+jackpots / premium rewards
+
+CYAN CHIP
+special event rewards
+
+==============================================================
+4. REMOVE THE SLANTED SCI-FI FONT
+==============================================================
+
+The app incorrectly reverted back to the slanted futuristic font.
+
+REMOVE IT.
+
+Do NOT use:
+- angled sci-fi font
+- slashed digital font
+- stretched futuristic type
+- thin techno lettering
+
+The numbers currently look hard to read and cheap.
+
+==============================================================
+5. NEW NUMBER FONT STYLE
+==============================================================
+
+Replace all chip amount numbers with a font style inspired by:
+
+- GTA UI numbers
+- retro arcade casino typography
+- bold rounded block numbers
+- thick outlined digits
+- heavy readable weight
+
+The font should feel:
+
+clean
+bold
+chunky
+premium
+casino arcade
+
+==============================================================
+6. ZERO DESIGN RULE
+==============================================================
+
+The number zero must ALWAYS be:
+
+clean hollow zero
+
+NOT:
+- slashed zero
+- crossed zero
+- futuristic zero
+- angled zero
+
+The zero should look readable instantly.
+
+==============================================================
+7. FONT EXAMPLES
+==============================================================
+
+GOOD STYLE:
+50,000
+20,000
+300,000
+
+BAD STYLE:
+5ØØØØ
+5/000
+5◁000
+
+Numbers should feel:
+thick
+bold
+clean
+readable
+
+==============================================================
+8. WHERE TO APPLY THE NEW FONT
+==============================================================
+
+Apply the corrected bold number font globally to:
+
+- wheel rewards
+- scratch ticket rewards
+- gameplay pot amounts
+- chip balances
+- tournament prize pools
+- player balances
+- achievement rewards
+- daily streak rewards
+- store chip bundles
+- post pot amounts
+- hand result screens
+
+==============================================================
+9. WHEEL SPIN UPDATE
+==============================================================
+
+The wheel rewards should now display:
+
+[custom chip icon] 50,000
+
+NOT:
+₿ 50,000
+
+NOT:
+$50,000
+
+The icon should feel like Chip Society’s own branded currency.
+
+==============================================================
+10. WIN / LOSS COLORS
+==============================================================
+
+Chip amount colors:
+
+GREEN:
+wins and rewards
+
+RED:
+losses
+
+WHITE:
+neutral balances
+
+GOLD:
+jackpots / legendary rewards
+
+==============================================================
+11. FINAL VISUAL GOAL
+==============================================================
+
+The app should feel like it has its own branded casino currency system.
+
+The icon should feel:
+fast
+modern
+casino-inspired
+premium
+
+The numbers should feel:
+bold
+arcade
+high-contrast
+instantly readable
+
+No more slanted sci-fi typography.
+
+No more Bitcoin symbols.
+
+No more crypto appearance.
+
+==============================================================
+12. ACCEPTANCE TESTS
+==============================================================
+
+Before marking complete verify:
+
+1. No slanted futuristic font remains.
+2. All zeroes are hollow clean zeroes.
+3. Bitcoin symbol fully removed.
+4. Custom chip icon uses speed-line chip style.
+5. Wheel rewards use new chip icon.
+6. Gameplay pots use new font.
+7. Store balances use new font.
+8. Scratch rewards use new font.
+9. Numbers are bold and readable.
+10. Entire app feels like a custom casino currency ecosystem.

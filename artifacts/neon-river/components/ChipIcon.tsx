@@ -1,14 +1,52 @@
 import React from 'react';
-import Svg, { Ellipse, Rect, Line, Path } from 'react-native-svg';
+import Svg, { Circle, Line, Rect } from 'react-native-svg';
 
-export type ChipVariant = 'green' | 'red' | 'white' | 'gold';
+export type ChipVariant = 'green' | 'red' | 'white' | 'gold' | 'cyan';
 
-const PALETTE: Record<ChipVariant, { top: string; body: string; dark: string; stripe: string }> = {
-  green: { top: '#22c55e', body: '#16a34a', dark: '#14532d', stripe: '#86efac' },
-  red:   { top: '#ef4444', body: '#b91c1c', dark: '#7f1d1d', stripe: '#fca5a5' },
-  white: { top: '#e2e8f0', body: '#94a3b8', dark: '#475569', stripe: '#f8fafc' },
-  gold:  { top: '#ffd700', body: '#ca8a04', dark: '#78350f', stripe: '#fef08a' },
+const FILL: Record<ChipVariant, string> = {
+  green: '#22c55e',
+  red:   '#ef4444',
+  white: '#d0d8e8',
+  gold:  '#ffd700',
+  cyan:  '#00d4ff',
 };
+
+const DARK: Record<ChipVariant, string> = {
+  green: '#166534',
+  red:   '#7f1d1d',
+  white: '#8090a8',
+  gold:  '#92400e',
+  cyan:  '#0e6e8a',
+};
+
+// Chip face geometry
+const CX = 11, CY = 11;
+const R_OUT  = 9.5;  // outer edge of chip
+const R_RING = 6.4;  // outer edge of center disc / inner edge of ring
+const R_IN   = 4.8;  // inner accent ring
+
+// 8 radial segment dividers at 45° intervals
+const DIVIDERS = Array.from({ length: 8 }, (_, i) => {
+  const a = ((i * 45) - 90) * (Math.PI / 180);
+  return {
+    x1: CX + R_RING * Math.cos(a),
+    y1: CY + R_RING * Math.sin(a),
+    x2: CX + (R_OUT - 0.5) * Math.cos(a),
+    y2: CY + (R_OUT - 0.5) * Math.sin(a),
+  };
+});
+
+// Stack bars to the right of the chip face
+// 5 bars tapering narrower as they go down (perspective effect)
+const BARS = [
+  { y: 1.5,  x: 20.0, w: 12.5 },
+  { y: 5.0,  x: 21.2, w: 10.8 },
+  { y: 8.5,  x: 22.4, w: 9.1  },
+  { y: 12.0, x: 23.6, w: 7.4  },
+  { y: 15.5, x: 24.8, w: 5.7  },
+];
+const BAR_H  = 2.8;
+const BAR_RX = 0.5;
 
 interface ChipIconProps {
   variant?: ChipVariant;
@@ -16,53 +54,63 @@ interface ChipIconProps {
 }
 
 export default function ChipIcon({ variant = 'white', size = 22 }: ChipIconProps) {
-  const p = PALETTE[variant];
-
-  // Fixed viewBox 24x24
-  const cx = 12;
-  const topY = 8;    // y center of top ellipse
-  const botY = 17;   // y center of bottom ellipse
-  const rx = 9;      // horizontal radius of ellipses
-  const ry = 3.2;    // vertical radius (perspective squeeze)
-  const midY = (topY + botY) / 2;
-
-  // Left / right x edges of the stack body
-  const lx = cx - rx;
-  const rx2 = cx + rx;
+  const fill = FILL[variant];
+  const dark = DARK[variant];
+  const barWidth = size * (33 / 22);  // maintain aspect ratio
 
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24">
-      {/* Stack body fill — the rectangular side of the chip stack */}
-      <Rect x={lx} y={topY} width={rx * 2} height={botY - topY} fill={p.body} />
+    <Svg width={barWidth} height={size} viewBox="0 0 33 22">
 
-      {/* Mid-chip divider line */}
-      <Line x1={lx} y1={midY} x2={rx2} y2={midY} stroke="#000" strokeWidth={0.8} strokeOpacity={0.35} />
+      {/* ── Chip face ─────────────────────────────────────────── */}
 
-      {/* Left and right vertical edges with dark color */}
-      <Rect x={lx} y={topY} width={1.4} height={botY - topY} fill={p.dark} />
-      <Rect x={rx2 - 1.4} y={topY} width={1.4} height={botY - topY} fill={p.dark} />
+      {/* Full chip disc */}
+      <Circle cx={CX} cy={CY} r={R_OUT} fill={fill} />
 
-      {/* Bottom ellipse — underside of the chip stack */}
-      <Ellipse cx={cx} cy={botY} rx={rx} ry={ry} fill={p.dark} stroke="#000" strokeWidth={1.3} />
+      {/* Segment ring (slightly darker band) */}
+      <Circle cx={CX} cy={CY} r={R_OUT}  fill="none" stroke={dark} strokeWidth={3.2} />
 
-      {/* Top face — top chip surface */}
-      <Ellipse cx={cx} cy={topY} rx={rx} ry={ry} fill={p.top} stroke="#000" strokeWidth={1.5} />
+      {/* 8 radial dividers creating segments in the ring */}
+      {DIVIDERS.map((d, i) => (
+        <Line
+          key={i}
+          x1={d.x1} y1={d.y1}
+          x2={d.x2} y2={d.y2}
+          stroke="#000"
+          strokeWidth={1.2}
+          strokeLinecap="round"
+        />
+      ))}
 
-      {/* Inner ring on top face */}
-      <Ellipse cx={cx} cy={topY} rx={rx * 0.55} ry={ry * 0.55} fill="none" stroke={p.stripe} strokeWidth={0.9} strokeOpacity={0.75} />
+      {/* Center disc (inner raised area) */}
+      <Circle cx={CX} cy={CY} r={R_RING - 0.3} fill={fill} />
+
+      {/* Inner accent ring */}
+      <Circle cx={CX} cy={CY} r={R_IN} fill="none" stroke={dark} strokeWidth={0.9} strokeOpacity={0.8} />
 
       {/* Center dot */}
-      <Ellipse cx={cx} cy={topY} rx={rx * 0.18} ry={ry * 0.18} fill={p.stripe} fillOpacity={0.7} />
+      <Circle cx={CX} cy={CY} r={1.4} fill={dark} fillOpacity={0.7} />
 
-      {/* Outline the stack sides explicitly */}
-      <Path
-        d={`M ${lx} ${topY} L ${lx} ${botY}`}
-        stroke="#000" strokeWidth={1.4} strokeLinecap="round"
-      />
-      <Path
-        d={`M ${rx2} ${topY} L ${rx2} ${botY}`}
-        stroke="#000" strokeWidth={1.4} strokeLinecap="round"
-      />
+      {/* Outer border */}
+      <Circle cx={CX} cy={CY} r={R_OUT} fill="none" stroke="#000" strokeWidth={1.4} />
+
+      {/* Inner disc border */}
+      <Circle cx={CX} cy={CY} r={R_RING - 0.3} fill="none" stroke="#000" strokeWidth={0.8} />
+
+      {/* ── Stack bars (side view of chip stack) ─────────────── */}
+      {BARS.map((b, i) => (
+        <Rect
+          key={i}
+          x={b.x}
+          y={b.y}
+          width={b.w}
+          height={BAR_H}
+          rx={BAR_RX}
+          fill={fill}
+          stroke="#000"
+          strokeWidth={0.9}
+        />
+      ))}
+
     </Svg>
   );
 }
