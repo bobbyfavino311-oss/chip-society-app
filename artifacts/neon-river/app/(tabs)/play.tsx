@@ -17,7 +17,7 @@ import { useColors } from '@/hooks/useColors';
 import { useTheme } from '@/context/ThemeContext';
 import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
-import { GuestBanner, GuestLockOverlay } from '@/components/GuestBanner';
+import { GuestBanner } from '@/components/GuestBanner';
 import type { GameVariant } from '@/constants/gameVariants';
 import { VARIANT_CONFIGS } from '@/constants/gameVariants';
 
@@ -70,6 +70,21 @@ function createStyles(c: Colors) {
     },
     rulesChipText: {
       fontSize: 9, fontWeight: '700', letterSpacing: 0.8,
+    },
+
+    actionBtnLocked: {
+      borderColor: 'rgba(255,255,255,0.07)',
+      backgroundColor: 'rgba(255,255,255,0.03)',
+    },
+    actionBtnLabelLocked: {
+      color: 'rgba(255,255,255,0.2)',
+    },
+    soonChip: {
+      borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2,
+      backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    },
+    soonText: {
+      fontSize: 7, fontWeight: '800', letterSpacing: 0.8, color: 'rgba(255,255,255,0.25)',
     },
 
     sectionTitle: {
@@ -154,39 +169,20 @@ function ShortDeckRulesModal({ visible, onClose }: { visible: boolean; onClose: 
 interface VariantCardProps {
   variant: GameVariant;
   onAIPractice: () => void;
-  onQuickMatch: () => void;
-  onTournaments: () => void;
   onRules?: () => void;
 }
 
-function VariantCard({ variant, onAIPractice, onQuickMatch, onTournaments, onRules }: VariantCardProps) {
+function VariantCard({ variant, onAIPractice, onRules }: VariantCardProps) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const cfg = VARIANT_CONFIGS[variant];
   const c = cfg.color;
   const a = cfg.accentColor;
 
-  const scaleAI   = useRef(new Animated.Value(1)).current;
-  const scaleQM   = useRef(new Animated.Value(1)).current;
-  const scaleTmnt = useRef(new Animated.Value(1)).current;
+  const scaleAI = useRef(new Animated.Value(1)).current;
 
   const pressIn  = (v: Animated.Value) => () => Animated.spring(v, { toValue: 0.95, useNativeDriver: true }).start();
   const pressOut = (v: Animated.Value) => () => Animated.spring(v, { toValue: 1, useNativeDriver: true }).start();
-
-  const actions = [
-    {
-      scale: scaleAI, label: 'AI PRACTICE', sub: 'Offline · Ready', color: c,
-      icon: 'flash' as const, badge: 'READY', onPress: onAIPractice,
-    },
-    {
-      scale: scaleQM, label: 'QUICK MATCH', sub: 'vs real players', color: '#ffd700',
-      icon: 'people' as const, badge: null, onPress: onQuickMatch,
-    },
-    {
-      scale: scaleTmnt, label: 'TOURNAMENTS', sub: 'Prize pools', color: a,
-      icon: 'trophy' as const, badge: null, onPress: onTournaments,
-    },
-  ];
 
   return (
     <View style={[styles.variantCard, { borderColor: `${c}44` }]}>
@@ -217,29 +213,49 @@ function VariantCard({ variant, onAIPractice, onQuickMatch, onTournaments, onRul
 
       {/* Action buttons */}
       <View style={styles.variantActions}>
-        {actions.map(btn => (
-          <Animated.View key={btn.label} style={{ flex: 1, transform: [{ scale: btn.scale }] }}>
-            <TouchableOpacity
-              style={[styles.actionBtn, {
-                borderColor: `${btn.color}55`,
-                backgroundColor: `${btn.color}10`,
-              }]}
-              onPress={btn.onPress}
-              onPressIn={pressIn(btn.scale)}
-              onPressOut={pressOut(btn.scale)}
-              activeOpacity={1}
-            >
-              <LinearGradient
-                colors={[`${btn.color}18`, 'transparent']}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-              />
-              <Ionicons name={btn.icon} size={18} color={btn.color} />
-              <Text style={[styles.actionBtnLabel, { color: btn.color }]}>{btn.label}</Text>
-              <Text style={[styles.actionBtnSub, { color: `${btn.color}99` }]}>{btn.sub}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        ))}
+
+        {/* AI PRACTICE — open */}
+        <Animated.View style={{ flex: 1, transform: [{ scale: scaleAI }] }}>
+          <TouchableOpacity
+            style={[styles.actionBtn, { borderColor: `${c}55`, backgroundColor: `${c}10` }]}
+            onPress={onAIPractice}
+            onPressIn={pressIn(scaleAI)}
+            onPressOut={pressOut(scaleAI)}
+            activeOpacity={1}
+          >
+            <LinearGradient
+              colors={[`${c}18`, 'transparent']}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+            />
+            <Ionicons name="flash" size={18} color={c} />
+            <Text style={[styles.actionBtnLabel, { color: c }]}>AI PRACTICE</Text>
+            <Text style={[styles.actionBtnSub, { color: `${c}99` }]}>Offline · Ready</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* QUICK MATCH — locked */}
+        <View style={{ flex: 1 }}>
+          <View style={[styles.actionBtn, styles.actionBtnLocked]}>
+            <Ionicons name="lock-closed-outline" size={16} color="rgba(255,255,255,0.2)" />
+            <Text style={[styles.actionBtnLabel, styles.actionBtnLabelLocked]}>QUICK MATCH</Text>
+            <View style={styles.soonChip}>
+              <Text style={styles.soonText}>SOON</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* RANKED — locked */}
+        <View style={{ flex: 1 }}>
+          <View style={[styles.actionBtn, styles.actionBtnLocked]}>
+            <Ionicons name="lock-closed-outline" size={16} color="rgba(255,255,255,0.2)" />
+            <Text style={[styles.actionBtnLabel, styles.actionBtnLabelLocked]}>RANKED</Text>
+            <View style={styles.soonChip}>
+              <Text style={styles.soonText}>SOON</Text>
+            </View>
+          </View>
+        </View>
+
       </View>
 
       {/* Rules chip for Short Deck */}
@@ -260,7 +276,6 @@ export default function PlayScreen() {
   const colors = useColors();
   const { isDark } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [guestLockFeature, setGuestLockFeature] = useState<string | null>(null);
   const [shortDeckRulesVisible, setShortDeckRulesVisible] = useState(false);
 
   const bgGradient = isDark
@@ -269,16 +284,6 @@ export default function PlayScreen() {
 
   const goAIPractice = (variant: GameVariant) => {
     router.push(`/game/practice?variant=${variant}` as any);
-  };
-
-  const goQuickMatch = (variant: GameVariant) => {
-    if (profile.isGuest) { setGuestLockFeature('Quick Match'); return; }
-    router.push(`/modes/quickmatch?variant=${variant}` as any);
-  };
-
-  const goTournaments = (variant: GameVariant) => {
-    if (profile.isGuest) { setGuestLockFeature('Tournaments'); return; }
-    router.push(`/(tabs)/tournaments?variant=${variant}` as any);
   };
 
   return (
@@ -290,11 +295,7 @@ export default function PlayScreen() {
       />
 
       {profile.isGuest && (
-        <GuestBanner message="Guest mode — create a free account to unlock Ranked, Tournaments & cloud saves" />
-      )}
-
-      {guestLockFeature && (
-        <GuestLockOverlay feature={guestLockFeature} onDismiss={() => setGuestLockFeature(null)} />
+        <GuestBanner message="Guest mode — create a free account to unlock Ranked & cloud saves" />
       )}
 
       <ShortDeckRulesModal
@@ -310,24 +311,18 @@ export default function PlayScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.pageTitle}>PLAY MODES</Text>
-        <Text style={styles.pageSub}>Choose your game and format</Text>
+        <Text style={styles.pageSub}>Jump in and play</Text>
 
         <Text style={styles.sectionTitle}>TRADITIONAL HOLD'EM</Text>
-
         <VariantCard
           variant="texas_holdem"
           onAIPractice={() => goAIPractice('texas_holdem')}
-          onQuickMatch={() => goQuickMatch('texas_holdem')}
-          onTournaments={() => goTournaments('texas_holdem')}
         />
 
         <Text style={styles.sectionTitle}>SHORT DECK HOLD'EM</Text>
-
         <VariantCard
           variant="short_deck_holdem"
           onAIPractice={() => goAIPractice('short_deck_holdem')}
-          onQuickMatch={() => goQuickMatch('short_deck_holdem')}
-          onTournaments={() => goTournaments('short_deck_holdem')}
           onRules={() => setShortDeckRulesVisible(true)}
         />
 
@@ -335,7 +330,7 @@ export default function PlayScreen() {
           <LinearGradient colors={[colors.primaryDim, 'transparent']} style={StyleSheet.absoluteFill} />
           <Ionicons name="information-circle-outline" size={16} color={colors.primary} />
           <Text style={styles.infoText}>
-            AI Practice is always available offline. Quick Match and Tournaments connect you to live tables — real players or AI bots fill seats.
+            AI Practice is always available offline. Quick Match and Ranked are coming soon — tournament discovery is on the Home screen.
           </Text>
         </View>
       </ScrollView>

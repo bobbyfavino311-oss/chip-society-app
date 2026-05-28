@@ -24,6 +24,7 @@ import { useNotifications } from '@/context/NotificationContext';
 import { getCharacter } from '@/constants/characters';
 import CharacterPortrait from '@/components/CharacterPortrait';
 import { MusicEngine } from '@/lib/musicEngine';
+import { useAISocial } from '@/context/AISocialContext';
 
 const { width } = Dimensions.get('window');
 
@@ -299,41 +300,6 @@ interface TrendPost {
   pot?: string;
 }
 
-const TRENDING_POSTS: TrendPost[] = [
-  {
-    id: '1',
-    user: 'NightShark99',
-    avatar: '♠',
-    avatarColor: colors.primary,
-    type: 'BIG WIN',
-    typeColor: colors.success,
-    content: 'Turned ♠A♠K into a Royal Flush on the river. 42K pot! 🔥',
-    likes: 1240,
-    pot: '42K',
-  },
-  {
-    id: '2',
-    user: 'VegasMirage',
-    avatar: '♥',
-    avatarColor: colors.secondary,
-    type: 'BLUFF',
-    typeColor: colors.accent,
-    content: 'Triple-barrel bluff with 7-2 off on a paired board. They folded a set. 😈',
-    likes: 887,
-    pot: '18K',
-  },
-  {
-    id: '3',
-    user: 'NeonAce_',
-    avatar: '♦',
-    avatarColor: colors.gold,
-    type: 'BAD BEAT',
-    typeColor: colors.warning,
-    content: 'Quad Aces cracked by a straight flush. The universe hates me.',
-    likes: 2103,
-    pot: '91K',
-  },
-];
 
 // ─── Reward quick-access row (Spin + Streak only — Scratch is in Store) ───────
 function RewardRow() {
@@ -435,85 +401,6 @@ function TrendCard({ post }: { post: TrendPost }) {
   );
 }
 
-// ─── Variant carousel (2 cards: Texas + Short Deck) ──────────────────────────
-
-const VARIANT_CARDS = [
-  {
-    title: "NO LIMIT HOLD'EM",
-    sub: 'Classic Texas Hold\'em',
-    detail: 'Full deck · Standard rankings',
-    rankNote: 'Full House beats Flush',
-    color: '#00d4ff',
-    accent: '#0044cc',
-    icon: 'card-outline' as const,
-    label: 'VIEW TOURNAMENTS',
-    route: '/(tabs)/tournaments',
-  },
-  {
-    title: 'SHORT DECK NO LIMIT',
-    sub: '36-card deck',
-    detail: '6 through Ace · Flush beats Full House',
-    rankNote: 'Flush beats Full House',
-    color: '#ff0090',
-    accent: '#bf5fff',
-    icon: 'layers-outline' as const,
-    label: 'VIEW SHORT DECK',
-    route: '/(tabs)/play',
-  },
-];
-
-function VariantCarousel() {
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      snapToInterval={width * 0.78 + 12}
-      decelerationRate="fast"
-      snapToAlignment="start"
-      contentContainerStyle={{ gap: 12, paddingRight: 16 }}
-    >
-      {VARIANT_CARDS.map(v => (
-        <TouchableOpacity
-          key={v.title}
-          style={[vc.card, { borderColor: `${v.color}55`, width: width * 0.78 }]}
-          onPress={() => router.push(v.route as any)}
-          activeOpacity={0.88}
-        >
-          <LinearGradient
-            colors={['#160028', '#080018', '#050010']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-          />
-          <LinearGradient
-            colors={[`${v.color}28`, 'transparent']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }} end={{ x: 0.85, y: 0.65 }}
-          />
-          <View style={[vc.accentBar, { backgroundColor: v.color }]} />
-          <View style={vc.body}>
-            <View style={[vc.iconWrap, { backgroundColor: `${v.color}20`, borderColor: `${v.color}40` }]}>
-              <Ionicons name={v.icon} size={22} color={v.color} />
-            </View>
-            <Text style={[vc.title, { color: v.color }]} numberOfLines={1}>{v.title}</Text>
-            <Text style={vc.sub}>{v.sub}</Text>
-            <Text style={vc.detail}>{v.detail}</Text>
-            <View style={[vc.rankBadge, { backgroundColor: `${v.accent}22`, borderColor: `${v.accent}44` }]}>
-              <Text style={[vc.rankNote, { color: v.accent }]}>{v.rankNote}</Text>
-            </View>
-            <TouchableOpacity
-              style={[vc.ctaBtn, { backgroundColor: v.color }]}
-              onPress={() => router.push(v.route as any)}
-              activeOpacity={0.85}
-            >
-              <Text style={vc.ctaText}>{v.label}</Text>
-              <Ionicons name="chevron-forward" size={12} color="#050010" />
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  );
-}
 
 // ─── Main screen ─────────────────────────────────────────────────────────────
 
@@ -546,6 +433,19 @@ export default function HomeScreen() {
   const closeSettings = () => {
     Animated.timing(dropAnim, { toValue: 0, duration: 140, useNativeDriver: true }).start(() => setSettingsOpen(false));
   };
+
+  const { posts: aiPosts } = useAISocial();
+  const trendingPosts: TrendPost[] = aiPosts.slice(0, 5).map(p => ({
+    id: p.id,
+    user: p.personality.username,
+    avatar: p.personality.avatarInitials[0],
+    avatarColor: p.personality.avatarColor,
+    type: p.tag,
+    typeColor: p.tagColor,
+    content: p.content,
+    likes: p.likes,
+    pot: p.pot,
+  }));
 
   const [tournaments, setTournaments] = useState<LiveTournament[]>(initTournamentPool);
 
@@ -720,33 +620,7 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={22} color="rgba(255,255,255,0.6)" />
         </TouchableOpacity>
 
-        {/* Trending now */}
-        <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>TRENDING NOW</Text>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/feed')}>
-            <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
-        >
-          {TRENDING_POSTS.map(post => <TrendCard key={post.id} post={post} />)}
-        </ScrollView>
-
-        {/* Variant Carousel */}
-        <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>GAME VARIANTS</Text>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/play')}>
-            <Text style={[styles.seeAll, { color: colors.primary }]}>Play</Text>
-          </TouchableOpacity>
-        </View>
-
-        <VariantCarousel />
-
-        {/* Live Tournaments — scrolling pool */}
+        {/* Live Tournaments — primary section, scrolling pool */}
         <View style={styles.sectionRow}>
           <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>LIVE TOURNAMENTS</Text>
           <View style={styles.activeBadge}>
@@ -763,6 +637,22 @@ export default function HomeScreen() {
           contentContainerStyle={{ gap: 12, paddingRight: 16 }}
         >
           {tournaments.map(t => <TournamentCard key={t.id} t={t} />)}
+        </ScrollView>
+
+        {/* Trending Now — live AI social feed */}
+        <View style={styles.sectionRow}>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>TRENDING NOW</Text>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/feed')}>
+            <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+        >
+          {trendingPosts.map(post => <TrendCard key={post.id} post={post} />)}
         </ScrollView>
 
         {/* Stats snapshot */}
@@ -881,32 +771,6 @@ const trend = StyleSheet.create({
   timeAgo: { color: colors.textDim, fontSize: 11 },
 });
 
-const vc = StyleSheet.create({
-  card: {
-    borderRadius: 18, borderWidth: 1, overflow: 'hidden',
-    flexDirection: 'row',
-  },
-  accentBar: { width: 4 },
-  body: { flex: 1, padding: 14, gap: 6 },
-  iconWrap: {
-    width: 38, height: 38, borderRadius: 10, borderWidth: 1,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 2,
-  },
-  title: { fontSize: 13, fontWeight: '800', fontFamily: 'Inter_700Bold', letterSpacing: 0.2 },
-  sub: { color: colors.textMuted, fontSize: 10, marginTop: -2 },
-  detail: { color: colors.textDim, fontSize: 9 },
-  rankBadge: {
-    alignSelf: 'flex-start', borderRadius: 5, borderWidth: 1,
-    paddingHorizontal: 6, paddingVertical: 2, marginTop: 2,
-  },
-  rankNote: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
-  ctaBtn: {
-    borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7,
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    alignSelf: 'flex-start', marginTop: 4,
-  },
-  ctaText: { color: '#050010', fontSize: 10, fontWeight: '900', letterSpacing: 0.3 },
-});
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

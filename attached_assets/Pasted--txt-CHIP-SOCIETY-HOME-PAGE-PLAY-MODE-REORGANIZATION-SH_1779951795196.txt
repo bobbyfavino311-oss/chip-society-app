@@ -1,0 +1,384 @@
+```txt
+CHIP SOCIETY — HOME PAGE + PLAY MODE REORGANIZATION
+SHORT DECK FIXES + LIVE AI SOCIAL SYSTEM
+==============================================================
+
+The Home page and Play page are currently too repetitive.
+
+The same game mode information appears in both places, which creates clutter and weakens the app structure.
+
+We are reorganizing the app architecture to make each section serve a unique purpose.
+
+==============================================================
+1. REMOVE GAME VARIANTS SECTION FROM HOME PAGE
+==============================================================
+
+REMOVE:
+“GAME VARIANTS”
+
+The Home page should NOT explain game modes anymore.
+
+The Play tab already handles that.
+
+This section is redundant and wastes premium space on the home screen.
+
+==============================================================
+2. HOME PAGE NEW STRUCTURE
+==============================================================
+
+The Home page should now become:
+
+--------------------------------------------------------------
+TOP:
+- logo
+- notifications
+- daily streak
+- daily spin
+- music toggle
+--------------------------------------------------------------
+
+SECTION 1:
+QUICK PLAY BUTTON
+
+SECTION 2:
+TOURNAMENT CAROUSEL
+(THIS REPLACES GAME VARIANTS)
+
+SECTION 3:
+TRENDING NOW
+
+SECTION 4:
+LIVE FEED PREVIEW
+
+SECTION 5:
+PLAYER STATS / MISSIONS / STREAKS
+
+==============================================================
+3. TOURNAMENT CAROUSEL REPLACEMENT
+==============================================================
+
+The old “Game Variants” section is now replaced by:
+
+==============================================================
+LIVE TOURNAMENT CAROUSEL
+==============================================================
+
+This becomes the MAIN competitive section of the home screen.
+
+Carousel cards should include:
+
+--------------------------------------------------------------
+NO LIMIT HOLD’EM
+Classic Texas Hold’em tournaments
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+SHORT DECK HOLD’EM
+36-card deck · Flush beats Full House
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+LOW STAKES LOUNGE
+Beginner friendly
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+CHROME SERIES
+Mid-stakes competitive
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+VICE CITY CLASSIC
+Flagship event
+--------------------------------------------------------------
+
+==============================================================
+4. PLAY TAB REORGANIZATION
+==============================================================
+
+The Play tab should now ONLY focus on:
+
+ACTUAL PLAYABLE MODES.
+
+==============================================================
+FOR NOW:
+LOCK EVERYTHING EXCEPT AI MODE
+==============================================================
+
+We are still building core systems.
+
+TEMPORARILY DISABLE:
+- tournaments
+- ranked
+- matchmaking
+
+on BOTH:
+- No Limit Hold’em
+- Short Deck Hold’em
+
+==============================================================
+5. PLAY TAB FINAL TEMPORARY STRUCTURE
+==============================================================
+
+NO LIMIT HOLD’EM
+--------------------------------
+[AI PRACTICE]
+OPEN
+
+[QUICK MATCH]
+LOCKED
+
+[RANKED]
+LOCKED
+
+[TOURNAMENTS]
+REMOVED ENTIRELY
+
+==============================================================
+
+SHORT DECK HOLD’EM
+--------------------------------
+[AI PRACTICE]
+OPEN
+
+[QUICK MATCH]
+LOCKED
+
+[RANKED]
+LOCKED
+
+[TOURNAMENTS]
+REMOVED ENTIRELY
+
+==============================================================
+6. REMOVE TOURNAMENT BUTTONS FROM PLAY TAB
+==============================================================
+
+Completely remove tournament buttons from the Play tab for now.
+
+Tournament discovery should ONLY happen from:
+HOME PAGE TOURNAMENT CAROUSEL.
+
+==============================================================
+7. CRITICAL SHORT DECK BUG FIX
+==============================================================
+
+Current issue:
+Entering Short Deck tournaments throws players into:
+REGULAR HOLD’EM TABLES.
+
+This is a major variant routing failure.
+
+==============================================================
+REQUIRED FIX:
+==============================================================
+
+Short Deck tournament entries MUST ONLY load:
+
+- Short Deck deck
+- Short Deck evaluator
+- Short Deck table logic
+- Short Deck rules
+- Short Deck HUD labels
+
+DO NOT fall back to:
+regular Hold’em game state.
+
+==============================================================
+8. GAME VARIANT ROUTING SYSTEM
+==============================================================
+
+Create strict variant routing.
+
+When entering:
+SHORT_DECK_HOLDEM
+
+Load:
+- shortDeckTableEngine
+- shortDeckDeck
+- shortDeckEvaluator
+- shortDeckRules
+- shortDeckAI
+
+NOT:
+regularHoldemEngine
+
+==============================================================
+9. AI SOCIAL POSTING SYSTEM
+==============================================================
+
+The Trending section and Feed currently feel static.
+
+The game needs to feel:
+alive
+social
+viral
+active
+constantly moving
+
+==============================================================
+CREATE:
+LIVE AI SOCIAL SYSTEM
+==============================================================
+
+The game should automatically generate AI-created social posts continuously.
+
+==============================================================
+10. AI FEED SYSTEM REQUIREMENTS
+==============================================================
+
+Generate:
+1 NEW AI POST EVERY 10 MINUTES.
+
+Posts should appear in:
+- Trending section
+- Feed tab
+- occasionally notifications
+
+==============================================================
+11. AI PROFILES
+==============================================================
+
+Create rotating AI personalities:
+
+Examples:
+- NightShark99
+- VegasMirage
+- ShadowKing
+- BluffMachine
+- RoyalRiver
+- AceHunter
+- ChipBandit
+- TiltDealer
+- RiverRat
+- PokerPhantom
+
+Each AI profile should have:
+- avatar
+- poker personality
+- writing style
+- favorite hand types
+- bluff tendencies
+- catchphrases
+
+==============================================================
+12. AI POST TYPES
+==============================================================
+
+Generate believable poker social content.
+
+Examples:
+
+--------------------------------------------------------------
+BIG WIN POSTS
+--------------------------------------------------------------
+“Turned quad 9s into a 220K pot. Table went silent.”
+
+--------------------------------------------------------------
+BAD BEAT POSTS
+--------------------------------------------------------------
+“Lost with pocket aces again. I’m cursed.”
+
+--------------------------------------------------------------
+BLUFF POSTS
+--------------------------------------------------------------
+“Triple-barreled with 7-2 offsuit. They folded top pair.”
+
+--------------------------------------------------------------
+TOURNAMENT POSTS
+--------------------------------------------------------------
+“Final table reached in Chrome Series.”
+
+--------------------------------------------------------------
+TILT POSTS
+--------------------------------------------------------------
+“I need a break after that river.”
+
+--------------------------------------------------------------
+FUNNY POSTS
+--------------------------------------------------------------
+“If you limp aces preflop we cannot be friends.”
+
+==============================================================
+13. AI FEED BEHAVIOR
+==============================================================
+
+Posts should:
+- appear organically
+- have varying engagement
+- gain likes/comments over time
+- rotate visibility
+- sometimes trend
+
+The feed should NEVER feel empty.
+
+==============================================================
+14. TRENDING SECTION IMPROVEMENT
+==============================================================
+
+Trending cards should now:
+refresh periodically.
+
+Every refresh:
+- new AI hand
+- new AI post
+- new bluff story
+- new win highlight
+
+==============================================================
+15. SOCIAL IMMERSION GOAL
+==============================================================
+
+The app should feel like:
+Poker Twitter
+Vegas nightlife
+casino social media
+live poker culture
+
+NOT:
+a dead static UI.
+
+==============================================================
+16. AI FEED POST TIMING
+==============================================================
+
+Post generation:
+every 10 minutes minimum.
+
+Allow:
+- staggered post scheduling
+- randomized timestamps
+- randomized engagement growth
+
+==============================================================
+17. PERFORMANCE REQUIREMENTS
+==============================================================
+
+AI social system should:
+- preload posts
+- cache avatars
+- avoid frame drops
+- not freeze scrolling
+- use lightweight text generation
+
+==============================================================
+18. FINAL ACCEPTANCE CHECK
+==============================================================
+
+Before marking complete verify:
+
+1. Game Variants removed from Home page.
+2. Home page now starts with tournament carousel.
+3. Tournament carousel replaces old variants section.
+4. Tournament buttons removed from Play tab.
+5. Ranked mode locked.
+6. Matchmaking locked.
+7. AI Practice remains playable.
+8. Short Deck tournaments no longer load regular Hold’em.
+9. Short Deck routing works correctly.
+10. AI social posts generate every 10 minutes.
+11. AI posts appear in Trending and Feed.
+12. Feed always feels alive and active.
+13. Home page no longer feels repetitive.
+14. Tournament discovery happens only from Home page.
+```

@@ -24,6 +24,7 @@ import { TermsProvider, useTerms } from '@/context/TermsContext';
 import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
 import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
 import { SocialProvider } from '@/context/SocialContext';
+import { AISocialProvider } from '@/context/AISocialContext';
 import { NotificationProvider } from '@/context/NotificationContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import TutorialOverlay from '@/components/TutorialOverlay';
@@ -166,6 +167,7 @@ export default function RootLayout() {
                 <SoundProvider>
                   <AchievementProvider>
                     <SocialProvider>
+                      <AISocialProvider>
                       <NotificationBridge>
                         <GestureHandlerRootView style={{ flex: 1 }}>
                           <KeyboardProvider>
@@ -173,6 +175,7 @@ export default function RootLayout() {
                           </KeyboardProvider>
                         </GestureHandlerRootView>
                       </NotificationBridge>
+                      </AISocialProvider>
                     </SocialProvider>
                   </AchievementProvider>
                 </SoundProvider>
