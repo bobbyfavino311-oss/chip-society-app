@@ -186,17 +186,19 @@ export function describeHand(result: HandResult): string {
     if (l === 'J') return 'Jacks';
     return `${l}s`;
   };
-  switch (result.rank) {
-    case 9: return 'Royal Flush';
-    case 8: return `Straight Flush, ${vl(result.values[0])} high`;
-    case 7: return `Four of a Kind — ${plural(result.values[0])}`;
-    case 6: return `Full House — ${plural(result.values[0])} over ${plural(result.values[1])}`;
-    case 5: return `Flush — ${vl(result.values[0])} high`;
-    case 4: return `Straight — ${vl(result.values[0])} high`;
-    case 3: return `Three of a Kind — ${plural(result.values[0])}`;
-    case 2: return `Two Pair — ${plural(result.values[0])} & ${plural(result.values[1])}`;
-    case 1: return `Pair of ${plural(result.values[0])}`;
-    default: return `${vl(result.values[0])} High`;
+  // Dispatch on name — NOT rank. Short Deck swaps ranks 5 & 6 (Flush > Full House),
+  // so rank-based dispatch returns the wrong label for Short Deck hands.
+  switch (result.name) {
+    case 'Royal Flush':      return 'Royal Flush';
+    case 'Straight Flush':   return `Straight Flush, ${vl(result.values[0])} high`;
+    case 'Four of a Kind':   return `Four of a Kind — ${plural(result.values[0])}`;
+    case 'Full House':       return `Full House — ${plural(result.values[0])} over ${plural(result.values[1])}`;
+    case 'Flush':            return `Flush — ${vl(result.values[0])} high`;
+    case 'Straight':         return `Straight — ${vl(result.values[0])} high`;
+    case 'Three of a Kind':  return `Three of a Kind — ${plural(result.values[0])}`;
+    case 'Two Pair':         return `Two Pair — ${plural(result.values[0])} & ${plural(result.values[1])}`;
+    case 'One Pair':         return `Pair of ${plural(result.values[0])}`;
+    default:                 return `${vl(result.values[0])} High`;
   }
 }
 

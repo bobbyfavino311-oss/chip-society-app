@@ -1,0 +1,196 @@
+CRITICAL SHORT DECK HAND EVALUATOR BUG
+======================================
+
+The Short Deck Hold’em hand evaluator is currently producing incorrect hand rankings.
+
+The evaluator incorrectly awarded:
+
+“Full House — Aces over Queens”
+
+on a board where no Full House existed.
+
+==============================================================
+EXAMPLE BUGGED HAND
+==============================================================
+
+BOARD:
+Q♣ 8♣ A♣ 9♣ J♥
+
+PLAYER HAND:
+K♠ 10♣
+
+CORRECT RESULT:
+FLUSH
+
+NOT:
+Full House
+
+==============================================================
+CURRENT ISSUE
+==============================================================
+
+The Short Deck evaluator is falsely detecting grouped hands (Full House / Trips / etc.) where none exist.
+
+This is a critical integrity issue.
+
+Poker hand evaluation MUST be mathematically correct.
+
+==============================================================
+REQUIRED FIX
+==============================================================
+
+Rebuild Short Deck hand evaluation logic cleanly.
+
+DO NOT reuse broken Texas Hold’em grouping logic directly.
+
+Short Deck evaluation must independently calculate:
+
+1. Straight Flush
+2. Four of a Kind
+3. Flush
+4. Full House
+5. Straight
+6. Trips
+7. Two Pair
+8. Pair
+9. High Card
+
+==============================================================
+IMPORTANT:
+IN SHORT DECK:
+FLUSH BEATS FULL HOUSE
+==============================================================
+
+However:
+A Flush is still ONLY a flush.
+
+DO NOT incorrectly convert flushes into full houses.
+
+==============================================================
+HAND EVALUATION REQUIREMENTS
+==============================================================
+
+The evaluator must:
+
+- correctly detect suit counts
+- correctly detect rank counts
+- correctly separate grouped hands from flushes
+- correctly detect straights in a 36-card deck
+- correctly compare kicker strength
+- correctly rank Short Deck hands
+
+==============================================================
+MANDATORY TEST CASES
+==============================================================
+
+TEST 1:
+Board:
+Q♣ 8♣ A♣ 9♣ J♥
+Hand:
+K♠ 10♣
+
+EXPECTED:
+Flush
+
+==============================================================
+
+TEST 2:
+Board:
+Q♣ Q♦ A♣ A♥ 9♣
+Hand:
+9♦ 10♣
+
+EXPECTED:
+Full House
+
+==============================================================
+
+TEST 3:
+Board:
+6♣ 7♣ 8♣ 9♣ K♦
+Hand:
+10♣ J♣
+
+EXPECTED:
+Straight Flush
+
+==============================================================
+
+TEST 4:
+Board:
+A♣ K♦ Q♠ J♣ 10♥
+
+EXPECTED:
+Straight
+
+==============================================================
+TABLE ZOOM / LAYOUT BUG
+==============================================================
+
+The Short Deck table layout is also incorrectly zoomed in.
+
+Current problems:
+- cards oversized
+- results section cramped
+- player area compressed
+- community cards too tall
+- layout scaling inconsistent with regular Hold’em
+
+==============================================================
+FIX THE SHORT DECK TABLE SCALE
+==============================================================
+
+Short Deck gameplay should use:
+the SAME camera framing,
+spacing,
+padding,
+and responsive layout
+as regular Hold’em.
+
+Only the deck/rules should change.
+
+==============================================================
+REQUIRED TABLE FIXES
+==============================================================
+
+Reduce:
+- community card height
+- glow intensity
+- oversized spacing
+- result panel height
+
+Increase:
+- negative space
+- vertical breathing room
+- margins between sections
+
+==============================================================
+TARGET LOOK
+==============================================================
+
+The table should feel:
+clean
+balanced
+professional
+easy to read
+
+NOT:
+zoomed in
+claustrophobic
+arcade oversized
+
+==============================================================
+FINAL ACCEPTANCE CHECK
+==============================================================
+
+Before marking complete verify:
+
+1. Flushes are detected correctly.
+2. Full Houses only trigger when mathematically valid.
+3. Short Deck rankings are accurate.
+4. Straight logic works in 36-card deck.
+5. Table scale matches regular Hold’em.
+6. Community cards no longer oversized.
+7. Result panel fits naturally on screen.
+8. No clipping or cramped UI remains.
+9. Layout feels balanced and premium.

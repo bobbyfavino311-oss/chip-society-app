@@ -905,8 +905,8 @@ const setup = StyleSheet.create({
 });
 
 const table = StyleSheet.create({
-  communityArea: { alignItems: 'center', gap: 10 },
-  communityCards: { flexDirection: 'row', gap: 8 },
+  communityArea: { alignItems: 'center', gap: 6 },
+  communityCards: { flexDirection: 'row', gap: 6 },
   emptySlot: {
     width: 56, height: 78, borderRadius: 7,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
@@ -978,22 +978,22 @@ const styles = StyleSheet.create({
   },
 
   // ── Center game area
-  gameCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14 },
+  gameCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 },
 
   // ── Card board surface
   tableSurface: {
     alignItems: 'center',
-    paddingHorizontal: 18, paddingVertical: 14,
-    borderRadius: 20,
-    borderWidth: 1, borderColor: 'rgba(220,0,210,0.34)',
+    paddingHorizontal: 14, paddingVertical: 10,
+    borderRadius: 18,
+    borderWidth: 1, borderColor: 'rgba(220,0,210,0.28)',
     backgroundColor: 'rgba(0,0,8,0.52)',
-    shadowColor: '#FF00C8', shadowOpacity: 0.22, shadowRadius: 22, shadowOffset: { width: 0, height: 0 },
+    shadowColor: '#FF00C8', shadowOpacity: 0.16, shadowRadius: 16, shadowOffset: { width: 0, height: 0 },
     overflow: 'hidden',
   },
   tableCenterGlow: {
     position: 'absolute', top: '10%', left: '5%', right: '5%', bottom: '10%',
-    borderRadius: 14,
-    backgroundColor: 'rgba(0,60,35,0.18)',
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,60,35,0.12)',
   },
 
   // ── Chip animations
