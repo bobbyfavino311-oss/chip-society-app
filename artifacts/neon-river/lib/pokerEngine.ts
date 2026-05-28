@@ -215,3 +215,148 @@ export function determineWinners(
   const winners = evaluated.filter(e => compareHands(e.hand, best) === 0);
   return winners.map(w => ({ winnerId: w.id, handResult: w.hand }));
 }
+
+// ─── Short Deck Hold'em variant ──────────────────────────────────────────────
+
+export type GameVariant = 'texas_holdem' | 'short_deck_holdem';
+
+/** 36-card deck: values 6–14, all 4 suits */
+export function createShortDeck(): Card[] {
+  const suits: Suit[] = ['S', 'H', 'D', 'C'];
+  const deck: Card[] = [];
+  for (const suit of suits) {
+    for (let v = 6; v <= 14; v++) {
+      deck.push({ suit, value: v });
+    }
+  }
+  return deck;
+}
+
+/**
+ * Short Deck hand evaluator.
+ * Identical to evaluate5Cards except: Flush (rank 6) > Full House (rank 5).
+ * No wheel straight — A-2-3-4-5 cannot occur with a 36-card deck.
+ */
+export function evaluate5CardsShortDeck(hand: Card[]): HandResult {
+  const vals = hand.map(c => c.value).sort((a, b) => b - a);
+  const suits = hand.map(c => c.suit);
+
+  const counts: Record<number, number> = {};
+  for (const v of vals) counts[v] = (counts[v] || 0) + 1;
+
+  const countVals = Object.values(counts).sort((a, b) => b - a);
+  const uniqueVals = Object.keys(counts)
+    .map(Number)
+    .sort((a, b) => b - a);
+
+  const isFlush = suits.every(s => s === suits[0]);
+  // No wheel possible in Short Deck (no 2–5)
+  const isStraight = vals[0] - vals[4] === 4 && new Set(vals).size === 5;
+  const straightHigh = vals[0];
+
+  if (isFlush && isStraight) {
+    if (straightHigh === 14) return { rank: 9, values: [14], name: 'Royal Flush' };
+    return { rank: 8, values: [straightHigh], name: 'Straight Flush' };
+  }
+
+  if (countVals[0] === 4) {
+    const quad = uniqueVals.find(v => counts[v] === 4)!;
+    const kick = uniqueVals.find(v => counts[v] !== 4)!;
+    return { rank: 7, values: [quad, kick], name: 'Four of a Kind' };
+  }
+
+  // Short Deck key difference: Flush (rank 6) beats Full House (rank 5)
+  if (isFlush) return { rank: 6, values: vals, name: 'Flush' };
+
+  if (countVals[0] === 3 && countVals[1] === 2) {
+    const trips = uniqueVals.find(v => counts[v] === 3)!;
+    const pair = uniqueVals.find(v => counts[v] === 2)!;
+    return { rank: 5, values: [trips, pair], name: 'Full House' };
+  }
+
+  if (isStraight) return { rank: 4, values: [straightHigh], name: 'Straight' };
+
+  if (countVals[0] === 3) {
+    const trips = uniqueVals.find(v => counts[v] === 3)!;
+    const kickers = uniqueVals.filter(v => counts[v] !== 3);
+    return { rank: 3, values: [trips, ...kickers], name: 'Three of a Kind' };
+  }
+
+  if (countVals[0] === 2 && countVals[1] === 2) {
+    const pairs = uniqueVals.filter(v => counts[v] === 2).sort((a, b) => b - a);
+    const kick = uniqueVals.find(v => counts[v] === 1)!;
+    return { rank: 2, values: [...pairs, kick], name: 'Two Pair' };
+  }
+
+  if (countVals[0] === 2) {
+    const pairVal = uniqueVals.find(v => counts[v] === 2)!;
+    const kickers = uniqueVals.filter(v => counts[v] !== 2);
+    return { rank: 1, values: [pairVal, ...kickers], name: 'One Pair' };
+  }
+
+  return { rank: 0, values: vals, name: 'High Card' };
+}
+
+/** Variant-aware best hand evaluator */
+export function getBestHandVariant(
+  holeCards: Card[],
+  communityCards: Card[],
+  variant: GameVariant = 'texas_holdem'
+): HandResult {
+  const all = [...holeCards, ...communityCards];
+  const n = all.length;
+  let best: HandResult | null = null;
+  const eval5 = variant === 'short_deck_holdem' ? evaluate5CardsShortDeck : evaluate5Cards;
+
+  for (let i = 0; i < n - 4; i++) {
+    for (let j = i + 1; j < n - 3; j++) {
+      for (let k = j + 1; k < n - 2; k++) {
+        for (let l = k + 1; l < n - 1; l++) {
+          for (let m = l + 1; m < n; m++) {
+            const combo = [all[i], all[j], all[k], all[l], all[m]];
+            const result = eval5(combo);
+            if (!best || compareHands(result, best) > 0) best = result;
+          }
+        }
+      }
+    }
+  }
+
+  return best ?? { rank: 0, values: [], name: 'High Card' };
+}
+
+/** Variant-aware winner determination */
+export function determineWinnersVariant(
+  activePlayers: { id: string; holeCards: Card[] }[],
+  communityCards: Card[],
+  variant: GameVariant = 'texas_holdem'
+): { winnerId: string; handResult: HandResult }[] {
+  const evaluated = activePlayers.map(p => ({
+    id: p.id,
+    hand: getBestHandVariant(p.holeCards, communityCards, variant),
+  }));
+
+  evaluated.sort((a, b) => compareHands(b.hand, a.hand));
+  const best = evaluated[0].hand;
+
+  const winners = evaluated.filter(e => compareHands(e.hand, best) === 0);
+  return winners.map(w => ({ winnerId: w.id, handResult: w.hand }));
+}
+
+/** Variant-aware postflop strength (normalises rank against the variant's max rank) */
+export function getPostflopStrengthVariant(
+  holeCards: Card[],
+  communityCards: Card[],
+  variant: GameVariant = 'texas_holdem'
+): number {
+  if (communityCards.length === 0) return getPreflopStrength(holeCards);
+  const result = getBestHandVariant(holeCards, communityCards, variant);
+  const rankStrength = result.rank / 9;
+  const topValue = (result.values[0] ?? 7) / 14;
+  return Math.min(1, rankStrength * 0.85 + topValue * 0.15);
+}
+
+/** Create the right deck for the given variant */
+export function createVariantDeck(variant: GameVariant = 'texas_holdem'): Card[] {
+  return variant === 'short_deck_holdem' ? createShortDeck() : createDeck();
+}

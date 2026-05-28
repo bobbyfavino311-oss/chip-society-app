@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AIDifficulty, AIAction, AIPersonality, getAIDecision, getAIDelay, getRaiseAmount, getBotPersonality, analyzeBoardTexture } from '../lib/aiBot';
-import { Card, createDeck, describeHand, determineWinners, getPreflopStrength, getPostflopStrength, shuffleDeck } from '../lib/pokerEngine';
+import { Card, createVariantDeck, describeHand, determineWinnersVariant, GameVariant, getPreflopStrength, getPostflopStrengthVariant, shuffleDeck } from '../lib/pokerEngine';
 
 const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
@@ -82,6 +82,7 @@ export interface GameState {
   sidePots: SidePot[];  // populated when at least one player is all-in for less
   isSplitPot: boolean;  // true when two or more players tie for the same pot
   bigBlind: number;     // table big blind — used for minRaise reset between streets
+  variant: GameVariant; // which poker variant is being played
 }
 
 const INITIAL_STATE: GameState = {
@@ -106,6 +107,7 @@ const INITIAL_STATE: GameState = {
   sidePots: [],
   isSplitPot: false,
   bigBlind: BIG_BLIND,
+  variant: 'texas_holdem',
 };
 
 function getActivePlayers(players: GamePlayer[]): GamePlayer[] {
@@ -246,9 +248,10 @@ function doShowdown(state: GameState): GameState {
       const potEligible = eligible.filter(p => pot.eligiblePlayerIds.includes(p.id));
       if (potEligible.length === 0) continue;
 
-      const potWinners = determineWinners(
+      const potWinners = determineWinnersVariant(
         potEligible.map(p => ({ id: p.id, holeCards: p.holeCards })),
-        s.communityCards
+        s.communityCards,
+        s.variant
       );
       const potWinnerIds = potWinners.map(w => w.winnerId);
       const share = Math.floor(pot.amount / potWinnerIds.length);
@@ -278,9 +281,10 @@ function doShowdown(state: GameState): GameState {
   }
 
   // ── Standard showdown (single pot, no side pots) ────────────────────────
-  const winners = determineWinners(
+  const winners = determineWinnersVariant(
     eligible.map(p => ({ id: p.id, holeCards: p.holeCards })),
-    s.communityCards
+    s.communityCards,
+    s.variant
   );
   const winnerIds = winners.map(w => w.winnerId);
   const share = Math.floor(potSize / winnerIds.length);
@@ -439,8 +443,8 @@ function getActionMsg(name: string, action: AIAction, amount: number): string {
   }[action];
 }
 
-function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, sb: number = SMALL_BLIND, bb: number = BIG_BLIND): GameState {
-  const deck = shuffleDeck(createDeck());
+function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, sb: number = SMALL_BLIND, bb: number = BIG_BLIND, variant: GameVariant = 'texas_holdem'): GameState {
+  const deck = shuffleDeck(createVariantDeck(variant));
   const ps = players.map(p => ({
     ...p,
     holeCards: [] as Card[],
@@ -499,6 +503,7 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, sb: number 
     numToAct: active.length,
     timer: TIMER_SECONDS,
     message: 'Cards dealt!',
+    variant,
   };
 }
 
@@ -513,7 +518,7 @@ function executeAIAction(prev: GameState): GameState {
   const board = analyzeBoardTexture(prev.communityCards);
   const handStrength = prev.phase === 'preflop'
     ? getPreflopStrength(player.holeCards)
-    : getPostflopStrength(player.holeCards, prev.communityCards);
+    : getPostflopStrengthVariant(player.holeCards, prev.communityCards, prev.variant);
 
   const decision = getAIDecision({
     holeCards: player.holeCards,
@@ -549,6 +554,7 @@ export function usePokerGame(
   humanChips: number,
   numPlayers: number = 5,
   tableConfig: TableConfig = DEFAULT_TABLE_CONFIG,
+  variant: GameVariant = 'texas_holdem',
 ) {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -661,8 +667,8 @@ export function usePokerGame(
       })),
     ];
 
-    setState(dealAndPostBlinds(players, dealerIdx, tableConfig.smallBlind, tableConfig.bigBlind));
-  }, [difficulty, humanName, humanChips, numPlayers, tableConfig, clearTimer, clearAI]);
+    setState(dealAndPostBlinds(players, dealerIdx, tableConfig.smallBlind, tableConfig.bigBlind, variant));
+  }, [difficulty, humanName, humanChips, numPlayers, tableConfig, variant, clearTimer, clearAI]);
 
   const handleAction = useCallback((action: AIAction, raiseAmount?: number) => {
     clearTimer();
@@ -713,9 +719,9 @@ export function usePokerGame(
         isBigBlind: false,
       }));
 
-      return dealAndPostBlinds(cleanPlayers, nextDealer);
+      return dealAndPostBlinds(cleanPlayers, nextDealer, tableConfig.smallBlind, tableConfig.bigBlind, variant);
     });
-  }, [clearTimer, clearAI]);
+  }, [clearTimer, clearAI, tableConfig, variant]);
 
   return { state, startNewHand, handleAction, skipBotTurn, skipToShowdown, continueAfterHand };
 }

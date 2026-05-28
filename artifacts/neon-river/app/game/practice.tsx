@@ -27,7 +27,8 @@ import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame, TableConfig } from '@/hooks/usePokerGame';
 import { SoundEngine } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
-import { getBestHand, describeHand } from '@/lib/pokerEngine';
+import { getBestHandVariant, describeHand } from '@/lib/pokerEngine';
+import type { GameVariant } from '@/constants/gameVariants';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -176,10 +177,12 @@ function CommunityCards({
   cards,
   phase,
   holeCards,
+  variant = 'texas_holdem',
 }: {
   cards: any[];
   phase: string;
   holeCards: any[];
+  variant?: GameVariant;
 }) {
   // Track how many cards have been revealed face-up so far
   const [revealedCount, setRevealedCount] = useState(0);
@@ -212,7 +215,7 @@ function CommunityCards({
   const hasComm = cards.length > 0;
   const hasHole = holeCards.length >= 2;
   const handResult = hasComm && hasHole
-    ? getBestHand(holeCards, cards)
+    ? getBestHandVariant(holeCards, cards, variant)
     : null;
   const handColor = handResult ? (HAND_COLORS[handResult.name] ?? colors.textMuted) : colors.textMuted;
 
@@ -352,8 +355,9 @@ const g = StyleSheet.create({
 
 export default function PracticeScreen() {
   const { profile, recordWin, recordLoss } = useUser();
-  const { tier } = useLocalSearchParams<{ tier?: string }>();
+  const { tier, variant: variantParam } = useLocalSearchParams<{ tier?: string; variant?: string }>();
   const tableConfig = STAKE_CONFIGS[tier ?? ''] ?? STAKE_CONFIGS.casual;
+  const gameVariant = (variantParam === 'short_deck_holdem' ? 'short_deck_holdem' : 'texas_holdem') as import('@/constants/gameVariants').GameVariant;
 
   const [difficulty, setDifficulty] = useState<AIDifficulty>('casual');
   const [gameStarted, setGameStarted] = useState(false);
@@ -384,6 +388,7 @@ export default function PracticeScreen() {
     profile.chips,
     numPlayers,
     tableConfig,
+    gameVariant,
   );
 
   const insets = useSafeAreaInsets();
@@ -545,7 +550,7 @@ export default function PracticeScreen() {
       const human = state.players.find(p => p.isHuman);
       let handDesc = state.winnerHand ?? '';
       if (!handDesc && human && human.holeCards.length === 2) {
-        const best = getBestHand(human.holeCards, state.communityCards);
+        const best = getBestHandVariant(human.holeCards, state.communityCards, state.variant);
         handDesc = describeHand(best);
       }
       const wasAllIn = human?.status === 'allIn' || isAllIn;
@@ -661,6 +666,7 @@ export default function PracticeScreen() {
             cards={state.communityCards}
             phase={state.phase}
             holeCards={humanPlayer?.holeCards ?? []}
+            variant={state.variant}
           />
         </View>
 
@@ -775,7 +781,7 @@ export default function PracticeScreen() {
             return (
               <View style={styles.showdownPanel}>
                 {showdownPlayers.map(p => {
-                  const hand = p.holeCards.length === 2 ? getBestHand(p.holeCards, state.communityCards) : null;
+                  const hand = p.holeCards.length === 2 ? getBestHandVariant(p.holeCards, state.communityCards, state.variant) : null;
                   const isWinner = state.winnerIds.includes(p.id);
                   return (
                     <View key={p.id} style={[styles.showdownRow, isWinner && styles.showdownRowWin]}>

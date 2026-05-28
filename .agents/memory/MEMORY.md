@@ -1,0 +1,2 @@
+- [Short Deck variant architecture](short-deck-variant.md) — GameVariant lives in pokerEngine.ts; GameState carries variant field so all pure functions see it without extra params.
+- [Chip amount font](chip-font.md) — Inter_700Bold only for numbers, never Orbitron (user explicitly rejected Orbitron as "slanted sci-fi").

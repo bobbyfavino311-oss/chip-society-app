@@ -1,0 +1,392 @@
+CHIP SOCIETY — SHORT DECK HOLD’EM GAME VARIANT BUILD
+GAME MODES + TOURNAMENT CAROUSEL UPDATE
+==============================================================
+
+We are beginning to add multiple poker variants into Chip Society one at a time.
+
+The first new poker variant to build is:
+
+SHORT DECK HOLD’EM
+
+This must be added as a real playable game mode, not a placeholder.
+
+==============================================================
+1. SHORT DECK HOLD’EM RULESET
+==============================================================
+
+Short Deck Hold’em is mostly the same as traditional Texas Hold’em, with these required differences:
+
+DECK:
+Use only 36 cards.
+
+Allowed ranks:
+6, 7, 8, 9, 10, J, Q, K, A
+
+Remove from the deck:
+2, 3, 4, 5
+
+SUITS:
+Keep all four suits:
+Spades, Hearts, Diamonds, Clubs
+
+TOTAL DECK:
+36 cards
+
+==============================================================
+2. SHORT DECK HAND RANKING CHANGE
+==============================================================
+
+Hand rankings mostly match Texas Hold’em with ONE important change:
+
+FLUSH BEATS FULL HOUSE
+
+Required Short Deck ranking order:
+
+1. Royal Flush
+2. Straight Flush
+3. Four of a Kind
+4. Flush
+5. Full House
+6. Straight
+7. Three of a Kind
+8. Two Pair
+9. One Pair
+10. High Card
+
+IMPORTANT:
+In Short Deck mode only, Flush must rank higher than Full House.
+
+Do NOT change traditional Texas Hold’em rankings.
+
+==============================================================
+3. STRAIGHT LOGIC
+==============================================================
+
+Short Deck uses cards 6 through Ace.
+
+The hand evaluator must correctly support Short Deck straights using the 36-card deck.
+
+Aces should still function naturally for high straights.
+
+Make sure the evaluator does not look for impossible 2–5 straights because those cards are not in the deck.
+
+==============================================================
+4. GAME ENGINE ARCHITECTURE
+==============================================================
+
+Create a flexible poker rules engine that supports multiple variants.
+
+Do NOT hardcode everything into one Texas Hold’em rules file.
+
+Create variant support:
+
+gameVariant = "texas_holdem"
+gameVariant = "short_deck_holdem"
+
+Each variant should define:
+
+- deck composition
+- hand ranking rules
+- hand evaluator behavior
+- tournament availability
+- matchmaking availability
+- AI availability
+- display label
+- rules description
+
+==============================================================
+5. SHORT DECK MODE AVAILABILITY
+==============================================================
+
+Add Short Deck Hold’em to the following areas:
+
+1. AI Practice
+2. Regular Matchmaking
+3. Tournament Mode
+
+This means players can access Short Deck from:
+
+- Play tab
+- AI Practice mode selector
+- Matchmaking mode selector
+- Tournament lobby
+- Home carousel tournament cards
+
+==============================================================
+6. PLAY TAB ORGANIZATION
+==============================================================
+
+Update the Play tab so poker variants are organized clearly.
+
+Suggested layout:
+
+PLAY MODES
+
+Traditional Hold’em
+- AI Practice
+- Quick Match
+- Tournaments
+
+Short Deck Hold’em
+- AI Practice
+- Quick Match
+- Tournaments
+
+Each variant should have:
+- title
+- short rules summary
+- deck info
+- available modes
+
+Example card:
+
+SHORT DECK HOLD’EM
+36-card deck · 6 through Ace · Flush beats Full House
+
+[AI PRACTICE]
+[QUICK MATCH]
+[TOURNAMENTS]
+
+==============================================================
+7. SHORT DECK AI PRACTICE
+==============================================================
+
+Build Short Deck AI Practice mode.
+
+Requirements:
+- uses 36-card deck
+- uses Short Deck hand rankings
+- AI understands flush beats full house
+- AI betting behavior adjusts to Short Deck odds
+- no 2, 3, 4, 5 cards appear
+- full hand flow works correctly
+
+AI opponents should not evaluate hands using regular Hold’em rankings.
+
+==============================================================
+8. SHORT DECK REGULAR MATCHMAKING
+==============================================================
+
+Build Short Deck Quick Match / regular matchmaking.
+
+For beta:
+- allow AI bots to fill seats
+- clearly label mode as Short Deck Hold’em
+- use same table UI as regular gameplay
+- use correct deck and hand rankings
+
+Matchmaking card:
+
+SHORT DECK QUICK MATCH
+36-card deck · Faster action · Flush beats Full House
+
+[PLAY]
+
+==============================================================
+9. SHORT DECK TOURNAMENT MODE
+==============================================================
+
+Build Short Deck Tournament mode.
+
+Short Deck tournaments must use:
+- 36-card deck
+- Short Deck rankings
+- tournament blind structure
+- AI bot fill for beta
+- correct payouts
+- newest table UI
+- variant label shown clearly
+
+Tournament table must display:
+SHORT DECK HOLD’EM
+
+somewhere compactly in the tournament HUD.
+
+==============================================================
+10. TOURNAMENT TITLES
+==============================================================
+
+Organize tournaments with clean casino-style names.
+
+Do NOT overuse “neon.”
+
+Use mature premium poker names.
+
+Traditional Texas Hold’em tournament titles:
+
+1. LOW STAKES LOUNGE
+Beginner-friendly No Limit Hold’em
+
+2. SIT & GO RUSH
+Fast five-player No Limit Hold’em
+
+3. CHROME SERIES
+Mid-stakes No Limit Hold’em
+
+4. MIDNIGHT SHOWDOWN
+Scheduled No Limit Hold’em event
+
+Short Deck tournament titles:
+
+1. SHORT DECK LOUNGE
+Entry-level Short Deck Hold’em
+
+2. SIX PLUS SHOWDOWN
+Short Deck No Limit tournament
+
+3. 36-CARD RUSH
+Fast Short Deck tournament
+
+4. ROYAL SHORT DECK
+Premium Short Deck event
+
+==============================================================
+11. HOME PAGE TOURNAMENT CAROUSEL UPDATE
+==============================================================
+
+Remove the current “Featured Tournament” section.
+
+We are not using a generic featured tournament tab right now.
+
+Replace it with a compact tournament carousel that features exactly TWO playable tournament options:
+
+1. NO LIMIT HOLD’EM
+Traditional Texas Hold’em tournament
+
+2. SHORT DECK NO LIMIT
+Short Deck Hold’em tournament
+
+Carousel card 1:
+
+NO LIMIT HOLD’EM
+Classic Texas Hold’em
+Full deck · Standard rankings
+[VIEW TOURNAMENTS]
+
+Carousel card 2:
+
+SHORT DECK NO LIMIT
+36-card deck
+6 through Ace · Flush beats Full House
+[VIEW SHORT DECK]
+
+==============================================================
+12. REMOVE FEATURED TOURNAMENT TAB
+==============================================================
+
+Remove:
+- Featured Tournament tab
+- fake featured tournament card
+- filler tournament content
+
+This will return later after all poker variants are built properly.
+
+For now, the home page should only show the two clean playable tournament carousel cards.
+
+==============================================================
+13. TOURNAMENT CAROUSEL DESIGN
+==============================================================
+
+Carousel style:
+- horizontal swipe
+- two premium cards
+- clean casino branding
+- dark glass
+- purple / blue / gold accents
+- readable text
+- clear CTA buttons
+
+No fake player counts.
+No fake prize pools.
+No fake countdowns unless tied to real tournament data.
+
+==============================================================
+14. RULES MODAL
+==============================================================
+
+Add a rules modal for Short Deck Hold’em.
+
+Rules modal should explain:
+
+SHORT DECK HOLD’EM RULES
+
+- Deck contains only 6 through Ace
+- 36 total cards
+- Same betting flow as Texas Hold’em
+- Each player gets 2 hole cards
+- Five community cards
+- Best 5-card hand wins
+- Flush beats Full House
+- No 2s, 3s, 4s, or 5s are used
+
+Add button:
+[UNDERSTOOD]
+
+==============================================================
+15. VISUAL LABELING
+==============================================================
+
+Players must always know which variant they are playing.
+
+Add compact labels:
+
+Texas Hold’em
+Short Deck Hold’em
+
+Display variant label in:
+- tournament cards
+- game loading screen
+- table HUD
+- results screen
+- hand history
+
+==============================================================
+16. HAND HISTORY UPDATE
+==============================================================
+
+Hand history must record game variant.
+
+Example:
+
+Variant:
+Short Deck Hold’em
+
+Winning hand:
+Flush
+
+Note:
+Flush beats Full House in Short Deck.
+
+==============================================================
+17. TESTING REQUIREMENTS
+==============================================================
+
+Before marking complete, verify:
+
+1. Short Deck deck only contains 6, 7, 8, 9, 10, J, Q, K, A.
+2. No 2, 3, 4, or 5 ever appears.
+3. Short Deck hand evaluator ranks Flush above Full House.
+4. Regular Texas Hold’em still ranks Full House above Flush.
+5. AI Practice works in Short Deck.
+6. Quick Match works in Short Deck.
+7. Tournaments work in Short Deck.
+8. Tournament cards are clearly labeled.
+9. Home carousel shows exactly:
+   - No Limit Hold’em
+   - Short Deck No Limit
+10. Featured Tournament section is removed.
+11. Rules modal explains Short Deck clearly.
+12. Tournament gameplay uses newest table UI.
+13. Results screen correctly reflects Short Deck hand rankings.
+
+==============================================================
+FINAL GOAL
+==============================================================
+
+Chip Society should now support its first official poker variant:
+
+SHORT DECK HOLD’EM
+
+This is the foundation for adding future poker game types one by one.
+
+The system should be modular, scalable, organized, and launch-quality.
