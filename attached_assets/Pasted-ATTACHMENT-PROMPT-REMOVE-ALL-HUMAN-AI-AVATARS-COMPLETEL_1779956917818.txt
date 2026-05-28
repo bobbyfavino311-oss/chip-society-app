@@ -1,0 +1,181 @@
+ATTACHMENT PROMPT:
+
+REMOVE ALL HUMAN AI AVATARS COMPLETELY FROM THE ENTIRE GAME.
+
+The platform identity is much stronger and more unique when every player uses neon symbol avatars instead of realistic AI-generated faces.
+
+==============================================================
+GLOBAL AVATAR SYSTEM OVERHAUL
+=============================
+
+ALL AI BOTS MUST NOW USE:
+random neon symbol avatars ONLY.
+
+REMOVE:
+
+* human AI portraits
+* realistic faces
+* cinematic people avatars
+* initials-only icons
+* generic placeholder profile images
+
+AI bots should NEVER display:
+
+* letters
+* initials
+* default user silhouettes
+* realistic humans
+
+ONLY USE:
+the neon symbol avatar system across the ENTIRE platform.
+
+==============================================================
+AI BOT AVATAR SYSTEM
+====================
+
+Every AI profile should automatically receive:
+
+* a random neon symbol
+* a random glow color
+* random badge styling
+* unique combinations
+
+Examples:
+
+* martini glass
+* poker chip
+* flamingo
+* palm tree
+* lightning bolt
+* cassette tape
+* shark fin
+* crown
+* moon
+* sports car
+* rose
+* dice
+* sunset grid
+* cocktail cherry
+* etc.
+
+This creates:
+
+* stronger visual identity
+* more personality
+* cleaner branding
+* more recognizable players
+* less generic feeling
+
+==============================================================
+PLAYER AVATAR CONSISTENCY SYSTEM
+================================
+
+CRITICAL REQUIREMENT:
+
+The player’s selected avatar MUST persist consistently across the ENTIRE platform.
+
+If the player selects:
+
+* a neon symbol
+  OR
+* uploads a custom image
+
+That avatar MUST appear EVERYWHERE consistently.
+
+==============================================================
+PLAYER AVATAR MUST MATCH ACROSS:
+================================
+
+* gameplay tables
+* player profile
+* feed posts
+* trending posts
+* notifications
+* comments
+* reactions
+* tournament entries
+* followers/following
+* leaderboard
+* hand results
+* post cards
+* home screen activity
+* achievements
+* social interactions
+* friend lists
+* quick play lobby
+* tournament lobby
+
+The avatar should NEVER randomly change.
+
+==============================================================
+CURRENT BUG
+===========
+
+Currently:
+
+* avatars are inconsistent
+* some areas revert to initials
+* some areas revert to human AI portraits
+* some posts display incorrect avatars
+
+This breaks immersion and platform identity.
+
+==============================================================
+FIX REQUIRED
+============
+
+Create a centralized avatar persistence system.
+
+The saved avatar selection should become:
+the single global source of truth for the user identity.
+
+When a player changes avatar:
+EVERY instance across the platform updates automatically.
+
+==============================================================
+IF USER UPLOADS CUSTOM IMAGE
+============================
+
+The uploaded image should:
+
+* override neon symbol selection
+* appear everywhere consistently
+* persist across sessions
+* sync platform-wide
+
+==============================================================
+IF USER USES NEON SYMBOL
+========================
+
+The selected neon symbol should:
+
+* appear everywhere consistently
+* retain its glow color
+* retain styling
+* persist globally
+
+==============================================================
+AI SOCIAL POSTS
+===============
+
+AI-generated feed posts and trending posts should:
+
+* always use neon symbol avatars
+* never use realistic human portraits
+* never use initials
+
+==============================================================
+VISUAL STYLE
+============
+
+The platform identity should now feel:
+
+* iconic
+* symbolic
+* recognizable
+* nightlife-inspired
+* vaporwave
+* casino-luxury themed
+* clean and modern
+
+The neon avatar system should become one of the strongest visual identities of Chip Society.

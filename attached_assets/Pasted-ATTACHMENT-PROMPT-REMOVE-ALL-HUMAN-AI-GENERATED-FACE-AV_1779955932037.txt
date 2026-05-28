@@ -1,0 +1,204 @@
+ATTACHMENT PROMPT:
+
+REMOVE ALL HUMAN / AI GENERATED FACE AVATARS FROM THE GAME.
+
+The game has much more identity, style, and originality when using neon symbol avatars instead of realistic human portraits. The realistic avatars make the game feel generic and inconsistent with the vaporwave poker aesthetic.
+
+KEEP ONLY:
+
+1. Upload Your Own Avatar option
+2. Neon Symbol Avatar System
+
+DELETE:
+
+* all AI human portraits
+* realistic faces
+* cinematic people avatars
+* generated character portraits
+
+The avatar system should feel:
+
+* iconic
+* symbolic
+* stylish
+* nightlife inspired
+* retro casino inspired
+* instantly recognizable
+
+Think:
+
+* 1980s Miami nightlife
+* neon cocktail lounges
+* luxury casinos
+* synthwave aesthetics
+* poker culture
+* nightlife energy
+* retro futurism
+* vaporwave
+* Vegas after dark
+
+==============================================================
+CREATE 30 NEW NEON SYMBOL AVATARS
+=================================
+
+All avatars should:
+
+* glow neon
+* have clean simple silhouettes
+* work well in circular icon form
+* feel unique from each other
+* use strong recognizable shapes
+* feel premium and stylish
+* avoid cluttered details
+* be highly readable at small size
+
+Each symbol should have:
+
+* a primary neon color
+* subtle glow
+* dark navy/purple background
+* clean vector styling
+* centered composition
+
+==============================================================
+NEW AVATAR CONCEPTS
+===================
+
+1. MARTINI GLASS
+   Electric cyan martini glass with glowing cocktail olive toothpick. Luxury rooftop lounge energy.
+
+2. NEON PALM
+   Hot pink glowing palm tree silhouette inspired by 80s Miami nightlife.
+
+3. DICE STACK
+   Purple neon casino dice stacked diagonally with glowing edges.
+
+4. CASSETTE TAPE
+   Retro synthwave cassette tape with cyan/magenta glow.
+
+5. LIGHTNING BOLT
+   Sharp electric blue lightning symbol with energetic glow.
+
+6. FLAMINGO
+   Minimal neon flamingo silhouette in hot pink.
+
+7. CHAMPAGNE GLASS
+   Gold glowing champagne flute with luxury casino vibe.
+
+8. SHARK FIN
+   Cyan shark fin cutting through dark water with subtle glow.
+
+9. POKER CHIP
+   Custom neon poker chip symbol with segmented outer ring glow.
+
+10. MOON PHASE
+    Purple crescent moon with dreamy vaporwave glow.
+
+11. NEON ROSE
+    Hot pink glowing rose icon inspired by nightclub aesthetics.
+
+12. COCKTAIL CHERRY
+    Bright red cocktail cherry with dual stem and glow.
+
+13. EIGHT BALL
+    Black 8-ball with cyan neon outline.
+
+14. SUNSET GRID
+    Retro outrun sunset with horizontal grid lines.
+
+15. SNAKE
+    Minimal coiled neon serpent with glowing eyes.
+
+16. SWORD
+    Slim glowing katana inspired by retro cyberpunk nightlife.
+
+17. SKULL
+    Stylized neon skull with simplified geometric design.
+
+18. SATURN PLANET
+    Purple Saturn with glowing ring system.
+
+19. FIRE ICON
+    Orange/red flame symbol with smooth neon gradients.
+
+20. ACE CARD
+    Minimal glowing Ace playing card silhouette.
+
+21. WOLF HEAD
+    Sharp geometric wolf icon with cyan neon eyes.
+
+22. CROWN
+    Gold luxury crown symbol with casino royalty aesthetic.
+
+23. RECORD VINYL
+    Retro synthwave vinyl record with glowing grooves.
+
+24. SPORTS CAR
+    Minimal 80s supercar silhouette with underglow.
+
+25. SCORPION
+    Magenta neon scorpion with sharp segmented tail.
+
+26. DRAGON
+    Simplified eastern dragon emblem with electric glow.
+
+27. ANCHOR
+    Luxury yacht-club inspired neon anchor symbol.
+
+28. HOURGLASS
+    Glowing hourglass with neon sand effect.
+
+29. STARBURST
+    Explosive retro neon starburst symbol inspired by casino lights.
+
+30. TIGER EYE
+    Single glowing tiger eye symbol with sleek predator vibe.
+
+==============================================================
+AVATAR SYSTEM REQUIREMENTS
+==========================
+
+Players should:
+
+* unlock symbols through progression
+* select symbols in profile settings
+* see symbols throughout gameplay
+* see symbols in feed posts
+* see symbols in tournaments
+* see symbols in notifications
+* use uploaded custom images optionally
+
+==============================================================
+VISUAL STYLE
+============
+
+All icons should feel:
+
+* bold
+* iconic
+* premium
+* clean
+* nightlife-inspired
+* vaporwave
+* casino-luxury themed
+
+Avoid:
+
+* cartoon style
+* realism
+* over-detailing
+* blurry gradients
+* generic emojis
+
+==============================================================
+FINAL GOAL
+==========
+
+The avatar system should become one of the defining visual identities of the game.
+
+Players should instantly recognize Chip Society by:
+
+* glowing neon symbols
+* iconic silhouettes
+* vaporwave nightlife energy
+* stylish poker-inspired branding

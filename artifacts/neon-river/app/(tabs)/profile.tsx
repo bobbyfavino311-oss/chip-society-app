@@ -20,9 +20,7 @@ import ChipAmount from '@/components/ChipAmount';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
-import { getCharacter } from '@/constants/characters';
-import CharacterPortrait from '@/components/CharacterPortrait';
-import SymbolPortrait from '@/components/SymbolPortrait';
+import NeonAvatar from '@/components/NeonAvatar';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
 import { useSocial } from '@/context/SocialContext';
@@ -295,10 +293,12 @@ export default function ProfileScreen() {
                 <View style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}>
                   <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
                 </View>
-              ) : profile.profileImageType === 'symbol' ? (
-                <SymbolPortrait symbolIndex={profile.symbolIndex ?? 0} size={90} showGlow />
               ) : (
-                <CharacterPortrait character={getCharacter(profile.avatarIndex ?? 1)} size={90} isEquipped />
+                <NeonAvatar
+                  avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (profile.avatarIndex ? ((profile.avatarIndex - 1) % 30) + 1 : 1)}
+                  size={90}
+                  isEquipped
+                />
               )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.changeAvatarBtn} onPress={() => router.push('/profile/photo-select')}>

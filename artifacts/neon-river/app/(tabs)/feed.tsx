@@ -27,9 +27,7 @@ import {
   AVATAR_SYMBOLS, AVATAR_COLORS, getLeaderboard,
   type SocialPost, type PostTag,
 } from '@/lib/socialData';
-import CharacterPortrait from '@/components/CharacterPortrait';
-import { getCharacter } from '@/constants/characters';
-import SymbolPortrait from '@/components/SymbolPortrait';
+import NeonAvatar from '@/components/NeonAvatar';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -266,7 +264,7 @@ function PostCard({ post }: { post: SocialPost }) {
           onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}
         >
           {player?.avatarId != null ? (
-            <CharacterPortrait character={getCharacter(player.avatarId)} size={44} />
+            <NeonAvatar avatarId={((player.avatarId - 1) % 30) + 1} size={44} />
           ) : (
             <View style={[cd.avatar, { borderColor: player?.avatarColor ?? colors.primary }]}>
               <Text style={[cd.avatarText, { color: player?.avatarColor ?? colors.primary }]}>
@@ -844,12 +842,14 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
       <View style={me.profileHeader}>
         <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
         <View style={me.avatarWrap}>
-          {avatarType === 'symbol' ? (
-            <SymbolPortrait symbolIndex={profile.symbolIndex ?? 0} size={60} showGlow />
-          ) : avatarType === 'custom' && profile.avatarUri ? (
+          {avatarType === 'custom' && profile.avatarUri ? (
             <Image source={{ uri: profile.avatarUri }} style={[me.bigAvatar, { borderColor: colors.primary }]} />
           ) : (
-            <CharacterPortrait character={getCharacter(profile.avatarIndex)} size={60} />
+            <NeonAvatar
+              avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (profile.avatarIndex ? ((profile.avatarIndex - 1) % 30) + 1 : 1)}
+              size={60}
+              isEquipped
+            />
           )}
           <LinearGradient colors={[`${col}40`, 'transparent']} style={me.glow} />
         </View>

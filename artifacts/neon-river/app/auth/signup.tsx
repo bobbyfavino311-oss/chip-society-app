@@ -16,10 +16,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
-import { CHARACTERS, RARITY_COLORS } from '@/constants/characters';
-import CharacterPortrait from '@/components/CharacterPortrait';
+import NeonAvatar from '@/components/NeonAvatar';
+import { NEON_AVATARS, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
 
-const STARTER_CHARS = CHARACTERS.filter(c => c.rarity === 'COMMON').slice(0, 8);
+const STARTER_AVATARS = NEON_AVATARS.filter(a => a.rarity === 'COMMON');
 
 const STEPS = ['USERNAME', 'AVATAR', 'WELCOME'];
 
@@ -28,7 +28,7 @@ export default function SignupScreen() {
   const [step, setStep] = useState(0);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [avatarIndex, setAvatarIndex] = useState(0);
+  const [avatarIndex, setAvatarIndex] = useState(1);
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'ok' | 'error'>('idle');
   const [usernameError, setUsernameError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -196,16 +196,16 @@ export default function SignupScreen() {
                   <Text style={s.stepDesc}>Your face at the table. More avatars unlock as you level up.</Text>
 
                   <View style={s.avatarGrid}>
-                    {STARTER_CHARS.map((char, i) => {
-                      const rc = RARITY_COLORS[char.rarity];
-                      const selected = avatarIndex === char.id;
+                    {STARTER_AVATARS.map((av) => {
+                      const rc = NEON_RARITY_COLORS[av.rarity];
+                      const selected = avatarIndex === av.id;
                       return (
                         <Pressable
-                          key={char.id}
+                          key={av.id}
                           style={[s.avatarTile, selected && { borderColor: rc, backgroundColor: `${rc}18` }]}
-                          onPress={() => setAvatarIndex(char.id)}
+                          onPress={() => setAvatarIndex(av.id)}
                         >
-                          <CharacterPortrait character={char} size={52} isEquipped={selected} />
+                          <NeonAvatar avatarId={av.id} size={52} isEquipped={selected} />
                           {selected && (
                             <View style={[s.avatarCheck, { backgroundColor: rc }]}>
                               <Ionicons name="checkmark" size={10} color="#000" />

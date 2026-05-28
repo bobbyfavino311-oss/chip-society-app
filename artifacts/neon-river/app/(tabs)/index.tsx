@@ -21,8 +21,6 @@ import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useColors } from '@/hooks/useColors';
 import { useNotifications } from '@/context/NotificationContext';
-import { getCharacter } from '@/constants/characters';
-import CharacterPortrait from '@/components/CharacterPortrait';
 import { MusicEngine } from '@/lib/musicEngine';
 import { useAISocial } from '@/context/AISocialContext';
 

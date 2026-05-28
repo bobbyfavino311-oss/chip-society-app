@@ -2,3 +2,4 @@
 - [Chip amount font](chip-font.md) — Inter_700Bold only for numbers, never Orbitron (user explicitly rejected Orbitron as "slanted sci-fi").
 - [AI Social Engine architecture](ai-social-engine.md) — 10 AI personalities, 7 post types, pure in-memory generation; AISocialContext seeds 8 posts and adds one every 10 min.
 - [Play tab conventions](play-tab-conventions.md) — Tournament discovery is Home-only; Quick Match and Ranked show as LOCKED in Play tab; VariantCard has no onTournaments prop.
+- [Neon avatar naming collision](neon-avatar-naming.md) — `type NeonAvatar` (from neonAvatars.ts) and the default `NeonAvatar` component (NeonAvatar.tsx) cause TS2300 in the same file; alias one: `type NeonAvatar as NeonAvatarData` + `import NeonAvatarView from ...`.
