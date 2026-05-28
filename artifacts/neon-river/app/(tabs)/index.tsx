@@ -40,53 +40,51 @@ const RANK_COLORS: Record<string, string> = {
 
 // ─── Live tournament pool ─────────────────────────────────────────────────────
 
+type TVariant = 'texas_holdem' | 'short_deck_holdem';
+
 interface LiveTournament {
   id: string;
   name: string;
-  style: string;
+  variant: TVariant;
+  variantLabel: string;
+  speed: 'Regular' | 'Turbo' | 'Hyper-Turbo';
   prizePool: number;
   buyIn: number;
   totalSeats: number;
   filledSeats: number;
+  registrations: number;
   status: 'registering' | 'live' | 'late';
   endTime: number;
   accentColor: string;
 }
 
-const T_NAMES = [
-  'VICE CITY CLASSIC', 'MIDNIGHT SHOWDOWN', 'CHROME SERIES',
-  'ROYAL CIRCUIT', 'LASER STACK OPEN', 'TURBO HEAT CUP',
-  'AFTER HOURS OPEN', 'BLACK CARD INVITATIONAL', 'SIT & GO RUSH',
-  'CYBER SUNDAY CLASSIC', 'VAPOR WAVE CUP', 'CHROME CITY SERIES',
-  'ELECTRIC SUNSET OPEN', 'RETROWAVE SHOWDOWN', 'MIAMI NIGHT SPECIAL',
-  'CIRCUIT BREAKER SERIES', 'PULSE CITY MASTERS', 'CHROME STALLION CUP',
-  'DIGITAL DUSK CLASSIC', 'GRID IRON INVITATIONAL',
+const TOURNAMENT_TEMPLATES: Omit<LiveTournament, 'id' | 'filledSeats' | 'registrations' | 'status' | 'endTime'>[] = [
+  { name: 'LOW STAKES LOUNGE',    variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 500,  prizePool: 50_000,   totalSeats: 128, accentColor: colors.primary },
+  { name: 'SIX CARD SPRINT',      variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Turbo',       buyIn: 500,  prizePool: 50_000,   totalSeats: 64,  accentColor: colors.secondary },
+  { name: 'MIDNIGHT RUN',         variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Turbo',       buyIn: 1000, prizePool: 100_000,  totalSeats: 256, accentColor: '#00ff88' },
+  { name: 'CUT DECK CLASH',       variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Regular',     buyIn: 1000, prizePool: 100_000,  totalSeats: 128, accentColor: '#bf5fff' },
+  { name: 'SKYLINE SERIES',       variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 2500, prizePool: 250_000,  totalSeats: 512, accentColor: colors.gold },
+  { name: 'HIGH HEAT SHORT DECK', variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Turbo',       buyIn: 2500, prizePool: 250_000,  totalSeats: 128, accentColor: '#ff4400' },
+  { name: 'RIVER KINGS',          variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 250,  prizePool: 25_000,   totalSeats: 64,  accentColor: '#00aaff' },
+  { name: 'TURBO SIX',            variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Hyper-Turbo', buyIn: 250,  prizePool: 25_000,   totalSeats: 64,  accentColor: '#aa44ff' },
+  { name: 'SUNDAY FREEZEOUT',     variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 5000, prizePool: 1_000_000,totalSeats: 512, accentColor: '#44aaff' },
+  { name: 'ROYAL RUSH',           variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Regular',     buyIn: 5000, prizePool: 500_000,  totalSeats: 256, accentColor: '#ff6600' },
 ];
-const T_STYLES = ["No Limit Hold'em", "Pot Limit Omaha", "Turbo Hold'em", 'Short Deck NL'];
-const T_COLORS = [colors.primary, colors.secondary, colors.gold, '#00ff88', '#bf5fff'];
-const T_PRIZES = [10000, 25000, 50000, 100000, 250000, 500000, 1000000];
-const T_BUYINS = [100, 250, 500, 1000, 2500];
-const T_SEATS = [64, 128, 256, 512];
 
 function makeTournament(usedNames: Set<string>): LiveTournament {
-  const pool = T_NAMES.filter(n => !usedNames.has(n));
-  const nameList = pool.length > 0 ? pool : T_NAMES;
-  const name = nameList[Math.floor(Math.random() * nameList.length)];
-  const totalSeats = T_SEATS[Math.floor(Math.random() * T_SEATS.length)];
-  const filledSeats = Math.floor(totalSeats * (0.2 + Math.random() * 0.75));
+  const pool = TOURNAMENT_TEMPLATES.filter(t => !usedNames.has(t.name));
+  const tmpl = (pool.length > 0 ? pool : TOURNAMENT_TEMPLATES)[Math.floor(Math.random() * Math.max(1, pool.length || TOURNAMENT_TEMPLATES.length))];
+  const totalSeats = tmpl.totalSeats;
+  const filledSeats = Math.floor(totalSeats * (0.22 + Math.random() * 0.70));
   const roll = Math.random();
   const status: LiveTournament['status'] = roll > 0.5 ? 'live' : roll > 0.25 ? 'registering' : 'late';
   return {
+    ...tmpl,
     id: `t_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
-    name,
-    style: T_STYLES[Math.floor(Math.random() * T_STYLES.length)],
-    prizePool: T_PRIZES[Math.floor(Math.random() * T_PRIZES.length)],
-    buyIn: T_BUYINS[Math.floor(Math.random() * T_BUYINS.length)],
-    totalSeats,
     filledSeats,
+    registrations: filledSeats + Math.floor(Math.random() * 40),
     status,
     endTime: Date.now() + (4 + Math.floor(Math.random() * 56)) * 60_000,
-    accentColor: T_COLORS[Math.floor(Math.random() * T_COLORS.length)],
   };
 }
 
@@ -117,59 +115,78 @@ function TournamentCard({ t }: { t: LiveTournament }) {
     if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
     return String(n);
   };
-  const fmtBuy = (n: number) => n >= 1000 ? `${n / 1000}K` : String(n);
+  const fmtChips = (n: number) => n >= 1000 ? `${n / 1000}K` : String(n);
 
   const sc = STATUS_COLORS[t.status];
   const fillPct = Math.min(100, Math.round((t.filledSeats / t.totalSeats) * 100));
   const seatsLeft = t.totalSeats - t.filledSeats;
   const isLive = t.status === 'live';
+  const isShortDeck = t.variant === 'short_deck_holdem';
+
+  const handleJoin = () => {
+    router.push((`/game/practice?variant=${t.variant}&players=4`) as any);
+  };
 
   return (
     <TouchableOpacity
       style={[tc.card, { borderColor: `${t.accentColor}55` }]}
-      onPress={() => router.push('/(tabs)/tournaments' as any)}
+      onPress={handleJoin}
       activeOpacity={0.88}
     >
-      {/* Deep gradient */}
       <LinearGradient
         colors={['#160028', '#080018', '#050010']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      {/* Accent glow at top-left */}
       <LinearGradient
         colors={[`${t.accentColor}28`, 'transparent']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 0.85, y: 0.65 }}
       />
-      {/* Left color bar */}
       <View style={[tc.accentBar, { backgroundColor: t.accentColor }]} />
 
       <View style={tc.body}>
-        {/* Status pill + countdown */}
+        {/* Top row: status + countdown */}
         <View style={tc.topRow}>
           <View style={[tc.badge, { backgroundColor: `${sc}20`, borderColor: `${sc}50` }]}>
             {isLive && <View style={[tc.liveDot, { backgroundColor: sc }]} />}
             <Text style={[tc.badgeText, { color: sc }]}>{STATUS_LABELS[t.status]}</Text>
           </View>
+          <View style={tc.speedPill}>
+            <Text style={tc.speedText}>{t.speed.toUpperCase()}</Text>
+          </View>
           <Text style={tc.timeLeft}>{timeStr}</Text>
         </View>
 
-        {/* Tournament name + game type */}
-        <Text style={[tc.name, { color: t.accentColor }]} numberOfLines={2}>{t.name}</Text>
-        <Text style={tc.variant}>{t.style}</Text>
+        {/* Variant badge */}
+        <View style={[tc.variantBadge, { backgroundColor: isShortDeck ? `${colors.secondary}18` : `${colors.primary}18`, borderColor: isShortDeck ? `${colors.secondary}40` : `${colors.primary}40` }]}>
+          <Text style={[tc.variantText, { color: isShortDeck ? colors.secondary : colors.primary }]}>
+            {isShortDeck ? '36-CARD SHORT DECK' : "NO LIMIT HOLD'EM"}
+          </Text>
+        </View>
 
-        {/* Prize pool + seats remaining */}
-        <View style={tc.prizeRow}>
-          <View>
-            <Text style={tc.subLabel}>PRIZE POOL</Text>
-            <Text style={[tc.prize, { color: t.accentColor }]}>{fmtPrize(t.prizePool)}</Text>
+        {/* Tournament name */}
+        <Text style={[tc.name, { color: t.accentColor }]} numberOfLines={1}>{t.name}</Text>
+
+        {/* Stats grid */}
+        <View style={tc.statsGrid}>
+          <View style={tc.statCell}>
+            <Text style={tc.statLbl}>PRIZE POOL</Text>
+            <Text style={[tc.statVal, { color: t.accentColor }]}>{fmtPrize(t.prizePool)}</Text>
           </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={tc.subLabel}>SEATS LEFT</Text>
-            <Text style={tc.seats}>{seatsLeft}</Text>
+          <View style={tc.statCell}>
+            <Text style={tc.statLbl}>BUY-IN</Text>
+            <Text style={tc.statVal}>{fmtChips(t.buyIn)}</Text>
+          </View>
+          <View style={tc.statCell}>
+            <Text style={tc.statLbl}>SEATS LEFT</Text>
+            <Text style={tc.statVal}>{seatsLeft}</Text>
+          </View>
+          <View style={tc.statCell}>
+            <Text style={tc.statLbl}>REGISTERED</Text>
+            <Text style={tc.statVal}>{t.registrations}</Text>
           </View>
         </View>
 
@@ -178,15 +195,135 @@ function TournamentCard({ t }: { t: LiveTournament }) {
           <View style={[tc.barFill, { width: `${fillPct}%` as any, backgroundColor: t.accentColor }]} />
         </View>
 
-        {/* Buy-in + Join button */}
-        <View style={tc.bottomRow}>
-          <Text style={tc.buyIn}>BUY-IN  {fmtBuy(t.buyIn)} chips</Text>
-          <View style={[tc.joinBtn, { backgroundColor: t.accentColor }]}>
-            <Text style={tc.joinText}>JOIN →</Text>
-          </View>
-        </View>
+        {/* Join CTA */}
+        <TouchableOpacity style={[tc.joinBtn, { borderColor: `${t.accentColor}80` }]} onPress={handleJoin} activeOpacity={0.85}>
+          <LinearGradient
+            colors={[`${t.accentColor}33`, `${t.accentColor}15`]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <Ionicons name="flash" size={14} color={t.accentColor} />
+          <Text style={[tc.joinText, { color: t.accentColor }]}>PLAY NOW</Text>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
+  );
+}
+
+// ─── Quick Play inline launcher ──────────────────────────────────────────────
+
+function QuickPlayCard() {
+  const [variant, setVariant] = useState<TVariant>('texas_holdem');
+  const [seats, setSeats] = useState<4 | 5>(5);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const isHoldem = variant === 'texas_holdem';
+  const accentColor = isHoldem ? colors.primary : colors.secondary;
+  const gradientColors: [string, string] = isHoldem
+    ? [colors.primary, '#0066cc']
+    : [colors.secondary, '#cc0077'];
+
+  const handleStart = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, { toValue: 0.96, duration: 70, useNativeDriver: true }),
+      Animated.timing(scaleAnim, { toValue: 1, duration: 120, useNativeDriver: true }),
+    ]).start(() => {
+      router.push(`/game/practice?variant=${variant}&players=${seats}` as any);
+    });
+  };
+
+  return (
+    <View style={qp.card}>
+      <LinearGradient
+        colors={['#120022', '#08001a', '#050010']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      />
+      <LinearGradient
+        colors={[`${accentColor}14`, 'transparent']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      />
+
+      {/* Header */}
+      <View style={qp.header}>
+        <Ionicons name="flash" size={16} color={accentColor} />
+        <Text style={[qp.title, { color: accentColor }]}>QUICK PLAY</Text>
+      </View>
+
+      {/* Step 1 — Game Mode */}
+      <Text style={qp.stepLabel}>STEP 1 · SELECT GAME MODE</Text>
+      <View style={qp.modeRow}>
+        <TouchableOpacity
+          style={[qp.modeBtn, isHoldem && { borderColor: colors.primary, backgroundColor: `${colors.primary}15` }]}
+          onPress={() => setVariant('texas_holdem')}
+          activeOpacity={0.8}
+        >
+          {isHoldem && (
+            <LinearGradient colors={[`${colors.primary}18`, 'transparent']} style={StyleSheet.absoluteFill} />
+          )}
+          <View style={[qp.modeIconWrap, { borderColor: isHoldem ? `${colors.primary}60` : colors.border }]}>
+            <Ionicons name="card" size={20} color={isHoldem ? colors.primary : colors.textMuted} />
+          </View>
+          <Text style={[qp.modeName, { color: isHoldem ? colors.primary : colors.textMuted }]}>NO LIMIT{'\n'}HOLD'EM</Text>
+          <Text style={qp.modeSub}>Classic · 52 cards</Text>
+          {isHoldem && <Ionicons name="checkmark-circle" size={16} color={colors.primary} style={qp.modeCheck} />}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[qp.modeBtn, !isHoldem && { borderColor: colors.secondary, backgroundColor: `${colors.secondary}15` }]}
+          onPress={() => setVariant('short_deck_holdem')}
+          activeOpacity={0.8}
+        >
+          {!isHoldem && (
+            <LinearGradient colors={[`${colors.secondary}18`, 'transparent']} style={StyleSheet.absoluteFill} />
+          )}
+          <View style={[qp.modeIconWrap, { borderColor: !isHoldem ? `${colors.secondary}60` : colors.border }]}>
+            <MaterialCommunityIcons name="cards" size={20} color={!isHoldem ? colors.secondary : colors.textMuted} />
+          </View>
+          <Text style={[qp.modeName, { color: !isHoldem ? colors.secondary : colors.textMuted }]}>SHORT{'\n'}DECK</Text>
+          <Text style={qp.modeSub}>36 cards · Flush beats Full House</Text>
+          {!isHoldem && <Ionicons name="checkmark-circle" size={16} color={colors.secondary} style={qp.modeCheck} />}
+        </TouchableOpacity>
+      </View>
+
+      {/* Step 2 — Seat Count */}
+      <Text style={qp.stepLabel}>STEP 2 · SELECT TABLE SIZE</Text>
+      <View style={qp.seatRow}>
+        {([4, 5] as const).map(n => {
+          const active = seats === n;
+          return (
+            <TouchableOpacity
+              key={n}
+              style={[qp.seatBtn, active && { borderColor: accentColor, backgroundColor: `${accentColor}15` }]}
+              onPress={() => setSeats(n)}
+              activeOpacity={0.8}
+            >
+              {active && (
+                <LinearGradient colors={[`${accentColor}18`, 'transparent']} style={StyleSheet.absoluteFill} />
+              )}
+              <Text style={[qp.seatNum, { color: active ? accentColor : colors.textMuted }]}>{n}</Text>
+              <Text style={[qp.seatLabel, { color: active ? accentColor : colors.textMuted }]}>PLAYERS</Text>
+              <Text style={qp.seatSub}>You + {n - 1} AI bots</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      {/* Step 3 — Start */}
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <TouchableOpacity style={qp.startBtn} onPress={handleStart} activeOpacity={0.9}>
+          <LinearGradient
+            colors={gradientColors}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <Ionicons name="flash" size={18} color="#050010" />
+          <Text style={qp.startText}>START QUICK PLAY</Text>
+          <Ionicons name="arrow-forward" size={16} color="#05001088" />
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
   );
 }
 
@@ -298,6 +435,7 @@ interface TrendPost {
   content: string;
   likes: number;
   pot?: string;
+  timeAgo?: string;
 }
 
 
@@ -395,7 +533,7 @@ function TrendCard({ post }: { post: TrendPost }) {
             {liked ? post.likes + 1 : post.likes}
           </Text>
         </TouchableOpacity>
-        <Text style={trend.timeAgo}>2h ago</Text>
+        <Text style={trend.timeAgo}>{post.timeAgo ?? 'just now'}</Text>
       </View>
     </View>
   );
@@ -416,6 +554,8 @@ export default function HomeScreen() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const dropAnim = useRef(new Animated.Value(0)).current;
   const [tournaments, setTournaments] = useState<LiveTournament[]>(initTournamentPool);
+  const trendScrollRef = useRef<ScrollView>(null);
+  const trendIndexRef = useRef(0);
 
   // ─── Effects ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -447,10 +587,23 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  // ─── Derived values ────────────────────────────────────────────────────────
-  const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
+  // Auto-scroll trending carousel every 3.5 s (dep on aiPosts.length — same signal)
+  useEffect(() => {
+    const CARD_W = width * 0.72 + 12;
+    const timer = setInterval(() => {
+      const postCount = Math.min(8, aiPosts.length);
+      if (!trendScrollRef.current || postCount < 2) return;
+      trendIndexRef.current = (trendIndexRef.current + 1) % postCount;
+      trendScrollRef.current.scrollTo({ x: trendIndexRef.current * CARD_W, animated: true });
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [aiPosts.length]);
 
-  const trendingPosts: TrendPost[] = aiPosts.slice(0, 5).map(p => ({
+  // ─── Derived values (must be before effects that reference them) ──────────
+  const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
+  const formatChips = (n: number) => n.toLocaleString('en-US');
+
+  const trendingPosts: TrendPost[] = aiPosts.slice(0, 8).map(p => ({
     id: p.id,
     user: p.personality.username,
     avatar: p.personality.avatarInitials[0],
@@ -460,9 +613,8 @@ export default function HomeScreen() {
     content: p.content,
     likes: p.likes,
     pot: p.pot,
+    timeAgo: p.timeAgo,
   }));
-
-  const formatChips = (n: number) => n.toLocaleString('en-US');
 
   const openSettings = () => {
     setSettingsOpen(true);
@@ -599,32 +751,37 @@ export default function HomeScreen() {
       >
         <ChipSocietyLogo />
 
-        {/* ─── Rewards quick-access row ─── */}
+        {/* 1 ─── Daily Rewards ─── */}
+        <View style={styles.sectionRow}>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>DAILY REWARDS</Text>
+        </View>
         <RewardRow />
 
-        {/* Quick Play CTA */}
-        <TouchableOpacity
-          style={styles.quickPlay}
-          onPress={() => router.push('/game/practice')}
-          activeOpacity={0.88}
-        >
-          <LinearGradient
-            colors={[colors.primary, '#0055cc', '#8800ff']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-          <Ionicons name="flash" size={26} color="#fff" />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.quickPlayTitle}>QUICK PLAY</Text>
-            <Text style={styles.quickPlaySub}>AI Practice — Jump in instantly</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={22} color="rgba(255,255,255,0.6)" />
-        </TouchableOpacity>
-
-        {/* Live Tournaments — primary section, scrolling pool */}
+        {/* 2 ─── Trending Now ─── */}
         <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>LIVE TOURNAMENTS</Text>
+          <View style={styles.activeBadge}>
+            <View style={[styles.activeDot, { backgroundColor: colors.secondary }]} />
+            <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>TRENDING NOW</Text>
+          </View>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/feed')}>
+            <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView
+          ref={trendScrollRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+        >
+          {trendingPosts.map(post => <TrendCard key={post.id} post={post} />)}
+        </ScrollView>
+
+        {/* 3 ─── Quick Play ─── */}
+        <QuickPlayCard />
+
+        {/* 4 ─── Featured Tournaments ─── */}
+        <View style={styles.sectionRow}>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>FEATURED TOURNAMENTS</Text>
           <View style={styles.activeBadge}>
             <View style={styles.activeDot} />
             <Text style={styles.activeCount}>{tournaments.length} ACTIVE</Text>
@@ -633,7 +790,7 @@ export default function HomeScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          snapToInterval={width * 0.80 + 12}
+          snapToInterval={width * 0.82 + 12}
           decelerationRate="fast"
           snapToAlignment="start"
           contentContainerStyle={{ gap: 12, paddingRight: 16 }}
@@ -641,34 +798,26 @@ export default function HomeScreen() {
           {tournaments.map(t => <TournamentCard key={t.id} t={t} />)}
         </ScrollView>
 
-        {/* Trending Now — live AI social feed */}
+        {/* 5 ─── Player Stats ─── */}
         <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>TRENDING NOW</Text>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/feed')}>
-            <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
-          </TouchableOpacity>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>YOUR STATS</Text>
+          <Text style={[styles.seeAll, { color: colors.textDim }]}>{profile.rank}</Text>
         </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
-        >
-          {trendingPosts.map(post => <TrendCard key={post.id} post={post} />)}
-        </ScrollView>
-
-        {/* Stats snapshot */}
         <View style={styles.statsRow}>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { borderColor: `${colors.success}30` }]}>
             <Text style={[styles.statVal, { color: colors.success }]}>{profile.wins}</Text>
             <Text style={styles.statLbl}>WINS</Text>
           </View>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { borderColor: `${colors.primary}30` }]}>
             <Text style={[styles.statVal, { color: colors.primary }]}>{profile.handsPlayed}</Text>
             <Text style={styles.statLbl}>HANDS</Text>
           </View>
-          <View style={styles.statCard}>
-            <Text style={[styles.statVal, { color: colors.gold }]}>Lv.{profile.level}</Text>
+          <View style={[styles.statCard, { borderColor: `${colors.gold}30` }]}>
+            <Text style={[styles.statVal, { color: colors.gold }]}>{formatChips(profile.chips)}</Text>
+            <Text style={styles.statLbl}>CHIPS</Text>
+          </View>
+          <View style={[styles.statCard, { borderColor: `${rankColor}30` }]}>
+            <Text style={[styles.statVal, { color: rankColor }]}>Lv.{profile.level}</Text>
             <Text style={styles.statLbl}>LEVEL</Text>
           </View>
         </View>
@@ -686,42 +835,52 @@ const LOGO_LINE_HEIGHT = Platform.select({ web: LOGO_SIZE * 1.12, default: undef
 
 const tc = StyleSheet.create({
   card: {
-    width: width * 0.80,
+    width: width * 0.82,
     borderRadius: 18,
     borderWidth: 1,
     overflow: 'hidden',
     flexDirection: 'row',
   },
   accentBar: { width: 4 },
-  body: { flex: 1, padding: 14, gap: 6 },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  body: { flex: 1, padding: 14, gap: 7 },
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   badge: {
     borderRadius: 6, borderWidth: 1,
-    paddingHorizontal: 7, paddingVertical: 3,
-    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: 6, paddingVertical: 2,
+    flexDirection: 'row', alignItems: 'center', gap: 3,
   },
   liveDot: { width: 5, height: 5, borderRadius: 2.5 },
-  badgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
-  timeLeft: { color: colors.textMuted, fontSize: 10, fontFamily: 'Inter_700Bold' },
+  badgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
+  speedPill: {
+    borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+  },
+  speedText: { color: 'rgba(255,255,255,0.45)', fontSize: 7, fontWeight: '700', letterSpacing: 0.3 },
+  timeLeft: { color: colors.textMuted, fontSize: 10, fontFamily: 'Inter_700Bold', marginLeft: 'auto' },
+  variantBadge: {
+    alignSelf: 'flex-start', borderRadius: 5, borderWidth: 1,
+    paddingHorizontal: 7, paddingVertical: 2,
+  },
+  variantText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.6 },
   name: {
-    fontSize: 13, fontWeight: '800',
+    fontSize: 14, fontWeight: '800',
     fontFamily: 'Inter_700Bold',
-    letterSpacing: 0.2, lineHeight: 17, marginTop: 2,
+    letterSpacing: 0.3, lineHeight: 18,
   },
-  variant: { color: colors.textMuted, fontSize: 9 },
-  prizeRow: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'flex-end', marginTop: 2,
+  statsGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2,
   },
-  subLabel: { color: colors.textDim, fontSize: 7, letterSpacing: 1 },
-  prize: { fontSize: 24, fontWeight: '800', fontFamily: 'Inter_700Bold', lineHeight: 28 },
-  seats: { color: colors.text, fontSize: 18, fontWeight: '800', fontFamily: 'Inter_700Bold' },
+  statCell: { minWidth: '44%', flex: 1 },
+  statLbl: { color: colors.textDim, fontSize: 7, letterSpacing: 1, marginBottom: 1 },
+  statVal: { color: colors.text, fontSize: 13, fontWeight: '800', fontFamily: 'Inter_700Bold' },
   barWrap: { height: 3, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 2 },
   barFill: { height: 3, borderRadius: 2 },
-  bottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  buyIn: { color: colors.textDim, fontSize: 9 },
-  joinBtn: { borderRadius: 20, paddingHorizontal: 14, paddingVertical: 5 },
-  joinText: { color: '#050010', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
+  joinBtn: {
+    borderRadius: 8, borderWidth: 1, overflow: 'hidden',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 8, gap: 5,
+  },
+  joinText: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6 },
 });
 
 const logo = StyleSheet.create({
@@ -773,6 +932,57 @@ const trend = StyleSheet.create({
   timeAgo: { color: colors.textDim, fontSize: 11 },
 });
 
+
+const qp = StyleSheet.create({
+  card: {
+    borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    overflow: 'hidden', padding: 18, gap: 14,
+  },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  title: {
+    fontSize: 13, fontWeight: '800', letterSpacing: 2,
+    fontFamily: 'Orbitron_700Bold',
+  },
+  stepLabel: {
+    fontSize: 8, fontWeight: '700', letterSpacing: 1.5,
+    color: 'rgba(255,255,255,0.35)', fontFamily: 'Orbitron_400Regular',
+  },
+  modeRow: { flexDirection: 'row', gap: 10 },
+  modeBtn: {
+    flex: 1, borderRadius: 12, borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    padding: 12, gap: 6, overflow: 'hidden', alignItems: 'flex-start',
+  },
+  modeIconWrap: {
+    width: 36, height: 36, borderRadius: 10, borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  modeName: {
+    fontSize: 12, fontWeight: '800', letterSpacing: 0.4,
+    fontFamily: 'Orbitron_700Bold', lineHeight: 16,
+  },
+  modeSub: { color: 'rgba(255,255,255,0.35)', fontSize: 9, lineHeight: 13 },
+  modeCheck: { position: 'absolute', top: 8, right: 8 },
+  seatRow: { flexDirection: 'row', gap: 10 },
+  seatBtn: {
+    flex: 1, borderRadius: 12, borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    padding: 12, alignItems: 'center', gap: 2, overflow: 'hidden',
+  },
+  seatNum: { fontSize: 28, fontWeight: '900', fontFamily: 'Inter_700Bold', lineHeight: 32 },
+  seatLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  seatSub: { color: 'rgba(255,255,255,0.35)', fontSize: 9, marginTop: 2 },
+  startBtn: {
+    borderRadius: 12, overflow: 'hidden',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 16, gap: 8,
+  },
+  startText: {
+    color: '#050010', fontSize: 14, fontWeight: '900',
+    letterSpacing: 1.5, fontFamily: 'Orbitron_700Bold',
+  },
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -830,13 +1040,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   scroll: { paddingHorizontal: 16, gap: 16, paddingTop: 72 },
-  quickPlay: {
-    borderRadius: colors.radiusLg, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 18, paddingHorizontal: 20, gap: 14,
-  },
-  quickPlayTitle: { color: '#fff', fontSize: 16, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-  quickPlaySub: { color: 'rgba(255,255,255,0.65)', fontSize: 11, marginTop: 2 },
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionTitle: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
   seeAll: { color: colors.primary, fontSize: 11, fontWeight: '600' },

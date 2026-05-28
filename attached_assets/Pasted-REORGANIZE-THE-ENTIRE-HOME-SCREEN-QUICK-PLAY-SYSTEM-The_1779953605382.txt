@@ -1,0 +1,301 @@
+REORGANIZE THE ENTIRE HOME SCREEN + QUICK PLAY SYSTEM
+
+The Home screen structure still feels repetitive and cluttered now that multiple poker variants exist. Reorganize the app flow so the Home page acts as the central activity hub while the Play tab focuses only on entering gameplay.
+
+==============================================================
+NEW HOME SCREEN ORDER
+=====================
+
+1. DAILY REWARDS
+2. TRENDING NOW
+3. QUICK PLAY
+4. FEATURED TOURNAMENTS
+5. PLAYER STATS SNAPSHOT
+
+==============================================================
+DAILY REWARDS
+=============
+
+Keep:
+
+* Daily Spin
+* Daily Streak
+
+Include:
+
+* countdown timers
+* ready states
+* subtle glow animation
+* clear “claim available” indicators
+
+==============================================================
+TRENDING NOW
+============
+
+Move Trending back to the TOP directly under Daily Rewards.
+
+Trending should feel:
+
+* alive
+* social
+* active
+* constantly updating
+
+==============================================================
+AI GENERATED SOCIAL SYSTEM
+==========================
+
+Program an automated AI posting system.
+
+Generate:
+1 new AI-generated social post every 10 minutes.
+
+These posts must appear in:
+
+* Trending carousel
+* Feed tab
+
+==============================================================
+AI POSTS SHOULD INCLUDE:
+========================
+
+* huge pots
+* bad beats
+* bluffs
+* all-ins
+* tournament wins
+* insane rivers
+* chip milestones
+* comeback wins
+* quad aces cracked
+* crazy folds
+
+==============================================================
+AI PROFILE REQUIREMENTS
+=======================
+
+AI profiles should:
+
+* use random usernames
+* random avatars
+* random chip counts
+* random tags/badges
+* simulated likes/comments/reposts
+
+==============================================================
+TRENDING UI
+===========
+
+Trending should:
+
+* be horizontal swipe carousel
+* auto-scroll slowly
+* glow subtly
+* remain compact and readable
+* match vaporwave neon theme
+
+==============================================================
+REMOVE GAME VARIANTS SECTION
+============================
+
+Delete the current “Game Variants” section from the Home page entirely.
+
+It is repetitive to the Play tab.
+
+==============================================================
+REPLACE GAME VARIANTS WITH:
+===========================
+
+FEATURED TOURNAMENTS CAROUSEL
+
+==============================================================
+FEATURED TOURNAMENTS
+====================
+
+This section should appear BELOW Quick Play.
+
+IMPORTANT:
+These must be REAL playable tournaments.
+
+NO fake filler tournaments.
+NO placeholder events.
+
+All tournament cards shown on Home must connect to actual playable tournament systems.
+
+==============================================================
+TOURNAMENT CARDS MUST DISPLAY:
+==============================
+
+* real registration counts
+* active timers
+* buy-ins
+* prize pools
+* blind format
+* tournament speed
+* seat availability
+* game variant
+
+==============================================================
+TOURNAMENT CAROUSEL
+===================
+
+Display tournaments in:
+horizontal swipe carousel format.
+
+Include BOTH:
+
+* No Limit Hold’em tournaments
+* Short Deck Hold’em tournaments
+
+==============================================================
+EXAMPLE TOURNAMENT NAMES
+========================
+
+NO LIMIT HOLD’EM:
+
+* Low Stakes Lounge
+* Midnight Run
+* Skyline Series
+* River Kings
+* Sunday Freezeout
+
+SHORT DECK:
+
+* Six Card Sprint
+* Cut Deck Clash
+* High Heat Short Deck
+* Turbo Six
+* Royal Rush
+
+==============================================================
+QUICK PLAY REDESIGN
+===================
+
+Replace the current Quick Play system completely.
+
+==============================================================
+NEW QUICK PLAY FORMAT
+=====================
+
+QUICK PLAY
+
+STEP 1:
+SELECT GAME MODE
+
+[ NO LIMIT HOLD’EM ]
+Classic Texas Hold’em
+52-card deck
+
+[ SHORT DECK HOLD’EM ]
+36-card deck
+Flush beats Full House
+
+==============================================================
+STEP 2:
+SELECT SEATS
+============
+
+[ 4 PLAYERS ]
+[ 5 PLAYERS ]
+
+==============================================================
+STEP 3:
+START BUTTON
+============
+
+[ START QUICK PLAY ]
+
+==============================================================
+FUNCTIONAL REQUIREMENTS
+=======================
+
+NO LIMIT HOLD’EM:
+
+* launches standard AI table
+* uses full 52-card deck
+
+SHORT DECK HOLD’EM:
+
+* launches proper Short Deck table
+* uses 36-card deck
+* flush beats full house
+* uses correct hand ranking logic
+
+==============================================================
+REMOVE FROM PLAY TAB
+====================
+
+REMOVE:
+
+* Tournament mode
+* Ranked mode
+
+LOCK THEM for now.
+
+ONLY PLAYABLE OPTIONS:
+
+* AI Hold’em
+* AI Short Deck Hold’em
+
+==============================================================
+CRITICAL BUG FIX
+================
+
+Current issue:
+Short Deck tournament buttons incorrectly launch regular Hold’em tables.
+
+This MUST be fixed.
+
+Short Deck mode must ALWAYS:
+
+* use Short Deck rules
+* use 36-card deck
+* use Flush > Full House ranking
+* use proper dealing logic
+
+==============================================================
+VISUAL DESIGN
+=============
+
+Maintain:
+
+* vaporwave neon aesthetic
+* dark navy/purple backgrounds
+* cyan/magenta accents
+* GTA-style digital font
+* subtle glow effects
+
+Home page should feel:
+
+* cleaner
+* more organized
+* less repetitive
+* more alive
+* more premium
+
+==============================================================
+FINAL ACCEPTANCE CHECK
+======================
+
+Verify all of the following:
+
+1. Trending moved directly under Daily Rewards.
+2. AI posts generate every 10 minutes.
+3. AI posts appear in Trending and Feed.
+4. Game Variants section removed.
+5. Featured Tournaments moved to bottom.
+6. Tournament cards are REAL and playable.
+7. Tournament carousel supports both Hold’em and Short Deck.
+8. Quick Play supports:
+
+   * Hold’em
+   * Short Deck
+9. Quick Play supports:
+
+   * 4 players
+   * 5 players
+10. Ranked mode locked.
+11. Tournament mode removed from Play tab.
+12. Short Deck launches correct rules and deck.
+13. Home page no longer feels repetitive.
+14. UI remains clean and premium.

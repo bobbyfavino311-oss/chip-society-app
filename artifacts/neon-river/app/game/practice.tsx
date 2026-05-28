@@ -355,15 +355,17 @@ const g = StyleSheet.create({
 
 export default function PracticeScreen() {
   const { profile, recordWin, recordLoss } = useUser();
-  const { tier, variant: variantParam } = useLocalSearchParams<{ tier?: string; variant?: string }>();
+  const { tier, variant: variantParam, players: playersParam } = useLocalSearchParams<{ tier?: string; variant?: string; players?: string }>();
   const tableConfig = STAKE_CONFIGS[tier ?? ''] ?? STAKE_CONFIGS.casual;
   const gameVariant = (variantParam === 'short_deck_holdem' ? 'short_deck_holdem' : 'texas_holdem') as import('@/constants/gameVariants').GameVariant;
+  const initialPlayers = playersParam ? Math.max(4, Math.min(5, parseInt(playersParam, 10))) : 5;
+  const autoStart = !!playersParam;
 
   const [difficulty, setDifficulty] = useState<AIDifficulty>('casual');
-  const [gameStarted, setGameStarted] = useState(false);
+  const [gameStarted, setGameStarted] = useState(autoStart);
   const [exitConfirm, setExitConfirm] = useState(false);
   const [handCount, setHandCount] = useState(0);
-  const [numPlayers, setNumPlayers] = useState(5);
+  const [numPlayers, setNumPlayers] = useState(initialPlayers);
   const [fxEnabled, setFxEnabled] = useState(true);
 
   useEffect(() => {
@@ -512,6 +514,16 @@ export default function PracticeScreen() {
     else MusicEngine.setIntensity('normal');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStarted, state.phase, state.players]);
+
+  // ── Auto-start when launched from Quick Play (players URL param provided) ─
+  const autoStartFired = useRef(false);
+  useEffect(() => {
+    if (!autoStart || autoStartFired.current) return;
+    autoStartFired.current = true;
+    startNewHand(0, initialPlayers - 1);
+    SoundEngine.deal();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Setup screen (early return — hooks are all above this) ────────────────
   if (!gameStarted) {
