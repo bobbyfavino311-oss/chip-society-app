@@ -13,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
@@ -38,55 +37,6 @@ const RANK_COLORS: Record<string, string> = {
   'Neon Legend': colors.accent,
 };
 
-// ─── 80s casino chip SVG ─────────────────────────────────────────────────────
-
-function CasinoChip({ color, size = 68 }: { color: string; size?: number }) {
-  const r = size / 2;
-  const outerR = r - 2;
-  const midR = r * 0.72;
-  const innerR = r * 0.44;
-  const NUM_SEGMENTS = 8;
-  const segLen = r * 0.14;
-
-  const segments = Array.from({ length: NUM_SEGMENTS }, (_, i) => {
-    const angle = (i * (360 / NUM_SEGMENTS) - 90) * (Math.PI / 180);
-    return {
-      x1: r + (outerR - 1) * Math.cos(angle),
-      y1: r + (outerR - 1) * Math.sin(angle),
-      x2: r + (outerR - segLen) * Math.cos(angle),
-      y2: r + (outerR - segLen) * Math.sin(angle),
-    };
-  });
-
-  return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {/* Outer glow ring */}
-      <Circle cx={r} cy={r} r={outerR} fill={`${color}18`} stroke={color} strokeWidth={2.5} />
-      {/* Mid ring */}
-      <Circle cx={r} cy={r} r={midR} fill="none" stroke={color} strokeWidth={1} strokeOpacity={0.55} />
-      {/* Inner fill */}
-      <Circle cx={r} cy={r} r={innerR} fill={`${color}30`} stroke={color} strokeWidth={1.5} strokeOpacity={0.8} />
-      {/* Center dot */}
-      <Circle cx={r} cy={r} r={r * 0.13} fill={color} />
-      {/* Edge tick marks */}
-      {segments.map((s, i) => (
-        <Line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
-          stroke={color} strokeWidth={3} strokeLinecap="round" />
-      ))}
-      {/* Card suit in the inner area */}
-      <SvgText
-        x={r} y={r + r * 0.14}
-        textAnchor="middle"
-        fontSize={r * 0.46}
-        fill={color}
-        opacity={0.85}
-      >
-        {color === colors.secondary ? '♥' : '♠'}
-      </SvgText>
-    </Svg>
-  );
-}
-
 // ─── Live tournament pool ─────────────────────────────────────────────────────
 
 interface LiveTournament {
@@ -103,13 +53,13 @@ interface LiveTournament {
 }
 
 const T_NAMES = [
-  'NEON MIDNIGHT OPEN', 'CYBER SUNDAY CLASSIC', 'VAPOR WAVE CUP',
-  'CHROME CITY SERIES', 'ELECTRIC SUNSET OPEN', 'RETROWAVE SHOWDOWN',
-  'PIXEL PARADISE PRIX', 'SYNTHWAVE INVITATIONAL', 'MIAMI NIGHT SPECIAL',
-  'LASER GRID CHAMPIONSHIP', 'NEON STRIP OPEN', 'ARCADE FURY CUP',
-  'CIRCUIT BREAKER SERIES', 'HYPERNOVA CHALLENGE', 'HOLOGRAM OPEN',
-  'DIGITAL DUSK CLASSIC', 'PULSE CITY MASTERS', 'CHROME STALLION CUP',
-  'ULTRA VIOLET OPEN', 'GRID IRON INVITATIONAL',
+  'VICE CITY CLASSIC', 'MIDNIGHT SHOWDOWN', 'CHROME SERIES',
+  'ROYAL CIRCUIT', 'LASER STACK OPEN', 'TURBO HEAT CUP',
+  'AFTER HOURS OPEN', 'BLACK CARD INVITATIONAL', 'SIT & GO RUSH',
+  'CYBER SUNDAY CLASSIC', 'VAPOR WAVE CUP', 'CHROME CITY SERIES',
+  'ELECTRIC SUNSET OPEN', 'RETROWAVE SHOWDOWN', 'MIAMI NIGHT SPECIAL',
+  'CIRCUIT BREAKER SERIES', 'PULSE CITY MASTERS', 'CHROME STALLION CUP',
+  'DIGITAL DUSK CLASSIC', 'GRID IRON INVITATIONAL',
 ];
 const T_STYLES = ["No Limit Hold'em", "Pot Limit Omaha", "Turbo Hold'em", 'Short Deck NL'];
 const T_COLORS = [colors.primary, colors.secondary, colors.gold, '#00ff88', '#bf5fff'];
@@ -161,41 +111,81 @@ function TournamentCard({ t }: { t: LiveTournament }) {
     ? `${h}h ${m.toString().padStart(2, '0')}m`
     : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 
-  const fmtPrize = (n: number) => n.toLocaleString('en-US');
+  const fmtPrize = (n: number) => {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+    return String(n);
+  };
   const fmtBuy = (n: number) => n >= 1000 ? `${n / 1000}K` : String(n);
 
   const sc = STATUS_COLORS[t.status];
   const fillPct = Math.min(100, Math.round((t.filledSeats / t.totalSeats) * 100));
+  const seatsLeft = t.totalSeats - t.filledSeats;
+  const isLive = t.status === 'live';
 
   return (
-    <View style={[tc.card, { borderColor: `${t.accentColor}55` }]}>
-      <LinearGradient colors={['#190028', '#07000f']} style={StyleSheet.absoluteFill} />
-      <View style={[tc.strip, { backgroundColor: t.accentColor }]} />
+    <TouchableOpacity
+      style={[tc.card, { borderColor: `${t.accentColor}55` }]}
+      onPress={() => router.push('/(tabs)/tournaments' as any)}
+      activeOpacity={0.88}
+    >
+      {/* Deep gradient */}
+      <LinearGradient
+        colors={['#160028', '#080018', '#050010']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      {/* Accent glow at top-left */}
+      <LinearGradient
+        colors={[`${t.accentColor}28`, 'transparent']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.85, y: 0.65 }}
+      />
+      {/* Left color bar */}
+      <View style={[tc.accentBar, { backgroundColor: t.accentColor }]} />
+
       <View style={tc.body}>
+        {/* Status pill + countdown */}
         <View style={tc.topRow}>
-          <View style={[tc.badge, { backgroundColor: `${sc}22`, borderColor: `${sc}55` }]}>
+          <View style={[tc.badge, { backgroundColor: `${sc}20`, borderColor: `${sc}50` }]}>
+            {isLive && <View style={[tc.liveDot, { backgroundColor: sc }]} />}
             <Text style={[tc.badgeText, { color: sc }]}>{STATUS_LABELS[t.status]}</Text>
           </View>
           <Text style={tc.timeLeft}>{timeStr}</Text>
         </View>
+
+        {/* Tournament name + game type */}
         <Text style={[tc.name, { color: t.accentColor }]} numberOfLines={2}>{t.name}</Text>
         <Text style={tc.variant}>{t.style}</Text>
-        <View style={tc.infoRow}>
+
+        {/* Prize pool + seats remaining */}
+        <View style={tc.prizeRow}>
           <View>
             <Text style={tc.subLabel}>PRIZE POOL</Text>
             <Text style={[tc.prize, { color: t.accentColor }]}>{fmtPrize(t.prizePool)}</Text>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
-            <Text style={tc.subLabel}>PLAYERS</Text>
-            <Text style={tc.seats}>{t.filledSeats}/{t.totalSeats}</Text>
+            <Text style={tc.subLabel}>SEATS LEFT</Text>
+            <Text style={tc.seats}>{seatsLeft}</Text>
           </View>
         </View>
-        <View style={tc.bar}>
+
+        {/* Fill progress */}
+        <View style={tc.barWrap}>
           <View style={[tc.barFill, { width: `${fillPct}%` as any, backgroundColor: t.accentColor }]} />
         </View>
-        <Text style={tc.buyIn}>BUY-IN · {fmtBuy(t.buyIn)} chips</Text>
+
+        {/* Buy-in + Join button */}
+        <View style={tc.bottomRow}>
+          <Text style={tc.buyIn}>BUY-IN  {fmtBuy(t.buyIn)} chips</Text>
+          <View style={[tc.joinBtn, { backgroundColor: t.accentColor }]}>
+            <Text style={tc.joinText}>JOIN →</Text>
+          </View>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -464,7 +454,7 @@ function FeaturedTournament() {
         <Text style={feat.prizeLabel}>PRIZE POOL</Text>
         <Text style={feat.prize}>500K</Text>
       </View>
-      <Text style={feat.name}>NEON CHAMPIONSHIP</Text>
+      <Text style={feat.name}>VICE CITY CLASSIC</Text>
       <Text style={feat.sub}>Sunday Night Special · No Limit Hold'em</Text>
       <View style={feat.meta}>
         <View style={feat.metaItem}>
@@ -730,6 +720,9 @@ export default function HomeScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          snapToInterval={width * 0.80 + 12}
+          decelerationRate="fast"
+          snapToAlignment="start"
           contentContainerStyle={{ gap: 12, paddingRight: 16 }}
         >
           {tournaments.map(t => <TournamentCard key={t.id} t={t} />)}
@@ -764,43 +757,42 @@ const LOGO_LINE_HEIGHT = Platform.select({ web: LOGO_SIZE * 1.12, default: undef
 
 const tc = StyleSheet.create({
   card: {
-    width: width * 0.62,
-    borderRadius: 16,
+    width: width * 0.80,
+    borderRadius: 18,
     borderWidth: 1,
     overflow: 'hidden',
     flexDirection: 'row',
   },
-  strip: { width: 4 },
-  body: { flex: 1, padding: 12, gap: 5 },
+  accentBar: { width: 4 },
+  body: { flex: 1, padding: 14, gap: 6 },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   badge: {
-    borderRadius: 5, borderWidth: 1,
-    paddingHorizontal: 6, paddingVertical: 2,
+    borderRadius: 6, borderWidth: 1,
+    paddingHorizontal: 7, paddingVertical: 3,
+    flexDirection: 'row', alignItems: 'center', gap: 4,
   },
+  liveDot: { width: 5, height: 5, borderRadius: 2.5 },
   badgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
-  timeLeft: {
-    color: colors.textMuted, fontSize: 11,
-    fontFamily: 'Orbitron_400Regular',
-  },
+  timeLeft: { color: colors.textMuted, fontSize: 10, fontFamily: 'Inter_700Bold' },
   name: {
-    fontSize: 11, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 0.4, lineHeight: 16,
+    fontSize: 13, fontWeight: '800',
+    fontFamily: 'Inter_700Bold',
+    letterSpacing: 0.2, lineHeight: 17, marginTop: 2,
   },
   variant: { color: colors.textMuted, fontSize: 9 },
-  infoRow: {
+  prizeRow: {
     flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'flex-end', marginTop: 4,
+    alignItems: 'flex-end', marginTop: 2,
   },
-  subLabel: {
-    color: colors.textDim, fontSize: 7,
-    letterSpacing: 1, fontFamily: 'Orbitron_400Regular',
-  },
-  prize: { fontSize: 20, fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  seats: { color: colors.text, fontSize: 11, fontWeight: '700' },
-  bar: { height: 3, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2, marginTop: 2 },
+  subLabel: { color: colors.textDim, fontSize: 7, letterSpacing: 1 },
+  prize: { fontSize: 24, fontWeight: '800', fontFamily: 'Inter_700Bold', lineHeight: 28 },
+  seats: { color: colors.text, fontSize: 18, fontWeight: '800', fontFamily: 'Inter_700Bold' },
+  barWrap: { height: 3, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 2 },
   barFill: { height: 3, borderRadius: 2 },
-  buyIn: { color: colors.textDim, fontSize: 9, marginTop: 2 },
+  bottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  buyIn: { color: colors.textDim, fontSize: 9 },
+  joinBtn: { borderRadius: 20, paddingHorizontal: 14, paddingVertical: 5 },
+  joinText: { color: '#050010', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
 });
 
 const logo = StyleSheet.create({

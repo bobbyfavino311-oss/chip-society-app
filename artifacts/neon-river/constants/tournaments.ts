@@ -17,8 +17,8 @@ export interface TournamentConfig {
 export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
   beginner: {
     type: 'beginner',
-    name: 'BEGINNER',
-    subtitle: '5 players · Low stakes',
+    name: 'LOW STAKES LOUNGE',
+    subtitle: '5 players · Entry level',
     description: 'Perfect for new players. Gentle blind increases, relaxed pacing.',
     buyIn: 5_000,
     startingChips: 10_000,
@@ -30,9 +30,9 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
   },
   sitandgo: {
     type: 'sitandgo',
-    name: 'SIT & GO',
+    name: 'SIT & GO RUSH',
     subtitle: '5 players · Classic format',
-    description: 'Single-table tournament, starts immediately. The classic Sit & Go experience.',
+    description: 'Single-table tournament, starts immediately. Fast, competitive poker.',
     buyIn: 15_000,
     startingChips: 25_000,
     numPlayers: 5,
@@ -43,7 +43,7 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
   },
   turbo: {
     type: 'turbo',
-    name: 'TURBO',
+    name: 'TURBO HEAT',
     subtitle: '6 players · Fast blinds',
     description: 'Rapid blind increases ramp up the pressure. Every chip counts.',
     buyIn: 25_000,
@@ -56,7 +56,7 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
   },
   highroller: {
     type: 'highroller',
-    name: 'HIGH ROLLER',
+    name: 'BLACK CARD SERIES',
     subtitle: '6 players · VIP stakes',
     description: 'Big stacks, deep blinds, maximum prestige. For elite players only.',
     buyIn: 100_000,

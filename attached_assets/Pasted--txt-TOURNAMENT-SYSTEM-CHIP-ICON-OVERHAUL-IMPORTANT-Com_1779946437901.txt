@@ -1,0 +1,254 @@
+```txt
+TOURNAMENT SYSTEM + CHIP ICON OVERHAUL
+======================================
+
+IMPORTANT:
+Completely remove the overuse of the word “NEON” across tournament naming and UI branding.
+
+The game should feel:
+premium
+modern
+Vegas-inspired
+cyber casino
+high-end social poker
+
+NOT repetitive or cheesy.
+
+Use more mature casino-inspired names instead.
+
+==============================================================
+1. REMOVE “NEON” TOURNAMENT NAMING
+==============================================================
+
+REMOVE names like:
+- Neon Championship
+- Neon Starter
+- Neon Open
+- Neon Launch
+
+The branding is becoming repetitive.
+
+Replace with cleaner casino/social poker naming.
+
+==============================================================
+2. NEW TOURNAMENT NAMES
+==============================================================
+
+LOW STAKES LOUNGE
+(beginner / entry level)
+
+SIT & GO RUSH
+(fast compact games)
+
+CHROME SERIES
+(mid-stakes competitive)
+
+MIDNIGHT SHOWDOWN
+(late-night tournaments)
+
+VICE CITY CLASSIC
+(flagship scheduled event)
+
+ROYAL CIRCUIT
+(high roller events)
+
+LASER STACK
+(deep stack tournaments)
+
+TURBO HEAT
+(fast blinds)
+
+AFTER HOURS
+(late registration night games)
+
+BLACK CARD SERIES
+(exclusive higher stakes)
+
+==============================================================
+3. HOME SCREEN TOURNAMENT REDESIGN
+==============================================================
+
+The home screen tournament section should now become:
+
+==============================================================
+LIVE TOURNAMENT CAROUSEL
+==============================================================
+
+NOT static vertical cards.
+
+Use a premium horizontal carousel slider.
+
+Style inspiration:
+modern sportsbook apps
+premium casino apps
+luxury event banners
+
+==============================================================
+4. TOURNAMENT CAROUSEL FEATURES
+==============================================================
+
+Each carousel card should include:
+
+TOP:
+- live status pill
+- countdown timer
+
+CENTER:
+- tournament name
+- prize pool
+- live player count
+
+BOTTOM:
+- buy-in
+- join button
+- seats remaining
+
+==============================================================
+5. CAROUSEL ANIMATION
+==============================================================
+
+Add:
+- smooth horizontal swipe
+- snapping animation
+- subtle parallax motion
+- glowing edge lighting
+- animated gradients
+- responsive drag physics
+
+The cards should feel:
+alive
+premium
+interactive
+
+==============================================================
+6. CHIP ICON REDESIGN
+==============================================================
+
+REMOVE:
+- bitcoin symbol
+- generic coin icon
+- dollar symbols
+
+ALL virtual currency in the game must now use a CUSTOM CHIP ICON.
+
+==============================================================
+7. NEW OFFICIAL CHIP ICON STYLE
+==============================================================
+
+Use the uploaded poker chip reference as the official inspiration.
+
+Style:
+minimal
+clean
+recognizable
+casino-focused
+
+==============================================================
+NEW CHIP ICON DESIGN:
+==============================================================
+
+- circular poker chip silhouette
+- thick outer ring
+- evenly spaced chip cutouts
+- centered inner circle
+- simplified clean symbol in center
+- no dollar sign
+
+Instead:
+use either:
+- stylized “C”
+- minimalist diamond
+- custom Chip Society emblem
+
+The icon should work:
+small
+large
+outlined
+filled
+animated
+
+==============================================================
+8. CHIP ICON IMPLEMENTATION
+==============================================================
+
+Replace ALL old currency visuals across:
+
+- wheel rewards
+- tournament prize pools
+- player balance
+- scratch ticket prizes
+- achievement rewards
+- pot amounts
+- feed winnings
+- store bundles
+- tournament payouts
+
+EVERYWHERE.
+
+==============================================================
+9. TYPOGRAPHY FIX
+==============================================================
+
+The font reverted back to the old slanted futuristic font.
+
+REMOVE it completely.
+
+Replace all gameplay number typography with:
+
+bold squared GTA-style casino typography
+
+Style references:
+- GTA UI numbers
+- casino signage
+- retro-futuristic arcade lettering
+- clean block typography
+
+Requirements:
+- NO slanted zeros
+- NO diagonal slash through zeros
+- hollow zeros only
+- strong readability
+- thicker font weight
+- better spacing
+
+==============================================================
+10. FINAL VISUAL GOAL
+==============================================================
+
+The game should now feel like:
+
+luxury Vegas social poker
+high-end mobile casino
+modern multiplayer poker platform
+
+NOT:
+cheap neon cyberpunk overload.
+
+The visual language should now prioritize:
+black glass
+deep navy
+purple gradients
+chrome
+gold accents
+electric blue highlights
+premium casino lighting
+
+while reducing repetitive “neon” branding everywhere.
+
+==============================================================
+11. FINAL ACCEPTANCE CHECK
+==============================================================
+
+Before marking complete verify:
+
+1. “Neon” removed from tournament naming.
+2. Home tournaments redesigned as live carousel.
+3. Carousel uses real tournament data.
+4. New poker chip icon implemented globally.
+5. Bitcoin/dollar icons fully removed.
+6. Typography updated globally.
+7. Slashed zeros removed everywhere.
+8. GTA-style block font restored.
+9. Tournament UI feels premium and alive.
+10. Currency visuals feel custom and branded.
+```

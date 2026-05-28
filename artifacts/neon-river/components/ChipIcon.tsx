@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Circle, Line, Rect } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 
 export type ChipVariant = 'green' | 'red' | 'white' | 'gold' | 'cyan';
 
@@ -12,41 +12,25 @@ const FILL: Record<ChipVariant, string> = {
 };
 
 const DARK: Record<ChipVariant, string> = {
-  green: '#166534',
+  green: '#14532d',
   red:   '#7f1d1d',
-  white: '#8090a8',
-  gold:  '#92400e',
-  cyan:  '#0e6e8a',
+  white: '#4a5568',
+  gold:  '#78350f',
+  cyan:  '#0c4a6e',
 };
 
-// Chip face geometry
-const CX = 11, CY = 11;
-const R_OUT  = 9.5;  // outer edge of chip
-const R_RING = 6.4;  // outer edge of center disc / inner edge of ring
-const R_IN   = 4.8;  // inner accent ring
+// 8 dot cutouts evenly spaced in the outer ring
+const N_DOTS = 8;
+const DOT_RING_R = 8.8; // radius from center where dots sit
+const DOT_R = 1.35;     // dot circle radius
 
-// 8 radial segment dividers at 45° intervals
-const DIVIDERS = Array.from({ length: 8 }, (_, i) => {
-  const a = ((i * 45) - 90) * (Math.PI / 180);
+const DOTS = Array.from({ length: N_DOTS }, (_, i) => {
+  const angle = (i * (360 / N_DOTS) - 90) * (Math.PI / 180);
   return {
-    x1: CX + R_RING * Math.cos(a),
-    y1: CY + R_RING * Math.sin(a),
-    x2: CX + (R_OUT - 0.5) * Math.cos(a),
-    y2: CY + (R_OUT - 0.5) * Math.sin(a),
+    cx: 12 + DOT_RING_R * Math.cos(angle),
+    cy: 12 + DOT_RING_R * Math.sin(angle),
   };
 });
-
-// Stack bars to the right of the chip face
-// 5 bars tapering narrower as they go down (perspective effect)
-const BARS = [
-  { y: 1.5,  x: 20.0, w: 12.5 },
-  { y: 5.0,  x: 21.2, w: 10.8 },
-  { y: 8.5,  x: 22.4, w: 9.1  },
-  { y: 12.0, x: 23.6, w: 7.4  },
-  { y: 15.5, x: 24.8, w: 5.7  },
-];
-const BAR_H  = 2.8;
-const BAR_RX = 0.5;
 
 interface ChipIconProps {
   variant?: ChipVariant;
@@ -56,61 +40,28 @@ interface ChipIconProps {
 export default function ChipIcon({ variant = 'white', size = 22 }: ChipIconProps) {
   const fill = FILL[variant];
   const dark = DARK[variant];
-  const barWidth = size * (33 / 22);  // maintain aspect ratio
 
   return (
-    <Svg width={barWidth} height={size} viewBox="0 0 33 22">
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* Outer disc — forms the thick outer ring */}
+      <Circle cx={12} cy={12} r={11} fill={fill} />
 
-      {/* ── Chip face ─────────────────────────────────────────── */}
+      {/* Dark separator band between outer ring and center */}
+      <Circle cx={12} cy={12} r={7.6} fill={dark} />
 
-      {/* Full chip disc */}
-      <Circle cx={CX} cy={CY} r={R_OUT} fill={fill} />
-
-      {/* Segment ring (slightly darker band) */}
-      <Circle cx={CX} cy={CY} r={R_OUT}  fill="none" stroke={dark} strokeWidth={3.2} />
-
-      {/* 8 radial dividers creating segments in the ring */}
-      {DIVIDERS.map((d, i) => (
-        <Line
-          key={i}
-          x1={d.x1} y1={d.y1}
-          x2={d.x2} y2={d.y2}
-          stroke="#000"
-          strokeWidth={1.2}
-          strokeLinecap="round"
-        />
-      ))}
-
-      {/* Center disc (inner raised area) */}
-      <Circle cx={CX} cy={CY} r={R_RING - 0.3} fill={fill} />
+      {/* Center disc */}
+      <Circle cx={12} cy={12} r={6.6} fill={fill} />
 
       {/* Inner accent ring */}
-      <Circle cx={CX} cy={CY} r={R_IN} fill="none" stroke={dark} strokeWidth={0.9} strokeOpacity={0.8} />
+      <Circle cx={12} cy={12} r={4.5} fill="none" stroke={dark} strokeWidth={0.9} strokeOpacity={0.55} />
 
-      {/* Center dot */}
-      <Circle cx={CX} cy={CY} r={1.4} fill={dark} fillOpacity={0.7} />
-
-      {/* Outer border */}
-      <Circle cx={CX} cy={CY} r={R_OUT} fill="none" stroke="#000" strokeWidth={1.4} />
-
-      {/* Inner disc border */}
-      <Circle cx={CX} cy={CY} r={R_RING - 0.3} fill="none" stroke="#000" strokeWidth={0.8} />
-
-      {/* ── Stack bars (side view of chip stack) ─────────────── */}
-      {BARS.map((b, i) => (
-        <Rect
-          key={i}
-          x={b.x}
-          y={b.y}
-          width={b.w}
-          height={BAR_H}
-          rx={BAR_RX}
-          fill={fill}
-          stroke="#000"
-          strokeWidth={0.9}
-        />
+      {/* 8 dot cutouts in the outer ring */}
+      {DOTS.map((d, i) => (
+        <Circle key={i} cx={d.cx} cy={d.cy} r={DOT_R} fill={dark} />
       ))}
 
+      {/* Outer border */}
+      <Circle cx={12} cy={12} r={11} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth={1} />
     </Svg>
   );
 }
