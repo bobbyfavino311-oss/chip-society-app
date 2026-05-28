@@ -224,7 +224,7 @@ function CommunityCards({
       <View style={table.communityCards}>
         {[0, 1, 2, 3, 4].map(i =>
           cards[i]
-            ? <PlayingCard key={i} card={cards[i]} faceDown={i >= revealedCount} size="lg" highlighted={
+            ? <PlayingCard key={i} card={cards[i]} faceDown={i >= revealedCount} size="md" highlighted={
                 handResult != null && holeCards.length >= 2
               } />
             : <View key={i} style={table.emptySlot} />
@@ -305,10 +305,10 @@ function CompactAISeat({
       {isCurrentTurn && !folded && <DotTimer seconds={timer} maxSeconds={30} isActive size={3} gap={2} />}
       <Text style={[g.seatName, isWinner && g.seatNameWinner]} numberOfLines={1}>{player.name}</Text>
       <Text style={[g.seatChips, folded && g.dimText]}>{formatChips(player.chips)}</Text>
-      {player.holeCards.length > 0 && !folded && (
+      {player.holeCards.length > 0 && showCards && (
         <View style={g.holeCardRow}>
           {player.holeCards.map((card: any, i: number) => (
-            <PlayingCard key={i} card={card} faceDown={!showCards} size="sm" animated={false} />
+            <PlayingCard key={i} card={card} faceDown={false} size="sm" animated={false} />
           ))}
         </View>
       )}
@@ -918,9 +918,9 @@ const setup = StyleSheet.create({
 
 const table = StyleSheet.create({
   communityArea: { alignItems: 'center', gap: 6 },
-  communityCards: { flexDirection: 'row', gap: 6 },
+  communityCards: { flexDirection: 'row', gap: 8 },
   emptySlot: {
-    width: 56, height: 78, borderRadius: 7,
+    width: 44, height: 62, borderRadius: 6,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
     borderStyle: 'dashed',
     backgroundColor: 'rgba(0,0,0,0.25)',
@@ -971,35 +971,38 @@ const styles = StyleSheet.create({
 
   // ── Background glows
   glowPurple: {
-    position: 'absolute', top: '18%', left: -70, width: 200, height: 200, borderRadius: 100,
-    backgroundColor: 'rgba(110,0,170,0.07)',
+    position: 'absolute', top: '10%', left: -90, width: 300, height: 300, borderRadius: 150,
+    backgroundColor: 'rgba(110,0,170,0.13)',
   },
   glowCyan: {
-    position: 'absolute', top: '45%', right: -60, width: 180, height: 180, borderRadius: 90,
-    backgroundColor: 'rgba(0,160,210,0.06)',
+    position: 'absolute', top: '38%', right: -90, width: 280, height: 280, borderRadius: 140,
+    backgroundColor: 'rgba(0,160,210,0.10)',
   },
   glowCenter: {
-    position: 'absolute', top: '25%', left: '10%', right: '10%', height: 220, borderRadius: 110,
-    backgroundColor: 'rgba(0,40,25,0.12)',
+    position: 'absolute', top: '18%', left: '0%', right: '0%', height: 340, borderRadius: 170,
+    backgroundColor: 'rgba(0,50,90,0.16)',
   },
 
   // ── AI row
   aiRow: {
     flexDirection: 'row', alignItems: 'flex-start',
-    paddingHorizontal: 6, paddingVertical: 4,
+    paddingHorizontal: 8, paddingTop: 4, paddingBottom: 10,
   },
 
   // ── Center game area
-  gameCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 },
+  gameCenter: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    gap: 16, paddingTop: 24, paddingBottom: 20,
+  },
 
   // ── Card board surface
   tableSurface: {
     alignItems: 'center',
-    paddingHorizontal: 14, paddingVertical: 10,
-    borderRadius: 18,
-    borderWidth: 1, borderColor: 'rgba(220,0,210,0.28)',
-    backgroundColor: 'rgba(0,0,8,0.52)',
-    shadowColor: '#FF00C8', shadowOpacity: 0.16, shadowRadius: 16, shadowOffset: { width: 0, height: 0 },
+    paddingHorizontal: 22, paddingVertical: 16,
+    borderRadius: 22,
+    borderWidth: 1, borderColor: 'rgba(220,0,210,0.30)',
+    backgroundColor: 'rgba(0,0,8,0.55)',
+    shadowColor: '#FF00C8', shadowOpacity: 0.20, shadowRadius: 22, shadowOffset: { width: 0, height: 0 },
     overflow: 'hidden',
   },
   tableCenterGlow: {
@@ -1063,7 +1066,7 @@ const styles = StyleSheet.create({
   },
 
   // ── Human area
-  humanArea: { alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingBottom: 4 },
+  humanArea: { alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 22 },
   humanCards: { flexDirection: 'row', gap: 10 },
   humanStrip: {
     flexDirection: 'row', alignItems: 'center', gap: 8,

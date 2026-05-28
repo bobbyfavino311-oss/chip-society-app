@@ -1,0 +1,152 @@
+ATTACHMENT PROMPT:
+
+==============================================================
+MAJOR GAMEPLAY TABLE SCALING BUG
+================================
+
+The gameplay table is currently scaling incorrectly and appears massively zoomed in compared to the previous version of the game.
+
+The OLD layout had:
+
+* cinematic spacing
+* visible atmospheric background
+* balanced proportions
+* proper positioning
+* cleaner composition
+* more negative space
+
+The NEW layout currently feels:
+
+* overcrowded
+* vertically compressed
+* enlarged
+* claustrophobic
+* missing atmospheric breathing room
+
+This appears to be caused by:
+
+* incorrect viewport scaling
+* transform scaling issue
+* gameplay container height bug
+* flexbox compression
+* safe-area sizing problem
+* overflow wrapper issue
+
+==============================================================
+FIX REQUIRED
+============
+
+Restore the ORIGINAL gameplay proportions and spacing from the older layout while KEEPING the updated modern visuals.
+
+==============================================================
+COMMUNITY CARD AREA
+===================
+
+Restore:
+
+* original vertical positioning
+* original spacing
+* original board proportions
+
+The community cards should NOT dominate the screen.
+
+==============================================================
+PLAYER HAND POSITION
+====================
+
+Move the player hand LOWER again like the older version.
+
+Current layout pushes everything upward too aggressively.
+
+==============================================================
+BACKGROUND ATMOSPHERE
+=====================
+
+Restore more visible:
+
+* vaporwave glow
+* neon depth
+* purple atmospheric gradients
+* background orbs
+* cinematic empty space
+
+The old layout felt immersive because the background had room to breathe.
+
+==============================================================
+DO NOT REMOVE
+=============
+
+KEEP:
+
+* dark electric blue individual card glow
+* magenta outer board glow
+* updated modernized layout
+* current neon aesthetic
+* upgraded visuals
+
+ONLY FIX:
+
+* gameplay scaling
+* zoom level
+* spacing
+* positioning
+* proportions
+
+==============================================================
+IMPORTANT
+=========
+
+Do NOT simply shrink the cards.
+
+The issue is:
+
+* overall gameplay scene scaling
+* compressed vertical layout
+* enlarged gameplay container
+* incorrect proportions
+
+The ENTIRE gameplay scene needs to be rebalanced to resemble the original cinematic table composition again.
+
+==============================================================
+EXPECTED RESULT
+===============
+
+Final gameplay should:
+
+* resemble the old layout proportions
+* feel more spacious
+* feel cinematic
+* feel immersive
+* feel less crowded
+* restore atmospheric balance
+* maintain the upgraded modern visuals
+* no longer appear zoomed in
+
+==============================================================
+ACTIVE STATES
+=============
+
+Gameplay should feel smooth and balanced again:
+
+* correct spacing
+* proper scale
+* comfortable visibility
+* better visual hierarchy
+* improved readability
+* restored cinematic composition
+
+==============================================================
+FINAL ACCEPTANCE CHECK
+======================
+
+Verify:
+
+* table no longer appears zoomed in
+* player hand moved lower
+* community cards properly centered
+* more background atmosphere visible
+* spacing restored
+* gameplay feels cinematic again
+* no overcrowding
+* no vertical compression
+* old proportions restored with modern visuals intact
