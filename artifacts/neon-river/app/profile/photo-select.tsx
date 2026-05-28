@@ -1,5 +1,5 @@
-// ─── Photo Select Screen ───────────────────────────────────────────────────────
-// Players choose between a Character Portrait or a Custom Photo upload.
+// ─── Avatar Select Hub ─────────────────────────────────────────────────────────
+// Central screen for choosing between a Neon Symbol Avatar or a Custom Photo.
 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,20 +19,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useUser } from '@/context/UserContext';
-import { getCharacter } from '@/constants/characters';
-import CHARACTER_IMAGES from '@/constants/characterImages';
-
-const PORTRAIT_W = 168;
-const PORTRAIT_H = Math.round(PORTRAIT_W * 152 / 134); // match source portrait ratio 134:152
+import { getNeonAvatar, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
+import NeonAvatarView from '@/components/NeonAvatar';
 
 export default function PhotoSelectScreen() {
   const insets = useSafeAreaInsets();
   const { profile, updateProfile } = useUser();
   const [busy, setBusy] = useState(false);
 
-  const character = getCharacter(profile.avatarIndex ?? 1);
-  const isCustom = profile.profileImageType === 'custom' && !!profile.avatarUri;
-  const charImg   = CHARACTER_IMAGES[character.id];
+  const symbolId   = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
+  const avatar     = getNeonAvatar(symbolId);
+  const isCustom   = profile.profileImageType === 'custom' && !!profile.avatarUri;
+  const isSymbol   = !isCustom;
+  const rarityColor = NEON_RARITY_COLORS[avatar.rarity];
 
   const launchPicker = async (source: 'gallery' | 'camera') => {
     if (Platform.OS !== 'web') {
@@ -54,23 +53,16 @@ export default function PhotoSelectScreen() {
     setBusy(true);
     try {
       const result = source === 'camera'
-        ? await ImagePicker.launchCameraAsync({
-            allowsEditing: true,
-            aspect: [3, 4],
-            quality: 0.85,
-          })
+        ? await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.85 })
         : await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
-            aspect: [3, 4],
+            aspect: [1, 1],
             quality: 0.85,
           });
 
       if (!result.canceled && result.assets[0]) {
-        await updateProfile({
-          avatarUri: result.assets[0].uri,
-          profileImageType: 'custom',
-        });
+        await updateProfile({ avatarUri: result.assets[0].uri, profileImageType: 'custom' });
         router.back();
       }
     } catch {
@@ -81,7 +73,7 @@ export default function PhotoSelectScreen() {
   };
 
   const removeCustomPhoto = async () => {
-    await updateProfile({ avatarUri: undefined, profileImageType: 'character' });
+    await updateProfile({ avatarUri: undefined, profileImageType: 'symbol' });
   };
 
   return (
@@ -96,30 +88,17 @@ export default function PhotoSelectScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.75}>
           <Ionicons name="chevron-back" size={22} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.title}>PROFILE IMAGE</Text>
+        <Text style={styles.title}>AVATAR</Text>
         <View style={{ width: 44 }} />
       </View>
 
       {/* ── Current preview ────────────────────────────────────────────────── */}
       <View style={styles.previewArea}>
-        <View style={[
-          styles.previewFrame,
-          { borderColor: isCustom ? '#ff0090' : '#00d4ff' },
-        ]}>
+        <View style={[styles.previewFrame, { borderColor: isCustom ? '#ff0090' : rarityColor }]}>
           {isCustom ? (
-            <Image
-              source={{ uri: profile.avatarUri }}
-              style={styles.previewImg}
-              resizeMode="cover"
-            />
-          ) : charImg ? (
-            <Image
-              source={charImg}
-              style={styles.previewImg}
-              resizeMode="cover"
-            />
+            <Image source={{ uri: profile.avatarUri }} style={styles.previewImg} resizeMode="cover" />
           ) : (
-            <View style={[styles.previewImg, { backgroundColor: '#0a0025' }]} />
+            <NeonAvatarView avatarId={symbolId} size={164} />
           )}
         </View>
         <View style={[
@@ -128,15 +107,17 @@ export default function PhotoSelectScreen() {
         ]}>
           <View style={[styles.activeDot, { backgroundColor: isCustom ? '#ff0090' : '#00d4ff' }]} />
           <Text style={[styles.activeBadgeText, { color: isCustom ? '#ff0090' : '#00d4ff' }]}>
-            {isCustom ? 'CUSTOM PHOTO ACTIVE' : `${character.name.toUpperCase()} ACTIVE`}
+            {isCustom ? 'CUSTOM PHOTO ACTIVE' : `${avatar.name.toUpperCase()} ACTIVE`}
           </Text>
         </View>
       </View>
 
-      {/* ── Option: Character Portrait ─────────────────────────────────────── */}
+      {/* ── Options ────────────────────────────────────────────────────────── */}
       <View style={styles.options}>
+
+        {/* Neon Symbol Avatar */}
         <TouchableOpacity
-          style={[styles.optionRow, !isCustom && styles.optionRowActive]}
+          style={[styles.optionRow, isSymbol && styles.optionRowActive]}
           onPress={() => router.push('/profile/avatar-select')}
           activeOpacity={0.8}
         >
@@ -146,16 +127,16 @@ export default function PhotoSelectScreen() {
             style={StyleSheet.absoluteFill}
           />
           <View style={styles.optionIconWrap}>
-            <Ionicons name="person-circle" size={26} color="#00d4ff" />
+            <NeonAvatarView avatarId={symbolId} size={36} />
           </View>
           <View style={styles.optionContent}>
-            <Text style={styles.optionTitle}>CHARACTER PORTRAIT</Text>
-            <Text style={styles.optionSub}>Browse &amp; unlock 40 cinematic characters</Text>
+            <Text style={styles.optionTitle}>NEON SYMBOL</Text>
+            <Text style={styles.optionSub}>Choose from 30 neon icon avatars · all unlocked</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="rgba(0,212,255,0.5)" />
         </TouchableOpacity>
 
-        {/* ── Option: Custom Photo ───────────────────────────────────────────── */}
+        {/* Custom Photo */}
         <View style={[styles.uploadSection, isCustom && styles.uploadSectionActive]}>
           <LinearGradient
             colors={['rgba(255,0,144,0.06)', 'transparent']}
@@ -166,7 +147,7 @@ export default function PhotoSelectScreen() {
             <Ionicons name="camera" size={20} color="#ff0090" />
             <View style={{ flex: 1 }}>
               <Text style={styles.uploadTitle}>CUSTOM PHOTO</Text>
-              <Text style={styles.uploadSub}>Upload your own portrait — 3:4 ratio, built-in crop tool</Text>
+              <Text style={styles.uploadSub}>Upload your own portrait — square crop</Text>
             </View>
           </View>
 
@@ -193,11 +174,10 @@ export default function PhotoSelectScreen() {
           </View>
 
           <Text style={styles.disclaimer}>
-            Profile photos must follow community guidelines. Inappropriate images may result in account suspension.
+            Profile photos must follow community guidelines.
           </Text>
         </View>
 
-        {/* Remove button (only when custom photo is active) */}
         {isCustom && (
           <TouchableOpacity
             style={styles.removeBtn}
@@ -210,7 +190,6 @@ export default function PhotoSelectScreen() {
         )}
       </View>
 
-      {/* Loading overlay */}
       {busy && (
         <View style={styles.busyOverlay}>
           <ActivityIndicator size="large" color="#ff0090" />
@@ -222,10 +201,7 @@ export default function PhotoSelectScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#050010',
-  },
+  root: { flex: 1, backgroundColor: '#050010' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -233,36 +209,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 14,
   },
-  backBtn: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontFamily: 'Orbitron_700Bold',
-    fontSize: 13,
-    color: '#fff',
-    letterSpacing: 2,
-  },
+  backBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  title: { fontFamily: 'Orbitron_700Bold', fontSize: 13, color: '#fff', letterSpacing: 2 },
 
-  previewArea: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    gap: 12,
-  },
+  previewArea: { alignItems: 'center', paddingVertical: 20, gap: 12 },
   previewFrame: {
-    width: PORTRAIT_W,
-    height: PORTRAIT_H,
-    borderRadius: 14,
+    width: 164,
+    height: 164,
+    borderRadius: 18,
     borderWidth: 2,
     overflow: 'hidden',
     backgroundColor: '#0a0025',
   },
-  previewImg: {
-    width: '100%',
-    height: '100%',
-  },
+  previewImg: { width: '100%', height: '100%' },
   activeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -272,22 +231,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
   },
-  activeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  activeBadgeText: {
-    fontFamily: 'Orbitron_700Bold',
-    fontSize: 9,
-    letterSpacing: 1.5,
-  },
+  activeDot: { width: 6, height: 6, borderRadius: 3 },
+  activeBadgeText: { fontFamily: 'Orbitron_700Bold', fontSize: 9, letterSpacing: 1.5 },
 
-  options: {
-    flex: 1,
-    paddingHorizontal: 16,
-    gap: 10,
-  },
+  options: { flex: 1, paddingHorizontal: 16, gap: 10 },
   optionRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -296,31 +243,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
     paddingHorizontal: 14,
-    paddingVertical: 14,
+    paddingVertical: 12,
     gap: 12,
     overflow: 'hidden',
   },
-  optionRowActive: {
-    borderColor: 'rgba(0,212,255,0.35)',
-  },
+  optionRowActive: { borderColor: 'rgba(0,212,255,0.35)' },
   optionIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,212,255,0.1)',
+    width: 44,
+    height: 44,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
-  optionContent: {
-    flex: 1,
-    gap: 3,
-  },
-  optionTitle: {
-    fontFamily: 'Orbitron_700Bold',
-    fontSize: 11,
-    color: '#fff',
-    letterSpacing: 1,
-  },
+  optionContent: { flex: 1, gap: 3 },
+  optionTitle: { fontFamily: 'Orbitron_700Bold', fontSize: 11, color: '#fff', letterSpacing: 1 },
   optionSub: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 9,
@@ -337,14 +274,8 @@ const styles = StyleSheet.create({
     gap: 10,
     overflow: 'hidden',
   },
-  uploadSectionActive: {
-    borderColor: 'rgba(255,0,144,0.35)',
-  },
-  uploadHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-  },
+  uploadSectionActive: { borderColor: 'rgba(255,0,144,0.35)' },
+  uploadHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   uploadTitle: {
     fontFamily: 'Orbitron_700Bold',
     fontSize: 11,
@@ -358,10 +289,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.45)',
     letterSpacing: 0.5,
   },
-  uploadBtnRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
+  uploadBtnRow: { flexDirection: 'row', gap: 10 },
   uploadBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -388,7 +316,6 @@ const styles = StyleSheet.create({
     lineHeight: 13,
     textAlign: 'center',
   },
-
   removeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -400,13 +327,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,68,68,0.3)',
     backgroundColor: 'rgba(255,68,68,0.06)',
   },
-  removeText: {
-    fontFamily: 'Orbitron_700Bold',
-    fontSize: 10,
-    color: '#ff4444',
-    letterSpacing: 1.5,
-  },
-
+  removeText: { fontFamily: 'Orbitron_700Bold', fontSize: 10, color: '#ff4444', letterSpacing: 1.5 },
   busyOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(5,0,16,0.8)',
@@ -414,10 +335,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 14,
   },
-  busyText: {
-    fontFamily: 'Orbitron_700Bold',
-    fontSize: 11,
-    color: '#ff0090',
-    letterSpacing: 2,
-  },
+  busyText: { fontFamily: 'Orbitron_700Bold', fontSize: 11, color: '#ff0090', letterSpacing: 2 },
 });

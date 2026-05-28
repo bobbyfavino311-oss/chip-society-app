@@ -26,14 +26,14 @@ interface NeonAvatarProps {
 
 function GlowPath({ d, color, sw = 4, filled = false }: { d: string; color: string; sw?: number; filled?: boolean }) {
   return (
-    <>
+    <G>
       <Path d={d} stroke={color} strokeWidth={sw * 2.6} strokeOpacity={0.32}
         fill={filled ? color : 'none'} fillOpacity={filled ? 0.18 : 0}
         strokeLinecap="round" strokeLinejoin="round" />
       <Path d={d} stroke={color} strokeWidth={sw} strokeOpacity={1}
         fill={filled ? color : 'none'} fillOpacity={filled ? 0.9 : 0}
         strokeLinecap="round" strokeLinejoin="round" />
-    </>
+    </G>
   );
 }
 
@@ -41,12 +41,12 @@ function GlowCircle({ cx, cy, r, color, sw = 3.5, filled = false }: {
   cx: number; cy: number; r: number; color: string; sw?: number; filled?: boolean;
 }) {
   return (
-    <>
+    <G>
       <Circle cx={cx} cy={cy} r={r} stroke={color} strokeWidth={sw * 2.6} strokeOpacity={0.32}
         fill={filled ? color : 'none'} fillOpacity={filled ? 0.2 : 0} />
       <Circle cx={cx} cy={cy} r={r} stroke={color} strokeWidth={sw} strokeOpacity={1}
         fill={filled ? color : 'none'} fillOpacity={filled ? 0.85 : 0} />
-    </>
+    </G>
   );
 }
 
