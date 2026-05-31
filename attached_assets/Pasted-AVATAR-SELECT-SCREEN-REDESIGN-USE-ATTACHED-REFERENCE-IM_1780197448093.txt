@@ -1,0 +1,200 @@
+AVATAR SELECT SCREEN REDESIGN
+USE ATTACHED REFERENCE IMAGE
+
+The attached reference image represents the new design direction.
+
+Do NOT recreate the image exactly.
+
+Instead, rebuild the Avatar Select screen using the same visual hierarchy, spacing philosophy, and circular avatar system while keeping all artwork original.
+
+==============================================================
+
+PRIMARY OBJECTIVE
+
+The current avatar screen feels like a collection of square cards.
+
+This is no longer the desired design language.
+
+The avatar system should feel like a premium collectible gallery.
+
+Think:
+
+* luxury watch collection
+* rare badge collection
+* achievement showcase
+* collectible poker identity system
+
+NOT:
+
+* inventory grid
+* icon library
+* app menu
+
+==============================================================
+
+REMOVE
+
+DELETE ENTIRELY:
+
+* square avatar containers
+* rounded rectangle avatar cards
+* box outlines around every avatar
+* avatar tile backgrounds
+* avatar tile borders
+
+The avatars themselves become the focus.
+
+==============================================================
+
+NEW AVATAR SYSTEM
+
+Every avatar should exist inside:
+
+PERFECT CIRCULAR FRAMES
+
+not squares
+
+not rounded rectangles
+
+not cards
+
+not containers
+
+Each avatar should appear as:
+
+* premium neon symbol
+* centered within circular frame
+* subtle glow
+* floating on background
+
+The circular border should match the style shown in the reference image.
+
+==============================================================
+
+LAYOUT
+
+TOP SECTION
+
+Large featured avatar display:
+
+* oversized circular avatar
+* rarity badge
+* avatar name
+* unlock requirement
+* equipped button
+
+Keep current structure.
+
+==============================================================
+
+AVATAR GRID
+
+Replace current square grid with:
+
+3-column circular gallery
+
+Each avatar consists of:
+
+* circular border
+* neon symbol
+* avatar name underneath
+
+No container.
+
+No tile.
+
+No square frame.
+
+No card background.
+
+Only the avatar itself.
+
+==============================================================
+
+VISUAL STYLE
+
+Reference image demonstrates correct direction:
+
+* clean circles
+* simple neon symbols
+* strong silhouettes
+* premium spacing
+
+The redesign should feel:
+
+* cleaner
+* more modern
+* less cluttered
+* more collectible
+
+==============================================================
+
+SPACING
+
+Increase spacing between avatars.
+
+Each avatar should have room to breathe.
+
+Do not allow borders to touch.
+
+Do not allow the screen to feel crowded.
+
+Maintain symmetry.
+
+==============================================================
+
+SELECTION STATES
+
+Equipped Avatar:
+
+* strongest glow
+* animated pulse
+* rarity-colored border
+* green equipped indicator
+
+Locked Avatar:
+
+* dimmed glow
+* lock icon
+* reduced opacity
+
+Available Avatar:
+
+* normal glow
+* standard border
+
+==============================================================
+
+RARITY SYSTEM
+
+Common:
+cool cyan border
+
+Rare:
+electric blue border
+
+Epic:
+magenta border
+
+Legendary:
+gold border
+
+The border itself communicates rarity.
+
+==============================================================
+
+OVERALL GOAL
+
+The final screen should look like a premium collection of collectible neon identities.
+
+When a player opens Avatar Select, it should feel like browsing rare casino collectibles rather than choosing icons from a menu.
+
+Use the attached reference image as the quality benchmark for:
+
+* border treatment
+* icon presentation
+* spacing
+* hierarchy
+* visual polish
+
+The redesign should be noticeably cleaner, more premium, and more visually consistent than the current square-card implementation.

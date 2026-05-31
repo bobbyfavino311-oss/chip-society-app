@@ -1,4 +1,4 @@
-// ─── Avatar Select Screen — Neon Symbol Avatars ───────────────────────────────
+// ─── Avatar Select Screen — Circular Neon Gallery ─────────────────────────────
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
@@ -28,11 +28,10 @@ import NeonAvatarView from '@/components/NeonAvatar';
 import { useUser } from '@/context/UserContext';
 
 const { width: SCREEN_W } = Dimensions.get('window');
-const COLS      = 3;
-const H_PAD     = 14;
-const GAP       = 8;
-const CARD_W    = Math.floor((Math.min(SCREEN_W, 420) - H_PAD * 2 - GAP * (COLS - 1)) / COLS);
-const CARD_H    = CARD_W + 24;
+const COLS    = 3;
+const H_PAD   = 16;
+const SLOT_W  = Math.floor((Math.min(SCREEN_W, 420) - H_PAD * 2) / COLS);
+const AV_SIZE = Math.min(SLOT_W - 20, 88);
 
 const RARITY_FILTERS = ['ALL', 'COMMON', 'RARE', 'EPIC', 'LEGENDARY'] as const;
 type RarityFilter = typeof RARITY_FILTERS[number];
@@ -43,6 +42,13 @@ const TIER_COUNT: Record<string, number> = {
   RARE:      NEON_AVATARS.filter(a => a.rarity === 'RARE').length,
   EPIC:      NEON_AVATARS.filter(a => a.rarity === 'EPIC').length,
   LEGENDARY: NEON_AVATARS.filter(a => a.rarity === 'LEGENDARY').length,
+};
+
+const RARITY_RING: Record<NeonRarity, string> = {
+  COMMON:    '#00d4ff',
+  RARE:      '#4080ff',
+  EPIC:      '#d040ff',
+  LEGENDARY: '#ffd700',
 };
 
 export default function AvatarSelectScreen() {
@@ -59,12 +65,13 @@ export default function AvatarSelectScreen() {
 
   const previewScale = useRef(new Animated.Value(1)).current;
 
-  const preview    = getNeonAvatar(previewId) as NeonAvatarData;
-  const unlocked   = isNeonAvatarUnlocked(preview, profile.xp);
-  const isEquipped = profile.profileImageType === 'symbol'
+  const preview     = getNeonAvatar(previewId) as NeonAvatarData;
+  const unlocked    = isNeonAvatarUnlocked(preview, profile.xp);
+  const isEquipped  = profile.profileImageType === 'symbol'
     && (profile.symbolIndex ?? 0) === previewId;
   const rarityColor = NEON_RARITY_COLORS[preview.rarity];
-  const xpPct = Math.min(1, preview.unlockXP > 0 ? profile.xp / preview.unlockXP : 1);
+  const ringColor   = RARITY_RING[preview.rarity];
+  const xpPct       = Math.min(1, preview.unlockXP > 0 ? profile.xp / preview.unlockXP : 1);
 
   const filtered = rarityFilter === 'ALL'
     ? NEON_AVATARS
@@ -72,7 +79,7 @@ export default function AvatarSelectScreen() {
 
   function pulse() {
     Animated.sequence([
-      Animated.timing(previewScale, { toValue: 0.93, duration: 70,  useNativeDriver: true }),
+      Animated.timing(previewScale, { toValue: 0.94, duration: 70,  useNativeDriver: true }),
       Animated.spring(previewScale,  { toValue: 1,   friction: 4,   useNativeDriver: true }),
     ]).start();
   }
@@ -107,20 +114,25 @@ export default function AvatarSelectScreen() {
       </View>
 
       {/* ── Hero preview ── */}
-      <Animated.View
-        style={[s.hero, { transform: [{ scale: previewScale }] }]}
-      >
+      <Animated.View style={[s.hero, { transform: [{ scale: previewScale }] }]}>
+        {/* Subtle ambient gradient behind hero */}
         <LinearGradient
-          colors={[preview.bgColor + 'dd', '#050010']}
+          colors={[ringColor + '28', 'transparent']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         />
 
-        <NeonAvatarView avatarId={previewId} size={86} isEquipped={isEquipped} isLocked={!unlocked} />
+        {/* Large circular avatar */}
+        <View style={s.heroAvatarWrap}>
+          {/* Outer glow ring */}
+          <View style={[s.heroGlowRing, { borderColor: ringColor + '60', shadowColor: ringColor }]} />
+          <NeonAvatarView avatarId={previewId} size={100} isEquipped={isEquipped} isLocked={!unlocked} />
+        </View>
 
+        {/* Info panel */}
         <View style={s.heroInfo}>
-          <View style={[s.rarityBadge, { borderColor: rarityColor + '66', backgroundColor: rarityColor + '1a' }]}>
+          <View style={[s.rarityBadge, { borderColor: rarityColor + '80', backgroundColor: rarityColor + '18' }]}>
             <Text style={[s.rarityBadgeText, { color: rarityColor }]}>{preview.rarity}</Text>
           </View>
 
@@ -129,14 +141,14 @@ export default function AvatarSelectScreen() {
           {!unlocked ? (
             <View style={s.xpBlock}>
               <View style={s.xpBarBg}>
-                <View style={[s.xpBarFill, { width: `${xpPct * 100}%` as `${number}%`, backgroundColor: rarityColor }]} />
+                <View style={[s.xpBarFill, { width: `${xpPct * 100}%` as `${number}%`, backgroundColor: ringColor }]} />
               </View>
-              <Text style={[s.xpLabel, { color: rarityColor + 'cc' }]}>
+              <Text style={[s.xpLabel, { color: rarityColor + 'bb' }]}>
                 {profile.xp.toLocaleString()} / {preview.unlockXP.toLocaleString()} XP
               </Text>
             </View>
           ) : (
-            <Text style={[s.unlockText, { color: rarityColor + 'cc' }]}>
+            <Text style={[s.unlockText, { color: rarityColor + 'bb' }]}>
               {preview.unlockCondition}
             </Text>
           )}
@@ -145,12 +157,10 @@ export default function AvatarSelectScreen() {
             style={[
               s.equipBtn,
               {
-                borderColor: unlocked ? rarityColor : '#2a2a3a',
+                borderColor: unlocked ? ringColor : '#2a2a3a',
                 backgroundColor: justEquipped
-                  ? rarityColor + '44'
-                  : unlocked
-                  ? rarityColor + '1a'
-                  : '#0a0a1a',
+                  ? ringColor + '40'
+                  : unlocked ? ringColor + '18' : '#0a0a1a',
                 opacity: !unlocked ? 0.5 : 1,
               },
             ]}
@@ -158,7 +168,7 @@ export default function AvatarSelectScreen() {
             disabled={!unlocked || isEquipped}
             activeOpacity={0.7}
           >
-            <Text style={[s.equipBtnText, { color: unlocked ? rarityColor : '#334' }]}>
+            <Text style={[s.equipBtnText, { color: unlocked ? ringColor : '#334' }]}>
               {!unlocked
                 ? `LOCKED — ${(preview.unlockXP - profile.xp).toLocaleString()} XP`
                 : isEquipped
@@ -179,7 +189,10 @@ export default function AvatarSelectScreen() {
           return (
             <TouchableOpacity
               key={r}
-              style={[s.filterChip, { borderColor: active ? rc : '#1e1e38', backgroundColor: active ? rc + '22' : 'transparent' }]}
+              style={[s.filterChip, {
+                borderColor: active ? rc : '#1e1e38',
+                backgroundColor: active ? rc + '22' : 'transparent',
+              }]}
               onPress={() => setRarityFilter(r)}
               activeOpacity={0.7}
             >
@@ -191,53 +204,55 @@ export default function AvatarSelectScreen() {
         })}
       </View>
 
-      {/* ── Avatar grid ── */}
+      {/* ── Circular avatar gallery ── */}
       <FlatList
         data={filtered}
         keyExtractor={(item: NeonAvatarData) => String(item.id)}
         numColumns={COLS}
         contentContainerStyle={[s.grid, { paddingBottom: bottomInset }]}
-        columnWrapperStyle={{ gap: GAP }}
         renderItem={({ item }: { item: NeonAvatarData }) => {
-          const av       = item;
-          const avLocked = !isNeonAvatarUnlocked(av, profile.xp);
-          const avRC     = NEON_RARITY_COLORS[av.rarity];
-          const selected = previewId === av.id;
-          const equipped = profile.profileImageType === 'symbol' && profile.symbolIndex === av.id;
+          const avLocked  = !isNeonAvatarUnlocked(item, profile.xp);
+          const avRC      = RARITY_RING[item.rarity];
+          const selected  = previewId === item.id;
+          const equipped  = profile.profileImageType === 'symbol' && profile.symbolIndex === item.id;
 
           return (
             <TouchableOpacity
-              style={[
-                s.tile,
-                { width: CARD_W, height: CARD_H },
-                selected && { borderColor: avRC, backgroundColor: avRC + '18' },
-                !selected && { borderColor: '#1a1a38' },
-              ]}
-              onPress={() => handleSelect(av)}
-              activeOpacity={0.7}
+              style={s.cell}
+              onPress={() => handleSelect(item)}
+              activeOpacity={0.75}
             >
+              {/* Selection glow ring — renders behind the avatar */}
+              {selected && (
+                <View style={[s.selectionRing, {
+                  width:  AV_SIZE + 16,
+                  height: AV_SIZE + 16,
+                  borderRadius: (AV_SIZE + 16) / 2,
+                  borderColor: avRC,
+                  shadowColor: avRC,
+                }]} />
+              )}
+
               <NeonAvatarView
-                avatarId={av.id}
-                size={CARD_W - 16}
+                avatarId={item.id}
+                size={AV_SIZE}
                 isLocked={avLocked}
                 isEquipped={equipped}
               />
-              <Text
-                style={[s.tileName, { color: selected ? avRC : '#556' }]}
-                numberOfLines={1}
-              >
-                {av.name}
-              </Text>
 
+              {/* Equipped dot */}
               {equipped && !avLocked && (
-                <View style={[s.equippedBadge, { backgroundColor: '#00ff88' }]}>
-                  <Ionicons name="checkmark" size={9} color="#000" />
+                <View style={s.equippedDot}>
+                  <Ionicons name="checkmark" size={8} color="#000" />
                 </View>
               )}
 
-              {selected && (
-                <View style={[s.selectedBar, { backgroundColor: avRC }]} />
-              )}
+              <Text
+                style={[s.cellName, { color: selected ? avRC : '#4a5070' }]}
+                numberOfLines={1}
+              >
+                {item.name}
+              </Text>
             </TouchableOpacity>
           );
         }}
@@ -247,6 +262,7 @@ export default function AvatarSelectScreen() {
 }
 
 const s = StyleSheet.create({
+  // ── Header ────────────────────────────────────────────────────────────────────
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -267,20 +283,37 @@ const s = StyleSheet.create({
     letterSpacing: 4,
   },
 
-  // ── Hero ────────────────────────────────────────────────────────────────────
+  // ── Hero ──────────────────────────────────────────────────────────────────────
   hero: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 18,
     overflow: 'hidden',
-    marginBottom: 4,
-    minHeight: 130,
+    marginBottom: 6,
+    minHeight: 140,
+  },
+  heroAvatarWrap: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 116,
+    height: 116,
+  },
+  heroGlowRing: {
+    position: 'absolute',
+    width: 116,
+    height: 116,
+    borderRadius: 58,
+    borderWidth: 2,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 16,
+    shadowOpacity: 0.8,
   },
   heroInfo: {
     flex: 1,
-    gap: 5,
+    gap: 6,
   },
   rarityBadge: {
     alignSelf: 'flex-start',
@@ -300,19 +333,14 @@ const s = StyleSheet.create({
     color: '#ffffff',
     letterSpacing: 1,
   },
-  xpBlock: {
-    gap: 4,
-  },
+  xpBlock: { gap: 4 },
   xpBarBg: {
     height: 4,
     backgroundColor: '#1a1a3a',
     borderRadius: 2,
     overflow: 'hidden',
   },
-  xpBarFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
+  xpBarFill: { height: '100%', borderRadius: 2 },
   xpLabel: {
     fontSize: 9,
     fontFamily: 'Orbitron_700Bold',
@@ -337,12 +365,12 @@ const s = StyleSheet.create({
     letterSpacing: 1.5,
   },
 
-  // ── Filter ──────────────────────────────────────────────────────────────────
+  // ── Filter ────────────────────────────────────────────────────────────────────
   filterRow: {
     flexDirection: 'row',
     paddingHorizontal: 14,
     gap: 6,
-    marginBottom: 8,
+    marginBottom: 10,
     flexWrap: 'wrap',
   },
   filterChip: {
@@ -357,46 +385,43 @@ const s = StyleSheet.create({
     letterSpacing: 1,
   },
 
-  // ── Grid ────────────────────────────────────────────────────────────────────
+  // ── Circular gallery ──────────────────────────────────────────────────────────
   grid: {
     paddingHorizontal: H_PAD,
-    gap: GAP,
+    paddingTop: 4,
   },
-  tile: {
-    borderRadius: 12,
-    borderWidth: 1.5,
-    backgroundColor: '#0a0a22',
+  cell: {
+    width: SLOT_W,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 8,
-    paddingBottom: 4,
-    paddingHorizontal: 4,
-    overflow: 'hidden',
+    paddingVertical: 12,
     position: 'relative',
   },
-  tileName: {
+  selectionRing: {
+    position: 'absolute',
+    top: 12 - 8,
+    borderWidth: 2,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 10,
+    shadowOpacity: 0.9,
+  },
+  equippedDot: {
+    position: 'absolute',
+    top: 12 + AV_SIZE - 14,
+    right: SLOT_W / 2 - AV_SIZE / 2 - 2,
+    width: 14, height: 14,
+    borderRadius: 7,
+    backgroundColor: '#00ff88',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#050010',
+  },
+  cellName: {
     fontFamily: 'Orbitron_700Bold',
     fontSize: 7,
     letterSpacing: 0.5,
-    marginTop: 4,
+    marginTop: 7,
     textAlign: 'center',
-  },
-  equippedBadge: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  selectedBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2.5,
-    opacity: 0.9,
+    width: SLOT_W - 8,
   },
 });

@@ -436,7 +436,7 @@ export default function NeonAvatar({
   const avatar       = getNeonAvatar(avatarId);
   const rarityColor  = NEON_RARITY_COLORS[avatar.rarity];
   const borderWidth  = NEON_RARITY_BORDER[avatar.rarity];
-  const borderRadius = size * 0.22;
+  const borderRadius = size / 2;
 
   const pulseAnim = useRef(new Animated.Value(0.6)).current;
 
