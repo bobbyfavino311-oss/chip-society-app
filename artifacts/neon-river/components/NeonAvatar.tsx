@@ -29,25 +29,29 @@ type TextOp  = { t: 'txt'; x: number; y: number; text: string; size: number };
 type Op = PathOp | CircOp | TextOp;
 
 const I: Record<number, Op[]> = {
-  // ── 1  MARTINI GLASS ──────────────────────────────────────────────────────────
+  // ── 1  MARTINI GLASS — geometric luxury cocktail emblem ───────────────────────
+  // Inverted V bowl · olive dot · vertical stem · horizontal base
   1: [
-    { t: 'p', d: 'M16,18 H84 M16,18 L50,72 M84,18 L50,72 M50,72 V87 M32,87 H68', sw: 3.5 },
-    { t: 'p', d: 'M22,36 L78,36', sw: 3 },
-    { t: 'c', cx: 70, cy: 28, r: 5, sw: 3, fill: true },
-    { t: 'p', d: 'M63,22 L70,33', sw: 2.5 },
+    { t: 'p', d: 'M16,18 L50,78 L84,18', sw: 4.5 },
+    { t: 'p', d: 'M50,78 V90', sw: 4 },
+    { t: 'p', d: 'M34,90 H66', sw: 3.5 },
+    { t: 'c', cx: 72, cy: 26, r: 5.5, sw: 3, fill: true },
   ],
-  // ── 2  LIGHTNING BOLT ─────────────────────────────────────────────────────────
+  // ── 2  LIGHTNING BOLT — angular rank rune ─────────────────────────────────────
+  // Single angular rune stroke — not filled, pure neon line glyph
   2: [
-    { t: 'p', d: 'M60,8 L28,54 L52,54 L40,92 L72,46 L48,46 Z', sw: 4, fill: true },
+    { t: 'p', d: 'M64,8 L34,50 L54,50 L30,92', sw: 5 },
   ],
-  // ── 3  POKER CHIP ─────────────────────────────────────────────────────────────
+  // ── 3  POKER CHIP — casino brand mark ────────────────────────────────────────
+  // Outer ring · inner ring · 4 cardinal tick marks · center jewel
   3: [
-    { t: 'c', cx: 50, cy: 50, r: 40, sw: 3.5 },
-    { t: 'c', cx: 50, cy: 50, r: 26, sw: 3 },
-    { t: 'p', d: 'M50,10 L50,24', sw: 3 }, { t: 'p', d: 'M50,76 L50,90', sw: 3 },
-    { t: 'p', d: 'M10,50 L24,50', sw: 3 }, { t: 'p', d: 'M76,50 L90,50', sw: 3 },
-    { t: 'p', d: 'M21,21 L31,31', sw: 3 }, { t: 'p', d: 'M79,21 L69,31', sw: 3 },
-    { t: 'p', d: 'M21,79 L31,69', sw: 3 }, { t: 'p', d: 'M79,79 L69,69', sw: 3 },
+    { t: 'c', cx: 50, cy: 50, r: 38, sw: 4 },
+    { t: 'c', cx: 50, cy: 50, r: 22, sw: 3 },
+    { t: 'p', d: 'M50,12 V22', sw: 4 },
+    { t: 'p', d: 'M50,78 V88', sw: 4 },
+    { t: 'p', d: 'M12,50 H22', sw: 4 },
+    { t: 'p', d: 'M78,50 H88', sw: 4 },
+    { t: 'c', cx: 50, cy: 50, r: 5, sw: 3, fill: true },
   ],
   // ── 4  ACE CARD ───────────────────────────────────────────────────────────────
   4: [
@@ -76,22 +80,24 @@ const I: Record<number, Op[]> = {
     { t: 'p', d: 'M50,88 C28,84 16,64 22,50 C18,60 26,54 28,46 C22,56 30,50 34,40 C28,30 40,18 50,10 C60,18 72,30 66,40 C70,50 78,56 72,46 C78,64 72,84 50,88 Z', sw: 3.5, fill: true },
     { t: 'p', d: 'M50,75 C38,72 32,60 36,52 C38,58 44,56 46,50 C50,58 54,62 50,75 Z', sw: 2.5, fill: true },
   ],
-  // ── 8  CROWN ──────────────────────────────────────────────────────────────────
+  // ── 8  CROWN — heraldic VIP insignia ─────────────────────────────────────────
+  // 3 sharp angular spikes from a clean base line · architectural, not cartoonish
   8: [
-    { t: 'p', d: 'M10,76 L10,44 L28,64 L50,26 L72,64 L90,44 L90,76 Z', sw: 3.5 },
-    { t: 'p', d: 'M10,65 H90', sw: 3 },
-    { t: 'c', cx: 26, cy: 70, r: 4.5, sw: 2.5, fill: true },
-    { t: 'c', cx: 50, cy: 70, r: 4.5, sw: 2.5, fill: true },
-    { t: 'c', cx: 74, cy: 70, r: 4.5, sw: 2.5, fill: true },
+    { t: 'p', d: 'M10,78 H90', sw: 4.5 },
+    { t: 'p', d: 'M10,78 L28,46', sw: 4 },
+    { t: 'p', d: 'M50,78 L50,20', sw: 4 },
+    { t: 'p', d: 'M90,78 L72,46', sw: 4 },
+    { t: 'p', d: 'M28,46 L40,60', sw: 3.5 },
+    { t: 'p', d: 'M72,46 L60,60', sw: 3.5 },
   ],
-  // ── 9  NEON PALM ──────────────────────────────────────────────────────────────
+  // ── 9  NEON PALM — Miami luxury silhouette ────────────────────────────────────
+  // Curved trunk + 4 elegant frond arcs from crown point — neon sign minimal
   9: [
-    { t: 'p', d: 'M50,90 C47,72 53,60 50,32', sw: 3 },
-    { t: 'p', d: 'M50,32 C40,24 22,17 14,8',  sw: 3 },
-    { t: 'p', d: 'M50,32 C60,24 78,17 86,8',  sw: 3 },
-    { t: 'p', d: 'M50,32 C34,20 16,28 8,35',  sw: 3 },
-    { t: 'p', d: 'M50,32 C66,20 84,28 92,35', sw: 3 },
-    { t: 'p', d: 'M50,32 C48,18 50,6 50,4',   sw: 2.5 },
+    { t: 'p', d: 'M50,92 C48,72 46,54 50,26', sw: 4 },
+    { t: 'p', d: 'M50,26 C38,12 16,10 8,6',   sw: 3.5 },
+    { t: 'p', d: 'M50,26 C62,12 84,10 92,6',   sw: 3.5 },
+    { t: 'p', d: 'M50,38 C36,26 18,28 10,32',  sw: 3 },
+    { t: 'p', d: 'M50,38 C64,26 82,28 90,32',  sw: 3 },
   ],
   // ── 10 CASSETTE ───────────────────────────────────────────────────────────────
   10: [

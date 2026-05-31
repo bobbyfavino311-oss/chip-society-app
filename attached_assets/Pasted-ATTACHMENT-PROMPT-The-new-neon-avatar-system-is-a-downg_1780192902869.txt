@@ -1,0 +1,250 @@
+ATTACHMENT PROMPT:
+
+The new neon avatar system is a downgrade from the original symbol system and needs a complete art-direction pass.
+
+==============================================================
+CORE PROBLEM
+============
+
+The current avatars feel:
+
+* clip-art
+* generic
+* mobile game asset pack quality
+* overly literal
+* cartoonish
+* lacking personality
+* lacking luxury
+* lacking mystery
+* lacking nightlife energy
+
+The original symbols had much stronger identity because they felt:
+
+* abstract
+* iconic
+* premium
+* futuristic
+* recognizable at a glance
+
+Right now the symbols are trying too hard to literally depict objects.
+
+The result feels tacky.
+
+==============================================================
+NEW ART DIRECTION
+=================
+
+Think:
+
+Miami nightlife.
+Luxury rooftop bars.
+Retro-futurism.
+Casino VIP lounges.
+Synthwave.
+Vice City.
+High-end cocktail culture.
+Neon signs glowing in the dark.
+
+NOT:
+
+Emoji style.
+Sticker style.
+Cartoon style.
+Clip-art style.
+Children's mobile game style.
+
+==============================================================
+REDESIGN RULE
+=============
+
+Do NOT draw the actual object.
+
+Create an ICONIC SYMBOL inspired by the object.
+
+Examples:
+
+BAD:
+A detailed martini glass.
+
+GOOD:
+A geometric neon shape that instantly suggests a martini glass.
+
+BAD:
+A realistic palm tree.
+
+GOOD:
+A stylized neon silhouette made from only a few elegant lines.
+
+BAD:
+A cartoon poker chip.
+
+GOOD:
+A futuristic casino insignia that resembles a poker chip.
+
+==============================================================
+MARTINI GLASS
+=============
+
+Current:
+Looks like a cheap bar logo.
+
+Replace with:
+
+* minimalist neon outline
+* geometric
+* elegant
+* luxury cocktail lounge vibe
+* inspired by vintage neon signage
+
+Should feel like:
+a VIP club logo.
+
+==============================================================
+LIGHTNING BOLT
+==============
+
+Current:
+Looks like a generic mobile app icon.
+
+Replace with:
+
+* sharp angular bolt
+* futuristic
+* aggressive
+* cyberpunk
+* premium
+
+Should feel:
+like an elite rank emblem.
+
+==============================================================
+POKER CHIP
+==========
+
+Current:
+Looks like a toy chip.
+
+Replace with:
+
+* futuristic casino insignia
+* abstract circular symbol
+* glowing segmented ring
+* luxury gambling aesthetic
+
+Should feel:
+like a high-stakes casino brand mark.
+
+==============================================================
+ACE CARD
+========
+
+Current:
+Literal playing card.
+
+Replace with:
+
+* minimalist Ace symbol
+* luxury monogram
+* futuristic casino logo
+
+Not an actual card.
+
+==============================================================
+DICE STACK
+==========
+
+Current:
+Literal dice.
+
+Replace with:
+
+* abstract geometric luck symbol
+* interconnected neon shapes
+* elegant composition
+
+==============================================================
+MOON PHASE
+==========
+
+Current:
+Looks closest to correct.
+
+Improve:
+
+* thinner lines
+* softer glow
+* more mysterious
+* more premium
+
+==============================================================
+FIRE
+====
+
+Current:
+Looks cartoonish.
+
+Replace with:
+
+* stylized flame silhouette
+* elegant
+* neon nightclub sign
+* sharp and iconic
+
+==============================================================
+CROWN
+=====
+
+Current:
+Looks childish.
+
+Replace with:
+
+* luxury VIP insignia
+* sleek geometric crown
+* casino royalty aesthetic
+
+==============================================================
+NEON PALM
+=========
+
+Current:
+Looks like a doodle.
+
+Replace with:
+
+* luxury Miami icon
+* elegant curved trunk
+* refined fronds
+* iconic silhouette
+
+==============================================================
+NEW DESIGN TEST
+===============
+
+Before creating all 30 avatars:
+
+Redesign ONLY these first:
+
+1. Martini Glass
+2. Poker Chip
+3. Crown
+4. Neon Palm
+5. Lightning Bolt
+
+Present them as the new gold standard.
+
+Once approved:
+
+Apply the same visual language across every avatar.
+
+==============================================================
+TARGET RESULT
+=============
+
+Every avatar should feel like:
+
+A collectible neon emblem from an exclusive futuristic casino social network.
+
+Users should want to collect them because they look rare and stylish.
+
+Not because they literally depict an object.
