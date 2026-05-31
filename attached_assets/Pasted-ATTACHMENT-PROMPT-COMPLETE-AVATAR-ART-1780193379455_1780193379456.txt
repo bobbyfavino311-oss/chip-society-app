@@ -1,0 +1,184 @@
+ATTACHMENT PROMPT
+==============================================================
+COMPLETE AVATAR ART DIRECTION REBOOT
+
+The current avatar system still feels cheap.
+
+The issue is NOT rendering quality.
+
+The issue is artistic direction.
+
+These symbols currently look like:
+
+neon signs
+menu icons
+clip art
+decorative graphics
+
+They do NOT feel like profile identities.
+
+==============================================================
+NEW RULE
+
+Every avatar must function as:
+
+A PLAYER EMBLEM
+
+NOT
+
+A literal object.
+
+==============================================================
+TARGET REFERENCE
+
+Think:
+
+luxury watch logos
+casino insignias
+poker room badges
+racing team logos
+nightclub VIP symbols
+designer monograms
+
+NOT:
+
+emoji
+clip art
+bar signs
+stock icon packs
+==============================================================
+MARTINI GLASS
+
+DELETE the martini glass.
+
+Replace with:
+
+A luxury V-shaped insignia.
+
+Inspired by:
+
+cocktail culture
+VIP nightlife
+exclusive lounges
+
+Someone should NOT immediately say:
+
+"That's a martini."
+
+They should say:
+
+"That looks expensive."
+
+==============================================================
+POKER CHIP
+
+DELETE the literal chip.
+
+Create:
+
+A futuristic casino crest.
+
+Something resembling:
+
+currency
+status
+prestige
+
+Should feel:
+
+high stakes.
+
+==============================================================
+LIGHTNING BOLT
+
+Current version is generic.
+
+Replace with:
+
+A sharp angular energy mark.
+
+Feels like:
+
+speed
+aggression
+elite rank
+
+==============================================================
+FIRE
+
+DELETE cartoon flame.
+
+Replace with:
+
+A sharp flame crest.
+
+Feels like:
+
+danger
+heat
+competition
+
+==============================================================
+CROWN
+
+Current version feels childish.
+
+Replace with:
+
+A luxury geometric insignia.
+
+Think:
+
+kingpin
+owner
+VIP
+
+==============================================================
+NEON PALM
+
+DELETE the literal palm tree.
+
+Replace with:
+
+An abstract Miami-inspired symbol.
+
+Curved lines.
+
+Elegant silhouette.
+
+Luxury resort aesthetic.
+
+==============================================================
+OVERALL STYLE
+
+Each avatar should use:
+
+fewer lines
+stronger shapes
+bold silhouettes
+premium spacing
+less detail
+more identity
+==============================================================
+VISUAL TEST
+
+Shrink every avatar to:
+
+24x24 pixels.
+
+If it becomes unrecognizable:
+
+FAIL.
+
+If it still looks iconic:
+
+PASS.
+
+==============================================================
+FINAL GOAL
+
+The avatar system should feel like:
+
+collectible luxury emblems from an underground high-stakes poker society.
+
+Not a set of neon clip-art illustrations.

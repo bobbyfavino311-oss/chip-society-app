@@ -29,243 +29,275 @@ type TextOp  = { t: 'txt'; x: number; y: number; text: string; size: number };
 type Op = PathOp | CircOp | TextOp;
 
 const I: Record<number, Op[]> = {
-  // ── 1  MARTINI GLASS — geometric luxury cocktail emblem ───────────────────────
-  // Inverted V bowl · olive dot · vertical stem · horizontal base
+  // ── 1  MARTINI — V INSIGNIA ───────────────────────────────────────────────────
+  // Bold V-shape emblem. Cocktail culture encoded as pure geometry.
   1: [
-    { t: 'p', d: 'M16,18 L50,78 L84,18', sw: 4.5 },
-    { t: 'p', d: 'M50,78 V90', sw: 4 },
-    { t: 'p', d: 'M34,90 H66', sw: 3.5 },
-    { t: 'c', cx: 72, cy: 26, r: 5.5, sw: 3, fill: true },
+    { t: 'p', d: 'M14,14 L50,84 L86,14', sw: 6 },
+    { t: 'c', cx: 74, cy: 22, r: 5.5, sw: 3, fill: true },
   ],
-  // ── 2  LIGHTNING BOLT — angular rank rune ─────────────────────────────────────
-  // Single angular rune stroke — not filled, pure neon line glyph
+
+  // ── 2  LIGHTNING — RANK RUNE ──────────────────────────────────────────────────
+  // Single angular Z-stroke. Aggressive. Reads like an elite rank emblem.
   2: [
-    { t: 'p', d: 'M64,8 L34,50 L54,50 L30,92', sw: 5 },
+    { t: 'p', d: 'M66,8 L32,50 L58,50 L24,92', sw: 6 },
   ],
-  // ── 3  POKER CHIP — casino brand mark ────────────────────────────────────────
-  // Outer ring · inner ring · 4 cardinal tick marks · center jewel
+
+  // ── 3  POKER CHIP — CASINO CREST ─────────────────────────────────────────────
+  // Championship ring: outer + inner ring, 4 cardinal marks, center jewel.
   3: [
-    { t: 'c', cx: 50, cy: 50, r: 38, sw: 4 },
-    { t: 'c', cx: 50, cy: 50, r: 22, sw: 3 },
-    { t: 'p', d: 'M50,12 V22', sw: 4 },
-    { t: 'p', d: 'M50,78 V88', sw: 4 },
-    { t: 'p', d: 'M12,50 H22', sw: 4 },
-    { t: 'p', d: 'M78,50 H88', sw: 4 },
-    { t: 'c', cx: 50, cy: 50, r: 5, sw: 3, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 38, sw: 5 },
+    { t: 'p', d: 'M50,12 V24', sw: 5 },
+    { t: 'p', d: 'M50,76 V88', sw: 5 },
+    { t: 'p', d: 'M12,50 H24', sw: 5 },
+    { t: 'p', d: 'M76,50 H88', sw: 5 },
+    { t: 'c', cx: 50, cy: 50, r: 14, sw: 4 },
+    { t: 'c', cx: 50, cy: 50, r: 4,  sw: 3, fill: true },
   ],
-  // ── 4  ACE CARD ───────────────────────────────────────────────────────────────
+
+  // ── 4  ACE CARD — DIAMOND MONOGRAM ───────────────────────────────────────────
+  // Bold diamond + horizontal bar. Casino brand mark, not a playing card.
   4: [
-    { t: 'p', d: 'M24,10 Q24,8 26,8 L74,8 Q76,8 76,10 L76,90 Q76,92 74,92 L26,92 Q24,92 24,90 Z', sw: 3.5 },
-    { t: 'txt', x: 50, y: 58, text: 'A', size: 38 },
+    { t: 'p', d: 'M50,8 L86,50 L50,92 L14,50 Z', sw: 5.5 },
+    { t: 'p', d: 'M28,50 H72', sw: 5 },
   ],
-  // ── 5  DICE STACK ─────────────────────────────────────────────────────────────
+
+  // ── 5  DICE — DOUBLE DIAMOND ──────────────────────────────────────────────────
+  // Two stacked rotated squares. Abstract luck geometry.
   5: [
-    { t: 'p', d: 'M14,14 Q14,11 17,11 L57,11 Q60,11 60,14 L60,54 Q60,57 57,57 L17,57 Q14,57 14,54 Z', sw: 3.5 },
-    { t: 'p', d: 'M40,40 Q40,37 43,37 L83,37 Q86,37 86,40 L86,80 Q86,83 83,83 L43,83 Q40,83 40,80 Z', sw: 3.5 },
-    { t: 'c', cx: 24, cy: 34, r: 3.5, sw: 2, fill: true },
-    { t: 'c', cx: 50, cy: 22, r: 3.5, sw: 2, fill: true },
-    { t: 'c', cx: 56, cy: 70, r: 3.5, sw: 2, fill: true },
-    { t: 'c', cx: 63, cy: 62, r: 3.5, sw: 2, fill: true },
-    { t: 'c', cx: 70, cy: 54, r: 3.5, sw: 2, fill: true },
+    { t: 'p', d: 'M50,8 L78,36 L50,64 L22,36 Z', sw: 5 },
+    { t: 'p', d: 'M50,36 L78,64 L50,92 L22,64 Z', sw: 5 },
+    { t: 'c', cx: 50, cy: 36, r: 4, sw: 3, fill: true },
+    { t: 'c', cx: 50, cy: 64, r: 4, sw: 3, fill: true },
   ],
-  // ── 6  MOON PHASE ─────────────────────────────────────────────────────────────
+
+  // ── 6  MOON PHASE — BOLD CRESCENT ────────────────────────────────────────────
+  // Filled crescent arc. Mysterious. Reads like a premium brand mark.
   6: [
-    { t: 'p', d: 'M50,12 C76,12 88,28 88,50 C88,72 76,88 50,88 C62,80 70,66 70,50 C70,34 62,20 50,12 Z', sw: 4 },
-    { t: 'c', cx: 72, cy: 26, r: 4, sw: 2.5, fill: true },
-    { t: 'c', cx: 80, cy: 40, r: 3, sw: 2,   fill: true },
-    { t: 'c', cx: 80, cy: 62, r: 3.5, sw: 2, fill: true },
+    { t: 'p', d: 'M30,12 C62,12 80,28 80,50 C80,72 62,88 30,88 C48,80 62,66 62,50 C62,34 48,20 30,12 Z', sw: 4.5, fill: true },
+    { t: 'c', cx: 72, cy: 28, r: 4.5, sw: 3, fill: true },
+    { t: 'c', cx: 82, cy: 46, r: 3.5, sw: 2.5, fill: true },
   ],
-  // ── 7  FIRE ───────────────────────────────────────────────────────────────────
+
+  // ── 7  FIRE — TRIPLE FLAME CREST ─────────────────────────────────────────────
+  // Three angular spikes from a base line. Sharp crest, not cartoon flame.
   7: [
-    { t: 'p', d: 'M50,88 C28,84 16,64 22,50 C18,60 26,54 28,46 C22,56 30,50 34,40 C28,30 40,18 50,10 C60,18 72,30 66,40 C70,50 78,56 72,46 C78,64 72,84 50,88 Z', sw: 3.5, fill: true },
-    { t: 'p', d: 'M50,75 C38,72 32,60 36,52 C38,58 44,56 46,50 C50,58 54,62 50,75 Z', sw: 2.5, fill: true },
+    { t: 'p', d: 'M14,82 H86', sw: 5 },
+    { t: 'p', d: 'M50,82 L50,18', sw: 6 },
+    { t: 'p', d: 'M22,82 L38,34', sw: 5 },
+    { t: 'p', d: 'M78,82 L62,34', sw: 5 },
   ],
-  // ── 8  CROWN — heraldic VIP insignia ─────────────────────────────────────────
-  // 3 sharp angular spikes from a clean base line · architectural, not cartoonish
+
+  // ── 8  CROWN — SKYLINE INSIGNIA ───────────────────────────────────────────────
+  // Five vertical spikes of different heights from a base line.
+  // Reads as a crown at any size. Architectural. VIP.
   8: [
-    { t: 'p', d: 'M10,78 H90', sw: 4.5 },
-    { t: 'p', d: 'M10,78 L28,46', sw: 4 },
-    { t: 'p', d: 'M50,78 L50,20', sw: 4 },
-    { t: 'p', d: 'M90,78 L72,46', sw: 4 },
-    { t: 'p', d: 'M28,46 L40,60', sw: 3.5 },
-    { t: 'p', d: 'M72,46 L60,60', sw: 3.5 },
+    { t: 'p', d: 'M10,80 H90', sw: 5.5 },
+    { t: 'p', d: 'M20,80 V58', sw: 5 },
+    { t: 'p', d: 'M35,80 V42', sw: 5 },
+    { t: 'p', d: 'M50,80 V22', sw: 5 },
+    { t: 'p', d: 'M65,80 V42', sw: 5 },
+    { t: 'p', d: 'M80,80 V58', sw: 5 },
   ],
-  // ── 9  NEON PALM — Miami luxury silhouette ────────────────────────────────────
-  // Curved trunk + 4 elegant frond arcs from crown point — neon sign minimal
+
+  // ── 9  NEON PALM — RADIANT ARCS ──────────────────────────────────────────────
+  // Five elegant arcs fanning from a base point. Miami resort emblem.
   9: [
-    { t: 'p', d: 'M50,92 C48,72 46,54 50,26', sw: 4 },
-    { t: 'p', d: 'M50,26 C38,12 16,10 8,6',   sw: 3.5 },
-    { t: 'p', d: 'M50,26 C62,12 84,10 92,6',   sw: 3.5 },
-    { t: 'p', d: 'M50,38 C36,26 18,28 10,32',  sw: 3 },
-    { t: 'p', d: 'M50,38 C64,26 82,28 90,32',  sw: 3 },
+    { t: 'p', d: 'M50,78 C42,58 18,36 8,12',  sw: 4.5 },
+    { t: 'p', d: 'M50,78 C48,56 28,28 22,8',  sw: 4.5 },
+    { t: 'p', d: 'M50,78 C50,54 50,28 50,8',  sw: 5.5 },
+    { t: 'p', d: 'M50,78 C52,56 72,28 78,8',  sw: 4.5 },
+    { t: 'p', d: 'M50,78 C58,58 82,36 92,12', sw: 4.5 },
+    { t: 'p', d: 'M32,90 C40,84 60,84 68,90', sw: 4 },
   ],
-  // ── 10 CASSETTE ───────────────────────────────────────────────────────────────
+
+  // ── 10 CASSETTE — RETRO TECH EMBLEM ──────────────────────────────────────────
+  // Bold rectangle frame + two reel circles + hub dots.
   10: [
-    { t: 'p', d: 'M11,25 Q9,25 9,27 L9,73 Q9,75 11,75 L89,75 Q91,75 91,73 L91,27 Q91,25 89,25 Z', sw: 3.5 },
-    { t: 'c', cx: 34, cy: 51, r: 13, sw: 3 },
-    { t: 'c', cx: 66, cy: 51, r: 13, sw: 3 },
-    { t: 'c', cx: 34, cy: 51, r: 5,  sw: 2.5 },
-    { t: 'c', cx: 66, cy: 51, r: 5,  sw: 2.5 },
-    { t: 'p', d: 'M14,30 H86', sw: 2.5 },
-    { t: 'p', d: 'M47,47 H53 L53,55 H47 Z', sw: 2 },
+    { t: 'p', d: 'M8,24 H92 V76 H8 Z', sw: 5 },
+    { t: 'c', cx: 32, cy: 50, r: 14, sw: 4.5 },
+    { t: 'c', cx: 68, cy: 50, r: 14, sw: 4.5 },
+    { t: 'c', cx: 32, cy: 50, r: 5,  sw: 3.5, fill: true },
+    { t: 'c', cx: 68, cy: 50, r: 5,  sw: 3.5, fill: true },
   ],
-  // ── 11 FLAMINGO ───────────────────────────────────────────────────────────────
+
+  // ── 11 FLAMINGO — S-CURVE MARK ───────────────────────────────────────────────
+  // Single bold S-curve. Abstract bird. Pure elegant line.
   11: [
-    { t: 'p', d: 'M50,14 C58,14 65,20 65,30 C65,42 55,48 50,56 C45,48 35,42 35,30 C35,20 42,14 50,14 Z', sw: 3.5 },
-    { t: 'p', d: 'M50,56 C52,68 60,76 55,88', sw: 3 },
-    { t: 'p', d: 'M50,56 C48,68 40,76 45,88', sw: 3 },
-    { t: 'p', d: 'M45,88 H55', sw: 2.5 },
-    { t: 'c', cx: 50, cy: 30, r: 8, sw: 3 },
+    { t: 'p', d: 'M55,88 C55,70 72,62 74,48 C76,34 60,24 56,12 C54,6 58,2 62,4', sw: 6 },
+    { t: 'p', d: 'M28,90 C36,82 55,82 55,88', sw: 4.5 },
+    { t: 'c', cx: 62, cy: 4, r: 4, sw: 3, fill: true },
   ],
-  // ── 12 CHAMPAGNE ──────────────────────────────────────────────────────────────
+
+  // ── 12 CHAMPAGNE — CELEBRATION MARK ──────────────────────────────────────────
+  // Flute silhouette + 3 bubble arcs. Luxury celebration crest.
   12: [
-    { t: 'p', d: 'M38,88 H62 M50,88 V60 M32,60 H68 M38,60 C30,40 28,24 32,10 M62,60 C70,40 72,24 68,10 M32,10 H68', sw: 3 },
-    { t: 'c', cx: 60, cy: 22, r: 5, sw: 2.5, fill: true },
-    { t: 'c', cx: 65, cy: 34, r: 4, sw: 2,   fill: true },
-    { t: 'c', cx: 55, cy: 14, r: 3, sw: 2,   fill: true },
+    { t: 'p', d: 'M38,88 H62', sw: 5 },
+    { t: 'p', d: 'M42,88 C36,72 34,52 38,28 H62 C66,52 64,72 58,88', sw: 4.5 },
+    { t: 'p', d: 'M62,28 C68,16 74,8 72,4', sw: 4 },
+    { t: 'p', d: 'M62,28 C72,20 80,18 82,12', sw: 3.5 },
+    { t: 'p', d: 'M62,28 C74,30 82,38 84,44', sw: 3.5 },
+    { t: 'c', cx: 72, cy: 4,  r: 3.5, sw: 2.5, fill: true },
+    { t: 'c', cx: 84, cy: 10, r: 3,   sw: 2.5, fill: true },
+    { t: 'c', cx: 86, cy: 44, r: 3,   sw: 2.5, fill: true },
   ],
-  // ── 13 SHARK FIN ──────────────────────────────────────────────────────────────
+
+  // ── 13 SHARK FIN — CUT MARK ───────────────────────────────────────────────────
+  // Bold angular fin silhouette above a clean horizon. Aggressive emblem.
   13: [
-    { t: 'p', d: 'M8,72 C20,72 30,60 38,40 C44,24 48,14 52,10 C56,14 62,28 68,50 C72,64 78,72 92,72', sw: 4 },
-    { t: 'p', d: 'M8,72 H92', sw: 3 },
-    { t: 'p', d: 'M8,78 H92', sw: 2.5 },
-    { t: 'p', d: 'M8,84 H92', sw: 2 },
+    { t: 'p', d: 'M12,68 C26,68 36,52 44,32 C48,20 52,10 56,8 C60,12 68,34 76,56 C80,66 86,68 88,68', sw: 5.5 },
+    { t: 'p', d: 'M8,68 H92', sw: 5 },
   ],
-  // ── 14 NEON ROSE ──────────────────────────────────────────────────────────────
+
+  // ── 14 NEON ROSE — RADIAL MARK ───────────────────────────────────────────────
+  // 8 bold radial strokes from center. Abstract bloom. Pure geometric identity.
   14: [
-    { t: 'p', d: 'M50,50 C50,50 38,44 32,34 C26,24 30,10 42,12 C46,14 48,18 50,24 C52,18 54,14 58,12 C70,10 74,24 68,34 C62,44 50,50 50,50 Z', sw: 3, fill: true },
-    { t: 'p', d: 'M50,50 C50,50 36,56 28,66 C20,76 22,90 34,88 C40,86 44,82 46,76 M50,50 C50,50 64,56 72,66 C80,76 78,90 66,88 C60,86 56,82 54,76', sw: 3, fill: true },
-    { t: 'p', d: 'M50,50 V90', sw: 2.5 },
-    { t: 'p', d: 'M44,70 C40,68 36,70 34,72', sw: 2 },
-    { t: 'p', d: 'M56,70 C60,68 64,70 66,72', sw: 2 },
+    { t: 'p', d: 'M50,14 V86', sw: 5 },
+    { t: 'p', d: 'M14,50 H86', sw: 5 },
+    { t: 'p', d: 'M22,22 L78,78', sw: 4.5 },
+    { t: 'p', d: 'M78,22 L22,78', sw: 4.5 },
+    { t: 'c', cx: 50, cy: 50, r: 10, sw: 4, fill: true },
   ],
-  // ── 15 EIGHT BALL ─────────────────────────────────────────────────────────────
+
+  // ── 15 EIGHT BALL — TARGET MARK ───────────────────────────────────────────────
+  // Large circle + filled center + 8 numeral. Bold, reads instantly.
   15: [
-    { t: 'c', cx: 50, cy: 50, r: 40, sw: 3.5 },
-    { t: 'c', cx: 50, cy: 50, r: 18, sw: 2.5 },
-    { t: 'txt', x: 50, y: 58, text: '8', size: 22 },
+    { t: 'c', cx: 50, cy: 50, r: 38, sw: 5 },
+    { t: 'c', cx: 50, cy: 50, r: 20, sw: 4, fill: true },
+    { t: 'txt', x: 50, y: 57, text: '8', size: 22 },
   ],
-  // ── 16 ANCHOR ─────────────────────────────────────────────────────────────────
+
+  // ── 16 ANCHOR — MARITIME CREST ────────────────────────────────────────────────
+  // Bold T-crossbar + vertical shaft + ring + curved arms. Iconic minimal.
   16: [
-    { t: 'c', cx: 50, cy: 22, r: 10, sw: 3 },
-    { t: 'p', d: 'M50,32 V82', sw: 3.5 },
-    { t: 'p', d: 'M30,50 H70', sw: 3 },
-    { t: 'p', d: 'M22,82 C22,68 36,68 50,82 C64,68 78,68 78,82', sw: 3 },
+    { t: 'p', d: 'M28,22 H72', sw: 5.5 },
+    { t: 'p', d: 'M50,22 V84', sw: 5.5 },
+    { t: 'p', d: 'M20,84 C20,64 34,62 50,84 C66,62 80,64 80,84', sw: 5 },
+    { t: 'c', cx: 50, cy: 30, r: 9,  sw: 4.5 },
   ],
-  // ── 17 SUNSET GRID ────────────────────────────────────────────────────────────
+
+  // ── 17 SUNSET GRID — RETRO PERSPECTIVE ───────────────────────────────────────
+  // Vanishing point above horizon lines. Synthwave landscape compressed to a mark.
   17: [
-    { t: 'p', d: 'M8,55 H92', sw: 2.5 }, { t: 'p', d: 'M8,65 H92', sw: 2.5 },
-    { t: 'p', d: 'M8,75 H92', sw: 2.5 }, { t: 'p', d: 'M8,85 H92', sw: 2.5 },
-    { t: 'p', d: 'M20,55 L14,92', sw: 2 }, { t: 'p', d: 'M33,55 L27,92', sw: 2 },
-    { t: 'p', d: 'M50,55 L50,92', sw: 2 }, { t: 'p', d: 'M67,55 L73,92', sw: 2 },
-    { t: 'p', d: 'M80,55 L86,92', sw: 2 },
-    { t: 'p', d: 'M50,8 C30,8 8,30 8,55 C22,45 38,40 50,40 C62,40 78,45 92,55 C92,30 70,8 50,8 Z', sw: 3.5, fill: true },
+    { t: 'p', d: 'M8,52 H92', sw: 5 },
+    { t: 'p', d: 'M8,66 H92', sw: 3.5 },
+    { t: 'p', d: 'M8,80 H92', sw: 3 },
+    { t: 'p', d: 'M50,10 L8,52',  sw: 4 },
+    { t: 'p', d: 'M50,10 L28,52', sw: 3.5 },
+    { t: 'p', d: 'M50,10 L50,52', sw: 3.5 },
+    { t: 'p', d: 'M50,10 L72,52', sw: 3.5 },
+    { t: 'p', d: 'M50,10 L92,52', sw: 4 },
+    { t: 'c', cx: 50, cy: 10, r: 5, sw: 3.5, fill: true },
   ],
-  // ── 18 SNAKE ──────────────────────────────────────────────────────────────────
+
+  // ── 18 SNAKE — S-MARK ─────────────────────────────────────────────────────────
+  // Bold S-curve + coiled tail. Sinuous threat. Pure abstract power.
   18: [
-    { t: 'p', d: 'M50,10 C70,10 82,24 80,40 C78,56 60,60 50,70 C40,80 36,92 50,92 C64,92 72,82 72,72', sw: 3.5 },
-    { t: 'p', d: 'M42,10 C42,14 46,16 50,16 C54,16 58,14 58,10', sw: 2.5 },
-    { t: 'p', d: 'M44,8 L46,4 M56,8 L54,4', sw: 2.5 },
-    { t: 'c', cx: 44, cy: 18, r: 2.5, sw: 2, fill: true },
-    { t: 'c', cx: 56, cy: 18, r: 2.5, sw: 2, fill: true },
+    { t: 'p', d: 'M26,86 C26,64 74,60 74,42 C74,24 26,20 26,8', sw: 6.5 },
+    { t: 'c', cx: 26, cy: 86, r: 7, sw: 4.5 },
+    { t: 'p', d: 'M18,6 C22,2 30,2 34,6', sw: 4 },
   ],
-  // ── 19 KATANA ─────────────────────────────────────────────────────────────────
+
+  // ── 19 KATANA — BLADE MARK ────────────────────────────────────────────────────
+  // Long diagonal blade + short perpendicular guard. Weapon geometry, nothing more.
   19: [
-    { t: 'p', d: 'M18,82 L78,22', sw: 4 },
-    { t: 'p', d: 'M78,22 L82,14 L90,10 L86,18 L78,22 Z', sw: 3, fill: true },
-    { t: 'p', d: 'M18,82 L12,86 L10,92 L16,90 L18,82 Z', sw: 2.5 },
-    { t: 'p', d: 'M28,72 L34,66', sw: 5 },
-    { t: 'p', d: 'M22,78 L28,72', sw: 2 },
+    { t: 'p', d: 'M18,86 L82,14', sw: 5.5 },
+    { t: 'p', d: 'M30,74 L50,56', sw: 9 },
+    { t: 'c', cx: 82, cy: 14, r: 4.5, sw: 3.5, fill: true },
+    { t: 'c', cx: 18, cy: 86, r: 4,   sw: 3, fill: true },
   ],
-  // ── 20 SKULL ──────────────────────────────────────────────────────────────────
+
+  // ── 20 SKULL — DEATH MARK ─────────────────────────────────────────────────────
+  // Bold dome arch + two filled eye circles + jaw bar. Reads at any size.
   20: [
-    { t: 'p', d: 'M20,54 C20,34 34,16 50,16 C66,16 80,34 80,54 C80,68 74,78 66,82 L66,90 H34 L34,82 C26,78 20,68 20,54 Z', sw: 3.5 },
-    { t: 'c', cx: 37, cy: 50, r: 10, sw: 3 },
-    { t: 'c', cx: 63, cy: 50, r: 10, sw: 3 },
-    { t: 'p', d: 'M42,82 V90 M50,82 V90 M58,82 V90', sw: 2.5 },
-    { t: 'p', d: 'M40,68 C42,72 46,74 50,74 C54,74 58,72 60,68', sw: 2.5 },
+    { t: 'p', d: 'M18,56 C18,30 34,12 50,12 C66,12 82,30 82,56 C82,68 76,78 66,82 L66,90 H34 L34,82 C24,78 18,68 18,56 Z', sw: 5 },
+    { t: 'c', cx: 36, cy: 50, r: 10, sw: 4, fill: true },
+    { t: 'c', cx: 64, cy: 50, r: 10, sw: 4, fill: true },
+    { t: 'p', d: 'M40,82 V90 M50,82 V90 M60,82 V90', sw: 4.5 },
   ],
-  // ── 21 SATURN ─────────────────────────────────────────────────────────────────
+
+  // ── 21 SATURN — PLANET RING ───────────────────────────────────────────────────
+  // Bold planet circle + angled ring arc cutting through it. Space emblem.
   21: [
-    { t: 'c', cx: 50, cy: 50, r: 22, sw: 3.5 },
-    { t: 'p', d: 'M10,32 C18,16 82,84 90,68', sw: 3.5 },
-    { t: 'c', cx: 50, cy: 50, r: 6,  sw: 2.5 },
+    { t: 'c', cx: 50, cy: 50, r: 24, sw: 5.5 },
+    { t: 'p', d: 'M6,34 C20,18 80,80 94,64', sw: 5.5 },
   ],
-  // ── 22 VINYL RECORD ───────────────────────────────────────────────────────────
+
+  // ── 22 VINYL — GROOVE MARK ────────────────────────────────────────────────────
+  // Three concentric rings + filled center dot. Music prestige emblem.
   22: [
-    { t: 'c', cx: 50, cy: 50, r: 40, sw: 3.5 },
-    { t: 'c', cx: 50, cy: 50, r: 30, sw: 2 },
-    { t: 'c', cx: 50, cy: 50, r: 20, sw: 2 },
-    { t: 'c', cx: 50, cy: 50, r: 10, sw: 2 },
-    { t: 'c', cx: 50, cy: 50, r: 5,  sw: 2.5, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 40, sw: 5 },
+    { t: 'c', cx: 50, cy: 50, r: 26, sw: 4 },
+    { t: 'c', cx: 50, cy: 50, r: 13, sw: 3.5 },
+    { t: 'c', cx: 50, cy: 50, r: 5,  sw: 3.5, fill: true },
   ],
-  // ── 23 SPORTS CAR ─────────────────────────────────────────────────────────────
+
+  // ── 23 SPORTS CAR — SPEED WEDGE ──────────────────────────────────────────────
+  // Low horizontal wedge silhouette + two wheel circles. Racing insignia.
   23: [
-    { t: 'p', d: 'M6,62 L6,54 L24,38 L66,34 L86,42 L94,54 L94,66 L6,66 Z', sw: 3.5 },
-    { t: 'p', d: 'M24,38 L30,22 L62,22 L66,34', sw: 2.5 },
-    { t: 'c', cx: 26, cy: 66, r: 12, sw: 3 },
-    { t: 'c', cx: 74, cy: 66, r: 12, sw: 3 },
-    { t: 'c', cx: 26, cy: 66, r: 5,  sw: 2, fill: true },
-    { t: 'c', cx: 74, cy: 66, r: 5,  sw: 2, fill: true },
-    { t: 'p', d: 'M38,66 H62', sw: 2 },
+    { t: 'p', d: 'M4,62 L22,36 L88,36 L96,62 Z', sw: 5 },
+    { t: 'c', cx: 26, cy: 68, r: 13, sw: 5 },
+    { t: 'c', cx: 74, cy: 68, r: 13, sw: 5 },
+    { t: 'c', cx: 26, cy: 68, r: 5,  sw: 3.5, fill: true },
+    { t: 'c', cx: 74, cy: 68, r: 5,  sw: 3.5, fill: true },
   ],
-  // ── 24 SCORPION ───────────────────────────────────────────────────────────────
+
+  // ── 24 SCORPION — STING MARK ──────────────────────────────────────────────────
+  // Curved body + arched tail + stinger tip. Abstract threat crest.
   24: [
-    { t: 'p', d: 'M50,42 C42,38 30,38 22,44 C14,50 12,60 18,66 C24,72 34,72 40,68', sw: 3 },
-    { t: 'p', d: 'M50,42 C58,38 70,38 78,44 C86,50 88,60 82,66 C76,72 66,72 60,68', sw: 3 },
-    { t: 'p', d: 'M40,68 C38,76 40,82 46,86 C50,88 54,86 58,82 C62,76 64,70 60,68', sw: 3 },
-    { t: 'p', d: 'M58,82 C60,76 64,68 68,58 C72,48 72,38 68,30', sw: 2.5 },
-    { t: 'p', d: 'M68,30 C66,24 62,22 64,16 C66,12 70,14 72,10', sw: 2.5 },
-    { t: 'p', d: 'M38,52 L28,46 M38,58 L28,62', sw: 2 },
-    { t: 'p', d: 'M62,52 L72,46 M62,58 L72,62', sw: 2 },
-    { t: 'c', cx: 50, cy: 42, r: 8, sw: 2.5 },
-    { t: 'c', cx: 44, cy: 38, r: 2.5, sw: 2, fill: true },
-    { t: 'c', cx: 56, cy: 38, r: 2.5, sw: 2, fill: true },
+    { t: 'p', d: 'M18,72 C18,50 30,38 50,36 C70,34 82,46 82,58 C82,70 72,76 60,70', sw: 5 },
+    { t: 'p', d: 'M60,70 C56,58 62,46 70,38 C76,32 78,22 72,12', sw: 4.5 },
+    { t: 'p', d: 'M72,12 L68,20', sw: 5 },
+    { t: 'c', cx: 50, cy: 36, r: 6.5, sw: 4, fill: true },
   ],
-  // ── 25 DRAGON ─────────────────────────────────────────────────────────────────
+
+  // ── 25 DRAGON — WING MARK ─────────────────────────────────────────────────────
+  // Two bold wing arcs sweeping down from a crown point. Power emblem.
   25: [
-    { t: 'p', d: 'M50,82 C36,82 22,72 16,60 C10,48 14,34 22,28 C28,24 36,24 42,28 C40,34 40,42 44,48 C46,52 48,54 50,54 C52,54 54,52 56,48 C60,42 60,34 58,28 C64,24 72,24 78,28 C86,34 90,48 84,60 C78,72 64,82 50,82 Z', sw: 3.5 },
-    { t: 'c', cx: 38, cy: 36, r: 5, sw: 2.5 },
-    { t: 'c', cx: 62, cy: 36, r: 5, sw: 2.5 },
-    { t: 'p', d: 'M30,28 C28,20 24,14 20,10 M70,28 C72,20 76,14 80,10', sw: 2.5 },
-    { t: 'p', d: 'M44,48 C42,60 44,70 50,74 C56,70 58,60 56,48', sw: 2, fill: true },
+    { t: 'p', d: 'M50,18 L14,56 C8,70 14,82 28,80 C38,78 46,70 50,58', sw: 5.5 },
+    { t: 'p', d: 'M50,18 L86,56 C92,70 86,82 72,80 C62,78 54,70 50,58', sw: 5.5 },
+    { t: 'p', d: 'M50,18 V8', sw: 5 },
+    { t: 'c', cx: 50, cy: 58, r: 6, sw: 4, fill: true },
+    { t: 'c', cx: 50, cy: 8,  r: 5, sw: 3.5, fill: true },
   ],
-  // ── 26 HOURGLASS ──────────────────────────────────────────────────────────────
+
+  // ── 26 HOURGLASS — TIME MARK ──────────────────────────────────────────────────
+  // Two bold triangles point-to-point. Clean. Geometric. Inevitable.
   26: [
-    { t: 'p', d: 'M18,10 H82 L50,50 L82,90 H18 L50,50 Z', sw: 3.5 },
-    { t: 'p', d: 'M18,10 H82', sw: 2.5 },
-    { t: 'p', d: 'M18,90 H82', sw: 2.5 },
-    { t: 'p', d: 'M22,18 C30,22 40,28 50,50 C60,28 70,22 78,18', sw: 2, fill: true },
+    { t: 'p', d: 'M12,8 H88 L50,50 L88,92 H12 L50,50 Z', sw: 5.5 },
   ],
-  // ── 27 STARBURST ──────────────────────────────────────────────────────────────
+
+  // ── 27 STARBURST — PRESTIGE MARK ─────────────────────────────────────────────
+  // Bold 8-point star + center jewel. Achievement emblem.
   27: [
-    { t: 'p', d: 'M50,8 L56,36 L82,18 L64,43 L94,50 L64,57 L82,82 L56,64 L50,92 L44,64 L18,82 L36,57 L6,50 L36,43 L18,18 L44,36 Z', sw: 4 },
-    { t: 'c', cx: 50, cy: 50, r: 10, sw: 3, fill: true },
+    { t: 'p', d: 'M50,8 L58,38 L86,20 L68,46 L94,50 L68,54 L86,80 L58,62 L50,92 L42,62 L14,80 L32,54 L6,50 L32,46 L14,20 L42,38 Z', sw: 4.5 },
+    { t: 'c', cx: 50, cy: 50, r: 9, sw: 4, fill: true },
   ],
-  // ── 28 TIGER EYE ──────────────────────────────────────────────────────────────
+
+  // ── 28 TIGER EYE — EYE MARK ───────────────────────────────────────────────────
+  // Bold almond eye outline + filled vertical slit pupil. Predator emblem.
   28: [
-    { t: 'p', d: 'M10,50 C14,28 30,14 50,14 C70,14 86,28 90,50 C86,72 70,86 50,86 C30,86 14,72 10,50 Z', sw: 3.5 },
-    { t: 'c', cx: 50, cy: 50, r: 22, sw: 3 },
-    { t: 'p', d: 'M50,28 C54,36 54,64 50,72 C46,64 46,36 50,28 Z', sw: 4, fill: true },
+    { t: 'p', d: 'M6,50 C20,20 80,20 94,50 C80,80 20,80 6,50 Z', sw: 5.5 },
+    { t: 'p', d: 'M50,24 C54,34 54,66 50,76 C46,66 46,34 50,24 Z', sw: 5, fill: true },
   ],
-  // ── 29 WOLF HEAD ──────────────────────────────────────────────────────────────
+
+  // ── 29 WOLF HEAD — PACK MARK ──────────────────────────────────────────────────
+  // Bold angular head polygon + ear spikes + two filled eye circles.
   29: [
-    { t: 'p', d: 'M50,12 L30,24 L22,52 L30,72 L50,85 L70,72 L78,52 L70,24 Z', sw: 3.5 },
-    { t: 'p', d: 'M30,24 L22,8 L40,18', sw: 3 },
-    { t: 'p', d: 'M70,24 L78,8 L60,18', sw: 3 },
-    { t: 'p', d: 'M36,42 L40,38 L44,42 L40,46 Z', sw: 3 },
-    { t: 'p', d: 'M56,42 L60,38 L64,42 L60,46 Z', sw: 3 },
-    { t: 'p', d: 'M46,60 L50,54 L54,60 C54,65 46,65 46,60 Z', sw: 2.5 },
-    { t: 'p', d: 'M36,66 C40,72 46,76 50,76 C54,76 60,72 64,66', sw: 2.5 },
+    { t: 'p', d: 'M50,10 L28,22 L18,54 L28,76 L50,88 L72,76 L82,54 L72,22 Z', sw: 5 },
+    { t: 'p', d: 'M28,22 L16,4 L36,16',  sw: 5 },
+    { t: 'p', d: 'M72,22 L84,4 L64,16',  sw: 5 },
+    { t: 'c', cx: 37, cy: 48, r: 8, sw: 4, fill: true },
+    { t: 'c', cx: 63, cy: 48, r: 8, sw: 4, fill: true },
   ],
-  // ── 30 CHERRY ─────────────────────────────────────────────────────────────────
+
+  // ── 30 CHERRY — TWIN DOT MARK ─────────────────────────────────────────────────
+  // Two bold filled circles + stems. Maximalist simplicity. Reads at 16px.
   30: [
-    { t: 'c', cx: 36, cy: 64, r: 18, sw: 3.5, fill: true },
-    { t: 'c', cx: 64, cy: 68, r: 18, sw: 3.5, fill: true },
-    { t: 'p', d: 'M36,46 C40,30 52,20 56,10', sw: 3 },
-    { t: 'p', d: 'M64,50 C62,36 58,24 56,10', sw: 3 },
-    { t: 'p', d: 'M36,46 C44,40 54,42 64,50', sw: 2.5 },
-    { t: 'c', cx: 56, cy: 10, r: 4, sw: 2.5, fill: true },
+    { t: 'c', cx: 32, cy: 66, r: 20, sw: 5, fill: true },
+    { t: 'c', cx: 68, cy: 70, r: 20, sw: 5, fill: true },
+    { t: 'p', d: 'M32,46 C34,28 48,18 52,8', sw: 4.5 },
+    { t: 'p', d: 'M68,50 C66,32 58,20 52,8', sw: 4.5 },
+    { t: 'p', d: 'M32,46 C42,40 58,42 68,50', sw: 4 },
   ],
 };
 
