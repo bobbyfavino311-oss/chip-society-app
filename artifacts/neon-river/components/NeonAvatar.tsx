@@ -1,10 +1,10 @@
-// ─── NeonAvatar — official reference image sprite sheet ───────────────────────
-// Crops the exact symbol from the approved 1536×1024 master sheet.
-// Each icon is a square crop centered within its grid cell — no neighboring art.
+// ─── NeonAvatar — 30 individual avatar PNGs ───────────────────────────────────
+// Each avatar is a separate 1024×1024 PNG cropped from the official reference
+// image using ImageMagick. Full symbol, perfectly centered, no clipping.
+// resizeMode="contain" ensures the whole badge is always visible.
 
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
-import { Animated, Image, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
   getNeonAvatar,
@@ -20,44 +20,40 @@ export interface NeonAvatarProps {
   style?: object;
 }
 
-// ─── Sprite-sheet constants ────────────────────────────────────────────────────
-// Source image: 1536 × 1024 px, 6 columns × 5 rows = 30 avatars
-const SPRITE = require('@/assets/images/neon-avatars.png');
-const IMG_W  = 1536;
-const IMG_H  = 1024;
-const COLS   = 6;
-const ROWS   = 5;
-const CELL_W = IMG_W / COLS;                // 256 px wide per cell
-const CELL_H = IMG_H / ROWS;                // 204.8 px tall per cell
-// Square crop: use the shorter dimension, centred horizontally in the wider cell
-const CROP_SIDE = CELL_H;                   // 204.8 px — the crop square side
-const CROP_X0   = (CELL_W - CROP_SIDE) / 2; // 25.6 px — horizontal offset to centre
-
-// ─── Sprite renderer ───────────────────────────────────────────────────────────
-// Clips a CROP_SIDE × CROP_SIDE region from the sheet for avatar `id`.
-// The clipped region maps to a perfectly square display of `size × size`.
-function SpriteAvatar({ id, size }: { id: number; size: number }) {
-  const idx  = Math.max(0, Math.min(29, id - 1));
-  const col  = idx % COLS;
-  const row  = Math.floor(idx / COLS);
-
-  // Scale so the square crop fills the display size exactly
-  const scale = size / CROP_SIDE;
-  const imgW  = IMG_W * scale;
-  const imgH  = IMG_H * scale;
-
-  // Offset: scroll the full image so the correct crop cell starts at (0, 0)
-  const left = -(col * CELL_W + CROP_X0) * scale;
-  const top  = -(row * CELL_H) * scale;
-
-  return (
-    <Image
-      source={SPRITE}
-      style={{ position: 'absolute', width: imgW, height: imgH, left, top }}
-      resizeMode="cover"
-    />
-  );
-}
+// ─── Static asset map ─────────────────────────────────────────────────────────
+// React Native requires static require() calls — no dynamic expressions.
+const AVATAR_IMAGES: Record<number, ImageSourcePropType> = {
+  1:  require('@/assets/avatars/avatar_1.png'),
+  2:  require('@/assets/avatars/avatar_2.png'),
+  3:  require('@/assets/avatars/avatar_3.png'),
+  4:  require('@/assets/avatars/avatar_4.png'),
+  5:  require('@/assets/avatars/avatar_5.png'),
+  6:  require('@/assets/avatars/avatar_6.png'),
+  7:  require('@/assets/avatars/avatar_7.png'),
+  8:  require('@/assets/avatars/avatar_8.png'),
+  9:  require('@/assets/avatars/avatar_9.png'),
+  10: require('@/assets/avatars/avatar_10.png'),
+  11: require('@/assets/avatars/avatar_11.png'),
+  12: require('@/assets/avatars/avatar_12.png'),
+  13: require('@/assets/avatars/avatar_13.png'),
+  14: require('@/assets/avatars/avatar_14.png'),
+  15: require('@/assets/avatars/avatar_15.png'),
+  16: require('@/assets/avatars/avatar_16.png'),
+  17: require('@/assets/avatars/avatar_17.png'),
+  18: require('@/assets/avatars/avatar_18.png'),
+  19: require('@/assets/avatars/avatar_19.png'),
+  20: require('@/assets/avatars/avatar_20.png'),
+  21: require('@/assets/avatars/avatar_21.png'),
+  22: require('@/assets/avatars/avatar_22.png'),
+  23: require('@/assets/avatars/avatar_23.png'),
+  24: require('@/assets/avatars/avatar_24.png'),
+  25: require('@/assets/avatars/avatar_25.png'),
+  26: require('@/assets/avatars/avatar_26.png'),
+  27: require('@/assets/avatars/avatar_27.png'),
+  28: require('@/assets/avatars/avatar_28.png'),
+  29: require('@/assets/avatars/avatar_29.png'),
+  30: require('@/assets/avatars/avatar_30.png'),
+};
 
 // ─── Lock overlay ──────────────────────────────────────────────────────────────
 function LockOverlay({ size, color, xpLabel }: { size: number; color: string; xpLabel?: string }) {
@@ -88,6 +84,7 @@ export default function NeonAvatar({
   const avatar      = getNeonAvatar(avatarId);
   const rarityColor = NEON_RARITY_COLORS[avatar.rarity];
   const borderWidth = NEON_RARITY_BORDER[avatar.rarity];
+  const src         = AVATAR_IMAGES[avatarId] ?? AVATAR_IMAGES[1];
 
   const pulseAnim = useRef(new Animated.Value(0.6)).current;
 
@@ -108,15 +105,14 @@ export default function NeonAvatar({
   const glowOpacity = pulseAnim.interpolate({
     inputRange: [0.6, 1],
     outputRange: [
-      0.20,
-      avatar.rarity === 'LEGENDARY' ? 0.75
-        : avatar.rarity === 'EPIC'  ? 0.48
-        : 0.28,
+      0.18,
+      avatar.rarity === 'LEGENDARY' ? 0.72
+        : avatar.rarity === 'EPIC'  ? 0.44
+        : 0.26,
     ],
   });
 
-  const glowPad = avatar.rarity === 'LEGENDARY' ? 18
-    : avatar.rarity === 'EPIC' ? 12 : 0;
+  const glowPad  = avatar.rarity === 'LEGENDARY' ? 18 : avatar.rarity === 'EPIC' ? 12 : 0;
   const glowSize = size + glowPad;
 
   const xpLabel = isLocked
@@ -125,24 +121,24 @@ export default function NeonAvatar({
       : `${avatar.unlockXP} XP`
     : undefined;
 
+  const inner = size - borderWidth * 2;
+
   return (
     <View style={[{ width: size, height: size }, style]}>
 
-      {/* Outer animated glow halo — EPIC/LEGENDARY only */}
+      {/* Animated glow halo — EPIC / LEGENDARY */}
       {glowPad > 0 && (
         <Animated.View style={{
           position: 'absolute',
-          top:    -glowPad / 2,
-          left:   -glowPad / 2,
-          width:   glowSize,
-          height:  glowSize,
+          top:  -glowPad / 2, left: -glowPad / 2,
+          width: glowSize, height: glowSize,
           borderRadius: glowSize / 2,
           backgroundColor: rarityColor,
           opacity: glowOpacity,
         }} />
       )}
 
-      {/* Circular clip container */}
+      {/* Outer rarity border ring */}
       <View style={{
         width: size, height: size,
         borderRadius: size / 2,
@@ -150,20 +146,27 @@ export default function NeonAvatar({
         borderColor: isEquipped ? '#ffffff' : rarityColor,
         overflow: 'hidden',
         backgroundColor: '#050010',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
-        {/* Official sprite sheet crop */}
-        <SpriteAvatar id={avatarId} size={size - borderWidth * 2} />
+        {/* Individual avatar PNG — full symbol, contain (no cropping) */}
+        <Image
+          source={src}
+          style={{
+            width: inner,
+            height: inner,
+            opacity: isLocked ? 0.18 : 1,
+          }}
+          resizeMode="contain"
+        />
 
-        {/* Dim + lock when locked */}
+        {/* Lock overlay */}
         {isLocked && (
-          <>
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,0,16,0.55)' }]} />
-            <LockOverlay size={size} color={rarityColor} xpLabel={size >= 56 ? xpLabel : undefined} />
-          </>
+          <LockOverlay size={size} color={rarityColor} xpLabel={size >= 56 ? xpLabel : undefined} />
         )}
       </View>
 
-      {/* Equipped indicator dot — outside the clip */}
+      {/* Equipped indicator dot (outside the circular clip) */}
       {isEquipped && !isLocked && (
         <View style={[st.equippedDot, {
           width:        Math.max(8, size * 0.16),

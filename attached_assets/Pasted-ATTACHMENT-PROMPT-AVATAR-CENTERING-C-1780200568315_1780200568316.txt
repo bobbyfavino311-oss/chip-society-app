@@ -1,0 +1,159 @@
+ATTACHMENT PROMPT:
+
+===========================================================
+AVATAR CENTERING + CROPPING FIX
+===============================
+
+The avatar system is still wrong.
+
+The circular frames are centered, but the actual artwork inside the circles is NOT centered.
+
+Current issue:
+
+* symbols are cut off on the left
+* some symbols only show partial artwork
+* the Tiger Eye preview is mostly empty space
+* icons are not centered inside the circle
+* the crop is still using the wrong anchor point
+* some avatars show only the edge of the reference image instead of the full symbol
+
+This means the system is still cropping from the wrong coordinates.
+
+===========================================================
+STOP USING RANDOM IMAGE CROP POSITIONS
+======================================
+
+Do NOT crop based on circle masks alone.
+
+Do NOT crop based on visible grid position guesses.
+
+Do NOT use automatic object-fit cover if it cuts artwork off.
+
+Each avatar must be manually centered inside its circular frame.
+
+===========================================================
+CORRECT AVATAR FORMAT
+=====================
+
+Each avatar asset must contain:
+
+* one full symbol
+* centered perfectly
+* full circular border
+* full glow effect
+* equal padding on all sides
+
+The symbol should be centered both:
+
+* horizontally
+* vertically
+
+No avatar should show:
+
+* only half the symbol
+* only the left edge
+* only the right edge
+* empty dark circle
+* neighboring artwork
+* cropped glow
+
+===========================================================
+IMPLEMENTATION RULE
+===================
+
+For every avatar:
+
+1. Create a 1024x1024 transparent canvas.
+2. Place the full avatar artwork in the exact center.
+3. Scale it so the full circular badge fits inside the canvas.
+4. Leave 8–12% padding around the outside glow.
+5. Export as an individual PNG.
+6. Use that PNG directly in the app.
+
+DO NOT use CSS object-fit: cover.
+
+Use:
+object-fit: contain
+
+Do NOT crop with overflow hidden unless the source asset is already centered.
+
+===========================================================
+UI DISPLAY RULE
+===============
+
+In the app, each avatar image should use:
+
+* width: 100%
+* height: 100%
+* object-fit: contain
+* object-position: center center
+
+NOT:
+object-fit: cover
+
+NOT:
+background-position guesses
+
+NOT:
+negative offsets
+
+NOT:
+sprite-sheet cropping
+
+===========================================================
+FIX THE FEATURED AVATAR PREVIEW
+===============================
+
+The large selected avatar preview must also use the same centered asset.
+
+Current issue:
+Tiger Eye is only showing a partial left-side crop.
+
+Fix:
+
+* use the full Tiger Eye avatar image
+* center it
+* show entire circular badge
+* no clipping
+
+===========================================================
+REMOVE SPRITE SHEET CROPPING
+============================
+
+If the app is still using the reference sheet as a sprite sheet, STOP.
+
+The reference sheet should NOT be rendered directly in the UI.
+
+The app should load:
+30 separate avatar PNG files
+
+NOT:
+one sheet with crop offsets.
+
+===========================================================
+FINAL ACCEPTANCE CHECK
+======================
+
+For every avatar:
+
+* full symbol visible
+* symbol centered
+* circle centered
+* glow visible
+* no clipping
+* no neighboring symbols
+* no empty space taking over the circle
+* no partial artwork
+* same size across all avatars
+
+If even one avatar shows only half of the image, the system is still broken.
+
+===========================================================
+FINAL GOAL
+==========
+
+The avatar gallery should look like a clean collectible badge gallery.
+
+Every icon should be fully visible, perfectly centered, and consistent.
+
+No more broken crops.
