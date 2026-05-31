@@ -1,0 +1,213 @@
+===========================================================
+AVATAR SYSTEM FINAL REVISION
+===========================================================
+
+IMPORTANT:
+
+DO NOT CREATE NEW SYMBOLS.
+
+DO NOT REINTERPRET THE SYMBOLS.
+
+DO NOT GENERATE NEW ARTWORK.
+
+USE THE SYMBOLS FROM THE ATTACHED REFERENCE IMAGE.
+
+The attached image contains the approved avatar artwork for Chip Society.
+
+Those symbols are now the official avatar collection.
+
+I want those exact symbols used throughout the avatar system.
+
+===========================================================
+REMOVE CURRENT SYSTEM
+===========================================================
+
+DELETE:
+
+- square avatar cards
+- rounded rectangle containers
+- boxed icon backgrounds
+- category filter tabs
+
+REMOVE ENTIRELY:
+
+ALL • 30
+COMM • 8
+RARE • 8
+EPIC • 8
+LEGE • 6
+
+The screen feels cluttered.
+
+The tabs add no value.
+
+Delete them.
+
+===========================================================
+NEW AVATAR STYLE
+===========================================================
+
+Every avatar should become a circular collectible badge.
+
+Structure:
+
+Outer Glow Ring
+↓
+Metallic Rarity Ring
+↓
+Dark Interior Circle
+↓
+Centered Symbol
+
+NO SQUARES.
+
+NO RECTANGLES.
+
+NO CARD CONTAINERS.
+
+Everything should be circular.
+
+Exactly like luxury casino player badges.
+
+===========================================================
+USE ATTACHED SYMBOLS
+===========================================================
+
+Crop and use the symbols from the attached reference image.
+
+DO NOT redraw them.
+
+DO NOT redesign them.
+
+DO NOT replace them.
+
+DO NOT generate similar versions.
+
+The symbol artwork itself is approved.
+
+Only place them into the new circular badge system.
+
+===========================================================
+GRID LAYOUT
+===========================================================
+
+3 avatars per row.
+
+Large circular badges.
+
+Equal spacing.
+
+Perfect alignment.
+
+Luxury presentation.
+
+Not cramped.
+
+Not crowded.
+
+The page should feel like a premium collectible gallery.
+
+===========================================================
+VISUAL STYLE
+===========================================================
+
+Theme:
+
+1980s Miami nightlife
+
+Luxury poker room
+
+High-end casino rewards
+
+Retro-futuristic
+
+Dark electric blue background
+
+Subtle purple gradients
+
+Premium glow effects
+
+Clean spacing
+
+Minimal clutter
+
+===========================================================
+RARITY COLORS
+===========================================================
+
+Common:
+Electric Blue
+
+Rare:
+Purple
+
+Epic:
+Hot Pink
+
+Legendary:
+Gold
+
+The border ring and glow should reflect rarity.
+
+===========================================================
+TOP SECTION
+===========================================================
+
+Keep:
+
+Large equipped avatar display
+
+Avatar Name
+
+Rarity Badge
+
+Unlock Requirement
+
+Equip Button
+
+However:
+
+Convert the equipped avatar preview from a square to a circle.
+
+The equipped avatar preview should match the circular badge system below.
+
+===========================================================
+REFERENCE IMAGE RULE
+===========================================================
+
+The attached reference image is the source of truth.
+
+If a symbol exists in the reference image:
+
+USE IT.
+
+Do not recreate it.
+
+Do not redesign it.
+
+Do not improve it.
+
+Do not stylize it.
+
+Do not substitute it.
+
+Crop it cleanly and use it directly.
+
+===========================================================
+FINAL GOAL
+===========================================================
+
+The avatar screen should feel like:
+
+A premium collection of luxury casino badges.
+
+NOT a mobile icon grid.
+
+NOT a card collection screen.
+
+NOT a generated icon gallery.
+
+The original symbols from the attached reference image must remain recognizable and unchanged.
+
+Build the avatar system around those symbols instead of replacing them.
+===========================================================
