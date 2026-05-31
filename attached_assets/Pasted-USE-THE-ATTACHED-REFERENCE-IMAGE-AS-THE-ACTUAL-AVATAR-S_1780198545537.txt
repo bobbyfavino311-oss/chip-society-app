@@ -1,0 +1,164 @@
+USE THE ATTACHED REFERENCE IMAGE AS THE ACTUAL AVATAR SOURCE MATERIAL
+
+This is NOT a style reference.
+
+This is NOT inspiration.
+
+This is NOT a loose design direction.
+
+The neon symbols shown in the attached reference image are now the official avatar set for the game.
+
+==============================================================
+
+DO NOT GENERATE NEW AVATARS
+
+DO NOT REDESIGN THE SYMBOLS
+
+DO NOT CREATE ALTERNATIVE VERSIONS
+
+DO NOT INTERPRET THE SYMBOLS
+
+DO NOT ATTEMPT TO "IMPROVE" THEM
+
+The previous attempts produced symbols that were less recognizable and lower quality than the reference image.
+
+The symbols shown in the attached image are the approved designs.
+
+==============================================================
+
+IMPLEMENTATION INSTRUCTIONS
+
+Use the attached image.
+
+Individually crop every avatar symbol from the image.
+
+Export each avatar as its own separate asset.
+
+Center each crop precisely.
+
+Maintain consistent spacing around each symbol.
+
+Maintain identical sizing across all avatars.
+
+Export at high resolution.
+
+==============================================================
+
+REQUIRED CROPPING STANDARD
+
+Each avatar should contain:
+
+* full circular border
+* full neon symbol
+* complete glow effect
+* equal padding on all sides
+
+DO NOT crop tightly.
+
+DO NOT cut off glow effects.
+
+DO NOT distort aspect ratios.
+
+DO NOT resize independently.
+
+Every avatar should feel like it came from the same premium collection.
+
+==============================================================
+
+CREATE INDIVIDUAL ASSETS FOR:
+
+Martini Glass
+
+Lightning Bolt
+
+Poker Chip
+
+Ace Card
+
+Dice Stack
+
+Moon Phase
+
+Fire
+
+Crown
+
+Neon Palm
+
+Cassette Tape
+
+Flamingo
+
+Champagne Glass
+
+Shark Fin
+
+Snake
+
+Neon Rose
+
+Eight Ball
+
+Sunset Grid
+
+Cocktail Cherry
+
+And all remaining symbols shown in the reference image.
+
+==============================================================
+
+PLAYER PROFILE SYSTEM
+
+The cropped avatars become the official avatar library.
+
+Players may:
+
+* choose from the official neon avatar collection
+* upload a custom image
+
+No AI-generated human avatars.
+
+No cartoon faces.
+
+No initials.
+
+No placeholder profile icons.
+
+Only:
+
+1. Official Neon Symbol Collection
+2. Custom Uploaded Image
+
+==============================================================
+
+BOT AVATARS
+
+All AI players must randomly use one of the official neon symbol avatars.
+
+Never use:
+
+* initials
+* letters
+* generated faces
+* human portraits
+* emoji faces
+
+Every AI bot should appear as if it selected a neon symbol from the same avatar collection available to players.
+
+==============================================================
+
+FINAL REQUIREMENT
+
+Treat the attached image as the master avatar sheet.
+
+The symbols contained within it are now the production-ready avatar assets for Chip Society.
+
+Use those exact symbols.
+
+Do not replace them.
+
+Do not redesign them.
+
+Do not generate new interpretations.
+
+Crop, export, and implement.
