@@ -1,0 +1,206 @@
+AVATAR SYSTEM FINAL REDESIGN
+USE ATTACHED REFERENCE IMAGE
+
+The attached image is the design direction.
+
+DO NOT trace it.
+DO NOT crop it directly.
+DO NOT recreate it pixel-for-pixel.
+
+Instead, create ORIGINAL artwork that matches the same visual philosophy, quality level, readability, and silhouette strength.
+
+================================================================
+
+CORE GOAL
+
+Every avatar must be instantly recognizable at:
+
+* profile size
+* feed size
+* gameplay table size
+* leaderboard size
+* notification size
+
+A player should identify the symbol in less than one second.
+
+If a symbol is confusing, abstract, or requires interpretation, redesign it.
+
+================================================================
+
+STYLE RULES
+
+Create premium neon lounge symbols.
+
+Think:
+
+* luxury poker room
+* Miami nightlife
+* cocktail lounge
+* Vegas after dark
+* retro-futuristic neon
+* collectible player badges
+
+NOT:
+
+* app icons
+* logos
+* clip art
+* emojis
+* abstract geometry
+* decorative line art
+
+================================================================
+
+ICON DESIGN RULES
+
+Every avatar must contain:
+
+* one central subject only
+* strong silhouette
+* clean recognizable shape
+* consistent line weight
+* subtle neon glow
+* circular composition
+* dark background
+
+REMOVE:
+
+* random circles
+* extra framing rings
+* decorative overlays
+* secondary symbols
+* unnecessary geometric shapes
+* clutter
+
+The symbol itself must be the focus.
+
+================================================================
+
+VISUAL QUALITY
+
+Generate all avatars as:
+
+* vector quality
+* razor sharp
+* ultra high resolution
+* anti-aliased edges
+* crisp neon tubing
+* no pixelation
+* no blur
+* no muddy colors
+
+These assets will be cropped and used directly in the game.
+
+Spacing between icons must be generous.
+
+Leave enough empty space around every symbol so automated cropping never captures portions of neighboring avatars.
+
+================================================================
+
+AVATAR ASSIGNMENTS
+
+1. Martini Glass
+   Simple luxury martini with olive.
+
+2. Palm Tree
+   Clean tropical neon palm.
+
+3. Dice Stack
+   Two poker dice.
+
+4. Cassette
+   Retro synthwave cassette tape.
+
+5. Lightning Bolt
+   Sharp electric bolt.
+
+6. Flamingo
+   Elegant neon flamingo.
+
+7. Champagne Glass
+   Luxury champagne flute.
+
+8. Shark Fin
+   Simple shark fin breaking water.
+
+9. Poker Chip
+   Clean premium poker chip.
+
+10. Moon Phase
+    Crescent moon.
+
+11. Rose
+    Single neon rose.
+
+12. Cherry
+    Twin cocktail cherries.
+
+13. Eight Ball
+    Classic billiard eight ball.
+
+14. Sunset Grid
+    80s synthwave sunset horizon.
+
+15. Snake
+    Neon serpent silhouette.
+
+16. Katana
+    Clean neon katana.
+
+17. Skull
+    Luxury neon skull.
+
+18. Saturn
+    Planet with ring.
+
+19. Fire
+    Strong flame silhouette.
+
+20. Ace Card
+    Ace of spades playing card.
+
+21. Wolf
+    Wolf head silhouette.
+
+22. Crown
+    Luxury crown.
+
+23. Vinyl Record
+    Spinning record.
+
+24. Sports Car
+    Retro exotic supercar.
+
+25. Scorpion
+    Neon scorpion.
+
+26. Dragon
+    Eastern dragon profile.
+
+27. Anchor
+    Marina yacht club anchor.
+
+28. Hourglass
+    Classic hourglass.
+
+29. Compass Star
+    Eight-point navigation star.
+
+30. Tiger Eye
+    Stylized tiger eye.
+
+================================================================
+
+CRITICAL REQUIREMENT
+
+The attached reference image succeeds because every symbol is recognizable immediately.
+
+Maintain that same clarity.
+
+The final result should feel like a premium collection of collectible neon player avatars for Chip Society, not a collection of app icons.
+
+Prioritize recognition over decoration.
+Prioritize silhouette over detail.
+Prioritize quality over quantity.
+
+Every avatar should feel worthy of being selected as a player's permanent identity throughout the entire game.

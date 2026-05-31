@@ -23,302 +23,344 @@ export interface NeonAvatarProps {
 // ─── Icon data ─────────────────────────────────────────────────────────────────
 // Each entry is an array of draw operations. Rendered with double-pass (glow + core).
 // t:'p' = Path, t:'c' = Circle, t:'txt' = Text (special case, rendered once)
+// DESIGN RULES:
+//   • Every icon has an outer circular badge ring  { t:'c', cx:50,cy:50,r:44,sw:3 }
+//   • Circles ARE the subject for: poker chip, 8-ball, vinyl, saturn
+//   • No extra decorative rings inside other icons
+//   • Thick neon tube strokes: 4.5–6px main, 3–4px secondary
 type PathOp  = { t: 'p';   d: string; sw?: number; fill?: boolean };
 type CircOp  = { t: 'c';   cx: number; cy: number; r: number; sw?: number; fill?: boolean };
 type TextOp  = { t: 'txt'; x: number; y: number; text: string; size: number };
 type Op = PathOp | CircOp | TextOp;
 
 const I: Record<number, Op[]> = {
+
   // ── 1  MARTINI GLASS ──────────────────────────────────────────────────────────
-  // Rim + V-bowl + stem + base + olive pick + olive
+  // Rim line + V-bowl + stem + base + pick + olive
   1: [
-    { t: 'p', d: 'M10,14 H90',         sw: 5 },
-    { t: 'p', d: 'M10,14 L50,76 L90,14', sw: 5 },
-    { t: 'p', d: 'M50,76 V88',          sw: 5 },
-    { t: 'p', d: 'M30,88 H70',          sw: 5 },
-    { t: 'p', d: 'M62,30 H76',          sw: 3.5 },
-    { t: 'c', cx: 76, cy: 30, r: 5.5, sw: 3.5, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M10,18 H90',            sw: 5 },
+    { t: 'p', d: 'M10,18 L50,74 L90,18',  sw: 5 },
+    { t: 'p', d: 'M50,74 V86',            sw: 5 },
+    { t: 'p', d: 'M32,86 H68',            sw: 5 },
+    { t: 'p', d: 'M64,32 H76',            sw: 3 },
+    { t: 'c', cx: 76, cy: 32, r: 5, sw: 3, fill: true },
   ],
 
-  // ── 2  LIGHTNING BOLT ─────────────────────────────────────────────────────────
-  // Classic Z-bolt polygon — filled solid, unmistakable at any size
+  // ── 2  NEON PALM ──────────────────────────────────────────────────────────────
+  // Curved trunk + 5 fronds fanning from crown
   2: [
-    { t: 'p', d: 'M64,4 L26,54 L50,54 L36,96 L74,46 L50,46 Z', sw: 4.5, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M50,92 C48,76 46,60 48,38',  sw: 6 },
+    { t: 'p', d: 'M48,38 C34,18 10,12 6,16',   sw: 4 },
+    { t: 'p', d: 'M48,38 C38,20 18,20 12,28',  sw: 4 },
+    { t: 'p', d: 'M48,38 C50,16 52,6 54,4',    sw: 4 },
+    { t: 'p', d: 'M48,38 C60,20 78,20 84,28',  sw: 4 },
+    { t: 'p', d: 'M48,38 C64,16 88,12 92,16',  sw: 4 },
   ],
 
-  // ── 3  POKER CHIP ─────────────────────────────────────────────────────────────
-  // Outer edge + 8 stripe marks + inner ring = instantly a chip
+  // ── 3  DICE STACK ─────────────────────────────────────────────────────────────
+  // Two overlapping rounded squares + pips — clearly two dice
   3: [
-    { t: 'c', cx: 50, cy: 50, r: 44, sw: 6 },
-    { t: 'p', d: 'M50,6 V18 M50,82 V94 M6,50 H18 M82,50 H94 M20,20 L28,28 M80,20 L72,28 M20,80 L28,72 M80,80 L72,72', sw: 5 },
-    { t: 'c', cx: 50, cy: 50, r: 26, sw: 4 },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M14,10 Q10,10 10,14 L10,54 Q10,58 14,58 L58,58 Q62,58 62,54 L62,14 Q62,10 58,10 Z', sw: 4.5 },
+    { t: 'p', d: 'M38,44 Q34,44 34,48 L34,86 Q34,90 38,90 L82,90 Q86,90 86,86 L86,48 Q86,44 82,44 Z', sw: 4.5 },
+    { t: 'c', cx: 22, cy: 22, r: 4,   sw: 2.5, fill: true },
+    { t: 'c', cx: 36, cy: 32, r: 4,   sw: 2.5, fill: true },
+    { t: 'c', cx: 50, cy: 42, r: 4,   sw: 2.5, fill: true },
+    { t: 'c', cx: 48, cy: 58, r: 4,   sw: 2.5, fill: true },
+    { t: 'c', cx: 64, cy: 70, r: 4,   sw: 2.5, fill: true },
+    { t: 'c', cx: 70, cy: 82, r: 4,   sw: 2.5, fill: true },
   ],
 
-  // ── 4  ACE CARD ───────────────────────────────────────────────────────────────
-  // Playing card rectangle + large A + corner pip
+  // ── 4  CASSETTE TAPE ──────────────────────────────────────────────────────────
+  // Rectangle body + 2 reel circles + hub rings + window line
   4: [
-    { t: 'p', d: 'M16,6 Q14,6 14,8 L14,94 Q14,96 16,96 L84,96 Q86,96 86,94 L86,8 Q86,6 84,6 Z', sw: 5 },
-    { t: 'txt', x: 50, y: 68, text: 'A', size: 60 },
-    { t: 'p', d: 'M22,18 L26,10 L30,18 H22 M24,18 L26,24', sw: 2 },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M8,24 H92 V76 H8 Z',  sw: 4.5 },
+    { t: 'c', cx: 30, cy: 50, r: 14,    sw: 4 },
+    { t: 'c', cx: 70, cy: 50, r: 14,    sw: 4 },
+    { t: 'c', cx: 30, cy: 50, r: 5.5,   sw: 3 },
+    { t: 'c', cx: 70, cy: 50, r: 5.5,   sw: 3 },
+    { t: 'p', d: 'M12,30 H88',          sw: 2 },
+    { t: 'p', d: 'M46,40 V60 M54,40 V60', sw: 1.5 },
   ],
 
-  // ── 5  DICE STACK ─────────────────────────────────────────────────────────────
-  // Two overlapping rounded squares with pips — clearly two dice
+  // ── 5  LIGHTNING BOLT ─────────────────────────────────────────────────────────
+  // Classic filled Z-polygon — nothing else needed
   5: [
-    { t: 'p', d: 'M16,4 Q12,4 12,8 L12,52 Q12,56 16,56 L60,56 Q64,56 64,52 L64,8 Q64,4 60,4 Z', sw: 5 },
-    { t: 'p', d: 'M36,56 Q32,56 32,60 L32,92 Q32,96 36,96 L82,96 Q86,96 86,92 L86,60 Q86,56 82,56 Z', sw: 5 },
-    { t: 'c', cx: 24, cy: 20, r: 4.5, sw: 2.5, fill: true },
-    { t: 'c', cx: 38, cy: 30, r: 4.5, sw: 2.5, fill: true },
-    { t: 'c', cx: 52, cy: 40, r: 4.5, sw: 2.5, fill: true },
-    { t: 'c', cx: 48, cy: 68, r: 4.5, sw: 2.5, fill: true },
-    { t: 'c', cx: 70, cy: 80, r: 4.5, sw: 2.5, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M62,6 L26,52 L50,52 L38,94 L74,48 L50,48 Z', sw: 4, fill: true },
   ],
 
-  // ── 6  MOON PHASE ─────────────────────────────────────────────────────────────
-  // Filled crescent + two star dots — pure, bold, unmistakable
+  // ── 6  FLAMINGO ───────────────────────────────────────────────────────────────
+  // Egg body + S-neck + hooked beak + standing leg + foot
   6: [
-    { t: 'p', d: 'M24,8 C58,8 78,26 78,50 C78,74 58,92 24,92 C44,84 58,70 58,50 C58,30 44,16 24,8 Z', sw: 4.5, fill: true },
-    { t: 'c', cx: 80, cy: 24, r: 5, sw: 3.5, fill: true },
-    { t: 'c', cx: 88, cy: 46, r: 3.5, sw: 2.5, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M36,60 C24,50 22,34 30,22 C38,10 54,10 62,22 C70,34 68,52 56,62 Z', sw: 4.5 },
+    { t: 'p', d: 'M54,62 C58,74 64,82 60,90 C56,96 48,96 44,90', sw: 4.5 },
+    { t: 'p', d: 'M44,90 C38,92 34,86 36,82',  sw: 3.5 },
+    { t: 'p', d: 'M44,62 C42,72 40,82 38,92',  sw: 4 },
+    { t: 'p', d: 'M30,92 L38,92 L42,98',       sw: 3.5 },
   ],
 
-  // ── 7  FIRE ───────────────────────────────────────────────────────────────────
-  // Three flame tongues — left, right, center tallest — filled solid
+  // ── 7  CHAMPAGNE GLASS ────────────────────────────────────────────────────────
+  // Tall flute sides + stem + base + 3 rising bubbles
   7: [
-    { t: 'p', d: 'M28,94 C14,86 12,68 20,56 C18,66 22,62 28,50 C26,62 32,60 38,42 C36,58 28,78 28,94 Z', sw: 3.5, fill: true },
-    { t: 'p', d: 'M72,94 C72,78 64,58 62,42 C68,60 74,62 72,50 C78,62 82,66 80,56 C88,68 86,86 72,94 Z', sw: 3.5, fill: true },
-    { t: 'p', d: 'M50,96 C34,90 22,74 28,56 C24,68 30,62 36,48 C32,62 40,60 44,40 C42,56 48,58 50,8 C52,58 58,56 56,40 C60,60 68,62 64,48 C70,62 76,68 72,56 C78,74 66,90 50,96 Z', sw: 4, fill: true },
-  ],
-
-  // ── 8  CROWN ──────────────────────────────────────────────────────────────────
-  // Classic W-crown silhouette + band + three gem dots
-  8: [
-    { t: 'p', d: 'M8,84 H92 V68 L72,40 L60,58 L50,24 L40,58 L28,40 L8,68 Z', sw: 5 },
-    { t: 'c', cx: 28, cy: 44, r: 5, sw: 3.5, fill: true },
-    { t: 'c', cx: 50, cy: 28, r: 5, sw: 3.5, fill: true },
-    { t: 'c', cx: 72, cy: 44, r: 5, sw: 3.5, fill: true },
-  ],
-
-  // ── 9  NEON PALM ──────────────────────────────────────────────────────────────
-  // Curved trunk + 5 drooping fronds — classic neon palm sign
-  9: [
-    { t: 'p', d: 'M50,96 C48,78 44,62 46,36', sw: 6 },
-    { t: 'p', d: 'M46,36 C32,16 8,10 4,14',  sw: 4 },
-    { t: 'p', d: 'M46,36 C36,18 16,18 10,26', sw: 4 },
-    { t: 'p', d: 'M46,36 C48,14 50,4 52,2',   sw: 4 },
-    { t: 'p', d: 'M46,36 C58,18 76,18 82,26', sw: 4 },
-    { t: 'p', d: 'M46,36 C62,14 86,10 90,14', sw: 4 },
-  ],
-
-  // ── 10 CASSETTE TAPE ──────────────────────────────────────────────────────────
-  // Rectangle body + two reel circles + hub centres + tape window line
-  10: [
-    { t: 'p', d: 'M6,22 H94 V78 H6 Z', sw: 5 },
-    { t: 'c', cx: 30, cy: 50, r: 15, sw: 4.5 },
-    { t: 'c', cx: 70, cy: 50, r: 15, sw: 4.5 },
-    { t: 'c', cx: 30, cy: 50, r: 6,  sw: 3.5 },
-    { t: 'c', cx: 70, cy: 50, r: 6,  sw: 3.5 },
-    { t: 'p', d: 'M10,28 H90', sw: 2.5 },
-  ],
-
-  // ── 11 FLAMINGO ───────────────────────────────────────────────────────────────
-  // Egg body + S-neck + hooked beak + single standing leg + foot
-  11: [
-    { t: 'p', d: 'M36,60 C24,50 22,34 30,22 C38,10 54,10 62,22 C70,34 68,52 56,62 Z', sw: 5 },
-    { t: 'p', d: 'M54,62 C60,72 66,80 62,88 C58,94 50,96 46,90', sw: 5 },
-    { t: 'p', d: 'M46,90 C40,92 36,88 38,82', sw: 4 },
-    { t: 'p', d: 'M44,62 C42,72 40,82 38,92', sw: 4.5 },
-    { t: 'p', d: 'M30,92 L38,92 L42,98', sw: 4 },
-  ],
-
-  // ── 12 CHAMPAGNE GLASS ────────────────────────────────────────────────────────
-  // Tall flute sides + stem + base + rising bubbles
-  12: [
-    { t: 'p', d: 'M34,92 H66', sw: 5 },
-    { t: 'p', d: 'M50,92 V66', sw: 5 },
-    { t: 'p', d: 'M36,66 H64', sw: 4.5 },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M34,90 H66',  sw: 5 },
+    { t: 'p', d: 'M50,90 V66',  sw: 5 },
+    { t: 'p', d: 'M36,66 H64',  sw: 4.5 },
     { t: 'p', d: 'M36,66 C34,52 30,36 28,10 M64,66 C66,52 70,36 72,10 M28,10 H72', sw: 4.5 },
-    { t: 'c', cx: 43, cy: 44, r: 3.5, sw: 2.5, fill: true },
-    { t: 'c', cx: 52, cy: 28, r: 3,   sw: 2.5, fill: true },
+    { t: 'c', cx: 42, cy: 46, r: 3.5, sw: 2.5, fill: true },
+    { t: 'c', cx: 52, cy: 30, r: 3,   sw: 2.5, fill: true },
     { t: 'c', cx: 44, cy: 16, r: 2.5, sw: 2,   fill: true },
   ],
 
-  // ── 13 SHARK FIN ──────────────────────────────────────────────────────────────
-  // Bold fin arc + flat horizon + two wave arcs below
+  // ── 8  SHARK FIN ──────────────────────────────────────────────────────────────
+  // Bold fin curve + flat waterline + wave arc
+  8: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M8,70 C26,70 36,52 44,28 C48,14 52,6 56,6 C60,10 70,36 78,60 C82,68 90,70 92,70', sw: 6 },
+    { t: 'p', d: 'M6,70 H94',  sw: 4.5 },
+    { t: 'p', d: 'M6,80 C16,76 24,84 36,80 C48,76 58,84 70,80 C82,76 88,82 94,78', sw: 3 },
+  ],
+
+  // ── 9  POKER CHIP ─────────────────────────────────────────────────────────────
+  // Outer ring + 8 stripe marks around edge + inner ring (circles ARE the chip)
+  9: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'c', cx: 50, cy: 50, r: 40, sw: 6 },
+    { t: 'p', d: 'M50,10 V22 M50,78 V90 M10,50 H22 M78,50 H90 M21,21 L30,30 M79,21 L70,30 M21,79 L30,70 M79,79 L70,70', sw: 5 },
+    { t: 'c', cx: 50, cy: 50, r: 24, sw: 4 },
+  ],
+
+  // ── 10 MOON PHASE ─────────────────────────────────────────────────────────────
+  // Filled crescent + 2 star dots
+  10: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M22,10 C58,10 78,26 78,50 C78,74 58,90 22,90 C42,82 56,68 56,50 C56,32 42,18 22,10 Z', sw: 4.5, fill: true },
+    { t: 'c', cx: 80, cy: 22, r: 5,   sw: 3.5, fill: true },
+    { t: 'c', cx: 88, cy: 44, r: 3.5, sw: 2.5, fill: true },
+  ],
+
+  // ── 11 NEON ROSE ──────────────────────────────────────────────────────────────
+  // 5-petal outer ring + inner ring + stem + leaf
+  11: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M50,14 C64,10 76,20 76,34 C82,26 88,42 80,52 C90,58 84,72 72,72 C76,82 66,92 50,90 C34,92 24,82 28,72 C16,72 10,58 20,52 C12,42 18,26 24,34 C24,20 36,10 50,14 Z', sw: 4.5 },
+    { t: 'c', cx: 50, cy: 50, r: 14, sw: 3.5 },
+    { t: 'p', d: 'M50,90 V98',               sw: 4.5 },
+    { t: 'p', d: 'M50,92 C44,94 34,90 30,84', sw: 3.5 },
+  ],
+
+  // ── 12 CHERRY ─────────────────────────────────────────────────────────────────
+  // 2 large filled berry circles + branching stems + shine rings
+  12: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'c', cx: 28, cy: 68, r: 20, sw: 5, fill: true },
+    { t: 'c', cx: 68, cy: 72, r: 20, sw: 5, fill: true },
+    { t: 'p', d: 'M28,48 C30,28 42,16 50,8', sw: 4.5 },
+    { t: 'p', d: 'M68,52 C66,30 56,16 50,8', sw: 4.5 },
+    { t: 'p', d: 'M28,48 C40,40 56,42 68,52', sw: 4 },
+    { t: 'c', cx: 36, cy: 64, r: 6, sw: 3.5 },
+    { t: 'c', cx: 76, cy: 68, r: 6, sw: 3.5 },
+  ],
+
+  // ── 13 EIGHT BALL ─────────────────────────────────────────────────────────────
+  // Outer ball ring + label circle + numeral 8
   13: [
-    { t: 'p', d: 'M6,70 C24,70 36,52 44,28 C48,14 52,6 56,6 C60,10 70,36 78,60 C82,68 90,70 94,70', sw: 6 },
-    { t: 'p', d: 'M4,70 H96', sw: 5 },
-    { t: 'p', d: 'M4,80 C14,76 22,84 32,80 C42,76 52,84 62,80 C72,76 82,84 96,80', sw: 3.5 },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'c', cx: 50, cy: 50, r: 40, sw: 6 },
+    { t: 'c', cx: 50, cy: 50, r: 20, sw: 4.5 },
+    { t: 'txt', x: 50, y: 58, text: '8', size: 24 },
   ],
 
-  // ── 14 NEON ROSE ──────────────────────────────────────────────────────────────
-  // Outer petal ring + inner petal ring + stem + leaf
+  // ── 14 SUNSET GRID ────────────────────────────────────────────────────────────
+  // Filled semicircle sun + horizon + receding grid lines
   14: [
-    { t: 'p', d: 'M50,14 C64,10 76,20 76,34 C82,26 88,40 80,50 C90,56 84,70 72,70 C76,82 66,92 52,90 C50,96 48,96 48,90 C34,92 24,82 28,70 C16,70 10,56 20,50 C12,40 18,26 24,34 C24,20 36,10 50,14 Z', sw: 4.5 },
-    { t: 'c', cx: 50, cy: 48, r: 14, sw: 4 },
-    { t: 'p', d: 'M50,90 V100', sw: 4.5 },
-    { t: 'p', d: 'M50,92 C44,92 34,88 28,82', sw: 3.5 },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M6,52 C6,26 26,8 50,8 C74,8 94,26 94,52 Z', sw: 4, fill: true },
+    { t: 'p', d: 'M6,52 H94',  sw: 5 },
+    { t: 'p', d: 'M6,64 H94',  sw: 3.5 },
+    { t: 'p', d: 'M6,76 H94',  sw: 3 },
+    { t: 'p', d: 'M6,88 H94',  sw: 2.5 },
+    { t: 'p', d: 'M50,52 L6,88 M50,52 L24,88 M50,52 L50,88 M50,52 L76,88 M50,52 L94,88', sw: 2 },
   ],
 
-  // ── 15 EIGHT BALL ─────────────────────────────────────────────────────────────
-  // Large outer ring + label ring + 8 — every pool player knows it instantly
+  // ── 15 SNAKE ──────────────────────────────────────────────────────────────────
+  // S-curve body + open mouth + forked tongue + 2 eye dots
   15: [
-    { t: 'c', cx: 50, cy: 50, r: 46, sw: 6.5 },
-    { t: 'c', cx: 50, cy: 50, r: 22, sw: 4.5 },
-    { t: 'txt', x: 50, y: 58, text: '8', size: 26 },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M50,22 C72,22 84,38 82,54 C80,70 58,74 50,84 C42,92 38,98 52,100 C66,102 74,90 74,78', sw: 6 },
+    { t: 'p', d: 'M38,18 C38,24 44,26 50,26 C56,26 62,24 62,18', sw: 4.5 },
+    { t: 'p', d: 'M44,15 L46,8 M56,15 L54,8', sw: 4 },
+    { t: 'c', cx: 43, cy: 28, r: 3, sw: 2.5, fill: true },
+    { t: 'c', cx: 57, cy: 28, r: 3, sw: 2.5, fill: true },
   ],
 
-  // ── 16 ANCHOR ─────────────────────────────────────────────────────────────────
-  // Crossbar + shaft + ring + two curved hooks — classic maritime anchor
+  // ── 16 KATANA ─────────────────────────────────────────────────────────────────
+  // Filled blade triangle + thick guard + wrapped handle
   16: [
-    { t: 'p', d: 'M26,20 H74', sw: 6 },
-    { t: 'p', d: 'M50,20 V88', sw: 6 },
-    { t: 'p', d: 'M14,88 C14,66 30,64 50,88 C70,64 86,66 86,88', sw: 6 },
-    { t: 'c', cx: 50, cy: 30, r: 12, sw: 5 },
-    { t: 'p', d: 'M34,52 H66', sw: 4 },
-  ],
-
-  // ── 17 SUNSET GRID ────────────────────────────────────────────────────────────
-  // Filled semicircle sun + horizon + receding grid lines — pure synthwave
-  17: [
-    { t: 'p', d: 'M4,54 C4,26 24,6 50,6 C76,6 96,26 96,54 Z', sw: 4.5, fill: true },
-    { t: 'p', d: 'M4,54 H96', sw: 5 },
-    { t: 'p', d: 'M4,66 H96', sw: 4 },
-    { t: 'p', d: 'M4,78 H96', sw: 3 },
-    { t: 'p', d: 'M4,90 H96', sw: 2.5 },
-    { t: 'p', d: 'M50,54 L4,90 M50,54 L24,90 M50,54 L50,90 M50,54 L76,90 M50,54 L96,90', sw: 2.5 },
-  ],
-
-  // ── 18 SNAKE ──────────────────────────────────────────────────────────────────
-  // S-curve coil + open mouth + forked tongue + two eye dots
-  18: [
-    { t: 'p', d: 'M50,20 C72,20 84,36 82,52 C80,68 58,72 50,82 C42,90 38,96 50,98 C64,100 74,90 74,78', sw: 6 },
-    { t: 'p', d: 'M38,16 C38,22 44,24 50,24 C56,24 62,22 62,16', sw: 4.5 },
-    { t: 'p', d: 'M43,14 L45,6 M57,14 L55,6', sw: 4 },
-    { t: 'c', cx: 43, cy: 26, r: 3, sw: 2.5, fill: true },
-    { t: 'c', cx: 57, cy: 26, r: 3, sw: 2.5, fill: true },
-  ],
-
-  // ── 19 KATANA (SWORD) ─────────────────────────────────────────────────────────
-  // Thin filled blade + thick guard (tsuba) + wrapped handle
-  19: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
     { t: 'p', d: 'M18,84 L76,14 C80,10 86,10 88,14 C90,18 86,22 82,26 L18,84 Z', sw: 3, fill: true },
     { t: 'p', d: 'M22,80 L32,70', sw: 11 },
-    { t: 'p', d: 'M12,90 L22,80', sw: 5.5 },
-    { t: 'p', d: 'M8,94 C8,98 12,98 14,96 L22,84', sw: 4 },
+    { t: 'p', d: 'M12,90 L22,80', sw: 5 },
+    { t: 'p', d: 'M8,94 C8,98 12,98 14,96 L22,84', sw: 3.5 },
   ],
 
-  // ── 20 SKULL ──────────────────────────────────────────────────────────────────
-  // Dome outline + two hollow eye sockets + jaw teeth — classic skull
-  20: [
-    { t: 'p', d: 'M14,58 C14,30 30,8 50,8 C70,8 86,30 86,58 C86,74 78,84 68,88 L68,96 H32 L32,88 C22,84 14,74 14,58 Z', sw: 5 },
+  // ── 17 SKULL ──────────────────────────────────────────────────────────────────
+  // Dome outline + 2 hollow eye sockets + jaw teeth
+  17: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M14,56 C14,30 30,10 50,10 C70,10 86,30 86,56 C86,72 78,84 68,88 L68,96 H32 L32,88 C22,84 14,72 14,56 Z', sw: 5 },
     { t: 'c', cx: 34, cy: 54, r: 12, sw: 4.5 },
     { t: 'c', cx: 66, cy: 54, r: 12, sw: 4.5 },
     { t: 'p', d: 'M38,88 V96 M50,88 V96 M62,88 V96', sw: 5 },
   ],
 
-  // ── 21 SATURN PLANET ──────────────────────────────────────────────────────────
-  // Bold sphere circle + diagonal ring arc cutting through — unmistakably Saturn
+  // ── 18 SATURN ─────────────────────────────────────────────────────────────────
+  // Sphere circle + diagonal ring arc — unmistakably Saturn
+  18: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'c', cx: 50, cy: 50, r: 22, sw: 6 },
+    { t: 'p', d: 'M4,32 C20,12 80,86 96,66', sw: 6 },
+  ],
+
+  // ── 19 FIRE ───────────────────────────────────────────────────────────────────
+  // 3 filled flame tongues: left small, right small, center tallest
+  19: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M28,92 C14,84 12,68 20,56 C18,66 22,62 28,50 C26,62 32,60 38,44 C36,58 28,78 28,92 Z', sw: 3.5, fill: true },
+    { t: 'p', d: 'M72,92 C72,78 64,58 62,44 C68,60 74,62 72,50 C78,62 82,66 80,56 C88,68 86,84 72,92 Z', sw: 3.5, fill: true },
+    { t: 'p', d: 'M50,94 C34,88 22,72 28,56 C24,68 30,62 36,48 C32,62 40,60 44,40 C42,56 48,58 50,8 C52,58 58,56 56,40 C60,60 68,62 64,48 C70,62 76,68 72,56 C78,72 66,88 50,94 Z', sw: 4, fill: true },
+  ],
+
+  // ── 20 ACE CARD ───────────────────────────────────────────────────────────────
+  // Card rectangle + large A + corner suit pip
+  20: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M18,8 Q16,8 16,10 L16,92 Q16,94 18,94 L82,94 Q84,94 84,92 L84,10 Q84,8 82,8 Z', sw: 4.5 },
+    { t: 'txt', x: 50, y: 66, text: 'A', size: 56 },
+    { t: 'p', d: 'M23,20 L27,12 L31,20 H23 M25,20 L27,26', sw: 2 },
+  ],
+
+  // ── 21 WOLF HEAD ──────────────────────────────────────────────────────────────
+  // Angular polygon head + 2 ear spikes + filled eyes + nose + muzzle
   21: [
-    { t: 'c', cx: 50, cy: 50, r: 26, sw: 6 },
-    { t: 'p', d: 'M2,30 C18,10 82,88 98,68', sw: 6 },
-  ],
-
-  // ── 22 VINYL RECORD ───────────────────────────────────────────────────────────
-  // Outer groove ring + two inner groove rings + centre label dot
-  22: [
-    { t: 'c', cx: 50, cy: 50, r: 46, sw: 7 },
-    { t: 'c', cx: 50, cy: 50, r: 32, sw: 3 },
-    { t: 'c', cx: 50, cy: 50, r: 20, sw: 3 },
-    { t: 'c', cx: 50, cy: 50, r: 8,  sw: 4, fill: true },
-  ],
-
-  // ── 23 SPORTS CAR ─────────────────────────────────────────────────────────────
-  // Side-profile wedge body + cabin + two large wheels + hubs
-  23: [
-    { t: 'p', d: 'M2,68 L2,58 L20,40 L36,26 L72,26 L86,36 L98,54 L98,68 Z', sw: 5 },
-    { t: 'p', d: 'M36,26 L40,18 L68,18 L72,26', sw: 4 },
-    { t: 'c', cx: 24, cy: 68, r: 15, sw: 5.5 },
-    { t: 'c', cx: 76, cy: 68, r: 15, sw: 5.5 },
-    { t: 'c', cx: 24, cy: 68, r: 6,  sw: 3.5, fill: true },
-    { t: 'c', cx: 76, cy: 68, r: 6,  sw: 3.5, fill: true },
-  ],
-
-  // ── 24 SCORPION ───────────────────────────────────────────────────────────────
-  // Oval body + two pincer arms + claw tips + arched stinger tail
-  24: [
-    { t: 'c', cx: 50, cy: 44, r: 12, sw: 5.5 },
-    { t: 'p', d: 'M38,40 C26,30 12,34 8,46 C12,56 26,52 38,48', sw: 4.5 },
-    { t: 'p', d: 'M62,40 C74,30 88,34 92,46 C88,56 74,52 62,48', sw: 4.5 },
-    { t: 'p', d: 'M8,46 L4,40 M8,46 L4,52', sw: 4 },
-    { t: 'p', d: 'M92,46 L96,40 M92,46 L96,52', sw: 4 },
-    { t: 'p', d: 'M50,56 C50,68 60,78 64,88 C68,96 64,100 58,96', sw: 4.5 },
-    { t: 'p', d: 'M58,96 L54,88 M58,96 L64,90', sw: 4.5 },
-  ],
-
-  // ── 25 DRAGON ─────────────────────────────────────────────────────────────────
-  // Muscular body outline + two horn spikes + glowing eyes + wing curves
-  25: [
-    { t: 'p', d: 'M50,84 C32,84 16,70 10,54 C4,38 8,22 20,16 C28,12 36,12 42,20 C40,30 40,42 46,48 L50,52 L54,48 C60,42 60,30 58,20 C64,12 72,12 80,16 C92,22 96,38 90,54 C84,70 68,84 50,84 Z', sw: 5 },
-    { t: 'p', d: 'M32,20 C28,10 24,4 20,6',  sw: 4 },
-    { t: 'p', d: 'M68,20 C72,10 76,4 80,6',  sw: 4 },
-    { t: 'c', cx: 36, cy: 32, r: 6, sw: 4, fill: true },
-    { t: 'c', cx: 64, cy: 32, r: 6, sw: 4, fill: true },
-  ],
-
-  // ── 26 HOURGLASS ──────────────────────────────────────────────────────────────
-  // Two triangles point-to-point + top/bottom bars + falling sand fill
-  26: [
-    { t: 'p', d: 'M10,6 H90 L50,50 L90,94 H10 L50,50 Z', sw: 5 },
-    { t: 'p', d: 'M10,6 H90', sw: 4.5 },
-    { t: 'p', d: 'M10,94 H90', sw: 4.5 },
-    { t: 'p', d: 'M14,16 C24,22 40,34 50,50', sw: 3, fill: true },
-  ],
-
-  // ── 27 STARBURST ──────────────────────────────────────────────────────────────
-  // Filled 8-point star — bold, fills the space, reads at any size
-  27: [
-    { t: 'p', d: 'M50,4 L54,34 L82,16 L66,42 L96,50 L66,58 L82,84 L54,66 L50,96 L46,66 L18,84 L34,58 L4,50 L34,42 L18,16 L46,34 Z', sw: 5, fill: true },
-  ],
-
-  // ── 28 TIGER EYE ──────────────────────────────────────────────────────────────
-  // Wide almond outline + iris ring + vertical slit pupil + shine dot
-  28: [
-    { t: 'p', d: 'M2,50 C16,14 84,14 98,50 C84,86 16,86 2,50 Z', sw: 5.5 },
-    { t: 'c', cx: 50, cy: 50, r: 24, sw: 4.5 },
-    { t: 'p', d: 'M50,26 C56,34 56,66 50,74 C44,66 44,34 50,26 Z', sw: 4, fill: true },
-    { t: 'c', cx: 60, cy: 38, r: 4.5, sw: 3, fill: true },
-  ],
-
-  // ── 29 WOLF HEAD ──────────────────────────────────────────────────────────────
-  // Angular polygon head + two ear spikes + filled eyes + nose + muzzle
-  29: [
-    { t: 'p', d: 'M50,6 L26,18 L14,52 L24,78 L50,94 L76,78 L86,52 L74,18 Z', sw: 5 },
-    { t: 'p', d: 'M26,18 L14,0 L34,12',  sw: 4.5 },
-    { t: 'p', d: 'M74,18 L86,0 L66,12',  sw: 4.5 },
-    { t: 'c', cx: 36, cy: 46, r: 9, sw: 4, fill: true },
-    { t: 'c', cx: 64, cy: 46, r: 9, sw: 4, fill: true },
-    { t: 'p', d: 'M44,64 C46,60 54,60 56,64 C54,68 46,68 44,64 Z', sw: 3.5, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M50,8 L26,20 L14,52 L24,76 L50,92 L76,76 L86,52 L74,20 Z', sw: 5 },
+    { t: 'p', d: 'M26,20 L14,2 L34,14',  sw: 4.5 },
+    { t: 'p', d: 'M74,20 L86,2 L66,14',  sw: 4.5 },
+    { t: 'c', cx: 35, cy: 46, r: 9, sw: 4, fill: true },
+    { t: 'c', cx: 65, cy: 46, r: 9, sw: 4, fill: true },
+    { t: 'p', d: 'M44,62 C46,58 54,58 56,62 C54,66 46,66 44,62 Z', sw: 3, fill: true },
     { t: 'p', d: 'M36,74 C42,82 46,86 50,86 C54,86 58,82 64,74', sw: 3.5 },
   ],
 
-  // ── 30 COCKTAIL CHERRY ────────────────────────────────────────────────────────
-  // Two large filled circles + branching stems — instantly two cherries
+  // ── 22 CROWN ──────────────────────────────────────────────────────────────────
+  // Classic W-crown silhouette + band + 3 gem dots
+  22: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M8,82 H92 V66 L72,40 L60,56 L50,24 L40,56 L28,40 L8,66 Z', sw: 5 },
+    { t: 'c', cx: 28, cy: 44, r: 5, sw: 3.5, fill: true },
+    { t: 'c', cx: 50, cy: 28, r: 5, sw: 3.5, fill: true },
+    { t: 'c', cx: 72, cy: 44, r: 5, sw: 3.5, fill: true },
+  ],
+
+  // ── 23 VINYL RECORD ───────────────────────────────────────────────────────────
+  // Outer groove + 3 inner groove rings + centre label dot (circles ARE the record)
+  23: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'c', cx: 50, cy: 50, r: 40, sw: 5.5 },
+    { t: 'c', cx: 50, cy: 50, r: 28, sw: 2.5 },
+    { t: 'c', cx: 50, cy: 50, r: 18, sw: 2.5 },
+    { t: 'c', cx: 50, cy: 50, r: 10, sw: 3 },
+    { t: 'c', cx: 50, cy: 50, r: 5,  sw: 3.5, fill: true },
+  ],
+
+  // ── 24 SPORTS CAR (FRONT VIEW) ────────────────────────────────────────────────
+  // Hood + windshield + body + bumper + 2 circular headlights + grille
+  24: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M22,36 Q24,24 50,22 Q76,24 78,36 L84,54 L16,54 Z', sw: 4 },
+    { t: 'p', d: 'M14,54 L12,72 L88,72 L86,54 Z', sw: 4.5 },
+    { t: 'p', d: 'M10,72 L12,84 L88,84 L90,72 Z', sw: 4 },
+    { t: 'c', cx: 26, cy: 62, r: 10, sw: 4 },
+    { t: 'c', cx: 74, cy: 62, r: 10, sw: 4 },
+    { t: 'c', cx: 26, cy: 62, r: 4.5, sw: 3, fill: true },
+    { t: 'c', cx: 74, cy: 62, r: 4.5, sw: 3, fill: true },
+    { t: 'p', d: 'M40,62 H60 V70 H40 Z', sw: 2 },
+  ],
+
+  // ── 25 SCORPION ───────────────────────────────────────────────────────────────
+  // Oval body + 2 pincer arms + claw tips + 4 legs + arched stinger tail
+  25: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'c', cx: 50, cy: 46, r: 12, sw: 5 },
+    { t: 'p', d: 'M38,42 C26,32 12,36 8,46 C12,56 26,52 38,50', sw: 4 },
+    { t: 'p', d: 'M62,42 C74,32 88,36 92,46 C88,56 74,52 62,50', sw: 4 },
+    { t: 'p', d: 'M8,46 L4,40 M8,46 L4,52', sw: 3.5 },
+    { t: 'p', d: 'M92,46 L96,40 M92,46 L96,52', sw: 3.5 },
+    { t: 'p', d: 'M42,54 L28,62 M44,60 L28,72', sw: 2.5 },
+    { t: 'p', d: 'M58,54 L72,62 M56,60 L72,72', sw: 2.5 },
+    { t: 'p', d: 'M50,58 C50,70 60,80 64,90 C68,98 62,102 58,96', sw: 4.5 },
+    { t: 'p', d: 'M58,96 L53,88 M58,96 L64,88', sw: 4.5 },
+  ],
+
+  // ── 26 DRAGON ─────────────────────────────────────────────────────────────────
+  // Eastern dragon — sinuous S-body + 2 horn spikes + eye dot
+  26: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M16,26 C16,14 28,8 38,14 C46,20 42,32 30,34 C22,36 14,42 14,52 C14,62 22,68 32,66 C42,64 50,56 52,46 C54,36 50,24 60,18 C70,12 82,16 86,26 C90,36 84,46 74,48 C64,50 56,58 58,68 C60,78 70,84 80,82 C90,80 94,70 90,62', sw: 5.5 },
+    { t: 'c', cx: 20, cy: 22, r: 4.5, sw: 3, fill: true },
+    { t: 'p', d: 'M12,24 L6,16', sw: 4 },
+    { t: 'p', d: 'M24,14 L18,8',  sw: 4 },
+  ],
+
+  // ── 27 ANCHOR ─────────────────────────────────────────────────────────────────
+  // Ring at top + crossbar + shaft + 2 curved hooks
+  27: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'c', cx: 50, cy: 20, r: 11, sw: 5 },
+    { t: 'p', d: 'M26,46 H74',   sw: 5.5 },
+    { t: 'p', d: 'M50,30 V88',   sw: 5.5 },
+    { t: 'p', d: 'M14,88 C14,66 30,64 50,88 C70,64 86,66 86,88', sw: 5.5 },
+  ],
+
+  // ── 28 HOURGLASS ──────────────────────────────────────────────────────────────
+  // Two triangles point-to-point + top/bottom bars + falling sand fill
+  28: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M12,8 H88 L50,50 L88,92 H12 L50,50 Z', sw: 5 },
+    { t: 'p', d: 'M12,8 H88',  sw: 4.5 },
+    { t: 'p', d: 'M12,92 H88', sw: 4.5 },
+    { t: 'p', d: 'M16,16 C26,24 40,36 50,50', sw: 3, fill: true },
+  ],
+
+  // ── 29 COMPASS STAR ───────────────────────────────────────────────────────────
+  // Filled 8-point navigation star + small centre ring
+  29: [
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M50,6 L54,44 L86,16 L58,46 L94,50 L58,54 L86,84 L54,56 L50,94 L46,56 L14,84 L42,54 L6,50 L42,46 L14,16 L46,44 Z', sw: 4, fill: true },
+    { t: 'c', cx: 50, cy: 50, r: 9, sw: 3.5 },
+  ],
+
+  // ── 30 TIGER EYE ──────────────────────────────────────────────────────────────
+  // Wide almond outline + iris ring + vertical slit pupil + shine dot
   30: [
-    { t: 'c', cx: 30, cy: 68, r: 24, sw: 5.5, fill: true },
-    { t: 'c', cx: 70, cy: 72, r: 24, sw: 5.5, fill: true },
-    { t: 'p', d: 'M30,44 C32,26 44,14 50,6', sw: 5 },
-    { t: 'p', d: 'M70,48 C68,28 56,14 50,6', sw: 5 },
-    { t: 'p', d: 'M30,44 C42,36 58,38 70,48', sw: 4.5 },
-    { t: 'c', cx: 38, cy: 68, r: 8, sw: 4 },
-    { t: 'c', cx: 78, cy: 72, r: 8, sw: 4 },
+    { t: 'c', cx: 50, cy: 50, r: 44, sw: 3 },
+    { t: 'p', d: 'M4,50 C16,16 84,16 96,50 C84,84 16,84 4,50 Z', sw: 5.5 },
+    { t: 'c', cx: 50, cy: 50, r: 22, sw: 4.5 },
+    { t: 'p', d: 'M50,28 C56,36 56,64 50,72 C44,64 44,36 50,28 Z', sw: 4, fill: true },
+    { t: 'c', cx: 60, cy: 38, r: 5, sw: 3, fill: true },
   ],
 };
 
 // ─── Icon renderer ─────────────────────────────────────────────────────────────
 // All elements are direct react-native-svg primitives — no custom component wrappers.
 function NeonIcon({ id, color }: { id: number; color: string }) {
-  const ops = I[id] ?? I[27];
+  const ops = I[id] ?? I[29];
   const nodes: React.ReactNode[] = [];
 
   ops.forEach((op, i) => {
