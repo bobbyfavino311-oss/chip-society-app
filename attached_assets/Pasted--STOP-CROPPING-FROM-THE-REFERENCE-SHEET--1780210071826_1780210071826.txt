@@ -1,0 +1,143 @@
+===========================================================
+STOP CROPPING FROM THE REFERENCE SHEET
+===========================================================
+
+The avatar system is still broken.
+
+The circular frames are correct.
+
+The icon artwork is not.
+
+Examples:
+
+SKULL:
+showing Saturn artwork
+
+VINYL:
+showing neighboring icon
+
+VIPER:
+car clipped
+
+SCORPION:
+top half only
+
+TIGER EYE:
+half visible
+
+STARBURST:
+sharing artwork with Tiger Eye
+
+FIRE:
+neighboring icon visible
+
+CROWN:
+neighboring icon visible
+
+===========================================================
+ROOT CAUSE
+===========================================================
+
+The app is still rendering icons from the master avatar sheet.
+
+This approach must be abandoned.
+
+===========================================================
+NEW REQUIREMENT
+===========================================================
+
+Create individual image assets.
+
+One file per avatar.
+
+Examples:
+
+katana.png
+
+skull.png
+
+saturn.png
+
+fire.png
+
+ace.png
+
+wolf.png
+
+crown.png
+
+vinyl.png
+
+viper.png
+
+scorpion.png
+
+dragon.png
+
+anchor.png
+
+hourglass.png
+
+starburst.png
+
+tiger_eye.png
+
+===========================================================
+AVATAR PREPARATION PROCESS
+===========================================================
+
+For every avatar:
+
+1. Export symbol into its own PNG.
+
+2. Transparent background.
+
+3. 1024x1024 canvas.
+
+4. Symbol centered horizontally.
+
+5. Symbol centered vertically.
+
+6. Equal padding on all sides.
+
+7. No neighboring artwork.
+
+8. No sprite sheet coordinates.
+
+===========================================================
+DISPLAY RULES
+===========================================================
+
+Avatar image:
+
+object-fit: contain
+
+object-position: center center
+
+No crop offsets.
+
+No sprite sheets.
+
+No coordinate slicing.
+
+===========================================================
+ACCEPTANCE TEST
+===========================================================
+
+Before finishing:
+
+SKULL shows only skull.
+
+VINYL shows only vinyl.
+
+VIPER shows entire car.
+
+SCORPION shows full body.
+
+STARBURST shows only starburst.
+
+TIGER EYE shows complete eye.
+
+If any avatar contains artwork from another avatar, the fix has failed.
+
+===========================================================
