@@ -1,0 +1,229 @@
+AVATAR CROPPING SYSTEM IS BROKEN — FIX IMMEDIATELY
+
+The current implementation is completely wrong.
+
+You are cropping portions of a screenshot instead of creating properly centered avatar assets.
+
+As a result:
+
+* symbols are cut off
+* symbols are off-center
+* circles contain partial neighboring avatars
+* many avatars only show 30-50% of the symbol
+* the system looks broken and unprofessional
+
+This is NOT acceptable.
+
+==============================================================
+
+THE PROBLEM
+
+You are treating the reference image as a screenshot.
+
+STOP.
+
+The reference image is an avatar master sheet.
+
+Each symbol must become its own independent asset.
+
+==============================================================
+
+WHAT I EXPECT
+
+Every avatar must be generated as:
+
+ONE COMPLETE CIRCLE
+
+containing
+
+ONE COMPLETE SYMBOL
+
+centered perfectly.
+
+Example:
+
+Martini Glass
+
+CORRECT:
+
+* full martini glass visible
+* centered
+* complete circular border
+* equal spacing on all sides
+
+WRONG:
+
+* half martini glass
+* cropped edge
+* neighboring icon visible
+* symbol touching border
+
+==============================================================
+
+REBUILD THE ENTIRE AVATAR LIBRARY
+
+Do NOT crop directly from the screenshot.
+
+Instead:
+
+Use the screenshot only to identify the approved symbols.
+
+Recreate each symbol individually as its own asset.
+
+==============================================================
+
+REQUIRED AVATAR FORMAT
+
+Canvas:
+1024 x 1024
+
+Background:
+transparent
+
+Avatar circle:
+centered
+
+Symbol:
+centered
+
+Padding:
+15-20% empty space around symbol
+
+No clipping.
+
+No cropping.
+
+No neighboring artwork.
+
+==============================================================
+
+EVERY AVATAR MUST LOOK LIKE:
+
+○ Martini Glass
+
+not
+
+◐ Martini Glass
+
+==============================================================
+
+REQUIRED SYMBOL LIST
+
+Martini Glass
+
+Neon Palm
+
+Dice Stack
+
+Cassette
+
+Lightning Bolt
+
+Flamingo
+
+Champagne
+
+Shark Fin
+
+Poker Chip
+
+Moon Phase
+
+Rose
+
+Cherry
+
+Eight Ball
+
+Sunset Grid
+
+Snake
+
+Katana
+
+Skull
+
+Saturn
+
+Fire
+
+Ace Card
+
+Wolf
+
+Crown
+
+Vinyl
+
+Sports Car
+
+Scorpion
+
+Dragon
+
+Anchor
+
+Hourglass
+
+Compass Star
+
+Tiger Eye
+
+==============================================================
+
+VISUAL RULES
+
+Every avatar must:
+
+* be fully visible
+* be centered
+* be symmetrical
+* contain complete circular border
+* contain complete neon symbol
+* contain no clipping
+* contain no partial artwork
+* contain no neighboring avatar elements
+
+==============================================================
+
+QUALITY CONTROL TEST
+
+Before an avatar is accepted:
+
+Zoom out to 25%.
+
+If the symbol is not immediately recognizable:
+
+REDO IT.
+
+If any part is clipped:
+
+REDO IT.
+
+If any neighboring symbol appears:
+
+REDO IT.
+
+If the circle is incomplete:
+
+REDO IT.
+
+==============================================================
+
+FINAL GOAL
+
+I want a premium collectible avatar library.
+
+Not a screenshot crop.
+
+Not partial symbols.
+
+Not fragments.
+
+Not circles containing random pieces of other icons.
+
+Every avatar should feel like it was intentionally designed as a standalone collectible badge.
+
+The current implementation fails this requirement.
+
+Rebuild the avatar library correctly from scratch using the approved symbols as individual centered assets.
