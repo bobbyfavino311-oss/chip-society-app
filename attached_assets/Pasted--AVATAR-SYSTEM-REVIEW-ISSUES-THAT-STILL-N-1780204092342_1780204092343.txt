@@ -1,0 +1,328 @@
+===========================================================
+AVATAR SYSTEM REVIEW
+ISSUES THAT STILL NEED TO BE FIXED
+===========================================================
+
+Overall direction is much better.
+
+The circular format is significantly stronger than the previous square card system.
+
+However, there are still several issues preventing this from feeling like a premium finished feature.
+
+===========================================================
+1. ALL ICONS FEEL GENERATED FROM DIFFERENT DESIGN SYSTEMS
+===========================================================
+
+Current issue:
+
+The icons do not feel like they belong to the same collection.
+
+Examples:
+
+- Poker Chip = geometric
+- Crown = cartoon style
+- Dice = detailed
+- Snake = mascot style
+- Shark Fin = simple silhouette
+- Eight Ball = realistic
+- Sunset Grid = synthwave poster style
+
+Every icon currently feels like it came from a different artist.
+
+Goal:
+
+All icons should feel like they were designed by the same person.
+
+Same:
+- line thickness
+- glow intensity
+- detail level
+- geometry style
+- visual language
+
+===========================================================
+2. GLOW IS TOO AGGRESSIVE
+===========================================================
+
+Current issue:
+
+The glow effect is overpowering the symbols.
+
+Some avatars appear blurry because the glow is stronger than the artwork.
+
+Examples:
+
+- Crown
+- Cherry
+- Poker Chip
+- Rose
+
+Fix:
+
+Reduce glow intensity by roughly 35%.
+
+Increase icon definition.
+
+The artwork should be the focus.
+
+Not the glow.
+
+===========================================================
+3. CROWN STILL LOOKS CHEAP
+===========================================================
+
+Current issue:
+
+The crown looks like a generic mobile game icon.
+
+It does not match the luxury casino aesthetic.
+
+Fix:
+
+Make it look like:
+- luxury casino crown
+- premium VIP badge
+- casino royalty
+
+Avoid cartoon styling.
+
+===========================================================
+4. SNAKE DOES NOT MATCH THE COLLECTION
+===========================================================
+
+Current issue:
+
+The snake feels random.
+
+It looks more like a mascot logo than a luxury badge.
+
+Fix:
+
+Either:
+- redesign into a cleaner neon serpent
+or
+- replace entirely with a stronger nightlife icon
+
+Current version feels out of place.
+
+===========================================================
+5. EIGHT BALL IS TOO REALISTIC
+===========================================================
+
+Current issue:
+
+Eight Ball uses a different visual language.
+
+Everything else is outlined neon.
+
+Eight Ball feels rendered.
+
+Fix:
+
+Convert to outline-style neon icon.
+
+Keep visual consistency.
+
+===========================================================
+6. TOP SECTION IS TOO LARGE
+===========================================================
+
+Current issue:
+
+The equipped avatar area takes too much vertical space.
+
+Result:
+
+Users see fewer avatars immediately.
+
+Fix:
+
+Reduce height by approximately 20%.
+
+Compact:
+- avatar preview
+- title
+- unlock requirement
+- equip button
+
+Allow more badges visible above the fold.
+
+===========================================================
+7. LEGENDARY BORDER IS TOO THICK
+===========================================================
+
+Current issue:
+
+The equipped avatar border dominates the artwork.
+
+Especially noticeable on Cherry.
+
+Fix:
+
+Make border thinner.
+
+Increase focus on avatar itself.
+
+===========================================================
+8. NO OWNERSHIP OR LOCK STATUS
+===========================================================
+
+Current issue:
+
+Nothing indicates:
+
+- owned
+- unlocked
+- locked
+- equipped
+
+At a glance every badge looks identical.
+
+Fix:
+
+Add subtle indicators:
+
+Owned:
+small green check
+
+Locked:
+small lock
+
+Equipped:
+gold highlight ring
+
+Keep it minimal.
+
+===========================================================
+9. NO RARITY VISUAL DIFFERENTIATION
+===========================================================
+
+Current issue:
+
+Common and Legendary avatars feel almost identical.
+
+Fix:
+
+Legendary:
+- richer glow
+- animated shimmer
+- metallic gold ring
+
+Epic:
+- brighter ring
+
+Rare:
+- purple ring
+
+Common:
+- blue ring
+
+Players should instantly know rarity.
+
+===========================================================
+10. THE SCREEN FEELS TOO PERFECTLY GRIDDED
+===========================================================
+
+Current issue:
+
+It feels like a spreadsheet.
+
+Not a collectible gallery.
+
+Fix:
+
+Increase spacing slightly.
+
+Allow more breathing room.
+
+Make it feel like browsing a luxury collection.
+
+===========================================================
+11. REMOVE "BADGE COLLECTION"
+===========================================================
+
+Current issue:
+
+The divider and title add no value.
+
+Delete:
+
+BADGE COLLECTION
+
+and divider lines.
+
+The avatars already communicate the section.
+
+===========================================================
+12. AVATAR NAMES SHOULD BE SHORTER
+===========================================================
+
+Examples:
+
+Change:
+
+COCKTAIL CHERRY
+
+to
+
+CHERRY
+
+CHAMPAGNE GLASS
+
+to
+
+CHAMPAGNE
+
+CASSETTE TAPE
+
+to
+
+CASSETTE
+
+Cleaner.
+More premium.
+
+===========================================================
+13. NEEDS MORE 80s MIAMI NIGHTLIFE ENERGY
+===========================================================
+
+Current issue:
+
+The system feels more sci-fi than Miami nightlife.
+
+Add more:
+
+- luxury
+- casino
+- cocktail lounge
+- art deco
+- synthwave
+
+Less:
+
+- generic gaming UI
+
+The avatars should feel like they belong inside a luxury poker room in Miami after midnight.
+
+===========================================================
+FINAL GOAL
+===========================================================
+
+The avatar system should feel like:
+
+A premium collectible badge gallery from a luxury poker club.
+
+Not:
+
+A mobile icon pack.
+
+Not:
+
+A generic gaming inventory.
+
+Not:
+
+Random AI-generated neon symbols.
+
+Everything should feel cohesive, premium, and designed from a single visual language.
+===========================================================

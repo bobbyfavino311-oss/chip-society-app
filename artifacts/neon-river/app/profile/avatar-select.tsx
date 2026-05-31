@@ -1,6 +1,6 @@
-// ─── Avatar Select — Premium Circular Badge Gallery ───────────────────────────
-// No filter tabs. 3-col grid of luxury casino collectible badges.
-// Official sprite-sheet symbols from the reference image.
+// ─── Avatar Select — Premium Collectible Badge Gallery ────────────────────────
+// Luxury casino collectible feel. Miami nightlife 1980s aesthetic.
+// No "BADGE COLLECTION" divider. Status badges. Rarity rings always visible.
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -32,17 +32,25 @@ import { useUser } from '@/context/UserContext';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const COLS   = 3;
-const H_PAD  = 20;
+const H_PAD  = 18;
 const USABLE = Math.min(SCREEN_W, 420) - H_PAD * 2;
 const SLOT_W = Math.floor(USABLE / COLS);
-const AV_SIZE = Math.min(SLOT_W - 24, 96);   // large, premium badge size
+const AV_SIZE = Math.min(SLOT_W - 20, 90);
 
-// Rarity ring colours per spec
+// Rarity ring colours — blue / purple / pink / gold
 const RARITY_RING: Record<NeonRarity, string> = {
-  COMMON:    '#00d4ff',   // electric blue
-  RARE:      '#8b5cf6',   // purple
-  EPIC:      '#ff0090',   // hot pink
-  LEGENDARY: '#ffd700',   // gold
+  COMMON:    '#00d4ff',
+  RARE:      '#8b5cf6',
+  EPIC:      '#ff0090',
+  LEGENDARY: '#ffd700',
+};
+
+// Faint bg tint per rarity — gives each tier a distinct feel in the grid
+const RARITY_CELL_BG: Record<NeonRarity, string> = {
+  COMMON:    '#00d4ff08',
+  RARE:      '#8b5cf60a',
+  EPIC:      '#ff009010',
+  LEGENDARY: '#ffd70014',
 };
 
 export default function AvatarSelectScreen() {
@@ -53,7 +61,7 @@ export default function AvatarSelectScreen() {
     ? profile.symbolIndex
     : 1;
 
-  const [previewId, setPreviewId]     = useState<number>(currentId);
+  const [previewId, setPreviewId]       = useState<number>(currentId);
   const [justEquipped, setJustEquipped] = useState(false);
 
   const previewScale = useRef(new Animated.Value(1)).current;
@@ -63,7 +71,6 @@ export default function AvatarSelectScreen() {
   const isEquipped = profile.profileImageType === 'symbol'
     && (profile.symbolIndex ?? 0) === previewId;
   const ringColor  = RARITY_RING[preview.rarity];
-  const rarityColor = NEON_RARITY_COLORS[preview.rarity];
   const xpPct      = Math.min(1, preview.unlockXP > 0 ? profile.xp / preview.unlockXP : 1);
 
   function pulse() {
@@ -87,56 +94,90 @@ export default function AvatarSelectScreen() {
     setTimeout(() => setJustEquipped(false), 1600);
   }
 
-  // ── Render grid cell ──────────────────────────────────────────────────────
+  // ── Grid cell ─────────────────────────────────────────────────────────────
   function renderBadge({ item }: { item: NeonAvatarData }) {
     const avLocked  = !isNeonAvatarUnlocked(item, profile.xp);
     const rc        = RARITY_RING[item.rarity];
+    const cellBg    = RARITY_CELL_BG[item.rarity];
     const selected  = previewId === item.id;
     const equipped  = profile.profileImageType === 'symbol'
       && profile.symbolIndex === item.id;
 
     return (
       <TouchableOpacity
-        style={[s.cell, { width: SLOT_W }]}
+        style={[s.cell, { width: SLOT_W, backgroundColor: selected ? cellBg : 'transparent' }]}
         onPress={() => handleSelect(item)}
         activeOpacity={0.75}
       >
-        {/* Outer glow when selected */}
+        {/* Selected: outer glow halo */}
         {selected && (
           <View style={[s.selectedGlow, {
-            width:  AV_SIZE + 24,
-            height: AV_SIZE + 24,
-            borderRadius: (AV_SIZE + 24) / 2,
+            width:  AV_SIZE + 22,
+            height: AV_SIZE + 22,
+            borderRadius: (AV_SIZE + 22) / 2,
             backgroundColor: rc,
           }]} />
         )}
-        {/* Secondary selection ring */}
-        {selected && (
-          <View style={[s.selectedRing, {
-            width:  AV_SIZE + 10,
-            height: AV_SIZE + 10,
-            borderRadius: (AV_SIZE + 10) / 2,
-            borderColor: rc,
-            shadowColor: rc,
-          }]} />
-        )}
 
-        <NeonAvatarView
-          avatarId={item.id}
-          size={AV_SIZE}
-          isLocked={avLocked}
-          isEquipped={equipped}
-        />
+        {/* Always-on faint rarity ring — dims when not selected */}
+        <View style={[s.rarityRingAlways, {
+          width:  AV_SIZE + 8,
+          height: AV_SIZE + 8,
+          borderRadius: (AV_SIZE + 8) / 2,
+          borderColor: rc,
+          opacity: selected ? 1 : 0.22,
+          shadowColor: rc,
+          shadowRadius: selected ? 10 : 4,
+          shadowOpacity: selected ? 0.9 : 0.3,
+        }]} />
+
+        {/* Avatar + status badge */}
+        <View style={{ position: 'relative', width: AV_SIZE, height: AV_SIZE }}>
+          <NeonAvatarView
+            avatarId={item.id}
+            size={AV_SIZE}
+            isLocked={avLocked}
+            isEquipped={equipped}
+          />
+
+          {/* Equipped indicator — gold check */}
+          {equipped && (
+            <View style={[s.statusBadge, {
+              backgroundColor: '#ffd700',
+              borderColor: '#000',
+              bottom: 1, right: 1,
+            }]}>
+              <Ionicons name="checkmark" size={8} color="#000" />
+            </View>
+          )}
+
+          {/* Locked indicator — only when not also equipped */}
+          {avLocked && !equipped && (
+            <View style={[s.statusBadge, {
+              backgroundColor: '#0d0d22',
+              borderColor: '#222244',
+              bottom: 1, right: 1,
+            }]}>
+              <Ionicons name="lock-closed" size={7} color="#44446a" />
+            </View>
+          )}
+        </View>
 
         <Text
-          style={[s.badgeName, { color: selected ? rc : '#3a4060' }]}
+          style={[s.badgeName, { color: selected ? rc : '#3a3a60' }]}
           numberOfLines={1}
         >
           {item.name}
         </Text>
 
-        {/* Rarity dot below name */}
-        <View style={[s.rarityDot, { backgroundColor: rc, opacity: selected ? 1 : 0.35 }]} />
+        {/* Rarity dot */}
+        <View style={[s.rarityDot, {
+          backgroundColor: rc,
+          opacity: selected ? 1 : 0.25,
+          shadowColor: rc,
+          shadowRadius: selected ? 4 : 0,
+          shadowOpacity: selected ? 1 : 0,
+        }]} />
       </TouchableOpacity>
     );
   }
@@ -144,21 +185,21 @@ export default function AvatarSelectScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: '#050010' }}>
 
-      {/* Deep space gradient background */}
+      {/* Deep Miami night gradient */}
       <LinearGradient
-        colors={['#08001e', '#050010', '#010008']}
+        colors={['#0a001f', '#050010', '#010008']}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Subtle radial glow behind hero */}
+      {/* Rarity-colored radial glow behind hero */}
       <LinearGradient
-        colors={[ringColor + '18', 'transparent']}
-        style={[StyleSheet.absoluteFill, { top: 0, height: 260 }]}
+        colors={[ringColor + '1a', 'transparent']}
+        style={[StyleSheet.absoluteFill, { height: 220 }]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
       />
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/* ── Header ─────────────────────────────────────────────────────── */}
       <View style={[s.header, { paddingTop: insets.top + 6 }]}>
         <TouchableOpacity style={s.backBtn} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={22} color={colors.primary} />
@@ -173,98 +214,85 @@ export default function AvatarSelectScreen() {
         numColumns={COLS}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
-          <>
-            {/* ── Hero preview ───────────────────────────────────────────── */}
-            <Animated.View
-              style={[s.hero, { transform: [{ scale: previewScale }] }]}
-            >
-              {/* Large circular avatar */}
-              <View style={s.heroAvatarWrap}>
-                {/* Outer metallic glow ring */}
-                <View style={[s.heroGlowRing, {
-                  width:  132, height: 132,
-                  borderRadius: 66,
-                  borderColor: ringColor,
-                  shadowColor: ringColor,
-                }]} />
-                {/* Second inner ring */}
-                <View style={[s.heroInnerRing, {
-                  width: 116, height: 116,
-                  borderRadius: 58,
-                  borderColor: ringColor + '55',
-                }]} />
-                <NeonAvatarView
-                  avatarId={previewId}
-                  size={108}
-                  isEquipped={isEquipped}
-                  isLocked={!unlocked}
-                />
+          <Animated.View
+            style={[s.hero, { transform: [{ scale: previewScale }] }]}
+          >
+            {/* Avatar with double ring */}
+            <View style={s.heroAvatarWrap}>
+              <View style={[s.heroGlowRing, {
+                width: 112, height: 112, borderRadius: 56,
+                borderColor: ringColor,
+                shadowColor: ringColor,
+              }]} />
+              <View style={[s.heroInnerRing, {
+                width: 98, height: 98, borderRadius: 49,
+                borderColor: ringColor + '44',
+              }]} />
+              <NeonAvatarView
+                avatarId={previewId}
+                size={90}
+                isEquipped={isEquipped}
+                isLocked={!unlocked}
+              />
+            </View>
+
+            {/* Info panel */}
+            <View style={s.heroInfo}>
+              {/* Rarity pill */}
+              <View style={[s.rarityPill, {
+                borderColor: ringColor,
+                backgroundColor: ringColor + '1a',
+              }]}>
+                <View style={[s.rarityPillDot, { backgroundColor: ringColor }]} />
+                <Text style={[s.rarityPillText, { color: ringColor }]}>
+                  {preview.rarity}
+                </Text>
               </View>
 
-              {/* Info panel */}
-              <View style={s.heroInfo}>
-                {/* Rarity badge */}
-                <View style={[s.rarityBadge, {
-                  borderColor: ringColor,
-                  backgroundColor: ringColor + '20',
-                }]}>
-                  <Text style={[s.rarityBadgeText, { color: ringColor }]}>
-                    {preview.rarity}
+              <Text style={s.heroName}>{preview.name}</Text>
+
+              {!unlocked ? (
+                <View style={s.xpBlock}>
+                  <View style={s.xpBarBg}>
+                    <View style={[s.xpBarFill, {
+                      width: `${xpPct * 100}%` as `${number}%`,
+                      backgroundColor: ringColor,
+                    }]} />
+                  </View>
+                  <Text style={[s.xpLabel, { color: ringColor + 'bb' }]}>
+                    {profile.xp.toLocaleString()} / {preview.unlockXP.toLocaleString()} XP
                   </Text>
                 </View>
+              ) : (
+                <Text style={[s.unlockText, { color: '#44446a' }]}>
+                  {preview.unlockCondition}
+                </Text>
+              )}
 
-                <Text style={s.heroName}>{preview.name}</Text>
-
-                {!unlocked ? (
-                  <View style={s.xpBlock}>
-                    <View style={s.xpBarBg}>
-                      <View style={[s.xpBarFill, {
-                        width: `${xpPct * 100}%` as `${number}%`,
-                        backgroundColor: ringColor,
-                      }]} />
-                    </View>
-                    <Text style={[s.xpLabel, { color: ringColor + 'cc' }]}>
-                      {profile.xp.toLocaleString()} / {preview.unlockXP.toLocaleString()} XP
-                    </Text>
-                  </View>
-                ) : (
-                  <Text style={[s.unlockText, { color: ringColor + 'bb' }]}>
-                    {preview.unlockCondition}
-                  </Text>
-                )}
-
-                <TouchableOpacity
-                  style={[s.equipBtn, {
-                    borderColor: unlocked ? ringColor : '#1a1a36',
-                    backgroundColor: justEquipped
-                      ? ringColor + '40'
-                      : unlocked ? ringColor + '18' : '#08081a',
-                    opacity: !unlocked ? 0.4 : 1,
-                  }]}
-                  onPress={handleEquip}
-                  disabled={!unlocked || isEquipped}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[s.equipBtnText, {
-                    color: unlocked ? ringColor : '#2a2a50',
-                  }]}>
-                    {!unlocked
-                      ? `LOCKED — ${(preview.unlockXP - profile.xp).toLocaleString()} XP`
-                      : isEquipped ? '✓  EQUIPPED'
-                      : justEquipped ? '✓  EQUIPPED!'
-                      : 'EQUIP AVATAR'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-
-            {/* ── Gallery header ────────────────────────────────────────── */}
-            <View style={s.galleryHeader}>
-              <View style={[s.galleryDivider, { backgroundColor: '#1a1a3a' }]} />
-              <Text style={s.galleryTitle}>BADGE COLLECTION</Text>
-              <View style={[s.galleryDivider, { backgroundColor: '#1a1a3a' }]} />
+              <TouchableOpacity
+                style={[s.equipBtn, {
+                  borderColor: unlocked ? ringColor : '#16163a',
+                  backgroundColor: justEquipped
+                    ? ringColor + '35'
+                    : unlocked ? ringColor + '14' : '#07071a',
+                  opacity: !unlocked ? 0.45 : 1,
+                }]}
+                onPress={handleEquip}
+                disabled={!unlocked || isEquipped}
+                activeOpacity={0.7}
+              >
+                <Text style={[s.equipBtnText, {
+                  color: unlocked ? ringColor : '#22225a',
+                }]}>
+                  {!unlocked
+                    ? `LOCKED  —  ${(preview.unlockXP - profile.xp).toLocaleString()} XP`
+                    : isEquipped   ? '✓  EQUIPPED'
+                    : justEquipped ? '✓  EQUIPPED!'
+                    : 'EQUIP'}
+                </Text>
+              </TouchableOpacity>
             </View>
-          </>
+          </Animated.View>
         )}
         renderItem={renderBadge}
         contentContainerStyle={[s.grid, { paddingBottom: insets.bottom + 32 }]}
@@ -274,46 +302,46 @@ export default function AvatarSelectScreen() {
 }
 
 const s = StyleSheet.create({
-  // ── Header ──────────────────────────────────────────────────────────────────
+  // ── Header ────────────────────────────────────────────────────────────────
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingBottom: 6,
   },
   backBtn: {
-    width: 38, height: 38, borderRadius: 19,
+    width: 36, height: 36, borderRadius: 18,
     backgroundColor: '#0d0d24',
     alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: '#1a1a40',
+    borderWidth: 1, borderColor: '#1a1a3e',
   },
   title: {
     fontFamily: 'Orbitron_700Bold',
-    fontSize: 13,
+    fontSize: 12,
     color: '#ffffff',
     letterSpacing: 4,
   },
 
-  // ── Hero ────────────────────────────────────────────────────────────────────
+  // ── Hero (compacted ~20%) ────────────────────────────────────────────────
   hero: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    gap: 20,
-    minHeight: 152,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    gap: 16,
+    minHeight: 122,
   },
   heroAvatarWrap: {
     position: 'relative',
-    width: 132, height: 132,
+    width: 112, height: 112,
     alignItems: 'center', justifyContent: 'center',
   },
   heroGlowRing: {
     position: 'absolute',
-    borderWidth: 2,
+    borderWidth: 1.5,
     shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 20,
+    shadowRadius: 16,
     shadowOpacity: 1,
   },
   heroInnerRing: {
@@ -322,31 +350,39 @@ const s = StyleSheet.create({
   },
   heroInfo: {
     flex: 1,
-    gap: 7,
+    gap: 6,
   },
-  rarityBadge: {
+
+  rarityPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 3,
     borderRadius: 20,
     borderWidth: 1,
+    gap: 5,
   },
-  rarityBadgeText: {
+  rarityPillDot: {
+    width: 4, height: 4, borderRadius: 2,
+  },
+  rarityPillText: {
     fontFamily: 'Orbitron_700Bold',
-    fontSize: 7.5,
-    letterSpacing: 2.5,
+    fontSize: 7,
+    letterSpacing: 2,
   },
+
   heroName: {
     fontFamily: 'Orbitron_700Bold',
-    fontSize: 15,
+    fontSize: 14,
     color: '#ffffff',
     letterSpacing: 1,
-    lineHeight: 20,
+    lineHeight: 19,
   },
   xpBlock: { gap: 4 },
   xpBarBg: {
-    height: 3,
-    backgroundColor: '#111130',
+    height: 2.5,
+    backgroundColor: '#0f0f2a',
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -355,83 +391,71 @@ const s = StyleSheet.create({
     borderRadius: 2,
   },
   xpLabel: {
-    fontSize: 8.5,
+    fontSize: 8,
     fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   unlockText: {
-    fontSize: 8.5,
+    fontSize: 8,
     fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 0.5,
-    lineHeight: 13,
+    letterSpacing: 0.4,
+    lineHeight: 12,
   },
   equipBtn: {
-    paddingVertical: 9,
+    paddingVertical: 8,
     paddingHorizontal: 14,
-    borderRadius: 24,
+    borderRadius: 22,
     borderWidth: 1.5,
     alignSelf: 'flex-start',
     marginTop: 2,
   },
   equipBtnText: {
     fontFamily: 'Orbitron_700Bold',
-    fontSize: 8.5,
+    fontSize: 8,
     letterSpacing: 1.5,
   },
 
-  // ── Gallery divider ─────────────────────────────────────────────────────────
-  galleryHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: H_PAD,
-    marginBottom: 16,
-    gap: 10,
-  },
-  galleryDivider: {
-    flex: 1,
-    height: 1,
-  },
-  galleryTitle: {
-    fontFamily: 'Orbitron_700Bold',
-    fontSize: 8,
-    color: '#2a2a50',
-    letterSpacing: 3,
-  },
-
-  // ── Grid ────────────────────────────────────────────────────────────────────
+  // ── Grid ──────────────────────────────────────────────────────────────────
   grid: {
     paddingHorizontal: H_PAD,
-    paddingTop: 4,
+    paddingTop: 8,
   },
   cell: {
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 2,
     position: 'relative',
+    borderRadius: 12,
   },
   selectedGlow: {
     position: 'absolute',
-    top: 14 - 12,
-    opacity: 0.14,
+    top: 16 - 11,
+    opacity: 0.12,
   },
-  selectedRing: {
+  rarityRingAlways: {
     position: 'absolute',
-    top: 14 - 5,
-    borderWidth: 2,
+    top: 16 - 4,
+    borderWidth: 1.5,
     shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 12,
-    shadowOpacity: 1,
+  },
+  statusBadge: {
+    position: 'absolute',
+    width: 15, height: 15, borderRadius: 7.5,
+    borderWidth: 1.5,
+    alignItems: 'center', justifyContent: 'center',
   },
   badgeName: {
     fontFamily: 'Orbitron_700Bold',
     fontSize: 6.5,
-    letterSpacing: 0.4,
-    marginTop: 8,
+    letterSpacing: 0.5,
+    marginTop: 7,
     textAlign: 'center',
-    width: SLOT_W - 10,
+    width: SLOT_W - 8,
   },
   rarityDot: {
     width: 4, height: 4,
     borderRadius: 2,
     marginTop: 4,
+    shadowOffset: { width: 0, height: 0 },
   },
 });
