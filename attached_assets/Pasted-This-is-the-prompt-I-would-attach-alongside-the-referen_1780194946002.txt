@@ -1,0 +1,173 @@
+This is the prompt I would attach alongside the reference image:
+
+AVATAR SYSTEM REDESIGN — USE ATTACHED IMAGE AS VISUAL REFERENCE
+
+IMPORTANT:
+
+The attached image is NOT intended to be copied directly.
+
+Do NOT recreate the image pixel-for-pixel.
+
+Do NOT crop sections from the image.
+
+Do NOT trace the image.
+
+Instead, use it as inspiration for the visual language, quality level, style, proportions, and overall artistic direction.
+
+==============================================================
+OBJECTIVE
+=========
+
+Redesign the Chip Society avatar collection so every avatar feels like a premium collectible neon emblem.
+
+The current avatars feel:
+
+* generic
+* low effort
+* clip-art like
+* menu icons
+* placeholder graphics
+
+The new avatars should feel:
+
+* iconic
+* collectible
+* premium
+* recognizable
+* stylish
+* luxurious
+* nightlife inspired
+* poker inspired
+
+Players should want to unlock these avatars.
+
+==============================================================
+STYLE GUIDE
+===========
+
+Use the attached image as reference for:
+
+* glow quality
+* icon clarity
+* composition
+* balance
+* silhouette strength
+* visual hierarchy
+
+Each avatar should be:
+
+* centered
+* highly recognizable
+* bold
+* clean
+* readable at small sizes
+
+==============================================================
+DO NOT
+======
+
+DO NOT create:
+
+* emojis
+* cartoon graphics
+* doodles
+* stock icon style artwork
+* generic app icons
+
+DO NOT use:
+
+* thin weak outlines
+* excessive empty space
+* abstract shapes that do not resemble the intended subject
+
+==============================================================
+DO
+==
+
+Create:
+
+* strong silhouettes
+* premium neon glow
+* luxury casino aesthetics
+* retro-futuristic nightlife styling
+* synthwave influence
+* Miami nightlife influence
+* high-end poker lounge influence
+
+==============================================================
+ICON REQUIREMENTS
+=================
+
+When a player sees the icon they should instantly know what it represents.
+
+Examples:
+
+Martini Glass:
+Must clearly read as a martini glass.
+
+Poker Chip:
+Must clearly read as a poker chip.
+
+Palm Tree:
+Must clearly read as a palm tree.
+
+Lightning Bolt:
+Must clearly read as a lightning bolt.
+
+Crown:
+Must clearly read as a crown.
+
+Fire:
+Must clearly read as a flame.
+
+Moon Phase:
+Must clearly read as a crescent moon.
+
+Dice Stack:
+Must clearly read as stacked dice.
+
+The current versions fail because they are either too abstract or poorly stylized.
+
+==============================================================
+DESIGN LANGUAGE
+===============
+
+Every icon should look like:
+
+* a premium casino emblem
+* a collectible badge
+* a luxury player identity
+
+Think:
+
+Grand Theft Auto loading screen quality
+
+Luxury casino branding
+
+1980s Miami nightlife
+
+Synthwave poster art
+
+Premium mobile game cosmetics
+
+==============================================================
+TECHNICAL REQUIREMENTS
+======================
+
+* Crisp vector artwork
+* High-resolution rendering
+* Strong neon glow
+* Retina quality
+* Consistent framing
+* Consistent border treatment
+* Consistent icon sizing
+
+==============================================================
+FINAL GOAL
+==========
+
+The finished avatar collection should look like a professionally designed set of collectible emblems from an exclusive high-stakes poker social network.
+
+Use the attached image only as inspiration for quality and style.
+
+Create original artwork that captures the same level of visual impact while remaining unique to Chip Society.
