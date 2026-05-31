@@ -1,0 +1,124 @@
+===========================================================
+CRITICAL BUG FOUND
+===========================================================
+
+The avatar issue is NOT a centering issue.
+
+The issue is that the app is still cropping from a sprite sheet.
+
+Evidence:
+
+Some avatars are perfectly centered:
+
+- Martini Glass
+- Neon Palm
+- Champagne
+- Shark Fin
+
+Others are offset:
+
+- Dice Stack
+- Cassette
+- Lightning Bolt
+- Flamingo
+- Poker Chip
+- Tiger Eye
+
+If centering were broken, ALL avatars would be offset equally.
+
+Instead, every avatar is offset differently.
+
+This proves the system is still using crop coordinates from a larger reference sheet.
+
+===========================================================
+STOP USING SPRITE SHEET CROPPING
+===========================================================
+
+Do not display avatars by cropping sections from a master image.
+
+Do not use x/y crop coordinates.
+
+Do not use background-position offsets.
+
+Do not use sprite rendering.
+
+===========================================================
+NEW REQUIREMENT
+===========================================================
+
+Each avatar must become its own image asset.
+
+Example:
+
+martini_glass.png
+
+neon_palm.png
+
+dice_stack.png
+
+cassette.png
+
+lightning_bolt.png
+
+flamingo.png
+
+champagne.png
+
+shark_fin.png
+
+poker_chip.png
+
+etc.
+
+Every avatar should exist as a separate file.
+
+===========================================================
+DISPLAY RULE
+===========================================================
+
+Avatar Circle
+    ↓
+Centered Avatar PNG
+    ↓
+object-fit: contain
+    ↓
+object-position: center center
+
+NO CROPPING.
+
+NO SPRITE SHEET.
+
+NO COORDINATES.
+
+NO OFFSETS.
+
+===========================================================
+TIGER EYE BUG
+===========================================================
+
+Tiger Eye currently shows only the left side of the symbol.
+
+This confirms sprite-sheet cropping is still active.
+
+Tiger Eye should display:
+
+- full badge
+- centered symbol
+- equal padding
+- entire artwork visible
+
+===========================================================
+FINAL GOAL
+===========================================================
+
+Every avatar should be:
+
+- full artwork visible
+- perfectly centered
+- identical scale
+- loaded from its own PNG asset
+
+The avatar system should not crop from a master image at all.
+
+The sprite-sheet approach must be removed entirely.
+===========================================================

@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "ufvp0-h4NM_hcrGugQnfx"
@@ -216,3 +215,9 @@ id = "5sMZZfm07P3aNvd2wWjI4"
 uri = "file://artifacts/neon-river/assets/characters/character_40.png"
 type = "image"
 title = "generated_image"
+
+[[outputs]]
+id = "xrX_1BGLTrQvJEdL8byJG"
+uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
+type = "image"
+title = "All 30 Avatars — v8 (clean, no sprite-sheet)"
