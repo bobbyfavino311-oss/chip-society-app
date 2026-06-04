@@ -1,0 +1,183 @@
+AVATAR STYLE CONSISTENCY OVERHAUL – HIGH PRIORITY
+
+The avatar collection system has drifted away from the original visual identity of the game. The original avatar style (such as the classic Spade avatar used throughout the app) should become the permanent art direction standard for all current and future avatars.
+
+The goal is for every avatar to look like it belongs to the same collection, designed by the same artist, using the same visual language and neon aesthetic.
+
+Current Problem
+
+Many of the newer avatars use thin line art, overly detailed illustrations, and inconsistent sizing. While they may look good at large sizes, they lose clarity when displayed in:
+
+* Social Feed
+* Comments
+* Notifications
+* Leaderboards
+* Profile Cards
+* Followers Lists
+* Achievement Popups
+* Tournament Results
+
+The original avatars remain much more readable because they use simple, bold, iconic shapes.
+
+⸻
+
+MASTER STYLE REFERENCE
+
+Use the original Spade avatar as the visual benchmark for all avatar design decisions.
+
+Every avatar should follow these rules:
+
+Visual Style
+
+* Bold silhouette-based artwork
+* Thick neon line weight
+* Simple iconic shapes
+* Strong contrast against black backgrounds
+* Minimal interior details
+* Large negative space
+* Single dominant neon color
+* Clean circular framing
+* Consistent glow intensity
+* Consistent scale
+
+Avoid
+
+* Thin line illustrations
+* Complex artwork
+* Small decorative details
+* Multi-layered illustrations
+* Realistic drawing styles
+* Overly intricate shapes
+* Visual clutter
+
+If an avatar cannot be immediately identified at a small size, it must be redesigned.
+
+⸻
+
+REDESIGN EXISTING AVATARS
+
+Keep all current themes but simplify them into bold icon-style silhouettes.
+
+Common Tier
+
+Martini
+
+* Single bold martini glass silhouette
+
+Palm
+
+* Large palm tree silhouette
+
+Dice
+
+* One simple die shape with minimal pips
+
+Cassette
+
+* Simplified cassette silhouette
+
+Rare Tier
+
+Saturn
+
+* Large planet with simple ring
+
+Vinyl
+
+* Record shape with minimal grooves
+
+Cherry
+
+* Bold cherry pair silhouette
+
+Flamingo
+
+* Simplified flamingo outline
+
+Sunset
+
+* Half sun and horizon grid only
+
+Epic Tier
+
+Ace
+
+* Large Ace card silhouette
+
+Hourglass
+
+* Thick hourglass shape
+
+Dragon
+
+* Simplified dragon head profile
+
+Chip
+
+* Clean poker chip silhouette
+
+Legendary Tier
+
+Champagne
+
+* Single champagne glass silhouette
+
+Moon
+
+* Crescent moon with two or three stars maximum
+
+Future Legendary avatars should follow the same simplicity standards.
+
+⸻
+
+AVATAR GENERATION RULES
+
+All avatar assets must be generated as:
+
+* Transparent PNG
+* 1024×1024 source size
+* Centered artwork
+* Equal padding on all sides
+* Uniform scale
+* Uniform glow intensity
+* Uniform outline thickness
+* Uniform circular framing
+
+No avatar should appear visually larger or smaller than another.
+
+⸻
+
+FEED AND PROFILE DISPLAY RULES
+
+All avatars must:
+
+* Fit entirely inside avatar circles
+* Never crop
+* Never overflow frame boundaries
+* Maintain equal visual sizing
+* Remain sharp on Retina displays
+* Remain recognizable at small sizes
+
+⸻
+
+REQUIRED QUALITY TEST
+
+Before approving any avatar:
+
+Render and inspect at:
+
+* 1024px
+* 256px
+* 128px
+* 64px
+* 40px
+
+If recognition suffers at 40px, simplify the design and regenerate.
+
+⸻
+
+FINAL GOAL
+
+Every avatar in the game should feel like it belongs to one premium neon collection. A player viewing the Social Feed, Profile Page, Leaderboards, Tournament Results, Notifications, or Comments should immediately recognize that all avatars share the same visual DNA as the original Spade avatar.
+
+The Spade avatar is the gold standard. All avatar artwork should be redesigned or adjusted until it matches that level of clarity, readability, simplicity, and premium neon presentation.
