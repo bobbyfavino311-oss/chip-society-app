@@ -1,0 +1,124 @@
+PLAY SCREEN UI CLEANUP – TEXT TRUNCATION FIXES
+
+Several labels and titles are being cut off, truncated, or wrapped incorrectly. This makes the interface feel unfinished and difficult to read.
+
+ALL text throughout the Play screen must be fully readable at all times.
+
+--------------------------------------------------
+THREE CARD POKER CARD
+--------------------------------------------------
+
+CURRENT:
+
+THREE CARD P...
+
+FIX:
+
+Display full title:
+
+THREE CARD POKER
+
+Never truncate.
+
+Never show ellipsis (...).
+
+Never wrap awkwardly.
+
+Adjust layout by:
+
+• Reducing title font size slightly
+• Expanding text container width
+• Reducing unnecessary spacing
+• Prioritizing title readability
+
+The entire title must remain on one line.
+
+--------------------------------------------------
+TOURNAMENT CARD
+--------------------------------------------------
+
+CURRENT:
+
+TOURNAMEN...
+
+FIX:
+
+Display:
+
+TOURNAMENTS
+
+Entire word visible.
+
+Never wrap.
+
+Never truncate.
+
+--------------------------------------------------
+MORE CASINO GAMES BANNER
+--------------------------------------------------
+
+Ensure text remains fully readable:
+
+MORE CASINO GAMES COMING SOON
+
+Blackjack • Roulette • Baccarat
+
+Nothing should be clipped.
+
+--------------------------------------------------
+CARD LAYOUT RULES
+--------------------------------------------------
+
+If text exceeds available width:
+
+1. Reduce font size slightly
+2. Increase text area width
+3. Adjust internal padding
+4. Reposition icon if necessary
+
+DO NOT:
+
+• Use ellipsis (...)
+• Cut off words
+• Break words in half
+• Hide text
+
+--------------------------------------------------
+GLOBAL UI RULE
+--------------------------------------------------
+
+Perform a full Play screen typography pass.
+
+Check:
+
+• Casino section
+• Tournament section
+• Quick Match section
+• Ranked section
+• AI Practice section
+• More Games Coming Soon banner
+
+Every label must be readable without truncation.
+
+--------------------------------------------------
+FINAL EXPECTATION
+--------------------------------------------------
+
+Visible examples:
+
+THREE CARD POKER
+
+MORE CASINO GAMES COMING SOON
+
+TOURNAMENTS
+
+QUICK MATCH
+
+RANKED
+
+No clipped text.
+No ellipsis.
+No broken words.
+No overlapping UI.
+
+The screen should feel polished, production-ready, and App Store quality.
