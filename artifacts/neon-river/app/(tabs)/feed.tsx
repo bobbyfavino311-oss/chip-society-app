@@ -50,7 +50,6 @@ const FEED_TABS = [
   { id: 'trending',    label: 'Trending',     icon: 'flame' as const },
   { id: 'following',   label: 'Following',    icon: 'people' as const },
   { id: 'pots',        label: 'Biggest Pots', icon: 'cash' as const },
-  { id: 'highlights',  label: 'Highlights',   icon: 'star' as const },
   { id: 'leaderboard', label: 'Leaderboard',  icon: 'podium' as const },
   { id: 'search',      label: 'Search',       icon: 'search' as const },
   { id: 'me',          label: 'Me',           icon: 'person-circle' as const },
@@ -840,7 +839,7 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
             <Image source={{ uri: profile.avatarUri }} style={[me.bigAvatar, { borderColor: colors.primary }]} />
           ) : (
             <NeonAvatar
-              avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (profile.avatarIndex ? ((profile.avatarIndex - 1) % 30) + 1 : 1)}
+              avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1}
               size={60}
               isEquipped
             />
@@ -984,11 +983,7 @@ function AIPostMiniCard({ post }: { post: AIPost }) {
       <View style={[aiCardStyle.accentLine, { backgroundColor: post.tagColor }]} />
       {/* Header row */}
       <View style={aiCardStyle.header}>
-        <View style={[aiCardStyle.avatar, { backgroundColor: `${post.personality.avatarColor}25`, borderColor: `${post.personality.avatarColor}55` }]}>
-          <Text style={[aiCardStyle.avatarText, { color: post.personality.avatarColor }]}>
-            {post.personality.avatarInitials}
-          </Text>
-        </View>
+        <NeonAvatar avatarId={post.personality.avatarId} size={32} />
         <View style={{ flex: 1 }}>
           <Text style={aiCardStyle.username} numberOfLines={1}>{post.personality.username}</Text>
           <Text style={aiCardStyle.timeAgo}>{post.timeAgo}</Text>
@@ -1042,10 +1037,6 @@ function AIPostsStrip({ posts }: { posts: AIPost[] }) {
   if (posts.length === 0) return null;
   return (
     <View style={stripStyle.wrap}>
-      <View style={stripStyle.label}>
-        <View style={stripStyle.liveDot} />
-        <Text style={stripStyle.labelText}>AI FEED — LIVE</Text>
-      </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -34,10 +34,10 @@ export const NEON_RARITY_BORDER: Record<NeonRarity, number> = {
 
 export const NEON_AVATARS: NeonAvatar[] = [
   // ── COMMON (1–4) — unlocked from the start ───────────────────────────────────
-  { id: 1,  name: 'MARTINI',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#00d4ff', bgColor: '#001822' },
-  { id: 2,  name: 'PALM',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#ff0090', bgColor: '#1a0012' },
-  { id: 3,  name: 'DICE',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#8b5cf6', bgColor: '#0e0018' },
-  { id: 4,  name: 'CASSETTE',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#00d4ff', bgColor: '#001822' },
+  { id: 1,  name: 'MARTINI',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
+  { id: 2,  name: 'PALM',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#ff0090', bgColor: '#1a0012' },
+  { id: 3,  name: 'DICE',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#8b5cf6', bgColor: '#0e0018' },
+  { id: 4,  name: 'CASSETTE',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
   // ── RARE (5–9) ────────────────────────────────────────────────────────────────
   { id: 5,  name: 'SATURN',    rarity: 'RARE',      unlockXP: 5000,   unlockCondition: 'Reach 5,000 XP',   color: '#a855f7', bgColor: '#0f001e' },
   { id: 6,  name: 'VINYL',     rarity: 'RARE',      unlockXP: 10000,  unlockCondition: 'Reach 10,000 XP',  color: '#ff1a6e', bgColor: '#1a000e' },

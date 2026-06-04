@@ -264,9 +264,11 @@ export default function AvatarSelectScreen() {
                   </Text>
                 </View>
               ) : (
-                <Text style={[s.unlockText, { color: '#44446a' }]}>
-                  {preview.unlockCondition}
-                </Text>
+                preview.unlockCondition ? (
+                  <Text style={[s.unlockText, { color: '#44446a' }]}>
+                    {preview.unlockCondition}
+                  </Text>
+                ) : null
               )}
 
               <TouchableOpacity

@@ -38,20 +38,6 @@ function TournamentTypeCard({ config, userChips }: { config: TournamentConfig; u
   const canAfford = userChips >= config.buyIn;
   const isHighRoller = config.type === 'highroller';
 
-  const handlePlay = () => {
-    if (!canAfford) {
-      Alert.alert(
-        'Not Enough Chips',
-        `You need ${formatChips(config.buyIn)} chips to enter this tournament.\n\nVisit the Store to get more chips.`,
-        [
-          { text: 'Visit Store', onPress: () => router.push('/store' as any) },
-          { text: 'Play Lower Stakes', style: 'cancel' },
-        ],
-      );
-      return;
-    }
-    router.push({ pathname: '/game/tournament', params: { type: config.type } } as any);
-  };
 
   return (
     <View style={[card.wrap, isHighRoller && card.wrapGold]}>
@@ -107,39 +93,18 @@ function TournamentTypeCard({ config, userChips }: { config: TournamentConfig; u
       {/* Prize label */}
       <Text style={card.prizeLabel}>{config.prizeLabel}</Text>
 
-      {/* Insufficient chips warning */}
-      {!canAfford && (
-        <View style={card.insufficientRow}>
-          <Ionicons name="warning-outline" size={12} color={colors.error} />
-          <Text style={card.insufficientText}>
-            Need {formatChips(config.buyIn - userChips)} more chips
-          </Text>
-        </View>
-      )}
-
-      {/* Play button */}
-      <TouchableOpacity
-        style={[card.playBtn, !canAfford && card.playBtnDisabled]}
-        onPress={handlePlay}
-        activeOpacity={0.85}
-      >
-        {canAfford ? (
-          <LinearGradient
-            colors={[config.color, `${config.color}99`]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-        ) : null}
-        <Ionicons
-          name={canAfford ? 'trophy' : 'lock-closed'}
-          size={14}
-          color={canAfford ? colors.background : colors.textDim}
-        />
-        <Text style={[card.playBtnText, !canAfford && card.playBtnTextDisabled]}>
-          {canAfford ? 'PLAY NOW' : 'NOT ENOUGH CHIPS'}
-        </Text>
-      </TouchableOpacity>
+      {/* Coming soon — locked */}
+      <View style={{
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+        gap: 8, paddingVertical: 12, borderRadius: 10, borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)',
+      }}>
+        <Ionicons name="lock-closed-outline" size={13} color="rgba(255,255,255,0.25)" />
+        <Text style={{
+          color: 'rgba(255,255,255,0.25)', fontSize: 10, fontWeight: '800',
+          fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
+        }}>COMING SOON</Text>
+      </View>
     </View>
   );
 }
@@ -199,11 +164,11 @@ export default function TournamentsScreen() {
           </View>
         </View>
 
-        {/* Beta notice */}
+        {/* Coming soon notice */}
         <View style={styles.betaNotice}>
-          <Ionicons name="information-circle-outline" size={14} color={colors.primary} />
-          <Text style={styles.betaText}>
-            Tournament Mode · AI opponents fill all seats · No real money
+          <Ionicons name="lock-closed-outline" size={14} color="rgba(255,215,0,0.65)" />
+          <Text style={[styles.betaText, { color: 'rgba(255,215,0,0.65)' }]}>
+            Tournaments are in development — launching soon
           </Text>
         </View>
 

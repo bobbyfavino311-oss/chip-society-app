@@ -1,24 +1,36 @@
-// ─── NeonAvatar — SVG-powered neon avatar, always renders ─────────────────────
-// Replaced PNG-based system with programmatic SVG icons (NeonAvatarSymbol.tsx).
-// No PNGs. No loading failures. No black circles. Scales to any size.
+// ─── NeonAvatar — pixel-perfect PNG avatars from approved source sheet ─────────
+// Each avatar_N.png is a 250×250 crop of the approved neon icon sprite sheet.
+// The View clip (overflow:hidden + borderRadius) produces the circular mask.
+// PNGs have the source black background — blends perfectly with #050010 dark bg.
 
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
   getNeonAvatar,
   NEON_RARITY_BORDER,
   NEON_RARITY_COLORS,
 } from '@/constants/neonAvatars';
-import { renderAvatarIcon } from './NeonAvatarSymbol';
 
-export interface NeonAvatarProps {
-  avatarId?: number;
-  size?: number;
-  isLocked?: boolean;
-  isEquipped?: boolean;
-  style?: object;
-}
+// ─── Static PNG map — must be literal require() calls for Metro bundler ────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AVATAR_IMAGES: Record<number, any> = {
+  1:  require('../assets/avatars/avatar_1.png'),
+  2:  require('../assets/avatars/avatar_2.png'),
+  3:  require('../assets/avatars/avatar_3.png'),
+  4:  require('../assets/avatars/avatar_4.png'),
+  5:  require('../assets/avatars/avatar_5.png'),
+  6:  require('../assets/avatars/avatar_6.png'),
+  7:  require('../assets/avatars/avatar_7.png'),
+  8:  require('../assets/avatars/avatar_8.png'),
+  9:  require('../assets/avatars/avatar_9.png'),
+  10: require('../assets/avatars/avatar_10.png'),
+  11: require('../assets/avatars/avatar_11.png'),
+  12: require('../assets/avatars/avatar_12.png'),
+  13: require('../assets/avatars/avatar_13.png'),
+  14: require('../assets/avatars/avatar_14.png'),
+  15: require('../assets/avatars/avatar_15.png'),
+};
 
 // ─── Lock overlay ──────────────────────────────────────────────────────────────
 function LockOverlay({ size, color, xpLabel }: { size: number; color: string; xpLabel?: string }) {
@@ -39,6 +51,14 @@ function LockOverlay({ size, color, xpLabel }: { size: number; color: string; xp
 }
 
 // ─── Main component ────────────────────────────────────────────────────────────
+export interface NeonAvatarProps {
+  avatarId?: number;
+  size?: number;
+  isLocked?: boolean;
+  isEquipped?: boolean;
+  style?: object;
+}
+
 export default function NeonAvatar({
   avatarId = 1,
   size = 64,
@@ -46,7 +66,8 @@ export default function NeonAvatar({
   isEquipped = false,
   style,
 }: NeonAvatarProps) {
-  const avatar      = getNeonAvatar(avatarId);
+  const safeId    = Math.min(15, Math.max(1, Math.round(avatarId || 1)));
+  const avatar    = getNeonAvatar(safeId);
   const rarityColor = NEON_RARITY_COLORS[avatar.rarity];
   const borderWidth = NEON_RARITY_BORDER[avatar.rarity];
 
@@ -86,6 +107,7 @@ export default function NeonAvatar({
     : undefined;
 
   const inner = Math.max(size - borderWidth * 2, 4);
+  const source = AVATAR_IMAGES[safeId] ?? AVATAR_IMAGES[1];
 
   return (
     <View style={[{ width: size, height: size }, style]}>
@@ -112,14 +134,20 @@ export default function NeonAvatar({
         borderWidth,
         borderColor: isEquipped ? '#ffffff' : rarityColor,
         overflow: 'hidden',
-        backgroundColor: '#050010',
+        backgroundColor: '#000000',
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        {/* SVG neon icon — always renders, no loading required */}
-        <View style={{ opacity: isLocked ? 0.18 : 1 }}>
-          {renderAvatarIcon(avatarId, avatar.color, inner)}
-        </View>
+        {/* PNG avatar — approved source artwork */}
+        <Image
+          source={source}
+          style={{
+            width:  inner,
+            height: inner,
+            opacity: isLocked ? 0.15 : 1,
+          }}
+          resizeMode="cover"
+        />
 
         {/* Lock overlay */}
         {isLocked && (

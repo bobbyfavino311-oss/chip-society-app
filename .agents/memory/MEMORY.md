@@ -1,7 +1,8 @@
 - [Short Deck variant architecture](short-deck-variant.md) — GameVariant lives in pokerEngine.ts; GameState carries variant field so all pure functions see it without extra params.
 - [Chip amount font](chip-font.md) — Inter_700Bold only for numbers, never Orbitron (user explicitly rejected Orbitron as "slanted sci-fi").
 - [AI Social Engine architecture](ai-social-engine.md) — 10 AI personalities, 7 post types, pure in-memory generation; AISocialContext seeds 8 posts and adds one every 10 min.
-- [Play tab conventions](play-tab-conventions.md) — Tournament discovery is Home-only; Quick Match and Ranked show as LOCKED in Play tab; VariantCard has no onTournaments prop.
+- [Play tab conventions](play-tab-conventions.md) — Play tab has 3 mode cards: Quick Play (functional), Ranked (alert-to-practice bridge), Tournaments (locked/COMING SOON). No variant cards.
 - [Neon avatar naming collision](neon-avatar-naming.md) — `type NeonAvatar` (from neonAvatars.ts) and the default `NeonAvatar` component (NeonAvatar.tsx) cause TS2300 in the same file; alias one: `type NeonAvatar as NeonAvatarData` + `import NeonAvatarView from ...`.
-- [SVG Avatar System — replaced broken PNGs](svg-avatar-system.md) — 15 programmatic SVG icons in NeonAvatarSymbol.tsx; avatarIds 1–15 only; getNeonAvatar() clamps; bots use [9,13,12,15,7].
+- [PNG avatar system](png-avatar-system.md) — NeonAvatar.tsx uses static require() map (15 PNGs); type must be Record<number,any> not ReturnType<typeof require>; bots use [9,13,12,15,7].
 - [Game screen crash — ArcTimer module-level createAnimatedComponent](arc-timer-crash.md) — DO NOT import PlayerSeat in practice.tsx or any game screen; it pulls in ArcTimer which calls Animated.createAnimatedComponent(Circle) at module level, triggering "Invalid hook call" with React Compiler + RNW 0.21 + React 19.
+- [aiSocialEngine required exports](ai-social-engine-exports.md) — AISocialContext.tsx imports formatTimeAgo, seedAIPosts, generateAIPost; all must be exported; idSuffix is optional; seedAIPosts must precede nothing (hoisted).

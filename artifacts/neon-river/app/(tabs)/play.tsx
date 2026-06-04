@@ -1,9 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
-  Animated,
-  Modal,
+  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -14,255 +13,132 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
-import { useTheme } from '@/context/ThemeContext';
-import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { GuestBanner } from '@/components/GuestBanner';
-import type { GameVariant } from '@/constants/gameVariants';
-import { VARIANT_CONFIGS } from '@/constants/gameVariants';
+import type { Colors } from '@/constants/colors';
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 function createStyles(c: Colors) {
   return StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.background },
-    scroll: { paddingHorizontal: 16, gap: 14 },
-    pageTitle: { color: c.text, fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
+    container:   { flex: 1, backgroundColor: c.background },
+    scroll:      { paddingHorizontal: 16, gap: 16 },
+    pageTitle: {
+      color: c.text, fontSize: 22, fontWeight: '800',
+      fontFamily: 'Orbitron_900Black', letterSpacing: 3,
+    },
     pageSub: { color: c.textMuted, fontSize: 13, marginTop: -6 },
 
-    variantCard: {
-      borderRadius: 18, borderWidth: 1, overflow: 'hidden',
-      paddingVertical: 0, marginBottom: 2,
+    modeCard: {
+      borderRadius: 20, borderWidth: 1, overflow: 'hidden', padding: 20, gap: 14,
     },
-    variantHeader: {
-      flexDirection: 'row', alignItems: 'center',
-      paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10, gap: 12,
-    },
-    variantIconWrap: {
-      width: 42, height: 42, borderRadius: 12, borderWidth: 1,
+    modeHeader:  { flexDirection: 'row', alignItems: 'center', gap: 14 },
+    modeIconWrap: {
+      width: 52, height: 52, borderRadius: 16, borderWidth: 1,
       alignItems: 'center', justifyContent: 'center',
     },
-    variantTitle: {
-      fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5,
+    modeTitle: {
+      fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
     },
-    variantDeckLabel: {
-      fontSize: 10, marginTop: 2,
+    modeSubtitle: { fontSize: 11, marginTop: 2 },
+    modeDesc:  { fontSize: 12, lineHeight: 18 },
+
+    modeBtn: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+      borderRadius: 14, paddingVertical: 14, gap: 8, overflow: 'hidden',
     },
-    variantRankNote: {
-      fontSize: 9, fontWeight: '700', letterSpacing: 0.8, marginTop: 1,
-    },
-    variantDivider: { height: 1, marginHorizontal: 16, opacity: 0.18 },
-    variantActions: {
-      flexDirection: 'row', padding: 12, gap: 8,
-    },
-    actionBtn: {
-      flex: 1, borderRadius: 12, borderWidth: 1, overflow: 'hidden',
-      paddingVertical: 12, alignItems: 'center', gap: 4,
-    },
-    actionBtnLabel: {
-      fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8,
-    },
-    actionBtnSub: {
-      fontSize: 8, fontWeight: '600',
-    },
-    rulesChip: {
-      flexDirection: 'row', alignItems: 'center', gap: 5,
-      paddingHorizontal: 16, paddingBottom: 14, paddingTop: 2,
-    },
-    rulesChipText: {
-      fontSize: 9, fontWeight: '700', letterSpacing: 0.8,
+    modeBtnText: {
+      fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
     },
 
-    actionBtnLocked: {
-      borderColor: 'rgba(255,255,255,0.07)',
+    lockedCard: { opacity: 0.72 },
+    lockedBtn: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+      borderRadius: 14, paddingVertical: 14, gap: 8,
+      borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
       backgroundColor: 'rgba(255,255,255,0.03)',
     },
-    actionBtnLabelLocked: {
-      color: 'rgba(255,255,255,0.2)',
+    lockedBtnText: {
+      fontSize: 11, fontWeight: '900', fontFamily: 'Orbitron_700Bold',
+      letterSpacing: 1, color: 'rgba(255,255,255,0.22)',
     },
-    soonChip: {
-      borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2,
-      backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    soonPill: {
+      borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3,
+      backgroundColor: 'rgba(255,255,255,0.06)',
+      borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
     },
     soonText: {
-      fontSize: 7, fontWeight: '800', letterSpacing: 0.8, color: 'rgba(255,255,255,0.25)',
-    },
-
-    sectionTitle: {
-      color: c.textMuted, fontSize: 10, fontWeight: '700',
-      letterSpacing: 2, fontFamily: 'Orbitron_400Regular', marginBottom: -4,
-    },
-    infoCard: {
-      borderRadius: 12, borderWidth: 1, borderColor: c.primaryDim,
-      padding: 14, flexDirection: 'row', alignItems: 'flex-start',
-      gap: 10, overflow: 'hidden', backgroundColor: c.surface,
-    },
-    infoText: { color: c.textMuted, fontSize: 11, lineHeight: 17, flex: 1 },
-
-    // Rules modal
-    overlay: { flex: 1, backgroundColor: 'rgba(5,0,16,0.88)', justifyContent: 'flex-end' },
-    rulesModal: {
-      backgroundColor: '#0d0025', borderTopLeftRadius: 24, borderTopRightRadius: 24,
-      borderWidth: 1, borderColor: '#ff009055', padding: 24, gap: 16,
-    },
-    rulesModalTitle: {
-      color: '#ff0090', fontSize: 16, fontWeight: '900',
-      fontFamily: 'Orbitron_700Bold', letterSpacing: 1, textAlign: 'center',
-    },
-    rulesModalSub: {
-      color: '#bf5fff', fontSize: 11, textAlign: 'center', marginTop: -8,
-    },
-    ruleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-    ruleDot: {
-      width: 6, height: 6, borderRadius: 3, marginTop: 5,
-    },
-    ruleText: { color: '#ccc', fontSize: 12, lineHeight: 18, flex: 1 },
-    ruleTextBold: { color: '#ff0090', fontWeight: '800' },
-    dismissBtn: {
-      borderRadius: 12, borderWidth: 1, borderColor: '#ff009066',
-      backgroundColor: '#ff009022', paddingVertical: 14,
-      alignItems: 'center', marginTop: 4,
-    },
-    dismissBtnText: {
-      color: '#ff0090', fontSize: 12, fontWeight: '900',
-      fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
+      fontSize: 8, fontWeight: '800', letterSpacing: 1, color: 'rgba(255,255,255,0.28)',
     },
   });
 }
 
-// ─── Short Deck Rules Modal ───────────────────────────────────────────────────
-function ShortDeckRulesModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const colors = useColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
-  const cfg = VARIANT_CONFIGS.short_deck_holdem;
-
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.rulesModal}>
-          <Text style={styles.rulesModalTitle}>SHORT DECK HOLD'EM</Text>
-          <Text style={styles.rulesModalSub}>6-Plus Hold'em · 36-card deck</Text>
-
-          {cfg.rulesPoints.map((point, i) => {
-            const isBold = point.includes('FLUSH BEATS');
-            return (
-              <View key={i} style={styles.ruleRow}>
-                <View style={[styles.ruleDot, { backgroundColor: isBold ? '#ff0090' : '#bf5fff' }]} />
-                {isBold ? (
-                  <Text style={[styles.ruleText, styles.ruleTextBold]}>{point}</Text>
-                ) : (
-                  <Text style={styles.ruleText}>{point}</Text>
-                )}
-              </View>
-            );
-          })}
-
-          <TouchableOpacity style={styles.dismissBtn} onPress={onClose} activeOpacity={0.85}>
-            <Text style={styles.dismissBtnText}>UNDERSTOOD</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
+// ─── Mode card ────────────────────────────────────────────────────────────────
+interface ModeCardProps {
+  icon: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  color: string;
+  btnLabel: string;
+  locked?: boolean;
+  onPress?: () => void;
 }
 
-// ─── Variant Card ─────────────────────────────────────────────────────────────
-interface VariantCardProps {
-  variant: GameVariant;
-  onAIPractice: () => void;
-  onRules?: () => void;
-}
-
-function VariantCard({ variant, onAIPractice, onRules }: VariantCardProps) {
+function ModeCard({ icon, title, subtitle, description, color, btnLabel, locked, onPress }: ModeCardProps) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const cfg = VARIANT_CONFIGS[variant];
-  const c = cfg.color;
-  const a = cfg.accentColor;
-
-  const scaleAI = useRef(new Animated.Value(1)).current;
-
-  const pressIn  = (v: Animated.Value) => () => Animated.spring(v, { toValue: 0.95, useNativeDriver: true }).start();
-  const pressOut = (v: Animated.Value) => () => Animated.spring(v, { toValue: 1, useNativeDriver: true }).start();
 
   return (
-    <View style={[styles.variantCard, { borderColor: `${c}44` }]}>
+    <View style={[styles.modeCard, locked && styles.lockedCard, {
+      borderColor: `${color}${locked ? '28' : '44'}`,
+      backgroundColor: `${color}09`,
+    }]}>
       <LinearGradient
-        colors={[`${c}14`, `${a}08`, 'transparent']}
+        colors={[`${color}16`, `${color}06`, 'transparent']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
 
       {/* Header */}
-      <View style={styles.variantHeader}>
-        <View style={[styles.variantIconWrap, { backgroundColor: `${c}20`, borderColor: `${c}40` }]}>
-          <Ionicons
-            name={variant === 'short_deck_holdem' ? 'layers-outline' : 'card-outline'}
-            size={22}
-            color={c}
+      <View style={styles.modeHeader}>
+        <View style={[styles.modeIconWrap, {
+          backgroundColor: `${color}1a`,
+          borderColor: `${color}44`,
+        }]}>
+          <Ionicons name={icon as any} size={26} color={color} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.modeTitle, { color }]}>{title}</Text>
+          <Text style={[styles.modeSubtitle, { color: `${color}99` }]}>{subtitle}</Text>
+        </View>
+        {locked && (
+          <View style={styles.soonPill}>
+            <Text style={styles.soonText}>SOON</Text>
+          </View>
+        )}
+      </View>
+
+      <Text style={[styles.modeDesc, { color: colors.textMuted }]}>{description}</Text>
+
+      {/* Action button */}
+      {locked ? (
+        <View style={styles.lockedBtn}>
+          <Ionicons name="lock-closed-outline" size={14} color="rgba(255,255,255,0.2)" />
+          <Text style={styles.lockedBtnText}>COMING SOON</Text>
+        </View>
+      ) : (
+        <TouchableOpacity
+          style={styles.modeBtn}
+          onPress={onPress}
+          activeOpacity={0.85}
+        >
+          <LinearGradient
+            colors={[color, `${color}bb`]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
           />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.variantTitle, { color: c }]}>{cfg.label.toUpperCase()}</Text>
-          <Text style={[styles.variantDeckLabel, { color: colors.textMuted }]}>{cfg.deckLabel}</Text>
-          <Text style={[styles.variantRankNote, { color: `${c}aa` }]}>{cfg.rankingNote}</Text>
-        </View>
-      </View>
-
-      {/* Divider */}
-      <View style={[styles.variantDivider, { backgroundColor: c }]} />
-
-      {/* Action buttons */}
-      <View style={styles.variantActions}>
-
-        {/* AI PRACTICE — open */}
-        <Animated.View style={{ flex: 1, transform: [{ scale: scaleAI }] }}>
-          <TouchableOpacity
-            style={[styles.actionBtn, { borderColor: `${c}55`, backgroundColor: `${c}10` }]}
-            onPress={onAIPractice}
-            onPressIn={pressIn(scaleAI)}
-            onPressOut={pressOut(scaleAI)}
-            activeOpacity={1}
-          >
-            <LinearGradient
-              colors={[`${c}18`, 'transparent']}
-              style={StyleSheet.absoluteFill}
-              start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-            />
-            <Ionicons name="flash" size={18} color={c} />
-            <Text style={[styles.actionBtnLabel, { color: c }]}>AI PRACTICE</Text>
-            <Text style={[styles.actionBtnSub, { color: `${c}99` }]}>Offline · Ready</Text>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* QUICK MATCH — locked */}
-        <View style={{ flex: 1 }}>
-          <View style={[styles.actionBtn, styles.actionBtnLocked]}>
-            <Ionicons name="lock-closed-outline" size={16} color="rgba(255,255,255,0.2)" />
-            <Text style={[styles.actionBtnLabel, styles.actionBtnLabelLocked]}>QUICK MATCH</Text>
-            <View style={styles.soonChip}>
-              <Text style={styles.soonText}>SOON</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* RANKED — locked */}
-        <View style={{ flex: 1 }}>
-          <View style={[styles.actionBtn, styles.actionBtnLocked]}>
-            <Ionicons name="lock-closed-outline" size={16} color="rgba(255,255,255,0.2)" />
-            <Text style={[styles.actionBtnLabel, styles.actionBtnLabelLocked]}>RANKED</Text>
-            <View style={styles.soonChip}>
-              <Text style={styles.soonText}>SOON</Text>
-            </View>
-          </View>
-        </View>
-
-      </View>
-
-      {/* Rules chip for Short Deck */}
-      {onRules && (
-        <TouchableOpacity style={styles.rulesChip} onPress={onRules} activeOpacity={0.75}>
-          <Ionicons name="information-circle-outline" size={13} color={`${c}cc`} />
-          <Text style={[styles.rulesChipText, { color: `${c}cc` }]}>SHORT DECK RULES</Text>
+          <Ionicons name="flash" size={16} color="#000" />
+          <Text style={[styles.modeBtnText, { color: '#000' }]}>{btnLabel}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -274,34 +150,32 @@ export default function PlayScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
   const colors = useColors();
-  const { isDark } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [shortDeckRulesVisible, setShortDeckRulesVisible] = useState(false);
 
-  const bgGradient = isDark
-    ? ([colors.background, '#0a001e', colors.background] as const)
-    : ([colors.background, colors.surfaceElevated, colors.background] as const);
+  const goQuickPlay = () => router.push('/game/practice?variant=texas_holdem' as any);
 
-  const goAIPractice = (variant: GameVariant) => {
-    router.push(`/game/practice?variant=${variant}` as any);
+  const goRanked = () => {
+    Alert.alert(
+      'RANKED MODE',
+      'Ranked matchmaking is launching in an upcoming update.\n\nYour stats are already being tracked — you will be placed based on your current record when ranked goes live.',
+      [
+        { text: 'PLAY QUICK MATCH', onPress: goQuickPlay },
+        { text: 'OK', style: 'cancel' },
+      ]
+    );
   };
 
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={bgGradient}
+        colors={[colors.background, '#0a001e', colors.background]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
 
       {profile.isGuest && (
-        <GuestBanner message="Guest mode — create a free account to unlock Ranked & cloud saves" />
+        <GuestBanner message="Create a free account to save your stats and progress" />
       )}
-
-      <ShortDeckRulesModal
-        visible={shortDeckRulesVisible}
-        onClose={() => setShortDeckRulesVisible(false)}
-      />
 
       <ScrollView
         contentContainerStyle={[
@@ -310,29 +184,38 @@ export default function PlayScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>PLAY MODES</Text>
-        <Text style={styles.pageSub}>Jump in and play</Text>
+        <Text style={styles.pageTitle}>PLAY</Text>
+        <Text style={styles.pageSub}>Choose your game mode</Text>
 
-        <Text style={styles.sectionTitle}>TRADITIONAL HOLD'EM</Text>
-        <VariantCard
-          variant="texas_holdem"
-          onAIPractice={() => goAIPractice('texas_holdem')}
+        <ModeCard
+          icon="flash"
+          title="QUICK PLAY"
+          subtitle="Texas Hold'em · AI opponents"
+          description="Jump into a full table against AI players. Practice your strategy, improve your reads, and earn XP — available offline, anytime."
+          color="#00d4ff"
+          btnLabel="PLAY NOW"
+          onPress={goQuickPlay}
         />
 
-        <Text style={styles.sectionTitle}>SHORT DECK HOLD'EM</Text>
-        <VariantCard
-          variant="short_deck_holdem"
-          onAIPractice={() => goAIPractice('short_deck_holdem')}
-          onRules={() => setShortDeckRulesVisible(true)}
+        <ModeCard
+          icon="podium"
+          title="RANKED"
+          subtitle="Competitive matchmaking"
+          description="Compete against real players for ranking points, seasonal leaderboard placement, and exclusive Ranked-only rewards."
+          color="#ff0090"
+          btnLabel="FIND MATCH"
+          onPress={goRanked}
         />
 
-        <View style={styles.infoCard}>
-          <LinearGradient colors={[colors.primaryDim, 'transparent']} style={StyleSheet.absoluteFill} />
-          <Ionicons name="information-circle-outline" size={16} color={colors.primary} />
-          <Text style={styles.infoText}>
-            AI Practice is always available offline. Quick Match and Ranked are coming soon — tournament discovery is on the Home screen.
-          </Text>
-        </View>
+        <ModeCard
+          icon="trophy"
+          title="TOURNAMENTS"
+          subtitle="Prize pools · Brackets · Glory"
+          description="Multi-table tournaments with structured blind levels, prize pools up to 2M chips, and final table prestige."
+          color="#ffd700"
+          btnLabel="COMING SOON"
+          locked
+        />
       </ScrollView>
     </View>
   );

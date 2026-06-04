@@ -1,0 +1,276 @@
+===========================================================
+LAUNCH FEATURE SIMPLIFICATION UPDATE
+PRE-LAUNCH LOCKDOWN PHASE
+=========================
+
+The game is becoming too complex too early.
+
+We need to simplify the experience for launch and focus only on the core features that are actually functional.
+
+Anything incomplete, filler, placeholder, or not fully polished should be hidden or locked until a future update.
+
+===========================================================
+TOURNAMENTS
+LOCK FEATURE FOR LAUNCH
+=======================
+
+Current tournament system is not ready.
+
+The tournament cards currently function more as placeholders than a true tournament ecosystem.
+
+Although players can enter tournament games, the experience is not complete and does not yet justify being presented as a fully available feature.
+
+ACTION REQUIRED:
+
+DO NOT REMOVE TOURNAMENTS.
+
+Keep tournament cards visible.
+
+Keep tournament branding visible.
+
+Keep tournament artwork visible.
+
+However:
+
+LOCK ALL TOURNAMENTS.
+
+Add lock icon.
+
+Disable interaction.
+
+Disable entry.
+
+Disable registration.
+
+Disable matchmaking.
+
+Display:
+
+COMING SOON
+
+on every tournament card.
+
+Tournament section should feel like a premium future feature that is currently under development.
+
+===========================================================
+PLAY SECTION
+SIMPLIFY FOR LAUNCH
+===================
+
+Available at launch:
+
+✓ Quick Play
+
+✓ Ranked
+
+Locked:
+
+🔒 Tournaments
+
+Coming Soon
+
+Nothing else.
+
+Keep this simple.
+
+Clean.
+
+Easy to understand.
+
+===========================================================
+SOCIAL FEED
+REMOVE UNNECESSARY ELEMENTS
+===========================
+
+DELETE:
+
+"AI FEED — LIVE"
+
+subheading above feed.
+
+The feed should simply begin with posts.
+
+No extra label.
+
+No extra subtext.
+
+===========================================================
+DELETE HIGHLIGHTS TAB
+=====================
+
+Remove:
+
+Highlights
+
+tab completely.
+
+Keep only the tabs that are actually useful.
+
+The Highlights tab currently adds clutter and serves little purpose.
+
+Remove it entirely.
+
+===========================================================
+AVATAR SYSTEM
+REMOVE THIS TEXT
+================
+
+Delete:
+
+"Available From The Start"
+
+from avatar selection.
+
+This text adds no value.
+
+The avatar itself already communicates availability.
+
+Remove everywhere.
+
+===========================================================
+AVATAR SYSTEM
+USE EXACT SOURCE ASSETS
+=======================
+
+Current avatars are similar to the provided reference.
+
+They are NOT identical.
+
+This is unacceptable.
+
+The supplied avatar sheet already contains the exact approved designs.
+
+DO NOT RECREATE THEM.
+
+DO NOT REDRAW THEM.
+
+DO NOT INTERPRET THEM.
+
+DO NOT GENERATE NEW VERSIONS.
+
+Instead:
+
+Use the exact artwork from the approved reference image.
+
+Crop directly from the approved source.
+
+===========================================================
+CROPPING REQUIREMENTS
+=====================
+
+Each avatar must be:
+
+✓ Cleanly cropped
+
+✓ Perfectly centered
+
+✓ Full icon visible
+
+✓ Full circular border visible
+
+✓ Full glow visible
+
+✓ No blur
+
+✓ No neighboring artwork
+
+✓ No clipping
+
+✓ No resizing distortion
+
+✓ No AI redraw
+
+Every avatar should look exactly like the source image.
+
+Pixel-for-pixel.
+
+If the avatar differs from the source image in any way:
+
+it is incorrect.
+
+===========================================================
+SOCIAL FEED AVATARS
+STILL BROKEN
+============
+
+AI feed posts still use initials.
+
+Examples:
+
+BM
+
+CB
+
+JS
+
+etc.
+
+This must stop.
+
+===========================================================
+NEW RULE
+========
+
+Every account must display an avatar.
+
+Human players:
+
+Use selected avatar.
+
+AI profiles:
+
+Use randomly assigned neon avatar.
+
+Never use initials.
+
+Never use letter badges.
+
+Never use placeholder circles.
+
+Never use generic profile icons.
+
+The avatar system must be visible everywhere.
+
+===========================================================
+LAUNCH FEATURE SET
+==================
+
+ONLY THESE FEATURES SHOULD BE AVAILABLE AT LAUNCH:
+
+✓ Quick Play
+
+✓ Ranked
+
+✓ Social Media Feed
+
+✓ Avatar Customization
+
+✓ Player Profile
+
+✓ Chip Store
+
+Everything else should either be:
+
+Locked
+
+or
+
+Coming Soon
+
+until fully completed.
+
+===========================================================
+GOAL
+====
+
+Launch a smaller feature set that feels polished.
+
+Do not overwhelm the player with unfinished systems.
+
+Focus on quality.
+
+Focus on stability.
+
+Focus on consistency.
+
+# Make every available feature feel complete before unlocking additional systems.
