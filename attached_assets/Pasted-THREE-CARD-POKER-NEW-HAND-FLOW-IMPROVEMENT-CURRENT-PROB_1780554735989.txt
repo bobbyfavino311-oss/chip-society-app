@@ -1,0 +1,155 @@
+THREE CARD POKER – NEW HAND FLOW IMPROVEMENT
+
+CURRENT PROBLEM
+
+After a hand finishes, the only available option is:
+
+REBET
+
+This forces the player to immediately repeat the exact same wager amount if they want another hand.
+
+This feels restrictive and creates unnecessary friction.
+
+--------------------------------------------------
+NEW REQUIREMENT
+--------------------------------------------------
+
+After EVERY completed hand, display TWO buttons:
+
+[ NEW HAND ]
+[ REBET ]
+
+--------------------------------------------------
+NEW HAND BUTTON
+--------------------------------------------------
+
+Purpose:
+
+Start a completely fresh round.
+
+Behavior:
+
+• Clears all previous bets
+• Resets Ante
+• Resets Pair Plus
+• Resets 6 Card Bonus
+• Clears Play wager
+• Removes previous cards
+• Deals no cards until player places new wagers
+• Returns table to pre-deal state
+
+Player may choose completely different bet amounts.
+
+Example:
+
+Previous hand:
+Ante 100K
+Pair Plus 100K
+6 Card Bonus 100K
+
+Player taps:
+
+NEW HAND
+
+Result:
+
+Ante = 0
+Pair Plus = 0
+6 Card Bonus = 0
+Play = 0
+
+Table resets.
+
+Player selects any new wager amount.
+
+--------------------------------------------------
+REBET BUTTON
+--------------------------------------------------
+
+Purpose:
+
+Fast repeat of previous hand.
+
+Behavior:
+
+• Automatically restores previous Ante
+• Automatically restores previous Pair Plus
+• Automatically restores previous 6 Card Bonus
+• Instantly starts next hand
+
+Example:
+
+Previous hand:
+Ante 25K
+Pair Plus 25K
+6 Card Bonus 50K
+
+Player taps:
+
+REBET
+
+Result:
+
+Same exact wagers are restored.
+
+New cards are dealt immediately.
+
+--------------------------------------------------
+UI LAYOUT
+--------------------------------------------------
+
+After showdown and payout screen:
+
+LEFT BUTTON
+
+NEW HAND
+
+Secondary style
+
+Dark neon button
+
+Outline border
+
+Medium size
+
+RIGHT BUTTON
+
+REBET
+
+Primary style
+
+Gold neon button
+
+More visually prominent
+
+--------------------------------------------------
+PLAYER EXPERIENCE GOAL
+--------------------------------------------------
+
+Players should never feel forced to repeat the same wager.
+
+Every completed hand should offer:
+
+1. NEW HAND
+(Start over)
+
+OR
+
+2. REBET
+(Repeat previous wager)
+
+This matches the behavior found in polished casino table games and greatly improves usability.
+
+--------------------------------------------------
+OPTIONAL QUALITY OF LIFE
+--------------------------------------------------
+
+Add small text beneath buttons:
+
+NEW HAND
+"Choose new wagers"
+
+REBET
+"Repeat last wager"
+
+This makes the difference instantly clear to players.

@@ -462,6 +462,9 @@ export default function ThreeCardPokerScreen() {
   }, [lastAnte, lastPpMult, lastScMult]);
 
   const handleNew = useCallback(() => {
+    setAnteBet(0);
+    setPpMult(0);
+    setScMult(0);
     setPhase('betting');
     setResult(null);
     setPlayerCards([]);
@@ -734,13 +737,21 @@ export default function ThreeCardPokerScreen() {
         {/* ── RESULT BUTTONS ── */}
         {phase === 'result' && (
           <View style={gs.actionRow}>
-            <TouchableOpacity style={gs.foldBtn} onPress={handleNew} activeOpacity={0.85}>
-              <Text style={gs.foldBtnLabel}>NEW</Text>
+            {/* NEW HAND — secondary, dark outline */}
+            <TouchableOpacity style={gs.newHandBtn} onPress={handleNew} activeOpacity={0.82}>
+              <Text style={gs.newHandLabel}>NEW HAND</Text>
+              <Text style={gs.newHandSub}>Choose new wagers</Text>
             </TouchableOpacity>
+            {/* REBET — primary, gold */}
             <TouchableOpacity style={gs.playBtn} onPress={handleRebet} activeOpacity={0.85}>
               <LinearGradient colors={['#ffd700', '#c89b00']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-              <Ionicons name="refresh" size={15} color="#000" />
-              <Text style={gs.playBtnText}>REBET {fmt(lastAnte + lastAnte * lastPpMult + lastAnte * lastScMult)}</Text>
+              <View style={{ alignItems: 'center', gap: 2 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Ionicons name="refresh" size={13} color="#000" />
+                  <Text style={gs.playBtnText}>REBET  {fmt(lastAnte + lastAnte * lastPpMult + lastAnte * lastScMult)}</Text>
+                </View>
+                <Text style={gs.playBtnSub}>Repeat last wager</Text>
+              </View>
             </TouchableOpacity>
           </View>
         )}
@@ -813,6 +824,13 @@ const gs = StyleSheet.create({
 
   // Action / result buttons
   actionRow:    { flexDirection: 'row', gap: 10 },
+  newHandBtn:   {
+    flex: 1, paddingVertical: 14, borderRadius: 13, borderWidth: 1,
+    borderColor: 'rgba(0,212,255,0.35)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(0,212,255,0.06)', gap: 3,
+  },
+  newHandLabel: { fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(0,212,255,0.9)' },
+  newHandSub:   { fontSize: 8, fontFamily: 'Orbitron_400Regular', color: 'rgba(0,212,255,0.4)' },
   foldBtn:      {
     flex: 1, paddingVertical: 14, borderRadius: 13, borderWidth: 1,
     borderColor: 'rgba(255,85,85,0.3)', alignItems: 'center', justifyContent: 'center',
