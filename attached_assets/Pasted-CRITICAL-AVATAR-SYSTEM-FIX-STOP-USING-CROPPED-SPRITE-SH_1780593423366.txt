@@ -1,0 +1,143 @@
+CRITICAL AVATAR SYSTEM FIX — STOP USING CROPPED SPRITE SHEET
+
+The avatar system is still broken.
+
+Current issue:
+- Avatars are partially cropped.
+- Many icons only show half the symbol.
+- Some avatars show pieces of neighboring icons.
+- Feed avatars are not displaying complete symbols.
+- Profile avatars are inconsistent.
+- The circular frames are correct, but the artwork inside is wrong.
+
+This proves the app is still using the avatar sheet as a sprite sheet or background image.
+
+STOP DOING THIS.
+
+The avatar sheet must NOT be rendered directly in the app.
+
+====================================================
+REQUIRED FIX
+====================================================
+
+Create 15 separate avatar image files.
+
+Each avatar must be its own independent PNG asset.
+
+Do not crop dynamically in the UI.
+
+Do not use background-position.
+
+Do not use sprite-sheet coordinates.
+
+Do not use object-fit: cover.
+
+Do not mask a large sheet with circles.
+
+Each avatar must be exported once, cleaned, centered, and then loaded normally.
+
+====================================================
+PHASE 1 AVATAR FILES
+====================================================
+
+Create these exact files:
+
+martini.png
+palm.png
+dice_stack.png
+cassette.png
+saturn.png
+vinyl.png
+cherry.png
+flamingo.png
+sunset.png
+ace.png
+hourglass.png
+dragon.png
+poker_chip.png
+champagne.png
+moon.png
+
+====================================================
+ASSET REQUIREMENTS
+====================================================
+
+Each PNG must be:
+
+1024 x 1024
+Transparent background
+Full circular border visible
+Full neon symbol visible
+Centered horizontally
+Centered vertically
+No neighboring artwork
+No clipping
+No zoomed-in fragments
+No blur
+No distortion
+
+The symbol should occupy about 70–80% of the circle.
+
+====================================================
+APP DISPLAY RULE
+====================================================
+
+Every avatar component must use the individual PNG file.
+
+Use:
+
+object-fit: contain
+object-position: center center
+
+Never use:
+
+object-fit: cover
+background-position
+sprite sheet offsets
+manual crop coordinates
+overflow-hidden cropping from a larger image
+
+====================================================
+WHERE AVATARS MUST DISPLAY CORRECTLY
+====================================================
+
+Avatar Select
+Player Profile
+Feed Posts
+Trending Posts
+AI Feed Posts
+Comments
+Table Seats
+Winner Screens
+Leaderboards
+Notifications
+
+====================================================
+AI BOT AVATARS
+====================================================
+
+AI bots must use one of the 15 neon avatar PNGs.
+
+Never use initials.
+
+Never use cropped fragments.
+
+Never use placeholder circles.
+
+====================================================
+FINAL TEST
+====================================================
+
+Select Palm.
+
+Palm must appear fully and centered on:
+- Avatar Select
+- Player Profile
+- Feed
+- Table Seat
+
+Then test Cherry, Dragon, Martini, Dice, Vinyl, and Moon.
+
+If any avatar shows only half an icon or neighboring artwork, the implementation failed.
+
+The avatar system is not complete until every avatar is a separate clean PNG asset and displays correctly everywhere.

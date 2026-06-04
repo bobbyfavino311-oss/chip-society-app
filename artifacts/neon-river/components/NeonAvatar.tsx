@@ -1,7 +1,6 @@
-// ─── NeonAvatar — pixel-perfect PNG avatars from approved source sheet ─────────
-// Each avatar_N.png is a 250×250 crop of the approved neon icon sprite sheet.
-// The View clip (overflow:hidden + borderRadius) produces the circular mask.
-// PNGs have the source black background — blends perfectly with #050010 dark bg.
+// ─── NeonAvatar — clean individual neon symbol avatars ─────────────────────────
+// Each avatar is a separate 512×512 PNG: black circular bg, neon SVG icon.
+// Loaded with resizeMode="contain" — no cropping, no sprite-sheet offsets.
 
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, View } from 'react-native';
@@ -13,23 +12,24 @@ import {
 } from '@/constants/neonAvatars';
 
 // ─── Static PNG map — must be literal require() calls for Metro bundler ────────
+// IDs 1-15 → individual named PNG files (512×512 each, black bg, neon icon)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AVATAR_IMAGES: Record<number, any> = {
-  1:  require('../assets/avatars/avatar_1.png'),
-  2:  require('../assets/avatars/avatar_2.png'),
-  3:  require('../assets/avatars/avatar_3.png'),
-  4:  require('../assets/avatars/avatar_4.png'),
-  5:  require('../assets/avatars/avatar_5.png'),
-  6:  require('../assets/avatars/avatar_6.png'),
-  7:  require('../assets/avatars/avatar_7.png'),
-  8:  require('../assets/avatars/avatar_8.png'),
-  9:  require('../assets/avatars/avatar_9.png'),
-  10: require('../assets/avatars/avatar_10.png'),
-  11: require('../assets/avatars/avatar_11.png'),
-  12: require('../assets/avatars/avatar_12.png'),
-  13: require('../assets/avatars/avatar_13.png'),
-  14: require('../assets/avatars/avatar_14.png'),
-  15: require('../assets/avatars/avatar_15.png'),
+  1:  require('../assets/avatars/martini.png'),
+  2:  require('../assets/avatars/palm.png'),
+  3:  require('../assets/avatars/dice_stack.png'),
+  4:  require('../assets/avatars/cassette.png'),
+  5:  require('../assets/avatars/saturn.png'),
+  6:  require('../assets/avatars/vinyl.png'),
+  7:  require('../assets/avatars/cherry.png'),
+  8:  require('../assets/avatars/flamingo.png'),
+  9:  require('../assets/avatars/sunset.png'),
+  10: require('../assets/avatars/ace.png'),
+  11: require('../assets/avatars/hourglass.png'),
+  12: require('../assets/avatars/dragon.png'),
+  13: require('../assets/avatars/poker_chip.png'),
+  14: require('../assets/avatars/champagne.png'),
+  15: require('../assets/avatars/moon.png'),
 };
 
 // ─── Lock overlay ──────────────────────────────────────────────────────────────
