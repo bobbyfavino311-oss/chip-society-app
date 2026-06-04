@@ -1,0 +1,513 @@
+```text
+===========================================================
+CRITICAL THREE CARD POKER PAYOUT + HAND EVALUATION FIX
+===========================================================
+
+The Three Card Poker math is currently wrong.
+
+This is a critical gameplay integrity issue.
+
+If hand evaluation, dealer qualification, or payouts are incorrect, players will not trust the game.
+
+Do not continue visual work until the Three Card Poker logic is mathematically correct.
+
+===========================================================
+EXAMPLE BUG FROM SCREENSHOT
+===========================================================
+
+DEALER HAND:
+
+J♥ 9♣ J♦
+
+Dealer has:
+
+PAIR OF JACKS
+
+PLAYER HAND:
+
+6♦ 2♠ 2♥
+
+Player has:
+
+PAIR OF TWOS
+
+CURRENT RESULT SHOWN:
+
+Dealer does not qualify
+Main Game +10K Win
+
+THIS IS WRONG.
+
+===========================================================
+CORRECT RESULT
+===========================================================
+
+Dealer DOES qualify because a Pair is stronger than Queen High.
+
+Dealer hand:
+
+Pair of Jacks
+
+Player hand:
+
+Pair of Twos
+
+Dealer wins.
+
+Correct result:
+
+ANTE loses
+
+PLAY loses if placed
+
+PAIR PLUS pays only if player placed Pair Plus
+
+Player should NOT win the main game.
+
+===========================================================
+DEALER QUALIFICATION RULE
+===========================================================
+
+Dealer qualifies with:
+
+QUEEN HIGH OR BETTER
+
+This means dealer qualifies with:
+
+- Queen High
+- King High
+- Ace High
+- Any Pair
+- Flush
+- Straight
+- Three of a Kind
+- Straight Flush
+
+Dealer does NOT qualify only if dealer has:
+
+- Jack High or lower
+- no pair
+- no flush
+- no straight
+- no stronger hand
+
+IMPORTANT:
+
+Any pair automatically qualifies.
+
+===========================================================
+THREE CARD HAND RANKINGS
+===========================================================
+
+Use this exact ranking order:
+
+1. Straight Flush
+2. Three of a Kind
+3. Straight
+4. Flush
+5. Pair
+6. High Card
+
+For Three Card Poker, Straight beats Flush.
+
+===========================================================
+HAND COMPARISON RULES
+===========================================================
+
+Compare hand class first.
+
+If same hand class, compare ranks.
+
+Examples:
+
+Pair of Jacks beats Pair of Twos.
+
+Ace High beats King High.
+
+K-Q-10 High beats K-J-9 High.
+
+Straight Flush beats Three of a Kind.
+
+Three of a Kind beats Straight.
+
+Straight beats Flush.
+
+Flush beats Pair.
+
+Pair beats High Card.
+
+===========================================================
+MAIN GAME RESOLUTION
+===========================================================
+
+If player folds:
+
+Player loses Ante.
+
+Pair Plus still resolves only if it was placed before deal.
+
+No Play wager is made.
+
+===========================================================
+
+If player plays:
+
+Player must place Play wager equal to Ante.
+
+Then dealer reveals cards.
+
+===========================================================
+
+If dealer does NOT qualify:
+
+Ante pays 1:1.
+
+Play pushes.
+
+Pair Plus resolves independently.
+
+Ante Bonus resolves independently.
+
+===========================================================
+
+If dealer qualifies and player beats dealer:
+
+Ante pays 1:1.
+
+Play pays 1:1.
+
+Pair Plus resolves independently.
+
+Ante Bonus resolves independently.
+
+===========================================================
+
+If dealer qualifies and dealer beats player:
+
+Ante loses.
+
+Play loses.
+
+Pair Plus resolves independently.
+
+Ante Bonus resolves independently.
+
+===========================================================
+
+If dealer qualifies and player ties dealer:
+
+Ante pushes.
+
+Play pushes.
+
+Pair Plus resolves independently.
+
+Ante Bonus resolves independently.
+
+===========================================================
+PAIR PLUS RULES
+===========================================================
+
+Pair Plus is based ONLY on the player's 3-card hand.
+
+Dealer hand does not matter.
+
+Player may win Pair Plus even if dealer beats player.
+
+Player may lose Pair Plus even if player wins the main game.
+
+PAIR PLUS PAYOUTS:
+
+Straight Flush = 40:1
+
+Three of a Kind = 30:1
+
+Straight = 6:1
+
+Flush = 3:1
+
+Pair = 1:1
+
+High Card = loses
+
+===========================================================
+ANTE BONUS RULES
+===========================================================
+
+Ante Bonus is based ONLY on the player's 3-card hand.
+
+Ante Bonus pays if player has:
+
+Straight Flush = 5:1
+
+Three of a Kind = 4:1
+
+Straight = 1:1
+
+Ante Bonus pays regardless of dealer qualification.
+
+Ante Bonus pays even if dealer beats player.
+
+No bonus for Flush, Pair, or High Card.
+
+===========================================================
+6 CARD BONUS RULES
+===========================================================
+
+6 Card Bonus uses:
+
+Player's 3 cards
+
+plus
+
+Dealer's 3 cards
+
+for 6 total cards.
+
+From those 6 cards, calculate the best possible 5-card poker hand.
+
+This wager is independent from the main game.
+
+6 Card Bonus can win even if player loses to dealer.
+
+6 CARD BONUS PAYOUTS:
+
+Royal Flush = 1000:1
+
+Straight Flush = 200:1
+
+Four of a Kind = 100:1
+
+Full House = 20:1
+
+Flush = 15:1
+
+Straight = 10:1
+
+Three of a Kind = 7:1
+
+Anything lower loses.
+
+===========================================================
+RESULT PANEL REQUIREMENTS
+===========================================================
+
+Result panel must show each wager separately:
+
+MAIN GAME
+
+PAIR PLUS
+
+ANTE BONUS
+
+6 CARD BONUS
+
+NET RESULT
+
+Do not combine unrelated wagers.
+
+Do not say dealer does not qualify when dealer has a pair.
+
+Do not pay main game if dealer has the better qualifying hand.
+
+===========================================================
+MANDATORY TEST CASES
+===========================================================
+
+TEST 1:
+
+Dealer:
+J♥ 9♣ J♦
+
+Player:
+6♦ 2♠ 2♥
+
+Expected:
+
+Dealer qualifies.
+
+Dealer has Pair of Jacks.
+
+Player has Pair of Twos.
+
+Dealer wins main game.
+
+Main Game: LOSS
+
+Pair Plus: pays 1:1 only if Pair Plus bet exists.
+
+===========================================================
+
+TEST 2:
+
+Dealer:
+J♥ 9♣ 4♦
+
+Player:
+A♦ 7♠ 3♥
+
+Expected:
+
+Dealer does not qualify.
+
+Player wins Ante 1:1.
+
+Play pushes.
+
+===========================================================
+
+TEST 3:
+
+Dealer:
+Q♥ 8♣ 3♦
+
+Player:
+K♦ 7♠ 2♥
+
+Expected:
+
+Dealer qualifies with Queen High.
+
+Player wins with King High.
+
+Ante pays 1:1.
+
+Play pays 1:1.
+
+===========================================================
+
+TEST 4:
+
+Dealer:
+A♥ 7♣ 3♦
+
+Player:
+K♦ K♠ 2♥
+
+Expected:
+
+Dealer qualifies with Ace High.
+
+Player wins with Pair of Kings.
+
+Ante pays 1:1.
+
+Play pays 1:1.
+
+Pair Plus pays if placed.
+
+===========================================================
+
+TEST 5:
+
+Dealer:
+10♥ 10♣ 4♦
+
+Player:
+9♦ 9♠ A♥
+
+Expected:
+
+Dealer qualifies with Pair of Tens.
+
+Player has Pair of Nines.
+
+Dealer wins.
+
+Main Game loses.
+
+Pair Plus pays only if placed.
+
+===========================================================
+
+TEST 6:
+
+Player:
+5♠ 6♠ 7♠
+
+Expected:
+
+Straight Flush.
+
+Pair Plus pays 40:1.
+
+Ante Bonus pays 5:1.
+
+===========================================================
+
+TEST 7:
+
+Player:
+8♠ 8♥ 8♦
+
+Expected:
+
+Three of a Kind.
+
+Pair Plus pays 30:1.
+
+Ante Bonus pays 4:1.
+
+===========================================================
+
+TEST 8:
+
+Player:
+4♠ 5♥ 6♦
+
+Expected:
+
+Straight.
+
+Pair Plus pays 6:1.
+
+Ante Bonus pays 1:1.
+
+===========================================================
+
+TEST 9:
+
+Player:
+A♠ 10♠ 3♠
+
+Expected:
+
+Flush.
+
+Pair Plus pays 3:1.
+
+No Ante Bonus.
+
+===========================================================
+
+TEST 10:
+
+Player:
+A♠ A♦ 4♣
+
+Expected:
+
+Pair.
+
+Pair Plus pays 1:1.
+
+No Ante Bonus.
+
+===========================================================
+FINAL ACCEPTANCE CHECK
+===========================================================
+
+Before marking complete, verify:
+
+1. Dealer qualification recognizes all pairs as qualifying.
+2. Dealer does not qualify only with Jack High or worse.
+3. Pair of Jacks beats Pair of Twos.
+4. Main game pays only when player actually wins.
+5. Pair Plus resolves independently.
+6. Ante Bonus resolves independently.
+7. 6 Card Bonus resolves independently.
+8. Every payout matches the official payout table.
+9. Result panel breaks down every wager clearly.
+10. No incorrect "dealer does not qualify" messages remain.
+===========================================================
+```

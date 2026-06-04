@@ -221,8 +221,16 @@ export function getSixCardBonusMultiplier(rank: SixCardRank): number {
 }
 
 // ─── Dealer qualification ─────────────────────────────────────────────────────
+/**
+ * Dealer qualifies with Queen High OR BETTER.
+ * Any pair, flush, straight, three-of-a-kind, or straight-flush automatically
+ * qualifies regardless of card values. Only a pure high-card hand needs the
+ * highest card to be Q (12) or above.
+ */
 export function tcpDealerQualifies(cards: Card[]): boolean {
-  return Math.max(...cards.map(c => c.value)) >= 12;
+  const hand = evaluateThreeCardHand(cards);
+  if (hand.rank !== 'high_card') return true;           // any made hand qualifies
+  return Math.max(...cards.map(c => c.value)) >= 12;    // high card: needs Q+
 }
 
 // ─── Hand comparison ──────────────────────────────────────────────────────────
