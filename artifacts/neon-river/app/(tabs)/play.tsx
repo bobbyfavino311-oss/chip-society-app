@@ -227,12 +227,16 @@ export default function PlayScreen() {
           lines={["Player vs Dealer · Queen High dealer qualify", "Win chips against the house"]}
           options={[
             {
-              label: "PLAY THREE CARD",
-              icon:  "albums-outline",
-              sub:   "Ante · Pair Plus · Ante Bonus",
+              label:   "THREE CARD POKER",
+              icon:    "albums-outline",
               onPress: () => router.push('/casino/three-card-poker' as any),
             },
-            { label: "MORE GAMES", icon: "grid-outline", sub: "Blackjack, Roulette and more", locked: true },
+            {
+              label:  "MORE GAMES SOON",
+              icon:   "grid-outline",
+              sub:    "Blackjack · Roulette · Baccarat",
+              locked: true,
+            },
           ]}
         />
 
