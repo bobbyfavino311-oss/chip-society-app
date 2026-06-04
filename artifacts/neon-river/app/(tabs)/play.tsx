@@ -107,11 +107,6 @@ function SectionCard({ section, accent, icon, title, lines, options, locked, onP
           <Text style={[sc.title, { color: titleColor }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{title}</Text>
           {lines.map((l, i) => <Text key={i} style={sc.line}>{l}</Text>)}
         </View>
-        {isActive && (
-          <View style={[sc.actionBadge, { backgroundColor: `${accent}22`, borderColor: `${accent}55` }]}>
-            <Ionicons name="play" size={14} color={accent} />
-          </View>
-        )}
         {locked && (
           <View style={sc.soonBadge}>
             <Ionicons name="lock-closed" size={9} color="rgba(255,215,0,0.4)" />
