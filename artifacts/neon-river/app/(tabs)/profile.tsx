@@ -360,57 +360,63 @@ export default function ProfileScreen() {
           <StatBox label="HANDS" value={profile.handsPlayed} />
         </View>
 
-        {/* Tournament stats section */}
+        {/* Tournament stats section — locked preview */}
         <Text style={styles.sectionTitle}>TOURNAMENTS</Text>
         <View style={styles.tournamentCard}>
+          {/* Background tint */}
           <LinearGradient
             colors={['rgba(191,95,255,0.08)', 'transparent']}
             style={StyleSheet.absoluteFill}
           />
-          <View style={styles.tournamentRow}>
-            <View style={styles.tournamentStat}>
-              <Text style={[styles.tournamentValue, { color: '#ffd700' }]}>
-                {profile.tournamentWins}
-              </Text>
-              <Text style={styles.tournamentLabel}>WINS</Text>
+
+          {/* Ghost stats — low opacity behind the overlay */}
+          <View style={{ opacity: 0.18 }}>
+            <View style={styles.tournamentRow}>
+              <View style={styles.tournamentStat}>
+                <Text style={[styles.tournamentValue, { color: '#ffd700' }]}>--</Text>
+                <Text style={styles.tournamentLabel}>WINS</Text>
+              </View>
+              <View style={styles.tournamentDivider} />
+              <View style={styles.tournamentStat}>
+                <Text style={[styles.tournamentValue, { color: '#ff4466' }]}>--</Text>
+                <Text style={styles.tournamentLabel}>LOSSES</Text>
+              </View>
+              <View style={styles.tournamentDivider} />
+              <View style={styles.tournamentStat}>
+                <Text style={[styles.tournamentValue, { color: '#00d4ff' }]}>--</Text>
+                <Text style={styles.tournamentLabel}>WIN RATE</Text>
+              </View>
             </View>
-            <View style={styles.tournamentDivider} />
-            <View style={styles.tournamentStat}>
-              <Text style={[styles.tournamentValue, { color: '#ff4466' }]}>
-                {profile.tournamentLosses}
-              </Text>
-              <Text style={styles.tournamentLabel}>LOSSES</Text>
-            </View>
-            <View style={styles.tournamentDivider} />
-            <View style={styles.tournamentStat}>
-              <Text style={[styles.tournamentValue, { color: '#00d4ff' }]}>
-                {hasTournamentData ? `${tournamentWinRate}%` : '--'}
-              </Text>
-              <Text style={styles.tournamentLabel}>WIN RATE</Text>
-            </View>
-          </View>
-          <View style={styles.tournamentRow}>
-            <View style={styles.tournamentStat}>
-              <Text style={[styles.tournamentValue, { color: '#bf5fff' }]}>
-                {profile.bestTournamentFinish > 0 ? `#${profile.bestTournamentFinish}` : '--'}
-              </Text>
-              <Text style={styles.tournamentLabel}>BEST FINISH</Text>
-            </View>
-            <View style={styles.tournamentDivider} />
-            <View style={[styles.tournamentStat, { flex: 2 }]}>
-              <Text style={[styles.tournamentValue, { color: '#00ff88', fontSize: 18 }]}>
-                {profile.biggestTournamentPrize > 0
-                  ? profile.biggestTournamentPrize.toLocaleString('en-US')
-                  : '--'}
-              </Text>
-              <Text style={styles.tournamentLabel}>BIGGEST PRIZE</Text>
+            <View style={styles.tournamentRow}>
+              <View style={styles.tournamentStat}>
+                <Text style={[styles.tournamentValue, { color: '#bf5fff' }]}>--</Text>
+                <Text style={styles.tournamentLabel}>BEST FINISH</Text>
+              </View>
+              <View style={styles.tournamentDivider} />
+              <View style={[styles.tournamentStat, { flex: 2 }]}>
+                <Text style={[styles.tournamentValue, { color: '#00ff88', fontSize: 18 }]}>--</Text>
+                <Text style={styles.tournamentLabel}>BIGGEST PRIZE</Text>
+              </View>
             </View>
           </View>
-          {!hasTournamentData && (
-            <Text style={styles.tournamentEmpty}>
-              Enter a tournament to track your results
-            </Text>
-          )}
+
+          {/* Dark overlay */}
+          <View style={styles.tournamentOverlay}>
+            <LinearGradient
+              colors={['rgba(4,0,26,0.82)', 'rgba(8,0,22,0.9)']}
+              style={StyleSheet.absoluteFill}
+            />
+            {/* Lock message */}
+            <View style={styles.tournamentLockContent}>
+              <View style={styles.tournamentLockIcon}>
+                <Ionicons name="lock-closed" size={22} color="rgba(191,95,255,0.7)" />
+              </View>
+              <Text style={styles.tournamentLockTitle}>TOURNAMENTS COMING SOON</Text>
+              <Text style={styles.tournamentLockSub}>
+                Tournament statistics will become available when tournaments launch.
+              </Text>
+            </View>
+          </View>
         </View>
 
         <Text style={styles.sectionTitle}>SOCIAL</Text>
@@ -782,6 +788,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0.5,
     paddingVertical: 4,
+  },
+  tournamentOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: colors.radius,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  tournamentLockContent: {
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 24,
+  },
+  tournamentLockIcon: {
+    width: 48, height: 48, borderRadius: 24,
+    backgroundColor: 'rgba(191,95,255,0.12)',
+    borderWidth: 1, borderColor: 'rgba(191,95,255,0.3)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  tournamentLockTitle: {
+    fontSize: 10, fontWeight: '900', fontFamily: 'Orbitron_700Bold',
+    color: 'rgba(191,95,255,0.85)', letterSpacing: 1.5, textAlign: 'center',
+  },
+  tournamentLockSub: {
+    fontSize: 9, color: 'rgba(255,255,255,0.35)',
+    fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 14,
   },
   chipCard: {
     backgroundColor: colors.surface,

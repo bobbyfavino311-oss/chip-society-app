@@ -1,0 +1,136 @@
+PROFILE SCREEN – TOURNAMENT STATS LOCKED STATE
+
+The Tournament system is not available at launch.
+
+The Profile screen should reflect this clearly.
+
+--------------------------------------------------
+CURRENT ISSUE
+--------------------------------------------------
+
+The Tournament stats section currently shows:
+
+Wins: 0
+Losses: 0
+Win Rate: --
+Best Finish: --
+Biggest Prize: --
+
+This makes it look broken or unfinished.
+
+--------------------------------------------------
+NEW BEHAVIOR
+--------------------------------------------------
+
+Keep the Tournament Stats card visible.
+
+DO NOT REMOVE IT.
+
+Instead display it in a LOCKED PREVIEW STATE.
+
+--------------------------------------------------
+VISUAL DESIGN
+--------------------------------------------------
+
+Tournament stat values should remain faintly visible underneath.
+
+Reduce opacity of all stat values to 20-30%.
+
+Add a semi-transparent dark overlay across the card.
+
+Center a lock icon over the card.
+
+Under the lock icon display:
+
+🔒 TOURNAMENTS COMING SOON
+
+Smaller subtitle:
+
+Tournament statistics will become available when tournaments open.
+
+--------------------------------------------------
+TEXT
+--------------------------------------------------
+
+Primary Message:
+
+TOURNAMENTS COMING SOON
+
+Secondary Message:
+
+Tournament statistics will become available when tournaments launch.
+
+--------------------------------------------------
+CARD CONTENT
+--------------------------------------------------
+
+Keep all current stat categories visible underneath:
+
+Wins
+Losses
+Win Rate
+Best Finish
+Biggest Prize
+
+These should appear as disabled placeholders.
+
+Examples:
+
+--
+--
+--
+--
+--
+
+or
+
+LOCKED
+
+depending on what fits best visually.
+
+--------------------------------------------------
+USER EXPERIENCE
+--------------------------------------------------
+
+This card should communicate:
+
+✔ Tournament feature exists
+✔ Tournament stats will eventually track performance
+✔ Feature is intentionally unavailable
+✔ App is not broken
+
+The user should instantly understand:
+
+"Tournaments haven't launched yet, therefore tournament statistics are not available."
+
+--------------------------------------------------
+INTERACTION
+--------------------------------------------------
+
+Card should not be tappable.
+
+No navigation.
+
+No hidden routes.
+
+No modal.
+
+Pure informational locked state.
+
+--------------------------------------------------
+STYLE
+--------------------------------------------------
+
+Match existing Neon River visual language:
+
+Dark translucent overlay
+
+Subtle neon border
+
+Neon lock icon
+
+Low-opacity stat values underneath
+
+Clean futuristic typography
+
+Professional AAA mobile game presentation
