@@ -7,7 +7,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useCasino, DAILY_WIN_CAP } from '@/context/CasinoContext';
 import colors from '@/constants/colors';
 
 // ─── Locked game card ─────────────────────────────────────────────────────────
@@ -35,15 +34,7 @@ const LOCKED_GAMES = [
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function CasinoLobbyScreen() {
-  const insets   = useSafeAreaInsets();
-  const { dailyWins, dailyWinCap, capReached } = useCasino();
-  const pct = Math.min(1, dailyWins / dailyWinCap);
-
-  function fmt(n: number) {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
-    return String(n);
-  }
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={s.container}>
@@ -73,26 +64,6 @@ export default function CasinoLobbyScreen() {
 
         <Text style={s.title}>CASINO</Text>
         <Text style={s.sub}>Win chips against the house</Text>
-
-        {/* Daily earnings */}
-        <View style={s.capCard}>
-          <LinearGradient colors={['rgba(255,215,0,0.12)', 'rgba(255,215,0,0.04)']} style={StyleSheet.absoluteFill} />
-          <View style={s.capRow}>
-            <Text style={s.capLabel}>TODAY'S CASINO WINS</Text>
-            {capReached && (
-              <View style={s.capBadge}>
-                <Text style={s.capBadgeText}>CAP REACHED</Text>
-              </View>
-            )}
-          </View>
-          <Text style={s.capAmount}>{fmt(dailyWins)} / {fmt(dailyWinCap)}</Text>
-          <View style={s.capBarBg}>
-            <View style={[s.capBarFill, { width: `${Math.round(pct * 100)}%` as any }]} />
-          </View>
-          {capReached && (
-            <Text style={s.capNote}>Daily chip limit reached · Wins now award XP until tomorrow</Text>
-          )}
-        </View>
 
         {/* Three Card Poker — active */}
         <Text style={s.sectionLabel}>AVAILABLE NOW</Text>
@@ -138,7 +109,7 @@ export default function CasinoLobbyScreen() {
 
         {/* Footer note */}
         <Text style={s.footer}>
-          Virtual chips only · No real-money gambling · Daily win cap: {fmt(DAILY_WIN_CAP)} chips
+          Virtual chips only · No real-money gambling
         </Text>
       </ScrollView>
     </View>

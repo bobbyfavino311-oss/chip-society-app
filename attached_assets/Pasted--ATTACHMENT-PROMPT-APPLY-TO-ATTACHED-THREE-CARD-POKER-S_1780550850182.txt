@@ -1,0 +1,345 @@
+**ATTACHMENT PROMPT – APPLY TO ATTACHED THREE CARD POKER SCREENSHOT**
+
+Use the attached image as the visual reference and starting point. Modify the existing screen rather than redesigning it from scratch. Preserve the current neon casino aesthetic, colors, typography, card layout, and overall visual identity.
+
+# THREE CARD POKER TABLE IMPROVEMENTS
+
+The current implementation is close, but it needs several gameplay, balancing, and UI improvements before release.
+
+## HEADER
+
+Remove the text:
+
+CASINO
+
+from the top-left area.
+
+Keep only the back arrow icon.
+
+Reduce the size of the main title by approximately 25% so the full title fits comfortably across the top of the screen.
+
+Example:
+
+THREE CARD POKER
+
+must appear on a single line without clipping or wrapping.
+
+---
+
+# BUTTON RESIZE
+
+The bottom action buttons are currently too large.
+
+Reduce the size of:
+
+NEW GAME
+
+REBET
+
+by approximately 20%.
+
+Keep them visually prominent but create additional space on the table layout.
+
+The goal is to make room for another wager area.
+
+---
+
+# ADD NEW WAGER
+
+Add a fourth betting circle called:
+
+6 CARD BONUS
+
+The table should now contain:
+
+PAIR PLUS
+
+ANTE
+
+PLAY
+
+6 CARD BONUS
+
+All betting circles must be evenly spaced and aligned.
+
+Maintain the same visual styling already used on the table.
+
+---
+
+# SIX CARD BONUS RULES
+
+The Six Card Bonus evaluates:
+
+Player's 3 cards
+
+plus
+
+Dealer's 3 cards
+
+for a total of 6 cards.
+
+The system automatically creates the best possible 5-card poker hand from those 6 cards.
+
+The wager is completely independent from the main game result.
+
+The player can lose to the dealer and still win the Six Card Bonus.
+
+---
+
+# SIX CARD BONUS PAYOUT TABLE
+
+Royal Flush = 1000 to 1
+
+Straight Flush = 200 to 1
+
+Four of a Kind = 100 to 1
+
+Full House = 20 to 1
+
+Flush = 15 to 1
+
+Straight = 10 to 1
+
+Three of a Kind = 7 to 1
+
+Add a small:
+
+PAYTABLE
+
+button near the title area.
+
+When tapped, it opens a modal displaying:
+
+Pair Plus payouts
+
+Ante Bonus payouts
+
+6 Card Bonus payouts
+
+---
+
+# BETTING SYSTEM
+
+Players should NOT be allowed to type custom wager amounts.
+
+Players should NOT be able to use unlimited bet sizes.
+
+Do NOT use sliders.
+
+Do NOT use manual number entry.
+
+Instead use preset chip selections.
+
+Examples:
+
+1K
+
+5K
+
+10K
+
+25K
+
+50K
+
+100K
+
+The player taps a chip value.
+
+That chip value becomes the wager.
+
+This keeps the game simple and prevents abuse.
+
+---
+
+# PAIR PLUS LIMITS
+
+Pair Plus must always be tied to the Ante amount.
+
+Rules:
+
+Minimum Pair Plus = Ante amount
+
+Maximum Pair Plus = 2x Ante amount
+
+Example:
+
+Ante = 5K
+
+Pair Plus may only be:
+
+5K
+
+10K
+
+Nothing higher.
+
+---
+
+# SIX CARD BONUS LIMITS
+
+Apply the same rule:
+
+Minimum = Ante amount
+
+Maximum = 2x Ante amount
+
+Example:
+
+Ante = 5K
+
+6 Card Bonus may only be:
+
+5K
+
+10K
+
+Nothing higher.
+
+---
+
+# REMOVE DAILY CAP
+
+Remove:
+
+TODAY 15K / 50K
+
+Remove all daily payout cap systems.
+
+There should be no visible daily casino limit.
+
+---
+
+# DEALER BALANCING
+
+Do NOT make the game feel rigged.
+
+Do NOT force an 80% dealer win rate.
+
+Instead create a realistic casino-style house edge.
+
+Target:
+
+Dealer wins approximately 55%–60% of completed hands.
+
+The dealer should still lose often enough that players believe they can win.
+
+Dealer improvements:
+
+Dealer qualifies slightly more often.
+
+Dealer receives fewer extremely weak hands.
+
+Dealer receives more Queen-high-or-better hands.
+
+Dealer receives slightly more Ace-high and Pair hands.
+
+Maintain true randomness while preserving a long-term house advantage.
+
+The player should feel challenged, not cheated.
+
+---
+
+# RESULTS PANEL
+
+Expand the results area to display:
+
+MAIN GAME
+
+PAIR PLUS
+
+6 CARD BONUS
+
+TOTAL WIN
+
+NET RESULT
+
+This breakdown should clearly explain where every chip payout originated.
+
+---
+
+# LAUNCH INTEGRATION
+
+This game must be accessible from:
+
+PLAY MODES
+
+under a new section called:
+
+CASINO
+
+Do NOT remove the existing game mode layout.
+
+Keep:
+
+No Limit Hold'em
+
+Short Deck Hold'em
+
+Quick Play
+
+Ranked
+
+AI Practice
+
+Exactly as they currently exist.
+
+Simply add a new:
+
+CASINO
+
+section underneath them.
+
+Selecting:
+
+THREE CARD POKER
+
+must open this fully functional table screen.
+
+Not a placeholder.
+
+Not a template.
+
+A complete playable game wired directly to all Three Card Poker rules, Pair Plus rules, Ante Bonus rules, and Six Card Bonus rules.
+
+---
+
+# FINAL ACCEPTANCE CHECKLIST
+
+✓ Existing visual design preserved
+
+✓ Back button only
+
+✓ Smaller title
+
+✓ Smaller action buttons
+
+✓ Added 6 Card Bonus wager
+
+✓ Added Paytable button
+
+✓ Correct 6 Card Bonus payouts
+
+✓ Preset chip betting only
+
+✓ Pair Plus tied to Ante
+
+✓ 6 Card Bonus tied to Ante
+
+✓ Daily cap removed
+
+✓ Balanced house-edge logic
+
+✓ Expanded results panel
+
+✓ Functional game implementation
+
+✓ Accessible from Play Modes → Casino
+
+✓ No placeholders
+
+✓ No templates
+
+✓ Fully playable and connected to chip economy system across the app
+
+✓ Chip winnings automatically added to player account balance and usable throughout the rest of the game ecosystem.
