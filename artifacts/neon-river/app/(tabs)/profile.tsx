@@ -449,11 +449,11 @@ export default function ProfileScreen() {
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
           <TouchableOpacity
             style={styles.refillBtn}
-            onPress={() => addChips(1_000_000)}
+            onPress={() => addChips(5_000_000)}
             activeOpacity={0.8}
           >
             <Ionicons name="add-circle-outline" size={14} color="#000" />
-            <Text style={styles.refillBtnText}>+ 1,000,000 CHIPS</Text>
+            <Text style={styles.refillBtnText}>+ 5,000,000 CHIPS</Text>
           </TouchableOpacity>
         </View>
 
