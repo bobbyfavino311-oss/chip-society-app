@@ -265,7 +265,7 @@ function PostCard({ post }: { post: SocialPost }) {
           onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}
         >
           {player?.avatarId != null ? (
-            <NeonAvatar avatarId={((player.avatarId - 1) % 30) + 1} size={44} />
+            <NeonAvatar avatarId={player.avatarId} size={44} />
           ) : (
             <View style={[cd.avatar, { borderColor: player?.avatarColor ?? colors.primary }]}>
               <Text style={[cd.avatarText, { color: player?.avatarColor ?? colors.primary }]}>

@@ -1,6 +1,6 @@
-// ─── CHIP SOCIETY — 30 Neon Symbol Avatars ────────────────────────────────────
-// Pure PNG neon icons. No portraits. No faces. No emojis.
-// Unlock through XP progression.
+// ─── CHIP SOCIETY — 15 Neon Symbol Avatars (Phase 1) ─────────────────────────
+// Programmatic SVG icons. No PNGs. Always renders.
+// IDs 1-15 map to NeonAvatarSymbol.tsx icon components.
 
 export type NeonRarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
 
@@ -33,51 +33,35 @@ export const NEON_RARITY_BORDER: Record<NeonRarity, number> = {
 };
 
 export const NEON_AVATARS: NeonAvatar[] = [
-  // ── COMMON (1–8) ────────────────────────────────────────────────────────────
-  { id: 1,  name: 'MARTINI',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#00d4ff', bgColor: '#001822' },
-  { id: 2,  name: 'PALM',         rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#ff0090', bgColor: '#1a0012' },
-  { id: 3,  name: 'DICE',         rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#8b5cf6', bgColor: '#0e0018' },
-  { id: 4,  name: 'CASSETTE',     rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#00d4ff', bgColor: '#001820' },
-  { id: 5,  name: 'LIGHTNING',    rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#4db8ff', bgColor: '#000c20' },
-  { id: 6,  name: 'FLAMINGO',     rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#ff69b4', bgColor: '#1a000f' },
-  { id: 7,  name: 'CHAMPAGNE',    rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#ffd700', bgColor: '#1a1100' },
-  { id: 8,  name: 'SHARK',        rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#00c8ff', bgColor: '#001420' },
-
-  // ── RARE (9–16) ─────────────────────────────────────────────────────────────
-  { id: 9,  name: 'CHIP',         rarity: 'RARE',      unlockXP: 5000,   unlockCondition: 'Reach 5,000 XP',  color: '#bf5fff', bgColor: '#120020' },
-  { id: 10, name: 'MOON',         rarity: 'RARE',      unlockXP: 8000,   unlockCondition: 'Reach 8,000 XP',  color: '#a855f7', bgColor: '#120020' },
-  { id: 11, name: 'ROSE',         rarity: 'RARE',      unlockXP: 12000,  unlockCondition: 'Reach 12,000 XP', color: '#ff0090', bgColor: '#1a0012' },
-  { id: 12, name: 'CHERRY',       rarity: 'RARE',      unlockXP: 16000,  unlockCondition: 'Reach 16,000 XP', color: '#ff3366', bgColor: '#1a0008' },
-  { id: 13, name: 'EIGHT BALL',   rarity: 'RARE',      unlockXP: 20000,  unlockCondition: 'Reach 20,000 XP', color: '#00d4ff', bgColor: '#001420' },
-  { id: 14, name: 'SUNSET',       rarity: 'RARE',      unlockXP: 25000,  unlockCondition: 'Reach 25,000 XP', color: '#ff6b35', bgColor: '#1a0600' },
-  { id: 15, name: 'SERPENT',      rarity: 'RARE',      unlockXP: 30000,  unlockCondition: 'Reach 30,000 XP', color: '#00ff88', bgColor: '#001a0a' },
-  { id: 16, name: 'KATANA',       rarity: 'RARE',      unlockXP: 35000,  unlockCondition: 'Reach 35,000 XP', color: '#00d4ff', bgColor: '#001420' },
-
-  // ── EPIC (17–24) ────────────────────────────────────────────────────────────
-  { id: 17, name: 'SKULL',        rarity: 'EPIC',      unlockXP: 40000,  unlockCondition: 'Reach 40,000 XP',  color: '#bf5fff', bgColor: '#120020' },
-  { id: 18, name: 'SATURN',       rarity: 'EPIC',      unlockXP: 50000,  unlockCondition: 'Reach 50,000 XP',  color: '#a855f7', bgColor: '#0f001e' },
-  { id: 19, name: 'FIRE',         rarity: 'EPIC',      unlockXP: 60000,  unlockCondition: 'Reach 60,000 XP',  color: '#ff6600', bgColor: '#1a0700' },
-  { id: 20, name: 'ACE',          rarity: 'EPIC',      unlockXP: 70000,  unlockCondition: 'Reach 70,000 XP',  color: '#00ff88', bgColor: '#001a0a' },
-  { id: 21, name: 'WOLF',         rarity: 'EPIC',      unlockXP: 80000,  unlockCondition: 'Reach 80,000 XP',  color: '#4db8ff', bgColor: '#000c20' },
-  { id: 22, name: 'CROWN',        rarity: 'EPIC',      unlockXP: 90000,  unlockCondition: 'Reach 90,000 XP',  color: '#ffd700', bgColor: '#1a1100' },
-  { id: 23, name: 'VINYL',        rarity: 'EPIC',      unlockXP: 100000, unlockCondition: 'Reach 100,000 XP', color: '#ff0090', bgColor: '#1a0010' },
-  { id: 24, name: 'VIPER',        rarity: 'EPIC',      unlockXP: 120000, unlockCondition: 'Reach 120,000 XP', color: '#00d4ff', bgColor: '#001420' },
-
-  // ── LEGENDARY (25–30) ───────────────────────────────────────────────────────
-  { id: 25, name: 'SCORPION',     rarity: 'LEGENDARY', unlockXP: 150000, unlockCondition: 'Reach 150,000 XP', color: '#ff0090', bgColor: '#1a0010' },
-  { id: 26, name: 'DRAGON',       rarity: 'LEGENDARY', unlockXP: 200000, unlockCondition: 'Reach 200,000 XP', color: '#00ff88', bgColor: '#001a0a' },
-  { id: 27, name: 'ANCHOR',       rarity: 'LEGENDARY', unlockXP: 300000, unlockCondition: 'Reach 300,000 XP', color: '#4db8ff', bgColor: '#001422' },
-  { id: 28, name: 'HOURGLASS',    rarity: 'LEGENDARY', unlockXP: 400000, unlockCondition: 'Reach 400,000 XP', color: '#bf5fff', bgColor: '#120020' },
-  { id: 29, name: 'COMPASS',      rarity: 'LEGENDARY', unlockXP: 500000, unlockCondition: 'Reach 500,000 XP', color: '#ff3366', bgColor: '#1a0008' },
-  { id: 30, name: 'TIGER EYE',    rarity: 'LEGENDARY', unlockXP: 600000, unlockCondition: 'Reach 600,000 XP', color: '#ff8c00', bgColor: '#1a0900' },
+  // ── COMMON (1–4) — unlocked from the start ───────────────────────────────────
+  { id: 1,  name: 'MARTINI',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#00d4ff', bgColor: '#001822' },
+  { id: 2,  name: 'PALM',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#ff0090', bgColor: '#1a0012' },
+  { id: 3,  name: 'DICE',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#8b5cf6', bgColor: '#0e0018' },
+  { id: 4,  name: 'CASSETTE',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: 'Available from the start', color: '#00d4ff', bgColor: '#001822' },
+  // ── RARE (5–9) ────────────────────────────────────────────────────────────────
+  { id: 5,  name: 'SATURN',    rarity: 'RARE',      unlockXP: 5000,   unlockCondition: 'Reach 5,000 XP',   color: '#a855f7', bgColor: '#0f001e' },
+  { id: 6,  name: 'VINYL',     rarity: 'RARE',      unlockXP: 10000,  unlockCondition: 'Reach 10,000 XP',  color: '#ff1a6e', bgColor: '#1a000e' },
+  { id: 7,  name: 'CHERRY',    rarity: 'RARE',      unlockXP: 16000,  unlockCondition: 'Reach 16,000 XP',  color: '#ff3344', bgColor: '#1a0008' },
+  { id: 8,  name: 'FLAMINGO',  rarity: 'RARE',      unlockXP: 22000,  unlockCondition: 'Reach 22,000 XP',  color: '#ff69b4', bgColor: '#1a000f' },
+  { id: 9,  name: 'SUNSET',    rarity: 'RARE',      unlockXP: 30000,  unlockCondition: 'Reach 30,000 XP',  color: '#ff6b35', bgColor: '#1a0600' },
+  // ── EPIC (10–13) ──────────────────────────────────────────────────────────────
+  { id: 10, name: 'ACE',       rarity: 'EPIC',      unlockXP: 50000,  unlockCondition: 'Reach 50,000 XP',  color: '#ffd700', bgColor: '#1a1100' },
+  { id: 11, name: 'HOURGLASS', rarity: 'EPIC',      unlockXP: 70000,  unlockCondition: 'Reach 70,000 XP',  color: '#bf5fff', bgColor: '#120020' },
+  { id: 12, name: 'DRAGON',    rarity: 'EPIC',      unlockXP: 100000, unlockCondition: 'Reach 100,000 XP', color: '#00ff88', bgColor: '#001a0a' },
+  { id: 13, name: 'CHIP',      rarity: 'EPIC',      unlockXP: 130000, unlockCondition: 'Reach 130,000 XP', color: '#bf5fff', bgColor: '#120020' },
+  // ── LEGENDARY (14–15) ─────────────────────────────────────────────────────────
+  { id: 14, name: 'CHAMPAGNE', rarity: 'LEGENDARY', unlockXP: 200000, unlockCondition: 'Reach 200,000 XP', color: '#ffaa00', bgColor: '#1a0d00' },
+  { id: 15, name: 'MOON',      rarity: 'LEGENDARY', unlockXP: 300000, unlockCondition: 'Reach 300,000 XP', color: '#a855f7', bgColor: '#0f001e' },
 ];
 
+/** Returns a valid NeonAvatar, always clamped to IDs 1-15. */
 export function getNeonAvatar(id: number): NeonAvatar {
-  return NEON_AVATARS.find(a => a.id === id) ?? NEON_AVATARS[0];
+  const safe = Math.min(15, Math.max(1, Math.round(id || 1)));
+  return NEON_AVATARS.find(a => a.id === safe) ?? NEON_AVATARS[0];
 }
 
 export function isNeonAvatarUnlocked(_avatar: NeonAvatar, _xp: number): boolean {
-  return true; // All avatars unlocked — XP gating re-enabled later
+  return true; // XP gating will be re-enabled in a later phase
 }
 
 export const COMMON_AVATARS  = NEON_AVATARS.filter(a => a.rarity === 'COMMON');

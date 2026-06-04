@@ -295,7 +295,7 @@ export default function ProfileScreen() {
                 </View>
               ) : (
                 <NeonAvatar
-                  avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (profile.avatarIndex ? ((profile.avatarIndex - 1) % 30) + 1 : 1)}
+                  avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1}
                   size={90}
                   isEquipped
                 />

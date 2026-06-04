@@ -72,7 +72,7 @@ export interface LiveEvent {
 export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p1', username: 'NightShark99', handle: '@nightshark99',
-    avatar: '♠', avatarColor: '#00d4ff', avatarId: 25, bannerColors: ['#001a40', '#000d20'],
+    avatar: '♠', avatarColor: '#00d4ff', avatarId: 12, bannerColors: ['#001a40', '#000d20'],
     rank: 'Neon Legend', level: 99, chips: 4_280_000, winRate: 68,
     handsPlayed: 12_401, biggestPot: 1_240_000, tournamentWins: 14,
     achievementCount: 48, followers: 12_400, following: 892,
@@ -86,7 +86,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p2', username: 'VegasMirage', handle: '@vegasmirage',
-    avatar: '♥', avatarColor: '#ff0090', avatarId: 27, bannerColors: ['#3d0020', '#1a0010'],
+    avatar: '♥', avatarColor: '#ff0090', avatarId: 15, bannerColors: ['#3d0020', '#1a0010'],
     rank: 'Neon Elite', level: 82, chips: 2_910_000, winRate: 61,
     handsPlayed: 9_808, biggestPot: 820_000, tournamentWins: 7,
     achievementCount: 36, followers: 8_770, following: 1_204,
@@ -99,7 +99,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p3', username: 'NeonAce_', handle: '@neonace_',
-    avatar: '♦', avatarColor: '#ffd700', avatarId: 17, bannerColors: ['#2a1a00', '#110d00'],
+    avatar: '♦', avatarColor: '#ffd700', avatarId: 10, bannerColors: ['#2a1a00', '#110d00'],
     rank: 'Neon Diamond', level: 71, chips: 1_650_000, winRate: 55,
     handsPlayed: 7_302, biggestPot: 520_000, tournamentWins: 4,
     achievementCount: 29, followers: 5_420, following: 778,
@@ -111,7 +111,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p4', username: 'ShadowKing', handle: '@shadowking',
-    avatar: '♣', avatarColor: '#bf5fff', avatarId: 20, bannerColors: ['#1e0040', '#0d001f'],
+    avatar: '♣', avatarColor: '#bf5fff', avatarId: 13, bannerColors: ['#1e0040', '#0d001f'],
     rank: 'Neon Legend', level: 95, chips: 3_740_000, winRate: 72,
     handsPlayed: 11_200, biggestPot: 980_000, tournamentWins: 11,
     achievementCount: 44, followers: 10_900, following: 640,
@@ -136,7 +136,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p6', username: 'BlazeFire77', handle: '@blazefire77',
-    avatar: '♥', avatarColor: '#ff6600', avatarId: 15, bannerColors: ['#301000', '#160800'],
+    avatar: '♥', avatarColor: '#ff6600', avatarId: 9, bannerColors: ['#301000', '#160800'],
     rank: 'Neon Gold', level: 44, chips: 540_000, winRate: 42,
     handsPlayed: 3_100, biggestPot: 140_000, tournamentWins: 1,
     achievementCount: 12, followers: 980, following: 420,
@@ -146,7 +146,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p7', username: 'PokerPhantom', handle: '@pokerphantom',
-    avatar: '♠', avatarColor: '#bf5fff', avatarId: 24, bannerColors: ['#150030', '#080018'],
+    avatar: '♠', avatarColor: '#bf5fff', avatarId: 11, bannerColors: ['#150030', '#080018'],
     rank: 'Neon Elite', level: 77, chips: 2_200_000, winRate: 64,
     handsPlayed: 8_800, biggestPot: 710_000, tournamentWins: 6,
     achievementCount: 33, followers: 6_800, following: 910,
@@ -169,7 +169,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p9', username: 'NeonWitch', handle: '@neonwitch',
-    avatar: '♥', avatarColor: '#ff0090', avatarId: 22, bannerColors: ['#2d0022', '#150010'],
+    avatar: '♥', avatarColor: '#ff0090', avatarId: 6, bannerColors: ['#2d0022', '#150010'],
     rank: 'Neon Elite', level: 80, chips: 2_750_000, winRate: 66,
     handsPlayed: 9_200, biggestPot: 890_000, tournamentWins: 9,
     achievementCount: 38, followers: 9_100, following: 1_050,
@@ -194,7 +194,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p11', username: 'RiverRuler', handle: '@riverruler',
-    avatar: '★', avatarColor: '#00d4ff', avatarId: 29, bannerColors: ['#001830', '#000b17'],
+    avatar: '★', avatarColor: '#00d4ff', avatarId: 14, bannerColors: ['#001830', '#000b17'],
     rank: 'Neon Platinum', level: 54, chips: 760_000, winRate: 51,
     handsPlayed: 4_200, biggestPot: 190_000, tournamentWins: 1,
     achievementCount: 16, followers: 1_600, following: 700,
@@ -204,7 +204,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   },
   {
     id: 'p12', username: 'AceHunter', handle: '@acehunter',
-    avatar: '♠', avatarColor: '#ff6600', avatarId: 19, bannerColors: ['#301000', '#180700'],
+    avatar: '♠', avatarColor: '#ff6600', avatarId: 10, bannerColors: ['#301000', '#180700'],
     rank: 'Neon Diamond', level: 62, chips: 980_000, winRate: 53,
     handsPlayed: 5_400, biggestPot: 290_000, tournamentWins: 2,
     achievementCount: 20, followers: 2_800, following: 660,

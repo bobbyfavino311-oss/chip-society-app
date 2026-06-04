@@ -1,0 +1,391 @@
+AVATAR SYSTEM REBOOT — PHASE 1
+
+STOP ADDING NEW AVATARS
+
+Do NOT create additional avatars.
+
+Do NOT expand the collection.
+
+Do NOT work on Phase 2.
+
+The avatar system is still fundamentally broken and must be fixed before any new content is added.
+
+We are reducing the system to 15 avatars only so every avatar can be perfected and properly implemented.
+
+QUALITY OVER QUANTITY.
+
+FUNCTIONALITY OVER QUANTITY.
+
+The remaining avatars will not be created until these 15 work perfectly throughout the platform.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL ISSUE #1
+
+AVATARS ARE STILL INVISIBLE ACROSS THE PLATFORM
+
+The selected avatar exists.
+
+The avatar is selected.
+
+The avatar is saved.
+
+However the artwork is not rendering.
+
+Current behavior:
+
+• Avatar appears black
+• Avatar appears empty
+• Avatar appears invisible
+• Avatar appears as a dark circle
+• Neon artwork is missing
+
+Examples:
+
+Player Profile
+
+Avatar Selection
+
+Feed
+
+Trending Posts
+
+Comment Threads
+
+Leaderboard Entries
+
+Tournament Screens
+
+Hand Results
+
+Player Search
+
+All still show either:
+
+empty avatar
+
+black avatar
+
+or missing artwork
+
+THIS MUST BE FIXED FIRST.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEW RULE
+
+WHEN AN AVATAR IS SELECTED
+
+THE ACTUAL AVATAR ARTWORK MUST RENDER.
+
+Not a placeholder.
+
+Not a fallback.
+
+Not a black circle.
+
+Not an empty container.
+
+The actual neon symbol must display.
+
+Example:
+
+Palm Tree selected
+
+↓
+
+Palm Tree visible everywhere.
+
+Martini Glass selected
+
+↓
+
+Martini Glass visible everywhere.
+
+Dragon selected
+
+↓
+
+Dragon visible everywhere.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL ISSUE #2
+
+PLAYER AVATAR DOES NOT PROPAGATE
+
+The selected avatar is not syncing across the platform.
+
+The avatar selected in Avatar Select must become the platform-wide avatar.
+
+Single source of truth:
+
+selectedAvatarId
+
+Everything should reference this value.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER AVATAR MUST APPEAR IN:
+
+Profile Screen
+
+Feed Posts
+
+Trending Posts
+
+Comment Threads
+
+Tournament Entries
+
+Tournament Results
+
+Leaderboard
+
+Winner Screens
+
+Player Search
+
+Followers
+
+Following
+
+Friends
+
+Notifications
+
+Table Seats
+
+Game Results
+
+Hand History
+
+Achievements
+
+Recent Activity
+
+Any future social feature
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL ISSUE #3
+
+SOCIAL POSTS STILL USE INITIALS
+
+This is incorrect.
+
+Examples:
+
+BM
+
+CB
+
+JS
+
+Letter avatars
+
+Initial badges
+
+These should never appear.
+
+If an avatar exists:
+
+SHOW THE AVATAR.
+
+NOT INITIALS.
+
+NOT LETTERS.
+
+NOT PLACEHOLDERS.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEW PLATFORM RULE
+
+REAL PLAYERS
+
+Use selected avatar.
+
+AI PLAYERS
+
+Use random neon avatar.
+
+NO INITIALS ANYWHERE.
+
+NO LETTER BADGES ANYWHERE.
+
+NO HUMAN AI PROFILE IMAGES.
+
+NEON AVATARS ONLY.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL ISSUE #4
+
+MIXED AVATAR SHAPES STILL EXIST
+
+The platform is inconsistent.
+
+Some screens use:
+
+Circle avatars
+
+Some use:
+
+Square avatars
+
+Some use:
+
+Rounded square avatars
+
+Some use:
+
+Circle inside square
+
+This must be unified.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEW GLOBAL RULE
+
+ALL NEON AVATARS ARE CIRCULAR.
+
+100%.
+
+Everywhere.
+
+No exceptions.
+
+Remove:
+
+Square avatar containers
+
+Rounded square containers
+
+Rectangle containers
+
+Mixed avatar styles
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED AVATAR SET
+
+ONLY THESE 15 AVATARS FOR PHASE 1
+
+1. Martini Glass
+
+2. Palm Tree
+
+3. Dice Stack
+
+4. Cassette Tape
+
+5. Saturn Planet
+
+6. Vinyl Record
+
+7. Cherry
+
+8. Flamingo
+
+9. Sunset Grid
+
+10. Ace Card
+
+11. Hour Glass
+
+12. Dragon
+
+13. Poker Chip
+
+14. Champagne Glass
+
+15. Moon
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REFERENCE IMAGE IS PROVIDED
+
+The supplied image is the source of truth.
+
+Do NOT redesign.
+
+Do NOT reinterpret.
+
+Do NOT simplify.
+
+Do NOT create alternative versions.
+
+Use the provided artwork style exactly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CROPPING RULES
+
+Every avatar must be exported individually.
+
+Each avatar must contain:
+
+✓ Full symbol
+
+✓ Full glow
+
+✓ Full circular border
+
+✓ Full artwork
+
+✓ Perfect centering
+
+No clipping.
+
+No cutoffs.
+
+No neighboring artwork.
+
+No partial symbols.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL ACCEPTANCE TEST
+
+Select Palm Tree.
+
+Verify:
+
+✓ Palm Tree visible on Profile
+
+✓ Palm Tree visible on Feed
+
+✓ Palm Tree visible on Trending
+
+✓ Palm Tree visible on Comments
+
+✓ Palm Tree visible on Tournament Screens
+
+✓ Palm Tree visible on Table Seat
+
+✓ Palm Tree visible on Results Screen
+
+✓ Palm Tree visible after app restart
+
+✓ No initials anywhere
+
+✓ No black avatars anywhere
+
+✓ No invisible avatars anywhere
+
+✓ No square avatar containers anywhere
+
+If any screen still shows:
+
+• black avatar
+
+• invisible avatar
+
+• empty avatar
+
+• initials
+
+• square avatar container
+
+Then the avatar system is NOT complete.

@@ -1,16 +1,16 @@
-// ─── NeonAvatar — 30 individual avatar PNGs ───────────────────────────────────
-// Each avatar is a separate 1024×1024 PNG cropped from the official reference
-// image using ImageMagick. Full symbol, perfectly centered, no clipping.
-// resizeMode="contain" ensures the whole badge is always visible.
+// ─── NeonAvatar — SVG-powered neon avatar, always renders ─────────────────────
+// Replaced PNG-based system with programmatic SVG icons (NeonAvatarSymbol.tsx).
+// No PNGs. No loading failures. No black circles. Scales to any size.
 
 import React, { useEffect, useRef } from 'react';
-import { Animated, Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
   getNeonAvatar,
   NEON_RARITY_BORDER,
   NEON_RARITY_COLORS,
 } from '@/constants/neonAvatars';
+import { renderAvatarIcon } from './NeonAvatarSymbol';
 
 export interface NeonAvatarProps {
   avatarId?: number;
@@ -19,41 +19,6 @@ export interface NeonAvatarProps {
   isEquipped?: boolean;
   style?: object;
 }
-
-// ─── Static asset map ─────────────────────────────────────────────────────────
-// React Native requires static require() calls — no dynamic expressions.
-const AVATAR_IMAGES: Record<number, ImageSourcePropType> = {
-  1:  require('@/assets/avatars/avatar_1.png'),
-  2:  require('@/assets/avatars/avatar_2.png'),
-  3:  require('@/assets/avatars/avatar_3.png'),
-  4:  require('@/assets/avatars/avatar_4.png'),
-  5:  require('@/assets/avatars/avatar_5.png'),
-  6:  require('@/assets/avatars/avatar_6.png'),
-  7:  require('@/assets/avatars/avatar_7.png'),
-  8:  require('@/assets/avatars/avatar_8.png'),
-  9:  require('@/assets/avatars/avatar_9.png'),
-  10: require('@/assets/avatars/avatar_10.png'),
-  11: require('@/assets/avatars/avatar_11.png'),
-  12: require('@/assets/avatars/avatar_12.png'),
-  13: require('@/assets/avatars/avatar_13.png'),
-  14: require('@/assets/avatars/avatar_14.png'),
-  15: require('@/assets/avatars/avatar_15.png'),
-  16: require('@/assets/avatars/avatar_16.png'),
-  17: require('@/assets/avatars/avatar_17.png'),
-  18: require('@/assets/avatars/avatar_18.png'),
-  19: require('@/assets/avatars/avatar_19.png'),
-  20: require('@/assets/avatars/avatar_20.png'),
-  21: require('@/assets/avatars/avatar_21.png'),
-  22: require('@/assets/avatars/avatar_22.png'),
-  23: require('@/assets/avatars/avatar_23.png'),
-  24: require('@/assets/avatars/avatar_24.png'),
-  25: require('@/assets/avatars/avatar_25.png'),
-  26: require('@/assets/avatars/avatar_26.png'),
-  27: require('@/assets/avatars/avatar_27.png'),
-  28: require('@/assets/avatars/avatar_28.png'),
-  29: require('@/assets/avatars/avatar_29.png'),
-  30: require('@/assets/avatars/avatar_30.png'),
-};
 
 // ─── Lock overlay ──────────────────────────────────────────────────────────────
 function LockOverlay({ size, color, xpLabel }: { size: number; color: string; xpLabel?: string }) {
@@ -84,7 +49,6 @@ export default function NeonAvatar({
   const avatar      = getNeonAvatar(avatarId);
   const rarityColor = NEON_RARITY_COLORS[avatar.rarity];
   const borderWidth = NEON_RARITY_BORDER[avatar.rarity];
-  const src         = AVATAR_IMAGES[avatarId] ?? AVATAR_IMAGES[1];
 
   const pulseAnim = useRef(new Animated.Value(0.6)).current;
 
@@ -121,26 +85,29 @@ export default function NeonAvatar({
       : `${avatar.unlockXP} XP`
     : undefined;
 
-  const inner = size - borderWidth * 2;
+  const inner = Math.max(size - borderWidth * 2, 4);
 
   return (
     <View style={[{ width: size, height: size }, style]}>
 
-      {/* Animated glow halo — EPIC / LEGENDARY */}
+      {/* Animated glow halo — EPIC / LEGENDARY only */}
       {glowPad > 0 && (
         <Animated.View style={{
           position: 'absolute',
-          top:  -glowPad / 2, left: -glowPad / 2,
-          width: glowSize, height: glowSize,
+          top:  -glowPad / 2,
+          left: -glowPad / 2,
+          width: glowSize,
+          height: glowSize,
           borderRadius: glowSize / 2,
           backgroundColor: rarityColor,
           opacity: glowOpacity,
         }} />
       )}
 
-      {/* Outer rarity border ring */}
+      {/* Rarity border ring + circular clip */}
       <View style={{
-        width: size, height: size,
+        width: size,
+        height: size,
         borderRadius: size / 2,
         borderWidth,
         borderColor: isEquipped ? '#ffffff' : rarityColor,
@@ -149,24 +116,22 @@ export default function NeonAvatar({
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        {/* Individual avatar PNG — full symbol, contain (no cropping) */}
-        <Image
-          source={src}
-          style={{
-            width: inner,
-            height: inner,
-            opacity: isLocked ? 0.18 : 1,
-          }}
-          resizeMode="contain"
-        />
+        {/* SVG neon icon — always renders, no loading required */}
+        <View style={{ opacity: isLocked ? 0.18 : 1 }}>
+          {renderAvatarIcon(avatarId, avatar.color, inner)}
+        </View>
 
         {/* Lock overlay */}
         {isLocked && (
-          <LockOverlay size={size} color={rarityColor} xpLabel={size >= 56 ? xpLabel : undefined} />
+          <LockOverlay
+            size={size}
+            color={rarityColor}
+            xpLabel={size >= 56 ? xpLabel : undefined}
+          />
         )}
       </View>
 
-      {/* Equipped indicator dot (outside the circular clip) */}
+      {/* Equipped indicator dot */}
       {isEquipped && !isLocked && (
         <View style={[st.equippedDot, {
           width:        Math.max(8, size * 0.16),

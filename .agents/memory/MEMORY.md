@@ -3,6 +3,5 @@
 - [AI Social Engine architecture](ai-social-engine.md) — 10 AI personalities, 7 post types, pure in-memory generation; AISocialContext seeds 8 posts and adds one every 10 min.
 - [Play tab conventions](play-tab-conventions.md) — Tournament discovery is Home-only; Quick Match and Ranked show as LOCKED in Play tab; VariantCard has no onTournaments prop.
 - [Neon avatar naming collision](neon-avatar-naming.md) — `type NeonAvatar` (from neonAvatars.ts) and the default `NeonAvatar` component (NeonAvatar.tsx) cause TS2300 in the same file; alias one: `type NeonAvatar as NeonAvatarData` + `import NeonAvatarView from ...`.
-- [Avatar PNG circular crop in IM7](avatar-png-generation.md) — sprite-sheet to individual PNGs: use -channel A -fx for circular alpha; CopyOpacity/DstIn on RGB mask produces all-transparent results in IM7.
-- [Neon-avatars sprite extraction](neon-avatar-extraction.md) — sprite-sheet rules, contamination root causes, and per-icon fixes for all 30 avatars.
+- [SVG Avatar System — replaced broken PNGs](svg-avatar-system.md) — 15 programmatic SVG icons in NeonAvatarSymbol.tsx; avatarIds 1–15 only; getNeonAvatar() clamps; bots use [9,13,12,15,7].
 - [Game screen crash — ArcTimer module-level createAnimatedComponent](arc-timer-crash.md) — DO NOT import PlayerSeat in practice.tsx or any game screen; it pulls in ArcTimer which calls Animated.createAnimatedComponent(Circle) at module level, triggering "Invalid hook call" with React Compiler + RNW 0.21 + React 19.
