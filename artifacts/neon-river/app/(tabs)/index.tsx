@@ -96,19 +96,7 @@ function initTournamentPool(): LiveTournament[] {
   });
 }
 
-const STATUS_LABELS = { live: '● LIVE', registering: 'REGISTERING', late: 'LATE REG' };
-const STATUS_COLORS = { live: '#ff4455', registering: colors.success, late: colors.gold };
-
 function TournamentCard({ t }: { t: LiveTournament }) {
-  const msLeft = Math.max(0, t.endTime - Date.now());
-  const totalSec = Math.floor(msLeft / 1000);
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  const s = totalSec % 60;
-  const timeStr = h > 0
-    ? `${h}h ${m.toString().padStart(2, '0')}m`
-    : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-
   const fmtPrize = (n: number) => {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
@@ -116,51 +104,41 @@ function TournamentCard({ t }: { t: LiveTournament }) {
   };
   const fmtChips = (n: number) => n >= 1000 ? `${n / 1000}K` : String(n);
 
-  const sc = STATUS_COLORS[t.status];
-  const fillPct = Math.min(100, Math.round((t.filledSeats / t.totalSeats) * 100));
-  const seatsLeft = t.totalSeats - t.filledSeats;
-  const isLive = t.status === 'live';
+  const fillPct    = Math.min(100, Math.round((t.filledSeats / t.totalSeats) * 100));
+  const seatsLeft  = t.totalSeats - t.filledSeats;
   const isShortDeck = t.variant === 'short_deck_holdem';
 
-  const handleJoin = () => {
-    router.push((`/game/practice?variant=${t.variant}&players=4`) as any);
-  };
-
   return (
-    <TouchableOpacity
-      style={[tc.card, { borderColor: `${t.accentColor}55` }]}
-      onPress={handleJoin}
-      activeOpacity={0.88}
-    >
+    <View style={[tc.card, { borderColor: `${t.accentColor}28`, opacity: 0.72 }]}>
       <LinearGradient
         colors={['#160028', '#080018', '#050010']}
         style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
       <LinearGradient
-        colors={[`${t.accentColor}28`, 'transparent']}
+        colors={[`${t.accentColor}18`, 'transparent']}
         style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0.85, y: 0.65 }}
+        start={{ x: 0, y: 0 }} end={{ x: 0.85, y: 0.65 }}
       />
       <View style={[tc.accentBar, { backgroundColor: t.accentColor }]} />
 
       <View style={tc.body}>
-        {/* Top row: status + countdown */}
+        {/* Top row: coming soon lock badge */}
         <View style={tc.topRow}>
-          <View style={[tc.badge, { backgroundColor: `${sc}20`, borderColor: `${sc}50` }]}>
-            {isLive && <View style={[tc.liveDot, { backgroundColor: sc }]} />}
-            <Text style={[tc.badgeText, { color: sc }]}>{STATUS_LABELS[t.status]}</Text>
+          <View style={[tc.badge, { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', gap: 5 }]}>
+            <Ionicons name="lock-closed-outline" size={8} color="rgba(255,255,255,0.3)" />
+            <Text style={[tc.badgeText, { color: 'rgba(255,255,255,0.3)' }]}>COMING SOON</Text>
           </View>
           <View style={tc.speedPill}>
             <Text style={tc.speedText}>{t.speed.toUpperCase()}</Text>
           </View>
-          <Text style={tc.timeLeft}>{timeStr}</Text>
         </View>
 
         {/* Variant badge */}
-        <View style={[tc.variantBadge, { backgroundColor: isShortDeck ? `${colors.secondary}18` : `${colors.primary}18`, borderColor: isShortDeck ? `${colors.secondary}40` : `${colors.primary}40` }]}>
+        <View style={[tc.variantBadge, {
+          backgroundColor: isShortDeck ? `${colors.secondary}18` : `${colors.primary}18`,
+          borderColor:     isShortDeck ? `${colors.secondary}40` : `${colors.primary}40`,
+        }]}>
           <Text style={[tc.variantText, { color: isShortDeck ? colors.secondary : colors.primary }]}>
             {isShortDeck ? '36-CARD SHORT DECK' : "NO LIMIT HOLD'EM"}
           </Text>
@@ -189,23 +167,18 @@ function TournamentCard({ t }: { t: LiveTournament }) {
           </View>
         </View>
 
-        {/* Fill progress */}
+        {/* Fill bar */}
         <View style={tc.barWrap}>
           <View style={[tc.barFill, { width: `${fillPct}%` as any, backgroundColor: t.accentColor }]} />
         </View>
 
-        {/* Join CTA */}
-        <TouchableOpacity style={[tc.joinBtn, { borderColor: `${t.accentColor}80` }]} onPress={handleJoin} activeOpacity={0.85}>
-          <LinearGradient
-            colors={[`${t.accentColor}33`, `${t.accentColor}15`]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-          />
-          <Ionicons name="flash" size={14} color={t.accentColor} />
-          <Text style={[tc.joinText, { color: t.accentColor }]}>PLAY NOW</Text>
-        </TouchableOpacity>
+        {/* Locked CTA — replaces PLAY NOW */}
+        <View style={[tc.joinBtn, { borderColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', gap: 8 }]}>
+          <Ionicons name="lock-closed-outline" size={13} color="rgba(255,255,255,0.2)" />
+          <Text style={[tc.joinText, { color: 'rgba(255,255,255,0.22)' }]}>COMPETITIVE SERIES — ARRIVING SOON</Text>
+        </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
