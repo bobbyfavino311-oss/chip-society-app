@@ -1,0 +1,114 @@
+PROFILE SCREEN – TOURNAMENT STATS LOCKED STATE REFINEMENT
+
+The current Tournament Stats card is much better, but the large centered lock icon is taking up too much space and makes the card feel empty.
+
+--------------------------------------------------
+REMOVE
+--------------------------------------------------
+
+Remove the oversized centered lock icon.
+
+Do not use a large badge-style lock.
+
+--------------------------------------------------
+REPLACE WITH
+--------------------------------------------------
+
+Use a small lock icon positioned in the top-right corner of the Tournament Stats card.
+
+Style:
+
+- Small neon purple lock
+- Similar size to a settings icon
+- Subtle glow
+- Clean and modern
+- Non-intrusive
+
+The card should feel informative, not blocked off.
+
+--------------------------------------------------
+KEEP
+--------------------------------------------------
+
+Keep the headline:
+
+TOURNAMENTS COMING SOON
+
+Keep the supporting text:
+
+Tournament statistics will become available when tournaments launch.
+
+--------------------------------------------------
+ADD INFO BUTTON
+--------------------------------------------------
+
+Add a small circular "i" information button in the top-left corner of the Tournament Stats card.
+
+Style:
+
+- Small neon outline circle
+- Matches app theme
+- Same style as other informational icons throughout the app
+
+--------------------------------------------------
+INFO POPUP CONTENT
+--------------------------------------------------
+
+When tapped, display:
+
+TOURNAMENT STATISTICS
+
+Tournament statistics will begin tracking automatically when tournaments become available.
+
+This section will track:
+
+• Tournament Entries
+• Tournament Wins
+• Final Table Appearances
+• Cash Finishes
+• Biggest Prize Won
+• Best Finish Position
+• Average Finish
+• Return on Investment (ROI)
+• Tournament Win Rate
+• Total Tournament Chips Won
+
+Compete in tournaments to build your tournament record and climb future leaderboards.
+
+--------------------------------------------------
+CARD DESIGN
+--------------------------------------------------
+
+Keep the existing dimmed statistics visible underneath the overlay.
+
+Reduce opacity to roughly 15–20%.
+
+The user should still be able to see:
+
+Wins
+Losses
+Win Rate
+Best Finish
+Biggest Prize
+
+but clearly understand they are inactive.
+
+--------------------------------------------------
+GOAL
+--------------------------------------------------
+
+The card should communicate:
+
+✔ Tournaments are planned
+✔ Tournament stats already have a dedicated place
+✔ Players can see what data will be tracked
+✔ The interface feels premium and intentional
+✔ The card uses less vertical space
+✔ The card feels informative rather than locked or inaccessible
+
+Think:
+"Feature Preview"
+
+NOT
+
+"Feature Disabled"

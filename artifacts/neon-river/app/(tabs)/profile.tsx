@@ -226,6 +226,7 @@ export default function ProfileScreen() {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.username);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showTournamentInfo, setShowTournamentInfo] = useState(false);
 
   const claimedCount = achievementCompletion(unlockedIds);
 
@@ -406,11 +407,20 @@ export default function ProfileScreen() {
               colors={['rgba(4,0,26,0.82)', 'rgba(8,0,22,0.9)']}
               style={StyleSheet.absoluteFill}
             />
-            {/* Lock message */}
+            {/* Top-left info button */}
+            <TouchableOpacity
+              style={styles.tournamentInfoBtn}
+              onPress={() => setShowTournamentInfo(true)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="information-circle-outline" size={18} color="rgba(191,95,255,0.65)" />
+            </TouchableOpacity>
+            {/* Top-right lock icon */}
+            <View style={styles.tournamentLockCorner}>
+              <Ionicons name="lock-closed" size={14} color="rgba(191,95,255,0.65)" />
+            </View>
+            {/* Centered headline */}
             <View style={styles.tournamentLockContent}>
-              <View style={styles.tournamentLockIcon}>
-                <Ionicons name="lock-closed" size={22} color="rgba(191,95,255,0.7)" />
-              </View>
               <Text style={styles.tournamentLockTitle}>TOURNAMENTS COMING SOON</Text>
               <Text style={styles.tournamentLockSub}>
                 Tournament statistics will become available when tournaments launch.
@@ -484,6 +494,51 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Tournament info modal */}
+      <Modal
+        visible={showTournamentInfo}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowTournamentInfo(false)}
+      >
+        <View style={achStyles.overlay}>
+          <View style={[achStyles.modalCard, { maxHeight: '80%' }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <Text style={[achStyles.modalTitle, { fontSize: 12, letterSpacing: 1.5 }]}>TOURNAMENT STATISTICS</Text>
+              <TouchableOpacity onPress={() => setShowTournamentInfo(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close" size={20} color="rgba(255,255,255,0.5)" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[achStyles.modalBody, { marginBottom: 14 }]}>
+                Tournament statistics will begin tracking automatically when tournaments become available.
+              </Text>
+              <Text style={tiStyles.subhead}>THIS SECTION WILL TRACK:</Text>
+              {[
+                'Tournament Entries',
+                'Tournament Wins',
+                'Final Table Appearances',
+                'Cash Finishes',
+                'Biggest Prize Won',
+                'Best Finish Position',
+                'Average Finish',
+                'Return on Investment (ROI)',
+                'Tournament Win Rate',
+                'Total Tournament Chips Won',
+              ].map(item => (
+                <View key={item} style={tiStyles.bullet}>
+                  <View style={tiStyles.dot} />
+                  <Text style={tiStyles.bulletText}>{item}</Text>
+                </View>
+              ))}
+              <Text style={[achStyles.modalBody, { marginTop: 16, color: 'rgba(191,95,255,0.7)' }]}>
+                Compete in tournaments to build your record and climb future leaderboards.
+              </Text>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Sign-out confirmation modal */}
       <Modal
         visible={showSignOutModal}
@@ -518,6 +573,16 @@ export default function ProfileScreen() {
     </View>
   );
 }
+
+const tiStyles = StyleSheet.create({
+  subhead: {
+    fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold',
+    color: 'rgba(191,95,255,0.7)', letterSpacing: 1.5, marginBottom: 10,
+  },
+  bullet: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 7 },
+  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(191,95,255,0.6)' },
+  bulletText: { fontSize: 11, color: 'rgba(255,255,255,0.75)', fontFamily: 'Inter_400Regular', flex: 1 },
+});
 
 const achStyles = StyleSheet.create({
   row: {
@@ -796,16 +861,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  tournamentInfoBtn: {
+    position: 'absolute', top: 10, left: 10,
+  },
+  tournamentLockCorner: {
+    position: 'absolute', top: 12, right: 12,
+  },
   tournamentLockContent: {
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 24,
-  },
-  tournamentLockIcon: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: 'rgba(191,95,255,0.12)',
-    borderWidth: 1, borderColor: 'rgba(191,95,255,0.3)',
-    alignItems: 'center', justifyContent: 'center',
+    gap: 6,
+    paddingHorizontal: 32,
   },
   tournamentLockTitle: {
     fontSize: 10, fontWeight: '900', fontFamily: 'Orbitron_700Bold',
