@@ -104,7 +104,7 @@ function SectionCard({ section, accent, icon, title, lines, options, locked, onP
           <Ionicons name={icon as any} size={22} color={locked ? 'rgba(255,215,0,0.45)' : accent} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[sc.title, { color: titleColor }]}>{title}</Text>
+          <Text style={[sc.title, { color: titleColor }]} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
           {lines.map((l, i) => <Text key={i} style={sc.line}>{l}</Text>)}
         </View>
         {isActive && (
@@ -258,16 +258,19 @@ export default function PlayScreen() {
           options={[]}
           onPress={() => router.push('/casino/three-card-poker' as any)}
         />
-        <SectionCard
-          accent="#ffd700"
-          icon="grid-outline"
-          title="MORE GAMES COMING SOON"
-          lines={["Blackjack · Roulette · Baccarat"]}
-          options={[]}
-          locked
-          lockedLabel="ADDITIONAL CASINO GAMES"
-          lockedSub="More casino experiences planned for future updates."
-        />
+        {/* ── MORE GAMES compact banner ───────────────────────────── */}
+        <View style={mb.banner}>
+          <View style={mb.left}>
+            <Ionicons name="lock-closed" size={11} color="rgba(255,215,0,0.4)" />
+            <View>
+              <Text style={mb.title}>MORE CASINO GAMES COMING SOON</Text>
+              <Text style={mb.sub}>Blackjack · Roulette · Baccarat</Text>
+            </View>
+          </View>
+          <View style={mb.badge}>
+            <Text style={mb.badgeText}>SOON</Text>
+          </View>
+        </View>
 
         {/* ── TOURNAMENTS ─────────────────────────────────────────────── */}
         <SectionCard
@@ -283,6 +286,21 @@ export default function PlayScreen() {
     </View>
   );
 }
+
+// ─── More Games compact banner styles ─────────────────────────────────────────
+const mb = StyleSheet.create({
+  banner:    {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.12)', backgroundColor: 'rgba(255,215,0,0.03)',
+    marginBottom: 6, opacity: 0.55,
+  },
+  left:      { flexDirection: 'row', alignItems: 'center', gap: 9, flex: 1 },
+  title:     { fontSize: 9, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8, color: 'rgba(255,215,0,0.65)' },
+  sub:       { fontSize: 8, color: 'rgba(255,255,255,0.3)', marginTop: 1 },
+  badge:     { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6, backgroundColor: 'rgba(255,215,0,0.07)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.15)' },
+  badgeText: { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1, color: 'rgba(255,215,0,0.4)' },
+});
 
 // ─── Root styles ──────────────────────────────────────────────────────────────
 const s = StyleSheet.create({

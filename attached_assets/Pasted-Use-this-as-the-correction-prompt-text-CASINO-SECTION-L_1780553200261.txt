@@ -1,0 +1,140 @@
+Use this as the correction prompt:
+
+```text
+CASINO SECTION LAYOUT REFINEMENT
+
+The current "MORE GAMES COMING SOON" card is taking up far too much vertical space and is pushing important content downward.
+
+REMOVE the large locked card completely.
+
+Do NOT replace it with another large card.
+
+Instead, replace it with a compact notification banner directly beneath the Three Card Poker card.
+
+--------------------------------------------------
+REPLACE THIS:
+--------------------------------------------------
+
+[Large More Games Coming Soon Card]
+
+with
+
+--------------------------------------------------
+THIS:
+--------------------------------------------------
+
+🔒 MORE CASINO GAMES COMING SOON
+
+Blackjack • Roulette • Baccarat
+
+Future casino experiences are currently in development.
+
+--------------------------------------------------
+
+DESIGN REQUIREMENTS
+--------------------------------------------------
+
+This should NOT look like a selectable game mode.
+
+It should look like a lightweight informational notification.
+
+Visual style:
+
+- Small horizontal notification box
+- 40-60% shorter than current card
+- Reduced height
+- Single-line layout
+- Subtle border
+- Low visual priority
+- Locked icon on left
+- "COMING SOON" badge on right
+- Same neon theme as app
+
+Think:
+
+Information banner
+
+NOT
+
+Game selection card
+
+--------------------------------------------------
+SPACE SAVINGS GOAL
+--------------------------------------------------
+
+The purpose is to reclaim vertical space.
+
+After replacing the large card:
+
+- Tournament section should move upward
+- More content should fit on screen
+- Less scrolling required
+- Better visual hierarchy
+
+--------------------------------------------------
+TOURNAMENT SECTION FIX
+--------------------------------------------------
+
+The Tournament card currently wraps the word:
+
+TOURNAMEN
+TS
+
+This is unacceptable.
+
+The title must remain on ONE LINE.
+
+Fix by:
+
+- Increasing text container width
+OR
+- Reducing font size slightly
+OR
+- Reworking card spacing
+
+The word must display as:
+
+TOURNAMENTS
+
+Never split across lines.
+
+--------------------------------------------------
+TOURNAMENTS STATUS
+--------------------------------------------------
+
+Tournaments remain locked.
+
+Display:
+
+🔒 TOURNAMENTS
+
+COMING SOON
+
+Multi-table tournaments will be available in a future update.
+
+Non-clickable.
+
+Disabled state.
+
+No navigation.
+
+No hidden routes.
+
+--------------------------------------------------
+FINAL HIERARCHY
+--------------------------------------------------
+
+CASINO
+
+[Three Card Poker Card]
+
+[Small More Games Coming Soon Notification Banner]
+
+TOURNAMENTS
+
+[Locked Tournament Card]
+
+This creates a much cleaner flow and prevents the UI from feeling oversized or cluttered.
+```
+
+This will free up a significant amount of vertical space and stop the Tournament section from breaking words across multiple lines.
