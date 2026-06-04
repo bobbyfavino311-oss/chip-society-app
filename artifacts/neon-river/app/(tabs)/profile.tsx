@@ -219,7 +219,7 @@ function SoundSettingsCard() {
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
-  const { profile, updateProfile, winRate, signOut } = useUser();
+  const { profile, updateProfile, winRate, signOut, addChips } = useUser();
   const { unlockedIds } = useAchievements();
   const { following } = useSocial();
   const socialFollowingCount = following.size;
@@ -447,6 +447,14 @@ export default function ProfileScreen() {
             size="xl"
           />
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
+          <TouchableOpacity
+            style={styles.refillBtn}
+            onPress={() => addChips(1_000_000)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="add-circle-outline" size={14} color="#000" />
+            <Text style={styles.refillBtnText}>+ 1,000,000 CHIPS</Text>
+          </TouchableOpacity>
         </View>
 
         <SoundSettingsCard />
@@ -897,6 +905,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
   },
   chipLabel: { color: colors.textMuted, fontSize: 10, letterSpacing: 2, fontWeight: '600' },
+  refillBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10,
+    backgroundColor: '#ffd700', marginTop: 4,
+  },
+  refillBtnText: { fontSize: 11, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#000', letterSpacing: 0.5 },
   streakNum: { color: colors.text, fontSize: 18, fontWeight: '700' },
   streakSub: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
   avatarPickerWrap: {
