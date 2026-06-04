@@ -5,3 +5,4 @@
 - [Neon avatar naming collision](neon-avatar-naming.md) — `type NeonAvatar` (from neonAvatars.ts) and the default `NeonAvatar` component (NeonAvatar.tsx) cause TS2300 in the same file; alias one: `type NeonAvatar as NeonAvatarData` + `import NeonAvatarView from ...`.
 - [Avatar PNG circular crop in IM7](avatar-png-generation.md) — sprite-sheet to individual PNGs: use -channel A -fx for circular alpha; CopyOpacity/DstIn on RGB mask produces all-transparent results in IM7.
 - [Neon-avatars sprite extraction](neon-avatar-extraction.md) — sprite-sheet rules, contamination root causes, and per-icon fixes for all 30 avatars.
+- [Game screen crash — ArcTimer module-level createAnimatedComponent](arc-timer-crash.md) — DO NOT import PlayerSeat in practice.tsx or any game screen; it pulls in ArcTimer which calls Animated.createAnimatedComponent(Circle) at module level, triggering "Invalid hook call" with React Compiler + RNW 0.21 + React 19.

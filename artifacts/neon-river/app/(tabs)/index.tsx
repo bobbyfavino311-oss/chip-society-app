@@ -23,6 +23,7 @@ import { useColors } from '@/hooks/useColors';
 import { useNotifications } from '@/context/NotificationContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import { useAISocial } from '@/context/AISocialContext';
+import NeonAvatar from '@/components/NeonAvatar';
 
 const { width } = Dimensions.get('window');
 
@@ -428,6 +429,7 @@ interface TrendPost {
   user: string;
   avatar: string;
   avatarColor: string;
+  avatarId?: number;
   type: string;
   typeColor: string;
   content: string;
@@ -507,9 +509,7 @@ function TrendCard({ post }: { post: TrendPost }) {
         end={{ x: 1, y: 1 }}
       />
       <View style={trend.header}>
-        <View style={[trend.avatar, { borderColor: post.avatarColor }]}>
-          <Text style={[trend.avatarText, { color: post.avatarColor }]}>{post.avatar}</Text>
-        </View>
+        <NeonAvatar avatarId={post.avatarId ?? 1} size={40} />
         <View style={{ flex: 1 }}>
           <Text style={trend.username}>{post.user}</Text>
           <View style={[trend.typeBadge, { backgroundColor: `${post.typeColor}22`, borderColor: `${post.typeColor}44` }]}>
@@ -601,11 +601,12 @@ export default function HomeScreen() {
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
   const formatChips = (n: number) => n.toLocaleString('en-US');
 
-  const trendingPosts: TrendPost[] = aiPosts.slice(0, 8).map(p => ({
+  const trendingPosts: TrendPost[] = aiPosts.slice(0, 8).map((p, i) => ({
     id: p.id,
     user: p.personality.username,
     avatar: p.personality.avatarInitials[0],
     avatarColor: p.personality.avatarColor,
+    avatarId: (i % 8) + 1,
     type: p.tag,
     typeColor: p.tagColor,
     content: p.content,

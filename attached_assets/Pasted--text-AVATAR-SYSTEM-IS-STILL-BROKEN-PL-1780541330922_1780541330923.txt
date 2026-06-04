@@ -1,0 +1,320 @@
+```text
+===========================================================
+AVATAR SYSTEM IS STILL BROKEN PLATFORM-WIDE
+CRITICAL AVATAR PROPAGATION FIX REQUIRED
+===========================================================
+
+The avatar redesign is not finished.
+
+The avatar selected by the player is NOT properly propagating throughout the app.
+
+Current screenshots reveal multiple avatar system failures.
+
+===========================================================
+ISSUE #1
+AVATARS ARE INVISIBLE
+===========================================================
+
+The selected Neon Palm avatar is active.
+
+However:
+
+- Profile avatar appears black
+- Avatar preview appears black
+- Avatar selector preview appears black
+- Avatar image is either not loading or not rendering
+
+The symbol itself should be visible everywhere.
+
+Current behavior:
+
+black circle
+faint shadow
+almost invisible icon
+
+This is incorrect.
+
+FIX:
+
+The actual neon avatar artwork must render.
+
+Display full brightness neon symbol.
+
+Display glow effects.
+
+Display proper color.
+
+Display proper transparency.
+
+Avatar should look identical to the asset selected in Avatar Select.
+
+===========================================================
+ISSUE #2
+PLAYER AVATAR NOT PROPAGATING
+===========================================================
+
+The avatar selected by the player must become the single source of truth.
+
+When a player selects an avatar:
+
+SAVE:
+
+selectedAvatarId
+
+Then use that avatar everywhere.
+
+Every screen.
+
+Every component.
+
+Every feature.
+
+Every future post.
+
+Every future profile view.
+
+Every future leaderboard entry.
+
+===========================================================
+PLAYER AVATAR MUST APPEAR IN:
+===========================================================
+
+Profile Screen
+
+Feed Posts
+
+Trending Posts
+
+Comment Threads
+
+Tournament Results
+
+Tournament Leaderboards
+
+Player Search
+
+Followers Lists
+
+Following Lists
+
+Friends Lists
+
+Notifications
+
+Achievements
+
+Hand History
+
+Recent Activity
+
+Winner Banners
+
+Table Seats
+
+End Hand Results
+
+Chat Messages
+
+Any future social feature
+
+===========================================================
+ISSUE #3
+SOCIAL POSTS STILL USING INITIALS
+===========================================================
+
+This must be completely removed.
+
+Current examples:
+
+BM
+CB
+initial-based placeholders
+
+These should never appear.
+
+If avatar exists:
+
+SHOW AVATAR
+
+NOT initials
+
+NOT letters
+
+NOT fallback badges
+
+===========================================================
+NEW RULE
+===========================================================
+
+AI bots use neon avatars.
+
+Players use selected avatar.
+
+No initials.
+
+No generated letter icons.
+
+No generic profile placeholders.
+
+===========================================================
+ISSUE #4
+MIXED SHAPES STILL EXIST
+===========================================================
+
+Some avatar containers are circular.
+
+Some are square.
+
+Some are rounded-square.
+
+This creates visual inconsistency.
+
+===========================================================
+NEW GLOBAL RULE
+===========================================================
+
+ALL NEON AVATARS:
+
+100% circular
+
+No squares
+
+No rounded squares
+
+No rectangular containers
+
+No mixed avatar styles
+
+===========================================================
+REQUIRED DESIGN SYSTEM
+===========================================================
+
+Avatar artwork:
+circle
+
+Avatar border:
+circle
+
+Avatar glow:
+circle
+
+Avatar selection:
+circle
+
+Avatar previews:
+circle
+
+Social feed:
+circle
+
+Trending feed:
+circle
+
+Profile page:
+circle
+
+Leaderboard:
+circle
+
+Table seat:
+circle
+
+Tournament entries:
+circle
+
+===========================================================
+ISSUE #5
+PROFILE SCREEN NOT MATCHING SELECTED AVATAR
+===========================================================
+
+Current profile page:
+
+avatar appears empty
+
+selected avatar not visible
+
+This is incorrect.
+
+Profile avatar should instantly update when player selects a new avatar.
+
+No refresh required.
+
+No restart required.
+
+No delayed sync.
+
+===========================================================
+EXPECTED BEHAVIOR
+===========================================================
+
+Player selects Neon Palm
+
+↓
+
+Avatar immediately updates
+
+↓
+
+Profile updates
+
+↓
+
+Feed posts update
+
+↓
+
+Trending updates
+
+↓
+
+Comments update
+
+↓
+
+Table seat updates
+
+↓
+
+Leaderboard updates
+
+↓
+
+Entire platform reflects the same avatar
+
+===========================================================
+ACCEPTANCE TEST
+===========================================================
+
+Select Neon Palm
+
+Then verify:
+
+✓ Profile avatar shows Neon Palm
+
+✓ Feed post shows Neon Palm
+
+✓ Trending post shows Neon Palm
+
+✓ Comment shows Neon Palm
+
+✓ Table seat shows Neon Palm
+
+✓ End-hand result shows Neon Palm
+
+✓ No initials visible anywhere
+
+✓ No square avatar containers anywhere
+
+✓ Avatar visible at full neon brightness
+
+✓ Avatar persists after app restart
+
+If ANY screen still shows initials,
+empty circles,
+black avatars,
+or square avatar containers,
+
+the avatar system is still not fixed.
+
+===========================================================
+```

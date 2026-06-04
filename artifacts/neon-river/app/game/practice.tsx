@@ -18,7 +18,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import BettingPanel from '@/components/BettingPanel';
 import PlayingCard from '@/components/PlayingCard';
-import PlayerSeat from '@/components/PlayerSeat';
 import DotTimer from '@/components/DotTimer';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
@@ -333,7 +332,6 @@ const g = StyleSheet.create({
     shadowColor: '#ffd700',
     shadowOpacity: 1, shadowRadius: 20, shadowOffset: { width: 0, height: 0 },
   },
-  avatarSymbol: { fontSize: 18, lineHeight: 22 },
   posBadge: {
     position: 'absolute', bottom: -2, right: -2,
     width: 13, height: 13, borderRadius: 6.5,

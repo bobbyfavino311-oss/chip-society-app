@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useSocial } from '@/context/SocialContext';
+import NeonAvatar from '@/components/NeonAvatar';
 import {
   MOCK_PLAYERS, SOCIAL_POSTS, POST_TAG_COLORS, POKER_REACTIONS,
   type MockPlayer, type SocialPost,
@@ -144,9 +145,7 @@ export default function PlayerProfileScreen() {
 
         {/* Avatar */}
         <View style={s.avatarWrap}>
-          <View style={[s.avatar, { borderColor: player.avatarColor }]}>
-            <Text style={[s.avatarText, { color: player.avatarColor }]}>{player.avatar}</Text>
-          </View>
+          <NeonAvatar avatarId={player.avatarId ?? 1} size={72} />
           <LinearGradient colors={[`${player.avatarColor}50`, 'transparent']} style={s.avatarGlow} />
         </View>
 

@@ -476,9 +476,7 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
                   : <Text style={lb.rankNum}>{i + 1}</Text>
                 }
               </View>
-              <View style={[lb.avatar, { borderColor: entry.player.avatarColor }]}>
-                <Text style={[lb.avatarText, { color: entry.player.avatarColor }]}>{entry.player.avatar}</Text>
-              </View>
+              <NeonAvatar avatarId={entry.player.avatarId ?? 1} size={34} />
               <View style={{ flex: 1 }}>
                 <Text style={lb.username}>{entry.player.username}</Text>
                 <Text style={lb.rankLabel}>{entry.player.rank}</Text>
@@ -585,9 +583,7 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
               onPress={() => router.push(`/social/player-profile?id=${p.id}`)}
             >
               <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
-              <View style={[srch.avatar, { borderColor: p.avatarColor }]}>
-                <Text style={[srch.avatarText, { color: p.avatarColor }]}>{p.avatar}</Text>
-              </View>
+              <NeonAvatar avatarId={p.avatarId ?? 1} size={38} />
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text style={srch.username}>{p.username}</Text>
