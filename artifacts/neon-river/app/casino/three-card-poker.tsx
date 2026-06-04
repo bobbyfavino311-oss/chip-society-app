@@ -579,16 +579,73 @@ export default function ThreeCardPokerScreen() {
           {pEvalLabel ? <Text style={gs.handLabel}>{pEvalLabel}</Text> : null}
 
           {/* Result breakdown */}
-          {phase === 'result' && result && (
+          {phase === 'result' && result && (() => {
+            // ── Verdict derivation ──────────────────────────────────────
+            const pLabel = result.playerEval.label;
+            const dLabel = result.dealerEval.label;
+            let verdictText: string;
+            let verdictColor: string;
+            let reasonText: string;
+            if (result.comparison === 'fold') {
+              verdictText = 'PLAYER FOLDED';
+              verdictColor = '#ff4466';
+              reasonText = 'Ante surrendered — hand ends';
+            } else if (!result.qualified) {
+              verdictText = 'DEALER DOES NOT QUALIFY';
+              verdictColor = '#ffd700';
+              reasonText = 'Dealer needs Q-high to qualify — ante returned';
+            } else if (result.comparison === 'player') {
+              verdictText = 'PLAYER WINS';
+              verdictColor = '#00ff88';
+              reasonText = `${pLabel} beats ${dLabel}`;
+            } else if (result.comparison === 'dealer') {
+              verdictText = 'DEALER WINS';
+              verdictColor = '#ff4466';
+              reasonText = `${dLabel} beats ${pLabel}`;
+            } else {
+              verdictText = 'PUSH';
+              verdictColor = '#ffd700';
+              reasonText = 'Equal hands — ante returned';
+            }
+
+            return (
             <View style={gs.resultPanel}>
               <LinearGradient colors={['rgba(0,0,0,0.82)', 'rgba(8,0,22,0.92)']} style={StyleSheet.absoluteFill} />
 
-              {/* Status header */}
-              <Text style={gs.foldLabel}>
-                {result.comparison === 'fold'
-                  ? 'PLAYER FOLDED — ANTE LOST'
-                  : result.qualified ? 'DEALER QUALIFIES' : 'DEALER DOES NOT QUALIFY'}
-              </Text>
+              {/* ── Hand comparison block ── */}
+              <View style={gs.compBlock}>
+                {/* Dealer row (hidden on fold unless dealer was revealed) */}
+                {result.comparison !== 'fold' && (
+                  <View style={gs.compHandRow}>
+                    <Text style={gs.compSideLabel}>DEALER</Text>
+                    <Text style={[gs.compHandName, { color: result.comparison === 'dealer' ? '#ff6680' : 'rgba(255,255,255,0.55)' }]}>
+                      {dLabel}
+                    </Text>
+                  </View>
+                )}
+
+                {result.comparison !== 'fold' && (
+                  <View style={gs.compVsDivider}>
+                    <View style={gs.compVsLine} />
+                    <Text style={gs.compVsText}>VS</Text>
+                    <View style={gs.compVsLine} />
+                  </View>
+                )}
+
+                {/* Player row */}
+                <View style={gs.compHandRow}>
+                  <Text style={gs.compSideLabel}>YOU</Text>
+                  <Text style={[gs.compHandName, { color: result.comparison === 'player' ? '#00ff88' : 'rgba(255,255,255,0.55)' }]}>
+                    {pLabel}
+                  </Text>
+                </View>
+
+                {/* Verdict pill */}
+                <View style={[gs.compVerdictPill, { borderColor: `${verdictColor}55`, backgroundColor: `${verdictColor}0f` }]}>
+                  <Text style={[gs.compVerdictText, { color: verdictColor }]}>{verdictText}</Text>
+                  <Text style={gs.compReasonText}>{reasonText}</Text>
+                </View>
+              </View>
 
               <View style={gs.resultDivider} />
 
@@ -658,7 +715,8 @@ export default function ThreeCardPokerScreen() {
                 isNet
               />
             </View>
-          )}
+            );
+          })()}
         </View>
 
         {/* ── BETTING CONTROLS ── */}
@@ -821,6 +879,21 @@ const gs = StyleSheet.create({
   },
   decisionLabel:  { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#00d4ff', letterSpacing: 2 },
   decisionHint:   { fontSize: 9, color: 'rgba(255,255,255,0.28)', fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 14 },
+
+  // Hand comparison block (top of result panel)
+  compBlock:       { gap: 8 },
+  compHandRow:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  compSideLabel:   { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.3)', letterSpacing: 1.5, width: 44 },
+  compHandName:    { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5, flex: 1, textAlign: 'right' },
+  compVsDivider:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  compVsLine:      { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
+  compVsText:      { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.18)', letterSpacing: 2 },
+  compVerdictPill: {
+    borderWidth: 1, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12,
+    alignItems: 'center', gap: 3, marginTop: 2,
+  },
+  compVerdictText: { fontSize: 11, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5 },
+  compReasonText:  { fontSize: 8, color: 'rgba(255,255,255,0.35)', fontFamily: 'Orbitron_400Regular', textAlign: 'center' },
 
   // Action / result buttons
   actionRow:    { flexDirection: 'row', gap: 10 },

@@ -1,0 +1,215 @@
+THREE CARD POKER – SHOW WHY THE DEALER WON
+
+CURRENT PROBLEM
+
+The result panel only tells the player:
+
+DEALER QUALIFIES
+
+and then shows wins/losses.
+
+This is not enough information.
+
+Players need to immediately understand WHY they won or lost.
+
+Casino games feel unfair when outcomes are not explained.
+
+--------------------------------------------------
+NEW REQUIREMENT
+--------------------------------------------------
+
+The result panel must always display:
+
+1. Dealer Hand
+2. Player Hand
+3. Hand Comparison
+4. Reason For Outcome
+
+--------------------------------------------------
+EXAMPLE (CURRENT HAND)
+--------------------------------------------------
+
+Dealer:
+A♦ 3♣ 2♦
+
+Player:
+J♥ 8♠ 3♦
+
+Display:
+
+DEALER HAND
+ACE HIGH
+
+PLAYER HAND
+JACK HIGH
+
+RESULT
+ACE HIGH BEATS JACK HIGH
+
+MAIN GAME
+-100K LOSS
+
+--------------------------------------------------
+PAIR EXAMPLE
+--------------------------------------------------
+
+Dealer:
+J♣ 9♣ J♦
+
+Player:
+6♦ 2♠ 2♥
+
+Display:
+
+DEALER HAND
+PAIR OF JACKS
+
+PLAYER HAND
+PAIR OF TWOS
+
+RESULT
+PAIR OF JACKS BEATS PAIR OF TWOS
+
+MAIN GAME
+-100K LOSS
+
+--------------------------------------------------
+STRAIGHT EXAMPLE
+--------------------------------------------------
+
+Dealer Hand
+STRAIGHT
+
+Player Hand
+PAIR
+
+RESULT
+
+STRAIGHT BEATS PAIR
+
+--------------------------------------------------
+FLUSH EXAMPLE
+--------------------------------------------------
+
+Dealer Hand
+FLUSH
+
+Player Hand
+ACE HIGH
+
+RESULT
+
+FLUSH BEATS ACE HIGH
+
+--------------------------------------------------
+TIE EXAMPLE
+--------------------------------------------------
+
+Dealer Hand
+KING HIGH
+
+Player Hand
+KING HIGH
+
+RESULT
+
+PUSH
+
+NO PLAYER OR DEALER ADVANTAGE
+
+--------------------------------------------------
+RESULT PANEL REDESIGN
+--------------------------------------------------
+
+At the top of the result card display:
+
+DEALER HAND:
+ACE HIGH
+
+PLAYER HAND:
+JACK HIGH
+
+RESULT:
+ACE HIGH BEATS JACK HIGH
+
+Then display payouts underneath.
+
+--------------------------------------------------
+COLOR CODING
+--------------------------------------------------
+
+Player Win:
+
+Green
+
+PLAYER WINS
+
+Pair of Kings beats Pair of Tens
+
+Dealer Win:
+
+Red
+
+DEALER WINS
+
+Ace High beats Jack High
+
+Push:
+
+Gold
+
+PUSH
+
+Equal hands
+
+--------------------------------------------------
+HAND NAMES SUPPORTED
+--------------------------------------------------
+
+High Card
+
+Pair
+
+Flush
+
+Straight
+
+Three of a Kind
+
+Straight Flush
+
+For 6 Card Bonus:
+
+Pair
+
+Two Pair
+
+Three of a Kind
+
+Straight
+
+Flush
+
+Full House
+
+Four of a Kind
+
+Straight Flush
+
+Royal Flush
+
+--------------------------------------------------
+GOAL
+--------------------------------------------------
+
+Every hand should answer these questions instantly:
+
+What did I have?
+
+What did the dealer have?
+
+Who had the stronger hand?
+
+Why did I win or lose?
+
+The player should never have to study the cards to understand the result.
