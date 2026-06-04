@@ -249,35 +249,19 @@ export default function PlayScreen() {
           section="CASINO"
           accent="#ffd700"
           icon="diamond-outline"
-          title="THREE CARD POKER"
-          lines={[
-            "Player vs Dealer",
-            "Dealer qualifies with Queen High or Better",
-            "Win chips against the house",
-          ]}
+          title="CASINO GAMES"
+          lines={["House games · Win chips against the dealer"]}
           options={[
             {
-              label: "PLAY THREE CARD POKER",
-              icon:  "game-controller-outline",
-              sub:   "Ante · Pair Plus · 6 Card Bonus",
+              label:   "THREE CARD POKER",
+              icon:    "game-controller-outline",
+              sub:     "Ante · Pair Plus · 6 Card Bonus",
               onPress: () => router.push('/casino/three-card-poker' as any),
             },
+            { label: "BLACKJACK",  icon: "card-outline",    sub: "Coming soon", locked: true },
+            { label: "ROULETTE",   icon: "radio-button-on-outline", sub: "Coming soon", locked: true },
           ]}
-          onPress={() => router.push('/casino/three-card-poker' as any)}
         />
-        {/* ── MORE GAMES compact banner ───────────────────────────── */}
-        <View style={mb.banner}>
-          <View style={mb.left}>
-            <Ionicons name="lock-closed" size={11} color="rgba(255,215,0,0.4)" />
-            <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={mb.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>MORE CASINO GAMES COMING SOON</Text>
-              <Text style={mb.sub}>Additional casino experiences planned for future updates.</Text>
-            </View>
-          </View>
-          <View style={mb.badge}>
-            <Text style={mb.badgeText}>SOON</Text>
-          </View>
-        </View>
 
         {/* ── TOURNAMENTS ─────────────────────────────────────────────── */}
         <SectionCard
