@@ -1,0 +1,209 @@
+# CASINO SECTION RESTRUCTURE + TABLE MUSIC FEATURE
+
+Use the attached screenshot as the reference.
+
+The Casino section needs to be cleaner and more focused while still showing future expansion.
+
+At launch, there should only be ONE playable casino game:
+
+THREE CARD POKER
+
+All other casino games should remain locked and unavailable.
+
+--------------------------------------------------
+CASINO SECTION LAYOUT
+--------------------------------------------------
+
+The Casino section should contain exactly TWO cards:
+
+1. THREE CARD POKER (ACTIVE)
+
+2. MORE GAMES COMING SOON (LOCKED)
+
+Nothing else.
+
+--------------------------------------------------
+THREE CARD POKER CARD
+--------------------------------------------------
+
+Remove the nested Three Card Poker tile currently inside the larger card.
+
+Remove:
+
+- Secondary Three Card Poker button
+- Play button icon
+- Duplicate Three Card Poker text
+- Extra inner card
+
+The OUTER card itself becomes the button.
+
+Tapping anywhere on the card launches Three Card Poker.
+
+Card content:
+
+THREE CARD POKER
+
+Player vs Dealer
+
+Dealer qualifies with Queen High or Better
+
+Win chips against the house
+
+No additional buttons required.
+
+No nested cards.
+
+No duplicate UI elements.
+
+The entire card is clickable.
+
+--------------------------------------------------
+MORE GAMES COMING SOON CARD
+--------------------------------------------------
+
+Directly beneath Three Card Poker add:
+
+🔒 MORE GAMES COMING SOON
+
+Subtitle:
+
+Blackjack • Roulette • Baccarat
+
+Additional casino games planned for future updates
+
+Requirements:
+
+- Locked icon visible
+- Disabled state
+- Reduced opacity
+- Non-clickable
+- "SOON" badge visible
+- Same visual style as other locked content throughout the app
+
+This card exists only to show future casino expansion.
+
+Users cannot interact with it.
+
+--------------------------------------------------
+VISUAL GOAL
+--------------------------------------------------
+
+Current structure:
+
+Casino
+→ Large Card
+→ Small Card
+→ Play Button
+
+This feels redundant.
+
+Replace with:
+
+Casino
+
+→ Three Card Poker (active)
+
+→ More Games Coming Soon (locked)
+
+Cleaner.
+
+More premium.
+
+More professional.
+
+--------------------------------------------------
+THREE CARD POKER TABLE SCREEN
+--------------------------------------------------
+
+Add a music control button.
+
+Location:
+
+Top-right corner of the table screen.
+
+Small circular neon icon.
+
+Match the existing UI style.
+
+--------------------------------------------------
+MUSIC FUNCTIONALITY
+--------------------------------------------------
+
+Use the SAME music system already used elsewhere in the app.
+
+Do not create a new soundtrack.
+
+Use existing game music.
+
+Behavior:
+
+- Music starts automatically when entering Three Card Poker.
+- Music loops continuously.
+- Music button toggles On/Off.
+- Music preference persists between sessions.
+- If player disables music, it remains disabled until manually turned back on.
+
+States:
+
+🔊 Music On
+
+🔇 Music Off
+
+--------------------------------------------------
+FINAL CASINO SECTION
+--------------------------------------------------
+
+CASINO
+
+--------------------------------
+
+THREE CARD POKER
+Player vs Dealer
+Dealer qualifies with Queen High or Better
+Win chips against the house
+
+(Entire card clickable)
+
+--------------------------------
+
+🔒 MORE GAMES COMING SOON
+
+Blackjack • Roulette • Baccarat
+
+SOON
+
+(Disabled)
+
+--------------------------------
+
+--------------------------------------------------
+FINAL ACCEPTANCE CHECK
+--------------------------------------------------
+
+✓ Only one playable casino game
+
+✓ Three Card Poker card launches game directly
+
+✓ No nested play button
+
+✓ No duplicate Three Card Poker tile
+
+✓ More Games Coming Soon card remains visible
+
+✓ Locked state works
+
+✓ Soon badge visible
+
+✓ Cleaner spacing and hierarchy
+
+✓ Music button added to table screen
+
+✓ Uses existing game soundtrack
+
+✓ Music loops automatically
+
+✓ Music toggle works
+
+✓ Music preference persists
+
+✓ Casino section feels polished and launch-ready

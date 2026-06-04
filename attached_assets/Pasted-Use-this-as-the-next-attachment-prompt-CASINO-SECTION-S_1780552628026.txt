@@ -1,0 +1,198 @@
+Use this as the next attachment prompt:
+
+---
+
+# CASINO SECTION SIMPLIFICATION + TABLE MUSIC FEATURE
+
+Use the attached screenshot as the reference.
+
+The Casino section is still too busy.
+
+At launch, there should only be ONE casino game available.
+
+That game is:
+
+**THREE CARD POKER**
+
+Everything else should be removed.
+
+---
+
+## REMOVE INNER GAME TILE
+
+Currently there is a second tile inside the Three Card Poker card that says:
+
+THREE CARD POKER
+
+with a play button.
+
+Delete this entire inner tile.
+
+Remove:
+
+* Secondary Three Card Poker button
+* Play button
+* Extra nested card
+* Extra spacing created by this card
+
+The entire outer casino card should become the button.
+
+Tapping anywhere on the Three Card Poker card launches the game.
+
+---
+
+## REMOVE "MORE GAMES SOON"
+
+Delete the entire:
+
+MORE GAMES SOON
+
+locked tile.
+
+Remove:
+
+* Lock icon
+* Soon badge
+* Blackjack text
+* Roulette text
+* Baccarat text
+
+Completely remove it.
+
+At launch there is only one casino game.
+
+No placeholders are needed.
+
+---
+
+## FINAL CASINO CARD
+
+The Casino section should contain only:
+
+### THREE CARD POKER
+
+Subtitle:
+
+Player vs Dealer
+
+Dealer qualifies with Queen High or Better
+
+Win chips against the house
+
+The entire card should be clickable.
+
+No secondary buttons.
+
+No nested cards.
+
+No duplicate Three Card Poker text.
+
+---
+
+## VISUAL GOAL
+
+Current hierarchy:
+
+Casino
+→ Card
+→ Another Card
+→ Play Button
+
+This is redundant.
+
+Replace with:
+
+Casino
+→ Three Card Poker Card
+
+Only.
+
+Much cleaner.
+
+Much more premium.
+
+---
+
+# TABLE SCREEN MUSIC FEATURE
+
+Add a music control button to the Three Card Poker table screen.
+
+Location:
+
+Top right corner of the table screen.
+
+Small circular icon.
+
+Match the game's existing neon visual style.
+
+---
+
+## MUSIC BEHAVIOR
+
+The button controls the same music system already used elsewhere in the app.
+
+When entering Three Card Poker:
+
+* Background music automatically starts.
+* Use the same soundtrack already used in the rest of the game.
+* Music loops continuously.
+
+The button should allow:
+
+🔊 Music On
+
+🔇 Music Off
+
+without leaving the table.
+
+---
+
+## MUSIC REQUIREMENTS
+
+Do NOT create a new soundtrack.
+
+Use the existing music already integrated into:
+
+* Home screen
+* Gameplay screens
+* Other game modes
+
+The casino should feel like part of the same game ecosystem.
+
+Music state should persist:
+
+If player turns music off,
+
+then leaves and returns,
+
+music remains off until manually enabled again.
+
+---
+
+## FINAL ACCEPTANCE CHECK
+
+✓ Casino section contains only one Three Card Poker card
+
+✓ Entire card launches game
+
+✓ No nested play tile
+
+✓ No duplicate Three Card Poker button
+
+✓ No More Games Soon section
+
+✓ Cleaner spacing
+
+✓ Better visual hierarchy
+
+✓ Music button added to table screen
+
+✓ Uses existing game soundtrack
+
+✓ Music loops automatically
+
+✓ Music toggle works
+
+✓ Music preference persists between sessions
+
+✓ Casino section feels complete and launch-ready with only one active game available.

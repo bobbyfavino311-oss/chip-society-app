@@ -71,61 +71,83 @@ const or = StyleSheet.create({
 
 // ─── Section card ─────────────────────────────────────────────────────────────
 interface SectionCardProps {
-  section: string;
-  accent:  string;
-  icon:    string;
-  title:   string;
-  lines:   string[];
-  options: OptionDef[];
-  locked?: boolean;
+  section?:    string;
+  accent:      string;
+  icon:        string;
+  title:       string;
+  lines:       string[];
+  options:     OptionDef[];
+  locked?:     boolean;
+  onPress?:    () => void;
+  lockedLabel?: string;
+  lockedSub?:  string;
 }
 
-function SectionCard({ section, accent, icon, title, lines, options, locked }: SectionCardProps) {
+function SectionCard({ section, accent, icon, title, lines, options, locked, onPress, lockedLabel, lockedSub }: SectionCardProps) {
   const borderColor = locked ? 'rgba(255,215,0,0.2)' : `${accent}38`;
   const topBar      = locked ? 'rgba(255,215,0,0.5)' : accent;
   const titleColor  = locked ? 'rgba(255,215,0,0.7)' : accent;
+  const isActive    = !!onPress && !locked;
 
-  return (
-    <View style={sc.wrap}>
-      <Text style={sc.sectionLabel}>{section}</Text>
+  const cardContent = (
+    <View style={[sc.card, { borderColor }, locked && sc.cardLocked]}>
+      <LinearGradient
+        colors={locked ? ['rgba(255,215,0,0.06)', 'transparent'] : [`${accent}10`, 'transparent']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      />
+      <View style={[sc.topBar, { backgroundColor: topBar }]} />
 
-      <View style={[sc.card, { borderColor }]}>
-        <LinearGradient
-          colors={locked ? ['rgba(255,215,0,0.06)', 'transparent'] : [`${accent}10`, 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        />
-        <View style={[sc.topBar, { backgroundColor: topBar }]} />
-
-        {/* Header */}
-        <View style={sc.header}>
-          <View style={[sc.iconWrap, { backgroundColor: `${accent}15`, borderColor: `${accent}40` }]}>
-            <Ionicons name={icon as any} size={22} color={locked ? 'rgba(255,215,0,0.55)' : accent} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[sc.title, { color: titleColor }]}>{title}</Text>
-            {lines.map((l, i) => <Text key={i} style={sc.line}>{l}</Text>)}
-          </View>
+      {/* Header */}
+      <View style={sc.header}>
+        <View style={[sc.iconWrap, { backgroundColor: `${accent}15`, borderColor: `${accent}40` }]}>
+          <Ionicons name={icon as any} size={22} color={locked ? 'rgba(255,215,0,0.45)' : accent} />
         </View>
-
-        {/* Divider */}
-        <View style={sc.divider} />
-
-        {/* Options / locked state */}
-        {locked ? (
-          <View style={sc.lockedRow}>
-            <Ionicons name="lock-closed" size={20} color="rgba(255,215,0,0.35)" />
-            <View>
-              <Text style={sc.lockedTitle}>COMING SOON</Text>
-              <Text style={sc.lockedSub}>Competitive tournaments arriving in a future update.</Text>
-            </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[sc.title, { color: titleColor }]}>{title}</Text>
+          {lines.map((l, i) => <Text key={i} style={sc.line}>{l}</Text>)}
+        </View>
+        {isActive && (
+          <View style={[sc.actionBadge, { backgroundColor: `${accent}22`, borderColor: `${accent}55` }]}>
+            <Ionicons name="play" size={14} color={accent} />
           </View>
-        ) : (
-          <View style={sc.optList}>
-            {options.map(o => <OptionRow key={o.label} opt={o} accent={accent} />)}
+        )}
+        {locked && (
+          <View style={sc.soonBadge}>
+            <Ionicons name="lock-closed" size={9} color="rgba(255,215,0,0.4)" />
+            <Text style={sc.soonText}>SOON</Text>
           </View>
         )}
       </View>
+
+      {/* Divider + options/locked row — only when there's content below */}
+      {(options.length > 0 || locked) && (
+        <>
+          <View style={sc.divider} />
+          {locked ? (
+            <View style={sc.lockedRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={sc.lockedTitle}>{lockedLabel ?? 'COMING SOON'}</Text>
+                <Text style={sc.lockedSub}>{lockedSub ?? 'Arriving in a future update.'}</Text>
+              </View>
+            </View>
+          ) : (
+            <View style={sc.optList}>
+              {options.map(o => <OptionRow key={o.label} opt={o} accent={accent} />)}
+            </View>
+          )}
+        </>
+      )}
+    </View>
+  );
+
+  return (
+    <View style={sc.wrap}>
+      {section ? <Text style={sc.sectionLabel}>{section}</Text> : null}
+      {isActive
+        ? <TouchableOpacity onPress={onPress} activeOpacity={0.82}>{cardContent}</TouchableOpacity>
+        : cardContent
+      }
     </View>
   );
 }
@@ -137,16 +159,20 @@ const sc = StyleSheet.create({
     letterSpacing: 2.5, color: 'rgba(255,255,255,0.32)',
     marginBottom: 10, marginTop: 8,
   },
-  card:     { borderRadius: 18, borderWidth: 1, overflow: 'hidden', padding: 16, gap: 14 },
-  topBar:   { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  header:   { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  iconWrap: { width: 52, height: 52, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  title:    { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0.8 },
-  line:     { fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 2 },
-  divider:  { height: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
-  optList:  { gap: 8 },
-  lockedRow:  { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 6 },
-  lockedTitle:{ fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.5)', letterSpacing: 2 },
+  card:       { borderRadius: 18, borderWidth: 1, overflow: 'hidden', padding: 16, gap: 14 },
+  cardLocked: { opacity: 0.52 },
+  topBar:     { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  header:     { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconWrap:   { width: 52, height: 52, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  title:      { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0.8 },
+  line:       { fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 2 },
+  divider:    { height: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
+  optList:    { gap: 8 },
+  actionBadge:{ width: 34, height: 34, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  soonBadge:  { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: 'rgba(255,215,0,0.06)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.15)' },
+  soonText:   { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.4)', letterSpacing: 1 },
+  lockedRow:  { paddingVertical: 4 },
+  lockedTitle:{ fontSize: 11, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.5)', letterSpacing: 1.5 },
   lockedSub:  { fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3 },
 });
 
@@ -224,20 +250,23 @@ export default function PlayScreen() {
           accent="#ffd700"
           icon="diamond-outline"
           title="THREE CARD POKER"
-          lines={["Player vs Dealer · Queen High dealer qualify", "Win chips against the house"]}
-          options={[
-            {
-              label:   "THREE CARD POKER",
-              icon:    "albums-outline",
-              onPress: () => router.push('/casino/three-card-poker' as any),
-            },
-            {
-              label:  "MORE GAMES SOON",
-              icon:   "grid-outline",
-              sub:    "Blackjack · Roulette · Baccarat",
-              locked: true,
-            },
+          lines={[
+            "Player vs Dealer",
+            "Dealer qualifies with Queen High or Better",
+            "Win chips against the house",
           ]}
+          options={[]}
+          onPress={() => router.push('/casino/three-card-poker' as any)}
+        />
+        <SectionCard
+          accent="#ffd700"
+          icon="grid-outline"
+          title="MORE GAMES COMING SOON"
+          lines={["Blackjack · Roulette · Baccarat"]}
+          options={[]}
+          locked
+          lockedLabel="ADDITIONAL CASINO GAMES"
+          lockedSub="More casino experiences planned for future updates."
         />
 
         {/* ── TOURNAMENTS ─────────────────────────────────────────────── */}

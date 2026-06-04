@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Modal, Platform, ScrollView, StyleSheet, Text,
   TouchableOpacity, View,
@@ -10,6 +10,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
 import { useUser } from '@/context/UserContext';
+import { useSoundSettings } from '@/context/SoundContext';
+import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
 import {
   createTCPDeck, shuffleTCPDeck, dealBiasedHands,
@@ -242,6 +244,19 @@ const rr = StyleSheet.create({
 export default function ThreeCardPokerScreen() {
   const insets = useSafeAreaInsets();
   const { profile, addChips, removeChips } = useUser();
+  const { isMusicMuted, toggleMusicMute } = useSoundSettings();
+
+  // ── Music: start on mount, stop on unmount, respect global mute ───────────
+  useEffect(() => {
+    MusicEngine.configure({ muted: isMusicMuted });
+    MusicEngine.play();
+    return () => { MusicEngine.stop(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    MusicEngine.configure({ muted: isMusicMuted });
+  }, [isMusicMuted]);
 
   const [phase,          setPhase]          = useState<Phase>('betting');
   const [anteBet,        setAnteBet]        = useState(1_000);
@@ -470,10 +485,19 @@ export default function ThreeCardPokerScreen() {
           <Ionicons name="chevron-back" size={22} color={colors.primary} />
         </TouchableOpacity>
         <Text style={gs.tableTitle}>THREE CARD POKER</Text>
-        <TouchableOpacity style={gs.ptBtn} onPress={() => setShowPT(true)}>
-          <Text style={gs.ptBtnText}>PAYTABLE</Text>
-          <Ionicons name="information-circle-outline" size={13} color="rgba(255,215,0,0.6)" />
-        </TouchableOpacity>
+        <View style={gs.headerRight}>
+          <TouchableOpacity style={gs.iconBtn} onPress={toggleMusicMute} activeOpacity={0.75}>
+            <Ionicons
+              name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
+              size={15}
+              color={isMusicMuted ? 'rgba(255,255,255,0.22)' : '#00d4ff'}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={gs.ptBtn} onPress={() => setShowPT(true)}>
+            <Text style={gs.ptBtnText}>TABLE</Text>
+            <Ionicons name="information-circle-outline" size={13} color="rgba(255,215,0,0.6)" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -733,11 +757,13 @@ const gs = StyleSheet.create({
   scroll:      { paddingHorizontal: 14, gap: 10 },
 
   // Header
-  header:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingBottom: 6 },
-  backBtn:    { width: 70, flexDirection: 'row', alignItems: 'center' },
-  tableTitle: { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.85)', letterSpacing: 1.5, flex: 1, textAlign: 'center' },
-  ptBtn:      { width: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 3 },
-  ptBtnText:  { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.55)', letterSpacing: 1 },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingBottom: 6 },
+  backBtn:     { width: 70, flexDirection: 'row', alignItems: 'center' },
+  tableTitle:  { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.85)', letterSpacing: 1.5, flex: 1, textAlign: 'center' },
+  headerRight: { width: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 8 },
+  iconBtn:     { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  ptBtn:       { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  ptBtnText:   { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.55)', letterSpacing: 1 },
 
   // Dealer
   dealerArea: { alignItems: 'center', gap: 8 },
