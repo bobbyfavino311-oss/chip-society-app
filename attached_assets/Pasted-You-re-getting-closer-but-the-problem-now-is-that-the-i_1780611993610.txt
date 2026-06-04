@@ -1,0 +1,278 @@
+You’re getting closer, but the problem now is that the icons have gone too far in the opposite direction.
+
+Right now they look like:
+
+* Mobile game stickers
+* Emoji-style symbols
+* Flat vector clip art
+* Cartoon icons
+* Random asset pack graphics
+
+What you’re trying to build is a premium Vegas / synthwave luxury poker brand, not Candy Crush.
+
+The avatars should feel like something you’d unlock in:
+
+* PokerStars
+* WSOP
+* GTA Online Casino
+* Cyberpunk
+* High-end esports profile systems
+
+Not a children’s game.
+
+⸻
+
+AVATAR COLLECTION ART DIRECTION OVERHAUL
+
+The current avatar collection has improved readability but now feels overly simplified and cartoonish.
+
+Many avatars look like flat clip art or mobile-game stickers rather than premium collectible profile cosmetics.
+
+The goal is to make the collection feel luxurious, exclusive, stylish, and desirable to unlock.
+
+Players should see these avatars and think:
+
+“I want that one.”
+
+Not:
+
+“That looks like a stock icon.”
+
+⸻
+
+NEW ART DIRECTION
+
+Keep:
+
+* Strong readability
+* Bold silhouettes
+* Clear recognition
+
+Improve:
+
+* Sophistication
+* Premium feel
+* Neon luxury aesthetic
+* Collectible value
+
+⸻
+
+VISUAL TARGET
+
+Think:
+
+* Miami Vice
+* Synthwave
+* Retro luxury
+* High stakes Vegas
+* Neon nightlife
+* Exclusive casino rewards
+
+NOT:
+
+* Emoji icons
+* Children’s game assets
+* Flat clip art
+* Generic mobile game stickers
+
+⸻
+
+DESIGN RULES
+
+Every avatar should feel like:
+
+* A neon sign hanging in a luxury casino
+* A collectible poker badge
+* A premium profile emblem
+
+Use:
+
+* Elegant proportions
+* Professional line work
+* Controlled glow effects
+* Refined shapes
+* Strong symmetry
+
+Avoid:
+
+* Chubby shapes
+* Cartoon proportions
+* Oversized eyes
+* Cute designs
+* Childlike silhouettes
+* Random vector clip art
+
+⸻
+
+SPECIFIC REDESIGN NOTES
+
+Palm
+
+Current:
+
+* Looks like a pink lollipop
+
+Redesign:
+
+* Elegant Miami palm tree silhouette
+* Thin trunk
+* Sophisticated leaf structure
+* Neon nightclub sign quality
+
+⸻
+
+Dice
+
+Current:
+
+* Looks like a basic emoji
+
+Redesign:
+
+* Premium casino dice
+* Perspective angle
+* Luxury casino aesthetic
+* Cleaner geometry
+
+⸻
+
+Cassette
+
+Current:
+
+* Looks like a toy cassette
+
+Redesign:
+
+* 1980s retro cassette
+* Premium synthwave styling
+* More refined details
+
+⸻
+
+Saturn
+
+Current:
+
+* Blob with a ring
+
+Redesign:
+
+* Elegant planet
+* Thin glowing ring
+* Better proportions
+
+⸻
+
+Flamingo
+
+Current:
+
+* Cartoon bird
+
+Redesign:
+
+* Neon lounge-sign flamingo
+* Thin elegant neck
+* Luxury Miami aesthetic
+
+⸻
+
+Dragon
+
+Current:
+
+* Looks like a green cat
+
+Redesign:
+
+* Aggressive premium dragon profile
+* Sharp silhouette
+* High-value unlock feel
+
+⸻
+
+Champagne
+
+Current:
+
+* Generic glass icon
+
+Redesign:
+
+* Luxury champagne flute
+* Vegas VIP energy
+* Premium celebration theme
+
+⸻
+
+Moon
+
+Current:
+
+* Looks decent
+
+Improve:
+
+* Better glow
+* More refined stars
+* Premium finish
+
+⸻
+
+RARITY DIFFERENTIATION
+
+The biggest missing feature:
+
+Rare, Epic, and Legendary avatars currently feel almost identical.
+
+They should immediately communicate rarity.
+
+Common
+
+* Simple glow
+* Basic ring
+
+Rare
+
+* Dual neon glow
+* More depth
+
+Epic
+
+* Animated glow effects ready
+* Premium frame
+* More detail
+
+Legendary
+
+* Signature halo effect
+* Luxury frame
+* Strong visual presence
+* Clearly superior to all lower tiers
+
+A player should instantly recognize a Legendary avatar without reading the rarity label.
+
+⸻
+
+COLLECTION TEST
+
+Ask:
+
+“If this appeared as a profile picture in PokerStars or a high-end casino game, would players want to unlock it?”
+
+If the answer is no:
+
+Redesign it.
+
+⸻
+
+FINAL GOAL
+
+Do not create simple icons.
+
+Create collectible digital status symbols.
+
+Every avatar should feel like a luxury neon badge earned inside an exclusive high-stakes poker community.
+
+The collection should look expensive, desirable, stylish, and consistent with the premium synthwave Miami-Vegas identity of the entire game.
