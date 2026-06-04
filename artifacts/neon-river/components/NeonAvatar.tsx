@@ -138,15 +138,15 @@ export default function NeonAvatar({
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        {/* PNG avatar — approved source artwork */}
+        {/* PNG avatar — 84% scale keeps the icon's neon ring within the clip border */}
         <Image
           source={source}
           style={{
-            width:  inner,
-            height: inner,
+            width:  Math.round(inner * 0.84),
+            height: Math.round(inner * 0.84),
             opacity: isLocked ? 0.15 : 1,
           }}
-          resizeMode="cover"
+          resizeMode="contain"
         />
 
         {/* Lock overlay */}

@@ -263,15 +263,7 @@ function PostCard({ post }: { post: SocialPost }) {
           style={cd.avatarWrap}
           onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}
         >
-          {player?.avatarId != null ? (
-            <NeonAvatar avatarId={player.avatarId} size={44} />
-          ) : (
-            <View style={[cd.avatar, { borderColor: player?.avatarColor ?? colors.primary }]}>
-              <Text style={[cd.avatarText, { color: player?.avatarColor ?? colors.primary }]}>
-                {player?.avatar ?? '♠'}
-              </Text>
-            </View>
-          )}
+          <NeonAvatar avatarId={player?.avatarId ?? 1} size={44} />
           {player?.status === 'online' && <View style={cd.onlineDot} />}
           {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
         </TouchableOpacity>

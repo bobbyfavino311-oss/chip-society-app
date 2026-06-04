@@ -265,9 +265,7 @@ export default function PlayerProfileScreen() {
                 onPress={() => router.replace(`/social/player-profile?id=${p.id}`)}
               >
                 <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
-                <View style={[s.simAvatar, { borderColor: p.avatarColor }]}>
-                  <Text style={[s.simAvatarText, { color: p.avatarColor }]}>{p.avatar}</Text>
-                </View>
+                <NeonAvatar avatarId={p.avatarId ?? 1} size={40} />
                 <Text style={s.simName}>{p.username}</Text>
                 <Text style={s.simRank}>{p.rank}</Text>
               </TouchableOpacity>
