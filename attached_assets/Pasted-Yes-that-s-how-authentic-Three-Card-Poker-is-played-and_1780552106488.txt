@@ -1,0 +1,277 @@
+Yes — that's how authentic Three Card Poker is played, and the current implementation sounds like it's skipping one of the most important decision points in the game.
+
+Here's the prompt I'd give the AI:
+
+---
+
+# CRITICAL THREE CARD POKER GAMEFLOW FIX
+
+The current Three Card Poker game flow is incorrect.
+
+The game is resolving the dealer hand too early and is not giving the player the opportunity to make the most important decision in Three Card Poker:
+
+**FOLD or PLAY**
+
+This must be rebuilt to follow real Three Card Poker rules.
+
+---
+
+# CORRECT GAME FLOW
+
+## STEP 1 — PLAYER PLACES BETS
+
+Player may place:
+
+ANTE (required)
+
+PAIR PLUS (optional)
+
+6 CARD BONUS (optional)
+
+ANTE BONUS is automatic and does not require a separate wager.
+
+No cards are visible yet.
+
+---
+
+## STEP 2 — PLAYER RECEIVES CARDS
+
+After betting:
+
+Deal exactly 3 cards to the player.
+
+Dealer cards remain completely hidden.
+
+Display:
+
+PLAYER HAND ONLY
+
+Dealer cards remain face down.
+
+---
+
+## STEP 3 — DECISION PHASE
+
+The player now evaluates their hand.
+
+At this point:
+
+Dealer hand is still hidden.
+
+No showdown occurs.
+
+Present two large action buttons:
+
+### FOLD
+
+### PLAY
+
+---
+
+# IF PLAYER CHOOSES FOLD
+
+Player forfeits the Ante wager.
+
+Player does NOT place a Play wager.
+
+Dealer cards are not required to be revealed.
+
+Pair Plus resolves normally.
+
+6 Card Bonus resolves normally if it was placed.
+
+Display outcome.
+
+Example:
+
+Ante = Lost
+
+Pair Plus = Won
+
+6 Card Bonus = Lost
+
+Net Result = +5K
+
+---
+
+# IF PLAYER CHOOSES PLAY
+
+The player must place a mandatory Play wager.
+
+The Play wager must automatically equal the Ante wager.
+
+Example:
+
+Ante = 10K
+
+Play = 10K
+
+Ante = 25K
+
+Play = 25K
+
+The Play wager amount cannot be changed.
+
+This is a required matching wager.
+
+---
+
+## STEP 4 — DEALER REVEAL
+
+Only after the player presses PLAY:
+
+Reveal all dealer cards.
+
+Evaluate dealer qualification.
+
+Evaluate hand strengths.
+
+Resolve all wagers.
+
+Show final result screen.
+
+---
+
+# DEALER QUALIFICATION
+
+Dealer qualifies with:
+
+Queen High or better
+
+Any Pair
+
+Any Flush
+
+Any Straight
+
+Three of a Kind
+
+Straight Flush
+
+Dealer fails to qualify only with:
+
+Jack High or worse
+
+and no made hand.
+
+---
+
+# SHOWDOWN SCREEN
+
+After dealer reveal:
+
+Display:
+
+Dealer Hand
+
+Dealer Qualification Status
+
+Player Hand
+
+Hand Rankings
+
+Example:
+
+PLAYER
+
+Pair of Twos
+
+DEALER
+
+Pair of Jacks
+
+Dealer Wins
+
+---
+
+# RESULTS PANEL
+
+Always show:
+
+MAIN GAME
+
+PAIR PLUS
+
+ANTE BONUS
+
+6 CARD BONUS
+
+NET RESULT
+
+Each wager should show:
+
+Green = Win
+
+Red = Loss
+
+Blue = Push
+
+Never gray out outcomes.
+
+---
+
+# PLAYER EXPERIENCE GOAL
+
+The game should feel like a real casino table.
+
+The player must experience:
+
+1. Betting
+2. Receiving cards
+3. Evaluating hand
+4. Choosing FOLD or PLAY
+5. Dealer reveal
+6. Showdown
+7. Payout resolution
+
+The player's decision to Fold or Play is the core mechanic of Three Card Poker and must occur before any dealer cards are revealed.
+
+---
+
+# ACCEPTANCE TEST
+
+Example:
+
+Player bets:
+
+Ante = 10K
+
+Pair Plus = 10K
+
+6 Card Bonus = 10K
+
+Player receives:
+
+A♠ K♠ Q♠
+
+Dealer cards remain hidden.
+
+Player chooses:
+
+PLAY
+
+System automatically places:
+
+Play = 10K
+
+Dealer reveals:
+
+9♦ 8♣ 3♥
+
+Dealer does not qualify.
+
+Results:
+
+Ante = Win
+
+Play = Push
+
+Pair Plus = Straight Flush payout
+
+Ante Bonus payout
+
+6 Card Bonus resolves separately
+
+Net result displayed clearly.
+
+The player should never see dealer cards before making the Fold or Play decision. This behavior is mandatory.

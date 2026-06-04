@@ -395,11 +395,13 @@ export default function ThreeCardPokerScreen() {
     setBusy(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    const pEval  = evaluateThreeCardHand(playerCards);
-    const dEval  = evaluateThreeCardHand(dealerCards);
-    const ppM    = getPairPlusMultiplier(pEval.rank);
+    const pEval = evaluateThreeCardHand(playerCards);
+    const dEval = evaluateThreeCardHand(dealerCards);
+    const ppM   = getPairPlusMultiplier(pEval.rank);
 
     let returnChips = 0;
+
+    // Pair Plus resolves normally on fold
     let ppWin = 0;
     if (ppBet > 0 && ppM >= 0) {
       returnChips += ppBet + ppBet * ppM;
@@ -408,18 +410,28 @@ export default function ThreeCardPokerScreen() {
       ppWin = -ppBet;
     }
 
+    // 6 Card Bonus resolves normally on fold (best 5 of all 6 cards)
+    let scEval: SixCardEval | null = null;
+    let scWin = 0;
+    if (scBet > 0) {
+      scEval = evaluateSixCardBonus(playerCards, dealerCards);
+      const scM = getSixCardBonusMultiplier(scEval.rank);
+      scWin = scM >= 0 ? scBet * scM : -scBet;
+      if (scM >= 0) returnChips += scBet + scBet * scM;
+    }
+
     if (returnChips > 0) await addChips(returnChips);
 
-    // netDelta: lost ante + pp (if lost) + sc; gained ppWin if positive
     const netDelta = returnChips - (anteBet + ppBet + scBet);
 
     setResult({
-      playerEval: pEval, dealerEval: dEval, sixCardEval: null,
+      playerEval: pEval, dealerEval: dEval, sixCardEval: scEval,
       qualified: false, comparison: 'fold',
       mainWin: -anteBet, pairPlusWin: ppWin, anteBonusWin: 0,
-      sixCardWin: scBet > 0 ? -scBet : 0, netDelta,
+      sixCardWin: scWin, netDelta,
     });
-    setDealerRevealed(true);
+    // Reveal dealer only if 6CB was placed — player needs to see the combined hand
+    setDealerRevealed(scBet > 0);
     setPlayed(false);
     setPhase('result');
     setBusy(false);
@@ -662,21 +674,36 @@ export default function ThreeCardPokerScreen() {
 
         {/* ── ACTION BUTTONS ── */}
         {phase === 'action' && (
-          <View style={gs.actionRow}>
-            <TouchableOpacity style={gs.foldBtn} onPress={handleFold} disabled={busy} activeOpacity={0.85}>
-              <Text style={gs.foldText}>FOLD</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[gs.playBtn, !canPlay && gs.playBtnOff]}
-              onPress={handlePlay} disabled={!canPlay || busy} activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={canPlay ? ['#ffd700', '#c89b00'] : ['#2a2a2a', '#1a1a1a']}
-                style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-              />
-              <Ionicons name="flash" size={15} color={canPlay ? '#000' : '#444'} />
-              <Text style={[gs.playBtnText, !canPlay && { color: '#444' }]}>PLAY +{fmt(lastAnte)}</Text>
-            </TouchableOpacity>
+          <View style={gs.decisionBlock}>
+            {/* Decision banner */}
+            <View style={gs.decisionBanner}>
+              <View style={gs.decisionPill}>
+                <Text style={gs.decisionLabel}>YOUR MOVE</Text>
+              </View>
+              <Text style={gs.decisionHint}>
+                Fold to surrender ante  ·  Play to match {fmt(lastAnte)} and face the dealer
+              </Text>
+            </View>
+
+            <View style={gs.actionRow}>
+              <TouchableOpacity style={gs.foldBtn} onPress={handleFold} disabled={busy} activeOpacity={0.85}>
+                <Text style={gs.foldBtnLabel}>FOLD</Text>
+                <Text style={gs.foldBtnSub}>−{fmt(lastAnte)}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[gs.playBtn, !canPlay && gs.playBtnOff]}
+                onPress={handlePlay} disabled={!canPlay || busy} activeOpacity={0.85}
+              >
+                <LinearGradient
+                  colors={canPlay ? ['#ffd700', '#c89b00'] : ['#2a2a2a', '#1a1a1a']}
+                  style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                />
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={[gs.playBtnText, !canPlay && { color: '#444' }]}>PLAY</Text>
+                  <Text style={[gs.playBtnSub, !canPlay && { color: '#444' }]}>+{fmt(lastAnte)} WAGER</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
 
@@ -684,7 +711,7 @@ export default function ThreeCardPokerScreen() {
         {phase === 'result' && (
           <View style={gs.actionRow}>
             <TouchableOpacity style={gs.foldBtn} onPress={handleNew} activeOpacity={0.85}>
-              <Text style={gs.foldText}>NEW</Text>
+              <Text style={gs.foldBtnLabel}>NEW</Text>
             </TouchableOpacity>
             <TouchableOpacity style={gs.playBtn} onPress={handleRebet} activeOpacity={0.85}>
               <LinearGradient colors={['#ffd700', '#c89b00']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
@@ -748,18 +775,30 @@ const gs = StyleSheet.create({
   dealBtnOff:   { opacity: 0.55 },
   dealBtnText:  { fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#000' },
 
-  // Action / result buttons (20% smaller than old implementation)
-  actionRow:   { flexDirection: 'row', gap: 10 },
-  foldBtn:     {
-    flex: 1, paddingVertical: 13, borderRadius: 13, borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+  // Decision banner (action phase)
+  decisionBlock:  { gap: 8 },
+  decisionBanner: { alignItems: 'center', gap: 5 },
+  decisionPill:   {
+    paddingHorizontal: 14, paddingVertical: 4, borderRadius: 20,
+    backgroundColor: 'rgba(0,212,255,0.1)', borderWidth: 1, borderColor: 'rgba(0,212,255,0.3)',
   },
-  foldText:    { fontSize: 11, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.55)' },
-  playBtn:     {
-    flex: 2, paddingVertical: 13, borderRadius: 13, overflow: 'hidden',
-    alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 7,
+  decisionLabel:  { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#00d4ff', letterSpacing: 2 },
+  decisionHint:   { fontSize: 9, color: 'rgba(255,255,255,0.28)', fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 14 },
+
+  // Action / result buttons
+  actionRow:    { flexDirection: 'row', gap: 10 },
+  foldBtn:      {
+    flex: 1, paddingVertical: 14, borderRadius: 13, borderWidth: 1,
+    borderColor: 'rgba(255,85,85,0.3)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,85,85,0.06)', gap: 2,
   },
-  playBtnOff:  { opacity: 0.5 },
-  playBtnText: { fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#000' },
+  foldBtnLabel: { fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,120,120,0.85)' },
+  foldBtnSub:   { fontSize: 9, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,100,100,0.5)' },
+  playBtn:      {
+    flex: 2, paddingVertical: 14, borderRadius: 13, overflow: 'hidden',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  playBtnOff:   { opacity: 0.5 },
+  playBtnText:  { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: '#000' },
+  playBtnSub:   { fontSize: 9, fontWeight: '700', fontFamily: 'Orbitron_700Bold', color: 'rgba(0,0,0,0.6)' },
 });
