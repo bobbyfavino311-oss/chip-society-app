@@ -103,8 +103,8 @@ function SectionCard({ section, accent, icon, title, lines, options, locked, onP
         <View style={[sc.iconWrap, { backgroundColor: `${accent}15`, borderColor: `${accent}40` }]}>
           <Ionicons name={icon as any} size={19} color={locked ? 'rgba(255,215,0,0.45)' : accent} />
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[sc.title, { color: titleColor }]} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={[sc.title, { color: titleColor }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{title}</Text>
           {lines.map((l, i) => <Text key={i} style={sc.line}>{l}</Text>)}
         </View>
         {isActive && (
@@ -163,14 +163,14 @@ const sc = StyleSheet.create({
   cardLocked: { opacity: 0.52 },
   topBar:     { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
   header:     { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  iconWrap:   { width: 44, height: 44, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  title:      { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0 },
+  iconWrap:   { width: 40, height: 40, borderRadius: 11, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  title:      { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0, flexShrink: 1 },
   line:       { fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 2 },
   divider:    { height: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
   optList:    { gap: 8 },
   actionBadge:{ width: 34, height: 34, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  soonBadge:  { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: 'rgba(255,215,0,0.06)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.15)' },
-  soonText:   { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.4)', letterSpacing: 1 },
+  soonBadge:  { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 7, backgroundColor: 'rgba(255,215,0,0.06)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.15)', flexShrink: 0 },
+  soonText:   { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.4)', letterSpacing: 0.5 },
   lockedRow:  { paddingVertical: 4 },
   lockedTitle:{ fontSize: 11, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,215,0,0.5)', letterSpacing: 1.5 },
   lockedSub:  { fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3 },
@@ -262,9 +262,9 @@ export default function PlayScreen() {
         <View style={mb.banner}>
           <View style={mb.left}>
             <Ionicons name="lock-closed" size={11} color="rgba(255,215,0,0.4)" />
-            <View style={{ flex: 1 }}>
-              <Text style={mb.title} numberOfLines={1} adjustsFontSizeToFit>MORE CASINO GAMES COMING SOON</Text>
-              <Text style={mb.sub}>Blackjack · Roulette · Baccarat</Text>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={mb.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>MORE CASINO GAMES COMING SOON</Text>
+              <Text style={mb.sub}>Additional casino experiences planned for future updates.</Text>
             </View>
           </View>
           <View style={mb.badge}>
@@ -278,9 +278,11 @@ export default function PlayScreen() {
           accent="#ffd700"
           icon="trophy-outline"
           title="TOURNAMENTS"
-          lines={["Multi-table · Prize pools · Brackets"]}
+          lines={["Tournament play will be available in a future update."]}
           options={[]}
           locked
+          lockedLabel="TOURNAMENTS COMING SOON"
+          lockedSub="Multi-table tournaments, prize pools, and brackets are on the way."
         />
       </ScrollView>
     </View>
