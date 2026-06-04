@@ -132,6 +132,10 @@ function RootLayoutNav() {
         <Stack.Screen name="social/player-profile" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="profile/avatar-select" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="profile/photo-select"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen
+          name="casino"
+          options={{ headerShown: false, animation: 'slide_from_right' }}
+        />
       </Stack>
     </>
   );

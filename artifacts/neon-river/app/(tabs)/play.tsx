@@ -36,11 +36,6 @@ const RANKED_MODES: SubMode[] = [
   { id: 'rsd', label: 'RANKED SHORT DECK', sub: 'Competitive matchmaking', icon: 'podium',    color: '#ff0090', locked: true, lockLabel: 'SOON' },
 ];
 
-const CASINO_MODES: SubMode[] = [
-  { id: 'tcp', label: 'THREE CARD POKER', sub: 'Classic casino game',    icon: 'diamond',   color: '#ffd700', locked: true, lockLabel: 'SOON' },
-  { id: 'cas', label: 'MORE GAMES',       sub: 'In development',         icon: 'sparkles',  color: '#ffd700', locked: true, lockLabel: 'SOON' },
-];
-
 // ─── Styles ───────────────────────────────────────────────────────────────────
 function createStyles(c: Colors) {
   return StyleSheet.create({
@@ -113,6 +108,28 @@ function createStyles(c: Colors) {
       backgroundColor: 'rgba(255,215,0,0.05)',
     },
     tourneyLockText: { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5, color: 'rgba(255,215,0,0.45)' },
+
+    // Casino active banner
+    casinoBanner: {
+      borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,215,0,0.35)',
+      overflow: 'hidden', padding: 16, flexDirection: 'row',
+      alignItems: 'center', gap: 12,
+    },
+    casinoTopBorder: { position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: '#ffd700' },
+    casinoLeft:     { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
+    casinoIconWrap: {
+      width: 48, height: 48, borderRadius: 13, backgroundColor: 'rgba(255,215,0,0.12)',
+      borderWidth: 1, borderColor: 'rgba(255,215,0,0.3)',
+      alignItems: 'center', justifyContent: 'center',
+    },
+    casinoTitle:   { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#ffd700' },
+    casinoSub:     { fontSize: 10, color: 'rgba(255,215,0,0.55)', marginTop: 2 },
+    casinoHint:    { fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 3 },
+    casinoCta: {
+      width: 60, height: 60, borderRadius: 13, overflow: 'hidden',
+      alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 2,
+    },
+    casinoCtaText: { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#000' },
   });
 }
 
@@ -206,11 +223,29 @@ export default function PlayScreen() {
 
         {/* ── CASINO ─────────────────────────────────────────────────────── */}
         <Text style={styles.sectionLabel}>CASINO</Text>
-        <View style={styles.modeRow}>
-          {CASINO_MODES.map(mode => (
-            <LockedModeCard key={mode.id} mode={mode} styles={styles} />
-          ))}
-        </View>
+        <TouchableOpacity
+          style={styles.casinoBanner}
+          onPress={() => router.push('/casino' as any)}
+          activeOpacity={0.85}
+        >
+          <LinearGradient colors={['rgba(255,215,0,0.18)', 'rgba(140,90,0,0.08)', 'transparent']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+          <View style={styles.casinoTopBorder} />
+          <View style={styles.casinoLeft}>
+            <View style={styles.casinoIconWrap}>
+              <Ionicons name="diamond-outline" size={24} color="#ffd700" />
+            </View>
+            <View>
+              <Text style={styles.casinoTitle}>CASINO</Text>
+              <Text style={styles.casinoSub}>Win chips against the house</Text>
+              <Text style={styles.casinoHint}>Three Card Poker · More games coming</Text>
+            </View>
+          </View>
+          <View style={styles.casinoCta}>
+            <LinearGradient colors={['#ffd700', '#c89b00']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
+            <Text style={styles.casinoCtaText}>ENTER</Text>
+            <Ionicons name="chevron-forward" size={14} color="#000" />
+          </View>
+        </TouchableOpacity>
 
         {/* ── TOURNAMENTS ────────────────────────────────────────────────── */}
         <Text style={styles.sectionLabel}>TOURNAMENTS</Text>
