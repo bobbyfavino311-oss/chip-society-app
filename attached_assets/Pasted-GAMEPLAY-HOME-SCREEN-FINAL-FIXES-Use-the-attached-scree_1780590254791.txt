@@ -1,0 +1,210 @@
+GAMEPLAY + HOME SCREEN FINAL FIXES
+
+Use the attached screenshots as the visual reference.
+
+Do not redesign from scratch. Fix the current implementation.
+
+===========================================================
+PLAY MODE SCREEN LAYOUT
+
+The Play Mode screen must match the referenced layout exactly across all game modes.
+
+Apply this same structure consistently to:
+
+No Limit Hold’em
+
+Short Deck Hold’em
+
+Three Card Poker / Casino
+
+Any future game mode
+
+Do not create different layouts for different modes.
+
+The Play screen should feel unified, clean, readable, and consistent.
+
+===========================================================
+HOME SCREEN FEATURED TOURNAMENTS
+
+Featured tournaments on the Home screen must be locked.
+
+Current issue:
+
+Tournaments appear active and playable.
+
+This will confuse players because tournaments are not launch-ready.
+
+Fix:
+
+Add lock icon.
+
+Add COMING SOON badge.
+
+Disable all tournament buttons.
+
+Remove or disable:
+
+PLAY NOW
+
+JOIN
+
+REGISTER
+
+LATE REG
+
+ACTIVE
+
+Tournament cards may remain visible, but they must clearly communicate:
+
+TOURNAMENTS COMING SOON
+
+Tournament play will be available in a future update.
+
+No tournament card should be clickable.
+
+===========================================================
+THREE CARD POKER SIDE BET LIMITS
+
+For Three Card Poker:
+
+Side bets:
+
+Pair Plus
+
+6 Card Bonus
+
+must be tied directly to the Ante bet.
+
+Rules:
+
+Minimum Pair Plus = exact Ante amount.
+
+Minimum 6 Card Bonus = exact Ante amount.
+
+Maximum Pair Plus = 3x Ante amount.
+
+Maximum 6 Card Bonus = 3x Ante amount.
+
+Players should only be able to increase side bets in preset steps based on the Ante.
+
+Example:
+
+Ante = 10K
+
+Pair Plus options:
+
+10K
+
+20K
+
+30K
+
+6 Card Bonus options:
+
+10K
+
+20K
+
+30K
+
+Nothing lower than Ante.
+
+Nothing higher than 3x Ante.
+
+No custom number entry.
+
+No slider.
+
+No unlimited side betting.
+
+===========================================================
+PROFILE CHIP TEST FEATURE REMOVAL
+
+Remove the profile feature/button:
+
+ADD 5 MILLION
+
+This was only for testing and is no longer needed.
+
+Do not display this option anywhere.
+
+===========================================================
+STARTING CHIP BALANCES
+
+New registered players start with:
+
+50,000 chips
+
+Guest mode players start with:
+
+25,000 chips
+
+This must be consistent across the entire app.
+
+Do not change these values.
+
+===========================================================
+HOME SCREEN STATS CHIP DISPLAY
+
+On the Home screen “Your Stats” section, the chip amount is too long.
+
+Do not display full long numbers like:
+
+10,000
+
+100,000
+
+5,100,000
+
+Instead use compact formatting.
+
+Examples:
+
+10,000 → 10K
+
+90,500 → 90.5K
+
+100,000 → 100K
+
+1,000,000 → 1M
+
+5,100,000 → 5.1M
+
+10,000,000 → 10M
+
+The display should be short, readable, and fit inside the stat card.
+
+===========================================================
+FINAL ACCEPTANCE CHECK
+
+Before marking complete, verify:
+
+✓ Play Mode screen matches the reference layout
+
+✓ Same layout works across all game modes
+
+✓ Home screen tournaments are locked
+
+✓ Tournament cards show Coming Soon
+
+✓ Tournament buttons are disabled
+
+✓ Pair Plus minimum equals Ante
+
+✓ Pair Plus maximum equals 3x Ante
+
+✓ 6 Card Bonus minimum equals Ante
+
+✓ 6 Card Bonus maximum equals 3x Ante
+
+✓ No custom side bet amounts
+
+✓ Add 5 Million removed from profile
+
+✓ Registered players start with 50,000 chips
+
+✓ Guest players start with 25,000 chips
+
+✓ Home stats chip display uses compact values like 5.1M and 10K
+
+Do not move on to new features until all of these are fixed.

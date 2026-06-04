@@ -24,7 +24,7 @@ import type { Card } from '@/lib/pokerEngine';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase   = 'betting' | 'action' | 'result';
-type Mult    = 0 | 1 | 2;
+type Mult    = 0 | 1 | 2 | 3;
 
 interface TCPResult {
   playerEval:     ThreeCardEval;
@@ -283,13 +283,13 @@ export default function ThreeCardPokerScreen() {
   const cyclePP = useCallback(() => {
     if (phase !== 'betting' || busy) return;
     Haptics.selectionAsync();
-    setPpMult(m => ((m + 1) % 3) as Mult);
+    setPpMult(m => ((m + 1) % 4) as Mult);
   }, [phase, busy]);
 
   const cycleSC = useCallback(() => {
     if (phase !== 'betting' || busy) return;
     Haptics.selectionAsync();
-    setScMult(m => ((m + 1) % 3) as Mult);
+    setScMult(m => ((m + 1) % 4) as Mult);
   }, [phase, busy]);
 
   // ── Deal ──────────────────────────────────────────────────────────────────

@@ -30,8 +30,8 @@ const HOURLY_BONUS          = 5_000;
 const HOURLY_INTERVAL_MS    = 24 * 60 * 60 * 1000;
 const COMEBACK_THRESHOLD    = 500;
 const COMEBACK_BONUS        = 20_000;
-const REGISTERED_CHIPS      = 1_000_000;
-const GUEST_CHIPS           = 1_000_000;
+const REGISTERED_CHIPS      = 50_000;
+const GUEST_CHIPS           = 25_000;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -217,8 +217,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           setProfile(p => ({
             ...p,
             ...saved,
-            // Dev chip boost — ensure testing balance
-            chips: Math.max(saved.chips ?? 0, 1_000_000),
+            chips: saved.chips ?? 0,
             // Backfill new fields for existing installs
             isGuest: saved.isGuest ?? false,
             accountType: saved.accountType ?? 'registered',

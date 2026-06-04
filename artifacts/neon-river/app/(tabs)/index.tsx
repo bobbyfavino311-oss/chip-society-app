@@ -572,7 +572,11 @@ export default function HomeScreen() {
 
   // ─── Derived values (must be before effects that reference them) ──────────
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
-  const formatChips = (n: number) => n.toLocaleString('en-US');
+  const formatChips = (n: number) => {
+    if (n >= 1_000_000) return `${parseFloat((n / 1_000_000).toFixed(1))}M`;
+    if (n >= 1_000)     return `${parseFloat((n / 1_000).toFixed(1))}K`;
+    return String(n);
+  };
 
   const trendingPosts: TrendPost[] = aiPosts.slice(0, 8).map((p, i) => ({
     id: p.id,
