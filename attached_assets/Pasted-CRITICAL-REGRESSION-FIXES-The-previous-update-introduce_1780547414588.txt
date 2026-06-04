@@ -1,0 +1,223 @@
+CRITICAL REGRESSION FIXES
+
+The previous update introduced multiple regressions that must be reverted immediately.
+
+DO NOT continue building new features until the following issues are fixed.
+
+===========================================================
+AVATAR SYSTEM BROKEN
+====================
+
+The avatar system is still not functioning correctly.
+
+Current problems:
+
+• Many avatars are cropped incorrectly.
+• Icons are shifted off-center.
+• Some avatars only show partial artwork.
+• Several avatars show only a slice of the icon.
+• Some avatars are zoomed too far in.
+• Some avatars are zoomed too far out.
+• Avatar artwork does not match the approved source image.
+• Some icons have been recreated instead of using the approved artwork.
+• Avatar artwork is inconsistent across rarities.
+
+REQUIREMENTS:
+
+All avatar artwork must be sourced from the approved master avatar image.
+
+DO NOT recreate.
+
+DO NOT reinterpret.
+
+DO NOT generate new versions.
+
+Use the exact approved artwork.
+
+Each avatar must be:
+
+• perfectly centered
+• perfectly circular
+• evenly scaled
+• fully visible inside the circle
+• cropped consistently
+
+Every avatar should occupy approximately 70-80% of the visible circular area.
+
+No icon should touch the border.
+
+No icon should be clipped.
+
+No icon should appear off-center.
+
+No blur.
+
+No stretching.
+
+No distortion.
+
+===========================================================
+AVATARS STILL NOT DISPLAYING PLATFORM-WIDE
+==========================================
+
+Current issue:
+
+Many areas of the application still display:
+
+• initials
+• placeholder circles
+• black avatars
+• empty avatars
+
+instead of the selected avatar.
+
+REQUIREMENTS:
+
+The selected avatar must become the user's single source of truth.
+
+When a player selects an avatar:
+
+that avatar must appear everywhere.
+
+Examples:
+
+• Profile page
+• Social feed posts
+• Social feed comments
+• AI live feed
+• Matchmaking
+• Quick Play tables
+• Ranked tables
+• Hand history
+• Winner screens
+• Results screens
+• Leaderboards
+• Friends lists
+• Notifications
+• Future tournaments
+
+No initials should ever appear if an avatar exists.
+
+AI players should also use avatar symbols.
+
+AI players should never use initials.
+
+AI players should never use placeholder images.
+
+===========================================================
+GAME MODES SCREEN REGRESSION
+============================
+
+The previous game mode layout was better.
+
+The update removed important structure.
+
+Restore the original hierarchy.
+
+REQUIRED STRUCTURE:
+
+QUICK PLAY
+
+Under Quick Play:
+
+Hold'em
+4 Players
+
+Hold'em
+5 Players
+
+Short Deck
+4 Players
+
+Short Deck
+5 Players
+
+RANKED
+
+Under Ranked:
+
+Ranked Hold'em
+
+Ranked Short Deck
+
+CASINO
+
+Under Casino:
+
+Three Card Poker
+
+Future casino games locked.
+
+TOURNAMENTS
+
+Remain visible.
+
+Remain in the game modes section.
+
+DO NOT REMOVE.
+
+DO NOT HIDE.
+
+===========================================================
+TOURNAMENTS STILL NOT LOCKED
+============================
+
+Current state:
+
+Tournaments appear active.
+
+This is incorrect.
+
+Tournament functionality is not ready.
+
+REQUIREMENTS:
+
+Keep tournament section visible.
+
+Add lock icon.
+
+Add "COMING SOON".
+
+Disable all interaction.
+
+Prevent joining.
+
+Prevent registration.
+
+Prevent entry.
+
+Prevent matchmaking.
+
+Tournament cards should communicate:
+
+"Competitive tournament series arriving in a future update."
+
+===========================================================
+DO NOT CHANGE EXISTING FEATURES
+===============================
+
+Do not redesign:
+
+• Quick Play layout
+• Ranked layout
+• Social Feed layout
+• Profile layout
+
+Only fix the broken areas.
+
+The goal is to restore functionality while preserving the existing user experience.
+
+===========================================================
+SUCCESS CRITERIA
+================
+
+1. Avatars display correctly.
+2. Avatars display everywhere.
+3. No initials remain.
+4. All icons are centered.
+5. All icons use approved artwork.
+6. Game Modes layout is restored.
+7. Casino is added without disrupting existing modes.
+8. Tournaments remain visible but locked.
+9. No existing navigation is removed.
+10. No existing functionality is broken.

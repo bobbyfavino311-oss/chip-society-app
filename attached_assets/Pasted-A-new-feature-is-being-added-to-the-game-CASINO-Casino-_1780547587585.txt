@@ -1,0 +1,471 @@
+A new feature is being added to the game:
+
+CASINO
+
+Casino should appear as a brand-new section inside the GAME MODES area.
+
+Navigation structure:
+
+QUICK PLAY
+
+RANKED
+
+CASINO
+
+TOURNAMENTS (LOCKED)
+
+Social Feed remains separate.
+
+Create a new card/button:
+
+CASINO
+
+Subtitle:
+
+"Win chips against the house"
+
+Neon gold styling.
+
+Luxury Vegas aesthetic.
+
+1980s casino atmosphere.
+
+When tapped:
+
+Open Casino Lobby.
+
+Available Now:
+
+THREE CARD POKER
+
+Future Locked Games:
+
+BLACKJACK
+COMING SOON
+
+ROULETTE
+COMING SOON
+
+BACCARAT
+COMING SOON
+
+VIDEO POKER
+COMING SOON
+
+SLOTS
+COMING SOON
+
+Locked games should display:
+
+Lock Icon
+
+COMING SOON
+
+Dimmed appearance
+
+Non-clickable
+
+===========================================================
+
+TOURNAMENTS (LAUNCH ADJUSTMENT)
+
+Tournaments should NOT be playable at launch.
+
+Current tournament functionality feels unfinished and confusing.
+
+Replace all active tournament entry points with:
+
+LOCK ICON
+
+COMING SOON
+
+"Competitive tournament series arriving in a future update."
+
+Tournament cards should remain visible so players know the feature exists.
+
+Players should not be able to enter, register, join, or interact with tournaments.
+
+The goal is to focus launch on four polished core experiences:
+
+• Quick Play
+• Ranked
+• Casino
+• Social Feed
+
+===========================================================
+
+THREE CARD POKER
+
+Use the attached reference image ONLY as inspiration for table layout.
+
+DO NOT copy it directly.
+
+The game must match the existing Neon River visual style.
+
+===========================================================
+
+TABLE STYLE
+
+Dark navy casino felt.
+
+Subtle animated neon reflections.
+
+Premium gold betting circles.
+
+Cyan and magenta accent lighting.
+
+Glassmorphism panels.
+
+Luxury synthwave atmosphere.
+
+The table should feel like:
+
+A high-end neon poker room.
+
+NOT a generic casino app.
+
+===========================================================
+
+TABLE LAYOUT
+
+Dealer position:
+
+Top center.
+
+Dealer cards face-down.
+
+Player position:
+
+Bottom center.
+
+Player cards face-up.
+
+Betting circles:
+
+ANTE
+
+PAIR PLUS
+
+PLAY
+
+Clearly labeled.
+
+Premium gold outlines.
+
+Neon glow when active.
+
+===========================================================
+
+PLAYER ACTIONS
+
+PLAY
+
+FOLD
+
+REBET
+
+DEAL
+
+Buttons should match the rest of the game UI.
+
+Large.
+
+Simple.
+
+Fast.
+
+Mobile-friendly.
+
+===========================================================
+
+THREE CARD POKER RULES
+
+Use official Three Card Poker rules.
+
+Only a standard 52-card deck.
+
+No Jokers.
+
+Player competes directly against the dealer.
+
+Each participant receives three cards.
+
+Dealer receives three cards.
+
+Dealer hand remains hidden until player action is complete.
+
+===========================================================
+
+BETTING OPTIONS
+
+ANTE
+
+Player bets against the dealer.
+
+To win, the player's final hand must beat the dealer's hand.
+
+PLAY WAGER
+
+After seeing their cards, the player may continue.
+
+The Play wager must exactly match the Ante wager.
+
+PAIR PLUS
+
+Optional side bet based only on the player's hand.
+
+Dealer hand does not matter.
+
+ANTE BONUS
+
+Automatically awarded when qualifying hands are achieved.
+
+===========================================================
+
+PLAYER DECISIONS
+
+After receiving three cards:
+
+PLAY
+
+Continue by matching the Ante bet.
+
+or
+
+FOLD
+
+Forfeit the Ante and end the hand.
+
+===========================================================
+
+DEALER QUALIFICATION
+
+Dealer must have:
+
+QUEEN HIGH OR BETTER
+
+to qualify.
+
+If dealer does NOT qualify:
+
+Ante bet wins.
+
+Play wager pushes.
+
+Ante Bonus still pays if qualified.
+
+===========================================================
+
+HAND RESOLUTION
+
+If dealer qualifies and beats player:
+
+Ante loses.
+
+Play loses.
+
+If player beats qualified dealer:
+
+Ante pays 1:1
+
+Play pays 1:1
+
+If hands tie:
+
+Push.
+
+No win.
+
+No loss.
+
+===========================================================
+
+PAIR PLUS PAYOUTS
+
+Straight Flush
+40:1
+
+Three Of A Kind
+30:1
+
+Straight
+6:1
+
+Flush
+3:1
+
+Pair
+1:1
+
+===========================================================
+
+ANTE BONUS PAYOUTS
+
+Straight Flush
+5:1
+
+Three Of A Kind
+4:1
+
+Straight
+1:1
+
+Ante Bonus pays regardless of whether the dealer wins.
+
+===========================================================
+
+CHIP ECONOMY
+
+CRITICAL:
+
+All winnings are added directly to the player's chip balance.
+
+The entire platform must use ONE unified chip wallet.
+
+Casino winnings immediately affect:
+
+Quick Play
+
+Ranked
+
+Store
+
+Profile
+
+Future Tournaments
+
+===========================================================
+
+DAILY CASINO WIN CAP
+
+IMPLEMENT IMMEDIATELY
+
+Players must NOT be able to farm unlimited chips.
+
+Create:
+
+DAILY CASINO WIN CAP
+
+Recommended:
+
+50,000 Chips Per Day
+
+Example:
+
+Player starts day:
+
+0 / 50,000
+
+Wins 12,000
+
+Progress:
+
+12,000 / 50,000
+
+Wins another 20,000
+
+Progress:
+
+32,000 / 50,000
+
+Reaches 50,000
+
+Casino winnings stop for the day.
+
+Player may continue playing.
+
+However additional winnings become:
+
+XP ONLY
+
+until daily reset.
+
+===========================================================
+
+CASINO REWARD TRACKING
+
+Display:
+
+Today's Casino Earnings
+
+Example:
+
+TODAY'S CASINO WINS
+
+34,200 / 50,000
+
+Progress bar underneath.
+
+Visible from:
+
+Casino Lobby
+
+Three Card Poker Table
+
+Profile Statistics
+
+===========================================================
+
+PLAYER RETENTION
+
+Casino mode should provide:
+
+Short play sessions
+
+Fast rewards
+
+Bankroll growth
+
+Something to do between poker matches
+
+The casino should support the poker ecosystem.
+
+It should never replace poker as the main feature.
+
+===========================================================
+
+VISUAL GOAL
+
+The experience should feel like:
+
+A premium casino inside Neon River.
+
+Not a separate app.
+
+Not generic casino software.
+
+Not green casino felt.
+
+Everything should visually match:
+
+Quick Play
+
+Ranked
+
+Profile
+
+Store
+
+Social Feed
+
+using the same synthwave neon visual identity.
+
+===========================================================
+
+SUCCESS CRITERIA
+
+A player should:
+
+Understand the game within 30 seconds.
+
+Complete a hand within 15 seconds.
+
+See chip rewards instantly.
+
+Feel rewarded between poker sessions.
+
+Never be able to generate unlimited chips.
+
+Casino mode should feel like a polished side activity that strengthens the entire game economy.
+
+===========================================================
