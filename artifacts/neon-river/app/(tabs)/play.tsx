@@ -255,7 +255,14 @@ export default function PlayScreen() {
             "Dealer qualifies with Queen High or Better",
             "Win chips against the house",
           ]}
-          options={[]}
+          options={[
+            {
+              label: "PLAY THREE CARD POKER",
+              icon:  "game-controller-outline",
+              sub:   "Ante · Pair Plus · 6 Card Bonus",
+              onPress: () => router.push('/casino/three-card-poker' as any),
+            },
+          ]}
           onPress={() => router.push('/casino/three-card-poker' as any)}
         />
         {/* ── MORE GAMES compact banner ───────────────────────────── */}
