@@ -1,0 +1,194 @@
+THREE CARD POKER – CHIP RESERVE & BET VALIDATION SYSTEM (HIGH PRIORITY)
+
+There is currently a major gameplay issue in Three Card Poker that must be fixed immediately.
+
+Players can currently place large Pair Plus and 6 Card Bonus side bets, receive their cards, and then discover they do not have enough chips remaining to make the mandatory Play wager. This creates situations where the only available option is Fold, even when the player wants to continue.
+
+This should never be possible.
+
+⸻
+
+Core Rule
+
+In Three Card Poker, the Play wager is mandatory if the player chooses to continue against the dealer.
+
+The Play wager must always equal the original Ante wager.
+
+Because of this, the system must reserve enough chips for the future Play wager before allowing side bets to be placed or increased.
+
+⸻
+
+Chip Reserve System
+
+When the player selects an Ante amount, immediately reserve:
+
+* Ante amount
+* Matching Play amount
+
+Example:
+
+Player Balance: 50K
+
+Ante: 10K
+
+Reserved:
+
+* 10K Ante
+* 10K Potential Play
+
+Total Reserved: 20K
+
+Remaining chips available for side bets:
+
+50K - 20K = 30K
+
+Only these remaining chips can be used for Pair Plus and 6 Card Bonus.
+
+⸻
+
+Side Bet Validation
+
+The player must never be allowed to create a wager setup that prevents them from making the mandatory Play bet later.
+
+Block Invalid Bets
+
+Example:
+
+Balance: 50K
+
+Ante: 10K
+
+Pair Plus: 20K
+
+6 Card Bonus: 30K
+
+Total Required: 60K
+
+This setup must be rejected.
+
+Display:
+
+“Insufficient chips. You must keep enough chips available for the Play wager.”
+
+⸻
+
+Pair Plus Rules
+
+Minimum:
+
+* Must match Ante exactly
+
+Maximum:
+
+* 3x Ante
+
+Example:
+
+Ante = 10K
+
+Allowed:
+
+* 10K
+* 20K
+* 30K
+
+Not Allowed:
+
+* Less than 10K
+* More than 30K
+
+⸻
+
+6 Card Bonus Rules
+
+Minimum:
+
+* Must match Ante exactly
+
+Maximum:
+
+* 3x Ante
+
+Example:
+
+Ante = 10K
+
+Allowed:
+
+* 10K
+* 20K
+* 30K
+
+Not Allowed:
+
+* Less than 10K
+* More than 30K
+
+⸻
+
+Deal Button Validation
+
+The Deal button should remain disabled until all requirements are met.
+
+Requirements:
+
+* Valid Ante selected
+* Enough chips for Ante
+* Enough chips reserved for future Play wager
+* Valid Pair Plus amount
+* Valid 6 Card Bonus amount
+
+If requirements fail:
+
+Display:
+
+“Not enough chips available. Reduce side bets or lower your Ante.”
+
+⸻
+
+Play Phase Validation
+
+After cards are dealt:
+
+The Play button must always be available.
+
+The game should never allow a hand to begin unless the player can afford the matching Play wager.
+
+This eliminates situations where:
+
+* Cards are dealt
+* Player wants to continue
+* Play button is unavailable
+* Folding becomes the only option
+
+⸻
+
+Fold Logic
+
+If the player folds:
+
+Lose:
+
+* Ante wager only
+
+Keep active:
+
+* Pair Plus wager
+* 6 Card Bonus wager
+
+Dealer hand should still be revealed.
+
+Side bets should still resolve normally according to the official payout tables.
+
+⸻
+
+User Experience Goal
+
+Every hand must start with enough chips reserved so the player always has a genuine choice:
+
+* Fold
+* Play
+
+The game should prevent invalid betting configurations before cards are dealt instead of discovering the problem after the hand has already started.
+
+The player should never encounter a situation where the Play button is disabled because they accidentally spent all available chips on side bets. The system should automatically protect the required Play wager from the moment the Ante is placed.

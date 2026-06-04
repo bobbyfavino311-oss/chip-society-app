@@ -449,6 +449,16 @@ export default function ProfileScreen() {
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
         </View>
 
+        {/* Dev: add chips for testing */}
+        <TouchableOpacity
+          style={devStyles.addChipsBtn}
+          activeOpacity={0.8}
+          onPress={() => addChips(100_000)}
+        >
+          <Ionicons name="add-circle-outline" size={16} color="#00d4ff" />
+          <Text style={devStyles.addChipsTxt}>+ 100K TEST CHIPS</Text>
+        </TouchableOpacity>
+
         <SoundSettingsCard />
 
         {/* Achievements link */}
@@ -920,5 +930,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: colors.background,
+  },
+});
+
+const devStyles = StyleSheet.create({
+  addChipsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,212,255,0.35)',
+    backgroundColor: 'rgba(0,212,255,0.07)',
+  },
+  addChipsTxt: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 11,
+    color: '#00d4ff',
+    letterSpacing: 1.5,
   },
 });

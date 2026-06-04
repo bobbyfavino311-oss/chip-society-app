@@ -273,24 +273,32 @@ export default function ThreeCardPokerScreen() {
   const [showPT,         setShowPT]         = useState(false);
   const [played,         setPlayed]         = useState(false);
 
-  const ppBet       = anteBet * ppMult;
-  const scBet       = anteBet * scMult;
-  const dealCost    = anteBet + ppBet + scBet;
-  const canDeal     = anteBet >= 1_000 && profile.chips >= dealCost && !busy;
-  const canPlay     = !busy && profile.chips >= anteBet;
+  const ppBet         = anteBet * ppMult;
+  const scBet         = anteBet * scMult;
+  const dealCost      = anteBet + ppBet + scBet;
+  // Always reserve one extra anteBet for the Play wager so the player
+  // is never forced to fold simply because side bets consumed all chips.
+  const totalRequired = dealCost + anteBet;
+  const canDeal       = anteBet >= 1_000 && profile.chips >= totalRequired && !busy;
+  const canPlay       = !busy && profile.chips >= anteBet;
 
-  // ── Cycle side-bet multiplier ──────────────────────────────────────────────
+  // ── Cycle side-bet multiplier (skip any amount that would eat the play reserve) ──
   const cyclePP = useCallback(() => {
     if (phase !== 'betting' || busy) return;
     Haptics.selectionAsync();
-    setPpMult(m => ((m + 1) % 4) as Mult);
-  }, [phase, busy]);
+    const next = ((ppMult + 1) % 4) as Mult;
+    // If increasing would leave < anteBet for play, wrap to 0 (off)
+    const costIfNext = anteBet + anteBet * next + scBet + anteBet;
+    setPpMult(next > 0 && costIfNext > profile.chips ? 0 : next);
+  }, [phase, busy, ppMult, anteBet, scBet, profile.chips]);
 
   const cycleSC = useCallback(() => {
     if (phase !== 'betting' || busy) return;
     Haptics.selectionAsync();
-    setScMult(m => ((m + 1) % 4) as Mult);
-  }, [phase, busy]);
+    const next = ((scMult + 1) % 4) as Mult;
+    const costIfNext = anteBet + ppBet + anteBet * next + anteBet;
+    setScMult(next > 0 && costIfNext > profile.chips ? 0 : next);
+  }, [phase, busy, scMult, anteBet, ppBet, profile.chips]);
 
   // ── Deal ──────────────────────────────────────────────────────────────────
   const handleDeal = useCallback(async () => {
@@ -734,13 +742,16 @@ export default function ThreeCardPokerScreen() {
             </View>
 
             <Text style={gs.controlHint}>
-              Tap PAIR PLUS or 6 CARD BONUS circles to add side bets (1× or 2× ante)
+              Tap PAIR PLUS or 6 CARD BONUS to add side bets · {fmt(anteBet)} reserved for Play
             </Text>
 
             <View style={gs.dealRow}>
               <View style={gs.balInfo}>
                 <Ionicons name="wallet-outline" size={12} color="rgba(255,215,0,0.5)" />
                 <Text style={gs.balText}>{fmt(profile.chips)}</Text>
+                {!canDeal && anteBet >= 1_000 && profile.chips < totalRequired && (
+                  <Text style={gs.reserveWarn}>  need {fmt(totalRequired - profile.chips)} more</Text>
+                )}
               </View>
               <TouchableOpacity
                 style={[gs.dealBtn, !canDeal && gs.dealBtnOff]}
@@ -866,6 +877,7 @@ const gs = StyleSheet.create({
   dealRow:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   balInfo:      { flexDirection: 'row', alignItems: 'center', gap: 5 },
   balText:      { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: 'rgba(255,215,0,0.7)' },
+  reserveWarn:  { fontSize: 10, color: '#ff4466', fontWeight: '700' },
   dealBtn:      { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 18, paddingVertical: 13, borderRadius: 13, overflow: 'hidden' },
   dealBtnOff:   { opacity: 0.55 },
   dealBtnText:  { fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#000' },
