@@ -222,11 +222,11 @@ function ResultRow({
 
   return (
     <View style={[rr.row, isNet && rr.netRow]}>
-      <View style={{ flex: 1 }}>
-        <Text style={[rr.label, isNet && rr.netLabel]}>{label}</Text>
-        {sub ? <Text style={rr.sub}>{sub}</Text> : null}
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={[rr.label, isNet && rr.netLabel]} numberOfLines={1}>{label}</Text>
+        {sub ? <Text style={rr.sub} numberOfLines={1}>{sub}</Text> : null}
       </View>
-      <Text style={[isNet ? rr.netValue : rr.value, { color }]}>{valueText}</Text>
+      <Text style={[isNet ? rr.netValue : rr.value, { color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{valueText}</Text>
     </View>
   );
 }
@@ -617,8 +617,8 @@ export default function ThreeCardPokerScreen() {
                 {/* Dealer row (hidden on fold unless dealer was revealed) */}
                 {result.comparison !== 'fold' && (
                   <View style={gs.compHandRow}>
-                    <Text style={gs.compSideLabel}>DEALER</Text>
-                    <Text style={[gs.compHandName, { color: result.comparison === 'dealer' ? '#ff6680' : 'rgba(255,255,255,0.55)' }]}>
+                    <Text style={gs.compSideLabel} numberOfLines={1}>DEALER</Text>
+                    <Text style={[gs.compHandName, { color: result.comparison === 'dealer' ? '#ff6680' : 'rgba(255,255,255,0.55)' }]} numberOfLines={1}>
                       {dLabel}
                     </Text>
                   </View>
@@ -634,16 +634,16 @@ export default function ThreeCardPokerScreen() {
 
                 {/* Player row */}
                 <View style={gs.compHandRow}>
-                  <Text style={gs.compSideLabel}>YOU</Text>
-                  <Text style={[gs.compHandName, { color: result.comparison === 'player' ? '#00ff88' : 'rgba(255,255,255,0.55)' }]}>
+                  <Text style={gs.compSideLabel} numberOfLines={1}>YOU</Text>
+                  <Text style={[gs.compHandName, { color: result.comparison === 'player' ? '#00ff88' : 'rgba(255,255,255,0.55)' }]} numberOfLines={1}>
                     {pLabel}
                   </Text>
                 </View>
 
                 {/* Verdict pill */}
                 <View style={[gs.compVerdictPill, { borderColor: `${verdictColor}55`, backgroundColor: `${verdictColor}0f` }]}>
-                  <Text style={[gs.compVerdictText, { color: verdictColor }]}>{verdictText}</Text>
-                  <Text style={gs.compReasonText}>{reasonText}</Text>
+                  <Text style={[gs.compVerdictText, { color: verdictColor }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{verdictText}</Text>
+                  <Text style={gs.compReasonText} numberOfLines={2}>{reasonText}</Text>
                 </View>
               </View>
 
@@ -882,18 +882,18 @@ const gs = StyleSheet.create({
 
   // Hand comparison block (top of result panel)
   compBlock:       { gap: 8 },
-  compHandRow:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  compSideLabel:   { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.3)', letterSpacing: 1.5, width: 44 },
-  compHandName:    { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5, flex: 1, textAlign: 'right' },
+  compHandRow:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  compSideLabel:   { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.3)', letterSpacing: 0, minWidth: 52, flexShrink: 0 },
+  compHandName:    { fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0, flex: 1, textAlign: 'right', flexShrink: 1 },
   compVsDivider:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
   compVsLine:      { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
-  compVsText:      { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.18)', letterSpacing: 2 },
+  compVsText:      { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.18)', letterSpacing: 1 },
   compVerdictPill: {
     borderWidth: 1, borderRadius: 10, paddingVertical: 8, paddingHorizontal: 12,
     alignItems: 'center', gap: 3, marginTop: 2,
   },
-  compVerdictText: { fontSize: 11, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5 },
-  compReasonText:  { fontSize: 8, color: 'rgba(255,255,255,0.35)', fontFamily: 'Orbitron_400Regular', textAlign: 'center' },
+  compVerdictText: { fontSize: 10, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+  compReasonText:  { fontSize: 8, color: 'rgba(255,255,255,0.35)', fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 12 },
 
   // Action / result buttons
   actionRow:    { flexDirection: 'row', gap: 10 },
