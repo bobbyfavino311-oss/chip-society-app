@@ -1,0 +1,209 @@
+Use this as a direct attachment prompt:
+
+---
+
+# THREE CARD POKER RESULTS PANEL CLARITY FIX
+
+The current results panel is confusing because losing wagers are displayed in gray.
+
+Players should never have to guess what happened.
+
+Every wager outcome must be clearly visible at a glance.
+
+## PROBLEM
+
+In the attached screenshot:
+
+Dealer does not qualify.
+
+Player won:
+
+✓ Ante
+
+✓ Pair Plus
+
+Player lost:
+
+✗ 6 Card Bonus
+
+However, the losing wager appears faded or gray.
+
+This makes it look inactive instead of lost.
+
+The player cannot instantly understand the outcome.
+
+---
+
+# REQUIRED FIX
+
+Every wager outcome must display a clear status.
+
+Use color coding.
+
+### WIN
+
+Display in bright neon green.
+
+Examples:
+
++10K WIN
+
++30K WIN
+
++5K WIN
+
+Color:
+
+Neon Green
+
+---
+
+### LOSS
+
+Display in bright neon red.
+
+Examples:
+
+-10K LOSS
+
+-5K LOSS
+
+-25K LOSS
+
+Color:
+
+Neon Red
+
+Do NOT gray these out.
+
+A loss is important information.
+
+Players need to see it immediately.
+
+---
+
+### PUSH
+
+Display in bright neon blue.
+
+Examples:
+
+PUSH
+
+0
+
+NO ACTION
+
+Color:
+
+Neon Blue
+
+---
+
+# RESULTS PANEL LAYOUT
+
+Replace the current summary with:
+
+MAIN GAME .......... +10K WIN
+
+PAIR PLUS .......... +10K WIN
+
+ANTE BONUS ......... NO BONUS
+
+6 CARD BONUS ....... -10K LOSS
+
+---
+
+NET RESULT ......... +10K
+
+---
+
+# SPECIAL CASES
+
+### Dealer Does Not Qualify
+
+Show:
+
+DEALER DOES NOT QUALIFY
+
+Then break down every wager individually.
+
+Example:
+
+MAIN GAME .......... +10K WIN
+
+PAIR PLUS .......... +10K WIN
+
+ANTE BONUS ......... NO BONUS
+
+6 CARD BONUS ....... -10K LOSS
+
+NET RESULT ........ +10K
+
+Do not hide losing wagers.
+
+Do not gray them out.
+
+---
+
+### Player Loses Everything
+
+Example:
+
+MAIN GAME .......... -10K LOSS
+
+PAIR PLUS .......... -10K LOSS
+
+6 CARD BONUS ....... -10K LOSS
+
+NET RESULT ........ -30K
+
+All losses should be bright red.
+
+---
+
+### Mixed Outcome Example
+
+Example:
+
+MAIN GAME .......... +10K WIN
+
+PAIR PLUS .......... +30K WIN
+
+ANTE BONUS ......... +10K WIN
+
+6 CARD BONUS ....... -10K LOSS
+
+NET RESULT ........ +40K
+
+This should be instantly understandable.
+
+---
+
+# VISUAL GOAL
+
+The results panel should feel like a casino receipt.
+
+Players should immediately understand:
+
+✓ What won
+
+✓ What lost
+
+✓ What pushed
+
+✓ Total chips won or lost
+
+without doing math in their head.
+
+No gray text for wager outcomes.
+
+Wins = Green
+
+Losses = Red
+
+Pushes = Blue
+
+Net Result = Large, bold, highly visible.
+
+This change is mandatory for player trust and payout transparency.

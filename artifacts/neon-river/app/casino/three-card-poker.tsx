@@ -69,9 +69,9 @@ function fmt(n: number): string {
   if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
   return String(n);
 }
-function fmtSigned(n: number): string {
-  if (n === 0) return '—';
-  return (n > 0 ? '+' : '') + fmt(Math.abs(n));
+function fmtNet(n: number): string {
+  if (n === 0) return 'PUSH';
+  return (n > 0 ? '+' : '-') + fmt(Math.abs(n));
 }
 
 // ─── Paytable modal ───────────────────────────────────────────────────────────
@@ -182,24 +182,60 @@ const ch = StyleSheet.create({
   textSel: { color: '#000' },
 });
 
-// ─── Result row helper ────────────────────────────────────────────────────────
-function ResultRow({ label, value, sub, highlight }: { label: string; value: string; sub?: string; highlight?: string }) {
-  const vc = value.startsWith('+') ? '#00ff88' : value.startsWith('-') ? '#ff5555' : '#aaa';
+// ─── Result row ───────────────────────────────────────────────────────────────
+type RowOutcome = 'win' | 'loss' | 'push' | 'none';
+
+const OUTCOME_COLORS: Record<RowOutcome, string> = {
+  win:  '#00ff88',
+  loss: '#ff4444',
+  push: '#00d4ff',
+  none: 'rgba(255,255,255,0.22)',
+};
+
+function ResultRow({
+  label, outcome, amount, sub, accent, isNet,
+}: {
+  label:   string;
+  outcome: RowOutcome;
+  amount?: number;
+  sub?:    string;
+  accent?: string;
+  isNet?:  boolean;
+}) {
+  const color = accent ?? OUTCOME_COLORS[outcome];
+  let valueText: string;
+  if (isNet) {
+    valueText = outcome === 'win' && amount ? `+${fmt(amount)}`
+      : outcome === 'loss' && amount ? `-${fmt(amount)}`
+      : 'PUSH';
+  } else if (outcome === 'win' && amount !== undefined) {
+    valueText = `+${fmt(amount)} WIN`;
+  } else if (outcome === 'loss' && amount !== undefined) {
+    valueText = `-${fmt(amount)} LOSS`;
+  } else if (outcome === 'push') {
+    valueText = 'PUSH';
+  } else {
+    valueText = 'NO BONUS';
+  }
+
   return (
-    <View style={rr.row}>
-      <View>
-        <Text style={rr.label}>{label}</Text>
+    <View style={[rr.row, isNet && rr.netRow]}>
+      <View style={{ flex: 1 }}>
+        <Text style={[rr.label, isNet && rr.netLabel]}>{label}</Text>
         {sub ? <Text style={rr.sub}>{sub}</Text> : null}
       </View>
-      <Text style={[rr.value, { color: highlight ?? vc }]}>{value}</Text>
+      <Text style={[isNet ? rr.netValue : rr.value, { color }]}>{valueText}</Text>
     </View>
   );
 }
 const rr = StyleSheet.create({
-  row:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingVertical: 5 },
-  label: { fontSize: 9, fontFamily: 'Orbitron_400Regular', letterSpacing: 1, color: 'rgba(255,255,255,0.4)' },
-  sub:   { fontSize: 8, color: 'rgba(255,255,255,0.25)', marginTop: 1 },
-  value: { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  row:      { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
+  netRow:   { paddingTop: 6 },
+  label:    { fontSize: 9, fontFamily: 'Orbitron_400Regular', letterSpacing: 1, color: 'rgba(255,255,255,0.4)' },
+  netLabel: { fontSize: 9, fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5, color: 'rgba(255,255,255,0.55)' },
+  sub:      { fontSize: 8, color: 'rgba(255,255,255,0.25)', marginTop: 1 },
+  value:    { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  netValue: { fontSize: 22, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
 });
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
@@ -506,58 +542,81 @@ export default function ThreeCardPokerScreen() {
           {/* Result breakdown */}
           {phase === 'result' && result && (
             <View style={gs.resultPanel}>
-              <LinearGradient colors={['rgba(0,0,0,0.8)', 'rgba(8,0,20,0.9)']} style={StyleSheet.absoluteFill} />
+              <LinearGradient colors={['rgba(0,0,0,0.82)', 'rgba(8,0,22,0.92)']} style={StyleSheet.absoluteFill} />
 
-              {result.comparison === 'fold' ? (
-                <Text style={gs.foldLabel}>PLAYER FOLDED — ANTE LOST</Text>
-              ) : (
-                <Text style={gs.foldLabel}>
-                  {result.qualified ? 'DEALER QUALIFIES' : 'DEALER DOES NOT QUALIFY'}
-                </Text>
-              )}
+              {/* Status header */}
+              <Text style={gs.foldLabel}>
+                {result.comparison === 'fold'
+                  ? 'PLAYER FOLDED — ANTE LOST'
+                  : result.qualified ? 'DEALER QUALIFIES' : 'DEALER DOES NOT QUALIFY'}
+              </Text>
 
               <View style={gs.resultDivider} />
 
+              {/* MAIN GAME */}
               <ResultRow
                 label="MAIN GAME"
-                value={result.comparison === 'fold'
-                  ? `-${fmt(lastAnte)}`
-                  : result.mainWin === 0 ? 'PUSH'
-                  : fmtSigned(result.mainWin)}
+                outcome={
+                  result.comparison === 'fold' ? 'loss'
+                  : result.mainWin > 0 ? 'win'
+                  : result.mainWin < 0 ? 'loss'
+                  : 'push'
+                }
+                amount={
+                  result.comparison === 'fold' ? lastAnte
+                  : result.mainWin !== 0 ? Math.abs(result.mainWin)
+                  : undefined
+                }
               />
 
+              {/* PAIR PLUS — only if bet was placed */}
               {lastPpMult > 0 && (
                 <ResultRow
                   label="PAIR PLUS"
-                  value={fmtSigned(result.pairPlusWin)}
+                  outcome={result.pairPlusWin > 0 ? 'win' : 'loss'}
+                  amount={Math.abs(result.pairPlusWin) || lastAnte * lastPpMult}
                   sub={result.playerEval.label}
                 />
               )}
 
-              {result.anteBonusWin > 0 && (
+              {/* ANTE BONUS — always shown when player played (not folded) */}
+              {result.comparison !== 'fold' && (
                 <ResultRow
                   label="ANTE BONUS"
-                  value={`+${fmt(result.anteBonusWin)}`}
-                  sub={result.playerEval.label}
-                  highlight="#ffd700"
+                  outcome={result.anteBonusWin > 0 ? 'win' : 'none'}
+                  amount={result.anteBonusWin > 0 ? result.anteBonusWin : undefined}
+                  sub={result.anteBonusWin > 0 ? result.playerEval.label : undefined}
+                  accent={result.anteBonusWin > 0 ? '#ffd700' : undefined}
                 />
               )}
 
+              {/* 6 CARD BONUS — only if bet was placed */}
               {lastScMult > 0 && (
                 <ResultRow
                   label="6 CARD BONUS"
-                  value={result.comparison === 'fold' ? `-${fmt(lastAnte * lastScMult)}` : fmtSigned(result.sixCardWin)}
-                  sub={result.sixCardEval?.label ?? '—'}
-                  highlight={result.sixCardWin > 0 ? '#bf5fff' : undefined}
+                  outcome={
+                    result.comparison === 'fold' ? 'loss'
+                    : result.sixCardWin > 0 ? 'win'
+                    : 'loss'
+                  }
+                  amount={
+                    result.comparison === 'fold'
+                      ? lastAnte * lastScMult
+                      : Math.abs(result.sixCardWin) || lastAnte * lastScMult
+                  }
+                  sub={result.comparison !== 'fold' ? (result.sixCardEval?.label ?? undefined) : undefined}
+                  accent={result.sixCardWin > 0 ? '#bf5fff' : undefined}
                 />
               )}
 
               <View style={gs.resultDivider} />
 
+              {/* NET RESULT — large, prominent */}
               <ResultRow
                 label="NET RESULT"
-                value={fmtSigned(result.netDelta)}
-                highlight={result.netDelta > 0 ? '#00ff88' : result.netDelta < 0 ? '#ff5555' : '#aaa'}
+                outcome={result.netDelta > 0 ? 'win' : result.netDelta < 0 ? 'loss' : 'push'}
+                amount={Math.abs(result.netDelta) || undefined}
+                isNet
               />
             </View>
           )}
