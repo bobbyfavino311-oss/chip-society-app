@@ -1,187 +1,244 @@
+/**
+ * DragonBackground — Minimal Dragon Dynasty
+ * Deep black/crimson atmosphere. Subtle embossed dragon (left),
+ * prosperity coin (right), cloud motifs (top corners).
+ * No giant art. Gameplay always first.
+ */
 import React from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Svg, {
   Circle,
-  ClipPath,
   Defs,
   Ellipse,
   G,
+  LinearGradient,
   Path,
-  Polygon,
   RadialGradient,
   Rect,
   Stop,
 } from 'react-native-svg';
 
 const { width: W, height: H } = Dimensions.get('window');
+const VW = 390;
+const VH = 844;
 
-// ─── Dragon spine — S-curve sweeping from top-center down the right side ──────
-// All values as fractions of W / H so it scales across device sizes
-const sx = (f: number) => f * W;
-const sy = (f: number) => f * H;
-
-const SPINE = [
-  `M ${sx(0.62)} ${sy(0.02)}`,
-  `C ${sx(0.95)} ${sy(0.07)}, ${sx(1.05)} ${sy(0.22)}, ${sx(0.96)} ${sy(0.34)}`,
-  `C ${sx(0.87)} ${sy(0.46)}, ${sx(0.74)} ${sy(0.50)}, ${sx(0.82)} ${sy(0.63)}`,
-  `C ${sx(0.90)} ${sy(0.76)}, ${sx(0.84)} ${sy(0.88)}, ${sx(0.70)} ${sy(0.96)}`,
-].join(' ');
-
-// Head region — roughly top-right quadrant
-const HEAD_CX = sx(0.72);
-const HEAD_CY = sy(0.06);
-
-// ─── Chinese cloud formations ──────────────────────────────────────────────────
-// Bottom-left cloud
-const CLOUD_BL = [
-  `M ${sx(0.00)} ${sy(0.92)}`,
-  `C ${sx(0.04)} ${sy(0.84)}, ${sx(0.14)} ${sy(0.87)}, ${sx(0.12)} ${sy(0.93)}`,
-  `C ${sx(0.18)} ${sy(0.89)}, ${sx(0.26)} ${sy(0.93)}, ${sx(0.22)} ${sy(0.98)}`,
-  `C ${sx(0.28)} ${sy(0.95)}, ${sx(0.34)} ${sy(1.00)}, ${sx(0.26)} ${sy(1.04)}`,
-  `L ${sx(0.00)} ${sy(1.04)} Z`,
-].join(' ');
-
-// Bottom-right cloud
-const CLOUD_BR = [
-  `M ${sx(1.00)} ${sy(0.88)}`,
-  `C ${sx(0.96)} ${sy(0.82)}, ${sx(0.86)} ${sy(0.84)}, ${sx(0.88)} ${sy(0.90)}`,
-  `C ${sx(0.82)} ${sy(0.87)}, ${sx(0.75)} ${sy(0.90)}, ${sx(0.78)} ${sy(0.96)}`,
-  `C ${sx(0.72)} ${sy(0.93)}, ${sx(0.68)} ${sy(0.98)}, ${sx(0.74)} ${sy(1.02)}`,
-  `L ${sx(1.00)} ${sy(1.02)} Z`,
-].join(' ');
-
-// ─── Scale shapes — overlapping diamond rows along the body ────────────────────
-function scalePoints(
-  cx: number, cy: number, w: number, h: number
-): string {
-  return `${cx},${cy - h} ${cx + w},${cy} ${cx},${cy + h} ${cx - w},${cy}`;
+// ─── Traditional Chinese cloud (ruyi) motif ────────────────────────────────────
+function CloudMotif({ x, y, scale = 1, flip = false, op = 0.22 }: {
+  x: number; y: number; scale?: number; flip?: boolean; op?: number;
+}) {
+  const s = scale;
+  const fx = flip ? -1 : 1;
+  const color = '#8B0000';
+  return (
+    <G opacity={op}>
+      <Path
+        d={`M ${x} ${y}
+          C ${x+fx*8*s} ${y-10*s}, ${x+fx*18*s} ${y-8*s}, ${x+fx*16*s} ${y}
+          C ${x+fx*24*s} ${y-4*s}, ${x+fx*32*s} ${y+2*s}, ${x+fx*28*s} ${y+10*s}
+          C ${x+fx*36*s} ${y+6*s}, ${x+fx*44*s} ${y+12*s}, ${x+fx*38*s} ${y+20*s}
+          C ${x+fx*28*s} ${y+22*s}, ${x+fx*12*s} ${y+18*s}, ${x} ${y+20*s}`}
+        stroke={color} strokeWidth={1.6*s} fill={color} fillOpacity={0.30} strokeOpacity={0.50}
+        strokeLinejoin="round" strokeLinecap="round"
+      />
+      {/* Second cloud puff below */}
+      <Path
+        d={`M ${x+fx*10*s} ${y+20*s}
+          C ${x+fx*16*s} ${y+28*s}, ${x+fx*26*s} ${y+26*s}, ${x+fx*30*s} ${y+34*s}
+          C ${x+fx*36*s} ${y+30*s}, ${x+fx*44*s} ${y+35*s}, ${x+fx*40*s} ${y+44*s}
+          C ${x+fx*30*s} ${y+46*s}, ${x+fx*18*s} ${y+42*s}, ${x+fx*10*s} ${y+44*s}`}
+        stroke={color} strokeWidth={1.4*s} fill={color} fillOpacity={0.22} strokeOpacity={0.42}
+        strokeLinejoin="round" strokeLinecap="round"
+      />
+    </G>
+  );
 }
 
-// Sample scales at key points along the spine
-const SCALE_POSITIONS = [
-  { cx: sx(0.78), cy: sy(0.12), w: 14, h: 9 },
-  { cx: sx(0.92), cy: sy(0.20), w: 18, h: 11 },
-  { cx: sx(0.97), cy: sy(0.28), w: 20, h: 13 },
-  { cx: sx(0.93), cy: sy(0.35), w: 18, h: 12 },
-  { cx: sx(0.86), cy: sy(0.43), w: 16, h: 10 },
-  { cx: sx(0.80), cy: sy(0.50), w: 15, h: 9 },
-  { cx: sx(0.83), cy: sy(0.58), w: 17, h: 11 },
-  { cx: sx(0.88), cy: sy(0.65), w: 19, h: 12 },
-  { cx: sx(0.89), cy: sy(0.73), w: 16, h: 10 },
-  { cx: sx(0.84), cy: sy(0.80), w: 14, h: 9 },
-  { cx: sx(0.78), cy: sy(0.87), w: 12, h: 8 },
-  { cx: sx(0.73), cy: sy(0.93), w: 10, h: 7 },
+// ─── Prosperity coin ──────────────────────────────────────────────────────────
+function ProsperityCoin({ cx, cy, r, op = 0.14 }: {
+  cx: number; cy: number; r: number; op?: number;
+}) {
+  const holeR = r * 0.28;
+  const color = '#8B0000';
+  const gold   = '#C89B3C';
+  return (
+    <G opacity={op}>
+      {/* Outer ring */}
+      <Circle cx={cx} cy={cy} r={r}
+        fill={color} fillOpacity={0.35} stroke={gold} strokeWidth={1.5} strokeOpacity={0.55} />
+      {/* Inner ring */}
+      <Circle cx={cx} cy={cy} r={r * 0.78}
+        fill="none" stroke={gold} strokeWidth={0.8} strokeOpacity={0.45} />
+      {/* Square centre hole — simulated with 4 lines */}
+      <Rect
+        x={cx - holeR} y={cy - holeR}
+        width={holeR * 2} height={holeR * 2}
+        fill="#0D0000" stroke={gold} strokeWidth={1.2} strokeOpacity={0.60}
+      />
+      {/* 4 small tick marks around ring (cardinal positions) */}
+      {[0, 90, 180, 270].map((deg) => {
+        const rad = (deg * Math.PI) / 180;
+        const mx = cx + Math.cos(rad) * r * 0.88;
+        const my = cy + Math.sin(rad) * r * 0.88;
+        const ix = cx + Math.cos(rad) * r * 0.72;
+        const iy = cy + Math.sin(rad) * r * 0.72;
+        return (
+          <Path key={deg}
+            d={`M ${mx} ${my} L ${ix} ${iy}`}
+            stroke={gold} strokeWidth={1.2} strokeOpacity={0.50} />
+        );
+      })}
+    </G>
+  );
+}
+
+// ─── Simplified Chinese dragon silhouette ─────────────────────────────────────
+// Coiling body, rendered as layered strokes for an embossed feel
+const BODY = [
+  'M 58 810',
+  'C 12 760, 5 705, 28 650',
+  'C 52 595, 120 588, 108 535',
+  'C 96 482, 45 462, 70 415',
+  'C 95 368, 148 362, 155 325',
+  'C 162 288, 138 265, 158 245',
+].join(' ');
+
+// Scale arc rows — positions along the body for decorative scale arcs
+const SCALE_ROWS = [
+  { cx: 40, cy: 724, r: 20, a: -20 },
+  { cx: 70, cy: 665, r: 18, a: 15 },
+  { cx: 112, cy: 613, r: 17, a: -10 },
+  { cx: 102, cy: 562, r: 16, a: 5 },
+  { cx: 62, cy: 517, r: 15, a: -15 },
+  { cx: 82, cy: 472, r: 14, a: 10 },
+  { cx: 112, cy: 428, r: 13, a: -5 },
+  { cx: 130, cy: 388, r: 12, a: 8 },
+  { cx: 142, cy: 350, r: 11, a: -8 },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// Dragon head — horn + snout at top of body
+function DragonHead({ x, y }: { x: number; y: number }) {
+  const GOLD = '#C89B3C';
+  const RED  = '#8B0000';
+  return (
+    <G opacity={0.38}>
+      {/* Snout */}
+      <Path d={`M ${x-18} ${y+8} C ${x-22} ${y-4}, ${x-8} ${y-14}, ${x+8} ${y-10} C ${x+18} ${y-6}, ${x+20} ${y+6}, ${x+10} ${y+12} Z`}
+        fill={RED} fillOpacity={0.60} stroke={GOLD} strokeWidth={0.8} strokeOpacity={0.40} />
+      {/* Left horn */}
+      <Path d={`M ${x-10} ${y-10} C ${x-16} ${y-24}, ${x-8} ${y-36}, ${x-4} ${y-32}`}
+        stroke={GOLD} strokeWidth={1.8} strokeLinecap="round" fill="none" strokeOpacity={0.50} />
+      {/* Right horn */}
+      <Path d={`M ${x+4} ${y-8} C ${x+10} ${y-22}, ${x+18} ${y-32}, ${x+14} ${y-28}`}
+        stroke={GOLD} strokeWidth={1.8} strokeLinecap="round" fill="none" strokeOpacity={0.45} />
+      {/* Whisker left */}
+      <Path d={`M ${x-18} ${y+2} C ${x-36} ${y-8}, ${x-42} ${y+4}, ${x-38} ${y+12}`}
+        stroke={RED} strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.40} />
+      {/* Eye glow */}
+      <Circle cx={x-4} cy={y-2} r={4} fill={GOLD} fillOpacity={0.30} />
+      <Circle cx={x-4} cy={y-2} r={2} fill={GOLD} fillOpacity={0.55} />
+    </G>
+  );
+}
+
 export default function DragonBackground() {
+  const GOLD = '#C89B3C';
+  const RED  = '#8B0000';
+  const DARK = '#0D0000';
+
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
+      <Svg width={W} height={H} viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet">
         <Defs>
-          <RadialGradient id="headGlow" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%"  stopColor="#8B0000" stopOpacity="0.35" />
-            <Stop offset="100%" stopColor="#8B0000" stopOpacity="0" />
+          <LinearGradient id="dbBg" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%"   stopColor="#0A0000" stopOpacity="1" />
+            <Stop offset="50%"  stopColor="#0E0101" stopOpacity="1" />
+            <Stop offset="100%" stopColor="#080000" stopOpacity="1" />
+          </LinearGradient>
+          <RadialGradient id="dbDragonGlow" cx="22%" cy="72%" r="45%">
+            <Stop offset="0%"   stopColor={RED} stopOpacity="0.18" />
+            <Stop offset="100%" stopColor="#000000" stopOpacity="0.00" />
           </RadialGradient>
-          <RadialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%"  stopColor="#C89B3C" stopOpacity="0.8" />
-            <Stop offset="60%" stopColor="#8B0000" stopOpacity="0.4" />
-            <Stop offset="100%" stopColor="#8B0000" stopOpacity="0" />
+          <RadialGradient id="dbTopGlow" cx="50%" cy="0%" r="45%">
+            <Stop offset="0%"   stopColor={RED} stopOpacity="0.10" />
+            <Stop offset="100%" stopColor="#000000" stopOpacity="0.00" />
+          </RadialGradient>
+          <RadialGradient id="dbHeadGlow" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%"   stopColor={GOLD} stopOpacity="0.20" />
+            <Stop offset="100%" stopColor="#000000" stopOpacity="0.00" />
           </RadialGradient>
         </Defs>
 
-        {/* ── Cloud formations ────────────────────────────────────────────── */}
-        <Path d={CLOUD_BL} fill="#3B0000" fillOpacity={0.55} />
-        <Path d={CLOUD_BL} fill="none" stroke="#8B0000" strokeWidth={0.8} strokeOpacity={0.4} />
+        {/* Background */}
+        <Rect x={0} y={0} width={VW} height={VH} fill="url(#dbBg)" />
+        <Rect x={0} y={0} width={VW} height={VH} fill="url(#dbDragonGlow)" />
+        <Rect x={0} y={0} width={VW} height={VH} fill="url(#dbTopGlow)" />
 
-        <Path d={CLOUD_BR} fill="#3B0000" fillOpacity={0.55} />
-        <Path d={CLOUD_BR} fill="none" stroke="#8B0000" strokeWidth={0.8} strokeOpacity={0.4} />
+        {/* ── Top-left cloud motif ──────────────────────────────────────── */}
+        <CloudMotif x={10} y={18} scale={1.0} op={0.28} />
 
-        {/* ── Dragon body — shadow / ambient glow layer ───────────────────── */}
-        <Path
-          d={SPINE}
-          stroke="#3B0000"
-          strokeWidth={90}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity={0.28}
-        />
+        {/* ── Top-right cloud motif ─────────────────────────────────────── */}
+        <CloudMotif x={VW - 10} y={18} scale={1.0} flip op={0.28} />
 
-        {/* ── Dragon body — main body layer ───────────────────────────────── */}
-        <Path
-          d={SPINE}
-          stroke="#5a0000"
-          strokeWidth={58}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity={0.40}
-        />
+        {/* ── Dragon body — ambient shadow layer ───────────────────────── */}
+        <Path d={BODY} stroke={DARK} strokeWidth={100} strokeLinecap="round"
+          strokeLinejoin="round" fill="none" opacity={0.40} />
 
-        {/* ── Dragon body — ridgeline ─────────────────────────────────────── */}
-        <Path
-          d={SPINE}
-          stroke="#8B0000"
-          strokeWidth={28}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity={0.50}
-        />
+        {/* ── Dragon body — deep red fill ──────────────────────────────── */}
+        <Path d={BODY} stroke={RED} strokeWidth={60} strokeLinecap="round"
+          strokeLinejoin="round" fill="none" opacity={0.22} />
 
-        {/* ── Dragon body — surface highlight ────────────────────────────── */}
-        <Path
-          d={SPINE}
-          stroke="#C89B3C"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity={0.22}
-        />
+        {/* ── Dragon body — ridge line ─────────────────────────────────── */}
+        <Path d={BODY} stroke="#B80000" strokeWidth={28} strokeLinecap="round"
+          strokeLinejoin="round" fill="none" opacity={0.28} />
 
-        {/* ── Scale diamond shapes along the body ────────────────────────── */}
-        {SCALE_POSITIONS.map((sp, i) => (
-          <G key={i}>
-            <Polygon
-              points={scalePoints(sp.cx, sp.cy, sp.w, sp.h)}
-              fill="#1a0000"
-              fillOpacity={0.6}
-              stroke="#C89B3C"
-              strokeWidth={0.6}
-              strokeOpacity={0.3}
+        {/* ── Dragon body — gold edge highlight ───────────────────────── */}
+        <Path d={BODY} stroke={GOLD} strokeWidth={1.0} strokeLinecap="round"
+          strokeLinejoin="round" fill="none" opacity={0.18} />
+
+        {/* ── Scale arc rows ───────────────────────────────────────────── */}
+        {SCALE_ROWS.map((sc, i) => (
+          <G key={i} opacity={0.32}>
+            {/* Outer arc */}
+            <Path
+              d={`M ${sc.cx - sc.r} ${sc.cy} A ${sc.r} ${sc.r * 0.55} 0 0 1 ${sc.cx + sc.r} ${sc.cy}`}
+              fill={RED} fillOpacity={0.45}
+              stroke={GOLD} strokeWidth={0.5} strokeOpacity={0.40}
             />
-            {/* Inner diamond */}
-            <Polygon
-              points={scalePoints(sp.cx, sp.cy, sp.w * 0.5, sp.h * 0.5)}
-              fill="none"
-              stroke="#8B0000"
-              strokeWidth={0.4}
-              strokeOpacity={0.4}
+            {/* Inner arc (scale detail) */}
+            <Path
+              d={`M ${sc.cx - sc.r*0.55} ${sc.cy - 2} A ${sc.r*0.55} ${sc.r*0.32} 0 0 1 ${sc.cx + sc.r*0.55} ${sc.cy - 2}`}
+              fill="none" stroke={RED} strokeWidth={0.6} strokeOpacity={0.50}
             />
           </G>
         ))}
 
-        {/* ── Head region — atmospheric glow ─────────────────────────────── */}
-        <Ellipse
-          cx={HEAD_CX}
-          cy={HEAD_CY}
-          rx={sx(0.22)}
-          ry={sy(0.09)}
-          fill="url(#headGlow)"
-        />
+        {/* ── Dragon head glow ─────────────────────────────────────────── */}
+        <Ellipse cx={148} cy={265} rx={55} ry={38} fill="url(#dbHeadGlow)" />
 
-        {/* ── Dragon eye hints — faint gold ────────────────────────────────── */}
-        <Circle cx={sx(0.68)} cy={sy(0.04)} r={8} fill="url(#eyeGlow)" opacity={0.65} />
-        <Circle cx={sx(0.68)} cy={sy(0.04)} r={3} fill="#C89B3C" opacity={0.5} />
+        {/* ── Dragon head ──────────────────────────────────────────────── */}
+        <DragonHead x={152} y={258} />
 
-        {/* ── Subtle red lantern / orb accents on left ────────────────────── */}
-        <Circle cx={sx(0.08)} cy={sy(0.22)} r={sx(0.025)} fill="#8B0000" fillOpacity={0.12} />
-        <Circle cx={sx(0.08)} cy={sy(0.22)} r={sx(0.012)} fill="#C89B3C" fillOpacity={0.15} />
+        {/* ── Dragon claw hints along body ────────────────────────────── */}
+        {[
+          { x: 26, y: 660, dir: -1 },
+          { x: 30, y: 545, dir: 1 },
+          { x: 55, y: 440, dir: -1 },
+        ].map(({ x, y, dir }, i) => (
+          <G key={i} opacity={0.28}>
+            <Path d={`M ${x} ${y} L ${x + dir * 18} ${y + 12} M ${x} ${y} L ${x + dir * 14} ${y + 20} M ${x} ${y} L ${x + dir * 8} ${y + 22}`}
+              stroke={GOLD} strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.55} />
+          </G>
+        ))}
 
-        <Circle cx={sx(0.05)} cy={sy(0.45)} r={sx(0.018)} fill="#8B0000" fillOpacity={0.10} />
-        <Circle cx={sx(0.05)} cy={sy(0.45)} r={sx(0.008)} fill="#C89B3C" fillOpacity={0.12} />
+        {/* ── Prosperity coin — right side ─────────────────────────────── */}
+        <ProsperityCoin cx={VW - 52} cy={VH * 0.62} r={44} op={0.18} />
+
+        {/* ── Small secondary coin accent ──────────────────────────────── */}
+        <ProsperityCoin cx={VW - 38} cy={VH * 0.38} r={24} op={0.12} />
+
+        {/* ── Bottom vignette for gameplay readability ─────────────────── */}
+        <Rect x={0} y={VH * 0.70} width={VW} height={VH * 0.30}
+          fill="#000000" fillOpacity={0.20} />
       </Svg>
     </View>
   );

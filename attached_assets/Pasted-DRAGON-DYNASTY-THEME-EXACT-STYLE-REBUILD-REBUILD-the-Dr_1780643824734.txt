@@ -1,0 +1,271 @@
+DRAGON DYNASTY THEME — EXACT STYLE REBUILD
+
+REBUILD the Dragon Dynasty poker theme using the EXACT design philosophy shown in the reference image.
+
+DO NOT redesign.
+
+DO NOT invent new layouts.
+
+DO NOT add new visual concepts.
+
+DO NOT create a realistic scene.
+
+DO NOT turn this into a wallpaper.
+
+The goal is to replicate the same clean, premium, minimalist approach used in the reference while replacing Miami elements with Chinese Dragon Dynasty elements.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CORE DESIGN PHILOSOPHY
+
+The current Dragon theme is too busy.
+
+The dragon is too large.
+
+The artwork overwhelms the gameplay.
+
+The theme must feel like a premium casino skin, not a poster.
+
+Everything should be decorative and subtle.
+
+Gameplay always comes first.
+
+Think:
+
+• Luxury casino
+• High-end baccarat room
+• Macau VIP lounge
+• Chinese New Year elegance
+• Black and gold premium aesthetic
+
+NOT:
+
+• Fantasy artwork
+• Mobile RPG
+• Anime
+• Dragon wallpaper
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BACKGROUND
+
+Use the same structure as the reference image.
+
+Very dark background.
+
+Deep black.
+
+Dark crimson gradients.
+
+Soft black-red atmosphere.
+
+Minimal texture only.
+
+Background should remain mostly empty.
+
+No giant dragons.
+
+No giant temples.
+
+No giant pagodas.
+
+No full-screen illustrations.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMMUNITY CARD TABLE
+
+Use the EXACT same sizing and placement as the reference.
+
+The community card area should be large and centered.
+
+Simple rectangular table.
+
+Dark black glass interior.
+
+Thin gold border.
+
+Chinese corner ornament accents.
+
+Five card slots.
+
+Red dashed card placeholders.
+
+Nothing else.
+
+NO dragon wrapping around the table.
+
+NO decorative clutter around the cards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+POT DISPLAY
+
+Same placement as reference.
+
+Rounded black capsule.
+
+Thin gold border.
+
+Gold typography.
+
+Example:
+
+POT 350
+
+Simple.
+
+Premium.
+
+Luxury.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DECORATIVE ELEMENTS
+
+Use subtle Chinese-themed accents ONLY.
+
+LEFT SIDE:
+
+Large red dragon illustration.
+
+Low opacity.
+
+Integrated into background.
+
+Should feel embossed into the design.
+
+Not floating above gameplay.
+
+Not highly detailed.
+
+RIGHT SIDE:
+
+Chinese prosperity coin emblem.
+
+Dark red.
+
+Very subtle.
+
+Low opacity.
+
+Background decoration only.
+
+TOP CORNERS:
+
+Small cloud motifs.
+
+Traditional Chinese cloud patterns.
+
+Dark red.
+
+Low opacity.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COLOR PALETTE
+
+Primary:
+
+• Black
+• Charcoal
+• Dark Crimson
+
+Accent:
+
+• Gold
+• Deep Red
+
+Glow:
+
+Very subtle.
+
+Avoid bright neon.
+
+Avoid cyan.
+
+Avoid pink.
+
+Avoid purple.
+
+This should feel mature and expensive.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER AVATARS
+
+Keep same avatar size.
+
+Keep same avatar placement.
+
+Use gold and red avatar rings.
+
+No oversized effects.
+
+No excessive glow.
+
+Premium poker room appearance.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER CARDS
+
+Standard white casino cards.
+
+Subtle red edge glow.
+
+Nothing exaggerated.
+
+Maximum readability.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BOTTOM HALF
+
+Leave mostly clean.
+
+The current version is too crowded.
+
+The player cards should dominate the visual focus.
+
+Decorative elements should remain pushed into the corners and edges.
+
+Gameplay controls should remain fully visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL REFERENCE GOAL
+
+Imagine taking the exact Miami Nights layout and visual simplicity...
+
+Then replacing:
+
+Palm Trees → Chinese Cloud Motifs
+
+Miami Elements → Dynasty Elements
+
+Neon Pink → Gold
+
+Neon Cyan → Crimson
+
+Vice City → Dragon Dynasty
+
+while keeping:
+
+• The exact spacing
+• The exact layout
+• The exact scale
+• The exact table size
+• The exact gameplay readability
+
+The final result should feel like:
+
+"A luxury Dragon Dynasty casino skin built by the same designer who created Miami Nights."
+
+NOT a different game.
+
+NOT a different art style.
+
+NOT a fantasy dragon illustration.
+
+The two themes should feel like matching premium skins from the same casino app.
