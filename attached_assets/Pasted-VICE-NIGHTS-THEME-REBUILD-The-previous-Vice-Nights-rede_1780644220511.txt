@@ -1,0 +1,239 @@
+VICE NIGHTS THEME REBUILD
+
+The previous Vice Nights redesigns are incorrect.
+
+DO NOT add:
+
+• Ocean Drive signs
+• Buildings
+• Sports cars
+• City skylines
+• Detailed scenery
+• Realistic environments
+• Neon billboards
+• Posters
+• Background illustrations
+
+The visual target is the attached reference image.
+
+This theme must be minimalist, atmospheric, clean, and premium.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CORE STYLE
+
+Minimalist Neon Miami
+
+Think:
+
+• Vaporwave
+• Synthwave
+• Palm silhouettes
+• Flamingo silhouettes
+• Tropical neon accents
+• Clean line art
+• Premium casino skin
+
+NOT:
+
+• City scenes
+• GTA artwork
+• Detailed illustrations
+• Busy backgrounds
+• Wallpaper art
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BACKGROUND
+
+Very dark navy blue.
+
+Almost black.
+
+Subtle purple gradients.
+
+Tiny scattered stars.
+
+Large areas of negative space.
+
+The background should feel calm, luxurious, and uncluttered.
+
+Do not fill the screen with artwork.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DECORATIVE ELEMENTS
+
+Use only simple neon line-art elements.
+
+LEFT SIDE
+
+Large flamingo outline.
+
+Thin neon pink lines.
+
+Subtle glow.
+
+Integrated into the background.
+
+RIGHT SIDE
+
+Single neon palm tree outline.
+
+Thin pink neon lines.
+
+Subtle glow.
+
+Integrated into the background.
+
+LOWER CORNER
+
+Dark cyan palm leaf silhouette.
+
+Very low opacity.
+
+Background accent only.
+
+BOTTOM OF SCREEN
+
+Simple neon horizon lines.
+
+Thin cyan glow.
+
+Minimalist vaporwave styling.
+
+No scenery.
+
+No objects.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMMUNITY CARD TABLE
+
+This is the centerpiece.
+
+Match the reference image.
+
+Large rounded rectangle.
+
+Dark transparent interior.
+
+Thin cyan neon border.
+
+Five dashed card placeholders.
+
+Clean.
+
+Minimal.
+
+Premium.
+
+No oversized decorations.
+
+No floating graphics.
+
+No attached artwork.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+POT DISPLAY
+
+Rounded capsule design.
+
+Dark glass appearance.
+
+Thin cyan border.
+
+Simple typography.
+
+Clean and minimal.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COLOR PALETTE
+
+Primary:
+
+• Midnight Blue
+• Deep Navy
+• Black
+
+Accent:
+
+• Neon Cyan
+• Neon Pink
+
+Do not introduce additional colors.
+
+No gold.
+
+No orange.
+
+No green.
+
+No yellow.
+
+Keep the palette extremely consistent.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER AVATARS
+
+Keep current avatar sizing.
+
+Keep current placement.
+
+Use cyan and pink avatar rings.
+
+Subtle glow only.
+
+Do not increase visual noise.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER CARDS
+
+Standard white casino cards.
+
+Soft cyan edge glow.
+
+Maximum readability.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OVERALL DESIGN GOAL
+
+The theme should feel like:
+
+"A luxury synthwave poker room."
+
+NOT:
+
+"A Miami city scene."
+
+NOT:
+
+"A Vice City poster."
+
+NOT:
+
+"A wallpaper."
+
+NOT:
+
+"A travel advertisement."
+
+The attached reference image is the exact artistic direction.
+
+Match:
+
+• The simplicity
+• The spacing
+• The atmosphere
+• The decoration density
+• The minimalism
+• The clean gameplay focus
+
+Gameplay visibility must remain the highest priority.
+
+Use the Dragon Dynasty theme as the layout reference and replace all dragon-themed decorative elements with minimalist neon Miami-themed line art elements while maintaining the same clean, premium casino presentation.
