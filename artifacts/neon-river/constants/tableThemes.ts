@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune' | 'vice_nights';
+export type ThemeId = 'neon_default' | 'dragon_fortune';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale' | 'vice_nights';
+  cardBackPattern: 'mandala' | 'dragon_scale';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -141,51 +141,4 @@ export const DRAGON_FORTUNE: TableTheme = {
   previewColors: ['#090909', '#8B0000', '#C89B3C'],
 };
 
-export const VICE_NIGHTS: TableTheme = {
-  id: 'vice_nights',
-  name: 'VICE NIGHTS',
-  tagline: 'Ocean Drive never sleeps. Neon lights, fast cars, and high-stakes poker under the Miami skyline.',
-  rarity: 'LEGENDARY',
-
-  bgGradient: ['#0E0025', '#080018', '#04050F', '#080018', '#0E0025'],
-
-  glowA: 'rgba(155,0,64,0.30)',
-  glowB: 'rgba(0,229,255,0.15)',
-  glowCenter: 'rgba(100,0,160,0.12)',
-
-  tableSurfaceBg: 'rgba(4,2,14,0.92)',
-  tableSurfaceBorder: 'rgba(255,47,174,0.60)',
-  tableSurfaceShadow: '#FF2FAE',
-  tableCenterGlow: 'rgba(255,47,174,0.05)',
-
-  cardBackBg: '#090909',
-  cardBackAccent: '#FF2FAE',
-  cardBackPattern: 'vice_nights',
-  cardHighlightColor: '#00E5FF',
-
-  chipTokenColor: '#00E5FF',
-  chipWinTokenColor: '#FF2FAE',
-
-  potBg: 'rgba(4,2,14,0.95)',
-  potBorder: 'rgba(0,229,255,0.65)',
-  potShadow: '#00E5FF',
-  potLabelColor: 'rgba(0,229,255,0.80)',
-  potAmountColor: '#FF2FAE',
-
-  foldAccent: '#FF2FAE',
-  checkAccent: '#00E5FF',
-  callAccent: '#00E5FF',
-  raiseAccent: '#6060FF',
-  allInAccent: '#FFD700',
-
-  accentPrimary: '#FF2FAE',
-  accentSecondary: '#00E5FF',
-  textColor: '#F8F0FF',
-
-  winEffectStyle: 'neon_burst',
-  winGoldColor: '#FF2FAE',
-
-  previewColors: ['#04050F', '#FF2FAE', '#00E5FF'],
-};
-
-export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE, VICE_NIGHTS];
+export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE];

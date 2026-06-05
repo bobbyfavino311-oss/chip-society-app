@@ -16,24 +16,6 @@ import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { ALL_TABLE_THEMES, TableTheme, ThemeId } from '@/constants/tableThemes';
 
-// ─── Vice Nights mini-preview ──────────────────────────────────────────────────
-function ViceNightsPreview({ size = 40 }: { size?: number }) {
-  const s = size;
-  const cx = s / 2;
-  const cy = s / 2;
-  const r  = s * 0.40;
-  return (
-    <Svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
-      <Rect x={0} y={0} width={s} height={s} fill="#050010" />
-      <Circle cx={cx} cy={cy} r={r}     stroke="#FF2FAE" strokeWidth={1.4} fill="none" strokeOpacity={0.80} />
-      <Circle cx={cx} cy={cy} r={r * 0.6} stroke="#00E5FF" strokeWidth={0.8} fill="none" strokeOpacity={0.55} />
-      <Line x1={cx - r} y1={cy} x2={cx + r} y2={cy} stroke="#FF2FAE" strokeWidth={0.5} strokeOpacity={0.35} />
-      <Line x1={cx} y1={cy - r} x2={cx} y2={cy + r} stroke="#00E5FF" strokeWidth={0.5} strokeOpacity={0.35} />
-      <Circle cx={cx} cy={cy} r={r * 0.18} fill="#FF2FAE" fillOpacity={0.85} />
-    </Svg>
-  );
-}
-
 // ─── Dragon scale mini-preview ─────────────────────────────────────────────────
 function DragonScalePreview({ size = 40 }: { size?: number }) {
   const s = size;
@@ -106,9 +88,9 @@ function ThemeCard({
     ? ['#120000', '#0A0000', '#060000']
     : ['#0e0028', '#08001a', '#050010'];
 
+
   function Preview() {
-    if (isDragon)          return <DragonScalePreview size={42} />;
-    if (theme.id === 'vice_nights') return <ViceNightsPreview size={42} />;
+    if (isDragon) return <DragonScalePreview size={42} />;
     return <NeonMandalaPreview size={42} />;
   }
 
