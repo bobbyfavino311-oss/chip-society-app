@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune' | 'vice_nights';
+export type ThemeId = 'neon_default' | 'dragon_fortune';
 
 export interface TableTheme {
   id: ThemeId;
@@ -23,7 +23,7 @@ export interface TableTheme {
   // Card back
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale' | 'vice_nights';
+  cardBackPattern: 'mandala' | 'dragon_scale';
   cardHighlightColor: string;
 
   // Chip animation tokens
@@ -151,51 +151,4 @@ export const DRAGON_FORTUNE: TableTheme = {
   previewColors: ['#090909', '#8B0000', '#C89B3C'],
 };
 
-export const VICE_NIGHTS: TableTheme = {
-  id: 'vice_nights',
-  name: 'VICE NIGHTS',
-  tagline: 'Ocean Drive never sleeps. Neon lights, fast cars, luxury yachts, and high-stakes poker under the Miami skyline.',
-  rarity: 'LEGENDARY',
-
-  bgGradient: ['#130022', '#0A001A', '#05081B', '#0A001A', '#130022'],
-
-  glowA: 'rgba(255,47,174,0.22)',
-  glowB: 'rgba(0,229,255,0.16)',
-  glowCenter: 'rgba(100,0,160,0.14)',
-
-  tableSurfaceBg: 'rgba(5,3,20,0.90)',
-  tableSurfaceBorder: 'rgba(255,47,174,0.55)',
-  tableSurfaceShadow: '#FF2FAE',
-  tableCenterGlow: 'rgba(255,47,174,0.07)',
-
-  cardBackBg: '#090909',
-  cardBackAccent: '#FF2FAE',
-  cardBackPattern: 'vice_nights',
-  cardHighlightColor: '#00E5FF',
-
-  chipTokenColor: '#00E5FF',
-  chipWinTokenColor: '#FF2FAE',
-
-  potBg: 'rgba(5,8,27,0.92)',
-  potBorder: 'rgba(255,47,174,0.55)',
-  potShadow: '#FF2FAE',
-  potLabelColor: 'rgba(0,229,255,0.70)',
-  potAmountColor: '#FF2FAE',
-
-  foldAccent: '#FF2FAE',
-  checkAccent: '#00E5FF',
-  callAccent: '#00E5FF',
-  raiseAccent: '#bf5fff',
-  allInAccent: '#ffd700',
-
-  accentPrimary: '#FF2FAE',
-  accentSecondary: '#00E5FF',
-  textColor: '#F2F2F2',
-
-  winEffectStyle: 'neon_burst',
-  winGoldColor: '#FF2FAE',
-
-  previewColors: ['#05081B', '#FF2FAE', '#00E5FF'],
-};
-
-export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE, VICE_NIGHTS];
+export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE];

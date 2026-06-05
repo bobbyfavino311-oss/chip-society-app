@@ -122,97 +122,10 @@ function DragonScaleBack({ w, h, r }: { w: number; h: number; r: number }) {
   );
 }
 
-// ─── Vice Nights card back ─────────────────────────────────────────────────────
-function ViceNightsBack({ w, h, r }: { w: number; h: number; r: number }) {
-  const pink = '#FF2FAE';
-  const cyan = '#00E5FF';
-  const cx = w / 2;
-  const cy = h / 2;
-
-  // Diagonal neon grid lines
-  const diagLines: { x1: number; y1: number; x2: number; y2: number; col: string }[] = [];
-  const step = w * 0.25;
-  for (let i = -2; i < 6; i++) {
-    const ox = i * step;
-    diagLines.push({ x1: ox, y1: 0, x2: ox + h, y2: h, col: i % 2 === 0 ? pink : cyan });
-    diagLines.push({ x1: ox + w, y1: 0, x2: ox, y2: h, col: i % 2 === 0 ? cyan : pink });
-  }
-
-  // Simplified palm trunk + 5 fronds from top-center
-  const pCx = cx;
-  const pBase = h * 0.88;
-  const pCrown = h * 0.30;
-  const L = w * 0.32;
-  const fronds = [
-    `M ${pCx} ${pCrown} C ${pCx + L * 0.4} ${pCrown - L * 0.35}, ${pCx + L} ${pCrown}, ${pCx + L} ${pCrown + L * 0.4}`,
-    `M ${pCx} ${pCrown} C ${pCx + L * 0.2} ${pCrown - L * 0.7}, ${pCx + L * 0.5} ${pCrown - L * 0.95}, ${pCx + L * 0.52} ${pCrown - L * 0.6}`,
-    `M ${pCx} ${pCrown} C ${pCx} ${pCrown - L * 0.8}, ${pCx} ${pCrown - L * 1.1}, ${pCx} ${pCrown - L}`,
-    `M ${pCx} ${pCrown} C ${pCx - L * 0.2} ${pCrown - L * 0.7}, ${pCx - L * 0.5} ${pCrown - L * 0.95}, ${pCx - L * 0.52} ${pCrown - L * 0.6}`,
-    `M ${pCx} ${pCrown} C ${pCx - L * 0.4} ${pCrown - L * 0.35}, ${pCx - L} ${pCrown}, ${pCx - L} ${pCrown + L * 0.4}`,
-  ];
-
-  // Skyline silhouette at bottom — simplified buildings
-  const skyH = h * 0.22;
-  const skyY = h - skyH;
-  const bldgs = [
-    { x: 0,          w: w * 0.14, h: skyH * 0.55 },
-    { x: w * 0.14,   w: w * 0.12, h: skyH * 0.80 },
-    { x: w * 0.26,   w: w * 0.18, h: skyH * 1.00 },
-    { x: w * 0.44,   w: w * 0.12, h: skyH * 0.90 },
-    { x: w * 0.56,   w: w * 0.16, h: skyH * 1.00 },
-    { x: w * 0.72,   w: w * 0.14, h: skyH * 0.70 },
-    { x: w * 0.86,   w: w * 0.14, h: skyH * 0.50 },
-  ];
-
-  return (
-    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#090909' }]}>
-      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-        {/* Diagonal grid */}
-        {diagLines.map((l, i) => (
-          <Line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
-            stroke={l.col} strokeWidth={0.4} strokeOpacity={0.10} />
-        ))}
-
-        {/* Palm trunk */}
-        <Path
-          d={`M ${pCx - 1.5} ${pBase} C ${pCx + 2} ${(pBase + pCrown) / 2}, ${pCx - 2} ${(pBase + pCrown) / 2}, ${pCx} ${pCrown}`}
-          stroke={pink} strokeWidth={2.5} strokeLinecap="round" fill="none" strokeOpacity={0.65}
-        />
-        {/* Fronds */}
-        {fronds.map((d, i) => (
-          <Path key={i} d={d} stroke={i % 2 === 0 ? pink : cyan}
-            strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.7} />
-        ))}
-
-        {/* Skyline silhouette */}
-        {bldgs.map((b, i) => (
-          <Rect key={i} x={b.x} y={skyY + skyH - b.h} width={b.w - 1} height={b.h}
-            fill={i % 2 === 0 ? 'rgba(255,47,174,0.18)' : 'rgba(0,229,255,0.12)'} />
-        ))}
-
-        {/* Pink border glow */}
-        <Rect x={1} y={1} width={w - 2} height={h - 2} rx={r}
-          fill="none" stroke={pink} strokeWidth={1.5} strokeOpacity={0.50} />
-        {/* Cyan inner accent */}
-        <Rect x={3} y={3} width={w - 6} height={h - 6} rx={r - 1}
-          fill="none" stroke={cyan} strokeWidth={0.7} strokeOpacity={0.28} strokeDasharray="3,3" />
-
-        {/* Center star / diamond */}
-        <Polygon
-          points={`${cx},${cy - w * 0.08} ${cx + w * 0.05},${cy} ${cx},${cy + w * 0.08} ${cx - w * 0.05},${cy}`}
-          fill="none" stroke={pink} strokeWidth={0.8} strokeOpacity={0.55}
-        />
-        <Circle cx={cx} cy={cy} r={w * 0.03} fill={cyan} opacity={0.55} />
-      </Svg>
-    </View>
-  );
-}
-
 // ─── Card back router ──────────────────────────────────────────────────────────
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
   if (theme.cardBackPattern === 'dragon_scale') return <DragonScaleBack w={w} h={h} r={r} />;
-  if (theme.cardBackPattern === 'vice_nights')  return <ViceNightsBack  w={w} h={h} r={r} />;
   return <MandalaBack w={w} h={h} r={r} />;
 }
 

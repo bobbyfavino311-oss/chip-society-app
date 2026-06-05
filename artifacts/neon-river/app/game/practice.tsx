@@ -32,8 +32,6 @@ import NeonAvatarSeat from '@/components/NeonAvatar';
 import { useTableTheme } from '@/context/TableThemeContext';
 import DragonBackground from '@/components/DragonBackground';
 import DragonCardFrame from '@/components/DragonCardFrame';
-import ViceBackground from '@/components/ViceBackground';
-import ViceCardFrame from '@/components/ViceCardFrame';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -397,7 +395,6 @@ export default function PracticeScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useTableTheme();
   const isDragon = theme.id === 'dragon_fortune';
-  const isVice   = theme.id === 'vice_nights';
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -598,7 +595,6 @@ export default function PracticeScreen() {
 
       {/* Theme atmospheric backgrounds */}
       {isDragon && <DragonBackground />}
-      {isVice   && <ViceBackground />}
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -633,10 +629,7 @@ export default function PracticeScreen() {
         </TouchableOpacity>
         <View style={styles.topCenter}>
           {state.phase !== 'idle' && (
-            <Text style={[
-              styles.phaseLabel,
-              isVice && styles.phaseLabelVice,
-            ]}>
+            <Text style={styles.phaseLabel}>
               {PHASE_LABELS[state.phase] ?? ''}
               {handCount > 0 && `  ·  #${handCount + 1}`}
             </Text>
@@ -687,7 +680,7 @@ export default function PracticeScreen() {
 
         {/* Community card board — dark glass surface (wrapped for Dragon frame) */}
         <View
-          onLayout={(isDragon || isVice) ? (e) => {
+          onLayout={isDragon ? (e) => {
             const { width, height } = e.nativeEvent.layout;
             setTableLayout({ w: width, h: height });
           } : undefined}
@@ -695,9 +688,6 @@ export default function PracticeScreen() {
         >
           {isDragon && tableLayout.w > 0 && (
             <DragonCardFrame width={tableLayout.w} height={tableLayout.h} />
-          )}
-          {isVice && tableLayout.w > 0 && (
-            <ViceCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
         <View style={[styles.tableSurface, {
           borderColor: theme.tableSurfaceBorder,
@@ -999,18 +989,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.25)', fontSize: 9, fontWeight: '600',
     letterSpacing: 3, fontFamily: 'Orbitron_400Regular',
   },
-  phaseLabelVice: {
-    color: '#FF2FAE',
-    fontSize: 14,
-    fontWeight: '800',
-    fontStyle: 'italic',
-    fontFamily: 'Inter_700Bold',
-    letterSpacing: 0.5,
-    textShadowColor: '#FF2FAE',
-    textShadowRadius: 10,
-    textShadowOffset: { width: 0, height: 0 },
-  },
-
   // ── Exit modal
   exitOverlay: { flex: 1, backgroundColor: 'rgba(5,0,16,0.88)', alignItems: 'center', justifyContent: 'center' },
   exitCard: {

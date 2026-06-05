@@ -55,41 +55,6 @@ function NeonMandalaPreview({ size = 40 }: { size?: number }) {
   );
 }
 
-// ─── Vice Nights palm mini-preview ────────────────────────────────────────────
-function ViceNightsPreview({ size = 40 }: { size?: number }) {
-  const cx = size / 2;
-  const baseY = size * 0.95;
-  const crownY = size * 0.30;
-  const L = size * 0.38;
-  return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {/* City glow */}
-      <Rect x={0} y={size * 0.68} width={size} height={size * 0.32} fill="rgba(255,47,174,0.10)" />
-      {/* Mini buildings */}
-      <Rect x={2}  y={size * 0.72} width={7}  height={size * 0.28} fill="rgba(255,47,174,0.30)" />
-      <Rect x={10} y={size * 0.62} width={6}  height={size * 0.38} fill="rgba(0,229,255,0.25)" />
-      <Rect x={17} y={size * 0.68} width={8}  height={size * 0.32} fill="rgba(255,47,174,0.25)" />
-      {/* Palm trunk */}
-      <Path d={`M ${cx - 1} ${baseY} C ${cx + 2} ${(baseY + crownY) / 2}, ${cx - 2} ${(baseY + crownY) / 2}, ${cx} ${crownY}`}
-        stroke="#FF2FAE" strokeWidth={2} strokeLinecap="round" fill="none" strokeOpacity={0.9} />
-      {/* Fronds */}
-      <Path d={`M ${cx} ${crownY} C ${cx + L * 0.4} ${crownY - L * 0.3}, ${cx + L} ${crownY}, ${cx + L} ${crownY + L * 0.4}`}
-        stroke="#FF2FAE" strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.85} />
-      <Path d={`M ${cx} ${crownY} C ${cx + L * 0.2} ${crownY - L * 0.7}, ${cx + L * 0.5} ${crownY - L}, ${cx + L * 0.5} ${crownY - L * 0.6}`}
-        stroke="#FF2FAE" strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.85} />
-      <Path d={`M ${cx} ${crownY} C ${cx} ${crownY - L * 0.8}, ${cx} ${crownY - L * 1.1}, ${cx} ${crownY - L}`}
-        stroke="#00E5FF" strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.85} />
-      <Path d={`M ${cx} ${crownY} C ${cx - L * 0.2} ${crownY - L * 0.7}, ${cx - L * 0.5} ${crownY - L}, ${cx - L * 0.5} ${crownY - L * 0.6}`}
-        stroke="#00E5FF" strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.85} />
-      <Path d={`M ${cx} ${crownY} C ${cx - L * 0.4} ${crownY - L * 0.3}, ${cx - L} ${crownY}, ${cx - L} ${crownY + L * 0.4}`}
-        stroke="#00E5FF" strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.85} />
-      {/* Pink horizon line */}
-      <Line x1={0} y1={size * 0.68} x2={size} y2={size * 0.68}
-        stroke="#FF2FAE" strokeWidth={0.8} strokeOpacity={0.55} />
-    </Svg>
-  );
-}
-
 // ─── Theme card ───────────────────────────────────────────────────────────────
 function ThemeCard({
   theme,
@@ -102,7 +67,6 @@ function ThemeCard({
 }) {
   const pressAnim = useRef(new Animated.Value(1)).current;
   const isDragon = theme.id === 'dragon_fortune';
-  const isVice   = theme.id === 'vice_nights';
 
   // Derive accent colors from the theme itself
   const primary   = theme.accentPrimary;
@@ -122,13 +86,10 @@ function ThemeCard({
 
   const bgColors: [string, string, string] = isDragon
     ? ['#120000', '#0A0000', '#060000']
-    : isVice
-    ? ['#130022', '#0A001A', '#05081B']
     : ['#0e0028', '#08001a', '#050010'];
 
   function Preview() {
     if (isDragon) return <DragonScalePreview size={42} />;
-    if (isVice)   return <ViceNightsPreview size={42} />;
     return <NeonMandalaPreview size={42} />;
   }
 
