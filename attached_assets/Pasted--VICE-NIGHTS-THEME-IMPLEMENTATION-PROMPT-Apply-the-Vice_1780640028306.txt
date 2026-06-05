@@ -1,0 +1,324 @@
+## VICE NIGHTS THEME IMPLEMENTATION PROMPT
+
+Apply the **Vice Nights** theme across the entire gameplay engine and all poker game modes. This is not a partial skin update. This is a complete visual overhaul of the gameplay experience while preserving all existing game logic and functionality.
+
+### CORE THEME DIRECTION
+
+Vice Nights is a premium 1980s Miami nightlife aesthetic inspired by:
+
+* Miami Vice
+* Ocean Drive at night
+* Scarface luxury lifestyle
+* Neon-lit South Beach
+* GTA Vice City atmosphere
+* Retro synthwave
+* Palm trees
+* Wet reflective streets
+* Luxury penthouses
+* High-end casinos
+
+The theme should feel like a private high-stakes poker game taking place in a neon-drenched Miami nightclub at midnight.
+
+NOT:
+
+* Cartoon
+* Cyberpunk
+* Futuristic sci-fi
+* Vaporwave meme aesthetic
+* Arcade game
+
+INSTEAD:
+
+* Premium
+* Luxurious
+* Mature
+* Sophisticated
+* Cinematic
+* AAA-quality mobile casino experience
+
+---
+
+# TABLE DESIGN
+
+Replace the current poker table visuals with the Vice Nights table.
+
+Requirements:
+
+* Black table surface
+* Deep charcoal interior
+* Neon pink and cyan trim
+* Sharp angular geometric frame
+* Double neon border
+* No rounded casino-style edges
+* Use the exact angular frame style shown in the reference
+
+The table border should glow subtly.
+
+Colors:
+
+* Hot Pink Neon
+* Electric Cyan
+* Purple Accent Glow
+* Deep Black
+
+---
+
+# TABLE TITLE
+
+Add:
+
+"VICE NIGHTS"
+
+directly above the community card area.
+
+Typography:
+
+* Retro 1980s script font
+* Similar to classic Miami Vice branding
+* Bright pink neon
+* Subtle glow
+* High readability
+
+This title should be integrated into the table frame itself.
+
+---
+
+# BACKGROUND ENVIRONMENT
+
+Replace existing gameplay backgrounds with:
+
+### Ocean Drive Night Scene
+
+Include:
+
+* Palm trees
+* Neon hotels
+* Purple sunset horizon
+* Pink sky gradients
+* Cyan highlights
+* Wet reflective pavement
+* Neon signs
+* South Beach architecture
+
+No vehicles.
+
+The background should remain visible but never distract from gameplay.
+
+Apply depth blur where needed.
+
+---
+
+# COMMUNITY CARD AREA
+
+Maintain exact card positioning.
+
+Community card slots should use:
+
+* Neon pink outlines
+* Cyan accent highlights
+* Clean geometric shapes
+* Thin glowing borders
+
+No heavy effects that reduce card visibility.
+
+---
+
+# POT DISPLAY
+
+Redesign pot display.
+
+Requirements:
+
+* Angular geometric shape
+* Cyan and pink neon trim
+* Black center
+* Large readable numbers
+
+Text:
+
+POT
+
+in cyan
+
+Amount:
+
+Bright pink
+
+Example:
+
+POT 150
+
+---
+
+# PLAYER AVATARS
+
+Keep current avatar functionality.
+
+Update styling:
+
+* Neon circular borders
+* Cyan and pink glow
+* Premium nightclub aesthetic
+
+Player chip counts:
+
+White text
+
+Readable at all sizes.
+
+---
+
+# PLAYER HAND CARDS
+
+Keep standard playing cards.
+
+Add:
+
+* Slight neon edge glow
+* Premium casino finish
+* Enhanced shadow depth
+
+Cards must remain highly readable.
+
+---
+
+# RAISE SECTION
+
+Completely redesign raise section.
+
+Layout:
+
+Palm Tree Icon — RAISE VALUE — Palm Tree Icon
+
+Example:
+
+🌴   RAISE 112   🌴
+
+Typography:
+
+* Retro synthwave script
+* Cyan and pink neon accents
+* High contrast
+
+Add subtle glow.
+
+---
+
+# BETTING SLIDER
+
+Replace current slider styling.
+
+Requirements:
+
+* Thin luxury slider track
+* Cyan to pink gradient fill
+* Neon palm tree chip icon as handle
+* Black background
+
+Slider should feel premium and responsive.
+
+No bulky casino sliders.
+
+---
+
+# ACTION BUTTONS
+
+Apply Vice Nights styling to:
+
+* Fold
+* Call
+* Raise
+* All In
+
+Requirements:
+
+### Fold
+
+Pink neon
+
+### Call
+
+Cyan neon
+
+### Raise
+
+Deep blue neon
+
+### All In
+
+Hot pink neon
+
+Button Style:
+
+* Black glass background
+* Neon borders
+* Subtle glow
+* Premium depth
+* Modern luxury appearance
+
+No flat buttons.
+
+---
+
+# HUD AND UI ELEMENTS
+
+Apply Vice Nights styling to:
+
+* Headers
+* Menus
+* Bet indicators
+* Player labels
+* Pot displays
+* Turn indicators
+* Dealer button
+* Status notifications
+
+All UI elements should share:
+
+* Black backgrounds
+* Pink highlights
+* Cyan highlights
+* Purple glow accents
+
+---
+
+# ANIMATIONS
+
+Add subtle:
+
+* Neon flicker effects
+* Soft glow pulses
+* Light reflections
+* Animated neon breathing
+
+Do not create distracting animations.
+
+Maintain smooth 60fps performance.
+
+---
+
+# COMPATIBILITY REQUIREMENTS
+
+Apply this theme consistently across:
+
+* Texas Hold'em
+* Three Card Poker
+* Blackjack
+* Omaha
+* Sit & Go
+* Cash Games
+* Tournaments
+* Practice Tables
+* Featured Tables
+
+All game modes must use the same Vice Nights visual language.
+
+---
+
+# FINAL QUALITY REQUIREMENT
+
+The finished product should look like a premium AAA social casino game that could compete visually with the highest-grossing mobile poker games on the App Store.
+
+The overall feeling should be:
+
+**"High-stakes poker at a luxury neon nightclub in 1980s Miami."**

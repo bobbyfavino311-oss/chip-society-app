@@ -32,6 +32,8 @@ import NeonAvatarSeat from '@/components/NeonAvatar';
 import { useTableTheme } from '@/context/TableThemeContext';
 import DragonBackground from '@/components/DragonBackground';
 import DragonCardFrame from '@/components/DragonCardFrame';
+import ViceBackground from '@/components/ViceBackground';
+import ViceCardFrame from '@/components/ViceCardFrame';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -395,6 +397,7 @@ export default function PracticeScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useTableTheme();
   const isDragon = theme.id === 'dragon_fortune';
+  const isVice   = theme.id === 'vice_nights';
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -595,6 +598,7 @@ export default function PracticeScreen() {
 
       {/* Theme atmospheric backgrounds */}
       {isDragon && <DragonBackground />}
+      {isVice   && <ViceBackground />}
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -678,9 +682,9 @@ export default function PracticeScreen() {
           }]} />
         ))}
 
-        {/* Community card board — dark glass surface (wrapped for Dragon frame) */}
+        {/* Community card board — dark glass surface (wrapped for Dragon/Vice frame) */}
         <View
-          onLayout={isDragon ? (e) => {
+          onLayout={(isDragon || isVice) ? (e) => {
             const { width, height } = e.nativeEvent.layout;
             setTableLayout({ w: width, h: height });
           } : undefined}
@@ -688,6 +692,9 @@ export default function PracticeScreen() {
         >
           {isDragon && tableLayout.w > 0 && (
             <DragonCardFrame width={tableLayout.w} height={tableLayout.h} />
+          )}
+          {isVice && tableLayout.w > 0 && (
+            <ViceCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
         <View style={[styles.tableSurface, {
           borderColor: theme.tableSurfaceBorder,

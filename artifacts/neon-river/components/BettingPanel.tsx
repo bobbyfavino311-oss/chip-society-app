@@ -68,6 +68,44 @@ function DragonHandle() {
   );
 }
 
+// ─── Vice Nights raise label  🌴  RAISE  amount  🌴 ───────────────────────────
+function ViceRaiseLabel({ amount }: { amount: string }) {
+  return (
+    <View style={vn.raiseRow}>
+      <Svg width={22} height={26} viewBox="0 0 22 26">
+        <Path d="M 11 26 C 12 20, 11 14, 12 9" stroke="#FF2FAE" strokeWidth={2} strokeLinecap="round" fill="none" />
+        <Path d="M 12 9 C 15 6, 19 7, 19 11" stroke="#FF2FAE" strokeWidth={1.1} strokeLinecap="round" fill="none" />
+        <Path d="M 12 9 C 13 4, 15 1, 15 4" stroke="#00E5FF" strokeWidth={0.9} strokeLinecap="round" fill="none" />
+        <Path d="M 12 9 C 7 6, 3 7, 3 11" stroke="#00E5FF" strokeWidth={1.1} strokeLinecap="round" fill="none" />
+      </Svg>
+      <Text style={vn.raiseLabel}>RAISE</Text>
+      <Text style={vn.raiseAmt}>{amount}</Text>
+      <Svg width={22} height={26} viewBox="0 0 22 26">
+        <Path d="M 11 26 C 10 20, 11 14, 10 9" stroke="#FF2FAE" strokeWidth={2} strokeLinecap="round" fill="none" />
+        <Path d="M 10 9 C 7 6, 3 7, 3 11" stroke="#FF2FAE" strokeWidth={1.1} strokeLinecap="round" fill="none" />
+        <Path d="M 10 9 C 9 4, 7 1, 7 4" stroke="#00E5FF" strokeWidth={0.9} strokeLinecap="round" fill="none" />
+        <Path d="M 10 9 C 15 6, 19 7, 19 11" stroke="#00E5FF" strokeWidth={1.1} strokeLinecap="round" fill="none" />
+      </Svg>
+    </View>
+  );
+}
+
+// ─── Vice Nights slider handle (palm-circle) ──────────────────────────────────
+function ViceHandle() {
+  const S = HANDLE_SIZE;
+  return (
+    <View style={{ width: S, height: S, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={S} height={S} viewBox="0 0 22 22">
+        <Circle cx={11} cy={11} r={10} fill="#08001C" stroke="#FF2FAE" strokeWidth={1.8} strokeOpacity={0.92} />
+        <Path d="M 11 19 C 12 16, 11 13, 12 10" stroke="#FF2FAE" strokeWidth={1.3} strokeLinecap="round" fill="none" />
+        <Path d="M 12 10 C 15 7.5, 18 8.5, 18 11.5" stroke="#FF2FAE" strokeWidth={0.9} strokeLinecap="round" fill="none" />
+        <Path d="M 12 10 C 10 6, 8 5.5, 9 8" stroke="#00E5FF" strokeWidth={0.8} strokeLinecap="round" fill="none" />
+        <Path d="M 12 10 C 8 7.5, 5 8.5, 5 11.5" stroke="#00E5FF" strokeWidth={0.9} strokeLinecap="round" fill="none" />
+      </Svg>
+    </View>
+  );
+}
+
 export default function BettingPanel({
   canCheck,
   callAmount,
@@ -83,6 +121,7 @@ export default function BettingPanel({
 }: BettingPanelProps) {
   const { theme } = useTableTheme();
   const isDragon = theme.id === 'dragon_fortune';
+  const isVice   = theme.id === 'vice_nights';
 
   const maxRaise = myChips;
   const canRaise = myChips > callAmount && myChips >= minRaise;
@@ -122,6 +161,8 @@ export default function BettingPanel({
   // ── Per-theme container overrides ────────────────────────────────────────
   const containerStyle = isDragon
     ? { backgroundColor: 'rgba(6,0,0,0.97)',  borderTopColor: 'rgba(139,0,0,0.50)' }
+    : isVice
+    ? { backgroundColor: 'rgba(4,2,14,0.97)', borderTopColor: 'rgba(255,47,174,0.35)' }
     : {};
 
   return (
@@ -137,6 +178,7 @@ export default function BettingPanel({
                   style={[
                     styles.quickBtn,
                     isDragon && { backgroundColor: 'rgba(20,0,0,0.6)', borderWidth: 1, borderColor: 'rgba(139,0,0,0.30)' },
+                    isVice   && { backgroundColor: 'rgba(4,0,20,0.7)',  borderWidth: 1, borderColor: 'rgba(255,47,174,0.25)' },
                   ]}
                   onPress={() => setRaiseAmount(clampRaise(b.amount))}
                   disabled={disabled}
@@ -145,12 +187,14 @@ export default function BettingPanel({
                   <Text style={[
                     styles.quickLabel,
                     isDragon && { color: 'rgba(200,155,60,0.55)' },
+                    isVice   && { color: 'rgba(0,229,255,0.50)' },
                   ]}>
                     {b.label}
                   </Text>
                   <Text style={[
                     styles.quickAmt,
                     isDragon && { color: '#EAE3D2' },
+                    isVice   && { color: '#FFFFFF' },
                   ]}>
                     {fmt(b.amount)}
                   </Text>
@@ -160,6 +204,7 @@ export default function BettingPanel({
                 style={[
                   styles.quickBtn,
                   isDragon ? { backgroundColor: 'rgba(50,0,0,0.5)',   borderWidth: 1, borderColor: 'rgba(139,0,0,0.45)' }
+                  : isVice  ? { backgroundColor: 'rgba(60,0,30,0.6)',  borderWidth: 1, borderColor: 'rgba(255,47,174,0.40)' }
                   : styles.quickAllIn,
                 ]}
                 onPress={() => setRaiseAmount(maxRaise)}
@@ -168,13 +213,13 @@ export default function BettingPanel({
               >
                 <Text style={[
                   styles.quickLabel,
-                  isDragon ? { color: '#8B0000'  } : { color: colors.secondary },
+                  isDragon ? { color: '#8B0000' } : isVice ? { color: '#FF2FAE' } : { color: colors.secondary },
                 ]}>
                   ALL IN
                 </Text>
                 <Text style={[
                   styles.quickAmt,
-                  isDragon ? { color: '#C89B3C'  } : { color: colors.secondary },
+                  isDragon ? { color: '#C89B3C' } : isVice ? { color: '#FF2FAE' } : { color: colors.secondary },
                 ]}>
                   {fmt(maxRaise)}
                 </Text>
@@ -185,6 +230,8 @@ export default function BettingPanel({
           {/* Raise amount display */}
           {isDragon ? (
             <DragonRaiseLabel amount={fmt(raiseAmount)} />
+          ) : isVice ? (
+            <ViceRaiseLabel amount={fmt(raiseAmount)} />
           ) : (
             <View style={styles.sliderSection}>
               <View style={styles.raiseDisplay}>
@@ -200,24 +247,36 @@ export default function BettingPanel({
               style={[
                 styles.sliderTrack,
                 isDragon && { backgroundColor: 'rgba(40,0,0,0.5)' },
+                isVice   && { backgroundColor: 'rgba(0,0,8,0.50)', overflow: 'hidden' },
               ]}
               onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
               {...panResponder.panHandlers}
             >
               {/* Fill */}
-              <View style={[styles.sliderFill, { width: `${Math.round(sliderRatio * 100)}%` }]}>
-                {isDragon ? (
-                  <LinearGradient colors={['#3B0000', '#8B0000']}
+              {isVice ? (
+                <View style={[styles.sliderFill, { width: '100%', opacity: 0.80 }]}>
+                  <LinearGradient colors={['#00E5FF', '#FF2FAE']}
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
-                ) : (
-                  <LinearGradient colors={[colors.primary, colors.secondary]}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
-                )}
-              </View>
+                </View>
+              ) : (
+                <View style={[styles.sliderFill, { width: `${Math.round(sliderRatio * 100)}%` }]}>
+                  {isDragon ? (
+                    <LinearGradient colors={['#3B0000', '#8B0000']}
+                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
+                  ) : (
+                    <LinearGradient colors={[colors.primary, colors.secondary]}
+                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
+                  )}
+                </View>
+              )}
               {/* Handle */}
               {isDragon ? (
                 <View style={[styles.sliderHandle, { left: handleLeft }]}>
                   <DragonHandle />
+                </View>
+              ) : isVice ? (
+                <View style={[styles.sliderHandle, { left: handleLeft, shadowColor: '#FF2FAE' }]}>
+                  <ViceHandle />
                 </View>
               ) : (
                 <View style={[styles.sliderHandle, { left: handleLeft }]}>
@@ -227,10 +286,10 @@ export default function BettingPanel({
             </View>
 
             <View style={styles.sliderLabels}>
-              <Text style={[styles.sliderMin, isDragon && { color: 'rgba(200,155,60,0.35)' }]}>
+              <Text style={[styles.sliderMin, isDragon && { color: 'rgba(200,155,60,0.35)' }, isVice && { color: 'rgba(0,229,255,0.45)' }]}>
                 {fmt(minRaise)}
               </Text>
-              <Text style={[styles.sliderMax, isDragon && { color: 'rgba(200,155,60,0.35)' }]}>
+              <Text style={[styles.sliderMax, isDragon && { color: 'rgba(200,155,60,0.35)' }, isVice && { color: 'rgba(255,47,174,0.45)' }]}>
                 {fmt(maxRaise)}
               </Text>
             </View>
@@ -243,42 +302,40 @@ export default function BettingPanel({
 
         {/* FOLD */}
         <TouchableOpacity
-          style={[styles.actionBtn, isDragon ? dr.foldBtn : styles.foldBtn]}
+          style={[styles.actionBtn, isDragon ? dr.foldBtn : isVice ? vn.foldBtn : styles.foldBtn]}
           onPress={onFold} disabled={disabled} activeOpacity={0.75}
         >
           <LinearGradient
-            colors={isDragon ? ['rgba(80,0,0,0.25)','rgba(30,0,0,0.15)'] : ['transparent','transparent']}
+            colors={['transparent','transparent']}
             style={StyleSheet.absoluteFill}
           />
-          <Text style={[styles.foldText, isDragon && dr.foldText]}>FOLD</Text>
+          <Text style={[styles.foldText, isDragon && dr.foldText, isVice && vn.foldText]}>FOLD</Text>
         </TouchableOpacity>
 
         {/* CHECK / CALL */}
         {canCheck ? (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.checkBtn : styles.checkBtn]}
+            style={[styles.actionBtn, isDragon ? dr.checkBtn : isVice ? vn.checkBtn : styles.checkBtn]}
             onPress={onCheck} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient
-              colors={isDragon ? ['rgba(15,50,40,0.35)','rgba(10,30,25,0.20)']
-                : ['rgba(0,180,80,0.3)','rgba(0,120,50,0.15)']}
+              colors={['transparent','transparent']}
               style={StyleSheet.absoluteFill}
             />
-            <Text style={[styles.checkText, isDragon && dr.checkText]}>CHECK</Text>
+            <Text style={[styles.checkText, isDragon && dr.checkText, isVice && vn.checkText]}>CHECK</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.callBtn : styles.callBtn]}
+            style={[styles.actionBtn, isDragon ? dr.callBtn : isVice ? vn.callBtn : styles.callBtn]}
             onPress={onCall} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient
-              colors={isDragon ? ['rgba(15,50,40,0.35)','rgba(10,30,25,0.20)']
-                : ['rgba(0,180,80,0.3)','rgba(0,120,50,0.15)']}
+              colors={['transparent','transparent']}
               style={StyleSheet.absoluteFill}
             />
-            <Text style={[styles.callText, isDragon && dr.callText]}>
+            <Text style={[styles.callText, isDragon && dr.callText, isVice && vn.callText]}>
               CALL{'\n'}
-              <Text style={[styles.callAmt, isDragon && dr.callAmt]}>{fmt(callAmount)}</Text>
+              <Text style={[styles.callAmt, isDragon && dr.callAmt, isVice && vn.callAmt]}>{fmt(callAmount)}</Text>
             </Text>
           </TouchableOpacity>
         )}
@@ -286,17 +343,16 @@ export default function BettingPanel({
         {/* RAISE */}
         {canRaise && (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.raiseBtn : styles.raiseBtn]}
+            style={[styles.actionBtn, isDragon ? dr.raiseBtn : isVice ? vn.raiseBtn : styles.raiseBtn]}
             onPress={() => onRaise(raiseAmount)} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient
-              colors={isDragon ? ['rgba(30,20,0,0.40)','rgba(15,10,0,0.25)']
-                : ['rgba(0,140,200,0.35)','rgba(0,80,140,0.18)']}
+              colors={['transparent','transparent']}
               style={StyleSheet.absoluteFill}
             />
-            <Text style={[styles.raiseText, isDragon && dr.raiseText]}>
+            <Text style={[styles.raiseText, isDragon && dr.raiseText, isVice && vn.raiseText]}>
               RAISE{'\n'}
-              <Text style={[styles.raiseInlineAmt, isDragon && dr.raiseInlineAmt]}>
+              <Text style={[styles.raiseInlineAmt, isDragon && dr.raiseInlineAmt, isVice && vn.raiseInlineAmt]}>
                 {fmt(raiseAmount)}
               </Text>
             </Text>
@@ -306,15 +362,14 @@ export default function BettingPanel({
         {/* ALL IN */}
         {canAllIn && (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.allInBtn : styles.allInBtn]}
+            style={[styles.actionBtn, isDragon ? dr.allInBtn : isVice ? vn.allInBtn : styles.allInBtn]}
             onPress={onAllIn} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient
-              colors={isDragon ? ['rgba(90,0,0,0.35)','rgba(40,0,0,0.20)']
-                : ['rgba(180,0,100,0.35)','rgba(120,0,70,0.18)']}
+              colors={['transparent','transparent']}
               style={StyleSheet.absoluteFill}
             />
-            <Text style={[styles.allInText, isDragon && dr.allInText]}>ALL{'\n'}IN</Text>
+            <Text style={[styles.allInText, isDragon && dr.allInText, isVice && vn.allInText]}>ALL{'\n'}IN</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -625,5 +680,127 @@ const dr = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Orbitron_700Bold',
     lineHeight: 14,
+  },
+});
+
+// ─── Vice Nights overrides ────────────────────────────────────────────────────
+const vn = StyleSheet.create({
+  raiseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 2,
+  },
+  raiseLabel: {
+    color: '#FF2FAE',
+    fontSize: 9,
+    fontWeight: '700',
+    fontStyle: 'italic',
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+    textShadowColor: '#FF2FAE',
+    textShadowRadius: 6,
+    textShadowOffset: { width: 0, height: 0 },
+  },
+  raiseAmt: {
+    color: '#00E5FF',
+    fontSize: 22,
+    fontWeight: '900',
+    fontFamily: 'Inter_700Bold',
+    lineHeight: 26,
+    textShadowColor: '#00E5FF',
+    textShadowRadius: 8,
+    textShadowOffset: { width: 0, height: 0 },
+  },
+
+  foldBtn: {
+    backgroundColor: '#A8004E',
+    borderWidth: 1.5,
+    borderColor: '#FF2FAE',
+    shadowColor: '#FF2FAE',
+    shadowOpacity: 0.65,
+    shadowRadius: 10,
+  },
+  foldText: { color: '#FFFFFF', fontWeight: '900' },
+
+  checkBtn: {
+    backgroundColor: '#085C5C',
+    borderWidth: 1.5,
+    borderColor: '#00E5FF',
+    shadowColor: '#00E5FF',
+    shadowOpacity: 0.50,
+    shadowRadius: 8,
+  },
+  checkText: { color: '#FFFFFF' },
+
+  callBtn: {
+    backgroundColor: '#085C5C',
+    borderWidth: 1.5,
+    borderColor: '#00E5FF',
+    shadowColor: '#00E5FF',
+    shadowOpacity: 0.50,
+    shadowRadius: 8,
+  },
+  callText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    fontFamily: 'Orbitron_400Regular',
+  },
+  callAmt: {
+    color: '#00E5FF',
+    fontSize: 12,
+    fontWeight: '900',
+    fontFamily: 'Inter_700Bold',
+  },
+
+  raiseBtn: {
+    backgroundColor: '#18285A',
+    borderWidth: 1.5,
+    borderColor: '#6060FF',
+    shadowColor: '#6060FF',
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
+  },
+  raiseText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+    fontStyle: 'italic',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    fontFamily: 'Orbitron_400Regular',
+  },
+  raiseInlineAmt: {
+    color: '#FF2FAE',
+    fontSize: 12,
+    fontWeight: '900',
+    fontStyle: 'normal',
+    fontFamily: 'Inter_700Bold',
+  },
+
+  allInBtn: {
+    backgroundColor: '#A8004E',
+    borderWidth: 1.5,
+    borderColor: '#FF2FAE',
+    shadowColor: '#FF2FAE',
+    shadowOpacity: 0.65,
+    shadowRadius: 10,
+    maxWidth: 64,
+  },
+  allInText: {
+    color: '#FFD700',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    fontFamily: 'Orbitron_700Bold',
+    lineHeight: 14,
+    textShadowColor: '#FFD700',
+    textShadowRadius: 4,
+    textShadowOffset: { width: 0, height: 0 },
   },
 });
