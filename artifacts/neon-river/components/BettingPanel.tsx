@@ -590,44 +590,63 @@ const vn = StyleSheet.create({
     paddingVertical: 2,
   },
   raiseLabel: {
-    color: 'rgba(255,47,174,0.60)',
-    fontSize: 8,
+    color: '#FF2FAE',
+    fontSize: 9,
     fontWeight: '700',
-    letterSpacing: 3,
-    fontFamily: 'Orbitron_400Regular',
+    fontStyle: 'italic',
+    letterSpacing: 2,
+    fontFamily: 'Inter_700Bold',
+    textShadowColor: '#FF2FAE',
+    textShadowRadius: 6,
+    textShadowOffset: { width: 0, height: 0 },
   },
   raiseAmt: {
     color: '#00E5FF',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '900',
     fontFamily: 'Inter_700Bold',
-    lineHeight: 24,
+    lineHeight: 26,
+    textShadowColor: '#00E5FF',
+    textShadowRadius: 8,
+    textShadowOffset: { width: 0, height: 0 },
   },
 
+  // FOLD — solid hot pink/magenta (matches reference)
   foldBtn: {
-    backgroundColor: 'rgba(8,3,20,0.75)',
+    backgroundColor: '#A8004E',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,47,174,0.65)',
+    borderColor: '#FF2FAE',
     shadowColor: '#FF2FAE',
+    shadowOpacity: 0.60,
+    shadowRadius: 10,
   },
-  foldText: { color: '#FF2FAE' },
+  foldText: {
+    color: '#FFFFFF',
+    fontWeight: '900',
+  },
 
+  // CHECK — solid teal (matches reference CALL button style)
   checkBtn: {
-    backgroundColor: 'rgba(3,8,22,0.75)',
+    backgroundColor: '#085C5C',
     borderWidth: 1.5,
-    borderColor: 'rgba(0,229,255,0.55)',
+    borderColor: '#00E5FF',
     shadowColor: '#00E5FF',
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
   },
-  checkText: { color: '#00E5FF' },
+  checkText: { color: '#FFFFFF' },
 
+  // CALL — solid teal (matches reference)
   callBtn: {
-    backgroundColor: 'rgba(3,8,22,0.75)',
+    backgroundColor: '#085C5C',
     borderWidth: 1.5,
-    borderColor: 'rgba(0,229,255,0.55)',
+    borderColor: '#00E5FF',
     shadowColor: '#00E5FF',
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
   },
   callText: {
-    color: '#F2F2F2',
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -641,14 +660,17 @@ const vn = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
   },
 
+  // RAISE — solid dark navy (matches reference)
   raiseBtn: {
-    backgroundColor: 'rgba(8,3,20,0.75)',
+    backgroundColor: '#18285A',
     borderWidth: 1.5,
-    borderColor: 'rgba(191,95,255,0.55)',
-    shadowColor: '#bf5fff',
+    borderColor: '#6060FF',
+    shadowColor: '#6060FF',
+    shadowOpacity: 0.40,
+    shadowRadius: 8,
   },
   raiseText: {
-    color: '#F2F2F2',
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -662,21 +684,27 @@ const vn = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
   },
 
+  // ALL IN — solid hot pink, gold text (matches reference)
   allInBtn: {
-    backgroundColor: 'rgba(8,3,20,0.75)',
+    backgroundColor: '#A8004E',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,47,174,0.65)',
+    borderColor: '#FF2FAE',
     shadowColor: '#FF2FAE',
-    maxWidth: 60,
+    shadowOpacity: 0.60,
+    shadowRadius: 10,
+    maxWidth: 64,
   },
   allInText: {
-    color: '#ffd700',
+    color: '#FFD700',
     fontSize: 11,
     fontWeight: '900',
     letterSpacing: 0.5,
     textAlign: 'center',
     fontFamily: 'Orbitron_700Bold',
     lineHeight: 14,
+    textShadowColor: '#FFD700',
+    textShadowRadius: 4,
+    textShadowOffset: { width: 0, height: 0 },
   },
 });
 
