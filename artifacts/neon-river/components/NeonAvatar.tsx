@@ -1,6 +1,6 @@
-// ─── NeonAvatar — clean individual neon symbol avatars ─────────────────────────
-// Each avatar is a separate 512×512 PNG: black circular bg, neon SVG icon.
-// Loaded with resizeMode="contain" — no cropping, no sprite-sheet offsets.
+// ─── NeonAvatar — collectible scene avatars ─────────────────────────────────────
+// Each avatar is a 1024×1024 AI-illustrated scene PNG.
+// resizeMode="cover" fills the circular clip for a full-bleed portrait look.
 
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, View } from 'react-native';
@@ -138,15 +138,15 @@ export default function NeonAvatar({
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        {/* PNG avatar — 92% scale fills the clip circle; icons are transparent-bg */}
+        {/* Scene avatar — cover fills the circular clip edge-to-edge */}
         <Image
           source={source}
           style={{
-            width:  Math.round(inner * 0.92),
-            height: Math.round(inner * 0.92),
+            width:  inner,
+            height: inner,
             opacity: isLocked ? 0.15 : 1,
           }}
-          resizeMode="contain"
+          resizeMode="cover"
         />
 
         {/* Lock overlay */}

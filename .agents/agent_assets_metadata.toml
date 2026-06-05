@@ -216,6 +216,96 @@ uri = "file://artifacts/neon-river/assets/characters/character_40.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "_jSrH9awa0oNkZZjtCM-n"
+uri = "file://artifacts/neon-river/assets/avatars/martini.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "lNN-LbYCFy3_X1ggtJLv6"
+uri = "file://artifacts/neon-river/assets/avatars/palm.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "8NcSijOoZsCFkijTxj1x8"
+uri = "file://artifacts/neon-river/assets/avatars/dice_stack.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "1OsyfpmzZncrTD8dRlq-B"
+uri = "file://artifacts/neon-river/assets/avatars/cassette.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "mx5hiyscXKq5Maaf_w2wp"
+uri = "file://artifacts/neon-river/assets/avatars/saturn.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Q9pcWAM48vnveV5Kh6Q8o"
+uri = "file://artifacts/neon-river/assets/avatars/vinyl.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "CPFKjUJsalLIIFV2Uuq8p"
+uri = "file://artifacts/neon-river/assets/avatars/cherry.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OVfSThekepIQuH3CtFBqb"
+uri = "file://artifacts/neon-river/assets/avatars/flamingo.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "pqQ6kz4pvi7HXLpGIeyBS"
+uri = "file://artifacts/neon-river/assets/avatars/sunset.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "zcjgd1txJJL7do93DxuVw"
+uri = "file://artifacts/neon-river/assets/avatars/ace.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Fs4BVQWrXWDMV7WhJx5rI"
+uri = "file://artifacts/neon-river/assets/avatars/hourglass.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "x3YSkgG-EmEag7_yTgB3R"
+uri = "file://artifacts/neon-river/assets/avatars/dragon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Mu_4uYzBM4veOhSv81Wr3"
+uri = "file://artifacts/neon-river/assets/avatars/poker_chip.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "NFxrSSOmn5Gmaw5giWgf5"
+uri = "file://artifacts/neon-river/assets/avatars/champagne.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "bqmEpZozMLpHSvjpmKTyI"
+uri = "file://artifacts/neon-river/assets/avatars/moon.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
