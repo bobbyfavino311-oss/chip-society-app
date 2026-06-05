@@ -1,0 +1,411 @@
+VICE NIGHTS — LEGENDARY TABLE THEME
+
+Create a premium unlockable table theme called "Vice Nights."
+
+This is NOT simply a background image.
+
+The entire poker experience should transform into a neon-soaked 1980s Miami nightlife environment inspired by Ocean Drive, luxury sports cars, palm trees, high-stakes gambling, midnight city lights, and retro synthwave culture.
+
+The theme should feel like:
+
+• Miami Vice
+• Ocean Drive at midnight
+• High-stakes underground poker
+• Luxury nightlife
+• Neon reflections after rain
+• Exotic sports cars
+• Private penthouse poker games
+• Wealth, danger, and excess
+
+This should be the signature theme of the game.
+
+──────────────────────────────
+
+OVERALL ATMOSPHERE
+
+The player feels like they are gambling in a secret high-stakes poker club in South Beach after midnight.
+
+The streets are wet from a recent rain.
+
+Neon signs reflect off black pavement.
+
+Palm trees sway in the distance.
+
+Luxury cars idle nearby.
+
+Pink and cyan neon illuminate everything.
+
+The environment should feel alive and expensive.
+
+──────────────────────────────
+
+PRIMARY COLOR PALETTE
+
+Hot Pink Neon
+#FF2FAE
+
+Electric Cyan
+#00E5FF
+
+Deep Midnight Purple
+#130022
+
+Dark Navy
+#05081B
+
+Black Glass
+#090909
+
+Soft White Highlights
+#F2F2F2
+
+Accent Colors:
+
+Miami Sunset Orange
+Ferrari Red
+Champagne Gold
+
+──────────────────────────────
+
+TABLE DESIGN
+
+The table itself becomes a custom Vice Nights poker table.
+
+Features:
+
+• Black glass surface
+• Neon pink edge lighting
+• Cyan underglow
+• Chrome trim
+• Wet reflective finish
+• Palm tree engravings
+• Retro geometric accents
+
+The table should look like a custom piece of furniture from a luxury South Beach nightclub.
+
+──────────────────────────────
+
+COMMUNITY CARD AREA
+
+Replace the standard board.
+
+Design:
+
+Large neon frame
+
+Pink and cyan lighting
+
+Chrome trim
+
+Palm silhouettes integrated into corners
+
+Subtle cracked neon texture
+
+Center branding:
+
+VICE CITY
+
+written in iconic cursive neon script.
+
+Not generic text.
+
+Should feel like a famous nightclub logo.
+
+──────────────────────────────
+
+BACKGROUND ENVIRONMENT
+
+Create a living Miami skyline environment.
+
+Features:
+
+• Ocean Drive architecture
+• Neon hotel signs
+• Palm trees
+• Luxury sports cars
+• Reflections on wet streets
+• Purple sunset fading into night
+• Neon storefronts
+• Luxury nightlife atmosphere
+
+Important:
+
+The environment should support gameplay and never overpower it.
+
+──────────────────────────────
+
+POT DISPLAY
+
+Replace standard pot display.
+
+Design:
+
+Chrome and neon plaque
+
+Pink and cyan illumination
+
+Retro-futuristic shape
+
+Large glowing numbers
+
+Looks like signage from an upscale nightclub.
+
+──────────────────────────────
+
+PLAYER AVATAR FRAMES
+
+Create Vice Nights avatar rings.
+
+Design:
+
+Chrome outer ring
+
+Pink inner glow
+
+Cyan highlights
+
+Animated neon pulse
+
+VIP players receive:
+
+Gold and pink variant.
+
+──────────────────────────────
+
+PLAYER SEAT MARKERS
+
+Replace standard dealer marker.
+
+Use:
+
+Golden sunset coin
+
+Palm tree icon
+
+Chrome trim
+
+Soft animated glow.
+
+──────────────────────────────
+
+CARD DESIGN
+
+Custom Vice Nights cards.
+
+Card Backs:
+
+Black background
+
+Neon palm trees
+
+Miami skyline silhouette
+
+Pink and cyan accents
+
+Chrome border
+
+Luxury casino quality.
+
+──────────────────────────────
+
+CHIP DESIGN
+
+Create Vice Nights chips.
+
+Base Material:
+
+Premium ceramic
+
+Color Tiers:
+
+1K = Cyan
+
+5K = Pink
+
+10K = Purple
+
+50K = Chrome
+
+100K = Gold Neon
+
+Center Logos:
+
+Palm tree
+Sunset
+Vice skyline
+Sports car
+Martini glass
+
+──────────────────────────────
+
+BUTTON DESIGN
+
+Completely redesign action buttons.
+
+Each button should feel like a neon sign.
+
+FOLD
+
+Pink neon panel
+
+South Beach skyline silhouette
+
+CALL
+
+Cyan neon panel
+
+Ocean wave lighting
+
+RAISE
+
+Purple panel
+
+Luxury sports car silhouette
+
+ALL IN
+
+Hot pink and gold
+
+Palm trees and pistol silhouette
+
+Most dramatic button on the table.
+
+──────────────────────────────
+
+RAISE SLIDER
+
+Custom Vice Nights slider.
+
+Features:
+
+Chrome frame
+
+Pink-to-cyan gradient fill
+
+Palm tree slider handle
+
+Wet neon reflections
+
+Retro synthwave styling.
+
+──────────────────────────────
+
+DECORATIVE ELEMENTS
+
+Add integrated theme objects:
+
+• Neon martini glass
+• Palm trees
+• Ocean Drive signs
+• Ferrari-style sports cars
+• Luxury yachts
+• Retro sunset graphics
+• Chrome accents
+• Pink neon tubing
+
+Everything should feel handcrafted into the table design.
+
+──────────────────────────────
+
+ANIMATIONS
+
+Small Win:
+
+Neon shimmer
+
+Medium Win:
+
+Palm tree lights pulse
+
+Big Win:
+
+Ocean Drive signs illuminate
+
+Large neon glow sweep
+
+Huge Win:
+
+Entire table transforms into a Miami nightlife celebration
+
+Neon reflections animate
+
+Palm trees glow
+
+Skyline illuminates
+
+No cartoon effects.
+
+No confetti.
+
+No arcade visuals.
+
+──────────────────────────────
+
+AUDIO PACKAGE
+
+Background Music:
+
+Retro synthwave
+
+Miami nightlife soundtrack
+
+Soft electronic beats
+
+Night-driving atmosphere
+
+Sound Effects:
+
+Neon electrical hum
+
+Chrome button clicks
+
+Luxury chip sounds
+
+Big Wins:
+
+Synth stinger
+
+Nightclub bass hit
+
+Crowd reaction
+
+──────────────────────────────
+
+THEME MENU
+
+Settings → Table Themes
+
+Theme Name:
+
+VICE NIGHTS
+
+Rarity:
+
+LEGENDARY
+
+Description:
+
+"Ocean Drive never sleeps. Neon lights, fast cars, luxury yachts, and high-stakes poker under the Miami skyline."
+
+──────────────────────────────
+
+MOST IMPORTANT RULE
+
+Do NOT make this a wallpaper behind a normal poker table.
+
+The entire poker experience must transform.
+
+Every major UI component should be redesigned around the Vice Nights identity:
+
+• Community board
+• Pot display
+• Cards
+• Chips
+• Buttons
+• Slider
+• Avatar frames
+• Animations
+• Audio
+• Visual effects
+
+Players should feel like they entered a completely different casino world inspired by Miami Vice, Ocean Drive, luxury nightlife, and 1980s synthwave culture.
