@@ -1,0 +1,242 @@
+**ATTACHED IMAGE REFERENCE:** Use the attached weapon/item icon sheet as the source inspiration for the collection categories and item types. Do not copy the icons directly. Reimagine each item as a premium collectible avatar matching the visual identity of the game.
+
+---
+
+# AVATAR COLLECTION EXPANSION – VAPORWAVE MIAMI VICE WEAPON SERIES
+
+Create a premium avatar collection based on the attached image. The current avatars in the game have evolved beyond simple neon symbols and must now feel like luxury collectible cosmetics.
+
+Every avatar should match the existing Miami Vice / Vaporwave aesthetic already established in the game's best-performing avatars.
+
+### DO NOT:
+
+* Create flat icons
+* Create vector-style symbols
+* Create mobile inventory assets
+* Create clip-art
+* Create cartoon-style artwork
+* Create simple outlines inside circles
+* Use plain colored backgrounds
+
+### DO:
+
+* Create premium collectible artwork
+* Fill the entire circular avatar frame
+* Use cinematic composition
+* Use dramatic lighting
+* Use luxury vaporwave environments
+* Use Miami nightlife aesthetics
+* Use synthwave color palettes
+* Create artwork players would proudly equip
+
+---
+
+# ART DIRECTION
+
+Style:
+
+* Miami Vice
+* Vaporwave
+* Synthwave
+* Luxury casino lifestyle
+* Neon nightlife
+* Retro futurism
+* High-end digital illustration
+* Premium gaming cosmetics
+
+Color Palette:
+
+* Neon Cyan
+* Electric Blue
+* Hot Pink
+* Magenta
+* Purple
+* Gold
+* Orange Sunset
+* Black backgrounds
+
+Lighting:
+
+* Strong neon glow
+* Reflections
+* Atmospheric haze
+* Water reflections
+* Rim lighting
+* High contrast
+
+---
+
+# COLLECTION 01 – STREET LEGENDS
+
+### Brass Knuckles
+
+Floating chrome brass knuckles over a neon casino floor.
+
+### Baseball Bat
+
+Chrome bat resting against a luxury sports car.
+
+### Axe
+
+Neon axe displayed in a high-end underground club.
+
+### Sledgehammer
+
+Heavy chrome hammer illuminated by pink and cyan lighting.
+
+### Crowbar
+
+Retro Miami underworld scene with glowing crowbar centerpiece.
+
+### Shovel
+
+Chrome shovel standing against a vaporwave sunset backdrop.
+
+---
+
+# COLLECTION 02 – HIGH ROLLER ARSENAL
+
+### Compact Pistol
+
+Luxury chrome pistol displayed in a glass showcase.
+
+### Tactical Pistol
+
+High-end weapon illuminated by neon casino lighting.
+
+### SMG
+
+Futuristic neon submachine gun floating above a synthwave city.
+
+### Compact SMG
+
+Luxury weapon display with holographic lighting.
+
+### Assault Rifle
+
+Chrome rifle displayed against a Miami skyline.
+
+### AK Platform
+
+Retro crime-drama aesthetic with dramatic sunset colors.
+
+### Shotgun
+
+Cinematic weapon display with smoke and reflections.
+
+### Sniper Rifle
+
+Long-range rifle overlooking a neon cityscape.
+
+---
+
+# COLLECTION 03 – CHAOS COLLECTION
+
+### Frag Grenade
+
+Chrome grenade floating over a glowing grid floor.
+
+### Flashbang
+
+Energy-filled futuristic tactical device.
+
+### Smoke Grenade
+
+Purple vapor clouds and neon lighting effects.
+
+### Molotov Cocktail
+
+Glowing bottle with vaporwave flames and reflections.
+
+---
+
+# COLLECTION 04 – UTILITY SERIES
+
+### Spray Can
+
+Neon paint mist with colorful vaporwave effects.
+
+### Walkie Talkie
+
+Retro communication device with holographic glow.
+
+### Radio Device
+
+1980s surveillance aesthetic with neon highlights.
+
+### Camera Lens
+
+Luxury lens with glowing reflections and depth effects.
+
+---
+
+# ENVIRONMENT BACKGROUNDS
+
+Randomly pair items with premium environments:
+
+### Ocean Drive
+
+Palm trees, neon hotels, wet streets.
+
+### High Roller Penthouse
+
+Luxury skyline views.
+
+### VIP Casino
+
+Poker chips, cards, and casino lighting.
+
+### Neon Marina
+
+Luxury yachts and water reflections.
+
+### Vaporwave Sunset
+
+Grid floor and glowing sun.
+
+### Midnight Skyline
+
+Purple cityscape and neon towers.
+
+### Sports Car Garage
+
+Retro exotic vehicles and atmospheric lighting.
+
+### Underground Club
+
+Neon haze, lasers, and dramatic shadows.
+
+---
+
+# RARITY SYSTEM
+
+### Common
+
+Simple premium environment.
+
+### Rare
+
+Enhanced lighting and reflections.
+
+### Epic
+
+Detailed environments and layered effects.
+
+### Legendary
+
+Full cinematic scenes with maximum detail and atmosphere.
+
+---
+
+# QUALITY REQUIREMENT
+
+Every avatar must feel like:
+
+* A premium unlockable cosmetic
+* A luxury poker collectible
+* A battle-pass reward from a AAA game
+* A miniature Miami Vice movie poster
+
+If an avatar looks like a simple icon placed inside a circle, it fails quality control and must be redesigned.
+
+The final collection should visually match the best existing avatars in the game and feel cohesive alongside the Miami Vice, Flamingo, Yacht, Sports Car, High Stakes, and Luxury Poker themed avatars already being used.

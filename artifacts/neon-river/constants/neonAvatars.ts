@@ -71,11 +71,41 @@ export const NEON_AVATARS: NeonAvatar[] = [
   { id: 28, name: 'CASINO CROWN',   rarity: 'LEGENDARY', unlockXP: 175000, unlockCondition: 'Reach 175,000 XP', color: '#ffd700', bgColor: '#1a1100' },
   { id: 29, name: 'POKER KING',     rarity: 'LEGENDARY', unlockXP: 250000, unlockCondition: 'Reach 250,000 XP', color: '#ffaa00', bgColor: '#1a0d00' },
   { id: 30, name: 'MIDNIGHT MIRAGE',rarity: 'LEGENDARY', unlockXP: 400000, unlockCondition: 'Reach 400,000 XP', color: '#a855f7', bgColor: '#0f001e' },
+
+  // ── COLLECTION 01 — STREET LEGENDS (31–36) ───────────────────────────────────
+  { id: 31, name: 'BRASS KNUCKLES', rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#00d4ff', bgColor: '#001822' },
+  { id: 32, name: 'BASEBALL BAT',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff0090', bgColor: '#1a0012' },
+  { id: 33, name: 'AXE',            rarity: 'RARE',      unlockXP: 6000,   unlockCondition: 'Reach 6,000 XP',   color: '#8b5cf6', bgColor: '#0e0018' },
+  { id: 34, name: 'SLEDGEHAMMER',   rarity: 'RARE',      unlockXP: 12000,  unlockCondition: 'Reach 12,000 XP',  color: '#a855f7', bgColor: '#0f001e' },
+  { id: 35, name: 'CROWBAR',        rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#00d4ff', bgColor: '#001822' },
+  { id: 36, name: 'SHOVEL',         rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff6b35', bgColor: '#1a0600' },
+
+  // ── COLLECTION 02 — HIGH ROLLER ARSENAL (37–44) ──────────────────────────────
+  { id: 37, name: 'COMPACT PISTOL', rarity: 'RARE',      unlockXP: 18000,  unlockCondition: 'Reach 18,000 XP',  color: '#00d4ff', bgColor: '#001422' },
+  { id: 38, name: 'TACTICAL PISTOL',rarity: 'RARE',      unlockXP: 25000,  unlockCondition: 'Reach 25,000 XP',  color: '#8b5cf6', bgColor: '#0e0018' },
+  { id: 39, name: 'SMG',            rarity: 'EPIC',      unlockXP: 40000,  unlockCondition: 'Reach 40,000 XP',  color: '#00d4ff', bgColor: '#001422' },
+  { id: 40, name: 'COMPACT SMG',    rarity: 'RARE',      unlockXP: 32000,  unlockCondition: 'Reach 32,000 XP',  color: '#ff0090', bgColor: '#1a0012' },
+  { id: 41, name: 'ASSAULT RIFLE',  rarity: 'EPIC',      unlockXP: 55000,  unlockCondition: 'Reach 55,000 XP',  color: '#00ff88', bgColor: '#001a0a' },
+  { id: 42, name: 'AK PLATFORM',    rarity: 'EPIC',      unlockXP: 75000,  unlockCondition: 'Reach 75,000 XP',  color: '#ff6b35', bgColor: '#1a0600' },
+  { id: 43, name: 'SHOTGUN',        rarity: 'RARE',      unlockXP: 38000,  unlockCondition: 'Reach 38,000 XP',  color: '#ffd700', bgColor: '#1a1100' },
+  { id: 44, name: 'SNIPER RIFLE',   rarity: 'EPIC',      unlockXP: 90000,  unlockCondition: 'Reach 90,000 XP',  color: '#a855f7', bgColor: '#0f001e' },
+
+  // ── COLLECTION 03 — CHAOS COLLECTION (45–48) ─────────────────────────────────
+  { id: 45, name: 'FRAG GRENADE',   rarity: 'EPIC',      unlockXP: 65000,  unlockCondition: 'Reach 65,000 XP',  color: '#00ff88', bgColor: '#001a0a' },
+  { id: 46, name: 'FLASHBANG',      rarity: 'RARE',      unlockXP: 35000,  unlockCondition: 'Reach 35,000 XP',  color: '#00d4ff', bgColor: '#001422' },
+  { id: 47, name: 'SMOKE GRENADE',  rarity: 'EPIC',      unlockXP: 85000,  unlockCondition: 'Reach 85,000 XP',  color: '#bf5fff', bgColor: '#120020' },
+  { id: 48, name: 'MOLOTOV',        rarity: 'LEGENDARY', unlockXP: 150000, unlockCondition: 'Reach 150,000 XP', color: '#ff6b35', bgColor: '#1a0600' },
+
+  // ── COLLECTION 04 — UTILITY SERIES (49–52) ───────────────────────────────────
+  { id: 49, name: 'SPRAY CAN',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff0090', bgColor: '#1a0012' },
+  { id: 50, name: 'WALKIE TALKIE',  rarity: 'RARE',      unlockXP: 9000,   unlockCondition: 'Reach 9,000 XP',   color: '#00d4ff', bgColor: '#001422' },
+  { id: 51, name: 'RADIO DEVICE',   rarity: 'RARE',      unlockXP: 15000,  unlockCondition: 'Reach 15,000 XP',  color: '#ffd700', bgColor: '#1a1100' },
+  { id: 52, name: 'CAMERA LENS',    rarity: 'EPIC',      unlockXP: 120000, unlockCondition: 'Reach 120,000 XP', color: '#a855f7', bgColor: '#0f001e' },
 ];
 
-/** Returns a valid NeonAvatar, always clamped to IDs 1-30. */
+/** Returns a valid NeonAvatar, always clamped to IDs 1-52. */
 export function getNeonAvatar(id: number): NeonAvatar {
-  const safe = Math.min(30, Math.max(1, Math.round(id || 1)));
+  const safe = Math.min(52, Math.max(1, Math.round(id || 1)));
   return NEON_AVATARS.find(a => a.id === safe) ?? NEON_AVATARS[0];
 }
 

@@ -47,6 +47,32 @@ const AVATAR_IMAGES: Record<number, any> = {
   28: require('../assets/avatars/casino_crown.png'),
   29: require('../assets/avatars/poker_king.png'),
   30: require('../assets/avatars/midnight_mirage.png'),
+  // Collection 01 — Street Legends (31-36)
+  31: require('../assets/avatars/brass_knuckles.png'),
+  32: require('../assets/avatars/baseball_bat.png'),
+  33: require('../assets/avatars/axe.png'),
+  34: require('../assets/avatars/sledgehammer.png'),
+  35: require('../assets/avatars/crowbar.png'),
+  36: require('../assets/avatars/shovel.png'),
+  // Collection 02 — High Roller Arsenal (37-44)
+  37: require('../assets/avatars/compact_pistol.png'),
+  38: require('../assets/avatars/tactical_pistol.png'),
+  39: require('../assets/avatars/smg.png'),
+  40: require('../assets/avatars/compact_smg.png'),
+  41: require('../assets/avatars/assault_rifle.png'),
+  42: require('../assets/avatars/ak_platform.png'),
+  43: require('../assets/avatars/shotgun.png'),
+  44: require('../assets/avatars/sniper_rifle.png'),
+  // Collection 03 — Chaos Collection (45-48)
+  45: require('../assets/avatars/frag_grenade.png'),
+  46: require('../assets/avatars/flashbang.png'),
+  47: require('../assets/avatars/smoke_grenade.png'),
+  48: require('../assets/avatars/molotov.png'),
+  // Collection 04 — Utility Series (49-52)
+  49: require('../assets/avatars/spray_can.png'),
+  50: require('../assets/avatars/walkie_talkie.png'),
+  51: require('../assets/avatars/radio_device.png'),
+  52: require('../assets/avatars/camera_lens.png'),
 };
 
 // ─── Lock overlay ──────────────────────────────────────────────────────────────
@@ -83,7 +109,7 @@ export default function NeonAvatar({
   isEquipped = false,
   style,
 }: NeonAvatarProps) {
-  const safeId    = Math.min(30, Math.max(1, Math.round(avatarId || 1)));
+  const safeId    = Math.min(52, Math.max(1, Math.round(avatarId || 1)));
   const avatar    = getNeonAvatar(safeId);
   const rarityColor = NEON_RARITY_COLORS[avatar.rarity];
   const borderWidth = NEON_RARITY_BORDER[avatar.rarity];

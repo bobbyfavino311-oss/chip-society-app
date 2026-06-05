@@ -396,6 +396,138 @@ uri = "file://artifacts/neon-river/assets/avatars/midnight_mirage.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "rHoiiH5He6gDa3CZkmugn"
+uri = "file://artifacts/neon-river/assets/avatars/brass_knuckles.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "MfwtC-hiGGOn-8Ho02tj3"
+uri = "file://artifacts/neon-river/assets/avatars/baseball_bat.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Jgj-w2BjOeOWh2H5McfrR"
+uri = "file://artifacts/neon-river/assets/avatars/axe.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ZxFbgMFhXeLj8afJHA992"
+uri = "file://artifacts/neon-river/assets/avatars/sledgehammer.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "mSxr5WoL4S8QOQlr60Kjo"
+uri = "file://artifacts/neon-river/assets/avatars/crowbar.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "UmQLCLidbTfepTa_0mCTq"
+uri = "file://artifacts/neon-river/assets/avatars/shovel.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "n6S_m418nMapAJNFuJoNK"
+uri = "file://artifacts/neon-river/assets/avatars/compact_pistol.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "54z0862C1IxDwZYTwGWG0"
+uri = "file://artifacts/neon-river/assets/avatars/tactical_pistol.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "aPIOVXne3p8v32jF93q0L"
+uri = "file://artifacts/neon-river/assets/avatars/smg.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "BSyycnp8ijPhyIvGsFPKu"
+uri = "file://artifacts/neon-river/assets/avatars/compact_smg.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "teSaU6UdB5NMDQVhJ2V71"
+uri = "file://artifacts/neon-river/assets/avatars/assault_rifle.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "rQJmCVFz6xxvldeSyLbsL"
+uri = "file://artifacts/neon-river/assets/avatars/ak_platform.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "pnI1IMLll6jHCsa3eIB8n"
+uri = "file://artifacts/neon-river/assets/avatars/shotgun.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "HGbP1Rs55DzcN8ucE9Iug"
+uri = "file://artifacts/neon-river/assets/avatars/sniper_rifle.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "zADn6fWh-WCYM9pOYs0qO"
+uri = "file://artifacts/neon-river/assets/avatars/frag_grenade.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "O6bY4t5VwnEK3q0tg7BR1"
+uri = "file://artifacts/neon-river/assets/avatars/flashbang.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Qkf8qtFamyZbY0G9a8iL6"
+uri = "file://artifacts/neon-river/assets/avatars/smoke_grenade.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "3cVYxpN71lQRToBe844-F"
+uri = "file://artifacts/neon-river/assets/avatars/molotov.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "uYwp8zD2aI3FtZ_dIgtz7"
+uri = "file://artifacts/neon-river/assets/avatars/spray_can.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "LHZx5aw-EjoSJHWUFOJLJ"
+uri = "file://artifacts/neon-river/assets/avatars/walkie_talkie.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "4yl_e7T8cWaot_tw2X2dX"
+uri = "file://artifacts/neon-river/assets/avatars/radio_device.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "0uOMNN27-D_LOVRxrHTGB"
+uri = "file://artifacts/neon-river/assets/avatars/camera_lens.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
