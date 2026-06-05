@@ -82,7 +82,8 @@ export default function BettingPanel({
   disabled = false,
 }: BettingPanelProps) {
   const { theme } = useTableTheme();
-  const isDragon = theme.id === 'dragon_fortune';
+  const isDragon        = theme.id === 'dragon_fortune';
+  const isMidnightBeach = theme.id === 'midnight_beach';
 
   const maxRaise = myChips;
   const canRaise = myChips > callAmount && myChips >= minRaise;
@@ -121,7 +122,9 @@ export default function BettingPanel({
 
   // ── Per-theme container overrides ────────────────────────────────────────
   const containerStyle = isDragon
-    ? { backgroundColor: 'rgba(6,0,0,0.97)', borderTopColor: 'rgba(139,0,0,0.50)' }
+    ? { backgroundColor: 'rgba(6,0,0,0.97)',  borderTopColor: 'rgba(139,0,0,0.50)' }
+    : isMidnightBeach
+    ? { backgroundColor: 'rgba(4,2,14,0.97)', borderTopColor: 'rgba(0,212,255,0.30)' }
     : {};
 
   return (
@@ -136,7 +139,8 @@ export default function BettingPanel({
                   key={b.label}
                   style={[
                     styles.quickBtn,
-                    isDragon && { backgroundColor: 'rgba(20,0,0,0.6)', borderWidth: 1, borderColor: 'rgba(139,0,0,0.30)' },
+                    isDragon        && { backgroundColor: 'rgba(20,0,0,0.6)',  borderWidth: 1, borderColor: 'rgba(139,0,0,0.30)' },
+                    isMidnightBeach && { backgroundColor: 'rgba(4,0,20,0.7)',  borderWidth: 1, borderColor: 'rgba(0,212,255,0.22)' },
                   ]}
                   onPress={() => setRaiseAmount(clampRaise(b.amount))}
                   disabled={disabled}
@@ -144,13 +148,15 @@ export default function BettingPanel({
                 >
                   <Text style={[
                     styles.quickLabel,
-                    isDragon && { color: 'rgba(200,155,60,0.55)' },
+                    isDragon        && { color: 'rgba(200,155,60,0.55)' },
+                    isMidnightBeach && { color: 'rgba(0,212,255,0.55)' },
                   ]}>
                     {b.label}
                   </Text>
                   <Text style={[
                     styles.quickAmt,
-                    isDragon && { color: '#EAE3D2' },
+                    isDragon        && { color: '#EAE3D2' },
+                    isMidnightBeach && { color: '#FFFFFF' },
                   ]}>
                     {fmt(b.amount)}
                   </Text>
@@ -159,7 +165,8 @@ export default function BettingPanel({
               <TouchableOpacity
                 style={[
                   styles.quickBtn,
-                  isDragon ? { backgroundColor: 'rgba(50,0,0,0.5)', borderWidth: 1, borderColor: 'rgba(139,0,0,0.45)' }
+                  isDragon        ? { backgroundColor: 'rgba(50,0,0,0.5)',   borderWidth: 1, borderColor: 'rgba(139,0,0,0.45)' }
+                  : isMidnightBeach ? { backgroundColor: 'rgba(60,0,30,0.6)',  borderWidth: 1, borderColor: 'rgba(255,47,174,0.40)' }
                   : styles.quickAllIn,
                 ]}
                 onPress={() => setRaiseAmount(maxRaise)}
@@ -168,13 +175,13 @@ export default function BettingPanel({
               >
                 <Text style={[
                   styles.quickLabel,
-                  isDragon ? { color: '#8B0000' } : { color: colors.secondary },
+                  isDragon ? { color: '#8B0000' } : isMidnightBeach ? { color: '#FF2FAE' } : { color: colors.secondary },
                 ]}>
                   ALL IN
                 </Text>
                 <Text style={[
                   styles.quickAmt,
-                  isDragon ? { color: '#C89B3C' } : { color: colors.secondary },
+                  isDragon ? { color: '#C89B3C' } : isMidnightBeach ? { color: '#FF2FAE' } : { color: colors.secondary },
                 ]}>
                   {fmt(maxRaise)}
                 </Text>
@@ -227,10 +234,10 @@ export default function BettingPanel({
             </View>
 
             <View style={styles.sliderLabels}>
-              <Text style={[styles.sliderMin, isDragon && { color: 'rgba(200,155,60,0.35)' }]}>
+              <Text style={[styles.sliderMin, isDragon && { color: 'rgba(200,155,60,0.35)' }, isMidnightBeach && { color: 'rgba(0,212,255,0.45)' }]}>
                 {fmt(minRaise)}
               </Text>
-              <Text style={[styles.sliderMax, isDragon && { color: 'rgba(200,155,60,0.35)' }]}>
+              <Text style={[styles.sliderMax, isDragon && { color: 'rgba(200,155,60,0.35)' }, isMidnightBeach && { color: 'rgba(255,47,174,0.45)' }]}>
                 {fmt(maxRaise)}
               </Text>
             </View>
@@ -243,7 +250,7 @@ export default function BettingPanel({
 
         {/* FOLD */}
         <TouchableOpacity
-          style={[styles.actionBtn, isDragon ? dr.foldBtn : styles.foldBtn]}
+          style={[styles.actionBtn, isDragon ? dr.foldBtn : isMidnightBeach ? { backgroundColor: 'rgba(168,0,78,0.15)', borderWidth: 1.5, borderColor: 'rgba(255,47,174,0.55)', shadowColor: '#FF2FAE' } : styles.foldBtn]}
           onPress={onFold} disabled={disabled} activeOpacity={0.75}
         >
           <LinearGradient
@@ -256,7 +263,7 @@ export default function BettingPanel({
         {/* CHECK / CALL */}
         {canCheck ? (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.checkBtn : styles.checkBtn]}
+            style={[styles.actionBtn, isDragon ? dr.checkBtn : isMidnightBeach ? { backgroundColor: 'rgba(0,100,120,0.15)', borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.50)', shadowColor: '#00D4FF' } : styles.checkBtn]}
             onPress={onCheck} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient
@@ -267,7 +274,7 @@ export default function BettingPanel({
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.callBtn : styles.callBtn]}
+            style={[styles.actionBtn, isDragon ? dr.callBtn : isMidnightBeach ? { backgroundColor: 'rgba(0,100,120,0.15)', borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.50)', shadowColor: '#00D4FF' } : styles.callBtn]}
             onPress={onCall} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient
@@ -284,7 +291,7 @@ export default function BettingPanel({
         {/* RAISE */}
         {canRaise && (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.raiseBtn : styles.raiseBtn]}
+            style={[styles.actionBtn, isDragon ? dr.raiseBtn : isMidnightBeach ? { backgroundColor: 'rgba(24,40,90,0.20)', borderWidth: 1.5, borderColor: 'rgba(123,95,255,0.55)', shadowColor: '#7B5FFF' } : styles.raiseBtn]}
             onPress={() => onRaise(raiseAmount)} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient
@@ -303,7 +310,7 @@ export default function BettingPanel({
         {/* ALL IN */}
         {canAllIn && (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.allInBtn : styles.allInBtn]}
+            style={[styles.actionBtn, isDragon ? dr.allInBtn : isMidnightBeach ? { backgroundColor: 'rgba(168,0,78,0.15)', borderWidth: 1.5, borderColor: 'rgba(255,47,174,0.55)', shadowColor: '#FF2FAE', maxWidth: 60 } : styles.allInBtn]}
             onPress={onAllIn} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient

@@ -122,10 +122,55 @@ function DragonScaleBack({ w, h, r }: { w: number; h: number; r: number }) {
   );
 }
 
+// ─── Midnight Beach card back ──────────────────────────────────────────────────
+function MidnightBeachBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const PINK = '#FF2FAE';
+  const CYAN = '#00D4FF';
+  const cx = w / 2;
+  const cy = h / 2;
+  const gr = Math.min(w, h) * 0.38;
+  const step = Math.min(w, h) * 0.18;
+  const gridLines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  for (let i = -2; i <= 6; i++) {
+    gridLines.push({ x1: i * step,     y1: 0, x2: i * step + h,     y2: h });
+    gridLines.push({ x1: i * step + w, y1: 0, x2: i * step + w - h, y2: h });
+  }
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#050018' }]}>
+      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+        {gridLines.map((l, i) => (
+          <Line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
+            stroke={i % 2 === 0 ? PINK : CYAN} strokeWidth={0.4} strokeOpacity={0.18} />
+        ))}
+        <Circle cx={cx} cy={cy} r={gr}          stroke={PINK} strokeWidth={1.2} fill="none" strokeOpacity={0.65} />
+        <Circle cx={cx} cy={cy} r={gr * 0.72}   stroke={CYAN} strokeWidth={0.7} fill="none" strokeOpacity={0.45} />
+        <Circle cx={cx} cy={cy} r={gr * 0.45}   stroke={PINK} strokeWidth={0.7} fill="none" strokeOpacity={0.40} />
+        {Array.from({ length: 8 }, (_, i) => {
+          const a = (i * 45 * Math.PI) / 180;
+          return (
+            <Line key={i}
+              x1={cx + Math.cos(a) * gr * 0.12} y1={cy + Math.sin(a) * gr * 0.12}
+              x2={cx + Math.cos(a) * gr * 0.90} y2={cy + Math.sin(a) * gr * 0.90}
+              stroke={i % 2 === 0 ? PINK : CYAN} strokeWidth={0.55} strokeOpacity={0.30} />
+          );
+        })}
+        {([[4, 4], [w - 4, 4], [4, h - 4], [w - 4, h - 4]] as [number, number][]).map(([px, py], i) => (
+          <Circle key={i} cx={px} cy={py} r={1.8}
+            fill={i % 2 === 0 ? PINK : CYAN} fillOpacity={0.60} />
+        ))}
+        <Circle cx={cx} cy={cy} r={gr * 0.10} fill={PINK} fillOpacity={0.80} />
+      </Svg>
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 2, borderWidth: 1, borderColor: 'rgba(0,212,255,0.30)' }} />
+    </View>
+  );
+}
+
 // ─── Card back router ──────────────────────────────────────────────────────────
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
-  if (theme.cardBackPattern === 'dragon_scale') return <DragonScaleBack w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'dragon_scale')   return <DragonScaleBack   w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'midnight_beach') return <MidnightBeachBack w={w} h={h} r={r} />;
   return <MandalaBack w={w} h={h} r={r} />;
 }
 

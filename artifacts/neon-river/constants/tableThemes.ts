@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune';
+export type ThemeId = 'neon_default' | 'dragon_fortune' | 'midnight_beach';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale';
+  cardBackPattern: 'mandala' | 'dragon_scale' | 'midnight_beach';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -141,4 +141,51 @@ export const DRAGON_FORTUNE: TableTheme = {
   previewColors: ['#090909', '#8B0000', '#C89B3C'],
 };
 
-export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE];
+export const MIDNIGHT_BEACH: TableTheme = {
+  id: 'midnight_beach',
+  name: 'MIDNIGHT BEACH',
+  tagline: 'Neon flamingos, tropical palms, and endless stars. A luxury synthwave poker room under the Miami sky.',
+  rarity: 'LEGENDARY',
+
+  bgGradient: ['#0E0025', '#080018', '#04050F', '#080018', '#0E0025'],
+
+  glowA: 'rgba(255,47,174,0.25)',
+  glowB: 'rgba(0,212,255,0.12)',
+  glowCenter: 'rgba(100,0,160,0.10)',
+
+  tableSurfaceBg: 'rgba(4,2,14,0.90)',
+  tableSurfaceBorder: 'rgba(0,212,255,0.55)',
+  tableSurfaceShadow: '#00D4FF',
+  tableCenterGlow: 'rgba(255,47,174,0.05)',
+
+  cardBackBg: '#050018',
+  cardBackAccent: '#FF2FAE',
+  cardBackPattern: 'midnight_beach',
+  cardHighlightColor: '#00D4FF',
+
+  chipTokenColor: '#00D4FF',
+  chipWinTokenColor: '#FF2FAE',
+
+  potBg: 'rgba(4,2,14,0.95)',
+  potBorder: 'rgba(0,212,255,0.60)',
+  potShadow: '#00D4FF',
+  potLabelColor: 'rgba(0,212,255,0.75)',
+  potAmountColor: '#FF2FAE',
+
+  foldAccent: '#FF2FAE',
+  checkAccent: '#00D4FF',
+  callAccent: '#00D4FF',
+  raiseAccent: '#7B5FFF',
+  allInAccent: '#FFD700',
+
+  accentPrimary: '#FF2FAE',
+  accentSecondary: '#00D4FF',
+  textColor: '#F8F0FF',
+
+  winEffectStyle: 'neon_burst',
+  winGoldColor: '#FF2FAE',
+
+  previewColors: ['#04050F', '#FF2FAE', '#00D4FF'],
+};
+
+export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE, MIDNIGHT_BEACH];
