@@ -26,6 +26,7 @@ import { AchievementProvider, useAchievements } from '@/context/AchievementConte
 import { SocialProvider } from '@/context/SocialContext';
 import { AISocialProvider } from '@/context/AISocialContext';
 import { NotificationProvider } from '@/context/NotificationContext';
+import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import TutorialOverlay from '@/components/TutorialOverlay';
 import { SoundEngine } from '@/lib/soundEngine';
@@ -132,6 +133,7 @@ function RootLayoutNav() {
         <Stack.Screen name="social/player-profile" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="profile/avatar-select" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="profile/photo-select"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen name="settings/table-themes" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen
           name="casino"
           options={{ headerShown: false, animation: 'slide_from_right' }}
@@ -165,6 +167,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ErrorBoundary>
         <ThemeProvider>
+          <TableThemeProvider>
           <QueryClientProvider client={queryClient}>
             <UserProvider>
               <TermsProvider>
@@ -186,6 +189,7 @@ export default function RootLayout() {
               </TermsProvider>
             </UserProvider>
           </QueryClientProvider>
+          </TableThemeProvider>
         </ThemeProvider>
       </ErrorBoundary>
     </SafeAreaProvider>

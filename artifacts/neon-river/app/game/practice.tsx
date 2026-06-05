@@ -29,6 +29,7 @@ import { MusicEngine } from '@/lib/musicEngine';
 import { getBestHandVariant, describeHand } from '@/lib/pokerEngine';
 import type { GameVariant } from '@/constants/gameVariants';
 import NeonAvatarSeat from '@/components/NeonAvatar';
+import { useTableTheme } from '@/context/TableThemeContext';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -390,6 +391,8 @@ export default function PracticeScreen() {
   );
 
   const insets = useSafeAreaInsets();
+  const { theme } = useTableTheme();
+  const isDragon = theme.id === 'dragon_fortune';
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
   const N_CHIP = 4;
@@ -577,15 +580,15 @@ export default function PracticeScreen() {
     <View style={styles.screen}>
       {/* Atmospheric background */}
       <LinearGradient
-        colors={['#0a0028', '#05001a', '#030010', '#05001a', '#0a0028']}
+        colors={theme.bgGradient as [string, string, string, string, string]}
         locations={[0, 0.25, 0.5, 0.75, 1]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0.3, y: 0 }} end={{ x: 0.7, y: 1 }}
       />
       {/* Ambient glow blobs */}
-      <View style={styles.glowPurple} />
-      <View style={styles.glowCyan} />
-      <View style={styles.glowCenter} />
+      <View style={[styles.glowPurple, { backgroundColor: theme.glowA }]} />
+      <View style={[styles.glowCyan,   { backgroundColor: theme.glowB }]} />
+      <View style={[styles.glowCenter, { backgroundColor: theme.glowCenter }]} />
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -658,18 +661,24 @@ export default function PracticeScreen() {
         {/* Chip fly animations */}
         {chipAnims.map(({ pos, opacity }, i) => (
           <Animated.View key={`c${i}`} style={[styles.chipToken, {
+            backgroundColor: theme.chipTokenColor,
             opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }],
           }]} />
         ))}
         {winAnims.map(({ pos, opacity }, i) => (
           <Animated.View key={`w${i}`} style={[styles.chipTokenWin, {
+            backgroundColor: theme.chipWinTokenColor,
             opacity, transform: [{ translateX: pos.x }, { translateY: pos.y }],
           }]} />
         ))}
 
         {/* Community card board — dark glass surface */}
-        <View style={styles.tableSurface}>
-          <View style={styles.tableCenterGlow} />
+        <View style={[styles.tableSurface, {
+          borderColor: theme.tableSurfaceBorder,
+          backgroundColor: theme.tableSurfaceBg,
+          shadowColor: theme.tableSurfaceShadow,
+        }]}>
+          <View style={[styles.tableCenterGlow, { backgroundColor: theme.tableCenterGlow }]} />
           <CommunityCards
             cards={state.communityCards}
             phase={state.phase}
@@ -680,20 +689,33 @@ export default function PracticeScreen() {
 
         {/* Floating pot */}
         {state.sidePots.length > 1 ? (
-          <Animated.View style={[styles.potFloat, { transform: [{ scale: potPulse }] }]}>
+          <Animated.View style={[styles.potFloat, {
+            backgroundColor: theme.potBg,
+            borderColor: theme.potBorder,
+            shadowColor: theme.potShadow,
+            transform: [{ scale: potPulse }],
+          }]}>
             <View style={styles.potSideRow}>
               {state.sidePots.map((sp, i) => (
-                <View key={i} style={styles.potSideItem}>
-                  <Text style={styles.potSideLabel}>{i === 0 ? 'MAIN' : `SIDE ${i}`}</Text>
-                  <Text style={styles.potSideAmt}>{formatChips(sp.amount)}</Text>
+                <View key={i} style={[styles.potSideItem, {
+                  backgroundColor: theme.potBg,
+                  borderColor: theme.potBorder,
+                }]}>
+                  <Text style={[styles.potSideLabel, { color: theme.potLabelColor }]}>{i === 0 ? 'MAIN' : `SIDE ${i}`}</Text>
+                  <Text style={[styles.potSideAmt,   { color: theme.potAmountColor }]}>{formatChips(sp.amount)}</Text>
                 </View>
               ))}
             </View>
           </Animated.View>
         ) : state.pot > 0 ? (
-          <Animated.View style={[styles.potFloat, { transform: [{ scale: potPulse }] }]}>
-            <Text style={styles.potLabel}>POT</Text>
-            <Text style={styles.potAmount}>{formatChips(state.pot)}</Text>
+          <Animated.View style={[styles.potFloat, {
+            backgroundColor: theme.potBg,
+            borderColor: theme.potBorder,
+            shadowColor: theme.potShadow,
+            transform: [{ scale: potPulse }],
+          }]}>
+            <Text style={[styles.potLabel,  { color: theme.potLabelColor  }]}>POT</Text>
+            <Text style={[styles.potAmount, { color: theme.potAmountColor }]}>{formatChips(state.pot)}</Text>
           </Animated.View>
         ) : null}
 

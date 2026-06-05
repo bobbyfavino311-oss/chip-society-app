@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Line, Path } from 'react-native-svg';
+import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
 import { Card, isRedSuit, suitSymbol, valueLabel } from '../lib/pokerEngine';
 import { SoundEngine } from '../lib/soundEngine';
+import { useTableTheme } from '../context/TableThemeContext';
 
 interface PlayingCardProps {
   card?: Card;
@@ -19,13 +20,11 @@ const SIZES = {
   xl:  { w: 76,  h: 106, valFont: 34, suitFont: 26, radius: 13 },
 };
 
-// ─── Circular mandala back pattern ────────────────────────────────────────────
-function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
+// ─── Neon mandala card back ────────────────────────────────────────────────────
+function MandalaBack({ w, h, r }: { w: number; h: number; r: number }) {
   const cx = w / 2;
   const cy = h / 2;
   const maxR = Math.min(w, h) * 0.42;
-
-  // 12 spokes radiating from center
   const spokes = Array.from({ length: 12 }, (_, i) => {
     const angle = (i * 30 * Math.PI) / 180;
     return {
@@ -35,55 +34,104 @@ function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
       y2: cy + Math.sin(angle) * maxR * 0.82,
     };
   });
-
   return (
     <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#c0182a' }]}>
       <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-        {/* Outer ring */}
         <Circle cx={cx} cy={cy} r={maxR} stroke="rgba(255,255,255,0.22)" strokeWidth={1.2} fill="none" />
-        {/* Mid ring */}
         <Circle cx={cx} cy={cy} r={maxR * 0.7} stroke="rgba(255,255,255,0.18)" strokeWidth={0.9} fill="none" />
-        {/* Inner ring */}
         <Circle cx={cx} cy={cy} r={maxR * 0.42} stroke="rgba(255,255,255,0.2)" strokeWidth={0.9} fill="none" />
-        {/* Tiny center dot ring */}
         <Circle cx={cx} cy={cy} r={maxR * 0.16} stroke="rgba(255,255,255,0.28)" strokeWidth={0.8} fill="none" />
-        {/* Spokes */}
         {spokes.map((s, i) => (
-          <Line
-            key={i}
-            x1={s.x1} y1={s.y1}
-            x2={s.x2} y2={s.y2}
-            stroke="rgba(255,255,255,0.14)"
-            strokeWidth={0.8}
-          />
+          <Line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
+            stroke="rgba(255,255,255,0.14)" strokeWidth={0.8} />
         ))}
-        {/* 8 petal dots on mid ring */}
         {Array.from({ length: 8 }, (_, i) => {
           const a = (i * 45 * Math.PI) / 180;
           return (
-            <Circle
-              key={i}
+            <Circle key={i}
               cx={cx + Math.cos(a) * maxR * 0.7}
               cy={cy + Math.sin(a) * maxR * 0.7}
-              r={maxR * 0.055}
-              fill="rgba(255,255,255,0.3)"
-            />
+              r={maxR * 0.055} fill="rgba(255,255,255,0.3)" />
           );
         })}
-        {/* Center dot */}
         <Circle cx={cx} cy={cy} r={maxR * 0.07} fill="rgba(255,255,255,0.35)" />
       </Svg>
-      {/* Subtle border inset */}
-      <View style={{
-        position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
-        borderRadius: r - 2, borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)',
-      }} />
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' }} />
     </View>
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
+// ─── Dragon Fortune card back ──────────────────────────────────────────────────
+function DragonScaleBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const gold = '#C89B3C';
+  const goldFaint = 'rgba(200,155,60,0.28)';
+  const goldDim   = 'rgba(200,155,60,0.14)';
+  const cx = w / 2;
+  const cy = h / 2;
+
+  // Dragon scale lattice — diagonal diamond grid
+  const cellW = w * 0.28;
+  const cellH = h * 0.18;
+  const scaleLines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  const cols = Math.ceil(w / cellW) + 2;
+  const rows = Math.ceil(h / cellH) + 2;
+  for (let row = -1; row < rows; row++) {
+    for (let col = -1; col < cols; col++) {
+      const ox = col * cellW + (row % 2 === 0 ? 0 : cellW / 2);
+      const oy = row * cellH;
+      // Diamond shape
+      scaleLines.push({ x1: ox + cellW / 2, y1: oy, x2: ox + cellW, y2: oy + cellH / 2 });
+      scaleLines.push({ x1: ox + cellW, y1: oy + cellH / 2, x2: ox + cellW / 2, y2: oy + cellH });
+      scaleLines.push({ x1: ox + cellW / 2, y1: oy + cellH, x2: ox, y2: oy + cellH / 2 });
+      scaleLines.push({ x1: ox, y1: oy + cellH / 2, x2: ox + cellW / 2, y2: oy });
+    }
+  }
+
+  // Central medallion — concentric diamonds
+  const med = Math.min(w, h) * 0.22;
+
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#0A0000' }]}>
+      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+        {/* Scale lattice */}
+        {scaleLines.map((l, i) => (
+          <Line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
+            stroke={goldDim} strokeWidth={0.5} />
+        ))}
+        {/* Central medallion — outer diamond */}
+        <Polygon
+          points={`${cx},${cy - med} ${cx + med * 0.65},${cy} ${cx},${cy + med} ${cx - med * 0.65},${cy}`}
+          fill="none" stroke={goldFaint} strokeWidth={1.0} />
+        {/* Mid diamond */}
+        <Polygon
+          points={`${cx},${cy - med * 0.65} ${cx + med * 0.42},${cy} ${cx},${cy + med * 0.65} ${cx - med * 0.42},${cy}`}
+          fill="none" stroke={gold} strokeWidth={0.8} strokeOpacity={0.6} />
+        {/* Center dot */}
+        <Circle cx={cx} cy={cy} r={med * 0.15} fill={gold} opacity={0.75} />
+        {/* Corner accents */}
+        <Circle cx={3} cy={3} r={1.5} fill={gold} opacity={0.4} />
+        <Circle cx={w - 3} cy={3} r={1.5} fill={gold} opacity={0.4} />
+        <Circle cx={3} cy={h - 3} r={1.5} fill={gold} opacity={0.4} />
+        <Circle cx={w - 3} cy={h - 3} r={1.5} fill={gold} opacity={0.4} />
+      </Svg>
+      {/* Gold inset border */}
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 1, borderWidth: 1, borderColor: 'rgba(200,155,60,0.35)' }} />
+    </View>
+  );
+}
+
+// ─── Card back router ──────────────────────────────────────────────────────────
+function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const { theme } = useTableTheme();
+  if (theme.cardBackPattern === 'dragon_scale') {
+    return <DragonScaleBack w={w} h={h} r={r} />;
+  }
+  return <MandalaBack w={w} h={h} r={r} />;
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function PlayingCard({
   card,
   faceDown = false,

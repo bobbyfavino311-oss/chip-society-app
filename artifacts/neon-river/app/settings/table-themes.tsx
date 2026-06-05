@@ -1,0 +1,456 @@
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import React, { useRef } from 'react';
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import Svg, { Circle, Line, Path, Polygon } from 'react-native-svg';
+
+import { useTableTheme } from '@/context/TableThemeContext';
+import { ALL_TABLE_THEMES, TableTheme, ThemeId } from '@/constants/tableThemes';
+
+// ─── Dragon scale mini-preview SVG ────────────────────────────────────────────
+function DragonScalePreview({ size = 40 }: { size?: number }) {
+  const s = size;
+  const gold = '#C89B3C';
+  const dark = '#0A0000';
+  return (
+    <Svg width={s} height={s} viewBox="0 0 40 40">
+      <Polygon points="20,2 38,20 20,38 2,20" fill={dark} stroke={gold} strokeWidth={1.2} />
+      <Polygon points="20,8 32,20 20,32 8,20" fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.5} />
+      <Circle cx={20} cy={20} r={4} fill={gold} opacity={0.85} />
+      <Line x1={20} y1={2} x2={20} y2={38} stroke={gold} strokeWidth={0.4} strokeOpacity={0.3} />
+      <Line x1={2} y1={20} x2={38} y2={20} stroke={gold} strokeWidth={0.4} strokeOpacity={0.3} />
+    </Svg>
+  );
+}
+
+// ─── Neon mandala mini-preview SVG ────────────────────────────────────────────
+function NeonMandalaPreview({ size = 40 }: { size?: number }) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size * 0.38;
+  return (
+    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <Circle cx={cx} cy={cy} r={r} stroke="#00d4ff" strokeWidth={1.2} fill="none" />
+      <Circle cx={cx} cy={cy} r={r * 0.6} stroke="#ff0090" strokeWidth={0.9} fill="none" />
+      <Circle cx={cx} cy={cy} r={r * 0.25} fill="#bf5fff" opacity={0.7} />
+      {[0, 45, 90, 135].map((deg, i) => {
+        const rad = (deg * Math.PI) / 180;
+        return (
+          <Line
+            key={i}
+            x1={cx + Math.cos(rad) * r * 0.2}
+            y1={cy + Math.sin(rad) * r * 0.2}
+            x2={cx + Math.cos(rad) * r * 0.85}
+            y2={cy + Math.sin(rad) * r * 0.85}
+            stroke="#00d4ff"
+            strokeWidth={0.7}
+            strokeOpacity={0.6}
+          />
+        );
+      })}
+    </Svg>
+  );
+}
+
+// ─── Theme card ───────────────────────────────────────────────────────────────
+function ThemeCard({
+  theme,
+  isActive,
+  onEquip,
+}: {
+  theme: TableTheme;
+  isActive: boolean;
+  onEquip: () => void;
+}) {
+  const pressAnim = useRef(new Animated.Value(1)).current;
+  const isDragon = theme.id === 'dragon_fortune';
+
+  function press() {
+    Animated.sequence([
+      Animated.timing(pressAnim, { toValue: 0.96, duration: 70, useNativeDriver: true }),
+      Animated.spring(pressAnim, { toValue: 1, friction: 5, useNativeDriver: true }),
+    ]).start();
+    onEquip();
+  }
+
+  const borderColor = isDragon
+    ? isActive ? '#C89B3C' : 'rgba(200,155,60,0.25)'
+    : isActive ? '#00d4ff' : 'rgba(0,212,255,0.15)';
+
+  const glowColor = isDragon ? '#C89B3C' : '#00d4ff';
+
+  return (
+    <Animated.View style={{ transform: [{ scale: pressAnim }] }}>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={press}
+        style={[
+          s.card,
+          { borderColor },
+          isActive && {
+            shadowColor: glowColor,
+            shadowOpacity: 0.45,
+            shadowRadius: 18,
+            shadowOffset: { width: 0, height: 0 },
+          },
+        ]}
+      >
+        {/* Card background */}
+        <LinearGradient
+          colors={isDragon
+            ? ['#120000', '#0A0000', '#060000']
+            : ['#0e0028', '#08001a', '#050010']
+          }
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        />
+
+        {/* Subtle top accent line */}
+        <View style={[s.cardAccentLine, { backgroundColor: borderColor, opacity: isActive ? 0.8 : 0.3 }]} />
+
+        {/* Card body */}
+        <View style={s.cardBody}>
+
+          {/* Left — icon + palette */}
+          <View style={s.cardLeft}>
+            <View style={[s.iconRing, { borderColor: isDragon ? 'rgba(200,155,60,0.4)' : 'rgba(0,212,255,0.3)' }]}>
+              <View style={[s.iconBg, { backgroundColor: theme.previewColors[0] }]}>
+                {isDragon ? <DragonScalePreview size={42} /> : <NeonMandalaPreview size={42} />}
+              </View>
+            </View>
+            <View style={s.paletteRow}>
+              {theme.previewColors.map((c, i) => (
+                <View key={i} style={[s.paletteDot, { backgroundColor: c, borderColor: 'rgba(255,255,255,0.15)' }]} />
+              ))}
+            </View>
+          </View>
+
+          {/* Right — info */}
+          <View style={s.cardRight}>
+            <View style={s.nameRow}>
+              <Text style={[s.themeName, { color: isDragon ? '#EAE3D2' : '#e8e8ff' }]}>
+                {theme.name}
+              </Text>
+              <View style={[s.rarityBadge, {
+                borderColor: isDragon ? '#C89B3C' : 'rgba(0,212,255,0.4)',
+                backgroundColor: isDragon ? 'rgba(200,155,60,0.12)' : 'rgba(0,212,255,0.08)',
+              }]}>
+                <Text style={[s.rarityText, { color: isDragon ? '#C89B3C' : '#00d4ff' }]}>
+                  {theme.rarity}
+                </Text>
+              </View>
+            </View>
+
+            <Text style={s.themeTagline} numberOfLines={3}>
+              {theme.tagline}
+            </Text>
+
+            {/* Equip button */}
+            {isActive ? (
+              <View style={[s.equippedTag, { borderColor: isDragon ? '#C89B3C' : '#00d4ff' }]}>
+                <Ionicons name="checkmark-circle" size={12} color={isDragon ? '#C89B3C' : '#00d4ff'} />
+                <Text style={[s.equippedText, { color: isDragon ? '#C89B3C' : '#00d4ff' }]}>
+                  EQUIPPED
+                </Text>
+              </View>
+            ) : (
+              <TouchableOpacity onPress={press} style={[s.equipBtn, {
+                borderColor: isDragon ? 'rgba(200,155,60,0.6)' : 'rgba(0,212,255,0.5)',
+              }]}>
+                <LinearGradient
+                  colors={isDragon
+                    ? ['rgba(200,155,60,0.18)', 'rgba(200,155,60,0.06)']
+                    : ['rgba(0,212,255,0.14)', 'rgba(0,212,255,0.04)']
+                  }
+                  style={StyleSheet.absoluteFill}
+                />
+                <Text style={[s.equipBtnText, { color: isDragon ? '#C89B3C' : '#00d4ff' }]}>
+                  EQUIP
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Active: subtle shimmer overlay */}
+        {isActive && (
+          <LinearGradient
+            colors={['transparent', isDragon ? 'rgba(200,155,60,0.05)' : 'rgba(0,212,255,0.05)', 'transparent']}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+          />
+        )}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
+export default function TableThemesScreen() {
+  const insets = useSafeAreaInsets();
+  const { theme: activeTheme, setTheme } = useTableTheme();
+
+  return (
+    <View style={s.screen}>
+      <LinearGradient
+        colors={['#0a0018', '#050010', '#030008']}
+        style={StyleSheet.absoluteFill}
+      />
+
+      {/* Header */}
+      <View style={[s.header, { paddingTop: insets.top + 12 }]}>
+        <TouchableOpacity
+          style={s.backBtn}
+          onPress={() => router.back()}
+          activeOpacity={0.75}
+        >
+          <Ionicons name="chevron-back" size={22} color="rgba(255,255,255,0.6)" />
+        </TouchableOpacity>
+        <Text style={s.headerTitle}>TABLE THEMES</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <Text style={s.headerSub}>Select a table theme. Applies to all game modes.</Text>
+
+      <ScrollView
+        contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 32 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Active theme preview band */}
+        <View style={[s.activePreview, {
+          borderColor: activeTheme.id === 'dragon_fortune'
+            ? 'rgba(200,155,60,0.25)' : 'rgba(0,212,255,0.20)',
+        }]}>
+          <LinearGradient
+            colors={activeTheme.id === 'dragon_fortune'
+              ? ['rgba(200,155,60,0.10)', 'transparent']
+              : ['rgba(0,212,255,0.08)', 'transparent']
+            }
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <Text style={s.activeLabel}>ACTIVE THEME</Text>
+          <Text style={[s.activeName, {
+            color: activeTheme.id === 'dragon_fortune' ? '#C89B3C' : '#00d4ff',
+          }]}>
+            {activeTheme.name}
+          </Text>
+        </View>
+
+        {/* Theme cards */}
+        {ALL_TABLE_THEMES.map((t) => (
+          <ThemeCard
+            key={t.id}
+            theme={t}
+            isActive={t.id === activeTheme.id}
+            onEquip={() => setTheme(t.id as ThemeId)}
+          />
+        ))}
+
+        {/* Coming soon hint */}
+        <View style={s.comingSoon}>
+          <Text style={s.comingSoonLabel}>MORE THEMES COMING SOON</Text>
+          <Text style={s.comingSoonSub}>Samurai Edge · Ice Palace · Golden Age</Text>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#050010' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  backBtn: {
+    width: 40, height: 40, borderRadius: 20,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  headerTitle: {
+    color: '#e8e8ff',
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 3,
+    fontFamily: 'Orbitron_700Bold',
+  },
+  headerSub: {
+    color: 'rgba(255,255,255,0.35)',
+    fontSize: 11,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+    marginBottom: 20,
+    marginTop: 2,
+  },
+  list: {
+    paddingHorizontal: 16,
+    gap: 16,
+  },
+
+  // ── Active preview band
+  activePreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    overflow: 'hidden',
+    marginBottom: 4,
+  },
+  activeLabel: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 9,
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  activeName: {
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+    fontFamily: 'Orbitron_700Bold',
+  },
+
+  // ── Theme card
+  card: {
+    borderRadius: 18,
+    borderWidth: 1.5,
+    overflow: 'hidden',
+    elevation: 8,
+  },
+  cardAccentLine: {
+    height: 2,
+    width: '100%',
+  },
+  cardBody: {
+    flexDirection: 'row',
+    gap: 14,
+    padding: 16,
+  },
+  cardLeft: {
+    alignItems: 'center',
+    gap: 10,
+  },
+  iconRing: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  iconBg: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paletteRow: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  paletteDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+  },
+  cardRight: {
+    flex: 1,
+    gap: 7,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  themeName: {
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+    fontFamily: 'Orbitron_700Bold',
+  },
+  rarityBadge: {
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  rarityText: {
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  themeTagline: {
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 0.2,
+  },
+  equippedTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  equippedText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+    fontFamily: 'Orbitron_700Bold',
+  },
+  equipBtn: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    overflow: 'hidden',
+  },
+  equipBtnText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_700Bold',
+  },
+
+  // ── Coming soon
+  comingSoon: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    gap: 6,
+  },
+  comingSoonLabel: {
+    color: 'rgba(255,255,255,0.2)',
+    fontSize: 9,
+    letterSpacing: 2.5,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  comingSoonSub: {
+    color: 'rgba(255,255,255,0.14)',
+    fontSize: 10,
+    letterSpacing: 0.5,
+  },
+});

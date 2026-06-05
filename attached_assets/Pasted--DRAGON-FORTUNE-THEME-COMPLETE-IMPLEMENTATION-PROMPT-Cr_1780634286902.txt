@@ -1,0 +1,361 @@
+## DRAGON FORTUNE THEME — COMPLETE IMPLEMENTATION PROMPT
+
+Create a premium unlockable table theme called **Dragon Fortune**. This is not a background image. The entire poker experience should transform across every game mode when selected.
+
+The Dragon Fortune theme must be available in **Settings → Table Themes**, and once selected it applies globally to:
+
+* Texas Hold'em
+* Short Deck Hold'em
+* Three Card Poker
+* Future Blackjack
+* Future Baccarat
+* Future Roulette
+* Future Tournaments
+
+The theme should feel like a high-stakes VIP room in Macau mixed with a luxury underground dragon casino.
+
+---
+
+# OVERALL ART DIRECTION
+
+Do NOT use bright rainbow colors.
+
+Avoid cartoonish designs.
+
+Avoid glowing neon overload.
+
+This theme should feel:
+
+* Expensive
+* Elegant
+* Powerful
+* Mysterious
+* High stakes
+* Wealthy
+* Legendary
+
+Visual inspiration:
+
+* Luxury Macau casinos
+* Dragon mythology
+* Black lacquer furniture
+* Red silk
+* Gold leaf detailing
+* Jade accents
+* VIP gambling salons
+* High-limit baccarat rooms
+
+Think:
+
+"Secret dragon casino reserved for billionaires."
+
+---
+
+# PRIMARY COLOR PALETTE
+
+### Main Felt
+
+Deep black
+
+#090909
+
+### Secondary
+
+Dark crimson
+
+#3B0000
+
+### Accent
+
+Blood red
+
+#8B0000
+
+### Luxury Accent
+
+Antique gold
+
+#C89B3C
+
+### Rare Highlight
+
+Dark jade
+
+#1F5E52
+
+### Text
+
+Warm ivory
+
+#EAE3D2
+
+---
+
+# TABLE DESIGN
+
+Replace the standard felt.
+
+The table should feature:
+
+* Black velvet felt
+* Subtle dragon scale texture
+* Gold embroidered border
+* Dark crimson betting circles
+* Gold betting labels
+* Thin jade accent lines
+
+No bright glows.
+
+Instead:
+
+Use subtle luxury lighting.
+
+The table should feel physical and expensive.
+
+---
+
+# TABLE RAIL
+
+Replace standard rail.
+
+Create:
+
+* Black lacquer rail
+* Gold trim
+* Dragon engravings
+* Red underlighting
+
+When players win:
+
+A soft gold shimmer moves across the rail.
+
+Not flashy.
+
+Premium.
+
+---
+
+# CARD DESIGN
+
+Create Dragon Fortune cards.
+
+### Card Back
+
+Black background
+
+Gold dragon wrapping around card center.
+
+Subtle red silk pattern.
+
+Luxury casino card quality.
+
+### Face Cards
+
+Custom artwork:
+
+* Kings inspired by emperors
+* Queens inspired by royal court
+* Jacks inspired by elite warriors
+
+Keep artwork elegant and readable.
+
+---
+
+# CHIP DESIGN
+
+Create Dragon Fortune chips.
+
+### Base
+
+Matte black
+
+### Outer Ring
+
+Gold
+
+### Inner Accent
+
+Dark red
+
+### High Value Chips
+
+Include jade inlays.
+
+Examples:
+
+* 1K = Red
+* 5K = Black
+* 10K = Gold
+* 50K = Jade
+* 100K = Dragon Gold
+
+---
+
+# DEAL BUTTON
+
+Replace standard deal button styling.
+
+New button:
+
+* Black background
+* Gold border
+* Red highlights
+
+Text:
+
+DEAL
+
+When pressed:
+
+Brief gold pulse animation.
+
+---
+
+# WIN EFFECTS
+
+No casino confetti.
+
+No fireworks.
+
+No childish animations.
+
+Instead:
+
+### Small Win
+
+Gold particle shimmer
+
+### Medium Win
+
+Golden dragon silhouette sweeps behind table
+
+### Big Win
+
+Dragon emerges behind table edge
+
+Gold embers float upward
+
+### Massive Win
+
+Entire table glows red and gold
+
+Dragon eyes briefly illuminate
+
+Luxury cinematic effect
+
+---
+
+# AUDIO
+
+Create a complete Dragon Fortune sound pack.
+
+### Background Ambience
+
+* Quiet VIP casino
+* Soft wind chimes
+* Distant ceremonial drums
+
+### Chip Sounds
+
+Heavy ceramic chip sounds
+
+### Button Sounds
+
+Luxury wood click
+
+### Win Sounds
+
+Ancient bell tones
+
+Subtle gong accents
+
+### Big Wins
+
+Deep dragon roar mixed with gold coin sounds
+
+---
+
+# THREE CARD POKER SPECIFIC CHANGES
+
+Bet circles become:
+
+* Black lacquer
+* Gold outline
+* Red inner glow
+
+Labels:
+
+* ANTE
+* PLAY
+* PAIR PLUS
+* 6 CARD BONUS
+
+Use gold typography.
+
+No yellow.
+
+---
+
+# TOURNAMENT THEME VERSION
+
+When tournaments launch:
+
+Dragon Fortune Final Table should become a premium version.
+
+Additional features:
+
+* Animated dragon statues
+* Floating gold particles
+* Champion banners
+* Gold spotlight effects
+
+Reserved for:
+
+Final tables
+Special events
+High roller tournaments
+
+---
+
+# THEME SELECTION SCREEN
+
+Settings → Themes
+
+Display Dragon Fortune with:
+
+Dragon head emblem
+
+Description:
+
+"Enter the VIP Dragon Room. Black lacquer tables, gold accents, and ancient fortune await those willing to risk everything."
+
+Rarity:
+
+LEGENDARY
+
+Color:
+
+Gold + Crimson
+
+---
+
+# IMPORTANT RULES
+
+DO NOT:
+
+* Use bright neon cyan
+* Use hot pink
+* Use rainbow effects
+* Use cartoon dragons
+* Use AI-generated table backgrounds
+* Use generic fantasy assets
+
+DO:
+
+* Make everything feel handcrafted
+* Make everything feel expensive
+* Use luxury casino design principles
+* Prioritize elegance over brightness
+* Make the theme feel worthy of a high-stakes VIP room
+
+The final result should feel like the most prestigious and expensive table theme in the entire game.

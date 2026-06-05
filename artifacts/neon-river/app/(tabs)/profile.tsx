@@ -24,6 +24,7 @@ import NeonAvatar from '@/components/NeonAvatar';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
 import { useSocial } from '@/context/SocialContext';
+import { useTableTheme } from '@/context/TableThemeContext';
 import { ALL_ACHIEVEMENTS } from '@/lib/achievements';
 
 const RANK_COLORS: Record<string, string> = {
@@ -229,6 +230,7 @@ export default function ProfileScreen() {
   const [showTournamentInfo, setShowTournamentInfo] = useState(false);
 
   const claimedCount = achievementCompletion(unlockedIds);
+  const { theme: tableTheme } = useTableTheme();
 
   const rankColor = RANK_COLORS[profile.rank] ?? c.primary;
   const rankIdx = RANK_ORDER.indexOf(profile.rank);
@@ -460,6 +462,40 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         <SoundSettingsCard />
+
+        {/* Table Themes */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={() => router.push('/settings/table-themes')}
+        >
+          <LinearGradient
+            colors={tableTheme.id === 'dragon_fortune'
+              ? ['rgba(200,155,60,0.12)', 'transparent']
+              : ['rgba(0,212,255,0.10)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={[achStyles.iconWrap, {
+            backgroundColor: tableTheme.id === 'dragon_fortune'
+              ? 'rgba(200,155,60,0.12)' : 'rgba(0,212,255,0.10)',
+          }]}>
+            <View style={{ flexDirection: 'row', gap: 3, padding: 2 }}>
+              {tableTheme.previewColors.map((col, i) => (
+                <View key={i} style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: col }} />
+              ))}
+            </View>
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>TABLE THEMES</Text>
+            <Text style={achStyles.achSub}>{tableTheme.name} · {tableTheme.rarity}</Text>
+          </View>
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={tableTheme.id === 'dragon_fortune' ? 'rgba(200,155,60,0.6)' : 'rgba(0,212,255,0.5)'}
+          />
+        </TouchableOpacity>
 
         {/* Achievements link */}
         <TouchableOpacity
