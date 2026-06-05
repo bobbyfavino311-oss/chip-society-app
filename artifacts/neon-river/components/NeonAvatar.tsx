@@ -73,6 +73,8 @@ const AVATAR_IMAGES: Record<number, any> = {
   50: require('../assets/avatars/walkie_talkie.png'),
   51: require('../assets/avatars/radio_device.png'),
   52: require('../assets/avatars/camera_lens.png'),
+  // Legendary Icon (53)
+  53: require('../assets/avatars/golden_tiki.png'),
 };
 
 // ─── Lock overlay ──────────────────────────────────────────────────────────────

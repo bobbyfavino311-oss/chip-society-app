@@ -528,6 +528,12 @@ uri = "file://artifacts/neon-river/assets/avatars/camera_lens.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "LQ2ZjEb-1iMe8icQNTHFQ"
+uri = "file://artifacts/neon-river/assets/avatars/golden_tiki.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
