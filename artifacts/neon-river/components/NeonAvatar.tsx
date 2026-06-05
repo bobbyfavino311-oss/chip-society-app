@@ -12,9 +12,10 @@ import {
 } from '@/constants/neonAvatars';
 
 // ─── Static PNG map — must be literal require() calls for Metro bundler ────────
-// IDs 1-15 → individual named PNG files (512×512 each, black bg, neon icon)
+// IDs 1-15: original set  |  IDs 16-30: premium vaporwave expansion
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AVATAR_IMAGES: Record<number, any> = {
+  // Original 15
   1:  require('../assets/avatars/martini.png'),
   2:  require('../assets/avatars/palm.png'),
   3:  require('../assets/avatars/dice_stack.png'),
@@ -30,6 +31,22 @@ const AVATAR_IMAGES: Record<number, any> = {
   13: require('../assets/avatars/poker_chip.png'),
   14: require('../assets/avatars/champagne.png'),
   15: require('../assets/avatars/moon.png'),
+  // Premium vaporwave expansion (16-30)
+  16: require('../assets/avatars/yacht.png'),
+  17: require('../assets/avatars/vice_skyline.png'),
+  18: require('../assets/avatars/palm_paradise.png'),
+  19: require('../assets/avatars/ferrari.png'),
+  20: require('../assets/avatars/ocean_drive.png'),
+  21: require('../assets/avatars/convertible.png'),
+  22: require('../assets/avatars/synthwave_moon.png'),
+  23: require('../assets/avatars/penthouse.png'),
+  24: require('../assets/avatars/tiger.png'),
+  25: require('../assets/avatars/royal_flush.png'),
+  26: require('../assets/avatars/million_pot.png'),
+  27: require('../assets/avatars/roulette.png'),
+  28: require('../assets/avatars/casino_crown.png'),
+  29: require('../assets/avatars/poker_king.png'),
+  30: require('../assets/avatars/midnight_mirage.png'),
 };
 
 // ─── Lock overlay ──────────────────────────────────────────────────────────────
@@ -66,7 +83,7 @@ export default function NeonAvatar({
   isEquipped = false,
   style,
 }: NeonAvatarProps) {
-  const safeId    = Math.min(15, Math.max(1, Math.round(avatarId || 1)));
+  const safeId    = Math.min(30, Math.max(1, Math.round(avatarId || 1)));
   const avatar    = getNeonAvatar(safeId);
   const rarityColor = NEON_RARITY_COLORS[avatar.rarity];
   const borderWidth = NEON_RARITY_BORDER[avatar.rarity];

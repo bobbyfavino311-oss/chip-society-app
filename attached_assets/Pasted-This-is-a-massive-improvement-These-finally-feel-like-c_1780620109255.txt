@@ -1,0 +1,129 @@
+This is a **massive improvement**. These finally feel like collectible premium avatars instead of mobile app icons.
+
+The biggest issue remaining is consistency.
+
+### Fix Existing Avatars
+
+**Flamingo**
+
+* Remove the white side margins completely.
+* Zoom artwork to fill the entire circular crop.
+* Remove all "Miami Vice" text.
+* Flamingo should occupy 60–70% of the frame.
+* Add water reflections and neon sunset atmosphere.
+* Make it feel like a luxury Miami resort scene.
+
+**Ace Cards**
+
+* Remove white side margins.
+* Scale artwork to fully occupy the circle.
+* Bring cards closer to the camera.
+* Increase chip stack detail.
+* Add neon glow around cards.
+* Make it feel like a high-stakes casino moment.
+
+---
+
+# Create 15 New Premium Vaporwave Avatars
+
+These should match the quality of the newest avatars.
+
+### 1. Neon Yacht
+
+Luxury yacht cruising through pink and cyan neon waters at sunset.
+
+### 2. Vice City Skyline
+
+Miami skyline reflected in calm water with glowing neon lights.
+
+### 3. Retro Ferrari
+
+White 1980s Ferrari parked beneath neon palm trees.
+
+### 4. High Roller Penthouse
+
+Luxury penthouse balcony overlooking a vaporwave cityscape.
+
+### 5. Neon Tiger
+
+Stylized cyber-neon tiger emerging from darkness.
+
+### 6. Royal Flush
+
+Five-card royal flush on a glowing poker table with chips.
+
+### 7. Palm Paradise
+
+Cinematic palm tree silhouette against a pink-purple sunset.
+
+### 8. Ocean Drive
+
+Neon-lit Art Deco hotel with classic Miami Vice atmosphere.
+
+### 9. Million Dollar Pot
+
+Massive stack of poker chips with glowing neon highlights.
+
+### 10. Synthwave Moon
+
+Large vaporwave moon with stars and purple haze.
+
+### 11. Casino Crown
+
+Gold crown floating above neon poker chips.
+
+### 12. Sunset Convertible
+
+1980s convertible driving toward a synthwave sunset.
+
+### 13. Neon Roulette
+
+Luxury roulette wheel illuminated by pink and cyan lighting.
+
+### 14. Poker King
+
+Stylized king card artwork with luxury casino atmosphere.
+
+### 15. Midnight Mirage
+
+Palm trees, water reflections, city skyline, and neon moonlight.
+
+---
+
+# Art Direction Requirements
+
+Every avatar must:
+
+* Fill the entire circular frame.
+* No white borders.
+* No empty side margins.
+* No text inside artwork.
+* No logos.
+* No labels.
+* No clip-art styling.
+* No flat icons.
+* No simplified vector graphics.
+
+Each avatar should look like:
+
+* Premium digital artwork.
+* A collectible poker profile item.
+* A mini movie poster.
+* A luxury synthwave scene.
+* Something players would want to unlock and show off.
+
+---
+
+# Quality Benchmark
+
+Before approving an avatar, ask:
+
+> "Would someone pay money to unlock this avatar?"
+
+If the answer is no, redesign it.
+
+The target aesthetic is:
+
+**Miami Vice + Vaporwave + Luxury Poker Lifestyle + High-End Digital Art + Collectible Gaming Cosmetic.**
+
+The Flamingo, Ace, Cherry, and Hourglass avatars should be used as the new quality baseline once the white side margins are removed and the artwork is properly scaled to fill the circular crop.
