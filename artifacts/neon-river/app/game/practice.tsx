@@ -633,7 +633,10 @@ export default function PracticeScreen() {
         </TouchableOpacity>
         <View style={styles.topCenter}>
           {state.phase !== 'idle' && (
-            <Text style={styles.phaseLabel}>
+            <Text style={[
+              styles.phaseLabel,
+              isVice && styles.phaseLabelVice,
+            ]}>
               {PHASE_LABELS[state.phase] ?? ''}
               {handCount > 0 && `  ·  #${handCount + 1}`}
             </Text>
@@ -995,6 +998,17 @@ const styles = StyleSheet.create({
   phaseLabel: {
     color: 'rgba(255,255,255,0.25)', fontSize: 9, fontWeight: '600',
     letterSpacing: 3, fontFamily: 'Orbitron_400Regular',
+  },
+  phaseLabelVice: {
+    color: '#FF2FAE',
+    fontSize: 14,
+    fontWeight: '800',
+    fontStyle: 'italic',
+    fontFamily: 'Inter_700Bold',
+    letterSpacing: 0.5,
+    textShadowColor: '#FF2FAE',
+    textShadowRadius: 10,
+    textShadowOffset: { width: 0, height: 0 },
   },
 
   // ── Exit modal

@@ -7,9 +7,102 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path, Circle, Polygon } from 'react-native-svg';
+import Svg, { Path, Circle, Ellipse, Line, Polygon, Rect } from 'react-native-svg';
 import colors from '../constants/colors';
 import { useTableTheme } from '../context/TableThemeContext';
+
+// ─── Vice Nights button silhouette backgrounds ────────────────────────────────
+
+function ViceFoldBg() {
+  // South Beach city skyline silhouette at the bottom of the FOLD button
+  return (
+    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      <Svg width="100%" height="100%" viewBox="0 0 70 48" preserveAspectRatio="xMidYMax meet">
+        {/* Silhouette buildings */}
+        <Rect x={0}  y={26} width={8}  height={22} fill="#000" opacity={0.30} />
+        <Rect x={9}  y={18} width={12} height={30} fill="#000" opacity={0.30} />
+        <Rect x={22} y={30} width={7}  height={18} fill="#000" opacity={0.28} />
+        <Rect x={30} y={20} width={10} height={28} fill="#000" opacity={0.30} />
+        <Rect x={41} y={25} width={8}  height={23} fill="#000" opacity={0.28} />
+        <Rect x={50} y={14} width={11} height={34} fill="#000" opacity={0.30} />
+        <Rect x={62} y={28} width={8}  height={20} fill="#000" opacity={0.28} />
+        {/* Palm silhouette */}
+        <Path d="M 15 18 C 15 14, 15 10, 15 7" stroke="#FF2FAE" strokeWidth={1.2} strokeOpacity={0.40} />
+        <Path d="M 15 7 C 20 5, 24 8, 24 11" stroke="#FF2FAE" strokeWidth={0.8} strokeOpacity={0.35} />
+        <Path d="M 15 7 C 10 5, 6 8, 6 11" stroke="#FF2FAE" strokeWidth={0.8} strokeOpacity={0.35} />
+        {/* Neon street glow */}
+        <Line x1={0} y1={48} x2={70} y2={48} stroke="#FF2FAE" strokeWidth={0.8} strokeOpacity={0.20} />
+      </Svg>
+    </View>
+  );
+}
+
+function ViceCallBg() {
+  // Ocean neon reflection waves
+  return (
+    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      <Svg width="100%" height="100%" viewBox="0 0 70 48" preserveAspectRatio="xMidYMax meet">
+        {/* Reflection wave lines */}
+        <Path d="M 0 38 Q 17 34, 35 38 Q 52 42, 70 38" stroke="#00E5FF" strokeWidth={0.8} fill="none" strokeOpacity={0.28} />
+        <Path d="M 0 42 Q 17 38, 35 42 Q 52 46, 70 42" stroke="#00E5FF" strokeWidth={0.6} fill="none" strokeOpacity={0.20} />
+        <Path d="M 0 46 Q 17 42, 35 46 Q 52 50, 70 46" stroke="#00E5FF" strokeWidth={0.5} fill="none" strokeOpacity={0.15} />
+        {/* Reflection streaks */}
+        <Line x1={18} y1={30} x2={18} y2={48} stroke="#00E5FF" strokeWidth={0.6} strokeOpacity={0.18} />
+        <Line x1={35} y1={28} x2={35} y2={48} stroke="#00E5FF" strokeWidth={0.8} strokeOpacity={0.22} />
+        <Line x1={52} y1={30} x2={52} y2={48} stroke="#FF2FAE" strokeWidth={0.6} strokeOpacity={0.18} />
+      </Svg>
+    </View>
+  );
+}
+
+function ViceRaiseBg() {
+  // Sports car silhouette at bottom right
+  return (
+    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      <Svg width="100%" height="100%" viewBox="0 0 70 48" preserveAspectRatio="xMaxYMax meet">
+        {/* Car body */}
+        <Path d="M 18 38 L 18 32 L 24 28 L 42 27 L 50 31 L 56 31 L 56 38 Z"
+          fill="#000" fillOpacity={0.35} />
+        {/* Windshield */}
+        <Path d="M 26 28 L 24 28 L 30 28 L 38 28 L 42 31 Z"
+          fill="#6060AA" fillOpacity={0.20} />
+        {/* Wheels */}
+        <Circle cx={26} cy={38} r={4.5} fill="#000" fillOpacity={0.45} />
+        <Circle cx={47} cy={38} r={4.5} fill="#000" fillOpacity={0.45} />
+        {/* Tail glow */}
+        <Ellipse cx={18} cy={33} rx={3} ry={2.5} fill="#FF2FAE" fillOpacity={0.50} />
+        <Ellipse cx={18} cy={33} rx={8} ry={5} fill="#FF2FAE" fillOpacity={0.12} />
+        {/* Street */}
+        <Line x1={0} y1={44} x2={70} y2={44} stroke="#FF2FAE" strokeWidth={0.6} strokeOpacity={0.18} />
+        {/* Neon underglow */}
+        <Ellipse cx={37} cy={42} rx={22} ry={3} fill="#FF2FAE" fillOpacity={0.08} />
+      </Svg>
+    </View>
+  );
+}
+
+function ViceAllInBg() {
+  // Palm tree silhouettes flanking
+  return (
+    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      <Svg width="100%" height="100%" viewBox="0 0 70 48" preserveAspectRatio="xMidYMax meet">
+        {/* Left palm */}
+        <Path d="M 8 48 C 8 40, 9 32, 10 24" stroke="#FF2FAE" strokeWidth={1.8} strokeOpacity={0.35} strokeLinecap="round" />
+        <Path d="M 10 24 C 16 20, 20 23, 20 27" stroke="#FF2FAE" strokeWidth={1.0} strokeOpacity={0.30} strokeLinecap="round" />
+        <Path d="M 10 24 C 4 20, 1 23, 1 27" stroke="#FF2FAE" strokeWidth={1.0} strokeOpacity={0.30} strokeLinecap="round" />
+        <Path d="M 10 24 C 11 18, 12 15, 11 12" stroke="#FF2FAE" strokeWidth={0.9} strokeOpacity={0.28} strokeLinecap="round" />
+        {/* Right palm */}
+        <Path d="M 62 48 C 62 40, 61 32, 60 24" stroke="#FF2FAE" strokeWidth={1.8} strokeOpacity={0.35} strokeLinecap="round" />
+        <Path d="M 60 24 C 66 20, 70 23, 70 27" stroke="#FF2FAE" strokeWidth={1.0} strokeOpacity={0.30} strokeLinecap="round" />
+        <Path d="M 60 24 C 54 20, 50 23, 50 27" stroke="#FF2FAE" strokeWidth={1.0} strokeOpacity={0.30} strokeLinecap="round" />
+        <Path d="M 60 24 C 59 18, 58 15, 59 12" stroke="#FF2FAE" strokeWidth={0.9} strokeOpacity={0.28} strokeLinecap="round" />
+        {/* Sun/glow circle center */}
+        <Circle cx={35} cy={36} r={10} fill="#FFD700" fillOpacity={0.06} />
+        <Circle cx={35} cy={36} r={6} fill="#FFD700" fillOpacity={0.08} />
+      </Svg>
+    </View>
+  );
+}
 
 // ─── Vice Nights palm ornament ────────────────────────────────────────────────
 function VicePalmOrnament({ color = '#FF2FAE' }: { color?: string }) {
@@ -238,10 +331,19 @@ export default function BettingPanel({
               style={[
                 styles.sliderTrack,
                 isDragon && { backgroundColor: 'rgba(40,0,0,0.5)' },
+                isVice   && { backgroundColor: 'transparent' },
               ]}
               onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
               {...panResponder.panHandlers}
             >
+              {/* Vice: full-width gradient track always visible (cyan→pink) */}
+              {isVice && (
+                <LinearGradient
+                  colors={['#0088AA', '#00E5FF', '#CC00AA', '#FF2FAE']}
+                  start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }}
+                  style={[StyleSheet.absoluteFill, { borderRadius: 14, opacity: 0.28 }]}
+                />
+              )}
               {/* Fill */}
               <View style={[styles.sliderFill, { width: `${Math.round(sliderRatio * 100)}%` }]}>
                 {isDragon ? (
@@ -294,10 +396,10 @@ export default function BettingPanel({
         >
           <LinearGradient
             colors={isDragon ? ['rgba(80,0,0,0.25)','rgba(30,0,0,0.15)']
-              : isVice ? ['rgba(80,0,50,0.35)','rgba(30,0,20,0.20)']
               : ['transparent','transparent']}
             style={StyleSheet.absoluteFill}
           />
+          {isVice && <ViceFoldBg />}
           <Text style={[styles.foldText, isDragon && dr.foldText, isVice && vn.foldText]}>FOLD</Text>
         </TouchableOpacity>
 
@@ -309,10 +411,10 @@ export default function BettingPanel({
           >
             <LinearGradient
               colors={isDragon ? ['rgba(15,50,40,0.35)','rgba(10,30,25,0.20)']
-                : isVice ? ['rgba(0,100,120,0.35)','rgba(0,60,80,0.20)']
                 : ['rgba(0,180,80,0.3)','rgba(0,120,50,0.15)']}
               style={StyleSheet.absoluteFill}
             />
+            {isVice && <ViceCallBg />}
             <Text style={[styles.checkText, isDragon && dr.checkText, isVice && vn.checkText]}>CHECK</Text>
           </TouchableOpacity>
         ) : (
@@ -322,10 +424,10 @@ export default function BettingPanel({
           >
             <LinearGradient
               colors={isDragon ? ['rgba(15,50,40,0.35)','rgba(10,30,25,0.20)']
-                : isVice ? ['rgba(0,100,120,0.35)','rgba(0,60,80,0.20)']
                 : ['rgba(0,180,80,0.3)','rgba(0,120,50,0.15)']}
               style={StyleSheet.absoluteFill}
             />
+            {isVice && <ViceCallBg />}
             <Text style={[styles.callText, isDragon && dr.callText, isVice && vn.callText]}>
               CALL{'\n'}
               <Text style={[styles.callAmt, isDragon && dr.callAmt, isVice && vn.callAmt]}>{fmt(callAmount)}</Text>
@@ -341,10 +443,10 @@ export default function BettingPanel({
           >
             <LinearGradient
               colors={isDragon ? ['rgba(30,20,0,0.40)','rgba(15,10,0,0.25)']
-                : isVice ? ['rgba(40,0,80,0.50)','rgba(20,0,50,0.30)']
                 : ['rgba(0,140,200,0.35)','rgba(0,80,140,0.18)']}
               style={StyleSheet.absoluteFill}
             />
+            {isVice && <ViceRaiseBg />}
             <Text style={[styles.raiseText, isDragon && dr.raiseText, isVice && vn.raiseText]}>
               RAISE{'\n'}
               <Text style={[styles.raiseInlineAmt, isDragon && dr.raiseInlineAmt, isVice && vn.raiseInlineAmt]}>
@@ -362,10 +464,10 @@ export default function BettingPanel({
           >
             <LinearGradient
               colors={isDragon ? ['rgba(90,0,0,0.35)','rgba(40,0,0,0.20)']
-                : isVice ? ['rgba(100,0,60,0.45)','rgba(50,0,30,0.25)']
                 : ['rgba(180,0,100,0.35)','rgba(120,0,70,0.18)']}
               style={StyleSheet.absoluteFill}
             />
+            {isVice && <ViceAllInBg />}
             <Text style={[styles.allInText, isDragon && dr.allInText, isVice && vn.allInText]}>ALL{'\n'}IN</Text>
           </TouchableOpacity>
         )}

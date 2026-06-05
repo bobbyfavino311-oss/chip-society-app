@@ -213,23 +213,23 @@ function OceanDriveSign({ x, y }: { x: number; y: number }) {
   const w = 110; const h = 42;
   return (
     <G>
-      {/* Outer glow */}
+      {/* Outer glow — cyan */}
       <Rect x={x - 4} y={y - 4} width={w + 8} height={h + 8} rx={8}
-        fill="none" stroke="#39FF14" strokeWidth={0.5} strokeOpacity={0.20} />
+        fill="none" stroke="#00E5FF" strokeWidth={0.5} strokeOpacity={0.22} />
       {/* Sign box */}
       <Rect x={x} y={y} width={w} height={h} rx={5}
-        fill="#040010" fillOpacity={0.90} stroke="#39FF14" strokeWidth={1.4} strokeOpacity={0.80} />
-      {/* Inner tube line top/bottom */}
+        fill="#040010" fillOpacity={0.90} stroke="#00E5FF" strokeWidth={1.4} strokeOpacity={0.80} />
+      {/* Inner tube lines */}
       <Rect x={x + 3} y={y + 2} width={w - 6} height={1}
-        fill="#39FF14" fillOpacity={0.20} />
+        fill="#00E5FF" fillOpacity={0.20} />
       <Rect x={x + 3} y={y + h - 3} width={w - 6} height={1}
-        fill="#39FF14" fillOpacity={0.20} />
-      {/* OCEAN */}
-      <SvgText x={x + w / 2} y={y + 16} fill="#39FF14" fontSize={11}
+        fill="#FF2FAE" fillOpacity={0.20} />
+      {/* OCEAN — cyan */}
+      <SvgText x={x + w / 2} y={y + 16} fill="#00E5FF" fontSize={11}
         fontWeight="bold" textAnchor="middle" letterSpacing={3} opacity={0.95}>
         OCEAN
       </SvgText>
-      {/* DRIVE */}
+      {/* DRIVE — pink */}
       <SvgText x={x + w / 2} y={y + 31} fill="#FF2FAE" fontSize={12}
         fontWeight="bold" textAnchor="middle" letterSpacing={2.5} opacity={0.95}>
         DRIVE
@@ -267,11 +267,12 @@ export default function ViceBackground() {
       <Svg width={W} height={H} viewBox={`0 0 ${VW} ${VH}`}
         preserveAspectRatio="xMidYMid meet">
         <Defs>
-          {/* Warm horizon glow — key feature from reference */}
-          <RadialGradient id="horizonWarm" cx="50%" cy="68%" r="65%">
-            <Stop offset="0%"   stopColor="#FF5020" stopOpacity="0.48" />
-            <Stop offset="25%"  stopColor="#CC0060" stopOpacity="0.30" />
-            <Stop offset="55%"  stopColor="#6B0080" stopOpacity="0.15" />
+          {/* Crimson-red horizon glow — deep red sunset behind buildings */}
+          <RadialGradient id="horizonWarm" cx="50%" cy="70%" r="68%">
+            <Stop offset="0%"   stopColor="#AA1018" stopOpacity="0.75" />
+            <Stop offset="15%"  stopColor="#CC2035" stopOpacity="0.55" />
+            <Stop offset="38%"  stopColor="#7B0040" stopOpacity="0.30" />
+            <Stop offset="68%"  stopColor="#3A0050" stopOpacity="0.12" />
             <Stop offset="100%" stopColor="#000000"  stopOpacity="0.00" />
           </RadialGradient>
           {/* Upper magenta sky tint */}
@@ -396,9 +397,9 @@ export default function ViceBackground() {
         <Path d="M 31 671 C 33 700, 29 725, 31 755"
           stroke="#FF2FAE" strokeWidth={1.0} strokeLinecap="round"
           fill="none" strokeOpacity={0.18} />
-        {/* OCEAN DRIVE right */}
+        {/* OCEAN DRIVE right — cyan reflection */}
         <Path d="M 325 671 C 327 698, 323 722, 325 748"
-          stroke="#39FF14" strokeWidth={1.0} strokeLinecap="round"
+          stroke="#00E5FF" strokeWidth={1.0} strokeLinecap="round"
           fill="none" strokeOpacity={0.16} />
         {/* Car tail light */}
         <Path d="M 245 691 C 244 710, 246 728, 245 748"

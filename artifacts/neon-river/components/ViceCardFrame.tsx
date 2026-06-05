@@ -123,7 +123,7 @@ export default function ViceCardFrame({ width, height }: { width: number; height
       {/* ── "Vice City" script label — top center, prominent ── */}
       <View style={styles.signRow}>
         <View style={styles.signBg}>
-          <Text style={styles.viceCityText}>Vice City</Text>
+          <Text style={styles.viceCityText}>Vice Nights</Text>
         </View>
       </View>
 

@@ -1,0 +1,353 @@
+VICE NIGHTS THEME — EXACT RECREATION MODE
+
+CRITICAL INSTRUCTION:
+
+DO NOT REDESIGN.
+DO NOT REINTERPRET.
+DO NOT CREATE YOUR OWN VERSION.
+DO NOT CHANGE THE LAYOUT.
+DO NOT MOVE ELEMENTS.
+DO NOT SIMPLIFY.
+DO NOT REPLACE ANY VISUALS.
+
+REBUILD THE THEME TO MATCH THE PROVIDED REFERENCE IMAGE AS CLOSELY AS POSSIBLE.
+
+The final result should look virtually identical to the reference image.
+
+The ONLY text change allowed is:
+
+Replace:
+"VICE CITY"
+
+With:
+"VICE NIGHTS"
+
+Everything else remains unchanged.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BACKGROUND
+
+Create a full-screen Miami Vice vaporwave cityscape.
+
+Features:
+
+• Neon pink and purple sunset sky
+• Orange glow on horizon
+• Palm trees throughout scene
+• Ocean Drive architecture
+• Neon hotel signs
+• Wet reflective streets
+• Cyan and magenta reflections
+• Luxury nightlife atmosphere
+• Sports cars parked along the road
+• Synthwave aesthetic
+• High contrast neon lighting
+
+Background should match the reference image exactly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TOP HEADER
+
+Keep identical layout.
+
+Top center:
+
+PRE-FLOP #2
+
+Use the same 1980s brush script style.
+
+Pink neon typography.
+
+Cyan accent underline.
+
+Do not alter size or placement.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER AVATARS
+
+Maintain identical avatar layout.
+
+Four players across top.
+
+Avatar rings:
+
+• Pink neon
+• Cyan glow
+• Gold ring for dealer
+
+Display:
+
+Player name
+Chip count
+Dealer marker
+
+Keep positioning identical.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MAIN TABLE
+
+MOST IMPORTANT PART.
+
+The table must look exactly like the reference.
+
+Table characteristics:
+
+• Large black glass poker table
+• Neon pink outer trim
+• Cyan secondary glow
+• Chrome accents
+• Thick illuminated frame
+
+Table occupies the center of the screen.
+
+Keep the same overall shape.
+
+Do not redesign the table silhouette.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE LOGO
+
+Replace text:
+
+VICE CITY
+
+WITH
+
+VICE NIGHTS
+
+Use the exact same script font style.
+
+Use the exact same placement.
+
+Use the exact same neon pink treatment.
+
+Do not change anything else.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PALM TREE DECORATIONS
+
+Keep both decorative palm trees attached to the table.
+
+One left.
+
+One right.
+
+Same size.
+
+Same placement.
+
+Same cyan/pink neon styling.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COMMUNITY CARD AREA
+
+Keep exact layout.
+
+Five card slots.
+
+Pink dashed outlines.
+
+Centered horizontally.
+
+Perfect spacing.
+
+No artwork inside slots.
+
+No redesign.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COCKTAIL GLASS ICON
+
+Keep identical neon martini icon.
+
+Position:
+
+Bottom right corner of table.
+
+Pink neon outline.
+
+Same scale.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+POT DISPLAY
+
+Keep identical shape.
+
+Black glass center.
+
+Chrome border.
+
+Pink neon trim.
+
+Cyan accent glow.
+
+Text:
+
+POT
+
+150
+
+Centered exactly like reference.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER CARD AREA
+
+Keep player cards directly beneath pot display.
+
+Two large cards.
+
+White card faces.
+
+Subtle pink neon glow around cards.
+
+Same sizing and spacing.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SPORTS CAR
+
+Keep luxury sports car.
+
+Bottom-right section.
+
+Partially behind gameplay.
+
+Visible headlights and rear lights.
+
+Pink and cyan reflections.
+
+Do not remove.
+
+Do not replace.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHIP DISPLAY
+
+Keep identical positioning.
+
+Player name.
+
+Chip count.
+
+Dealer marker.
+
+Colored betting dots.
+
+Same layout.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BETTING INFO BOXES
+
+Keep three boxes:
+
+POT
+2X
+ALL IN
+
+Black glass panels.
+
+Pink and cyan neon borders.
+
+Same layout.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RAISE SECTION
+
+Keep identical typography.
+
+Use:
+
+RAISE
+
+112
+
+Pink and cyan neon lettering.
+
+Palm tree accents on both sides.
+
+Do not alter placement.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SLIDER
+
+Keep exact slider design.
+
+Pink and cyan gradient.
+
+Palm tree slider knob.
+
+Black glass track.
+
+Same proportions.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACTION BUTTONS
+
+Keep exact button arrangement.
+
+FOLD
+
+Pink neon theme.
+City skyline silhouette.
+
+CALL
+
+Cyan neon theme.
+Ocean reflection styling.
+
+RAISE
+
+Purple neon theme.
+Sports car styling.
+
+ALL IN
+
+Pink and gold theme.
+Palm silhouettes.
+
+Do not redesign.
+
+Do not simplify.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+When compared side-by-side with the reference image:
+
+95%+ visual match.
+
+Same composition.
+
+Same proportions.
+
+Same theme.
+
+Same atmosphere.
+
+Same neon intensity.
+
+Same object placement.
+
+ONLY CHANGE:
+
+"VICE CITY"
+
+→
+
+"VICE NIGHTS"
