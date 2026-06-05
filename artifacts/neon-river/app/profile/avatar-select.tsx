@@ -46,12 +46,6 @@ const RARITY_RING: Record<NeonRarity, string> = {
 };
 
 // Faint bg tint per rarity — gives each tier a distinct feel in the grid
-const RARITY_CELL_BG: Record<NeonRarity, string> = {
-  COMMON:    '#00d4ff08',
-  RARE:      '#8b5cf60a',
-  EPIC:      '#ff009010',
-  LEGENDARY: '#ffd70014',
-};
 
 export default function AvatarSelectScreen() {
   const insets = useSafeAreaInsets();
@@ -71,7 +65,6 @@ export default function AvatarSelectScreen() {
   const isEquipped = profile.profileImageType === 'symbol'
     && (profile.symbolIndex ?? 0) === previewId;
   const ringColor  = RARITY_RING[preview.rarity];
-  const xpPct      = Math.min(1, preview.unlockXP > 0 ? profile.xp / preview.unlockXP : 1);
 
   function pulse() {
     Animated.sequence([
@@ -98,26 +91,16 @@ export default function AvatarSelectScreen() {
   function renderBadge({ item }: { item: NeonAvatarData }) {
     const avLocked  = !isNeonAvatarUnlocked(item, profile.xp);
     const rc        = RARITY_RING[item.rarity];
-    const cellBg    = RARITY_CELL_BG[item.rarity];
     const selected  = previewId === item.id;
     const equipped  = profile.profileImageType === 'symbol'
       && profile.symbolIndex === item.id;
 
     return (
       <TouchableOpacity
-        style={[s.cell, { width: SLOT_W, backgroundColor: selected ? cellBg : 'transparent' }]}
+        style={[s.cell, { width: SLOT_W }]}
         onPress={() => handleSelect(item)}
         activeOpacity={0.75}
       >
-        {/* Selected: outer glow halo */}
-        {selected && (
-          <View style={[s.selectedGlow, {
-            width:  AV_SIZE + 22,
-            height: AV_SIZE + 22,
-            borderRadius: (AV_SIZE + 22) / 2,
-            backgroundColor: rc,
-          }]} />
-        )}
 
         {/* Always-on faint rarity ring — dims when not selected */}
         <View style={[s.rarityRingAlways, {
@@ -251,25 +234,6 @@ export default function AvatarSelectScreen() {
 
               <Text style={s.heroName}>{preview.name}</Text>
 
-              {!unlocked ? (
-                <View style={s.xpBlock}>
-                  <View style={s.xpBarBg}>
-                    <View style={[s.xpBarFill, {
-                      width: `${xpPct * 100}%` as `${number}%`,
-                      backgroundColor: ringColor,
-                    }]} />
-                  </View>
-                  <Text style={[s.xpLabel, { color: ringColor + 'bb' }]}>
-                    {profile.xp.toLocaleString()} / {preview.unlockXP.toLocaleString()} XP
-                  </Text>
-                </View>
-              ) : (
-                preview.unlockCondition ? (
-                  <Text style={[s.unlockText, { color: '#44446a' }]}>
-                    {preview.unlockCondition}
-                  </Text>
-                ) : null
-              )}
 
               <TouchableOpacity
                 style={[s.equipBtn, {

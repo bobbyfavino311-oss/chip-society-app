@@ -1,0 +1,308 @@
+### AVATAR SYSTEM REFINEMENT PROMPT
+
+The avatar collection is moving in the right direction, but several issues still need to be corrected for consistency, premium presentation, and overall quality.
+
+---
+
+## 1. REMOVE WHITE BORDERS / LETTERBOXING
+
+The following avatars currently contain white empty space around the artwork:
+
+* Flamingo
+* Vice Skyline
+* Yacht
+
+### Required Fix
+
+The artwork must completely fill the circular avatar crop.
+
+* No white side bars
+* No white top bars
+* No letterboxing
+* No pillarboxing
+* No empty space
+
+The artwork should be intelligently scaled and cropped so the image fills the entire circular frame.
+
+The avatar should feel like a premium profile picture, not a rectangular image placed inside a circle.
+
+---
+
+## 2. FLAMINGO AVATAR
+
+Current Issues:
+
+* White borders visible
+* Artwork not filling circle
+
+### Fix
+
+* Scale artwork to full circular crop
+* Flamingo should occupy approximately 60–70% of the frame
+* Emphasize neon water reflections
+* Improve contrast and vibrancy
+* Remove any empty space
+
+Goal:
+
+A premium Miami resort flamingo standing in neon water at sunset.
+
+---
+
+## 3. VICE SKYLINE AVATAR
+
+Current Issues:
+
+* White borders
+* Image appears pasted into circle
+
+### Fix
+
+* Full bleed circular crop
+* Scale skyline artwork larger
+* Increase water reflections
+* Enhance neon cyan and pink city lights
+* Fill entire circle
+
+Goal:
+
+Luxury Miami skyline reflected in calm neon water.
+
+---
+
+## 4. YACHT AVATAR
+
+Current Issues:
+
+* White borders
+* Yacht composition too small
+
+### Fix
+
+* Scale yacht larger
+* Full circular crop
+* Yacht should dominate frame
+* Enhance water wake effects
+* Increase neon reflections
+
+Goal:
+
+High-speed luxury yacht cutting through neon ocean water.
+
+---
+
+## 5. REMOVE SELECTED AVATAR BOX
+
+Current Problem:
+
+When an avatar is selected, a large glowing square card appears around it.
+
+This is visually distracting and makes the gallery look cluttered.
+
+### Remove
+
+* Entire square selection box
+* Entire square highlight card
+
+### Replace With
+
+Selected avatar should use:
+
+* Slight glow around avatar ring
+* Small gold checkmark badge
+* Slightly brighter avatar border
+
+Nothing else.
+
+Keep the layout clean.
+
+---
+
+## 6. CHANGE SECTION TITLE
+
+Current:
+
+"NEON SYMBOL"
+
+Replace with:
+
+### SELECT AN AVATAR
+
+Description:
+
+Choose from 45 collectible avatars.
+
+---
+
+## 7. CORRECT AVATAR COUNT
+
+Current count is incorrect.
+
+Update all avatar references to:
+
+### 45 Avatars Available
+
+The number should automatically update as future avatars are added.
+
+---
+
+## 8. REMOVE WALKIE-TALKIE AVATAR
+
+Delete completely:
+
+* Walkie Talkie Avatar
+
+It feels out of place and lowers the overall collection quality.
+
+---
+
+## 9. MIDNIGHT AVATAR
+
+Current Issue:
+
+Glow effects are excessive.
+
+### Fix
+
+Reduce:
+
+* Outer bloom
+* Halo effects
+* Overexposed lighting
+
+Keep:
+
+* Atmospheric mood
+* Dark luxury aesthetic
+
+Goal:
+
+More sophisticated and premium.
+
+---
+
+## 10. REMOVE XP REQUIREMENTS
+
+Remove ALL XP text throughout avatar collection screens.
+
+Delete:
+
+* Reach 10,000 XP
+* Reach 30,000 XP
+* Reach 50,000 XP
+
+and any similar text.
+
+---
+
+## 11. UNLOCK ALL AVATARS
+
+All avatars should be available immediately.
+
+No restrictions.
+
+No unlock requirements.
+
+No XP requirements.
+
+No progression locks.
+
+No rarity restrictions affecting availability.
+
+Purpose:
+
+Players should be free to customize their identity immediately.
+
+---
+
+## 12. REDESIGN THESE AVATARS
+
+### Mirage
+
+Current version feels generic.
+
+Redesign as:
+
+* Neon desert casino oasis
+* Luxury resort lights
+* Purple and cyan reflections
+* Vaporwave atmosphere
+
+---
+
+### Crown
+
+Current version lacks prestige.
+
+Redesign as:
+
+* Floating gold crown
+* Neon lighting
+* Casino chip pedestal
+* Luxury high-roller aesthetic
+
+Should feel like:
+
+VIP status.
+
+---
+
+### Poker King
+
+Current version feels flat.
+
+Redesign as:
+
+* Cinematic King card
+* Luxury poker chips
+* High-stakes table environment
+* Neon reflections
+* Premium casino atmosphere
+
+Should feel like:
+
+The ultimate poker avatar.
+
+---
+
+## 13. REDESIGN TIKI AVATAR
+
+The Tiki should become one of the strongest avatars in the collection.
+
+### New Direction
+
+Legendary Golden Tiki
+
+Features:
+
+* Ancient tropical casino idol
+* Emerald green stone
+* Gold inlays
+* Art Deco geometric carvings
+* Luxury resort artifact
+* Neon reflections
+* Waterfront casino backdrop
+* Palm trees
+* Marina lights
+* Sunset atmosphere
+
+Style:
+
+Miami Vice + Luxury Resort + Vaporwave + Casino Mythology
+
+Goal:
+
+The Tiki should feel like a rare collectible artifact from a legendary tropical casino.
+
+---
+
+## FINAL QUALITY RULE
+
+Every avatar should feel like:
+
+* A premium collectible cosmetic
+* A luxury poker profile picture
+* A Miami Vice movie poster
+* A high-end gaming reward
+
+If any avatar looks like a simple image placed inside a circle, redesign it until it feels like a premium collectible artwork piece.

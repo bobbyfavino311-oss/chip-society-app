@@ -91,8 +91,7 @@ export const NEON_AVATARS: NeonAvatar[] = [
 
   // ── COLLECTION 04 — UTILITY SERIES (49–52) ───────────────────────────────────
   { id: 49, name: 'SPRAY CAN',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff0090', bgColor: '#1a0012' },
-  { id: 50, name: 'WALKIE TALKIE',  rarity: 'RARE',      unlockXP: 9000,   unlockCondition: 'Reach 9,000 XP',   color: '#00d4ff', bgColor: '#001422' },
-  { id: 51, name: 'RADIO DEVICE',   rarity: 'RARE',      unlockXP: 15000,  unlockCondition: 'Reach 15,000 XP',  color: '#ffd700', bgColor: '#1a1100' },
+  { id: 51, name: 'RADIO DEVICE',   rarity: 'RARE',      unlockXP: 15000,  unlockCondition: '',  color: '#ffd700', bgColor: '#1a1100' },
   { id: 52, name: '80S CAMERA',     rarity: 'EPIC',      unlockXP: 120000, unlockCondition: 'Reach 120,000 XP', color: '#a855f7', bgColor: '#0f001e' },
 
   // ── LEGENDARY ICON (53) ───────────────────────────────────────────────────────

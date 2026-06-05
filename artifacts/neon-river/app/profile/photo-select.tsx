@@ -130,8 +130,8 @@ export default function PhotoSelectScreen() {
             <NeonAvatarView avatarId={symbolId} size={36} />
           </View>
           <View style={styles.optionContent}>
-            <Text style={styles.optionTitle}>NEON SYMBOL</Text>
-            <Text style={styles.optionSub}>Choose from 30 neon icon avatars · all unlocked</Text>
+            <Text style={styles.optionTitle}>SELECT AN AVATAR</Text>
+            <Text style={styles.optionSub}>45 collectible avatars · all unlocked</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="rgba(0,212,255,0.5)" />
         </TouchableOpacity>
