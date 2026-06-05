@@ -1,0 +1,224 @@
+```text
+MIAMI NIGHTS POKER THEME — MINIMAL NEON EDITION
+
+Create a clean, minimalist Miami Nights poker table theme using the exact layout shown in the reference image.
+
+This is NOT a detailed cityscape theme.
+
+This is NOT a realistic background.
+
+This is NOT a complex artwork-heavy design.
+
+The goal is a sleek, premium, neon poker theme that feels modern, readable, and stylish while maintaining a Miami Vice aesthetic.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OVERALL STYLE
+
+Minimalist Miami Nights
+
+Inspired by:
+
+• Miami Vice
+• Ocean Drive neon
+• South Beach nightlife
+• Luxury poker lounges
+• Vaporwave aesthetics
+• Neon signage
+
+Visual Mood:
+
+• Dark
+• Elegant
+• Premium
+• Minimal
+• Clean
+• High-end
+
+Avoid:
+
+• Busy backgrounds
+• Cars
+• Buildings
+• Complex scenery
+• Overly detailed artwork
+• Visual clutter
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COLOR PALETTE
+
+Primary Background:
+
+• Deep Midnight Blue
+• Dark Navy
+• Black-blue gradients
+
+Accent Colors:
+
+• Neon Pink
+• Electric Cyan
+• Soft Purple
+
+No bright yellows.
+
+No oranges.
+
+No reds.
+
+Keep everything cool-toned.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BACKGROUND
+
+Very simple.
+
+Use a dark navy gradient background.
+
+Add subtle:
+
+• Palm leaf silhouettes
+• Soft neon reflections
+• Faint horizon glow
+
+Keep opacity extremely low.
+
+The background should never compete with gameplay elements.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMMUNITY CARD AREA
+
+Large centered rectangle.
+
+Black glass interior.
+
+Thin cyan neon outline.
+
+Rounded corners.
+
+Five dashed card slots.
+
+Each slot outlined in soft cyan.
+
+Add:
+
+Small neon flamingo illustration on the left side.
+
+Small neon palm tree illustration on the right side.
+
+Both should be simple line art.
+
+Not realistic.
+
+Not oversized.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+POT DISPLAY
+
+Centered beneath community cards.
+
+Rounded capsule shape.
+
+Black glass interior.
+
+Cyan neon border.
+
+Text:
+
+POT 350
+
+Use cyan typography.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DECORATIVE ELEMENTS
+
+Place large outline neon flamingo in bottom-left corner.
+
+Use thin pink neon line art.
+
+Place subtle palm tree silhouette in bottom-right corner.
+
+Use dark cyan line art.
+
+Keep both decorative.
+
+They should frame the gameplay area.
+
+Never overlap cards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER AVATARS
+
+Circular avatars.
+
+Neon ring borders.
+
+Pink and cyan glow.
+
+Miami-themed avatar artwork.
+
+Examples:
+
+• Palm trees
+• Flamingo
+• Skyline
+• Ocean sunset
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER CARDS
+
+Large white cards.
+
+Clean casino appearance.
+
+Soft blue glow around card edges.
+
+Minimal styling.
+
+Maximum readability.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BOTTOM AREA
+
+Subtle neon horizon reflection.
+
+Thin cyan and purple light streaks.
+
+Minimalist.
+
+Creates atmosphere without clutter.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+The final theme should feel like:
+
+"A luxury Miami poker lounge at midnight."
+
+Not a city scene.
+
+Not a poster.
+
+Not an illustration.
+
+A clean premium poker interface with tasteful Miami neon accents.
+
+Focus on:
+
+• Simplicity
+• Readability
+• Premium appearance
+• Neon atmosphere
+• Minimal artwork
+• Strong gameplay visibility
+
+Everything should feel sleek, modern, and casino-quality.
+```

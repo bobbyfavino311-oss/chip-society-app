@@ -1,58 +1,63 @@
 /**
- * ViceCardFrame — Angular neon-pink frame overlay for the community card area.
- * Reference: octagonal black frame, dashed pink border, "Vice Nights" italic
- * script title, palm tree decorations at top corners of title band.
+ * ViceCardFrame — Minimal Miami Nights community card overlay.
+ * Clean rounded rectangle with cyan dashed border + 5 dashed card slots.
+ * Small neon flamingo on the left, small neon palm on the right.
  */
 import React from 'react';
 import { View } from 'react-native';
-import Svg, {
-  Defs,
-  G,
-  Line,
-  LinearGradient,
-  Path,
-  Rect,
-  Stop,
-  Text as SvgText,
-} from 'react-native-svg';
+import Svg, { G, Path, Rect } from 'react-native-svg';
 
-const PINK  = '#FF2FAE';
-const CYAN  = '#00E5FF';
-const CUT   = 14;  // corner clip amount (px)
-const PAD   = 10;  // outset from card surface edge
+const PINK = '#FF2FAE';
+const CYAN = '#00D4FF';
+const PAD  = 8;   // outset from card surface edge
+const SIDE = 56;  // extra canvas width on each side for ornaments
 
 interface Props { width: number; height: number; }
 
-// ─── Small palm SVG ornament ──────────────────────────────────────────────────
-function PalmOrnament({ x, y, flip = false }: { x: number; y: number; flip?: boolean }) {
-  const s = flip ? -1 : 1;
-  const trunk = `M ${x} ${y + 22} C ${x + s * 2} ${y + 14}, ${x + s * 1} ${y + 8}, ${x + s * 2} ${y}`;
-  const f1 = `M ${x + s * 2} ${y} C ${x + s * 8} ${y - 4}, ${x + s * 14} ${y + 2}, ${x + s * 14} ${y + 8}`;
-  const f2 = `M ${x + s * 2} ${y} C ${x + s * 4} ${y - 8}, ${x + s * 8} ${y - 12}, ${x + s * 8} ${y - 7}`;
-  const f3 = `M ${x + s * 2} ${y} C ${x - s * 4} ${y - 4}, ${x - s * 8} ${y + 2}, ${x - s * 8} ${y + 8}`;
+// ─── Small neon flamingo ──────────────────────────────────────────────────────
+function SmallFlamingo({ x, y }: { x: number; y: number }) {
   return (
     <G>
-      <Path d={trunk} stroke={PINK} strokeWidth={2.2} strokeLinecap="round" fill="none" strokeOpacity={0.90} />
-      <Path d={f1} stroke={PINK} strokeWidth={1.3} strokeLinecap="round" fill="none" strokeOpacity={0.85} />
-      <Path d={f2} stroke={CYAN} strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.80} />
-      <Path d={f3} stroke={CYAN} strokeWidth={1.2} strokeLinecap="round" fill="none" strokeOpacity={0.80} />
+      <Path d={`M ${x-3} ${y} C ${x-3.5} ${y-7}, ${x-6} ${y-14}, ${x-5} ${y-22}`}
+        stroke={PINK} strokeWidth={1.8} strokeLinecap="round" fill="none" strokeOpacity={0.90} />
+      <Path d={`M ${x+1} ${y} C ${x+0.5} ${y-7}, ${x-1} ${y-13}, ${x-1} ${y-22}`}
+        stroke={PINK} strokeWidth={1.8} strokeLinecap="round" fill="none" strokeOpacity={0.90} />
+      <Path d={`M ${x-6} ${y-12} L ${x-3} ${y-11}`}
+        stroke={PINK} strokeWidth={1.4} strokeLinecap="round" fill="none" strokeOpacity={0.80} />
+      <Path d={`M ${x-9} ${y-26} C ${x-14} ${y-33}, ${x-2} ${y-40}, ${x+7} ${y-34} C ${x+13} ${y-28}, ${x+4} ${y-22}, ${x-5} ${y-22} Z`}
+        stroke={PINK} strokeWidth={1.6} fill="none" strokeOpacity={0.90} />
+      <Path d={`M ${x-9} ${y-30} C ${x-17} ${y-35}, ${x-18} ${y-27}, ${x-7} ${y-25}`}
+        stroke={PINK} strokeWidth={1.2} fill="none" strokeOpacity={0.55} />
+      <Path d={`M ${x+6} ${y-33} C ${x+14} ${y-41}, ${x+7} ${y-48}, ${x+11} ${y-55}`}
+        stroke={PINK} strokeWidth={1.7} strokeLinecap="round" fill="none" strokeOpacity={0.90} />
+      <Path d={`M ${x+11} ${y-55} C ${x+15} ${y-60}, ${x+19} ${y-58}, ${x+18} ${y-55} C ${x+17} ${y-52}, ${x+11} ${y-54}, ${x+11} ${y-55}`}
+        stroke={PINK} strokeWidth={1.5} fill="none" strokeOpacity={0.90} />
+      <Path d={`M ${x+18} ${y-56} C ${x+23} ${y-57.5}, ${x+24} ${y-55}, ${x+20} ${y-53.5}`}
+        stroke={PINK} strokeWidth={1.3} strokeLinecap="round" fill="none" strokeOpacity={0.85} />
     </G>
   );
 }
 
-// ─── Clipped-corner polygon path ──────────────────────────────────────────────
-function octPath(x: number, y: number, w: number, h: number, c: number) {
-  return [
-    `M ${x + c} ${y}`,
-    `L ${x + w - c} ${y}`,
-    `L ${x + w} ${y + c}`,
-    `L ${x + w} ${y + h - c}`,
-    `L ${x + w - c} ${y + h}`,
-    `L ${x + c} ${y + h}`,
-    `L ${x} ${y + h - c}`,
-    `L ${x} ${y + c}`,
-    'Z',
-  ].join(' ');
+// ─── Small neon palm ──────────────────────────────────────────────────────────
+function SmallPalm({ cx, baseY, h }: { cx: number; baseY: number; h: number }) {
+  const crown = baseY - h;
+  const tw = h * 0.52;
+  return (
+    <G>
+      <Path d={`M ${cx} ${baseY} C ${cx-3} ${baseY-h*0.5}, ${cx-5} ${crown+h*0.12}, ${cx-5} ${crown}`}
+        stroke={CYAN} strokeWidth={2.2} strokeLinecap="round" fill="none" strokeOpacity={0.80} />
+      <Path d={`M ${cx-5} ${crown} C ${cx-5+tw*0.45} ${crown-tw*0.32}, ${cx-5+tw} ${crown+tw*0.05}, ${cx-5+tw} ${crown+tw*0.40}`}
+        stroke={CYAN} strokeWidth={1.6} strokeLinecap="round" fill="none" strokeOpacity={0.75} />
+      <Path d={`M ${cx-5} ${crown} C ${cx-5+tw*0.18} ${crown-tw*0.68}, ${cx-5+tw*0.5} ${crown-tw*0.90}, ${cx-5+tw*0.52} ${crown-tw*0.60}`}
+        stroke={CYAN} strokeWidth={1.5} strokeLinecap="round" fill="none" strokeOpacity={0.72} />
+      <Path d={`M ${cx-5} ${crown} C ${cx-5} ${crown-tw*0.80}, ${cx-5} ${crown-tw*1.08}, ${cx-5} ${crown-tw*0.92}`}
+        stroke={CYAN} strokeWidth={1.5} strokeLinecap="round" fill="none" strokeOpacity={0.72} />
+      <Path d={`M ${cx-5} ${crown} C ${cx-5-tw*0.18} ${crown-tw*0.68}, ${cx-5-tw*0.5} ${crown-tw*0.90}, ${cx-5-tw*0.52} ${crown-tw*0.60}`}
+        stroke={CYAN} strokeWidth={1.5} strokeLinecap="round" fill="none" strokeOpacity={0.72} />
+      <Path d={`M ${cx-5} ${crown} C ${cx-5-tw*0.45} ${crown-tw*0.32}, ${cx-5-tw} ${crown+tw*0.05}, ${cx-5-tw} ${crown+tw*0.40}`}
+        stroke={CYAN} strokeWidth={1.6} strokeLinecap="round" fill="none" strokeOpacity={0.75} />
+    </G>
+  );
 }
 
 export default function ViceCardFrame({ width, height }: Props) {
@@ -60,108 +65,66 @@ export default function ViceCardFrame({ width, height }: Props) {
 
   const fw = width  + PAD * 2;
   const fh = height + PAD * 2;
-  const cx = fw / 2;
 
-  // title band sits ABOVE the card area — extra top overhang
-  const TITLE_H = 36;
-  const totalH  = fh + TITLE_H;
+  const totalW = fw + SIDE * 2;
+  const totalH = fh;
+
+  // Card slot geometry — 5 slots with even gaps
+  const CARD_GAP = 6;
+  const SLOT_INSET = 10;
+  const slotAreaW = width - SLOT_INSET * 2;
+  const cardW = (slotAreaW - CARD_GAP * 4) / 5;
+  const cardH = height - SLOT_INSET * 2;
 
   return (
     <View
       style={{
         position: 'absolute',
-        top:    -(PAD + TITLE_H),
-        left:   -PAD,
-        right:  -PAD,
-        bottom: -PAD,
+        top:    -PAD,
+        left:   -(PAD + SIDE),
+        width:  totalW,
+        height: totalH,
         pointerEvents: 'none',
       }}
     >
-      <Svg width={fw} height={totalH} viewBox={`0 0 ${fw} ${totalH}`}>
-        <Defs>
-          <LinearGradient id="vcFrameGlow" x1="0" y1="0" x2="1" y2="0">
-            <Stop offset="0%"   stopColor={PINK} stopOpacity="0.0" />
-            <Stop offset="35%"  stopColor={PINK} stopOpacity="0.55" />
-            <Stop offset="65%"  stopColor={CYAN} stopOpacity="0.55" />
-            <Stop offset="100%" stopColor={CYAN} stopOpacity="0.0" />
-          </LinearGradient>
-        </Defs>
+      <Svg width={totalW} height={totalH} viewBox={`0 0 ${totalW} ${totalH}`}>
 
-        {/* ── Outer soft glow frame ─────────────────────────────────── */}
-        <Path
-          d={octPath(2, TITLE_H + 2, fw - 4, fh - 4, CUT + 4)}
-          fill="none"
-          stroke={PINK}
-          strokeWidth={2.5}
-          strokeOpacity={0.18}
+        {/* ── Outer soft glow border ──────────────────────────────────── */}
+        <Rect
+          x={SIDE + 2} y={2} width={fw - 4} height={fh - 4} rx={13}
+          fill="none" stroke={CYAN} strokeWidth={3.5} strokeOpacity={0.12}
         />
 
-        {/* ── Main angular frame — dashed pink border ───────────────── */}
-        <Path
-          d={octPath(6, TITLE_H + 6, fw - 12, fh - 12, CUT)}
-          fill="none"
-          stroke={PINK}
-          strokeWidth={1.6}
-          strokeOpacity={0.85}
-          strokeDasharray="5,4"
+        {/* ── Main rounded-rect frame — dashed cyan ───────────────────── */}
+        <Rect
+          x={SIDE + 5} y={5} width={fw - 10} height={fh - 10} rx={10}
+          fill="none" stroke={CYAN} strokeWidth={1.5}
+          strokeDasharray="7,5" strokeOpacity={0.78}
         />
 
-        {/* ── Inner accent border — thinner cyan dash ───────────────── */}
-        <Path
-          d={octPath(10, TITLE_H + 10, fw - 20, fh - 20, CUT - 2)}
-          fill="none"
-          stroke={CYAN}
-          strokeWidth={0.7}
-          strokeOpacity={0.30}
-          strokeDasharray="3,5"
-        />
-
-        {/* ── Title gradient line ───────────────────────────────────── */}
-        <Line x1={20} y1={TITLE_H + 6} x2={fw - 20} y2={TITLE_H + 6}
-          stroke="url(#vcFrameGlow)" strokeWidth={1.0} strokeOpacity={0.7} />
-
-        {/* ── "Vice Nights" italic title ────────────────────────────── */}
-        {/* Pink glow layer */}
-        <SvgText
-          x={cx} y={TITLE_H - 6}
-          fill={PINK}
-          fontSize={22}
-          fontWeight="bold"
-          fontStyle="italic"
-          textAnchor="middle"
-          letterSpacing={1.5}
-          opacity={0.35}
-        >
-          Vice Nights
-        </SvgText>
-        {/* Main white-pink text */}
-        <SvgText
-          x={cx} y={TITLE_H - 7}
-          fill="#FFCCE8"
-          fontSize={22}
-          fontWeight="bold"
-          fontStyle="italic"
-          textAnchor="middle"
-          letterSpacing={1.5}
-          opacity={0.95}
-        >
-          Vice Nights
-        </SvgText>
-
-        {/* ── Palm tree decorations flanking title ─────────────────── */}
-        <PalmOrnament x={cx - 78} y={TITLE_H - 28} />
-        <PalmOrnament x={cx + 68} y={TITLE_H - 28} flip />
-
-        {/* ── Corner accent dots ────────────────────────────────────── */}
-        {[
-          [6, TITLE_H + 6], [fw - 6, TITLE_H + 6],
-          [6, totalH - 6],  [fw - 6, totalH - 6],
-        ].map(([px, py], i) => (
-          <Path key={i}
-            d={`M ${px - 5} ${py} L ${px} ${py - 5} L ${px + 5} ${py} L ${px} ${py + 5} Z`}
-            fill={i < 2 ? PINK : CYAN} fillOpacity={0.65}
+        {/* ── 5 dashed card slot placeholders ─────────────────────────── */}
+        {[0, 1, 2, 3, 4].map((i) => (
+          <Rect
+            key={i}
+            x={SIDE + PAD + SLOT_INSET + i * (cardW + CARD_GAP)}
+            y={PAD + SLOT_INSET}
+            width={cardW}
+            height={cardH}
+            rx={5}
+            fill="none"
+            stroke={CYAN}
+            strokeWidth={1.0}
+            strokeDasharray="5,3"
+            strokeOpacity={0.38}
           />
         ))}
+
+        {/* ── Flamingo ornament — left of frame ───────────────────────── */}
+        <SmallFlamingo x={SIDE - 10} y={fh - 4} />
+
+        {/* ── Palm ornament — right of frame ──────────────────────────── */}
+        <SmallPalm cx={SIDE + fw + 16} baseY={fh - 2} h={fh * 0.90} />
+
       </Svg>
     </View>
   );
