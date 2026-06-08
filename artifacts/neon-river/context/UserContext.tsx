@@ -112,7 +112,7 @@ const DEFAULT_PROFILE: UserProfile = {
   lastFreeScratch: null,
   createdAt: new Date().toISOString(),
   tutorialCompleted: false,
-  fortuneCookies: 1,
+  fortuneCookies: 3,
   goldenCookies: 0,
   dragonCookies: 0,
   lastFreeCookie: null,

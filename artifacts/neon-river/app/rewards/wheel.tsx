@@ -30,18 +30,18 @@ const CX = 150, CY = 150, R = WHEEL_SIZE / 2;
 const R_OUTER = 136, R_INNER = 38, R_TEXT = 98, R_ICON = 116;
 
 const SEGMENTS = [
-  { label: '2K',    emoji: '💰', chips: 2_000,   xp: 0,   ticket: 0, prob: 0.22, col: '#00d4ff', dim: '#001830' },
-  { label: '5K',    emoji: '🎰', chips: 5_000,   xp: 0,   ticket: 0, prob: 0.16, col: '#bf5fff', dim: '#150030' },
-  { label: '2K',    emoji: '💰', chips: 2_000,   xp: 0,   ticket: 0, prob: 0.15, col: '#00d4ff', dim: '#001830' },
-  { label: '10K',   emoji: '💎', chips: 10_000,  xp: 0,   ticket: 0, prob: 0.12, col: '#ff0090', dim: '#200016' },
-  { label: '5K',    emoji: '🎰', chips: 5_000,   xp: 0,   ticket: 0, prob: 0.10, col: '#bf5fff', dim: '#150030' },
-  { label: '+XP',   emoji: '⚡', chips: 0,       xp: 500, ticket: 0, prob: 0.08, col: '#00ff88', dim: '#001f14' },
-  { label: '25K',   emoji: '⭐', chips: 25_000,  xp: 0,   ticket: 0, prob: 0.07, col: '#ffd700', dim: '#1e1600' },
-  { label: '10K',   emoji: '💎', chips: 10_000,  xp: 0,   ticket: 0, prob: 0.04, col: '#ff0090', dim: '#200016' },
-  { label: 'TICKET',emoji: '🎟', chips: 0,       xp: 0,   ticket: 1, prob: 0.03, col: '#00ccaa', dim: '#001a16' },
-  { label: '50K',   emoji: '🔥', chips: 50_000,  xp: 0,   ticket: 0, prob: 0.02, col: '#ff6600', dim: '#1e0c00' },
-  { label: '2K',    emoji: '💰', chips: 2_000,   xp: 0,   ticket: 0, prob: 0.009,col: '#00d4ff', dim: '#001830' },
-  { label: '100K!', emoji: '👑', chips: 100_000, xp: 0,   ticket: 0, prob: 0.001,col: '#ffd700', dim: '#1e1600' },
+  { label: '2K',    emoji: '💰', chips: 2_000,   xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.25, col: '#00d4ff', dim: '#001830' },
+  { label: '5K',    emoji: '🎰', chips: 5_000,   xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.16, col: '#bf5fff', dim: '#150030' },
+  { label: 'COOKIE',emoji: '🥠', chips: 0,       xp: 0,   ticket: 0, cookie: 1, goldenCookie: 0, prob: 0.12, col: '#D4A017', dim: '#1a0e00' },
+  { label: '10K',   emoji: '💎', chips: 10_000,  xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.12, col: '#ff0090', dim: '#200016' },
+  { label: '5K',    emoji: '🎰', chips: 5_000,   xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.10, col: '#bf5fff', dim: '#150030' },
+  { label: '+XP',   emoji: '⚡', chips: 0,       xp: 500, ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.08, col: '#00ff88', dim: '#001f14' },
+  { label: '25K',   emoji: '⭐', chips: 25_000,  xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.07, col: '#ffd700', dim: '#1e1600' },
+  { label: '10K',   emoji: '💎', chips: 10_000,  xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.04, col: '#ff0090', dim: '#200016' },
+  { label: 'TICKET',emoji: '🎟', chips: 0,       xp: 0,   ticket: 1, cookie: 0, goldenCookie: 0, prob: 0.03, col: '#00ccaa', dim: '#001a16' },
+  { label: '50K',   emoji: '🔥', chips: 50_000,  xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.02, col: '#ff6600', dim: '#1e0c00' },
+  { label: 'GOLDEN',emoji: '✨', chips: 0,       xp: 0,   ticket: 0, cookie: 0, goldenCookie: 1, prob: 0.009,col: '#FFD700', dim: '#1a1200' },
+  { label: '100K!', emoji: '👑', chips: 100_000, xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.001,col: '#ffd700', dim: '#1e1600' },
 ];
 
 const N   = SEGMENTS.length;
@@ -147,7 +147,7 @@ const ct = StyleSheet.create({
 
 export default function WheelScreen() {
   const insets = useSafeAreaInsets();
-  const { canClaimWheel, nextWheelIn, claimWheelSpin, profile, updateProfile } = useUser();
+  const { canClaimWheel, nextWheelIn, claimWheelSpin, addFortuneCookies, profile, updateProfile } = useUser();
 
   const rotAnim      = useRef(new Animated.Value(0)).current;
   const totalRot     = useRef(0);
@@ -251,6 +251,7 @@ export default function WheelScreen() {
     const seg = SEGMENTS[winner];
     await claimWheelSpin(seg.chips, seg.ticket);
     if (seg.xp > 0) await updateProfile({ xp: profile.xp + seg.xp });
+    if (seg.cookie > 0 || seg.goldenCookie > 0) await addFortuneCookies(seg.cookie, seg.goldenCookie, 0);
     SoundEngine.claim();
   }, [winner, claimed, claimWheelSpin, updateProfile, profile.xp]);
 
