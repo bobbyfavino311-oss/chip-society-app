@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune';
+export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale';
+  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -141,4 +141,51 @@ export const DRAGON_FORTUNE: TableTheme = {
   previewColors: ['#160000', '#CC0000', '#C89B3C'],
 };
 
-export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE];
+export const ROYAL_MASQUERADE: TableTheme = {
+  id: 'royal_masquerade',
+  name: 'ROYAL MASQUERADE',
+  tagline: 'A private VIP casino behind a Venetian masquerade ball. Mysterious, elegant, and exclusively yours.',
+  rarity: 'LEGENDARY',
+
+  bgGradient: ['#160028', '#0C0018', '#080010', '#0C0018', '#160028'],
+
+  glowA: 'rgba(100,0,180,0.22)',
+  glowB: 'rgba(212,175,55,0.08)',
+  glowCenter: 'rgba(60,0,110,0.16)',
+
+  tableSurfaceBg: 'rgba(10,0,24,0.85)',
+  tableSurfaceBorder: 'rgba(212,175,55,0.48)',
+  tableSurfaceShadow: '#D4AF37',
+  tableCenterGlow: 'rgba(60,0,120,0.18)',
+
+  cardBackBg: '#100020',
+  cardBackAccent: '#D4AF37',
+  cardBackPattern: 'masquerade_veil',
+  cardHighlightColor: '#D4AF37',
+
+  chipTokenColor: '#D4AF37',
+  chipWinTokenColor: '#F5E6B0',
+
+  potBg: 'rgba(10,0,24,0.92)',
+  potBorder: 'rgba(212,175,55,0.42)',
+  potShadow: '#D4AF37',
+  potLabelColor: 'rgba(212,175,55,0.60)',
+  potAmountColor: '#D4AF37',
+
+  foldAccent: '#9B30FF',
+  checkAccent: '#1F5E52',
+  callAccent: '#1F5E52',
+  raiseAccent: '#D4AF37',
+  allInAccent: '#F5E6B0',
+
+  accentPrimary: '#D4AF37',
+  accentSecondary: '#9B30FF',
+  textColor: '#F0E8FF',
+
+  winEffectStyle: 'gold_shimmer',
+  winGoldColor: '#D4AF37',
+
+  previewColors: ['#12001E', '#9B30FF', '#D4AF37'],
+};
+
+export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE, ROYAL_MASQUERADE];

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
+import Svg, { Circle, Ellipse, Line, Path, Polygon, Rect } from 'react-native-svg';
 import { Card, isRedSuit, suitSymbol, valueLabel } from '../lib/pokerEngine';
 import { SoundEngine } from '../lib/soundEngine';
 import { useTableTheme } from '../context/TableThemeContext';
@@ -122,10 +122,70 @@ function DragonScaleBack({ w, h, r }: { w: number; h: number; r: number }) {
   );
 }
 
+// ─── Masquerade Veil card back ─────────────────────────────────────────────────
+function MasqueradeVeilBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const gold     = '#D4AF37';
+  const goldDim  = 'rgba(212,175,55,0.20)';
+  const goldFaint= 'rgba(212,175,55,0.10)';
+  const cx = w / 2;
+  const cy = h / 2;
+
+  // Diamond lattice
+  const cellW = w * 0.30;
+  const cellH = h * 0.20;
+  const lines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  const cols = Math.ceil(w / cellW) + 2;
+  const rows = Math.ceil(h / cellH) + 2;
+  for (let row = -1; row < rows; row++) {
+    for (let col = -1; col < cols; col++) {
+      const ox = col * cellW + (row % 2 === 0 ? 0 : cellW / 2);
+      const oy = row * cellH;
+      lines.push({ x1: ox + cellW / 2, y1: oy, x2: ox + cellW, y2: oy + cellH / 2 });
+      lines.push({ x1: ox + cellW, y1: oy + cellH / 2, x2: ox + cellW / 2, y2: oy + cellH });
+      lines.push({ x1: ox + cellW / 2, y1: oy + cellH, x2: ox, y2: oy + cellH / 2 });
+      lines.push({ x1: ox, y1: oy + cellH / 2, x2: ox + cellW / 2, y2: oy });
+    }
+  }
+
+  const med = Math.min(w, h) * 0.22;
+
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#100020' }]}>
+      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+        {lines.map((l, i) => (
+          <Line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
+            stroke={goldFaint} strokeWidth={0.5} />
+        ))}
+        {/* Central diamond medallion */}
+        <Polygon
+          points={`${cx},${cy - med} ${cx + med * 0.65},${cy} ${cx},${cy + med} ${cx - med * 0.65},${cy}`}
+          fill="none" stroke={goldDim} strokeWidth={1.0} />
+        <Polygon
+          points={`${cx},${cy - med * 0.65} ${cx + med * 0.42},${cy} ${cx},${cy + med * 0.65} ${cx - med * 0.42},${cy}`}
+          fill="none" stroke={gold} strokeWidth={0.8} strokeOpacity={0.55} />
+        {/* Tiny mask eye suggestions at center */}
+        <Ellipse cx={cx - med * 0.18} cy={cy} rx={med * 0.12} ry={med * 0.08}
+          fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.50} />
+        <Ellipse cx={cx + med * 0.18} cy={cy} rx={med * 0.12} ry={med * 0.08}
+          fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.50} />
+        <Circle cx={cx} cy={cy} r={med * 0.06} fill={gold} opacity={0.65} />
+        {/* Corner accents */}
+        <Circle cx={3} cy={3} r={1.5} fill={gold} opacity={0.4} />
+        <Circle cx={w - 3} cy={3} r={1.5} fill={gold} opacity={0.4} />
+        <Circle cx={3} cy={h - 3} r={1.5} fill={gold} opacity={0.4} />
+        <Circle cx={w - 3} cy={h - 3} r={1.5} fill={gold} opacity={0.4} />
+      </Svg>
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 1, borderWidth: 1, borderColor: 'rgba(212,175,55,0.30)' }} />
+    </View>
+  );
+}
+
 // ─── Card back router ──────────────────────────────────────────────────────────
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
-  if (theme.cardBackPattern === 'dragon_scale') return <DragonScaleBack w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'dragon_scale')    return <DragonScaleBack w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'masquerade_veil') return <MasqueradeVeilBack w={w} h={h} r={r} />;
   return <MandalaBack w={w} h={h} r={r} />;
 }
 

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Circle, Line, Path, Polygon } from 'react-native-svg';
+import Svg, { Circle, Ellipse, Line, Path, Polygon } from 'react-native-svg';
 
 import { useTableTheme } from '@/context/TableThemeContext';
 import { ALL_TABLE_THEMES, TableTheme, ThemeId } from '@/constants/tableThemes';
@@ -55,6 +55,35 @@ function NeonMandalaPreview({ size = 40 }: { size?: number }) {
   );
 }
 
+// ─── Masquerade mask mini-preview ──────────────────────────────────────────────
+function MasqueradePreview({ size = 40 }: { size?: number }) {
+  const s = size;
+  const cx = s / 2;
+  const cy = s / 2 + 2;
+  const gold = '#D4AF37';
+  return (
+    <Svg width={s} height={s} viewBox="0 0 40 40">
+      {/* Mask outline */}
+      <Path
+        d="M 5 22 C 5 13, 10 8, 16 8 L 24 8 C 30 8, 35 13, 35 22 C 35 27, 32 29, 29 28 C 27 30, 23 32, 20 32 C 17 32, 13 30, 11 28 C 8 29, 5 27, 5 22 Z"
+        fill="#1A0040" fillOpacity={0.8}
+        stroke={gold} strokeWidth={1.2} strokeOpacity={0.85}
+      />
+      {/* Left eye */}
+      <Ellipse cx={14} cy={19} rx={4.5} ry={3}
+        fill="#090018" stroke={gold} strokeWidth={0.8} strokeOpacity={0.65} />
+      {/* Right eye */}
+      <Ellipse cx={26} cy={19} rx={4.5} ry={3}
+        fill="#090018" stroke={gold} strokeWidth={0.8} strokeOpacity={0.65} />
+      {/* Crest top */}
+      <Circle cx={20} cy={6} r={1.5}
+        fill="none" stroke={gold} strokeWidth={0.8} strokeOpacity={0.60} />
+      <Line x1={20} y1={8} x2={20} y2={6}
+        stroke={gold} strokeWidth={0.8} strokeOpacity={0.55} />
+    </Svg>
+  );
+}
+
 // ─── Theme card ───────────────────────────────────────────────────────────────
 function ThemeCard({
   theme,
@@ -66,7 +95,8 @@ function ThemeCard({
   onEquip: () => void;
 }) {
   const pressAnim = useRef(new Animated.Value(1)).current;
-  const isDragon = theme.id === 'dragon_fortune';
+  const isDragon      = theme.id === 'dragon_fortune';
+  const isMasquerade  = theme.id === 'royal_masquerade';
 
   // Derive accent colors from the theme itself
   const primary   = theme.accentPrimary;
@@ -82,15 +112,17 @@ function ThemeCard({
 
   const borderColor = isActive
     ? primary
-    : `${primary}40`;  // ~25% opacity approximation
+    : `${primary}40`;
 
   const bgColors: [string, string, string] = isDragon
     ? ['#120000', '#0A0000', '#060000']
+    : isMasquerade
+    ? ['#140026', '#0C0018', '#080010']
     : ['#0e0028', '#08001a', '#050010'];
 
-
   function Preview() {
-    if (isDragon) return <DragonScalePreview size={42} />;
+    if (isDragon)     return <DragonScalePreview  size={42} />;
+    if (isMasquerade) return <MasqueradePreview   size={42} />;
     return <NeonMandalaPreview size={42} />;
   }
 
