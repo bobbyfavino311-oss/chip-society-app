@@ -63,6 +63,12 @@ export interface UserProfile {
   lastFreeScratch: string | null;
   createdAt: string;
   tutorialCompleted: boolean;
+  // Fortune Cookie inventory
+  fortuneCookies: number;
+  goldenCookies: number;
+  dragonCookies: number;
+  lastFreeCookie: string | null;
+  cookiesOpened: number;
   // Tournament stats
   tournamentWins: number;
   tournamentLosses: number;
@@ -106,6 +112,11 @@ const DEFAULT_PROFILE: UserProfile = {
   lastFreeScratch: null,
   createdAt: new Date().toISOString(),
   tutorialCompleted: false,
+  fortuneCookies: 1,
+  goldenCookies: 0,
+  dragonCookies: 0,
+  lastFreeCookie: null,
+  cookiesOpened: 0,
   tournamentWins: 0,
   tournamentLosses: 0,
   bestTournamentFinish: 0,
@@ -156,6 +167,12 @@ interface UserContextValue {
   nextHourlyIn: number;
   dailyRewardAmount: number;
   nextDailyIn: number;
+  canClaimFreeCookie: boolean;
+  nextCookieIn: number;
+  addXP: (amount: number) => Promise<void>;
+  consumeFortuneCookie: (type: 'standard' | 'golden' | 'dragon') => Promise<boolean>;
+  addFortuneCookies: (standard?: number, golden?: number, dragon?: number) => Promise<void>;
+  claimFreeCookie: () => Promise<boolean>;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -366,6 +383,38 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     await updateProfile({ scratchTickets: profile.scratchTickets + n });
   }, [profile, updateProfile]);
 
+  const addXP = useCallback(async (amount: number) => {
+    const newXP = profile.xp + amount;
+    await updateProfile({ xp: newXP, rank: getRankFromXP(newXP), level: getLevelFromXP(newXP) });
+  }, [profile, updateProfile]);
+
+  const consumeFortuneCookie = useCallback(async (type: 'standard' | 'golden' | 'dragon'): Promise<boolean> => {
+    const key = type === 'standard' ? 'fortuneCookies' : type === 'golden' ? 'goldenCookies' : 'dragonCookies';
+    if ((profile[key] as number) <= 0) return false;
+    await updateProfile({ [key]: (profile[key] as number) - 1, cookiesOpened: profile.cookiesOpened + 1 });
+    return true;
+  }, [profile, updateProfile]);
+
+  const addFortuneCookies = useCallback(async (standard = 0, golden = 0, dragon = 0) => {
+    await updateProfile({
+      fortuneCookies: profile.fortuneCookies + standard,
+      goldenCookies:  profile.goldenCookies  + golden,
+      dragonCookies:  profile.dragonCookies  + dragon,
+    });
+  }, [profile, updateProfile]);
+
+  const claimFreeCookie = useCallback(async (): Promise<boolean> => {
+    const lastClaim = profile.lastFreeCookie
+      ? new Date(profile.lastFreeCookie).toDateString()
+      : null;
+    if (lastClaim === new Date().toDateString()) return false;
+    await updateProfile({
+      fortuneCookies: profile.fortuneCookies + 1,
+      lastFreeCookie: new Date().toISOString(),
+    });
+    return true;
+  }, [profile, updateProfile]);
+
   const completeTutorial = useCallback(async () => {
     await updateProfile({ tutorialCompleted: true });
   }, [updateProfile]);
@@ -473,6 +522,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     return Date.now() - new Date(profile.lastFreeScratch).getTime() >= 24 * 60 * 60 * 1000;
   })();
 
+  const canClaimFreeCookie = (() => {
+    if (!profile.lastFreeCookie) return true;
+    return new Date(profile.lastFreeCookie).toDateString() !== new Date().toDateString();
+  })();
+  const nextCookieIn = (() => {
+    if (canClaimFreeCookie || !profile.lastFreeCookie) return 0;
+    const midnight = new Date(); midnight.setHours(24, 0, 0, 0);
+    return Math.max(0, Math.ceil((midnight.getTime() - Date.now()) / 60_000));
+  })();
+
   const yesterday = new Date(now - 86_400_000).toDateString();
   const isStreak     = profile.lastDailyReward === yesterday;
   const nextStreakDay = isStreak ? profile.streakDays + 1 : 1;
@@ -497,6 +556,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       completeTutorial, loginAsGuest, registerAccount, signIn, signOut, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,
+      canClaimFreeCookie, nextCookieIn,
+      addXP, consumeFortuneCookie, addFortuneCookies, claimFreeCookie,
     }}>
       {children}
     </UserContext.Provider>

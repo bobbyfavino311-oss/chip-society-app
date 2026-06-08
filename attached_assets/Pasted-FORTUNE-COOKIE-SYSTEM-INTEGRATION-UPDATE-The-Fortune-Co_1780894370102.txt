@@ -1,0 +1,202 @@
+FORTUNE COOKIE SYSTEM INTEGRATION UPDATE
+
+The Fortune Cookie feature should not be a standalone screen.
+
+Integrate it directly into the existing Rewards section alongside:
+
+• Chip Store
+• Lottery Tickets
+• Daily Rewards
+• Spin Wheel
+
+This should feel like a core progression feature of the game, not a separate mini-game.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REWARDS HUB LAYOUT
+
+Update the Rewards Hub to include:
+
+1. Chip Store
+2. Lottery Tickets
+3. Fortune Cookies
+4. Lucky Spin Wheel
+
+Each reward type should have its own premium card or section.
+
+The Fortune Cookie section should sit alongside Lottery Tickets and Spin Wheel rewards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE CARD
+
+Display a large fortune cookie icon.
+
+Show:
+
+FORTUNE COOKIE
+
+"Crack open a daily fortune and win rewards."
+
+Display:
+
+Available Cookies: X
+
+Button:
+
+OPEN COOKIE
+
+If no cookies remain:
+
+NEXT COOKIE IN 18H 42M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SPIN WHEEL INTEGRATION
+
+Fortune Cookies should become a reward category on the Lucky Spin Wheel.
+
+Add wheel rewards such as:
+
+• 1 Fortune Cookie
+• 2 Fortune Cookies
+• 3 Fortune Cookies
+• Golden Fortune Cookie
+• Dragon Fortune Cookie
+
+These rewards should appear as dedicated wheel segments.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE TYPES
+
+STANDARD COOKIE
+
+Brown fortune cookie.
+
+Most common.
+
+Contains:
+
+• Chips
+• XP
+• Small bonuses
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GOLDEN COOKIE
+
+Gold-colored cookie.
+
+Rare wheel reward.
+
+Enhanced opening animation.
+
+Guaranteed Rare reward or higher.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DRAGON COOKIE
+
+Red and gold dragon-themed fortune cookie.
+
+Very rare wheel reward.
+
+Exclusive animation.
+
+Guaranteed Epic or Legendary reward.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SPIN WHEEL REWARDS
+
+Update wheel rewards to include:
+
+• Chips
+• XP
+• Lottery Tickets
+• Fortune Cookies
+• Golden Cookies
+• Dragon Cookies
+• Avatar Tokens
+• Theme Tokens
+• Tournament Tickets
+
+This creates more variety and increases excitement.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ANIMATION FLOW
+
+When a cookie is won from the wheel:
+
+Display:
+
+YOU WON A FORTUNE COOKIE
+
+The cookie is added to inventory.
+
+Player can open it immediately or save it for later.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE INVENTORY
+
+Create a Fortune Cookie inventory section.
+
+Track:
+
+• Standard Cookies
+• Golden Cookies
+• Dragon Cookies
+
+Allow players to open them whenever they want.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COLLECTION SYSTEM
+
+Track:
+
+• Total Cookies Opened
+• Golden Cookies Found
+• Dragon Cookies Found
+• Best Reward Received
+
+Display stats inside the Fortune Cookie section.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DAILY ENGAGEMENT LOOP
+
+Player logs in.
+
+Receives daily cookie.
+
+Opens cookie.
+
+Wins reward.
+
+Uses reward.
+
+Spins wheel.
+
+Wins additional cookies.
+
+Returns later to open more.
+
+This creates another reward loop that works alongside Lottery Tickets and the Lucky Spin Wheel.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+The Rewards Hub should become a complete casino prize center featuring:
+
+• Chip Store
+• Lottery Tickets
+• Fortune Cookies
+• Lucky Spin Wheel
+• Daily Rewards
+
+Fortune Cookies should feel like a premium collectible reward system and become one of the most exciting items players can win from the spin wheel.

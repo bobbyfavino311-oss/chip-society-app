@@ -1,0 +1,260 @@
+FORTUNE COOKIE BONUS GAME
+
+Add a brand-new bonus game called:
+
+FORTUNE COOKIE
+
+This should function similarly to a daily reward, lottery scratcher, or lucky spin mechanic, but with its own unique identity and presentation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CORE CONCEPT
+
+The player receives a fortune cookie.
+
+The cookie appears in the center of the screen.
+
+The player taps it.
+
+The cookie animates and cracks open.
+
+A glowing fortune slip emerges.
+
+The fortune reveals the reward.
+
+The reveal should feel exciting, satisfying, and rewarding.
+
+Think:
+
+• Casino bonus game
+• Mobile reward event
+• Premium animation
+• Collectible experience
+
+NOT:
+
+• Simple popup window
+• Static reward screen
+• Basic text box
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL STYLE
+
+Theme:
+
+Modern Casino + Chinese Fortune Cookie
+
+Colors:
+
+• Deep red
+• Gold
+• Black
+• Warm amber glow
+
+Visual Effects:
+
+• Sparkles
+• Gold particles
+• Floating fortune paper
+• Light burst when opening
+• Premium casino presentation
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME FLOW
+
+STEP 1
+
+Player enters Fortune Cookie screen.
+
+Large animated fortune cookie sits in center.
+
+Subtitle:
+
+"Crack Open Your Fortune"
+
+Button:
+
+OPEN COOKIE
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 2
+
+Cookie cracking animation.
+
+Cookie splits in half.
+
+Gold particles burst outward.
+
+Fortune slip slowly rises from center.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 3
+
+Reward reveal.
+
+Fortune paper unfolds.
+
+Display:
+
+Lucky Fortune
+
+Then reveal reward.
+
+Examples:
+
++5,000 Chips
+
++25,000 Chips
+
++100,000 Chips
+
++250 XP
+
++500 XP
+
++1 Avatar Token
+
++1 Theme Token
+
++Free Tournament Entry
+
++Mystery Prize
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE MESSAGES
+
+Before reward reveal, show random fortunes such as:
+
+"Great wealth approaches."
+
+"Luck favors the bold."
+
+"A royal hand awaits."
+
+"The dragon smiles upon you."
+
+"A jackpot is in your future."
+
+"Your next hand may change everything."
+
+"Prosperity is near."
+
+"The cards are aligned."
+
+"Fortune follows confidence."
+
+"A lucky streak begins today."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REWARD TIERS
+
+Common
+
+• 5K Chips
+• 10K Chips
+• 250 XP
+
+Rare
+
+• 25K Chips
+• 50K Chips
+• 500 XP
+
+Epic
+
+• 100K Chips
+• 250K Chips
+• 1K XP
+
+Legendary
+
+• 500K Chips
+• 1M Chips
+• Avatar Token
+• Theme Token
+• Tournament Ticket
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BONUS FEATURES
+
+Golden Fortune Cookie
+
+Rare chance.
+
+Entire cookie becomes gold.
+
+Enhanced animation.
+
+Guaranteed Rare reward or higher.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Dragon Fortune Cookie
+
+Extremely rare.
+
+Red and gold dragon design.
+
+Special animation.
+
+Guaranteed Epic or Legendary reward.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DAILY SYSTEM
+
+Players receive:
+
+1 Free Fortune Cookie every 24 hours.
+
+Optional:
+
+Watch Ad = Extra Cookie
+
+VIP players may receive additional daily cookies.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PROGRESSION
+
+Track:
+
+Cookies Opened
+
+Fortunes Collected
+
+Legendary Fortunes Found
+
+Create achievement badges such as:
+
+Cookie Cracker I
+(Open 10 Cookies)
+
+Fortune Hunter
+(Open 50 Cookies)
+
+Lucky Dragon
+(Find Dragon Cookie)
+
+Golden Touch
+(Open 25 Golden Cookies)
+
+Master of Fortune
+(Open 500 Cookies)
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UI GOAL
+
+The entire experience should feel like a premium casino reward event.
+
+Opening a fortune cookie should be exciting enough that players look forward to returning every day.
+
+This should become one of the game's primary daily retention features.
