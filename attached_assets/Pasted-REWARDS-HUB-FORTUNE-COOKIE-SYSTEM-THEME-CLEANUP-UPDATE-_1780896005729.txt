@@ -1,0 +1,317 @@
+REWARDS HUB + FORTUNE COOKIE SYSTEM + THEME CLEANUP UPDATE
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE SYSTEM ICON UPDATE
+
+IMPORTANT:
+
+The official icon for the Fortune Cookie feature is:
+
+🥠
+
+Use the Fortune Cookie emoji (🥠) throughout the entire application.
+
+Do NOT use:
+
+🍪
+
+The cookie emoji is incorrect for this feature and should be removed everywhere.
+
+The 🥠 emoji is the official Unicode Fortune Cookie emoji and should be used consistently throughout the entire game. (Emojipedia)
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REPLACE ALL REFERENCES
+
+Replace:
+
+🍪 Fortune Cookie
+
+With:
+
+🥠 Fortune Cookie
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UPDATE ALL UI TEXT
+
+Use:
+
+🥠 Fortune Cookies
+
+🥠 Daily Fortune Cookie
+
+🥠 Open Fortune Cookie
+
+🥠 Cookie Inventory
+
+🥠 Golden Fortune Cookie
+
+🥠 Dragon Fortune Cookie
+
+🥠 Fortune Available
+
+🥠 Ready to Open
+
+Next Free 🥠 In 12H 34M
+
+You Won a 🥠 Fortune Cookie
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE TAB
+
+Rename the tab:
+
+🥠 Fortune Cookies
+
+Description:
+
+"Crack open a fortune and discover your reward."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DAILY COOKIE INTEGRATION
+
+The Daily Free 🥠 should NOT exist as a separate reward.
+
+Instead, connect it directly to the main Fortune Cookie section.
+
+Current structure:
+
+• Chip Store
+• Lottery Tickets
+• 🥠 Fortune Cookies
+• Spin Wheel
+
+When a player visits the 🥠 Fortune Cookie tab:
+
+Display:
+
+DAILY FORTUNE AVAILABLE
+
+🥠 Ready to Open
+
+or
+
+NEXT FREE 🥠 IN 18H 42M
+
+The daily free cookie should live inside the Fortune Cookie system itself.
+
+Do NOT create separate Daily Cookie pages.
+
+Do NOT create duplicate reward systems.
+
+Everything should be centralized inside the 🥠 Fortune Cookie section.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE HUB
+
+Display:
+
+🥠 Available Cookies
+
+Standard Cookies: X
+
+Golden Cookies: X
+
+Dragon Cookies: X
+
+Display Daily Cookie timer directly underneath.
+
+Example:
+
+Daily 🥠 Ready
+
+or
+
+Next Free 🥠 in 12H 34M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SPIN WHEEL INTEGRATION
+
+All Fortune Cookie rewards on the wheel should use:
+
+🥠
+
+Examples:
+
+🥠 Fortune Cookie
+
+🥠 x2 Fortune Cookies
+
+🥠 Golden Fortune Cookie
+
+🥠 Dragon Fortune Cookie
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SPIN WHEEL IMPROVEMENTS
+
+Current issue:
+
+Prize lettering is too small and difficult to read.
+
+Required fix:
+
+• Increase prize label font size significantly
+• Improve readability at a glance
+• Keep all prize text visible without clipping
+• Maintain clean spacing between wheel segments
+
+IMPORTANT:
+
+• Do NOT increase actual prize amounts
+• Do NOT change reward values
+• Do NOT enlarge wheel segments
+• Do NOT modify reward probabilities
+
+Only increase the text size and readability of the existing prize labels.
+
+The player should immediately be able to identify wheel rewards without zooming in.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE INVENTORY
+
+Display:
+
+🥠 Standard Fortune Cookies
+
+🥠 Golden Fortune Cookies
+
+🥠 Dragon Fortune Cookies
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NOTIFICATIONS
+
+Examples:
+
+"You received a 🥠 Fortune Cookie!"
+
+"Your free 🥠 is ready."
+
+"You opened a 🥠 Fortune Cookie."
+
+"You discovered a 🥠 Dragon Fortune Cookie."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACHIEVEMENTS
+
+Use:
+
+🥠 Cookie Cracker
+
+🥠 Fortune Hunter
+
+🥠 Lucky Dragon
+
+🥠 Golden Fortune Master
+
+🥠 Master of Fortune
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+THEME CLEANUP
+
+REMOVE ENTIRELY:
+
+• Vice Nights
+• Midnight Beach
+
+Delete completely from:
+
+• Theme Selector
+• Theme Inventory
+• Settings
+• Profile Customization
+• Rewards
+• Spin Wheel Rewards
+• Unlock Notifications
+• Theme Menu
+• Future References
+
+These themes should no longer exist anywhere in the application.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FOUR DRAGONS THEME
+
+Restore the original Dragon theme version.
+
+Revert all redesign attempts.
+
+Restore:
+
+• Original artwork
+• Original layout
+• Original colors
+• Original decorative elements
+• Original gameplay presentation
+• Original visual identity
+
+Rename:
+
+Dragon Fortune
+
+TO:
+
+FOUR DRAGONS
+
+Apply this change everywhere:
+
+• Theme Selector
+• Theme Inventory
+• Settings
+• Rewards
+• Notifications
+• Profile Displays
+• Future References
+
+All references should now read:
+
+FOUR DRAGONS
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL THEME LIST
+
+Only two themes should exist:
+
+1. Default Theme
+2. Four Dragons
+
+No additional themes should be visible.
+
+No disabled themes.
+
+No hidden themes.
+
+No placeholder themes.
+
+Only:
+
+• Default
+• Four Dragons
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+The Rewards Hub should contain:
+
+• Chip Store
+• Lottery Tickets
+• 🥠 Fortune Cookies
+• Spin Wheel
+
+The daily free 🥠 should be fully integrated into the Fortune Cookie tab.
+
+The wheel should have larger, easier-to-read prize labels.
+
+Only the Default theme and Four Dragons theme should remain available throughout the game.

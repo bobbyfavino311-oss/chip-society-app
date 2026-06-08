@@ -32,8 +32,6 @@ import NeonAvatarSeat from '@/components/NeonAvatar';
 import { useTableTheme } from '@/context/TableThemeContext';
 import DragonBackground from '@/components/DragonBackground';
 import DragonCardFrame from '@/components/DragonCardFrame';
-import MidnightBeachBackground from '@/components/MidnightBeachBackground';
-import MidnightBeachCardFrame from '@/components/MidnightBeachCardFrame';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -396,8 +394,7 @@ export default function PracticeScreen() {
 
   const insets = useSafeAreaInsets();
   const { theme } = useTableTheme();
-  const isDragon       = theme.id === 'dragon_fortune';
-  const isMidnightBeach = theme.id === 'midnight_beach';
+  const isDragon = theme.id === 'dragon_fortune';
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -597,8 +594,7 @@ export default function PracticeScreen() {
       <View style={[styles.glowCenter, { backgroundColor: theme.glowCenter }]} />
 
       {/* Theme atmospheric backgrounds */}
-      {isDragon        && <DragonBackground />}
-      {isMidnightBeach && <MidnightBeachBackground />}
+      {isDragon && <DragonBackground />}
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -684,7 +680,7 @@ export default function PracticeScreen() {
 
         {/* Community card board — dark glass surface (wrapped for Dragon/Vice frame) */}
         <View
-          onLayout={(isDragon || isMidnightBeach) ? (e) => {
+          onLayout={isDragon ? (e) => {
             const { width, height } = e.nativeEvent.layout;
             setTableLayout({ w: width, h: height });
           } : undefined}
@@ -692,9 +688,6 @@ export default function PracticeScreen() {
         >
           {isDragon && tableLayout.w > 0 && (
             <DragonCardFrame width={tableLayout.w} height={tableLayout.h} />
-          )}
-          {isMidnightBeach && tableLayout.w > 0 && (
-            <MidnightBeachCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
         <View style={[styles.tableSurface, {
           borderColor: theme.tableSurfaceBorder,

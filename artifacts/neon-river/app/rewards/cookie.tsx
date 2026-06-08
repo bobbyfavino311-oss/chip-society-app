@@ -344,7 +344,7 @@ export default function FortuneCookieScreen() {
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>FORTUNE COOKIE</Text>
           <Text style={styles.headerSub}>
-            {cookieType === 'dragon' ? '🐉 DRAGON FORTUNE' : cookieType === 'golden' ? '✨ GOLDEN FORTUNE' : 'CRACK OPEN YOUR FORTUNE'}
+            {cookieType === 'dragon' ? '🥠 FOUR DRAGONS' : cookieType === 'golden' ? '🥠 GOLDEN FORTUNE' : 'CRACK OPEN YOUR FORTUNE'}
           </Text>
         </View>
         {/* Cookie count badge */}
@@ -469,9 +469,9 @@ export default function FortuneCookieScreen() {
 
             <Text style={styles.hintText}>
               {cookieType === 'dragon'
-                ? '🐉 Dragon Cookie: Epic or Legendary reward guaranteed'
+                ? '🥠 Dragon Cookie: Epic or Legendary reward guaranteed'
                 : cookieType === 'golden'
-                ? '✨ Golden Cookie: Rare reward or higher guaranteed'
+                ? '🥠 Golden Cookie: Rare reward or higher guaranteed'
                 : 'Opening your best available cookie first'}
             </Text>
           </View>

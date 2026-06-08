@@ -117,94 +117,81 @@ function FortuneCookieSection() {
 
   const total = (profile.fortuneCookies ?? 0) + (profile.goldenCookies ?? 0) + (profile.dragonCookies ?? 0);
   const hasAny = total > 0;
-  const hasClaimed = !canClaimFreeCookie;
+  const canOpen = hasAny || canClaimFreeCookie;
 
-  const handleClaim = async () => {
-    if (claiming || hasClaimed) return;
-    setClaiming(true);
-    await claimFreeCookie();
-    setClaiming(false);
+  const dailyTimeLeft = useMemo(() => {
+    if (canClaimFreeCookie || !profile.lastFreeCookie) return '';
+    const COOLDOWN_MS = 24 * 60 * 60 * 1000;
+    const remaining = Math.max(0, new Date(profile.lastFreeCookie).getTime() + COOLDOWN_MS - Date.now());
+    const h = Math.floor(remaining / 3_600_000);
+    const m = Math.floor((remaining % 3_600_000) / 60_000);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }, [canClaimFreeCookie, profile.lastFreeCookie]);
+
+  const handleOpen = async () => {
+    if (!canOpen || claiming) return;
+    if (!hasAny && canClaimFreeCookie) {
+      setClaiming(true);
+      await claimFreeCookie();
+      setClaiming(false);
+    }
+    router.push('/rewards/cookie');
   };
 
   return (
     <View style={fc.section}>
       <View style={styles.sectionRow}>
-        <Text style={styles.sectionLabel}>FORTUNE COOKIES</Text>
+        <Text style={styles.sectionLabel}>🥠 FORTUNE COOKIES</Text>
         <View style={[styles.ticketBadge, { borderColor: 'rgba(212,160,23,0.40)', backgroundColor: 'rgba(212,160,23,0.12)' }]}>
-          <Text style={{ fontSize: 11 }}>🥠</Text>
           <Text style={[styles.ticketBadgeText, { color: '#D4A017' }]}>{total} cookies</Text>
         </View>
       </View>
-      <Text style={[styles.sectionSub, { marginTop: -8 }]}>Crack open a daily fortune and win chips, XP, and more</Text>
+      <Text style={[styles.sectionSub, { marginTop: -8 }]}>Crack open a fortune and discover your reward.</Text>
 
-      {/* Main cookie card */}
+      {/* Main cookie card — daily status integrated */}
       <TouchableOpacity
-        style={[fc.card, { borderColor: hasAny ? 'rgba(212,160,23,0.55)' : colors.border }]}
-        onPress={() => router.push('/rewards/cookie')}
+        style={[fc.card, { borderColor: canOpen ? 'rgba(212,160,23,0.55)' : colors.border }]}
+        onPress={handleOpen}
         activeOpacity={0.82}
-        disabled={!hasAny}
+        disabled={!canOpen || claiming}
       >
         <LinearGradient
-          colors={hasAny ? ['rgba(212,160,23,0.18)', 'rgba(212,160,23,0.05)'] : ['rgba(0,0,0,0.01)', 'transparent']}
+          colors={canOpen ? ['rgba(212,160,23,0.18)', 'rgba(212,160,23,0.05)'] : ['rgba(0,0,0,0.01)', 'transparent']}
           style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         />
         <View style={fc.cardLeft}>
-          <Text style={fc.cardEmoji}>{
-            (profile.dragonCookies ?? 0) > 0 ? '🐉'
-            : (profile.goldenCookies ?? 0) > 0 ? '✨'
-            : '🥠'
-          }</Text>
-          <View>
-            <Text style={[fc.cardTitle, { color: hasAny ? '#D4A017' : colors.textDim }]}>
-              {hasAny ? 'OPEN COOKIE' : 'NO COOKIES'}
+          <Text style={fc.cardEmoji}>🥠</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[fc.cardTitle, { color: canOpen ? '#D4A017' : colors.textDim }]}>
+              {hasAny ? 'OPEN COOKIE' : canClaimFreeCookie ? 'DAILY FORTUNE AVAILABLE' : 'NO COOKIES'}
             </Text>
             <Text style={fc.cardSub}>
               {hasAny
                 ? `${total} cookie${total !== 1 ? 's' : ''} ready to open`
-                : 'Get your free daily cookie below'}
+                : canClaimFreeCookie
+                ? '🥠 Ready to open — tap to claim!'
+                : 'Come back tomorrow for your free cookie'}
             </Text>
-            {/* Type breakdown */}
             {hasAny && (
               <View style={fc.typeRow}>
-                {(profile.fortuneCookies ?? 0) > 0 && <Text style={fc.typeTag}>🥠 ×{profile.fortuneCookies}</Text>}
-                {(profile.goldenCookies ?? 0) > 0  && <Text style={[fc.typeTag, { color: '#FFD700' }]}>✨ ×{profile.goldenCookies}</Text>}
-                {(profile.dragonCookies ?? 0) > 0  && <Text style={[fc.typeTag, { color: '#FF6622' }]}>🐉 ×{profile.dragonCookies}</Text>}
+                {(profile.fortuneCookies ?? 0) > 0 && <Text style={fc.typeTag}>🥠 Standard ×{profile.fortuneCookies}</Text>}
+                {(profile.goldenCookies ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#FFD700' }]}>🥠 Golden ×{profile.goldenCookies}</Text>}
+                {(profile.dragonCookies ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#C89B3C' }]}>🥠 Dragon ×{profile.dragonCookies}</Text>}
               </View>
             )}
+            {/* Daily status — always visible inside the card */}
+            <View style={fc.dailyStrip}>
+              {canClaimFreeCookie ? (
+                <Text style={fc.dailyReady}>DAILY 🥠 READY</Text>
+              ) : (
+                <Text style={fc.dailyTimer}>Next Free 🥠 In {dailyTimeLeft || '—'}</Text>
+              )}
+            </View>
           </View>
         </View>
-        <View style={[fc.openBtn, { backgroundColor: hasAny ? '#D4A017' : colors.border }]}>
-          <Text style={[fc.openBtnText, { color: hasAny ? '#050010' : colors.textDim }]}>
-            {hasAny ? 'OPEN' : 'LOCKED'}
-          </Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Daily free cookie claim */}
-      <TouchableOpacity
-        style={[fc.claimCard, { borderColor: canClaimFreeCookie ? 'rgba(212,160,23,0.55)' : colors.border }]}
-        onPress={handleClaim}
-        activeOpacity={0.80}
-        disabled={hasClaimed || claiming}
-      >
-        <LinearGradient
-          colors={canClaimFreeCookie ? ['rgba(212,160,23,0.10)', 'rgba(212,160,23,0.03)'] : ['rgba(0,0,0,0.01)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={fc.claimLeft}>
-          <Text style={fc.claimEmoji}>🍀</Text>
-          <View>
-            <Text style={[fc.claimTitle, { color: canClaimFreeCookie ? '#D4A017' : colors.textDim }]}>
-              Daily Free Cookie
-            </Text>
-            <Text style={fc.claimSub}>
-              {canClaimFreeCookie ? 'Your daily cookie is ready!' : 'Come back tomorrow for another cookie'}
-            </Text>
-          </View>
-        </View>
-        <View style={[styles.claimBtn, { backgroundColor: canClaimFreeCookie ? '#D4A017' : colors.border }]}>
-          <Text style={[styles.claimBtnText, { color: canClaimFreeCookie ? '#050010' : colors.textDim }]}>
-            {claiming ? '...' : canClaimFreeCookie ? 'CLAIM' : 'CLAIMED'}
+        <View style={[fc.openBtn, { backgroundColor: canOpen ? '#D4A017' : colors.border }]}>
+          <Text style={[fc.openBtnText, { color: canOpen ? '#050010' : colors.textDim }]}>
+            {claiming ? '...' : canOpen ? 'OPEN' : 'LOCKED'}
           </Text>
         </View>
       </TouchableOpacity>
@@ -236,27 +223,20 @@ const fc = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16, paddingVertical: 14,
   },
-  cardLeft:   { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
-  cardEmoji:  { fontSize: 30 },
-  cardTitle:  { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
-  cardSub:    { color: 'rgba(255,255,255,0.40)', fontSize: 11, marginTop: 2 },
-  typeRow:    { flexDirection: 'row', gap: 8, marginTop: 4 },
-  typeTag:    { color: 'rgba(212,160,23,0.70)', fontSize: 10, fontWeight: '700', fontFamily: 'Inter_700Bold' },
-  openBtn:    { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, minWidth: 64, alignItems: 'center' },
-  openBtnText:{ fontSize: 12, fontWeight: '900', letterSpacing: 1 },
+  cardLeft:    { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+  cardEmoji:   { fontSize: 30 },
+  cardTitle:   { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+  cardSub:     { color: 'rgba(255,255,255,0.40)', fontSize: 11, marginTop: 2 },
+  typeRow:     { flexDirection: 'row', gap: 8, marginTop: 4, flexWrap: 'wrap' },
+  typeTag:     { color: 'rgba(212,160,23,0.70)', fontSize: 10, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+  openBtn:     { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, minWidth: 64, alignItems: 'center' },
+  openBtnText: { fontSize: 12, fontWeight: '900', letterSpacing: 1 },
 
-  claimCard: {
-    borderRadius: 12, borderWidth: 1, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14, paddingVertical: 10,
-  },
-  claimLeft:  { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  claimEmoji: { fontSize: 22 },
-  claimTitle: { fontSize: 13, fontWeight: '700', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.3 },
-  claimSub:   { color: 'rgba(255,255,255,0.35)', fontSize: 10, marginTop: 2 },
+  dailyStrip:  { marginTop: 6 },
+  dailyReady:  { color: '#D4A017', fontSize: 10, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+  dailyTimer:  { color: 'rgba(255,255,255,0.30)', fontSize: 10, fontFamily: 'Inter_700Bold' },
 
-  rarityRow: { flexDirection: 'row', gap: 4, flexWrap: 'wrap' },
+  rarityRow:  { flexDirection: 'row', gap: 4, flexWrap: 'wrap' },
   rarityItem: { flex: 1, minWidth: 70, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', padding: 7, gap: 3, alignItems: 'center' },
   rarityDot:  { width: 8, height: 8, borderRadius: 4 },
   rarityLbl:  { fontSize: 7, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5, textAlign: 'center' },

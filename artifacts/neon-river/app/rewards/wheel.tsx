@@ -40,7 +40,7 @@ const SEGMENTS = [
   { label: '10K',   emoji: '💎', chips: 10_000,  xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.04, col: '#ff0090', dim: '#200016' },
   { label: 'TICKET',emoji: '🎟', chips: 0,       xp: 0,   ticket: 1, cookie: 0, goldenCookie: 0, prob: 0.03, col: '#00ccaa', dim: '#001a16' },
   { label: '50K',   emoji: '🔥', chips: 50_000,  xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.02, col: '#ff6600', dim: '#1e0c00' },
-  { label: 'GOLDEN',emoji: '✨', chips: 0,       xp: 0,   ticket: 0, cookie: 0, goldenCookie: 1, prob: 0.009,col: '#FFD700', dim: '#1a1200' },
+  { label: 'GOLDEN',emoji: '🥠', chips: 0,       xp: 0,   ticket: 0, cookie: 0, goldenCookie: 1, prob: 0.009,col: '#FFD700', dim: '#1a1200' },
   { label: '100K!', emoji: '👑', chips: 100_000, xp: 0,   ticket: 0, cookie: 0, goldenCookie: 0, prob: 0.001,col: '#ffd700', dim: '#1e1600' },
 ];
 
@@ -343,7 +343,7 @@ export default function WheelScreen() {
                     textAnchor="middle"
                     fill={isW ? '#fff' : sg.col}
                     fillOpacity={isW ? 1 : 0.85}
-                    fontSize={sg.label.length > 4 ? 7.5 : 9.5}
+                    fontSize={sg.label.length > 4 ? 9 : 11}
                     fontWeight="bold"
                     transform={`rotate(${p.rot}, ${p.x}, ${p.y})`}
                   >{sg.label}</SvgText>
