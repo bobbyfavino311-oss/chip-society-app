@@ -97,19 +97,19 @@ export const NEON_DEFAULT: TableTheme = {
 export const DRAGON_FORTUNE: TableTheme = {
   id: 'dragon_fortune',
   name: 'FOUR DRAGONS',
-  tagline: 'Enter the VIP Dragon Room. Black lacquer, gold leaf, and ancient fortune await those willing to risk everything.',
+  tagline: 'Enter the VIP Dragon Room. Ancient crimson, gold leaf, and the power of four dragons await.',
   rarity: 'LEGENDARY',
 
-  bgGradient: ['#0D0000', '#080000', '#050000', '#080000', '#0D0000'],
+  bgGradient: ['#1C0000', '#0E0000', '#080000', '#0E0000', '#1C0000'],
 
-  glowA: 'rgba(139,0,0,0.22)',
+  glowA: 'rgba(180,0,0,0.28)',
   glowB: 'rgba(200,155,60,0.10)',
-  glowCenter: 'rgba(59,0,0,0.14)',
+  glowCenter: 'rgba(100,0,0,0.18)',
 
-  tableSurfaceBg: 'rgba(6,0,0,0.88)',
+  tableSurfaceBg: 'rgba(10,0,0,0.85)',
   tableSurfaceBorder: 'rgba(200,155,60,0.55)',
   tableSurfaceShadow: '#C89B3C',
-  tableCenterGlow: 'rgba(59,0,0,0.28)',
+  tableCenterGlow: 'rgba(100,0,0,0.20)',
 
   cardBackBg: '#0A0000',
   cardBackAccent: '#C89B3C',
@@ -119,26 +119,26 @@ export const DRAGON_FORTUNE: TableTheme = {
   chipTokenColor: '#C89B3C',
   chipWinTokenColor: '#EAE3D2',
 
-  potBg: 'rgba(6,0,0,0.92)',
+  potBg: 'rgba(10,0,0,0.90)',
   potBorder: 'rgba(200,155,60,0.45)',
   potShadow: '#C89B3C',
   potLabelColor: 'rgba(200,155,60,0.65)',
   potAmountColor: '#C89B3C',
 
-  foldAccent: '#5a0000',
+  foldAccent: '#8B0000',
   checkAccent: '#1F5E52',
   callAccent: '#1F5E52',
-  raiseAccent: '#8B0000',
+  raiseAccent: '#CC0000',
   allInAccent: '#C89B3C',
 
   accentPrimary: '#C89B3C',
-  accentSecondary: '#8B0000',
+  accentSecondary: '#CC0000',
   textColor: '#EAE3D2',
 
   winEffectStyle: 'gold_shimmer',
   winGoldColor: '#C89B3C',
 
-  previewColors: ['#090909', '#8B0000', '#C89B3C'],
+  previewColors: ['#160000', '#CC0000', '#C89B3C'],
 };
 
 export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE];
