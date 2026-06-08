@@ -85,6 +85,7 @@ export default function BettingPanel({
   const isDragon     = theme.id === 'dragon_fortune';
   const isMasquerade = theme.id === 'royal_masquerade';
   const isTiger      = theme.id === 'tiger_fortune';
+  const isSakura     = theme.id === 'sakura_garden';
 
   const maxRaise = myChips;
   const canRaise = myChips > callAmount && myChips >= minRaise;
@@ -128,6 +129,8 @@ export default function BettingPanel({
     ? { backgroundColor: 'rgba(8,0,20,0.97)',  borderTopColor: 'rgba(180,140,40,0.28)'  }
     : isTiger
     ? { backgroundColor: 'rgba(6,4,0,0.97)',   borderTopColor: 'rgba(200,148,10,0.32)'  }
+    : isSakura
+    ? { backgroundColor: 'rgba(12,4,10,0.97)', borderTopColor: 'rgba(232,98,122,0.28)'  }
     : {};
 
   return (
@@ -144,7 +147,8 @@ export default function BettingPanel({
                     styles.quickBtn,
                     isDragon     && { backgroundColor: 'rgba(20,0,0,0.6)',  borderWidth: 1, borderColor: 'rgba(139,0,0,0.30)'    },
                     isMasquerade && { backgroundColor: 'rgba(16,0,36,0.6)', borderWidth: 1, borderColor: 'rgba(155,48,255,0.22)' },
-                    isTiger      && { backgroundColor: 'rgba(18,12,0,0.6)', borderWidth: 1, borderColor: 'rgba(200,148,10,0.22)' },
+                    isTiger      && { backgroundColor: 'rgba(18,12,0,0.6)',  borderWidth: 1, borderColor: 'rgba(200,148,10,0.22)' },
+                    isSakura     && { backgroundColor: 'rgba(20,8,16,0.6)',  borderWidth: 1, borderColor: 'rgba(232,98,122,0.20)'  },
                   ]}
                   onPress={() => setRaiseAmount(clampRaise(b.amount))}
                   disabled={disabled}
@@ -155,6 +159,7 @@ export default function BettingPanel({
                     isDragon     && { color: 'rgba(200,155,60,0.55)'  },
                     isMasquerade && { color: 'rgba(212,175,55,0.50)'  },
                     isTiger      && { color: 'rgba(200,148,10,0.50)'  },
+                    isSakura     && { color: 'rgba(244,168,192,0.48)' },
                   ]}>
                     {b.label}
                   </Text>
@@ -163,6 +168,7 @@ export default function BettingPanel({
                     isDragon     && { color: '#EAE3D2' },
                     isMasquerade && { color: '#F0E8FF' },
                     isTiger      && { color: '#F5DFA0' },
+                    isSakura     && { color: '#FFE8F0' },
                   ]}>
                     {fmt(b.amount)}
                   </Text>
@@ -173,7 +179,8 @@ export default function BettingPanel({
                   styles.quickBtn,
                   isDragon     ? { backgroundColor: 'rgba(50,0,0,0.5)',  borderWidth: 1, borderColor: 'rgba(139,0,0,0.45)'    }
                   : isMasquerade ? { backgroundColor: 'rgba(30,0,60,0.5)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.40)' }
-                  : isTiger      ? { backgroundColor: 'rgba(40,28,0,0.5)', borderWidth: 1, borderColor: 'rgba(200,148,10,0.45)' }
+                  : isTiger      ? { backgroundColor: 'rgba(40,28,0,0.5)',  borderWidth: 1, borderColor: 'rgba(200,148,10,0.45)' }
+                  : isSakura     ? { backgroundColor: 'rgba(32,10,24,0.5)', borderWidth: 1, borderColor: 'rgba(232,98,122,0.42)'  }
                   : styles.quickAllIn,
                 ]}
                 onPress={() => setRaiseAmount(maxRaise)}
@@ -185,6 +192,7 @@ export default function BettingPanel({
                   isDragon     ? { color: '#8B0000'  }
                   : isMasquerade ? { color: '#9B30FF'  }
                   : isTiger      ? { color: '#8B5E00'  }
+                  : isSakura     ? { color: '#C4407C'  }
                   : { color: colors.secondary },
                 ]}>
                   ALL IN
@@ -194,6 +202,7 @@ export default function BettingPanel({
                   isDragon     ? { color: '#C89B3C' }
                   : isMasquerade ? { color: '#D4AF37' }
                   : isTiger      ? { color: '#C8940A' }
+                  : isSakura     ? { color: '#F4A8C0' }
                   : { color: colors.secondary },
                 ]}>
                   {fmt(maxRaise)}
@@ -219,6 +228,13 @@ export default function BettingPanel({
                 <Text style={[styles.raiseAmt, { color: '#C8940A' }]}>{fmt(raiseAmount)}</Text>
               </View>
             </View>
+          ) : isSakura ? (
+            <View style={styles.sliderSection}>
+              <View style={styles.raiseDisplay}>
+                <Text style={[styles.raiseLabel, { color: 'rgba(244,168,192,0.50)', letterSpacing: 3 }]}>RAISE</Text>
+                <Text style={[styles.raiseAmt, { color: '#F4A8C0' }]}>{fmt(raiseAmount)}</Text>
+              </View>
+            </View>
           ) : (
             <View style={styles.sliderSection}>
               <View style={styles.raiseDisplay}>
@@ -235,7 +251,8 @@ export default function BettingPanel({
                 styles.sliderTrack,
                 isDragon     && { backgroundColor: 'rgba(40,0,0,0.5)'  },
                 isMasquerade && { backgroundColor: 'rgba(20,0,48,0.5)' },
-                isTiger      && { backgroundColor: 'rgba(30,18,0,0.5)' },
+                isTiger      && { backgroundColor: 'rgba(30,18,0,0.5)'  },
+                isSakura     && { backgroundColor: 'rgba(24,6,18,0.5)'  },
               ]}
               onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
               {...panResponder.panHandlers}
@@ -250,6 +267,9 @@ export default function BettingPanel({
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
                 ) : isTiger ? (
                   <LinearGradient colors={['#3A2200', '#C8940A']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
+                ) : isSakura ? (
+                  <LinearGradient colors={['#5A1030', '#F4A8C0']}
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
                 ) : (
                   <LinearGradient colors={[colors.primary, colors.secondary]}
@@ -269,6 +289,10 @@ export default function BettingPanel({
                 <View style={[styles.sliderHandle, { left: handleLeft }]}>
                   <LinearGradient colors={['#8B5E00', '#C8940A']} style={styles.handleGradient} />
                 </View>
+              ) : isSakura ? (
+                <View style={[styles.sliderHandle, { left: handleLeft }]}>
+                  <LinearGradient colors={['#C4407C', '#F4A8C0']} style={styles.handleGradient} />
+                </View>
               ) : (
                 <View style={[styles.sliderHandle, { left: handleLeft }]}>
                   <LinearGradient colors={[colors.primary, '#0088cc']} style={styles.handleGradient} />
@@ -281,6 +305,7 @@ export default function BettingPanel({
                 isDragon     && { color: 'rgba(200,155,60,0.35)' },
                 isMasquerade && { color: 'rgba(212,175,55,0.35)' },
                 isTiger      && { color: 'rgba(200,148,10,0.35)' },
+                isSakura     && { color: 'rgba(244,168,192,0.35)' },
               ]}>
                 {fmt(minRaise)}
               </Text>
@@ -288,6 +313,7 @@ export default function BettingPanel({
                 isDragon     && { color: 'rgba(200,155,60,0.35)' },
                 isMasquerade && { color: 'rgba(212,175,55,0.35)' },
                 isTiger      && { color: 'rgba(200,148,10,0.35)' },
+                isSakura     && { color: 'rgba(244,168,192,0.35)' },
               ]}>
                 {fmt(maxRaise)}
               </Text>
@@ -301,31 +327,31 @@ export default function BettingPanel({
 
         {/* FOLD */}
         <TouchableOpacity
-          style={[styles.actionBtn, isDragon ? dr.foldBtn : isMasquerade ? mq.foldBtn : isTiger ? tg.foldBtn : styles.foldBtn]}
+          style={[styles.actionBtn, isDragon ? dr.foldBtn : isMasquerade ? mq.foldBtn : isTiger ? tg.foldBtn : isSakura ? sk.foldBtn : styles.foldBtn]}
           onPress={onFold} disabled={disabled} activeOpacity={0.75}
         >
           <LinearGradient colors={['transparent','transparent']} style={StyleSheet.absoluteFill} />
-          <Text style={[styles.foldText, isDragon && dr.foldText, isMasquerade && mq.foldText, isTiger && tg.foldText]}>FOLD</Text>
+          <Text style={[styles.foldText, isDragon && dr.foldText, isMasquerade && mq.foldText, isTiger && tg.foldText, isSakura && sk.foldText]}>FOLD</Text>
         </TouchableOpacity>
 
         {/* CHECK / CALL */}
         {canCheck ? (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.checkBtn : isMasquerade ? mq.checkBtn : isTiger ? tg.checkBtn : styles.checkBtn]}
+            style={[styles.actionBtn, isDragon ? dr.checkBtn : isMasquerade ? mq.checkBtn : isTiger ? tg.checkBtn : isSakura ? sk.checkBtn : styles.checkBtn]}
             onPress={onCheck} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient colors={['transparent','transparent']} style={StyleSheet.absoluteFill} />
-            <Text style={[styles.checkText, isDragon && dr.checkText, isMasquerade && mq.checkText, isTiger && tg.checkText]}>CHECK</Text>
+            <Text style={[styles.checkText, isDragon && dr.checkText, isMasquerade && mq.checkText, isTiger && tg.checkText, isSakura && sk.checkText]}>CHECK</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.callBtn : isMasquerade ? mq.callBtn : isTiger ? tg.callBtn : styles.callBtn]}
+            style={[styles.actionBtn, isDragon ? dr.callBtn : isMasquerade ? mq.callBtn : isTiger ? tg.callBtn : isSakura ? sk.callBtn : styles.callBtn]}
             onPress={onCall} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient colors={['transparent','transparent']} style={StyleSheet.absoluteFill} />
-            <Text style={[styles.callText, isDragon && dr.callText, isMasquerade && mq.callText, isTiger && tg.callText]}>
+            <Text style={[styles.callText, isDragon && dr.callText, isMasquerade && mq.callText, isTiger && tg.callText, isSakura && sk.callText]}>
               CALL{'\n'}
-              <Text style={[styles.callAmt, isDragon && dr.callAmt, isMasquerade && mq.callAmt, isTiger && tg.callAmt]}>{fmt(callAmount)}</Text>
+              <Text style={[styles.callAmt, isDragon && dr.callAmt, isMasquerade && mq.callAmt, isTiger && tg.callAmt, isSakura && sk.callAmt]}>{fmt(callAmount)}</Text>
             </Text>
           </TouchableOpacity>
         )}
@@ -333,13 +359,13 @@ export default function BettingPanel({
         {/* RAISE */}
         {canRaise && (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.raiseBtn : isMasquerade ? mq.raiseBtn : isTiger ? tg.raiseBtn : styles.raiseBtn]}
+            style={[styles.actionBtn, isDragon ? dr.raiseBtn : isMasquerade ? mq.raiseBtn : isTiger ? tg.raiseBtn : isSakura ? sk.raiseBtn : styles.raiseBtn]}
             onPress={() => onRaise(raiseAmount)} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient colors={['transparent','transparent']} style={StyleSheet.absoluteFill} />
-            <Text style={[styles.raiseText, isDragon && dr.raiseText, isMasquerade && mq.raiseText, isTiger && tg.raiseText]}>
+            <Text style={[styles.raiseText, isDragon && dr.raiseText, isMasquerade && mq.raiseText, isTiger && tg.raiseText, isSakura && sk.raiseText]}>
               RAISE{'\n'}
-              <Text style={[styles.raiseInlineAmt, isDragon && dr.raiseInlineAmt, isMasquerade && mq.raiseInlineAmt, isTiger && tg.raiseInlineAmt]}>
+              <Text style={[styles.raiseInlineAmt, isDragon && dr.raiseInlineAmt, isMasquerade && mq.raiseInlineAmt, isTiger && tg.raiseInlineAmt, isSakura && sk.raiseInlineAmt]}>
                 {fmt(raiseAmount)}
               </Text>
             </Text>
@@ -349,11 +375,11 @@ export default function BettingPanel({
         {/* ALL IN */}
         {canAllIn && (
           <TouchableOpacity
-            style={[styles.actionBtn, isDragon ? dr.allInBtn : isMasquerade ? mq.allInBtn : isTiger ? tg.allInBtn : styles.allInBtn]}
+            style={[styles.actionBtn, isDragon ? dr.allInBtn : isMasquerade ? mq.allInBtn : isTiger ? tg.allInBtn : isSakura ? sk.allInBtn : styles.allInBtn]}
             onPress={onAllIn} disabled={disabled} activeOpacity={0.75}
           >
             <LinearGradient colors={['transparent','transparent']} style={StyleSheet.absoluteFill} />
-            <Text style={[styles.allInText, isDragon && dr.allInText, isMasquerade && mq.allInText, isTiger && tg.allInText]}>ALL{'\n'}IN</Text>
+            <Text style={[styles.allInText, isDragon && dr.allInText, isMasquerade && mq.allInText, isTiger && tg.allInText, isSakura && sk.allInText]}>ALL{'\n'}IN</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -558,6 +584,84 @@ const styles = StyleSheet.create({
   },
   allInText: {
     color: '#ff0090',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    fontFamily: 'Orbitron_700Bold',
+    lineHeight: 14,
+  },
+});
+
+// ─── Sakura Garden overrides ───────────────────────────────────────────────────
+const sk = StyleSheet.create({
+  foldBtn: {
+    backgroundColor: 'rgba(12,4,10,0.72)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(160,32,80,0.55)',
+    shadowColor: '#A02050',
+  },
+  foldText: { color: '#D05080' },
+
+  checkBtn: {
+    backgroundColor: 'rgba(12,4,10,0.72)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(42,112,80,0.50)',
+    shadowColor: '#2A7050',
+  },
+  checkText: { color: '#3AB870' },
+
+  callBtn: {
+    backgroundColor: 'rgba(12,4,10,0.72)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(42,112,80,0.50)',
+    shadowColor: '#2A7050',
+  },
+  callText: {
+    color: '#FFE8F0',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    fontFamily: 'Orbitron_400Regular',
+  },
+  callAmt: {
+    color: '#3AB870',
+    fontSize: 12,
+    fontWeight: '900',
+    fontFamily: 'Inter_700Bold',
+  },
+
+  raiseBtn: {
+    backgroundColor: 'rgba(12,4,10,0.72)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(232,98,122,0.55)',
+    shadowColor: '#E8627A',
+  },
+  raiseText: {
+    color: '#FFE8F0',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    fontFamily: 'Orbitron_400Regular',
+  },
+  raiseInlineAmt: {
+    color: '#F4A8C0',
+    fontSize: 12,
+    fontWeight: '900',
+    fontFamily: 'Inter_700Bold',
+  },
+
+  allInBtn: {
+    backgroundColor: 'rgba(12,4,10,0.72)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(244,168,192,0.55)',
+    shadowColor: '#F4A8C0',
+    maxWidth: 60,
+  },
+  allInText: {
+    color: '#F4A8C0',
     fontSize: 11,
     fontWeight: '900',
     letterSpacing: 0.5,

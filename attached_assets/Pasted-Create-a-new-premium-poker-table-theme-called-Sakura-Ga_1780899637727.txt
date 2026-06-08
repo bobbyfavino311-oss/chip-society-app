@@ -1,0 +1,45 @@
+Create a new premium poker table theme called Sakura Garden using the existing table layout and UI structure. This theme should be elegant, minimalist, peaceful, and easy to implement. Avoid detailed illustrations or complex scenery. Focus on silhouettes, subtle patterns, soft gradients, and premium visual presentation.
+
+THEME: SAKURA GARDEN
+
+Design a beautiful Japanese-inspired casino theme centered around cherry blossoms, tranquility, and refined simplicity. The atmosphere should feel calm, luxurious, and visually relaxing while maintaining a premium casino appearance.
+
+Visual Requirements:
+• Soft pink gradient background
+• Cherry blossom branch silhouettes framing the play area
+• Floating sakura petals drifting subtly across the screen
+• Minimal Japanese-inspired decorative patterns
+• Soft ambient glow effects
+• Elegant linework and subtle borders
+• Clean modern composition
+• Simple premium table surface
+• Soft lighting accents
+• High readability with minimal visual clutter
+
+Color Palette:
+• Sakura Pink
+• Soft Rose
+• White
+• Light Plum
+
+Design Direction:
+The theme should evoke the feeling of sitting beneath blooming cherry blossom trees during springtime. The design should feel peaceful, graceful, and luxurious without becoming overly decorative. Use silhouettes, soft gradients, and delicate accents rather than detailed artwork. The visual style should remain clean and airy, allowing the poker gameplay to remain the primary focus.
+
+Visual Inspiration:
+• Japanese cherry blossom gardens
+• Springtime sakura festivals
+• Soft pink sunsets
+• Traditional Japanese elegance
+• Minimalist luxury design
+• Premium spa and resort aesthetics
+
+Background Elements:
+• Soft gradient sky effect
+• Cherry blossom branch silhouettes in corners
+• Light floating petal effects
+• Subtle Japanese-inspired patterns
+• Delicate glow accents
+• Minimal decorative linework
+
+IMPORTANT:
+Keep the theme extremely minimalist and implementation-friendly. Avoid detailed buildings, landscapes, characters, or illustrations. Use silhouettes, gradients, petals, and simple decorative elements only. The overall look should feel premium, modern, elegant, and calming while maintaining perfect gameplay readability and preserving the existing poker table layout.

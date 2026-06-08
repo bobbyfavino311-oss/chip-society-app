@@ -239,12 +239,82 @@ function TigerClawBack({ w, h, r }: { w: number; h: number; r: number }) {
   );
 }
 
+// ─── Sakura Blossom card back ──────────────────────────────────────────────────
+function SakuraBlossomBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const pink     = '#F4A8C0';
+  const rose     = '#E8627A';
+  const pinkDim  = 'rgba(244,168,192,0.20)';
+  const pinkFaint= 'rgba(244,168,192,0.10)';
+  const cx = w / 2;
+  const cy = h / 2;
+  const med = Math.min(w, h) * 0.24;
+
+  // Scattered petal ellipses [cx, cy, rx, ry, angle, opacity]
+  const petals: [number, number, number, number, number, number][] = [
+    [cx - med * 1.4, cy - med * 1.1, 5, 3, 30,  0.18],
+    [cx + med * 1.3, cy - med * 0.9, 5, 3, -40, 0.16],
+    [cx - med * 1.1, cy + med * 1.0, 4, 2.5, 50, 0.14],
+    [cx + med * 1.2, cy + med * 1.1, 5, 3, -25, 0.15],
+    [cx - med * 0.3, cy - med * 1.6, 4, 2.5, 15, 0.14],
+    [cx + med * 0.4, cy + med * 1.5, 5, 3, -55, 0.13],
+    [5, 5, 3.5, 2, 20, 0.22], [w-5, 5, 3.5, 2, -20, 0.22],
+    [5, h-5, 3.5, 2, -30, 0.22], [w-5, h-5, 3.5, 2, 30, 0.22],
+  ];
+
+  // 4-petal blossom ring around center
+  const blossomOffsets: [number, number][] = [
+    [0, -med], [med, 0], [0, med], [-med, 0],
+  ];
+
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#160410' }]}>
+      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+        {/* Scattered petals */}
+        {petals.map(([pcx, pcy, prx, pry, ang, op], i) => (
+          <Ellipse key={i} cx={pcx} cy={pcy} rx={prx} ry={pry}
+            fill={pink} fillOpacity={op}
+            transform={`rotate(${ang}, ${pcx}, ${pcy})`} />
+        ))}
+        {/* Outer blossom ring — petals */}
+        {blossomOffsets.map(([ox, oy], i) => (
+          <Ellipse key={`b${i}`}
+            cx={cx + ox * 0.5} cy={cy + oy * 0.5}
+            rx={med * 0.62} ry={med * 0.40}
+            fill={pink} fillOpacity={0.22}
+            transform={`rotate(${i * 90}, ${cx + ox * 0.5}, ${cy + oy * 0.5})`}
+          />
+        ))}
+        {/* Inner medallion rings */}
+        <Circle cx={cx} cy={cy} r={med * 0.75}
+          fill="none" stroke={pinkDim} strokeWidth={1.0} />
+        <Circle cx={cx} cy={cy} r={med * 0.48}
+          fill="none" stroke={pinkFaint} strokeWidth={0.7} />
+        {/* Center blossom */}
+        {blossomOffsets.map(([ox, oy], i) => (
+          <Ellipse key={`c${i}`}
+            cx={cx + ox * 0.28} cy={cy + oy * 0.28}
+            rx={med * 0.28} ry={med * 0.18}
+            fill={pink} fillOpacity={0.35}
+            transform={`rotate(${i * 90}, ${cx + ox * 0.28}, ${cy + oy * 0.28})`}
+          />
+        ))}
+        <Circle cx={cx} cy={cy} r={med * 0.10}
+          fill={rose} fillOpacity={0.65} />
+      </Svg>
+      {/* Rose inset border */}
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 1, borderWidth: 1, borderColor: 'rgba(232,98,122,0.28)' }} />
+    </View>
+  );
+}
+
 // ─── Card back router ──────────────────────────────────────────────────────────
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
   if (theme.cardBackPattern === 'dragon_scale')    return <DragonScaleBack    w={w} h={h} r={r} />;
   if (theme.cardBackPattern === 'masquerade_veil') return <MasqueradeVeilBack w={w} h={h} r={r} />;
   if (theme.cardBackPattern === 'tiger_claw')      return <TigerClawBack      w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'sakura_blossom')  return <SakuraBlossomBack  w={w} h={h} r={r} />;
   return <MandalaBack w={w} h={h} r={r} />;
 }
 

@@ -36,6 +36,8 @@ import MasqueradeBackground from '@/components/MasqueradeBackground';
 import MasqueradeCardFrame from '@/components/MasqueradeCardFrame';
 import TigerBackground from '@/components/TigerBackground';
 import TigerCardFrame from '@/components/TigerCardFrame';
+import SakuraBackground from '@/components/SakuraBackground';
+import SakuraCardFrame from '@/components/SakuraCardFrame';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -401,7 +403,8 @@ export default function PracticeScreen() {
   const isDragon      = theme.id === 'dragon_fortune';
   const isMasquerade  = theme.id === 'royal_masquerade';
   const isTiger       = theme.id === 'tiger_fortune';
-  const needsFrame    = isDragon || isMasquerade || isTiger;
+  const isSakura      = theme.id === 'sakura_garden';
+  const needsFrame    = isDragon || isMasquerade || isTiger || isSakura;
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -604,6 +607,7 @@ export default function PracticeScreen() {
       {isDragon     && <DragonBackground />}
       {isMasquerade && <MasqueradeBackground />}
       {isTiger      && <TigerBackground />}
+      {isSakura     && <SakuraBackground />}
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -703,6 +707,9 @@ export default function PracticeScreen() {
           )}
           {isTiger && tableLayout.w > 0 && (
             <TigerCardFrame width={tableLayout.w} height={tableLayout.h} />
+          )}
+          {isSakura && tableLayout.w > 0 && (
+            <SakuraCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
         <View style={[styles.tableSurface, {
           borderColor: theme.tableSurfaceBorder,

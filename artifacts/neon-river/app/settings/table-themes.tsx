@@ -110,6 +110,40 @@ function TigerFortunePreview({ size = 40 }: { size?: number }) {
   );
 }
 
+// ─── Sakura Garden mini-preview ────────────────────────────────────────────────
+function SakuraGardenPreview({ size = 40 }: { size?: number }) {
+  const pink = '#F4A8C0';
+  const rose = '#E8627A';
+  const plum = '#C4407C';
+  const s = size;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 40 40">
+      {/* Branch */}
+      <Path
+        d="M 2 2 Q 14 14, 20 20 Q 26 26, 38 38"
+        fill="none" stroke={plum} strokeWidth={1.5} strokeOpacity={0.55}
+        strokeLinecap="round"
+      />
+      {/* Blossom clusters on branch */}
+      {([[10, 10], [20, 20], [30, 30]] as [number,number][]).map(([cx, cy], i) => (
+        <React.Fragment key={i}>
+          <Circle cx={cx}     cy={cy}     r={3.0} fill={pink} fillOpacity={0.70} />
+          <Circle cx={cx - 3} cy={cy}     r={2.2} fill={pink} fillOpacity={0.50} />
+          <Circle cx={cx + 3} cy={cy}     r={2.2} fill={pink} fillOpacity={0.50} />
+          <Circle cx={cx}     cy={cy - 3} r={2.2} fill={pink} fillOpacity={0.50} />
+          <Circle cx={cx}     cy={cy + 3} r={2.2} fill={pink} fillOpacity={0.50} />
+          <Circle cx={cx}     cy={cy}     r={0.8} fill={rose} fillOpacity={0.80} />
+        </React.Fragment>
+      ))}
+      {/* Scattered petals */}
+      <Ellipse cx={32} cy={8}  rx={3.5} ry={2} fill={pink} fillOpacity={0.35}
+        transform="rotate(40, 32, 8)" />
+      <Ellipse cx={8}  cy={30} rx={3}   ry={2} fill={pink} fillOpacity={0.30}
+        transform="rotate(-30, 8, 30)" />
+    </Svg>
+  );
+}
+
 // ─── Theme card ───────────────────────────────────────────────────────────────
 function ThemeCard({
   theme,
@@ -124,6 +158,7 @@ function ThemeCard({
   const isDragon      = theme.id === 'dragon_fortune';
   const isMasquerade  = theme.id === 'royal_masquerade';
   const isTiger       = theme.id === 'tiger_fortune';
+  const isSakura      = theme.id === 'sakura_garden';
 
   // Derive accent colors from the theme itself
   const primary   = theme.accentPrimary;
@@ -147,12 +182,15 @@ function ThemeCard({
     ? ['#140026', '#0C0018', '#080010']
     : isTiger
     ? ['#100B00', '#080500', '#040300']
+    : isSakura
+    ? ['#200814', '#160510', '#0E030C']
     : ['#0e0028', '#08001a', '#050010'];
 
   function Preview() {
     if (isDragon)     return <DragonScalePreview  size={42} />;
     if (isMasquerade) return <MasqueradePreview   size={42} />;
-    if (isTiger)      return <TigerFortunePreview size={42} />;
+    if (isTiger)      return <TigerFortunePreview  size={42} />;
+    if (isSakura)     return <SakuraGardenPreview  size={42} />;
     return <NeonMandalaPreview size={42} />;
   }
 

@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'tiger_fortune';
+export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'tiger_fortune' | 'sakura_garden';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'tiger_claw';
+  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'tiger_claw' | 'sakura_blossom';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -235,9 +235,57 @@ export const TIGER_FORTUNE: TableTheme = {
   previewColors: ['#080500', '#8B5E00', '#C8940A'],
 };
 
+export const SAKURA_GARDEN: TableTheme = {
+  id: 'sakura_garden',
+  name: 'SAKURA GARDEN',
+  tagline: 'Play beneath the cherry blossoms. Peaceful, graceful, and luxuriously elegant.',
+  rarity: 'LEGENDARY',
+
+  bgGradient: ['#200814', '#160510', '#0E030C', '#160510', '#200814'],
+
+  glowA: 'rgba(232,98,122,0.20)',
+  glowB: 'rgba(196,64,124,0.10)',
+  glowCenter: 'rgba(180,60,120,0.12)',
+
+  tableSurfaceBg: 'rgba(12,4,10,0.88)',
+  tableSurfaceBorder: 'rgba(232,98,122,0.44)',
+  tableSurfaceShadow: '#E8627A',
+  tableCenterGlow: 'rgba(150,50,100,0.16)',
+
+  cardBackBg: '#160410',
+  cardBackAccent: '#F4A8C0',
+  cardBackPattern: 'sakura_blossom',
+  cardHighlightColor: '#F4A8C0',
+
+  chipTokenColor: '#F4A8C0',
+  chipWinTokenColor: '#FFE8F0',
+
+  potBg: 'rgba(12,4,10,0.92)',
+  potBorder: 'rgba(232,98,122,0.42)',
+  potShadow: '#E8627A',
+  potLabelColor: 'rgba(232,98,122,0.60)',
+  potAmountColor: '#F4A8C0',
+
+  foldAccent: '#A02050',
+  checkAccent: '#2A7050',
+  callAccent: '#2A7050',
+  raiseAccent: '#E8627A',
+  allInAccent: '#FFE8F0',
+
+  accentPrimary: '#E8627A',
+  accentSecondary: '#C4407C',
+  textColor: '#FFE8F0',
+
+  winEffectStyle: 'gold_shimmer',
+  winGoldColor: '#F4A8C0',
+
+  previewColors: ['#160510', '#C4407C', '#F4A8C0'],
+};
+
 export const ALL_TABLE_THEMES: TableTheme[] = [
   NEON_DEFAULT,
   DRAGON_FORTUNE,
   ROYAL_MASQUERADE,
   TIGER_FORTUNE,
+  SAKURA_GARDEN,
 ];
