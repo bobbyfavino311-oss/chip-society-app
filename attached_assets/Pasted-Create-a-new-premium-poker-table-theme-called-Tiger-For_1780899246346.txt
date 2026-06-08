@@ -1,0 +1,38 @@
+Create a new premium poker table theme called Tiger Fortune using the existing table layout and UI structure. This theme should be minimalist, powerful, and luxurious while remaining easy to implement. Avoid detailed illustrations and complex artwork. Focus on silhouettes, patterns, gradients, and elegant visual accents.
+
+THEME: TIGER FORTUNE
+
+Design a high-stakes Asian-inspired casino theme centered around strength, luck, prosperity, and fortune. The atmosphere should feel bold, wealthy, and exclusive while maintaining a clean and uncluttered presentation.
+
+Visual Requirements:
+• Deep black gradient background
+• Subtle gold tiger stripe patterns integrated into the background
+• Minimalist tiger silhouette as a decorative focal element
+• Gold coin symbols and fortune-inspired accents
+• Chinese-inspired cloud motifs
+• Elegant gold linework and borders
+• Clean premium casino styling
+• Soft glowing highlights
+• Gold-accented UI elements
+• Refined table surface with luxury detailing
+• Minimal decorative artwork that does not distract from gameplay
+
+Color Palette:
+• Black
+• Gold
+• Deep Amber
+• Dark Bronze
+
+Design Direction:
+The theme should feel like an exclusive VIP casino inspired by Eastern wealth and fortune. Use tiger symbolism sparingly and elegantly. The tiger should appear as a subtle silhouette or decorative accent rather than a detailed illustration. Gold elements should feel premium and luxurious without becoming flashy or overwhelming.
+
+Visual Inspiration:
+• Luxury Asian casinos
+• Traditional fortune coin motifs
+• Gold tiger stripe textures
+• Chinese cloud patterns
+• High-end black and gold luxury branding
+• Wealth, power, luck, and prestige
+
+IMPORTANT:
+Keep the design minimalist and implementation-friendly. Use silhouettes, subtle patterns, elegant borders, and gradients rather than detailed artwork. Maintain excellent readability and preserve the existing poker table layout. The theme should feel powerful, lucky, premium, and high-stakes while remaining visually clean and modern.

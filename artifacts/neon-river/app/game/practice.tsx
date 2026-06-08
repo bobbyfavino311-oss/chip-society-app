@@ -34,6 +34,8 @@ import DragonBackground from '@/components/DragonBackground';
 import DragonCardFrame from '@/components/DragonCardFrame';
 import MasqueradeBackground from '@/components/MasqueradeBackground';
 import MasqueradeCardFrame from '@/components/MasqueradeCardFrame';
+import TigerBackground from '@/components/TigerBackground';
+import TigerCardFrame from '@/components/TigerCardFrame';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -398,7 +400,8 @@ export default function PracticeScreen() {
   const { theme } = useTableTheme();
   const isDragon      = theme.id === 'dragon_fortune';
   const isMasquerade  = theme.id === 'royal_masquerade';
-  const needsFrame    = isDragon || isMasquerade;
+  const isTiger       = theme.id === 'tiger_fortune';
+  const needsFrame    = isDragon || isMasquerade || isTiger;
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -600,6 +603,7 @@ export default function PracticeScreen() {
       {/* Theme atmospheric backgrounds */}
       {isDragon     && <DragonBackground />}
       {isMasquerade && <MasqueradeBackground />}
+      {isTiger      && <TigerBackground />}
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -696,6 +700,9 @@ export default function PracticeScreen() {
           )}
           {isMasquerade && tableLayout.w > 0 && (
             <MasqueradeCardFrame width={tableLayout.w} height={tableLayout.h} />
+          )}
+          {isTiger && tableLayout.w > 0 && (
+            <TigerCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
         <View style={[styles.tableSurface, {
           borderColor: theme.tableSurfaceBorder,

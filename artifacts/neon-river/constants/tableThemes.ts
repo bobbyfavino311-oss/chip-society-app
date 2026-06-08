@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade';
+export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'tiger_fortune';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil';
+  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'tiger_claw';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -188,4 +188,56 @@ export const ROYAL_MASQUERADE: TableTheme = {
   previewColors: ['#12001E', '#9B30FF', '#D4AF37'],
 };
 
-export const ALL_TABLE_THEMES: TableTheme[] = [NEON_DEFAULT, DRAGON_FORTUNE, ROYAL_MASQUERADE];
+export const TIGER_FORTUNE: TableTheme = {
+  id: 'tiger_fortune',
+  name: 'TIGER FORTUNE',
+  tagline: 'Exclusive VIP high-stakes Asian casino. Black, gold, and the strength of the tiger.',
+  rarity: 'LEGENDARY',
+
+  bgGradient: ['#0E0900', '#080500', '#040300', '#080500', '#0E0900'],
+
+  glowA: 'rgba(200,148,10,0.22)',
+  glowB: 'rgba(139,94,0,0.10)',
+  glowCenter: 'rgba(120,80,0,0.14)',
+
+  tableSurfaceBg: 'rgba(8,5,0,0.88)',
+  tableSurfaceBorder: 'rgba(200,148,10,0.52)',
+  tableSurfaceShadow: '#C8940A',
+  tableCenterGlow: 'rgba(100,60,0,0.18)',
+
+  cardBackBg: '#090600',
+  cardBackAccent: '#C8940A',
+  cardBackPattern: 'tiger_claw',
+  cardHighlightColor: '#C8940A',
+
+  chipTokenColor: '#C8940A',
+  chipWinTokenColor: '#F5DFA0',
+
+  potBg: 'rgba(8,5,0,0.92)',
+  potBorder: 'rgba(200,148,10,0.45)',
+  potShadow: '#C8940A',
+  potLabelColor: 'rgba(200,148,10,0.62)',
+  potAmountColor: '#C8940A',
+
+  foldAccent: '#8B2000',
+  checkAccent: '#2A6040',
+  callAccent: '#2A6040',
+  raiseAccent: '#C8940A',
+  allInAccent: '#F5DFA0',
+
+  accentPrimary: '#C8940A',
+  accentSecondary: '#8B5E00',
+  textColor: '#F5DFA0',
+
+  winEffectStyle: 'gold_shimmer',
+  winGoldColor: '#C8940A',
+
+  previewColors: ['#080500', '#8B5E00', '#C8940A'],
+};
+
+export const ALL_TABLE_THEMES: TableTheme[] = [
+  NEON_DEFAULT,
+  DRAGON_FORTUNE,
+  ROYAL_MASQUERADE,
+  TIGER_FORTUNE,
+];

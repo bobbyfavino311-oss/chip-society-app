@@ -181,11 +181,70 @@ function MasqueradeVeilBack({ w, h, r }: { w: number; h: number; r: number }) {
   );
 }
 
+// ─── Tiger Claw card back ──────────────────────────────────────────────────────
+function TigerClawBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const gold      = '#C8940A';
+  const goldDim   = 'rgba(200,148,10,0.22)';
+  const goldFaint = 'rgba(200,148,10,0.10)';
+  const cx = w / 2;
+  const cy = h / 2;
+  const med = Math.min(w, h) * 0.22;
+
+  // Diagonal tiger stripe lines
+  const stripes: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  const step = Math.min(w, h) * 0.28;
+  for (let i = -2; i < 8; i++) {
+    const x = i * step - step;
+    stripes.push({ x1: x, y1: 0, x2: x + h * 0.7, y2: h });
+  }
+
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#090600' }]}>
+      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+        {/* Stripe pattern */}
+        {stripes.map((s, i) => (
+          <Line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
+            stroke={gold} strokeWidth={step * 0.38} strokeOpacity={0.032} />
+        ))}
+        {/* Fortune coin medallion */}
+        <Circle cx={cx} cy={cy} r={med}
+          fill="none" stroke={goldDim} strokeWidth={1.0} />
+        <Circle cx={cx} cy={cy} r={med * 0.65}
+          fill="none" stroke={goldFaint} strokeWidth={0.7} />
+        <Rect
+          x={cx - med * 0.32} y={cy - med * 0.32}
+          width={med * 0.64} height={med * 0.64}
+          fill="rgba(0,0,0,0.50)" stroke={gold} strokeWidth={0.7} strokeOpacity={0.45}
+        />
+        {/* Claw marks (3 lines fanning from center-top) */}
+        <Line x1={cx - med * 0.22} y1={cy - med * 0.80}
+              x2={cx - med * 0.30} y2={cy + med * 0.90}
+          stroke={gold} strokeWidth={1.2} strokeOpacity={0.20} strokeLinecap="round" />
+        <Line x1={cx}              y1={cy - med * 0.90}
+              x2={cx}              y2={cy + med * 0.90}
+          stroke={gold} strokeWidth={1.5} strokeOpacity={0.24} strokeLinecap="round" />
+        <Line x1={cx + med * 0.22} y1={cy - med * 0.80}
+              x2={cx + med * 0.30} y2={cy + med * 0.90}
+          stroke={gold} strokeWidth={1.2} strokeOpacity={0.20} strokeLinecap="round" />
+        {/* Corner fortune coin pips */}
+        <Circle cx={3}     cy={3}     r={2} fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.40} />
+        <Circle cx={w - 3} cy={3}     r={2} fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.40} />
+        <Circle cx={3}     cy={h - 3} r={2} fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.40} />
+        <Circle cx={w - 3} cy={h - 3} r={2} fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.40} />
+      </Svg>
+      {/* Gold inset border */}
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 1, borderWidth: 1, borderColor: 'rgba(200,148,10,0.30)' }} />
+    </View>
+  );
+}
+
 // ─── Card back router ──────────────────────────────────────────────────────────
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
-  if (theme.cardBackPattern === 'dragon_scale')    return <DragonScaleBack w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'dragon_scale')    return <DragonScaleBack    w={w} h={h} r={r} />;
   if (theme.cardBackPattern === 'masquerade_veil') return <MasqueradeVeilBack w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'tiger_claw')      return <TigerClawBack      w={w} h={h} r={r} />;
   return <MandalaBack w={w} h={h} r={r} />;
 }
 

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Circle, Ellipse, Line, Path, Polygon } from 'react-native-svg';
+import Svg, { Circle, Ellipse, Line, Path, Polygon, Rect } from 'react-native-svg';
 
 import { useTableTheme } from '@/context/TableThemeContext';
 import { ALL_TABLE_THEMES, TableTheme, ThemeId } from '@/constants/tableThemes';
@@ -84,6 +84,32 @@ function MasqueradePreview({ size = 40 }: { size?: number }) {
   );
 }
 
+// ─── Tiger Fortune mini-preview ────────────────────────────────────────────────
+function TigerFortunePreview({ size = 40 }: { size?: number }) {
+  const gold = '#C8940A';
+  return (
+    <Svg width={size} height={size} viewBox="0 0 40 40">
+      {/* Stripe diagonals */}
+      {[-10, 2, 14, 26, 38].map((x, i) => (
+        <Line key={i} x1={x} y1={0} x2={x + 28} y2={40}
+          stroke={gold} strokeWidth={6} strokeOpacity={0.12} />
+      ))}
+      {/* Fortune coin */}
+      <Circle cx={20} cy={20} r={12}
+        fill="none" stroke={gold} strokeWidth={1.0} strokeOpacity={0.70} />
+      <Circle cx={20} cy={20} r={7.5}
+        fill="none" stroke={gold} strokeWidth={0.6} strokeOpacity={0.45} />
+      <Rect x={16.5} y={16.5} width={7} height={7}
+        fill="rgba(0,0,0,0.60)" stroke={gold} strokeWidth={0.8} strokeOpacity={0.60} />
+      {/* Tiger stripe hints on coin */}
+      <Line x1={15} y1={17} x2={25} y2={19}
+        stroke={gold} strokeWidth={0.7} strokeOpacity={0.28} />
+      <Line x1={15} y1={21} x2={25} y2={23}
+        stroke={gold} strokeWidth={0.7} strokeOpacity={0.22} />
+    </Svg>
+  );
+}
+
 // ─── Theme card ───────────────────────────────────────────────────────────────
 function ThemeCard({
   theme,
@@ -97,6 +123,7 @@ function ThemeCard({
   const pressAnim = useRef(new Animated.Value(1)).current;
   const isDragon      = theme.id === 'dragon_fortune';
   const isMasquerade  = theme.id === 'royal_masquerade';
+  const isTiger       = theme.id === 'tiger_fortune';
 
   // Derive accent colors from the theme itself
   const primary   = theme.accentPrimary;
@@ -118,11 +145,14 @@ function ThemeCard({
     ? ['#120000', '#0A0000', '#060000']
     : isMasquerade
     ? ['#140026', '#0C0018', '#080010']
+    : isTiger
+    ? ['#100B00', '#080500', '#040300']
     : ['#0e0028', '#08001a', '#050010'];
 
   function Preview() {
     if (isDragon)     return <DragonScalePreview  size={42} />;
     if (isMasquerade) return <MasqueradePreview   size={42} />;
+    if (isTiger)      return <TigerFortunePreview size={42} />;
     return <NeonMandalaPreview size={42} />;
   }
 
