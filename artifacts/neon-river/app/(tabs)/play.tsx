@@ -258,7 +258,12 @@ export default function PlayScreen() {
               sub:     "Ante · Pair Plus · 6 Card Bonus",
               onPress: () => router.push('/casino/three-card-poker' as any),
             },
-            { label: "BLACKJACK",  icon: "card-outline",    sub: "Coming soon", locked: true },
+            {
+              label:   "BLACKJACK",
+              icon:    "card-outline",
+              sub:     "Six Deck · Beat the dealer",
+              onPress: () => router.push('/casino/blackjack' as any),
+            },
             { label: "ROULETTE",   icon: "radio-button-on-outline", sub: "Coming soon", locked: true },
           ]}
         />

@@ -1,0 +1,482 @@
+CHIP SOCIETY — SIX DECK BLACKJACK IMPLEMENTATION (NEW GAME MODE)
+
+Create a brand-new Blackjack game mode inside Chip Society.
+
+IMPORTANT:
+
+This is STANDARD CASINO BLACKJACK played from a SIX-DECK SHOE.
+
+A SHOE is the casino card dealing device that contains multiple decks of playing cards.
+
+DO NOT interpret “shoe” as footwear.
+
+The game must simulate a real casino blackjack table using a six-deck blackjack shoe containing 312 cards total.
+
+⸻
+
+GAME OVERVIEW
+
+Game Name:
+
+BLACKJACK
+
+Subtitle:
+
+Six Deck Blackjack
+
+Description:
+
+Classic casino blackjack where players compete against the dealer.
+
+Goal:
+
+Beat the dealer without exceeding 21.
+
+⸻
+
+TABLE DESIGN
+
+Use Chip Society’s premium casino styling.
+
+DO NOT create a generic green felt table.
+
+DO NOT create a cartoon blackjack table.
+
+The visual style should match the existing quality of:
+
+* Texas Hold’em
+* Three Card Poker
+* Four Dragons theme
+
+Layout:
+
+Top Section:
+
+* Dealer cards centered at top
+* Dealer receives 2 cards
+* One face up
+* One face down (hole card)
+
+Center Section:
+
+* Community play area
+* Dealer hand
+* Dealer score appears after reveal
+
+Lower Center:
+
+* Player cards
+* Player hand total displayed underneath
+
+Bottom:
+
+* Action buttons
+* Betting controls
+
+The entire layout must feel premium and modern.
+
+⸻
+
+CARD DEALING FLOW
+
+Hand begins.
+
+Player places wager.
+
+Dealer deals:
+
+Player Card 1
+Player Card 2
+
+Dealer Up Card
+Dealer Hole Card
+
+Both player cards are visible.
+
+Dealer hole card remains hidden.
+
+After all player actions are complete:
+
+Dealer flips hole card.
+
+Reveal animation must be smooth.
+
+⸻
+
+BLACKJACK RULES
+
+This game uses SIX DECKS.
+
+312 total cards.
+
+Dealer draws from a virtual casino shoe.
+
+Dealer must:
+
+HIT on 16 or lower
+
+STAND on 17 or higher
+
+Dealer stands on soft 17.
+
+A soft 17 contains an Ace valued as 11.
+
+Examples:
+
+A + 6 = Soft 17
+
+Dealer stands.
+
+Dealer never makes decisions.
+
+Dealer actions are automatic.
+
+These rules follow standard casino blackjack formats. (WinStar￼)
+
+⸻
+
+PLAYER ACTIONS
+
+Allow:
+
+HIT
+
+STAND
+
+DOUBLE DOWN
+
+SPLIT
+
+DO NOT include Insurance.
+
+DO NOT include Surrender.
+
+Keep gameplay streamlined.
+
+⸻
+
+HIT
+
+Player receives one additional card.
+
+Player may continue hitting until:
+
+* Stand
+* Bust
+* Double
+
+Bust occurs when hand exceeds 21.
+
+Immediate loss.
+
+⸻
+
+STAND
+
+Player ends turn.
+
+Dealer begins turn.
+
+⸻
+
+DOUBLE DOWN
+
+Player doubles original wager.
+
+One card is dealt.
+
+Player automatically stands.
+
+No additional actions permitted.
+
+Double Down requires sufficient chip balance.
+
+⸻
+
+SPLIT
+
+When two identical value cards are dealt:
+
+Examples:
+
+8 + 8
+
+K + K
+
+Q + Q
+
+5 + 5
+
+Player may split.
+
+Create two separate hands.
+
+Duplicate original wager.
+
+Each hand plays independently.
+
+Display:
+
+HAND 1
+
+HAND 2
+
+Separate totals.
+
+Separate card groups.
+
+Player completes Hand 1 before Hand 2.
+
+⸻
+
+BLACKJACK
+
+Natural Blackjack:
+
+Ace + Any 10-value card
+
+Examples:
+
+A + K
+
+A + Q
+
+A + J
+
+A + 10
+
+Natural Blackjack pays:
+
+3:2
+
+Example:
+
+100k wager
+
+150k profit
+
+250k total return
+
+If dealer also has Blackjack:
+
+Push
+
+No winner
+
+This follows standard casino blackjack rules. (Bally’s Casinos￼)
+
+⸻
+
+PUSH
+
+When dealer and player totals match:
+
+Push
+
+Return wager.
+
+No win.
+
+No loss.
+
+⸻
+
+DEALER TURN
+
+After all players act:
+
+Reveal dealer hole card.
+
+Dealer must:
+
+Hit until reaching 17.
+
+Stand on 17 or higher.
+
+Dealer busts above 21.
+
+Remaining active players win.
+
+⸻
+
+SHOE SYSTEM
+
+Create a visible SIX-DECK SHOE indicator.
+
+Top-right corner.
+
+Display:
+
+CARDS REMAINING
+
+Example:
+
+312 / 312
+
+248 / 312
+
+129 / 312
+
+52 / 312
+
+When penetration reaches roughly 75%:
+
+Display animation:
+
+SHUFFLING SHOE
+
+Reshuffle all six decks.
+
+Reset counter.
+
+This should feel like a real casino blackjack shoe. (Vegas Aces￼)
+
+⸻
+
+BETTING SYSTEM
+
+DO NOT use physical chip denomination buttons.
+
+Use Chip Society’s existing betting system.
+
+Include:
+
+Minus button
+
+Plus button
+
+Bet slider
+
+Quick Bet Buttons:
+
+MIN
+
+2X
+
+MAX
+
+REPEAT BET
+
+Keep consistent with Hold’em and Three Card Poker.
+
+⸻
+
+HAND TOTAL DISPLAY
+
+Always display totals.
+
+Examples:
+
+PLAYER: 18
+
+PLAYER: 20
+
+PLAYER: BLACKJACK
+
+DEALER: 17
+
+DEALER: BUST
+
+⸻
+
+WIN ANIMATIONS
+
+BLACKJACK
+
+PLAYER WINS
+
+DEALER BUSTS
+
+PUSH
+
+PLAYER BUSTS
+
+DOUBLE DOWN WIN
+
+SPLIT SWEEP
+
+All animations should match Chip Society visual standards.
+
+Premium.
+
+Casino quality.
+
+Not cartoonish.
+
+⸻
+
+SOCIAL FEED INTEGRATION
+
+Add:
+
+SHARE TO FEED
+
+after notable hands.
+
+Examples:
+
+Blackjack
+
+Largest Win
+
+Double Down Win
+
+Split Sweep
+
+Win Streak
+
+Example post:
+
+🃏 Hit Blackjack against dealer Ace.
+
+Won 450K chips.
+
+⸻
+
+BLACKJACK ACHIEVEMENTS
+
+Natural Born Winner
+
+* Hit first Blackjack
+
+Lucky Ace
+
+* Hit 10 Blackjacks
+
+Double Trouble
+
+* Win 50 Double Downs
+
+Split Personality
+
+* Win both split hands 25 times
+
+Card Counter
+
+* Win 100 hands
+
+Blackjack Shark
+
+* Win 1,000 hands
+
+High Roller
+
+* Win 5M chips in Blackjack
+
+Six Deck Legend
+
+* Play 10,000 Blackjack hands
+
+⸻
+
+FINAL DESIGN GOAL
+
+The Blackjack mode should feel like a true casino blackjack experience.
+
+Not an arcade game.
+
+Not a simplified mobile game.
+
+Not cartoon themed.
+
+A premium social casino blackjack table that looks and feels consistent with the existing Chip Society ecosystem while using authentic six-deck blackjack rules and casino-style gameplay.
