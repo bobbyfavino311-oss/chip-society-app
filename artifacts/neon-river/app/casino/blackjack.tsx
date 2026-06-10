@@ -357,8 +357,15 @@ export default function BlackjackScreen() {
   const [exitConfirm,  setExitConfirm]  = useState(false);
 
   // ── Betting state ────────────────────────────────────────────────────────────
-  const [bet,     setBet]     = useState(Math.min(10_000, profile.chips));
-  const [lastBet, setLastBet] = useState(Math.min(10_000, profile.chips));
+  const [bet,     setBet]     = useState(Math.min(10_000, Math.max(MIN_BET, profile.chips)));
+  const [lastBet, setLastBet] = useState(Math.min(10_000, Math.max(MIN_BET, profile.chips)));
+
+  // Sync bet when profile.chips hydrates from AsyncStorage after mount
+  useEffect(() => {
+    if (profile.chips >= MIN_BET) {
+      setBet(prev => prev < MIN_BET ? Math.min(10_000, profile.chips) : prev);
+    }
+  }, [profile.chips]);
 
   // ─── Sync helpers ─────────────────────────────────────────────────────────────
   function syncDealerCards(cards: Card[]) { dealerCardsRef.current = cards; setDealerCards(cards); }
