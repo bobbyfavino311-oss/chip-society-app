@@ -1,0 +1,204 @@
+# BLACKJACK SHOE SHUFFLE BUG FIX + TESTING MODE
+
+CRITICAL BUG FIX REQUIRED
+
+Currently when the blackjack shoe reaches the end of its card count, the game correctly displays:
+
+SHUFFLING SHOE
+
+However, after the shuffle occurs, the game can become stuck and requires the player to exit Blackjack and re-enter the game before a new hand can be played.
+
+This is a bug.
+
+The player should NEVER need to leave the table after a shuffle.
+
+--------------------------------------------------
+
+REQUIRED BEHAVIOR
+
+When the shoe reaches its shuffle point:
+
+1. Finish the current hand.
+2. Display SHUFFLING SHOE.
+3. Run shuffle animation.
+4. Reset shoe card count.
+5. Automatically generate the next hand.
+6. Return player directly to betting phase.
+
+No loading screens.
+
+No frozen state.
+
+No manual refresh.
+
+No need to leave and re-enter Blackjack.
+
+The shuffle process should feel completely seamless.
+
+--------------------------------------------------
+
+SHUFFLE ANIMATION
+
+When displaying:
+
+SHUFFLING SHOE
+
+Show an animated casino card shuffle underneath the text.
+
+IMPORTANT:
+
+This is a CASINO CARD SHOE.
+
+NOT a footwear shoe.
+
+The animation should clearly show:
+
+- Multiple playing cards
+- Cards being mixed together
+- Cards being shuffled
+- Cards being inserted back into a casino dealing shoe
+
+Use smooth casino-style animations.
+
+Examples:
+
+🂠 🂠 🂠
+
+Cards mixing
+
+Cards stacking
+
+Cards entering shoe
+
+Reset complete
+
+NEW SHOE READY
+
+The animation should last approximately:
+
+2–3 seconds
+
+Then automatically proceed to the next hand.
+
+A dealing shoe is the casino device used to hold and deal multiple decks of cards. (Wikipedia)
+
+--------------------------------------------------
+
+TEMPORARY TESTING MODE
+
+For development and testing purposes:
+
+TEMPORARILY CHANGE BLACKJACK FROM:
+
+Six Deck Shoe
+
+312 Cards
+
+TO:
+
+Single Deck Shoe
+
+52 Cards
+
+This is ONLY for testing the shuffle system.
+
+Purpose:
+
+Allow frequent shoe depletion.
+
+Allow shuffle animation testing.
+
+Allow reshuffle bug testing.
+
+Allow edge-case testing.
+
+Display:
+
+SHOE
+47 / 52
+
+31 / 52
+
+12 / 52
+
+3 / 52
+
+instead of:
+
+305 / 312
+
+--------------------------------------------------
+
+AUTOMATIC SHUFFLE TESTING
+
+For testing mode:
+
+Trigger reshuffle whenever:
+
+Cards Remaining <= 10
+
+This allows rapid verification that:
+
+- Shuffle animation works
+- Card counter resets
+- Shoe resets
+- New hand starts correctly
+- No lockups occur
+
+--------------------------------------------------
+
+POST-SHUFFLE STATE
+
+After shuffle:
+
+Automatically return to:
+
+PLACE YOUR BET
+
+screen.
+
+Restore:
+
+Bet Slider
+
+Min Button
+
+2X Button
+
+Max Button
+
+Repeat Bet
+
+All controls should be active.
+
+The player should immediately be able to start another hand.
+
+--------------------------------------------------
+
+SUCCESS CONDITION
+
+The following flow must work flawlessly:
+
+Player finishes hand
+
+Shoe reaches cut point
+
+SHUFFLING SHOE appears
+
+Card shuffle animation plays
+
+Card count resets
+
+New betting round appears
+
+Player continues playing
+
+WITHOUT leaving Blackjack
+
+WITHOUT restarting the game
+
+WITHOUT re-entering the table
+
+WITHOUT refreshing the app
+
+This entire process should feel like a real casino shoe being shuffled and immediately placed back into action.

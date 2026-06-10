@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlayingCard from '@/components/PlayingCard';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
@@ -16,13 +15,19 @@ import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
 import type { Card, Suit } from '@/lib/pokerEngine';
 import {
-  createSixDeckShoe, handTotal,
-  isBlackjack, isBust, dealerShouldHit, canSplit,
-  SHOE_SIZE, RESHUFFLE_AT, fmt,
+  createShoe, handTotal,
+  isBlackjack, isBust, dealerShouldHit, canSplit, fmt,
 } from '@/lib/blackjackEngine';
 
+// ─── Testing mode ─────────────────────────────────────────────────────────────
+// Flip TESTING_MODE to false to restore six-deck production shoe.
+const TESTING_MODE    = true;
+const TEST_DECKS      = TESTING_MODE ? 1 : 6;
+const TEST_SHOE_TOTAL = TEST_DECKS * 52;          // 52 (testing) or 312
+const TEST_RESHUFFLE  = TEST_SHOE_TOTAL - 10;     // reshuffle when ≤10 remain
+
 // ─── Types ────────────────────────────────────────────────────────────────────
-type BJPhase = 'betting' | 'player' | 'dealer' | 'result';
+type BJPhase = 'betting' | 'player' | 'dealer' | 'result' | 'shuffling';
 type HandOutcome = 'blackjack' | 'win' | 'push' | 'lose' | 'bust';
 
 interface BJHand {
@@ -58,24 +63,9 @@ const MAX_BET      = 500_000;
 const QUICK_BETS   = [5_000, 25_000, 50_000, 100_000];
 const DEALER_DELAY = 700;
 
-const MUSIC_TRACKS = [
-  { id: 'classic_casino',   label: 'Classic Casino' },
-  { id: 'vegas_lounge',     label: 'Vegas Lounge' },
-  { id: 'vice_nights',      label: 'Vice Nights Synthwave' },
-  { id: 'four_dragons',     label: 'Four Dragons Ambience' },
-  { id: 'high_roller_jazz', label: 'High Roller Jazz' },
-  { id: 'midnight_casino',  label: 'Midnight Casino' },
-  { id: 'neon_skyline',     label: 'Neon Skyline' },
-] as const;
-type TrackId = (typeof MUSIC_TRACKS)[number]['id'];
-
-const TRACK_STORAGE_KEY = '@bj_music_track';
-
 // ─── Pure helpers ─────────────────────────────────────────────────────────────
-const VALUE_LABEL: Record<number, string> = {
-  11: 'J', 12: 'Q', 13: 'K', 14: 'A',
-};
-const SUIT_SYMBOL: Record<Suit, string> = { S: '♠', H: '♥', D: '♦', C: '♣' };
+const VALUE_LABEL: Record<number, string> = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
+const SUIT_SYMBOL: Record<Suit, string>   = { S: '♠', H: '♥', D: '♦', C: '♣' };
 
 function cardLabel(card: Card): string {
   return (VALUE_LABEL[card.value] ?? String(card.value)) + SUIT_SYMBOL[card.suit];
@@ -88,9 +78,9 @@ function handDisplay(hand: BJHand): string {
 }
 
 function dealerDisplay(cards: Card[], revealed: boolean): string {
-  if (!revealed) return '?';
-  if (isBust(cards))       return 'BUST';
-  if (isBlackjack(cards))  return 'BJ';
+  if (!revealed)          return '?';
+  if (isBust(cards))      return 'BUST';
+  if (isBlackjack(cards)) return 'BJ';
   return String(handTotal(cards));
 }
 
@@ -109,28 +99,24 @@ function buildExplanation(
       if (dealerBusts) return `Dealer busted with ${dealerTotal}`;
       return `${playerTotal} beats Dealer ${dealerTotal}`;
     case 'lose':
-      if (dealerBJ)   return 'Dealer had Blackjack';
-      if (dealerBusts) return `Dealer busted — you still lose (busted hand)`;
+      if (dealerBJ)    return 'Dealer had Blackjack';
       return `Dealer ${dealerTotal} beats your ${playerTotal}`;
   }
 }
 
-// ─── Outcome colors ──────────────────────────────────────────────────────────
-function outcomeColor(o: HandOutcome | string): string {
-  if (o === 'blackjack')              return colors.gold;
-  if (o === 'win')                    return colors.success;
-  if (o === 'push' || o === 'PUSH')   return '#4da6ff';
+function outcomeColor(o: HandOutcome): string {
+  if (o === 'blackjack') return colors.gold;
+  if (o === 'win')       return colors.success;
+  if (o === 'push')      return '#4da6ff';
   return colors.error;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function ShoeIndicator({ dealt }: { dealt: number }) {
-  const remaining = SHOE_SIZE - dealt;
+// ─── Shoe indicator ───────────────────────────────────────────────────────────
+function ShoeIndicator({ dealt, total }: { dealt: number; total: number }) {
   return (
     <View style={shoe.wrap}>
       <Text style={shoe.label}>SHOE</Text>
-      <Text style={shoe.count}>{remaining}/{SHOE_SIZE}</Text>
+      <Text style={shoe.count}>{total - dealt}/{total}</Text>
     </View>
   );
 }
@@ -140,6 +126,7 @@ const shoe = StyleSheet.create({
   count: { fontSize: 11, fontFamily: 'Inter_700Bold', color: 'rgba(255,215,0,0.75)', marginTop: 1 },
 });
 
+// ─── Score badge ──────────────────────────────────────────────────────────────
 function ScoreBadge({ label, bust, bj }: { label: string; bust?: boolean; bj?: boolean }) {
   const bg  = bj ? 'rgba(255,215,0,0.14)' : bust ? 'rgba(255,68,68,0.14)' : 'rgba(255,255,255,0.08)';
   const bdr = bj ? 'rgba(255,215,0,0.45)' : bust ? 'rgba(255,68,68,0.40)' : 'rgba(255,255,255,0.18)';
@@ -155,132 +142,99 @@ const sb = StyleSheet.create({
   text: { fontSize: 13, fontFamily: 'Inter_700Bold', letterSpacing: 0.5 },
 });
 
-function ShufflingOverlay({ visible }: { visible: boolean }) {
+// ─── Animated shuffle overlay ─────────────────────────────────────────────────
+function ShufflingOverlay({ visible, shuffleKey, numDecks }: { visible: boolean; shuffleKey: number; numDecks: number }) {
+  const [showReady, setShowReady] = useState(false);
+
+  // 5 animated cards — x offset, y offset, rotation
+  const cardX   = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
+  const cardY   = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
+  const cardRot = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    if (!visible) { setShowReady(false); return; }
+
+    // Reset to stacked center
+    cardX.forEach(a => a.setValue(0));
+    cardY.forEach(a => a.setValue(0));
+    cardRot.forEach(a => a.setValue(0));
+    setShowReady(false);
+
+    // Phase 1: fan out (300ms)
+    const fanOut = Animated.parallel([
+      ...cardX.map((a, i) => Animated.timing(a, { toValue: (i - 2) * 38, duration: 300, useNativeDriver: true })),
+      ...cardRot.map((a, i) => Animated.timing(a, { toValue: (i - 2) * 10, duration: 300, useNativeDriver: true })),
+    ]);
+
+    // Phase 2: riffle — alternating up/down 5 times (150ms each = 1500ms)
+    const riffleUp = Animated.parallel(
+      cardY.map((a, i) => Animated.timing(a, { toValue: i % 2 === 0 ? -14 : 14, duration: 140, useNativeDriver: true }))
+    );
+    const riffleDown = Animated.parallel(
+      cardY.map((a, i) => Animated.timing(a, { toValue: i % 2 === 0 ? 14 : -14, duration: 140, useNativeDriver: true }))
+    );
+    const riffle = Animated.loop(Animated.sequence([riffleUp, riffleDown]), { iterations: 6 });
+
+    // Run fan → riffle → collapse in sequence; riffle runs for 6*280=1680ms then stop
+    fanOut.start(() => {
+      riffle.start();
+      setTimeout(() => {
+        riffle.stop();
+        // Phase 3: collapse to center (300ms)
+        Animated.parallel([
+          ...cardX.map(a => Animated.timing(a, { toValue: 0, duration: 350, useNativeDriver: true })),
+          ...cardY.map(a => Animated.timing(a, { toValue: 0, duration: 350, useNativeDriver: true })),
+          ...cardRot.map(a => Animated.timing(a, { toValue: 0, duration: 350, useNativeDriver: true })),
+        ]).start(() => setShowReady(true));
+      }, 1680);
+    });
+  }, [shuffleKey, visible]);
+
   if (!visible) return null;
+
+  const deckLabel = numDecks === 1 ? 'Single deck · 52 cards' : `Six decks · ${numDecks * 52} cards`;
+
   return (
-    <View style={[StyleSheet.absoluteFillObject, { zIndex: 999, alignItems: 'center', justifyContent: 'center' }]}>
-      <LinearGradient colors={['rgba(5,0,16,0.97)', 'rgba(10,0,30,0.97)']} style={StyleSheet.absoluteFillObject} />
-      <Text style={sovl.title}>SHUFFLING SHOE</Text>
-      <Text style={sovl.sub}>Six decks · 312 cards</Text>
+    <View style={[StyleSheet.absoluteFillObject, sovl.wrap]}>
+      <LinearGradient colors={['rgba(5,0,16,0.97)', 'rgba(10,0,30,0.97)']} style={StyleSheet.absoluteFill} />
+
+      <Text style={sovl.title}>{showReady ? 'NEW SHOE READY' : 'SHUFFLING SHOE'}</Text>
+
+      {/* Animated card backs */}
+      <View style={sovl.cardRow}>
+        {cardX.map((ax, i) => (
+          <Animated.View
+            key={i}
+            style={[
+              sovl.card,
+              {
+                transform: [
+                  { translateX: ax },
+                  { translateY: cardY[i] },
+                  { rotate: cardRot[i].interpolate({ inputRange: [-20, 20], outputRange: ['-20deg', '20deg'] }) },
+                ],
+                zIndex: i,
+              },
+            ]}
+          >
+            <LinearGradient colors={['#1a003a', '#0d0025']} style={StyleSheet.absoluteFill} />
+            {/* diamond card-back pattern */}
+            <View style={sovl.cardDiamond} />
+          </Animated.View>
+        ))}
+      </View>
+
+      <Text style={[sovl.sub, showReady && { color: colors.success }]}>{deckLabel}</Text>
     </View>
   );
 }
 const sovl = StyleSheet.create({
-  title: { fontSize: 22, fontFamily: 'Orbitron_900Black', color: colors.gold, letterSpacing: 3, textAlign: 'center' },
-  sub:   { fontSize: 11, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.50)', letterSpacing: 2, marginTop: 8 },
-});
-
-// ─── Music panel modal ────────────────────────────────────────────────────────
-function MusicPanel({
-  visible, onClose, isMusicMuted, musicVolume,
-  toggleMusicMute, setMusicVolume,
-  selectedTrack, onSelectTrack,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  isMusicMuted: boolean;
-  musicVolume: number;
-  toggleMusicMute: () => void;
-  setMusicVolume: (v: number) => void;
-  selectedTrack: TrackId;
-  onSelectTrack: (id: TrackId) => void;
-}) {
-  return (
-    <Modal transparent visible={visible} animationType="slide" onRequestClose={onClose}>
-      <TouchableOpacity style={mp.backdrop} activeOpacity={1} onPress={onClose} />
-      <View style={mp.sheet}>
-        <LinearGradient colors={['#14002a', '#0a0018']} style={StyleSheet.absoluteFill} />
-        <View style={mp.handle} />
-
-        <Text style={mp.title}>TABLE MUSIC</Text>
-
-        {/* On / Off toggle */}
-        <View style={mp.toggleRow}>
-          <TouchableOpacity
-            style={[mp.toggleBtn, !isMusicMuted && mp.toggleOn]}
-            onPress={() => { if (isMusicMuted) toggleMusicMute(); }}
-            activeOpacity={0.8}
-          >
-            <Text style={[mp.toggleText, !isMusicMuted && { color: '#fff' }]}>ON</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[mp.toggleBtn, isMusicMuted && mp.toggleOff]}
-            onPress={() => { if (!isMusicMuted) toggleMusicMute(); }}
-            activeOpacity={0.8}
-          >
-            <Text style={[mp.toggleText, isMusicMuted && { color: '#fff' }]}>OFF</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Volume */}
-        <View style={mp.volRow}>
-          <Text style={mp.volLabel}>VOLUME</Text>
-          <TouchableOpacity style={mp.volBtn} onPress={() => setMusicVolume(Math.max(0, musicVolume - 0.1))} activeOpacity={0.7}>
-            <Text style={mp.volBtnText}>-</Text>
-          </TouchableOpacity>
-          <View style={mp.volBarWrap}>
-            {Array.from({ length: 10 }, (_, i) => (
-              <View
-                key={i}
-                style={[mp.volSegment, { backgroundColor: i < Math.round(musicVolume * 10) ? colors.primary : 'rgba(255,255,255,0.12)' }]}
-              />
-            ))}
-          </View>
-          <TouchableOpacity style={mp.volBtn} onPress={() => setMusicVolume(Math.min(1, musicVolume + 0.1))} activeOpacity={0.7}>
-            <Text style={mp.volBtnText}>+</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Track list */}
-        <Text style={mp.trackHeading}>SELECT TRACK</Text>
-        <ScrollView style={{ maxHeight: 220 }} showsVerticalScrollIndicator={false}>
-          {MUSIC_TRACKS.map(t => (
-            <TouchableOpacity
-              key={t.id}
-              style={[mp.trackRow, selectedTrack === t.id && mp.trackRowActive]}
-              onPress={() => onSelectTrack(t.id)}
-              activeOpacity={0.8}
-            >
-              {selectedTrack === t.id && (
-                <LinearGradient colors={[`${colors.primary}14`, 'transparent']} style={StyleSheet.absoluteFill} />
-              )}
-              <View style={[mp.trackDot, { backgroundColor: selectedTrack === t.id ? colors.primary : 'rgba(255,255,255,0.15)' }]} />
-              <Text style={[mp.trackLabel, selectedTrack === t.id && { color: colors.primary }]}>{t.label}</Text>
-              {selectedTrack === t.id && <Ionicons name="musical-notes" size={12} color={colors.primary} />}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <TouchableOpacity style={mp.closeBtn} onPress={onClose} activeOpacity={0.8}>
-          <Text style={mp.closeBtnText}>DONE</Text>
-        </TouchableOpacity>
-      </View>
-    </Modal>
-  );
-}
-const mp = StyleSheet.create({
-  backdrop:       { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
-  sheet:          { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 32, borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', borderTopWidth: 1, borderColor: 'rgba(255,255,255,0.08)', gap: 14 },
-  handle:         { width: 40, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', alignSelf: 'center', marginBottom: 4 },
-  title:          { fontSize: 13, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 3, textAlign: 'center' },
-  toggleRow:      { flexDirection: 'row', gap: 10, justifyContent: 'center' },
-  toggleBtn:      { flex: 1, height: 38, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.04)' },
-  toggleOn:       { backgroundColor: 'rgba(0,212,255,0.15)', borderColor: 'rgba(0,212,255,0.45)' },
-  toggleOff:      { backgroundColor: 'rgba(255,68,68,0.12)', borderColor: 'rgba(255,68,68,0.35)' },
-  toggleText:     { fontSize: 11, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.35)', letterSpacing: 2 },
-  volRow:         { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  volLabel:       { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, width: 52 },
-  volBtn:         { width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' },
-  volBtnText:     { fontSize: 18, color: '#fff', fontFamily: 'Inter_700Bold', lineHeight: 22 },
-  volBarWrap:     { flex: 1, flexDirection: 'row', gap: 3, alignItems: 'center' },
-  volSegment:     { flex: 1, height: 12, borderRadius: 2 },
-  trackHeading:   { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.30)', letterSpacing: 2.5 },
-  trackRow:       { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 10, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', marginBottom: 6, overflow: 'hidden' },
-  trackRowActive: { borderColor: 'rgba(0,212,255,0.30)' },
-  trackDot:       { width: 8, height: 8, borderRadius: 4 },
-  trackLabel:     { flex: 1, fontSize: 12, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,255,255,0.55)', letterSpacing: 0.5 },
-  closeBtn:       { height: 44, borderRadius: 13, backgroundColor: 'rgba(0,212,255,0.10)', borderWidth: 1, borderColor: 'rgba(0,212,255,0.30)', alignItems: 'center', justifyContent: 'center' },
-  closeBtnText:   { fontSize: 11, fontFamily: 'Orbitron_700Bold', color: colors.primary, letterSpacing: 2 },
+  wrap:        { zIndex: 999, alignItems: 'center', justifyContent: 'center', gap: 20 },
+  title:       { fontSize: 20, fontFamily: 'Orbitron_900Black', color: colors.gold, letterSpacing: 3, textAlign: 'center' },
+  cardRow:     { flexDirection: 'row', alignItems: 'center', height: 80 },
+  card:        { position: 'absolute', width: 46, height: 65, borderRadius: 7, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.40)', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  cardDiamond: { width: 20, height: 20, borderRadius: 3, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.35)', transform: [{ rotate: '45deg' }] },
+  sub:         { fontSize: 10, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.45)', letterSpacing: 2, textAlign: 'center' },
 });
 
 // ─── Per-hand result row ──────────────────────────────────────────────────────
@@ -341,19 +295,11 @@ const dll = StyleSheet.create({
 export default function BlackjackScreen() {
   const insets = useSafeAreaInsets();
   const { profile, addChips, removeChips, updateProfile } = useUser();
-  const { isMusicMuted, toggleMusicMute, musicVolume, setMusicVolume } = useSoundSettings();
+  const { isMusicMuted, toggleMusicMute, musicVolume } = useSoundSettings();
 
   // ── Music ─────────────────────────────────────────────────────────────────────
-  const [showMusicPanel, setShowMusicPanel] = useState(false);
-  const [selectedTrack, setSelectedTrack]   = useState<TrackId>('classic_casino');
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pulseRef  = useRef<Animated.CompositeAnimation | null>(null);
-
-  useEffect(() => {
-    AsyncStorage.getItem(TRACK_STORAGE_KEY).then(v => {
-      if (v && MUSIC_TRACKS.find(t => t.id === v)) setSelectedTrack(v as TrackId);
-    }).catch(() => {});
-  }, []);
 
   useEffect(() => {
     MusicEngine.configure({ muted: isMusicMuted, volume: musicVolume });
@@ -380,35 +326,21 @@ export default function BlackjackScreen() {
     return () => { pulseRef.current?.stop(); };
   }, [isMusicMuted]);
 
-  function handleSelectTrack(id: TrackId) {
-    setSelectedTrack(id);
-    AsyncStorage.setItem(TRACK_STORAGE_KEY, id).catch(() => {});
-  }
-
   // ── Shoe ─────────────────────────────────────────────────────────────────────
-  const shoeRef    = useRef<Card[]>(createSixDeckShoe());
-  const shoePosRef = useRef(0);
-  const [cardsDealt, setCardsDealt]   = useState(0);
-  const [isShuffling, setIsShuffling] = useState(false);
+  const shoeRef     = useRef<Card[]>(createShoe(TEST_DECKS));
+  const shoePosRef  = useRef(0);
+  const [cardsDealt, setCardsDealt]     = useState(0);
+  const [isShuffling, setIsShuffling]   = useState(false);
+  const [shuffleKey, setShuffleKey]     = useState(0);
 
   function drawCard(): Card {
     if (shoePosRef.current >= shoeRef.current.length) {
-      shoeRef.current = createSixDeckShoe();
+      shoeRef.current = createShoe(TEST_DECKS);
       shoePosRef.current = 0;
     }
     const card = shoeRef.current[shoePosRef.current++];
     setCardsDealt(prev => prev + 1);
     return card;
-  }
-
-  function checkAndReshuffle() {
-    if (shoePosRef.current >= RESHUFFLE_AT) {
-      shoeRef.current = createSixDeckShoe();
-      shoePosRef.current = 0;
-      setCardsDealt(0);
-      setIsShuffling(true);
-      setTimeout(() => setIsShuffling(false), 1800);
-    }
   }
 
   // ── Game state ───────────────────────────────────────────────────────────────
@@ -457,8 +389,7 @@ export default function BlackjackScreen() {
         addChips(hand.bet);
       } else if (playerBJ) {
         outcome = 'blackjack';
-        const payout = hand.bet + Math.floor(hand.originalBet * 1.5);
-        addChips(payout);
+        addChips(hand.bet + Math.floor(hand.originalBet * 1.5));
         totalNet += Math.floor(hand.originalBet * 1.5);
         wins++;
       } else if (dealerBJ) {
@@ -492,9 +423,7 @@ export default function BlackjackScreen() {
       handResults.push({
         outcome, net,
         explanation: buildExplanation(outcome, playerTotal, dealerTotal, dealerBusts, dealerBJ),
-        playerTotal,
-        isDoubled: hand.doubled,
-        originalBet: hand.originalBet,
+        playerTotal, isDoubled: hand.doubled, originalBet: hand.originalBet,
       });
     }
 
@@ -508,8 +437,8 @@ export default function BlackjackScreen() {
     if (handResults.every(r => r.outcome === 'blackjack'))  headline = 'BLACKJACK';
     else if (handResults.every(r => r.outcome === 'push'))  headline = 'PUSH';
     else if (handResults.every(r => r.outcome === 'bust'))  headline = 'PLAYER BUSTS';
-    else if (dealerBusts && handResults.some(r => !r.isDoubled || r.outcome !== 'bust')) headline = 'DEALER BUSTS';
-    else if (handResults.some(r => r.outcome === 'win' || r.outcome === 'blackjack'))    headline = 'PLAYER WINS';
+    else if (dealerBusts && handResults.some(r => r.outcome !== 'bust')) headline = 'DEALER BUSTS';
+    else if (handResults.some(r => r.outcome === 'win' || r.outcome === 'blackjack')) headline = 'PLAYER WINS';
 
     MusicEngine.setIntensity(totalNet > 0 ? 'normal' : 'showdown');
     setResult({ handResults, totalNet, headline, dealerTotal, dealerBusts, dealerBJ });
@@ -527,22 +456,14 @@ export default function BlackjackScreen() {
         const nextCards = [...currentCards, card];
         const nextTotal = handTotal(nextCards);
         syncDealerCards(nextCards);
-
-        if (isBust(nextCards)) {
-          addLog(`Dealer draws ${cardLabel(card)} · Busts with ${nextTotal}`);
-        } else {
-          addLog(`Dealer draws ${cardLabel(card)} · Now ${nextTotal}`);
-        }
-
+        addLog(isBust(nextCards)
+          ? `Dealer draws ${cardLabel(card)} · Busts with ${nextTotal}`
+          : `Dealer draws ${cardLabel(card)} · Now ${nextTotal}`);
         runDealerTurn(nextCards, hands);
       }, DEALER_DELAY);
     } else {
       const total = handTotal(currentCards);
-      if (isBust(currentCards)) {
-        addLog(`Dealer busts with ${total}`);
-      } else {
-        addLog(`Dealer stands on ${total}`);
-      }
+      addLog(isBust(currentCards) ? `Dealer busts with ${total}` : `Dealer stands on ${total}`);
       setTimeout(() => computeResults(currentCards, hands), 500);
     }
   }
@@ -552,8 +473,8 @@ export default function BlackjackScreen() {
     setPhase('dealer');
     setDealerLog([]);
 
-    const holeCard  = dCards[1];
-    const knownCard = dCards[0];
+    const holeCard      = dCards[1];
+    const knownCard     = dCards[0];
     const revealedTotal = handTotal(dCards);
 
     addLog(`Dealer reveals ${cardLabel(holeCard)}`);
@@ -568,7 +489,6 @@ export default function BlackjackScreen() {
     }, 400);
   }
 
-  // ─── Advance hand or go to dealer ────────────────────────────────────────────
   function advanceOrDealer(newHands: BJHand[], completedIdx: number) {
     syncPlayerHands(newHands);
     const nextIdx = completedIdx + 1;
@@ -588,7 +508,6 @@ export default function BlackjackScreen() {
     removeChips(actualBet);
     setLastBet(actualBet);
     setDealerLog([]);
-    checkAndReshuffle();
     MusicEngine.setIntensity('normal');
 
     const p1 = drawCard();
@@ -597,11 +516,10 @@ export default function BlackjackScreen() {
     const d2 = drawCard();
 
     const dCards = [d1, d2];
-    const initialHand: BJHand = {
+    const hands  = [{
       cards: [p1, p2], bet: actualBet, originalBet: actualBet,
       doubled: false, stood: false, busted: false,
-    };
-    const hands = [initialHand];
+    }];
 
     syncDealerCards(dCards);
     syncPlayerHands(hands);
@@ -609,9 +527,7 @@ export default function BlackjackScreen() {
     setHoleRevealed(false);
     setResult(null);
 
-    const playerBJ = isBlackjack([p1, p2]);
-    const dealerBJ = isBlackjack([d1, d2]);
-    if (playerBJ || dealerBJ) {
+    if (isBlackjack([p1, p2]) || isBlackjack([d1, d2])) {
       setTimeout(() => startDealerTurn(hands, dCards), 600);
     } else {
       setPhase('player');
@@ -620,58 +536,48 @@ export default function BlackjackScreen() {
 
   function handleHit() {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    const card    = drawCard();
-    const hand    = playerHandsRef.current[activeIdx];
+    const card     = drawCard();
+    const hand     = playerHandsRef.current[activeIdx];
     const newCards = [...hand.cards, card];
-    const updatedHand: BJHand = { ...hand, cards: newCards, busted: isBust(newCards) };
-    const newHands = playerHandsRef.current.map((h, i) => i === activeIdx ? updatedHand : h);
-
-    if (updatedHand.busted || handTotal(newCards) === 21) {
-      advanceOrDealer(newHands, activeIdx);
-    } else {
-      syncPlayerHands(newHands);
-    }
+    const updated  = { ...hand, cards: newCards, busted: isBust(newCards) };
+    const newHands = playerHandsRef.current.map((h, i) => i === activeIdx ? updated : h);
+    if (updated.busted || handTotal(newCards) === 21) advanceOrDealer(newHands, activeIdx);
+    else syncPlayerHands(newHands);
   }
 
   function handleStand() {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    const newHands = playerHandsRef.current.map((h, i) =>
-      i === activeIdx ? { ...h, stood: true } : h
-    );
+    const newHands = playerHandsRef.current.map((h, i) => i === activeIdx ? { ...h, stood: true } : h);
     advanceOrDealer(newHands, activeIdx);
   }
 
   function handleDouble() {
     const hand = playerHandsRef.current[activeIdx];
-    if (profile.chips < hand.bet) return;
+    if (profile.chips < hand.originalBet) return;
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     removeChips(hand.originalBet);
     const card     = drawCard();
     const newCards = [...hand.cards, card];
-    const updatedHand: BJHand = {
-      ...hand, cards: newCards,
-      bet: hand.originalBet * 2,
-      doubled: true, stood: true, busted: isBust(newCards),
-    };
-    const newHands = playerHandsRef.current.map((h, i) => i === activeIdx ? updatedHand : h);
+    const updated  = { ...hand, cards: newCards, bet: hand.originalBet * 2, doubled: true, stood: true, busted: isBust(newCards) };
+    const newHands = playerHandsRef.current.map((h, i) => i === activeIdx ? updated : h);
     advanceOrDealer(newHands, activeIdx);
   }
 
   function handleSplit() {
     const hand = playerHandsRef.current[activeIdx];
-    if (profile.chips < hand.bet || !canSplit(hand.cards)) return;
+    if (profile.chips < hand.originalBet || !canSplit(hand.cards)) return;
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     removeChips(hand.originalBet);
-
-    const c1 = drawCard();
-    const c2 = drawCard();
-    const bet1 = hand.originalBet;
-    const hand1: BJHand = { cards: [hand.cards[0], c1], bet: bet1, originalBet: bet1, doubled: false, stood: false, busted: false };
-    const hand2: BJHand = { cards: [hand.cards[1], c2], bet: bet1, originalBet: bet1, doubled: false, stood: false, busted: false };
-    syncPlayerHands([hand1, hand2]);
+    const c1 = drawCard(), c2 = drawCard();
+    const b  = hand.originalBet;
+    syncPlayerHands([
+      { cards: [hand.cards[0], c1], bet: b, originalBet: b, doubled: false, stood: false, busted: false },
+      { cards: [hand.cards[1], c2], bet: b, originalBet: b, doubled: false, stood: false, busted: false },
+    ]);
     setActiveIdx(0);
   }
 
+  // ─── New hand — FIXED sequential shuffle flow ─────────────────────────────────
   function handleNewHand() {
     syncDealerCards([]);
     syncPlayerHands([]);
@@ -679,9 +585,23 @@ export default function BlackjackScreen() {
     setResult(null);
     setDealerLog([]);
     setBet(Math.min(lastBet, profile.chips > 0 ? profile.chips : MIN_BET));
-    checkAndReshuffle();
     MusicEngine.setIntensity('normal');
-    setPhase('betting');
+
+    if (shoePosRef.current >= TEST_RESHUFFLE) {
+      // Reshuffle: show animation, THEN go to betting after it completes
+      shoeRef.current  = createShoe(TEST_DECKS);
+      shoePosRef.current = 0;
+      setCardsDealt(0);
+      setShuffleKey(k => k + 1);
+      setIsShuffling(true);
+      setPhase('shuffling');
+      setTimeout(() => {
+        setIsShuffling(false);
+        setPhase('betting');   // go to betting AFTER animation finishes
+      }, 2600);
+    } else {
+      setPhase('betting');
+    }
   }
 
   // ─── Derived ─────────────────────────────────────────────────────────────────
@@ -689,53 +609,53 @@ export default function BlackjackScreen() {
   const canDoubleNow = activeHand?.cards.length === 2 && !activeHand.doubled && profile.chips >= activeHand.originalBet;
   const canSplitNow  = activeHand?.cards.length === 2 && canSplit(activeHand.cards ?? []) && playerHands.length === 1 && profile.chips >= activeHand.originalBet;
   const isSplit      = playerHands.length === 2;
+  const maxBet       = Math.min(MAX_BET, profile.chips);
 
-  const maxBet = Math.min(MAX_BET, profile.chips);
-  function adjustBet(delta: number) {
-    setBet(prev => Math.min(maxBet, Math.max(MIN_BET, prev + delta)));
-  }
+  function adjustBet(delta: number) { setBet(prev => Math.min(maxBet, Math.max(MIN_BET, prev + delta))); }
 
-  function headlineColor(headline: string) {
-    if (headline === 'BLACKJACK')   return colors.gold;
-    if (headline === 'PLAYER WINS' || headline === 'DEALER BUSTS') return colors.success;
-    if (headline === 'PUSH')        return '#4da6ff';
+  function headlineColor(hl: string) {
+    if (hl === 'BLACKJACK')    return colors.gold;
+    if (hl === 'PLAYER WINS' || hl === 'DEALER BUSTS') return colors.success;
+    if (hl === 'PUSH')         return '#4da6ff';
     return colors.error;
   }
 
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
     <View style={s.root}>
-      <LinearGradient
-        colors={['#060010', '#0d0022', '#070015']}
-        style={StyleSheet.absoluteFillObject}
-      />
+      <LinearGradient colors={['#060010', '#0d0022', '#070015']} style={StyleSheet.absoluteFillObject} />
       <View style={[s.glowTop,    { backgroundColor: 'rgba(0,212,255,0.05)' }]} />
       <View style={[s.glowBottom, { backgroundColor: 'rgba(255,215,0,0.04)' }]} />
 
-      <ShufflingOverlay visible={isShuffling} />
+      <ShufflingOverlay visible={isShuffling} shuffleKey={shuffleKey} numDecks={TEST_DECKS} />
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <View style={[s.header, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity style={s.iconBtn} onPress={() => setExitConfirm(true)}>
-          <Ionicons name="close" size={20} color="rgba(255,255,255,0.6)" />
-        </TouchableOpacity>
-
-        <View style={s.titleBlock}>
-          <Text style={s.titleText}>BLACKJACK</Text>
-          <Text style={s.subtitleText}>SIX DECK SHOE</Text>
-        </View>
-
-        <View style={s.headerRight}>
+        {/* Left cluster: close + music */}
+        <View style={s.headerLeft}>
+          <TouchableOpacity style={s.iconBtn} onPress={() => setExitConfirm(true)}>
+            <Ionicons name="close" size={18} color="rgba(255,255,255,0.6)" />
+          </TouchableOpacity>
           <Animated.View style={{ opacity: pulseAnim }}>
-            <TouchableOpacity style={s.iconBtn} onPress={() => setShowMusicPanel(true)}>
+            <TouchableOpacity style={s.musicBtn} onPress={toggleMusicMute} activeOpacity={0.75}>
               <Ionicons
                 name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
-                size={16}
+                size={13}
                 color={isMusicMuted ? 'rgba(255,255,255,0.28)' : colors.primary}
               />
             </TouchableOpacity>
           </Animated.View>
-          <ShoeIndicator dealt={cardsDealt} />
+        </View>
+
+        {/* Center title */}
+        <View style={s.titleBlock}>
+          <Text style={s.titleText}>BLACKJACK</Text>
+          <Text style={s.subtitleText}>{TESTING_MODE ? 'SINGLE DECK · TEST MODE' : 'SIX DECK SHOE'}</Text>
+        </View>
+
+        {/* Right: shoe indicator only */}
+        <View style={s.headerRight}>
+          <ShoeIndicator dealt={cardsDealt} total={TEST_SHOE_TOTAL} />
         </View>
       </View>
 
@@ -787,11 +707,7 @@ export default function BlackjackScreen() {
                     <View key={i} style={s.cardSlot}><PlayingCard card={card} size="sm" /></View>
                   ))}
                 </View>
-                <ScoreBadge
-                  label={handDisplay(hand)}
-                  bust={hand.busted}
-                  bj={isBlackjack(hand.cards)}
-                />
+                <ScoreBadge label={handDisplay(hand)} bust={hand.busted} bj={isBlackjack(hand.cards)} />
                 <Text style={s.handBetLabel}>{fmt(hand.originalBet)}</Text>
               </View>
             ))}
@@ -914,41 +830,36 @@ export default function BlackjackScreen() {
           </View>
         )}
 
+        {/* SHUFFLING phase — controls hidden; overlay covers everything */}
+        {phase === 'shuffling' && <View style={s.shufflingPlaceholder} />}
+
         {/* RESULT */}
         {phase === 'result' && result && (
           <ScrollView style={s.resultScroll} contentContainerStyle={s.resultPanel} showsVerticalScrollIndicator={false}>
-            {/* Headline */}
             <View style={[s.headlineBadge, { borderColor: `${headlineColor(result.headline)}55` }]}>
               <LinearGradient colors={[`${headlineColor(result.headline)}18`, 'transparent']} style={StyleSheet.absoluteFill} />
               <Text style={[s.headlineText, { color: headlineColor(result.headline) }]}>{result.headline}</Text>
             </View>
 
-            {/* Per-hand results */}
             {result.handResults.length === 1 ? (
               <HandResultRow result={result.handResults[0]} />
             ) : (
-              result.handResults.map((r, i) => (
-                <HandResultRow key={i} result={r} label={`HAND ${i + 1}`} />
-              ))
+              result.handResults.map((r, i) => <HandResultRow key={i} result={r} label={`HAND ${i + 1}`} />)
             )}
 
-            {/* Net total */}
             <View style={s.netRow}>
               <Text style={s.netLabel}>NET RESULT</Text>
               <Text style={[
                 s.netText,
                 result.totalNet > 0 ? { color: colors.success } :
-                result.totalNet < 0 ? { color: colors.error } :
-                { color: '#4da6ff' },
+                result.totalNet < 0 ? { color: colors.error } : { color: '#4da6ff' },
               ]}>
-                {result.totalNet === 0 ? 'Bet Returned'
-                  : (result.totalNet > 0 ? '+' : '') + fmt(result.totalNet)}
+                {result.totalNet === 0 ? 'Bet Returned' : (result.totalNet > 0 ? '+' : '') + fmt(result.totalNet)}
               </Text>
             </View>
 
             <Text style={s.balanceTextSm}>Balance  {fmt(profile.chips)}</Text>
 
-            {/* Dealer log summary */}
             {dealerLog.length > 0 && (
               <View style={s.logSummary}>
                 {dealerLog.map((e, i) => <DealerLogLine key={i} entry={e} />)}
@@ -981,18 +892,6 @@ export default function BlackjackScreen() {
           </View>
         </View>
       </Modal>
-
-      {/* ── Music panel ─────────────────────────────────────────────────────── */}
-      <MusicPanel
-        visible={showMusicPanel}
-        onClose={() => setShowMusicPanel(false)}
-        isMusicMuted={isMusicMuted}
-        musicVolume={musicVolume}
-        toggleMusicMute={toggleMusicMute}
-        setMusicVolume={setMusicVolume}
-        selectedTrack={selectedTrack}
-        onSelectTrack={handleSelectTrack}
-      />
     </View>
   );
 }
@@ -1003,12 +902,15 @@ const s = StyleSheet.create({
   glowTop:    { position: 'absolute', top: 0, left: 0, right: 0, height: 200, borderRadius: 100, opacity: 0.8 },
   glowBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 180, borderRadius: 100 },
 
-  header:      { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 10, gap: 8, zIndex: 10 },
-  iconBtn:     { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)' },
+  header:      { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingBottom: 10, zIndex: 10 },
+  headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: 6, width: 72 },
+  headerRight: { width: 72, alignItems: 'flex-end' },
   titleBlock:  { flex: 1, alignItems: 'center' },
-  titleText:   { fontSize: 18, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 3 },
-  subtitleText:{ fontSize: 8, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.55)', letterSpacing: 2.5, marginTop: 2 },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  titleText:   { fontSize: 16, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 2 },
+  subtitleText:{ fontSize: 7, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.55)', letterSpacing: 2, marginTop: 2 },
+
+  iconBtn:  { width: 34, height: 34, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)' },
+  musicBtn: { width: 28, height: 28, borderRadius: 8,  backgroundColor: 'rgba(255,255,255,0.04)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)' },
 
   dealerZone: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 8 },
   playerZone: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 8 },
@@ -1027,63 +929,64 @@ const s = StyleSheet.create({
 
   splitRow:        { flexDirection: 'row', gap: 14, justifyContent: 'center', paddingHorizontal: 10 },
   splitHand:       { alignItems: 'center', padding: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)' },
-  splitHandActive: { borderColor: `rgba(0,212,255,0.50)`, backgroundColor: 'rgba(0,212,255,0.06)' },
+  splitHandActive: { borderColor: 'rgba(0,212,255,0.50)', backgroundColor: 'rgba(0,212,255,0.06)' },
   handLabel:       { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.35)', letterSpacing: 2, marginBottom: 6 },
   handBetLabel:    { fontSize: 9, fontFamily: 'Inter_700Bold', color: 'rgba(255,215,0,0.55)', marginTop: 4 },
 
   controls: { paddingHorizontal: 14, paddingTop: 4 },
+  shufflingPlaceholder: { height: 60 },
 
-  bettingPanel:  { gap: 8 },
-  bettingLabel:  { fontSize: 9, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.32)', letterSpacing: 2.5, textAlign: 'center' },
-  betRow:        { flexDirection: 'row', alignItems: 'center', gap: 14, justifyContent: 'center' },
-  betAdjBtn:     { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(0,212,255,0.10)', borderWidth: 1, borderColor: 'rgba(0,212,255,0.25)', alignItems: 'center', justifyContent: 'center' },
-  betAdjText:    { fontSize: 22, color: colors.primary, fontFamily: 'Inter_700Bold', lineHeight: 26 },
-  betDisplay:    { alignItems: 'center', minWidth: 100 },
-  betAmount:     { fontSize: 30, fontFamily: 'Inter_700Bold', color: '#fff', letterSpacing: -0.5 },
-  betChipsLabel: { fontSize: 9, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,255,255,0.3)', letterSpacing: 1.5, marginTop: -2 },
-  quickRow:      { flexDirection: 'row', gap: 5, flexWrap: 'wrap', justifyContent: 'center' },
-  quickBtn:      { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 9, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', alignItems: 'center', minWidth: 42 },
-  quickBtnActive:{ backgroundColor: 'rgba(0,212,255,0.12)', borderColor: 'rgba(0,212,255,0.35)' },
-  quickLabel:    { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.40)', letterSpacing: 1 },
-  quickAmt:      { fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.70)' },
-  balanceText:   { fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.28)', textAlign: 'center' },
-  dealBtn:       { height: 50, borderRadius: 15, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: 'rgba(0,200,0,0.45)' },
+  bettingPanel:   { gap: 8 },
+  bettingLabel:   { fontSize: 9, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.32)', letterSpacing: 2.5, textAlign: 'center' },
+  betRow:         { flexDirection: 'row', alignItems: 'center', gap: 14, justifyContent: 'center' },
+  betAdjBtn:      { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(0,212,255,0.10)', borderWidth: 1, borderColor: 'rgba(0,212,255,0.25)', alignItems: 'center', justifyContent: 'center' },
+  betAdjText:     { fontSize: 22, color: colors.primary, fontFamily: 'Inter_700Bold', lineHeight: 26 },
+  betDisplay:     { alignItems: 'center', minWidth: 100 },
+  betAmount:      { fontSize: 30, fontFamily: 'Inter_700Bold', color: '#fff', letterSpacing: -0.5 },
+  betChipsLabel:  { fontSize: 9, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,255,255,0.3)', letterSpacing: 1.5, marginTop: -2 },
+  quickRow:       { flexDirection: 'row', gap: 5, flexWrap: 'wrap', justifyContent: 'center' },
+  quickBtn:       { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 9, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', alignItems: 'center', minWidth: 42 },
+  quickBtnActive: { backgroundColor: 'rgba(0,212,255,0.12)', borderColor: 'rgba(0,212,255,0.35)' },
+  quickLabel:     { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.40)', letterSpacing: 1 },
+  quickAmt:       { fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.70)' },
+  balanceText:    { fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.28)', textAlign: 'center' },
+  dealBtn:        { height: 50, borderRadius: 15, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: 'rgba(0,200,0,0.45)' },
   dealBtnDisabled:{ opacity: 0.35 },
-  dealText:      { fontSize: 16, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 4 },
+  dealText:       { fontSize: 16, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 4 },
 
-  actionPanel: { gap: 8 },
-  betInfoRow:  { flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' },
-  betInfoLabel:{ fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.30)', letterSpacing: 1.5 },
-  betInfoAmt:  { fontSize: 12, fontFamily: 'Inter_700Bold', color: '#fff' },
-  betInfoSep:  { width: 1, height: 12, backgroundColor: 'rgba(255,255,255,0.12)' },
-  actionRow:   { flexDirection: 'row', gap: 7 },
-  actionBtn:   { flex: 1, height: 52, borderRadius: 14, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5 },
-  actionText:  { fontSize: 10, fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8 },
+  actionPanel:  { gap: 8 },
+  betInfoRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' },
+  betInfoLabel: { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.30)', letterSpacing: 1.5 },
+  betInfoAmt:   { fontSize: 12, fontFamily: 'Inter_700Bold', color: '#fff' },
+  betInfoSep:   { width: 1, height: 12, backgroundColor: 'rgba(255,255,255,0.12)' },
+  actionRow:    { flexDirection: 'row', gap: 7 },
+  actionBtn:    { flex: 1, height: 52, borderRadius: 14, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5 },
+  actionText:   { fontSize: 10, fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8 },
 
   dealerTurnPanel: { alignItems: 'center', gap: 4, paddingVertical: 8 },
   dealerLogWrap:   { gap: 3, alignItems: 'center' },
 
-  resultScroll: { maxHeight: 320 },
-  resultPanel:  { gap: 8, paddingBottom: 4 },
-  headlineBadge:{ height: 52, borderRadius: 15, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5 },
-  headlineText: { fontSize: 18, fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
-  netRow:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 },
-  netLabel:     { fontSize: 9, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.35)', letterSpacing: 2 },
-  netText:      { fontSize: 22, fontFamily: 'Inter_700Bold', letterSpacing: -0.5 },
-  balanceTextSm:{ fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.25)', textAlign: 'right' },
-  logSummary:   { gap: 2, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,215,0,0.04)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.10)' },
-  newHandBtn:   { height: 48, borderRadius: 15, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: 'rgba(0,100,255,0.45)', marginTop: 2 },
-  newHandText:  { fontSize: 13, fontFamily: 'Orbitron_700Bold', color: '#6699ff', letterSpacing: 3 },
+  resultScroll:  { maxHeight: 320 },
+  resultPanel:   { gap: 8, paddingBottom: 4 },
+  headlineBadge: { height: 52, borderRadius: 15, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5 },
+  headlineText:  { fontSize: 18, fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
+  netRow:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 },
+  netLabel:      { fontSize: 9, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.35)', letterSpacing: 2 },
+  netText:       { fontSize: 22, fontFamily: 'Inter_700Bold', letterSpacing: -0.5 },
+  balanceTextSm: { fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.25)', textAlign: 'right' },
+  logSummary:    { gap: 2, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,215,0,0.04)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.10)' },
+  newHandBtn:    { height: 48, borderRadius: 15, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: 'rgba(0,100,255,0.45)', marginTop: 2 },
+  newHandText:   { fontSize: 13, fontFamily: 'Orbitron_700Bold', color: '#6699ff', letterSpacing: 3 },
 });
 
 const em = StyleSheet.create({
-  overlay:   { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', padding: 32 },
-  card:      { width: '100%', borderRadius: 20, overflow: 'hidden', padding: 24, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  title:     { fontSize: 16, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 2, textAlign: 'center' },
-  sub:       { fontSize: 11, color: 'rgba(255,255,255,0.40)', textAlign: 'center' },
-  btns:      { flexDirection: 'row', gap: 10, marginTop: 8 },
-  cancelBtn: { flex: 1, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' },
-  cancelText:{ fontSize: 11, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.60)', letterSpacing: 1.5 },
-  leaveBtn:  { flex: 1, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,40,40,0.10)', borderWidth: 1, borderColor: 'rgba(255,40,40,0.30)', alignItems: 'center', justifyContent: 'center' },
-  leaveText: { fontSize: 11, fontFamily: 'Orbitron_700Bold', color: '#FF6B6B', letterSpacing: 1.5 },
+  overlay:    { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', padding: 32 },
+  card:       { width: '100%', borderRadius: 20, overflow: 'hidden', padding: 24, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  title:      { fontSize: 16, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 2, textAlign: 'center' },
+  sub:        { fontSize: 11, color: 'rgba(255,255,255,0.40)', textAlign: 'center' },
+  btns:       { flexDirection: 'row', gap: 10, marginTop: 8 },
+  cancelBtn:  { flex: 1, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' },
+  cancelText: { fontSize: 11, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.60)', letterSpacing: 1.5 },
+  leaveBtn:   { flex: 1, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,40,40,0.10)', borderWidth: 1, borderColor: 'rgba(255,40,40,0.30)', alignItems: 'center', justifyContent: 'center' },
+  leaveText:  { fontSize: 11, fontFamily: 'Orbitron_700Bold', color: '#FF6B6B', letterSpacing: 1.5 },
 });

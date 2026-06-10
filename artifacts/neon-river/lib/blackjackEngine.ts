@@ -9,9 +9,9 @@ export const RESHUFFLE_AT     = Math.floor(SHOE_SIZE * 0.75); // 234 — reshuff
 
 // ─── Shoe ─────────────────────────────────────────────────────────────────────
 
-export function createSixDeckShoe(): Card[] {
+export function createShoe(numDecks: number): Card[] {
   const cards: Card[] = [];
-  for (let d = 0; d < NUM_DECKS; d++) {
+  for (let d = 0; d < numDecks; d++) {
     for (const suit of SUITS) {
       for (let v = 2; v <= 14; v++) {
         cards.push({ suit, value: v });
@@ -19,6 +19,10 @@ export function createSixDeckShoe(): Card[] {
     }
   }
   return shuffleCards(cards);
+}
+
+export function createSixDeckShoe(): Card[] {
+  return createShoe(NUM_DECKS);
 }
 
 export function shuffleCards(cards: Card[]): Card[] {
