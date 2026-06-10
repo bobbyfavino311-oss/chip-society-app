@@ -1,0 +1,299 @@
+BLACKJACK UX IMPROVEMENTS — HAND RESULT EXPLANATIONS + MUSIC SYSTEM
+
+The current Blackjack implementation correctly determines wins, losses, pushes, and split-hand outcomes, but it does not clearly communicate WHY the result occurred.
+
+The player should never have to guess why they won, lost, pushed, or partially won a split hand.
+
+Every hand result must include a short, easy-to-read explanation.
+
+--------------------------------------------------
+
+SPLIT HAND RESULT SYSTEM
+
+When a hand is split, each hand must be evaluated independently.
+
+Each split hand should receive one of the following statuses:
+
+WIN
+
+LOSE
+
+PUSH
+
+BLACKJACK
+
+BUST
+
+Examples:
+
+Hand 1: 18 vs Dealer 20
+
+Result:
+LOSE
+
+Hand 2: 20 vs Dealer 20
+
+Result:
+PUSH
+
+--------------------------------------------------
+
+COMBINED RESULT SUMMARY
+
+After both split hands are evaluated, display a summary card.
+
+Example:
+
+HAND 1
+18 vs Dealer 20
+LOSE
+
+HAND 2
+20 vs Dealer 20
+PUSH
+
+OVERALL RESULT
+
+-500K
+
+Dealer wins Hand 1.
+Hand 2 pushed.
+One wager was lost and one wager was returned.
+
+This is much clearer than simply displaying:
+
+DEALER WINS
+
+-500K
+
+The player must understand exactly what happened.
+
+--------------------------------------------------
+
+EXAMPLE RESULT MESSAGES
+
+Player Wins
+
+YOU WIN
+
+21 beats Dealer 18
+
++500K
+
+--------------------------------------------------
+
+Dealer Wins
+
+DEALER WINS
+
+Dealer 20 beats your 18
+
+-500K
+
+--------------------------------------------------
+
+Push
+
+PUSH
+
+Your 20 matched Dealer 20
+
+Bet Returned
+
+0
+
+A push is a tie and the wager is returned. (Cache Creek Casino Resort)
+
+--------------------------------------------------
+
+Blackjack
+
+BLACKJACK
+
+Ace + King
+
+Paid 3:2
+
++750K
+
+--------------------------------------------------
+
+Dealer Bust
+
+YOU WIN
+
+Dealer busted with 23
+
++500K
+
+--------------------------------------------------
+
+Split Example
+
+HAND 1
+
+18 vs Dealer 20
+
+LOSE
+
+--------------------------------------------------
+
+HAND 2
+
+20 vs Dealer 20
+
+PUSH
+
+--------------------------------------------------
+
+OVERALL RESULT
+
+Dealer won one hand.
+One hand pushed.
+
+Net Result
+
+-500K
+
+--------------------------------------------------
+
+Double Down Example
+
+DOUBLE DOWN WIN
+
+18 beats Dealer 17
+
+Original Bet:
+500K
+
+Double:
+500K
+
+Total Win:
+1M
+
+--------------------------------------------------
+
+RESULT COLOR CODING
+
+WIN
+
+Green
+
+PUSH
+
+Blue
+
+LOSS
+
+Red
+
+BLACKJACK
+
+Gold
+
+--------------------------------------------------
+
+DEALER ACTION LOG
+
+Add a small dealer action feed during hand resolution.
+
+Examples:
+
+Dealer reveals hole card
+
+Dealer has 13
+
+Dealer hits
+
+Dealer draws 7
+
+Dealer now has 20
+
+Dealer stands
+
+This allows players to follow dealer logic.
+
+--------------------------------------------------
+
+MUSIC BUTTON FEATURE
+
+Add a dedicated music button to all Blackjack tables.
+
+Position:
+
+Top-right corner
+
+Consistent with Poker tables.
+
+--------------------------------------------------
+
+MUSIC MENU
+
+Tapping the music button opens:
+
+TABLE MUSIC
+
+ON / OFF
+
+Volume Slider
+
+Track Selection
+
+--------------------------------------------------
+
+BLACKJACK MUSIC TRACKS
+
+Classic Casino
+
+Vegas Lounge
+
+Vice Nights Synthwave
+
+Four Dragons Ambience
+
+High Roller Jazz
+
+Midnight Casino
+
+Neon Skyline
+
+Players can select a track and it remains active across all Blackjack sessions.
+
+--------------------------------------------------
+
+SETTINGS INTEGRATION
+
+Add:
+
+Remember Music Selection
+
+ON / OFF
+
+Remember Volume
+
+ON / OFF
+
+If enabled, music settings persist between sessions.
+
+--------------------------------------------------
+
+ANIMATION
+
+Music button should softly pulse while music is active.
+
+Tapping opens a smooth slide-up panel.
+
+No intrusive popups.
+
+Premium casino feel.
+
+--------------------------------------------------
+
+DESIGN GOAL
+
+Every Blackjack hand should clearly explain WHY the player won, lost, pushed, or partially won after a split.
+
+The player should never need to calculate the result themselves.
+
+All outcomes must be transparent, readable, and instantly understandable while maintaining a polished casino presentation.
