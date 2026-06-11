@@ -1,0 +1,218 @@
+# MATCHMAKING + SOCIAL FEED IMPROVEMENTS
+
+## RANKED MATCHMAKING EXPANSION
+
+Open Ranked Matchmaking across ALL multiplayer game modes.
+
+This includes:
+
+- Texas Hold'em
+- Three Card Poker
+- Blackjack
+- Future Poker Variants
+- Future Table Games
+
+Players should no longer be restricted from finding ranked opponents.
+
+--------------------------------------------------
+
+## CHIP BRACKET MATCHMAKING
+
+Players should primarily be matched against opponents with similar chip balances.
+
+The goal is to create fair competition and prevent extremely large stacks from constantly facing new players.
+
+Matchmaking should use chip brackets.
+
+Example:
+
+BEGINNER
+
+0 – 100K
+
+----------------
+
+AMATEUR
+
+100K – 1M
+
+----------------
+
+SEMI PRO
+
+1M – 10M
+
+----------------
+
+HIGH ROLLER
+
+10M – 100M
+
+----------------
+
+ELITE
+
+100M – 1B
+
+----------------
+
+LEGEND
+
+1B+
+
+Players should first search within their own bracket.
+
+If no players are available:
+
+Expand search gradually into neighboring brackets.
+
+--------------------------------------------------
+
+## AI OPPONENT INTEGRATION
+
+If no human opponent is available within a reasonable timeframe:
+
+Automatically fill seats using AI players.
+
+The AI should:
+
+- Use realistic usernames
+- Use profile avatars
+- Post on the social feed
+- Have believable chip balances
+- Behave like real players
+
+Players should never sit waiting in matchmaking.
+
+The system should feel active at all times. Matchmaking systems commonly broaden pools or use substitutes when population is low to keep queues moving. (Wikipedia)
+
+--------------------------------------------------
+
+## MATCHMAKING DISPLAY
+
+Show:
+
+Searching For Opponent...
+
+Then:
+
+Opponent Found
+
+or
+
+Filling Remaining Seats...
+
+This makes the process transparent.
+
+--------------------------------------------------
+
+# SOCIAL FEED IMPROVEMENTS
+
+## DELETE POST FEATURE
+
+Players must be able to delete their own feed posts.
+
+Add:
+
+Delete Post
+
+to the post options menu.
+
+Only the original author may delete the post.
+
+When deleted:
+
+Remove immediately from:
+
+- Trending
+- Following
+- Profile Feed
+- Global Feed
+
+--------------------------------------------------
+
+## POST ORDERING FIX
+
+When a player creates a new post:
+
+That post should immediately appear at the top of the feed.
+
+Newest posts should always appear first.
+
+Current behavior should be replaced with:
+
+Most Recent → Oldest
+
+unless another sorting mode is selected.
+
+--------------------------------------------------
+
+## INSTANT FEED UPDATE
+
+When posting:
+
+Do NOT require refresh.
+
+Do NOT require re-entering the feed.
+
+Immediately inject the new post at the top.
+
+Example:
+
+Player creates post.
+
+Feed automatically scrolls to top.
+
+New post appears in position #1.
+
+This should feel similar to modern social platforms.
+
+--------------------------------------------------
+
+## PROFILE FEED
+
+Add:
+
+Posts
+
+tab on player profiles.
+
+Players can view all posts made by that account.
+
+Newest first.
+
+Deleted posts disappear everywhere automatically.
+
+--------------------------------------------------
+
+## POST MANAGEMENT MENU
+
+For the author only:
+
+• Edit Post
+
+• Delete Post
+
+• Share Post
+
+• Pin Post (future feature)
+
+For everyone else:
+
+• Report Post
+
+• Share Post
+
+--------------------------------------------------
+
+## DESIGN GOAL
+
+Ranked matchmaking should always find an opponent quickly by using chip-based brackets and AI fill-ins when necessary.
+
+The social feed should feel alive and modern:
+
+- New posts instantly appear at the top.
+- Players can delete their own posts.
+- Feed updates occur in real time.
+- Profile pages show player post history.
+- No refreshes required.

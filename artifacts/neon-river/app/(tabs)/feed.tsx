@@ -811,7 +811,7 @@ const INITIAL_MY_POSTS: MePost[] = [
   { id: 'mp2', tag: 'ALL-IN', content: 'Short-stacked on the bubble. Shoved A9s, got called by KK, hit an ace on the flop. Still alive. 🙏', pot: '9,600', handRank: 'Pair of Aces', likes: 144, comments: 19, timeAgo: '1d' },
 ];
 
-function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: number }) {
+function MeSection({ myPosts, onDeletePost, bottomInset }: { myPosts: MePost[]; onDeletePost: (id: string) => void; bottomInset: number }) {
   const { profile, winRate } = useUser();
   const { following, notifications } = useSocial();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
@@ -887,6 +887,7 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
         ) : data.map(post => {
           const typeColor = POST_TAG_COLORS[post.tag];
           const isRepost = subTab === 'reposts' || subTab === 'likes';
+          const isOwnPost = subTab === 'posts';
           return (
             <View key={post.id} style={me.postCard}>
               <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
@@ -907,6 +908,11 @@ function MeSection({ myPosts, bottomInset }: { myPosts: MePost[]; bottomInset: n
                 <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
                   <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
                 </View>
+                {isOwnPost && (
+                  <TouchableOpacity onPress={() => onDeletePost(post.id)} style={me.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Ionicons name="trash-outline" size={13} color="rgba(255,80,80,0.5)" />
+                  </TouchableOpacity>
+                )}
               </View>
               <Text style={cd.content}>{post.content}</Text>
               <View style={cd.actions}>
@@ -958,6 +964,7 @@ const me = StyleSheet.create({
   postTime: { color: colors.textDim, fontSize: 10 },
   empty: { alignItems: 'center', paddingVertical: 44, gap: 10 },
   emptyText: { color: colors.textDim, fontSize: 13 },
+  deleteBtn: { padding: 3 },
 });
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
@@ -1138,7 +1145,11 @@ export default function FeedScreen() {
 
       {/* Content */}
       {activeTab === 'me' ? (
-        <MeSection myPosts={myPosts} bottomInset={insets.bottom} />
+        <MeSection
+          myPosts={myPosts}
+          onDeletePost={(id) => setMyPosts(prev => prev.filter(p => p.id !== id))}
+          bottomInset={insets.bottom}
+        />
       ) : activeTab === 'leaderboard' ? (
         <LeaderboardSection bottomInset={insets.bottom} />
       ) : activeTab === 'search' ? (

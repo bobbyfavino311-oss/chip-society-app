@@ -359,7 +359,7 @@ const g = StyleSheet.create({
 // ─── Main game screen ─────────────────────────────────────────────────────────
 
 export default function PracticeScreen() {
-  const { profile, recordWin, recordLoss } = useUser();
+  const { profile, recordWin, recordLoss, addChips, removeChips } = useUser();
   const { tier, variant: variantParam, players: playersParam } = useLocalSearchParams<{ tier?: string; variant?: string; players?: string }>();
   const tableConfig = STAKE_CONFIGS[tier ?? ''] ?? STAKE_CONFIGS.casual;
   const gameVariant = (variantParam === 'short_deck_holdem' ? 'short_deck_holdem' : 'texas_holdem') as import('@/constants/gameVariants').GameVariant;
@@ -567,10 +567,12 @@ export default function PracticeScreen() {
   const showRunItOut = isAllIn && !isHandOver && state.phase !== 'idle';
 
   const onHandOver = async () => {
+    const humanDelta = humanPlayer?.chipDelta ?? 0;
+    const finalHumanChips = humanPlayer?.chips ?? 0;
     const didWin = state.winnerIds.includes('human');
+
     if (didWin) {
       await recordWin(0);
-
       const human = state.players.find(p => p.isHuman);
       let handDesc = state.winnerHand ?? '';
       if (!handDesc && human && human.holeCards.length === 2) {
@@ -579,11 +581,18 @@ export default function PracticeScreen() {
       }
       const wasAllIn = human?.status === 'allIn' || isAllIn;
       recordGameWin(handDesc, wasAllIn, state.pot);
-      onChipBalance((humanPlayer?.chips ?? 0) + state.winnerPot);
+      onChipBalance(finalHumanChips);
     } else {
       await recordLoss();
       recordGameLoss();
     }
+
+    if (humanDelta > 0) {
+      await addChips(humanDelta);
+    } else if (humanDelta < 0) {
+      await removeChips(-humanDelta);
+    }
+
     setHandCount(h => h + 1);
     continueAfterHand();
     SoundEngine.deal();
@@ -816,7 +825,11 @@ export default function PracticeScreen() {
             const humanWon = state.winnerIds.includes('human');
             const isSplit = state.isSplitPot;
             const hasSidePots = state.sidePots.length > 1;
-            const share = Math.floor(state.winnerPot / Math.max(1, state.winnerIds.length));
+            const mainWinnerId = state.winnerIds[0];
+            const mainWinnerPlayer = state.players.find(p => p.id === mainWinnerId);
+            const share = hasSidePots
+              ? Math.max(0, mainWinnerPlayer?.chipDelta ?? 0)
+              : Math.floor(state.winnerPot / Math.max(1, state.winnerIds.length));
             const winnerName = state.players.find(p => state.winnerIds[0] === p.id);
             return (
               <>

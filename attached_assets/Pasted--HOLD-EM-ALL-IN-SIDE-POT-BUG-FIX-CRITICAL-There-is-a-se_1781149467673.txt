@@ -1,0 +1,213 @@
+# HOLD'EM ALL-IN / SIDE POT BUG FIX (CRITICAL)
+
+There is a serious payout calculation issue in Texas Hold'em when players go all-in with different stack sizes.
+
+The current system incorrectly awards chips as if both players were able to fully match each other's wagers.
+
+This is NOT how poker works.
+
+The game must use proper side-pot and all-in logic.
+
+--------------------------------------------------
+
+EXAMPLE OF THE BUG
+
+Player A:
+500,000 chips
+
+Player B:
+138,000 chips
+
+Player A goes ALL-IN.
+
+Player B calls ALL-IN for 138,000.
+
+Current behavior:
+
+The winner is being awarded as if both players contributed 500,000.
+
+This is incorrect.
+
+--------------------------------------------------
+
+CORRECT BEHAVIOR
+
+Player B can only risk:
+
+138,000
+
+Player A can only win:
+
+138,000 from Player B.
+
+The remaining:
+
+362,000
+
+must immediately be returned to Player A before showdown.
+
+The unmatched portion is never placed into the pot.
+
+The larger stack cannot force the smaller stack to play for chips they do not possess.
+
+This follows standard poker all-in and side-pot rules. A player can only win chips that were actually matched by opponents. (Wikipedia)
+
+--------------------------------------------------
+
+EXAMPLE
+
+Player A:
+500,000
+
+Player B:
+138,000
+
+Player A shoves ALL-IN.
+
+Player B calls ALL-IN.
+
+Pot calculation:
+
+138,000 from Player A
+
+138,000 from Player B
+
+Main Pot:
+
+276,000
+
+Unmatched chips:
+
+362,000
+
+Immediately returned to Player A.
+
+--------------------------------------------------
+
+SHOWDOWN
+
+If Player A wins:
+
+Player A receives:
+
+276,000
+
+NOT 1,000,000
+
+NOT 500,000 from opponent
+
+Only matched chips.
+
+--------------------------------------------------
+
+If Player B wins:
+
+Player B receives:
+
+276,000
+
+Player doubles up.
+
+Player A keeps:
+
+362,000 already returned
+
+--------------------------------------------------
+
+MULTIWAY POTS
+
+If multiple players have different stacks:
+
+Create proper:
+
+MAIN POT
+
+SIDE POT 1
+
+SIDE POT 2
+
+SIDE POT 3
+
+etc.
+
+Each player is only eligible to win pots they contributed to. (Poker Skill)
+
+--------------------------------------------------
+
+PLAYER FEEDBACK
+
+When an all-in occurs with unequal stacks:
+
+Display:
+
+ALL-IN MATCHED
+
+Vegas: 138K
+
+Bob: 138K
+
+Returned to Bob: 362K
+
+Main Pot: 276K
+
+This lets players understand exactly what happened.
+
+--------------------------------------------------
+
+SHOWDOWN SUMMARY
+
+Example:
+
+ALL-IN SHOWDOWN
+
+Vegas was all-in for 138K.
+
+Bob covered with 500K.
+
+362K was returned to Bob.
+
+Main Pot: 276K
+
+Vegas wins with Pair of Kings.
+
+Vegas wins 276K.
+
+This eliminates confusion.
+
+--------------------------------------------------
+
+VISUAL POT DISPLAY
+
+When unmatched chips are returned:
+
+Animate chips sliding back to the larger stack.
+
+Display:
+
+RETURNED
+
+362K
+
+for approximately 2 seconds.
+
+This visually teaches players how poker all-ins work.
+
+--------------------------------------------------
+
+DESIGN GOAL
+
+The Hold'em engine must use authentic poker side-pot logic.
+
+No player should ever win chips that were not matched.
+
+No player should ever lose chips that were never eligible to be won.
+
+All all-in scenarios must correctly calculate:
+
+- Main Pot
+- Side Pots
+- Eligible Players
+- Returned Chips
+- Final Payouts
+
+using standard casino poker rules.

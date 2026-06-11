@@ -1,8 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  Platform, ScrollView, StyleSheet, Text,
+  Animated, Modal, Platform, ScrollView, StyleSheet, Text,
   TouchableOpacity, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -176,10 +176,140 @@ const sc = StyleSheet.create({
   lockedSub:  { fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 3 },
 });
 
+// ─── Chip bracket ─────────────────────────────────────────────────────────────
+interface ChipBracket {
+  tier: string;
+  label: string;
+  color: string;
+  blinds: string;
+  desc: string;
+}
+
+function getChipBracket(chips: number): ChipBracket {
+  if (chips >= 2_500_000) return { tier: 'elite',      label: 'ELITE',       color: '#ff0090', blinds: '25K / 50K',   desc: 'Elite high-stakes tables' };
+  if (chips >= 250_000)  return { tier: 'highroller',  label: 'HIGH ROLLER', color: '#ffd700', blinds: '2.5K / 5K',   desc: 'High roller tables' };
+  if (chips >= 25_000)   return { tier: 'mid',         label: 'MID STAKES',  color: '#bf5fff', blinds: '250 / 500',   desc: 'Mid stakes tables' };
+  if (chips >= 2_000)    return { tier: 'casual',      label: 'CASUAL',      color: '#00d4ff', blinds: '50 / 100',    desc: 'Casual tables' };
+  return                        { tier: 'beginner',    label: 'BEGINNER',    color: '#00e887', blinds: '25 / 50',     desc: 'Beginner tables' };
+}
+
+// ─── Matchmaking modal ────────────────────────────────────────────────────────
+function MatchmakingModal({ visible, onClose, variant }: {
+  visible: boolean;
+  onClose: () => void;
+  variant: string;
+}) {
+  const { profile } = useUser();
+  const [phase, setPhase] = useState<'searching' | 'found'>('searching');
+  const [dotCount, setDotCount] = useState(0);
+  const scaleAnim = useRef(new Animated.Value(0.92)).current;
+  const glowAnim  = useRef(new Animated.Value(0)).current;
+  const bracket   = getChipBracket(profile.chips);
+
+  useEffect(() => {
+    if (!visible) { setPhase('searching'); setDotCount(0); return; }
+
+    Animated.spring(scaleAnim, { toValue: 1, friction: 6, tension: 100, useNativeDriver: true }).start();
+
+    const dotTimer = setInterval(() => setDotCount(d => (d + 1) % 4), 500);
+    const foundTimer = setTimeout(() => {
+      setPhase('found');
+      clearInterval(dotTimer);
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, { toValue: 1, duration: 420, useNativeDriver: true }),
+          Animated.timing(glowAnim, { toValue: 0.3, duration: 420, useNativeDriver: true }),
+        ])
+      ).start();
+      setTimeout(() => {
+        onClose();
+        router.push(`/game/practice?variant=${variant}&players=5&tier=${bracket.tier}` as any);
+      }, 1100);
+    }, 2600);
+
+    return () => { clearInterval(dotTimer); clearTimeout(foundTimer); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
+  if (!visible) return null;
+  const dots = '.'.repeat(dotCount);
+
+  return (
+    <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
+      <View style={mm.overlay}>
+        <Animated.View style={[mm.card, { transform: [{ scale: scaleAnim }] }]}>
+          <LinearGradient colors={['#14002e', '#07001a']} style={StyleSheet.absoluteFill} />
+          <View style={[mm.topBar, { backgroundColor: bracket.color }]} />
+
+          {phase === 'searching' ? (
+            <>
+              <View style={mm.searchIcon}>
+                <Ionicons name="search" size={28} color={bracket.color} />
+              </View>
+              <Text style={[mm.title, { color: bracket.color }]}>FINDING MATCH{dots}</Text>
+              <View style={[mm.bracketBadge, { borderColor: `${bracket.color}50`, backgroundColor: `${bracket.color}12` }]}>
+                <Ionicons name="layers" size={11} color={bracket.color} />
+                <Text style={[mm.bracketLabel, { color: bracket.color }]}>{bracket.label}</Text>
+                <Text style={mm.bracketSub}>{bracket.blinds}</Text>
+              </View>
+              <Text style={mm.desc}>{bracket.desc}</Text>
+              <View style={mm.playerRow}>
+                {[1, 2, 3, 4, 5].map(i => (
+                  <View key={i} style={mm.playerSlot}>
+                    <View style={[mm.playerDot, i === 3 && { backgroundColor: bracket.color }]} />
+                    <Text style={mm.playerLabel}>{i === 3 ? 'You' : '...'}</Text>
+                  </View>
+                ))}
+              </View>
+              <TouchableOpacity style={mm.cancelBtn} onPress={onClose}>
+                <Text style={mm.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Animated.View style={[mm.foundIcon, { opacity: glowAnim }]}>
+                <Ionicons name="checkmark-circle" size={44} color={bracket.color} />
+              </Animated.View>
+              <Text style={[mm.title, { color: bracket.color }]}>MATCH FOUND!</Text>
+              <Text style={mm.desc}>Joining table{dots}</Text>
+            </>
+          )}
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+}
+
+const mm = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
+  card: { width: '100%', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', overflow: 'hidden', padding: 24, alignItems: 'center', gap: 14 },
+  topBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  searchIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  foundIcon: { width: 64, height: 64, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2, textAlign: 'center' },
+  bracketBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
+  bracketLabel: { fontSize: 11, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  bracketSub: { color: 'rgba(255,255,255,0.35)', fontSize: 10 },
+  desc: { color: 'rgba(255,255,255,0.4)', fontSize: 12, textAlign: 'center' },
+  playerRow: { flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 4 },
+  playerSlot: { alignItems: 'center', gap: 4 },
+  playerDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.15)' },
+  playerLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 8, fontWeight: '600' },
+  cancelBtn: { marginTop: 4, paddingVertical: 8, paddingHorizontal: 24 },
+  cancelText: { color: 'rgba(255,255,255,0.35)', fontSize: 12 },
+});
+
 // ─── Main screen ──────────────────────────────────────────────────────────────
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
+  const [matchmakingVisible, setMatchmakingVisible] = useState(false);
+  const [matchmakingVariant, setMatchmakingVariant] = useState('texas_holdem');
+
+  function startMatchmaking(variant: string) {
+    setMatchmakingVariant(variant);
+    setMatchmakingVisible(true);
+  }
 
   return (
     <View style={s.container}>
@@ -220,8 +350,13 @@ export default function PlayScreen() {
               sub:   "vs AI bots — fully offline",
               onPress: () => router.push('/game/practice?variant=texas_holdem&players=5' as any),
             },
-            { label: "QUICK MATCH", icon: "flash-outline", sub: "Online matchmaking", locked: true },
-            { label: "RANKED",      icon: "podium-outline", sub: "Competitive ladder",  locked: true },
+            {
+              label: "QUICK MATCH",
+              icon:  "flash-outline",
+              sub:   `Chip bracket: ${getChipBracket(profile.chips).label}`,
+              onPress: () => startMatchmaking('texas_holdem'),
+            },
+            { label: "RANKED", icon: "podium-outline", sub: "Competitive ladder", locked: true },
           ]}
         />
 
@@ -239,8 +374,13 @@ export default function PlayScreen() {
               sub:   "vs AI bots — fully offline",
               onPress: () => router.push('/game/practice?variant=short_deck_holdem&players=5' as any),
             },
-            { label: "QUICK MATCH", icon: "flash-outline", sub: "Online matchmaking", locked: true },
-            { label: "RANKED",      icon: "podium-outline", sub: "Competitive ladder",  locked: true },
+            {
+              label: "QUICK MATCH",
+              icon:  "flash-outline",
+              sub:   `Chip bracket: ${getChipBracket(profile.chips).label}`,
+              onPress: () => startMatchmaking('short_deck_holdem'),
+            },
+            { label: "RANKED", icon: "podium-outline", sub: "Competitive ladder", locked: true },
           ]}
         />
 
@@ -281,6 +421,12 @@ export default function PlayScreen() {
           lockedSub="Multi-table tournaments, prize pools, and brackets are on the way."
         />
       </ScrollView>
+
+      <MatchmakingModal
+        visible={matchmakingVisible}
+        onClose={() => setMatchmakingVisible(false)}
+        variant={matchmakingVariant}
+      />
     </View>
   );
 }
