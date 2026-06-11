@@ -820,90 +820,190 @@ export default function PracticeScreen() {
 
       {/* Bottom controls */}
       {isHandOver ? (
-        <View style={[styles.handoverPanel, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 28 : 8) }]}>
-          {state.winnerIds.length > 0 && state.winnerPot > 0 && (() => {
-            const humanWon = state.winnerIds.includes('human');
-            const isSplit = state.isSplitPot;
-            const hasSidePots = state.sidePots.length > 1;
-            const mainWinnerId = state.winnerIds[0];
-            const mainWinnerPlayer = state.players.find(p => p.id === mainWinnerId);
-            const share = hasSidePots
-              ? Math.max(0, mainWinnerPlayer?.chipDelta ?? 0)
-              : Math.floor(state.winnerPot / Math.max(1, state.winnerIds.length));
-            const winnerName = state.players.find(p => state.winnerIds[0] === p.id);
+        <ScrollView
+          style={styles.handoverScroll}
+          contentContainerStyle={[styles.handoverPanel, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 28 : 10) }]}
+          showsVerticalScrollIndicator={false}
+        >
+          {(() => {
+            const humanWonAnyPot = state.potResults.some(pr => !pr.isReturned && pr.winnerIds.includes('human'));
+            const humanContrib  = state.playerContribs['human'] ?? 0;
+            const humanNet      = humanPlayer?.chipDelta ?? 0;
+            const humanReturned = state.returnedChips['human'] ?? 0;
+            const humanCollected = humanNet + humanContrib; // total chips received from pots
+
+            // Human's best hand at showdown
+            const humanHand = state.showCards && humanPlayer && humanPlayer.holeCards.length === 2 && state.communityCards.length >= 3
+              ? getBestHandVariant(humanPlayer.holeCards, state.communityCards, state.variant)
+              : null;
+            const humanHandName = humanHand?.name ?? '';
+            const humanHandDesc = humanHand ? describeHand(humanHand) : '';
+            const handColor = HAND_COLORS[humanHandName] ?? '#ffd700';
+
+            // All-in players (anyone who committed chips via all-in path)
+            const allInPlayers = state.players.filter(p => {
+              const contrib = state.playerContribs[p.id] ?? 0;
+              return contrib > 0 && (p.status === 'allIn' || (state.potResults.length > 1 && contrib > 0));
+            });
+            const hasAllIns = state.potResults.length > 1 || allInPlayers.some(p => p.status === 'allIn');
+
+            // Players with non-zero contribution for results table
+            const resultPlayers = state.players
+              .filter(p => (state.playerContribs[p.id] ?? 0) > 0 || p.chipDelta !== 0)
+              .sort((a, b) => b.chipDelta - a.chipDelta);
+
             return (
               <>
-                <View style={styles.winnerLine}>
-                  <Ionicons name="trophy" size={13} color={humanWon ? '#ffd700' : 'rgba(255,255,255,0.25)'} />
-                  <Text style={[styles.winnerLineName, humanWon && { color: '#ffd700' }]}>
-                    {'  '}{humanWon ? 'You won' : `${winnerName?.name ?? 'Opponent'} won`}
-                    {!isSplit && <Text style={[styles.winnerLineAmt, { color: humanWon ? '#ffd700' : 'rgba(255,255,255,0.5)' }]}>{'  '}+{formatChips(share)}</Text>}
-                  </Text>
-                  {state.winnerHand !== '' && (
-                    <Text style={styles.winnerLineHand}>{state.winnerHand}</Text>
-                  )}
-                  {isSplit && <Text style={styles.splitLabel}>{'  '}{state.winnerIds.length}-way split</Text>}
-                </View>
-                {hasSidePots && (
-                  <View style={styles.sidePotHandover}>
-                    {state.sidePots.map((sp, i) => (
-                      <View key={i} style={styles.sidePotHandoverRow}>
-                        <Text style={styles.sidePotHandoverLabel}>{i === 0 ? 'MAIN' : `SIDE ${i}`}</Text>
-                        <Text style={styles.sidePotHandoverAmt}>{formatChips(sp.amount)}</Text>
-                      </View>
-                    ))}
+                {/* ── Human hand result ─────────────────────────────────── */}
+                {humanHand && (
+                  <View style={styles.hoHandHeader}>
+                    <Text style={[styles.hoHandRank, { color: handColor }]}>{humanHandName.toUpperCase()}</Text>
+                    {humanHandDesc !== humanHandName && (
+                      <Text style={styles.hoHandDesc}>{humanHandDesc}</Text>
+                    )}
                   </View>
+                )}
+
+                {/* ── Pot breakdown ─────────────────────────────────────── */}
+                {state.potResults.length > 0 && (
+                  <View style={styles.hoPotSection}>
+                    {state.potResults.map((pr, i) => {
+                      const humanWonThis = pr.winnerIds.includes('human');
+                      const winnerNames  = pr.winnerIds
+                        .map(id => { const p = state.players.find(pl => pl.id === id); return p ? (p.isHuman ? 'You' : p.name) : id; })
+                        .join(' & ');
+                      return (
+                        <View key={i} style={[styles.hoPotRow, humanWonThis && !pr.isReturned && styles.hoPotRowWon]}>
+                          <View style={styles.hoPotLeft}>
+                            <Text style={styles.hoPotLabel}>{pr.label}</Text>
+                            {pr.isReturned
+                              ? <Text style={styles.hoPotReturnedTag}>RETURNED</Text>
+                              : <Text style={[styles.hoPotWinner, humanWonThis && { color: '#ffd700' }]}>
+                                  {humanWonThis ? 'YOU' : winnerNames}
+                                </Text>
+                            }
+                            {pr.winnerHand !== '' && !pr.isReturned && (
+                              <Text style={styles.hoPotHand}>{pr.winnerHand}</Text>
+                            )}
+                          </View>
+                          <Text style={[styles.hoPotAmt, pr.isReturned && { color: 'rgba(255,255,255,0.35)' }, humanWonThis && !pr.isReturned && { color: '#ffd700' }]}>
+                            {formatChips(pr.amount)}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {/* ── Human net summary ─────────────────────────────────── */}
+                {humanContrib > 0 && (
+                  <View style={styles.hoNetSection}>
+                    <View style={styles.hoNetRow}>
+                      <Text style={styles.hoNetLabel}>INVESTED</Text>
+                      <Text style={styles.hoNetValue}>-{formatChips(humanContrib)}</Text>
+                    </View>
+                    {humanReturned > 0 && (
+                      <View style={styles.hoNetRow}>
+                        <Text style={styles.hoNetLabel}>RETURNED</Text>
+                        <Text style={[styles.hoNetValue, { color: 'rgba(255,255,255,0.55)' }]}>+{formatChips(humanReturned)}</Text>
+                      </View>
+                    )}
+                    {humanWonAnyPot && humanCollected > 0 && (
+                      <View style={styles.hoNetRow}>
+                        <Text style={styles.hoNetLabel}>COLLECTED</Text>
+                        <Text style={[styles.hoNetValue, { color: 'rgba(255,255,255,0.7)' }]}>{formatChips(humanCollected)}</Text>
+                      </View>
+                    )}
+                    <View style={[styles.hoNetRow, styles.hoNetRowFinal]}>
+                      <Text style={[styles.hoNetLabel, { color: humanNet >= 0 ? '#00e887' : '#ff5555', fontFamily: 'Orbitron_700Bold', letterSpacing: 2 }]}>
+                        {humanNet >= 0 ? 'NET PROFIT' : 'NET LOSS'}
+                      </Text>
+                      <Text style={[styles.hoNetFinalAmt, { color: humanNet >= 0 ? '#00e887' : '#ff5555' }]}>
+                        {humanNet >= 0 ? '+' : ''}{formatChips(humanNet)}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* ── All-in contributions ──────────────────────────────── */}
+                {hasAllIns && (() => {
+                  const contrib = state.players.filter(p => (state.playerContribs[p.id] ?? 0) > 0);
+                  if (contrib.length < 2) return null;
+                  return (
+                    <View style={styles.hoContribSection}>
+                      <Text style={styles.hoSectionTitle}>ALL-IN CONTRIBUTIONS</Text>
+                      {contrib.sort((a, b) => (state.playerContribs[b.id] ?? 0) - (state.playerContribs[a.id] ?? 0)).map(p => (
+                        <View key={p.id} style={styles.hoContribRow}>
+                          <Text style={[styles.hoContribName, p.isHuman && { color: 'rgba(255,255,255,0.85)' }]}>
+                            {p.isHuman ? 'You' : p.name}
+                          </Text>
+                          <Text style={styles.hoContribAmt}>{formatChips(state.playerContribs[p.id] ?? 0)}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  );
+                })()}
+
+                {/* ── Player results table ──────────────────────────────── */}
+                {resultPlayers.length > 0 && (
+                  <View style={styles.hoPlayersSection}>
+                    <Text style={styles.hoSectionTitle}>PLAYER RESULTS</Text>
+                    {resultPlayers.map(p => {
+                      const wonPots = state.potResults.filter(pr => !pr.isReturned && pr.winnerIds.includes(p.id));
+                      const hand = state.showCards && p.holeCards.length === 2 && state.communityCards.length >= 3
+                        ? getBestHandVariant(p.holeCards, state.communityCards, state.variant)
+                        : null;
+                      const isFolded = p.status === 'folded';
+                      const delta = p.chipDelta;
+                      const won = delta > 0;
+                      return (
+                        <View key={p.id} style={[styles.hoPlayerRow, won && styles.hoPlayerRowWon]}>
+                          <View style={styles.hoPlayerLeft}>
+                            <View style={styles.hoPlayerNameRow}>
+                              {won
+                                ? <Ionicons name="trophy" size={9} color="#ffd700" style={{ marginRight: 4 }} />
+                                : <View style={{ width: 13 }} />
+                              }
+                              <Text style={[styles.hoPlayerName, won && { color: '#ffd700' }]}>
+                                {p.isHuman ? 'You' : p.name}
+                              </Text>
+                            </View>
+                            <Text style={styles.hoPlayerHandText} numberOfLines={1}>
+                              {isFolded ? 'Folded' : (hand ? describeHand(hand) : '—')}
+                            </Text>
+                            {wonPots.map((pr, i) => (
+                              <Text key={i} style={styles.hoPlayerPotTag}>Won {pr.label}</Text>
+                            ))}
+                          </View>
+                          <Text style={[styles.hoPlayerDelta, { color: delta > 0 ? '#00e887' : '#ff5555' }]}>
+                            {delta > 0 ? '+' : ''}{formatChips(delta)}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {/* ── Next Hand button ──────────────────────────────────── */}
+                {isGameOver ? (
+                  <TouchableOpacity style={styles.nextBtn} onPress={() => setGameStarted(false)}>
+                    <Text style={[styles.nextBtnText, { color: colors.text }]}>BACK TO LOBBY</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity style={styles.nextBtn} onPress={onHandOver} activeOpacity={0.85}>
+                    <LinearGradient
+                      colors={['rgba(0,150,180,0.4)', 'rgba(0,100,130,0.5)']}
+                      style={StyleSheet.absoluteFill}
+                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    />
+                    <Text style={styles.nextBtnText}>Next Hand</Text>
+                    <Ionicons name="chevron-forward" size={14} color="#00d4ff" />
+                  </TouchableOpacity>
                 )}
               </>
             );
           })()}
-          {state.showCards && (() => {
-            const showdownPlayers = state.players.filter(p => p.status !== 'folded');
-            if (showdownPlayers.length < 2 || state.communityCards.length < 3) return null;
-            return (
-              <View style={styles.showdownPanel}>
-                {showdownPlayers.map(p => {
-                  const hand = p.holeCards.length === 2 ? getBestHandVariant(p.holeCards, state.communityCards, state.variant) : null;
-                  const isWinner = state.winnerIds.includes(p.id);
-                  return (
-                    <View key={p.id} style={[styles.showdownRow, isWinner && styles.showdownRowWin]}>
-                      {isWinner ? <Ionicons name="trophy" size={9} color="#ffd700" /> : <View style={{ width: 9 }} />}
-                      <Text style={[styles.showdownName, isWinner && { color: '#ffd700' }]}>{p.isHuman ? 'You' : p.name}</Text>
-                      <Text style={[styles.showdownHand, isWinner && { color: '#ffd700' }]} numberOfLines={1}>
-                        {hand ? describeHand(hand) : '—'}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          })()}
-          <View style={styles.deltasRow}>
-            {state.players.filter(p => p.chipDelta !== 0).map(p => (
-              <View key={p.id} style={styles.deltaChip}>
-                <Text style={styles.deltaName}>{p.isHuman ? 'You' : p.name}</Text>
-                <Text style={[styles.deltaAmt, { color: p.chipDelta > 0 ? '#00e887' : '#ff5555' }]}>
-                  {p.chipDelta > 0 ? '+' : ''}{formatChips(p.chipDelta)}
-                </Text>
-              </View>
-            ))}
-          </View>
-          {isGameOver ? (
-            <TouchableOpacity style={styles.nextBtn} onPress={() => setGameStarted(false)}>
-              <Text style={[styles.nextBtnText, { color: colors.text }]}>BACK TO LOBBY</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.nextBtn} onPress={onHandOver} activeOpacity={0.85}>
-              <LinearGradient
-                colors={['rgba(0,150,180,0.4)', 'rgba(0,100,130,0.5)']}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-              />
-              <Text style={styles.nextBtnText}>Next Hand</Text>
-              <Ionicons name="chevron-forward" size={14} color="#00d4ff" />
-            </TouchableOpacity>
-          )}
-        </View>
+        </ScrollView>
       ) : isHumanTurn ? (
         <View style={{ paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) }}>
           <BettingPanel
@@ -1170,37 +1270,132 @@ const styles = StyleSheet.create({
     letterSpacing: 1, fontFamily: 'Orbitron_400Regular',
   },
 
-  // ── Handover panel
+  // ── Handover scroll + panel
+  handoverScroll: {
+    maxHeight: 300, flexShrink: 1,
+  },
   handoverPanel: {
-    paddingHorizontal: 14, paddingTop: 10, gap: 8,
+    paddingHorizontal: 12, paddingTop: 8, gap: 7,
   },
-  winnerLine: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
+
+  // Hand result header
+  hoHandHeader: {
+    alignItems: 'center', paddingVertical: 4,
   },
-  winnerLineName: { color: 'rgba(255,255,255,0.65)', fontSize: 13, fontWeight: '600', flex: 1 },
-  winnerLineAmt: { fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  winnerLineHand: { color: 'rgba(255,255,255,0.3)', fontSize: 11, marginLeft: 16 },
-  splitLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 10 },
-  sidePotHandover: { width: '100%' },
-  sidePotHandoverRow: {
-    flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2,
+  hoHandRank: {
+    fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2,
   },
-  sidePotHandoverLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
-  sidePotHandoverAmt: { color: '#ffd700', fontSize: 12, fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  showdownPanel: { gap: 3 },
-  showdownRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 2 },
-  showdownRowWin: {},
-  showdownName: { color: 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: '600', width: 70 },
-  showdownHand: { color: 'rgba(255,255,255,0.35)', fontSize: 10, flex: 1 },
-  deltasRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  deltaChip: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  deltaName: { color: 'rgba(255,255,255,0.3)', fontSize: 9 },
-  deltaAmt: { fontSize: 11, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+  hoHandDesc: {
+    fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1,
+  },
+
+  // Pot breakdown section
+  hoPotSection: {
+    gap: 3, borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.07)',
+    paddingHorizontal: 10, paddingVertical: 7,
+  },
+  hoPotRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingVertical: 4, borderRadius: 6,
+  },
+  hoPotRowWon: {
+    backgroundColor: 'rgba(255,215,0,0.05)',
+    paddingHorizontal: 6,
+  },
+  hoPotLeft: { flex: 1, gap: 1 },
+  hoPotLabel: {
+    fontSize: 8, fontWeight: '800', letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular', color: 'rgba(255,255,255,0.3)',
+  },
+  hoPotWinner: {
+    fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.65)',
+  },
+  hoPotReturnedTag: {
+    fontSize: 9, fontWeight: '700', letterSpacing: 1,
+    color: 'rgba(255,255,255,0.3)', fontFamily: 'Orbitron_400Regular',
+  },
+  hoPotHand: {
+    fontSize: 9, color: 'rgba(255,255,255,0.3)',
+  },
+  hoPotAmt: {
+    fontSize: 14, fontWeight: '900', fontFamily: 'Inter_700Bold', color: '#ffd700',
+  },
+
+  // Net summary section
+  hoNetSection: {
+    borderRadius: 10, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.07)',
+    paddingHorizontal: 10, paddingVertical: 6, gap: 4,
+  },
+  hoNetRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+  },
+  hoNetRowFinal: {
+    marginTop: 2, paddingTop: 5,
+    borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  hoNetLabel: {
+    fontSize: 9, fontWeight: '700', letterSpacing: 1.5,
+    fontFamily: 'Orbitron_400Regular', color: 'rgba(255,255,255,0.35)',
+  },
+  hoNetValue: {
+    fontSize: 12, fontWeight: '700', fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.55)',
+  },
+  hoNetFinalAmt: {
+    fontSize: 18, fontWeight: '900', fontFamily: 'Inter_700Bold',
+  },
+
+  // All-in contributions
+  hoContribSection: { gap: 4 },
+  hoSectionTitle: {
+    fontSize: 8, fontWeight: '800', letterSpacing: 2, fontFamily: 'Orbitron_400Regular',
+    color: 'rgba(255,255,255,0.2)', marginBottom: 1,
+  },
+  hoContribRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 2, paddingHorizontal: 6,
+    borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.02)',
+  },
+  hoContribName: {
+    fontSize: 10, fontWeight: '600', color: 'rgba(255,255,255,0.45)',
+  },
+  hoContribAmt: {
+    fontSize: 11, fontWeight: '700', fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.55)',
+  },
+
+  // Player results
+  hoPlayersSection: { gap: 3 },
+  hoPlayerRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingVertical: 4, paddingHorizontal: 8, borderRadius: 7,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+  },
+  hoPlayerRowWon: { backgroundColor: 'rgba(255,215,0,0.05)' },
+  hoPlayerLeft: { flex: 1, gap: 1 },
+  hoPlayerNameRow: { flexDirection: 'row', alignItems: 'center' },
+  hoPlayerName: {
+    fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.65)',
+  },
+  hoPlayerHandText: {
+    fontSize: 9, color: 'rgba(255,255,255,0.3)', marginLeft: 13,
+  },
+  hoPlayerPotTag: {
+    fontSize: 8, color: '#00d4ff', fontWeight: '600',
+    letterSpacing: 0.5, marginLeft: 13,
+  },
+  hoPlayerDelta: {
+    fontSize: 12, fontWeight: '800', fontFamily: 'Inter_700Bold',
+  },
+
   nextBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 6, borderRadius: 10, overflow: 'hidden', paddingVertical: 10,
     backgroundColor: 'rgba(0,120,180,0.12)',
     borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(0,180,255,0.2)',
+    marginTop: 2,
   },
   nextBtnText: {
     color: '#00d4ff', fontSize: 12, fontWeight: '700',

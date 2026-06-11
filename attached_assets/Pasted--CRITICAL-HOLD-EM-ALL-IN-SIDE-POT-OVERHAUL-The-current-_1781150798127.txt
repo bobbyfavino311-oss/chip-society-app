@@ -1,0 +1,369 @@
+# CRITICAL HOLD'EM ALL-IN / SIDE POT OVERHAUL
+
+The current Hold'em payout system is still producing confusing and potentially incorrect results during all-in situations.
+
+This entire payout engine needs to be rebuilt around proper poker side-pot logic.
+
+The player should NEVER have to wonder:
+
+- Why they won
+- Why they lost
+- How much they won
+- Which pot they won
+- Which pot they lost
+
+The game should explain everything automatically.
+
+--------------------------------------------------
+
+## STEP 1: REBUILD ALL-IN POT CALCULATION
+
+Every all-in scenario must calculate:
+
+Main Pot
+
+Side Pot 1
+
+Side Pot 2
+
+Side Pot 3
+
+etc.
+
+based on actual contributions.
+
+A player can only win pots they contributed to.
+
+Unmatched chips must immediately be returned.
+
+--------------------------------------------------
+
+## STEP 2: STORE PLAYER CONTRIBUTIONS
+
+Track:
+
+Player Name
+
+Starting Stack
+
+Amount Committed
+
+Amount Returned
+
+Eligible Pots
+
+Final Result
+
+Example:
+
+Bob
+
+Starting:
+151.8K
+
+Committed:
+151.8K
+
+Returned:
+0
+
+Eligible:
+Main Pot
+
+--------------------------------------------------
+
+Vegas
+
+Starting:
+117.5K
+
+Committed:
+117.5K
+
+Returned:
+0
+
+Eligible:
+Main Pot
+
+--------------------------------------------------
+
+Ace
+
+Starting:
+25.8K
+
+Committed:
+25.8K
+
+Returned:
+0
+
+Eligible:
+Main Pot
+
+--------------------------------------------------
+
+## STEP 3: POT BREAKDOWN SCREEN
+
+At showdown display:
+
+MAIN POT
+
+SIDE POT 1
+
+SIDE POT 2
+
+if applicable.
+
+Example:
+
+MAIN POT
+103.2K
+
+Won by Bob
+
+----------------
+
+SIDE POT 1
+
+183.4K
+
+Won by Bob
+
+----------------
+
+SIDE POT 2
+
+68.6K
+
+Won by Vegas
+
+This immediately explains payouts.
+
+--------------------------------------------------
+
+## STEP 4: RESULT SCREEN REDESIGN
+
+REMOVE:
+
+"You Won +151.8K"
+
+This is misleading.
+
+Replace with:
+
+--------------------------------
+
+FULL HOUSE
+
+9s Full of Jacks
+
+--------------------------------
+
+MAIN POT WON
+
+103.2K
+
+--------------------------------
+
+SIDE POT WON
+
+48.6K
+
+--------------------------------
+
+TOTAL COLLECTED
+
+151.8K
+
+--------------------------------
+
+NET PROFIT
+
++83.5K
+
+--------------------------------
+
+This distinction is critical.
+
+Total Collected ≠ Net Profit.
+
+--------------------------------------------------
+
+## STEP 5: PLAYER RESULT TABLE
+
+Replace current result list with:
+
+PLAYER RESULTS
+
+🏆 Bob
+
+Full House
+
+Won Main Pot
+
+Won Side Pot 1
+
+Net Profit:
++83.5K
+
+--------------------------------
+
+Ace
+
+Two Pair
+
+Lost Main Pot
+
+Net Result:
+-25.8K
+
+--------------------------------
+
+Blaze
+
+Two Pair
+
+Lost Main Pot
+
+Net Result:
+-34.5K
+
+--------------------------------
+
+Shadow
+
+Two Pair
+
+Lost Main Pot
+
+Net Result:
+-58.5K
+
+--------------------------------
+
+Vegas
+
+Two Pair
+
+Lost Main Pot
+
+Net Result:
+-117.5K
+
+--------------------------------------------------
+
+## STEP 6: SHOW ALL-IN CONTRIBUTIONS
+
+Before showdown display:
+
+ALL-IN SUMMARY
+
+Bob
+151.8K
+
+Ace
+25.8K
+
+Blaze
+34.5K
+
+Shadow
+58.5K
+
+Vegas
+117.5K
+
+This lets players verify the pot is correct.
+
+--------------------------------------------------
+
+## STEP 7: RETURNED CHIP VISIBILITY
+
+Whenever unmatched chips are returned:
+
+Animate chips returning.
+
+Display:
+
+UNMATCHED CHIPS RETURNED
+
++34.3K
+
+Players should never wonder where their chips went.
+
+--------------------------------------------------
+
+## STEP 8: SIDE POT VISUALIZATION
+
+When side pots exist:
+
+Display above community cards:
+
+MAIN POT
+
+SIDE POT 1
+
+SIDE POT 2
+
+with chip amounts.
+
+Example:
+
+MAIN POT
+103.2K
+
+SIDE POT 1
+130.8K
+
+SIDE POT 2
+68.6K
+
+Visible during the hand.
+
+Not just after showdown.
+
+--------------------------------------------------
+
+## STEP 9: VERIFY TOTALS
+
+At showdown automatically verify:
+
+Sum of all player contributions
+
+=
+
+Main Pot
++
+All Side Pots
++
+Returned Chips
+
+If totals do not match:
+
+Flag calculation error.
+
+Never distribute incorrect chip amounts.
+
+--------------------------------------------------
+
+## STEP 10: DESIGN GOAL
+
+The player should be able to look at the result screen and instantly understand:
+
+- Who went all-in
+- How much everyone committed
+- Which pots existed
+- Which pots they won
+- Which pots they lost
+- What was returned
+- What their actual profit was
+
+No ambiguity.
+
+No hidden calculations.
+
+No misleading payout numbers.
+
+The result screen should be as transparent as a real casino poker room hand history.

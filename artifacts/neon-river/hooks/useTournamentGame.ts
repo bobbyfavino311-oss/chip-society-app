@@ -89,6 +89,7 @@ const INITIAL_GAME: GameState = {
   showCards: false, winnerIds: [], winnerHand: '', winnerPot: 0,
   allInRunout: false, sidePots: [], isSplitPot: false, bigBlind: 100,
   variant: 'texas_holdem' as const,
+  potResults: [], playerContribs: {}, returnedChips: {},
 };
 
 function getActivePlayers(players: GamePlayer[]) {
