@@ -9,6 +9,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
+import StakeSelectModal from '@/components/StakeSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
@@ -18,6 +19,7 @@ import {
   createShoe, handTotal,
   isBlackjack, isBust, dealerShouldHit, canSplit, fmt,
 } from '@/lib/blackjackEngine';
+import { type StakeTier } from '@/lib/stakeConfig';
 
 // ─── Testing mode ─────────────────────────────────────────────────────────────
 // Flip TESTING_MODE to false to restore six-deck production shoe.
@@ -356,14 +358,30 @@ export default function BlackjackScreen() {
   const [dealerLog,    setDealerLog]    = useState<string[]>([]);
   const [exitConfirm,  setExitConfirm]  = useState(false);
 
+  // ── Stake tier ───────────────────────────────────────────────────────────────
+  const [selectedTier, setSelectedTier] = useState<StakeTier | null>(null);
+
+  // Tier-specific bet bounds (fallback to module constants before selection)
+  const tierMinBet    = selectedTier?.ante ?? MIN_BET;
+  const tierMaxBet    = selectedTier ? selectedTier.ante * 5 : MAX_BET;
+  const tierQuickBets = selectedTier
+    ? [selectedTier.ante, selectedTier.ante * 2, selectedTier.ante * 3, selectedTier.ante * 5]
+    : QUICK_BETS;
+
   // ── Betting state ────────────────────────────────────────────────────────────
   const [bet,     setBet]     = useState(Math.min(10_000, Math.max(MIN_BET, profile.chips)));
   const [lastBet, setLastBet] = useState(Math.min(10_000, Math.max(MIN_BET, profile.chips)));
 
-  // Sync bet when profile.chips hydrates from AsyncStorage after mount
+  // Sync bet when tier is selected or chips hydrate from AsyncStorage
+  useEffect(() => {
+    if (selectedTier) {
+      setBet(Math.min(selectedTier.ante, profile.chips > 0 ? profile.chips : selectedTier.ante));
+    }
+  }, [selectedTier?.key]);
+
   useEffect(() => {
     if (profile.chips >= MIN_BET) {
-      setBet(prev => prev < MIN_BET ? Math.min(10_000, profile.chips) : prev);
+      setBet(prev => prev < tierMinBet ? Math.min(tierMinBet, profile.chips) : prev);
     }
   }, [profile.chips]);
 
@@ -616,9 +634,9 @@ export default function BlackjackScreen() {
   const canDoubleNow = activeHand?.cards.length === 2 && !activeHand.doubled && profile.chips >= activeHand.originalBet;
   const canSplitNow  = activeHand?.cards.length === 2 && canSplit(activeHand.cards ?? []) && playerHands.length === 1 && profile.chips >= activeHand.originalBet;
   const isSplit      = playerHands.length === 2;
-  const maxBet       = Math.min(MAX_BET, profile.chips);
+  const maxBet       = Math.min(tierMaxBet, profile.chips);
 
-  function adjustBet(delta: number) { setBet(prev => Math.min(maxBet, Math.max(MIN_BET, prev + delta))); }
+  function adjustBet(delta: number) { setBet(prev => Math.min(maxBet, Math.max(tierMinBet, prev + delta))); }
 
   function headlineColor(hl: string) {
     if (hl === 'BLACKJACK')    return colors.gold;
@@ -747,26 +765,41 @@ export default function BlackjackScreen() {
       <View style={[s.controls, { paddingBottom: insets.bottom + 8 }]}>
 
         {/* BETTING */}
-        {phase === 'betting' && (
+        {phase === 'betting' && selectedTier && (
           <View style={s.bettingPanel}>
+            {/* Tier banner */}
+            <View style={[s.tierBanner, { borderColor: `${selectedTier.color}35` }]}>
+              <LinearGradient
+                colors={[`${selectedTier.color}12`, 'transparent']}
+                style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={[s.tierBannerName, { color: selectedTier.color }]}>{selectedTier.label}</Text>
+                <Text style={s.tierBannerSub}>Min {fmt(tierMinBet)} · Max {fmt(tierMaxBet)}</Text>
+              </View>
+              <TouchableOpacity onPress={() => setSelectedTier(null)} style={s.changeTableBtn} activeOpacity={0.75}>
+                <Text style={s.changeTableText}>CHANGE</Text>
+              </TouchableOpacity>
+            </View>
+
             <Text style={s.bettingLabel}>PLACE YOUR BET</Text>
             <View style={s.betRow}>
-              <TouchableOpacity style={s.betAdjBtn} onPress={() => adjustBet(-1_000)} activeOpacity={0.7}>
+              <TouchableOpacity style={s.betAdjBtn} onPress={() => adjustBet(-tierMinBet)} activeOpacity={0.7}>
                 <Text style={s.betAdjText}>-</Text>
               </TouchableOpacity>
               <View style={s.betDisplay}>
                 <Text style={s.betAmount}>{fmt(bet)}</Text>
                 <Text style={s.betChipsLabel}>chips</Text>
               </View>
-              <TouchableOpacity style={s.betAdjBtn} onPress={() => adjustBet(1_000)} activeOpacity={0.7}>
+              <TouchableOpacity style={s.betAdjBtn} onPress={() => adjustBet(tierMinBet)} activeOpacity={0.7}>
                 <Text style={s.betAdjText}>+</Text>
               </TouchableOpacity>
             </View>
             <View style={s.quickRow}>
-              <TouchableOpacity style={s.quickBtn} onPress={() => setBet(MIN_BET)} activeOpacity={0.7}>
+              <TouchableOpacity style={s.quickBtn} onPress={() => setBet(tierMinBet)} activeOpacity={0.7}>
                 <Text style={s.quickLabel}>MIN</Text>
               </TouchableOpacity>
-              {QUICK_BETS.filter(b => b <= maxBet).map(b => (
+              {tierQuickBets.filter(b => b <= maxBet).map(b => (
                 <TouchableOpacity key={b} style={[s.quickBtn, bet === b && s.quickBtnActive]} onPress={() => setBet(b)} activeOpacity={0.7}>
                   <Text style={[s.quickAmt, bet === b && { color: colors.primary }]}>{fmt(b)}</Text>
                 </TouchableOpacity>
@@ -774,7 +807,7 @@ export default function BlackjackScreen() {
               <TouchableOpacity style={s.quickBtn} onPress={() => setBet(maxBet)} activeOpacity={0.7}>
                 <Text style={s.quickLabel}>MAX</Text>
               </TouchableOpacity>
-              {lastBet > 0 && lastBet <= maxBet && (
+              {lastBet > 0 && lastBet >= tierMinBet && lastBet <= maxBet && (
                 <TouchableOpacity style={s.quickBtn} onPress={() => setBet(lastBet)} activeOpacity={0.7}>
                   <Text style={s.quickLabel}>RPT</Text>
                 </TouchableOpacity>
@@ -782,9 +815,9 @@ export default function BlackjackScreen() {
             </View>
             <Text style={s.balanceText}>Balance  {fmt(profile.chips)}</Text>
             <TouchableOpacity
-              style={[s.dealBtn, profile.chips < MIN_BET && s.dealBtnDisabled]}
+              style={[s.dealBtn, profile.chips < tierMinBet && s.dealBtnDisabled]}
               onPress={handleDeal}
-              disabled={profile.chips < MIN_BET}
+              disabled={profile.chips < tierMinBet}
               activeOpacity={0.82}
             >
               <LinearGradient colors={['#1a4a00', '#2a7800']} style={StyleSheet.absoluteFill} />
@@ -881,6 +914,14 @@ export default function BlackjackScreen() {
         )}
       </View>
 
+      <StakeSelectModal
+        visible={selectedTier === null}
+        chips={profile.chips}
+        onSelect={(tier) => setSelectedTier(tier)}
+        onBack={() => router.back()}
+        title="SELECT YOUR TABLE"
+      />
+
       {/* ── Exit modal ──────────────────────────────────────────────────────── */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
         <View style={em.overlay}>
@@ -945,6 +986,16 @@ const s = StyleSheet.create({
 
   bettingPanel:   { gap: 8 },
   bettingLabel:   { fontSize: 9, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.32)', letterSpacing: 2.5, textAlign: 'center' },
+
+  tierBanner:      {
+    flexDirection: 'row', alignItems: 'center',
+    padding: 10, borderRadius: 12, borderWidth: 1, overflow: 'hidden', gap: 8,
+    borderColor: 'rgba(255,255,255,0.07)', marginBottom: 2,
+  },
+  tierBannerName:  { fontSize: 10, fontFamily: 'Orbitron_900Black', letterSpacing: 1 },
+  tierBannerSub:   { fontSize: 8, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,255,255,0.3)', marginTop: 1, letterSpacing: 0.3 },
+  changeTableBtn:  { paddingHorizontal: 9, paddingVertical: 5, borderRadius: 7, borderWidth: 1, borderColor: 'rgba(0,212,255,0.3)', backgroundColor: 'rgba(0,212,255,0.07)' },
+  changeTableText: { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(0,212,255,0.8)', letterSpacing: 1 },
   betRow:         { flexDirection: 'row', alignItems: 'center', gap: 14, justifyContent: 'center' },
   betAdjBtn:      { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(0,212,255,0.10)', borderWidth: 1, borderColor: 'rgba(0,212,255,0.25)', alignItems: 'center', justifyContent: 'center' },
   betAdjText:     { fontSize: 22, color: colors.primary, fontFamily: 'Inter_700Bold', lineHeight: 26 },

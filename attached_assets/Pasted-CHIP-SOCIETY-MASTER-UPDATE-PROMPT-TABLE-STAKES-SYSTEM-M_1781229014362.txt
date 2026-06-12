@@ -1,0 +1,508 @@
+CHIP SOCIETY — MASTER UPDATE PROMPT
+
+TABLE STAKES SYSTEM + MATCHMAKING + THREE CARD POKER IMPROVEMENTS
+
+Implement the following changes across the entire Chip Society platform.
+
+These changes affect:
+
+* Texas Hold’em
+* Three Card Poker
+* Blackjack
+* Future Poker Variants
+* Future Table Games
+
+The goal is to create a consistent casino progression system where players choose a stake level BEFORE entering a game and are matched with opponents in the same bracket.
+
+⸻
+
+PART 1
+
+UNIVERSAL TABLE STAKE SYSTEM
+
+Create a universal stake system that applies across ALL game modes.
+
+Before entering ANY table, the player must first select a stake level.
+
+This applies to:
+
+* Texas Hold’em
+* Three Card Poker
+* Blackjack
+* Future games
+
+The player should NEVER be dropped directly into a table.
+
+⸻
+
+TABLE BRACKETS
+
+MICRO
+
+Minimum Bankroll:
+25K
+
+Ante / Buy-In Level:
+5K
+
+⸻
+
+LOW STAKES
+
+Minimum Bankroll:
+100K
+
+Ante / Buy-In Level:
+10K
+
+⸻
+
+STANDARD
+
+Minimum Bankroll:
+500K
+
+Ante / Buy-In Level:
+25K
+
+⸻
+
+HIGH ROLLER
+
+Minimum Bankroll:
+1M
+
+Ante / Buy-In Level:
+50K
+
+⸻
+
+VIP
+
+Minimum Bankroll:
+5M
+
+Ante / Buy-In Level:
+100K
+
+⸻
+
+ELITE
+
+Minimum Bankroll:
+25M
+
+Ante / Buy-In Level:
+250K
+
+⸻
+
+TABLE ACCESS RULES
+
+Players can only join tables that match their bankroll level.
+
+Example:
+
+Player bankroll:
+100K
+
+Can access:
+
+Micro
+
+Low Stakes
+
+Cannot access:
+
+Standard
+
+High Roller
+
+VIP
+
+Elite
+
+⸻
+
+PART 2
+
+HOLD’EM MATCHMAKING
+
+All ranked Hold’em games should use stake brackets.
+
+Players entering:
+
+LOW STAKES
+
+should primarily be matched with:
+
+LOW STAKES players.
+
+⸻
+
+MATCHMAKING PRIORITY
+
+1. Same stake bracket
+2. Nearby stake bracket
+3. AI player fill
+
+⸻
+
+AI PLAYERS
+
+If no players are available:
+
+Fill seats using AI.
+
+AI players should:
+
+* Use avatars
+* Have realistic usernames
+* Have realistic chip stacks
+* Behave like real users
+
+Players should never wait indefinitely.
+
+⸻
+
+PART 3
+
+THREE CARD POKER TABLE SELECTION
+
+Before entering Three Card Poker:
+
+Show:
+
+SELECT TABLE
+
+Micro Stakes
+
+Low Stakes
+
+Standard
+
+High Roller
+
+VIP
+
+Elite
+
+Each table uses its own ante structure.
+
+⸻
+
+EXAMPLE
+
+MICRO
+
+Ante:
+5K
+
+Pair Plus:
+5K - 15K
+
+6 Card Bonus:
+5K - 15K
+
+⸻
+
+LOW STAKES
+
+Ante:
+10K
+
+Pair Plus:
+10K - 30K
+
+6 Card Bonus:
+10K - 30K
+
+⸻
+
+STANDARD
+
+Ante:
+25K
+
+Pair Plus:
+25K - 75K
+
+6 Card Bonus:
+25K - 75K
+
+⸻
+
+HIGH ROLLER
+
+Ante:
+50K
+
+Pair Plus:
+50K - 150K
+
+6 Card Bonus:
+50K - 150K
+
+⸻
+
+VIP
+
+Ante:
+100K
+
+Pair Plus:
+100K - 300K
+
+6 Card Bonus:
+100K - 300K
+
+⸻
+
+ELITE
+
+Ante:
+250K
+
+Pair Plus:
+250K - 750K
+
+6 Card Bonus:
+250K - 750K
+
+⸻
+
+PART 4
+
+BET PROTECTION SYSTEM
+
+Reserve enough chips for the mandatory Play wager.
+
+Example:
+
+Bankroll:
+100K
+
+Ante:
+25K
+
+Required Play:
+25K
+
+Reserve:
+25K
+
+The player cannot spend those reserved chips on side bets.
+
+⸻
+
+PREVENT THIS:
+
+Player spends entire bankroll on:
+
+Pair Plus
+
+6 Card Bonus
+
+Then cannot complete the hand.
+
+⸻
+
+PART 5
+
+SIX CARD BONUS OVERHAUL
+
+The Six Card Bonus currently displays the winning hand but does not visually explain it.
+
+This must be fixed.
+
+⸻
+
+WINNING CARD HIGHLIGHT SYSTEM
+
+When a Six Card Bonus wins:
+
+Highlight ONLY the cards used in the winning hand.
+
+Use:
+
+Blue glow
+
+Blue pulse
+
+Blue border
+
+Soft particle effect
+
+⸻
+
+EXAMPLE
+
+Dealer:
+
+5♣
+
+6♠
+
+5♠
+
+Player:
+
+10♥
+
+Q♠
+
+5♦
+
+Result:
+
+THREE OF A KIND
+
+Highlight:
+
+5♣
+
+5♠
+
+5♦
+
+ONLY
+
+⸻
+
+EXAMPLE
+
+STRAIGHT
+
+Highlight:
+
+7
+
+8
+
+9
+
+10
+
+J
+
+⸻
+
+EXAMPLE
+
+FULL HOUSE
+
+Highlight:
+
+K
+
+K
+
+K
+
+7
+
+7
+
+⸻
+
+EXAMPLE
+
+FOUR OF A KIND
+
+Highlight all four matching cards.
+
+⸻
+
+EXAMPLE
+
+STRAIGHT FLUSH
+
+Highlight entire straight flush.
+
+⸻
+
+EXAMPLE
+
+ROYAL FLUSH
+
+Highlight all five royal cards.
+
+Trigger premium celebration.
+
+⸻
+
+WINNING HAND EXPLAINER
+
+Under the Six Card Bonus result display:
+
+WINNING COMBINATION
+
+Three of a Kind
+
+Made From:
+
+5♣ Dealer
+
+5♠ Dealer
+
+5♦ Player
+
+This helps players understand why they were paid.
+
+⸻
+
+PART 6
+
+SOCIAL FEED IMPROVEMENTS
+
+Players can delete their own posts.
+
+Add:
+
+Delete Post
+
+to post options.
+
+Only the author can delete.
+
+⸻
+
+NEW POSTS
+
+When a player creates a post:
+
+Immediately place it at the top of:
+
+Trending
+
+Following
+
+Profile Feed
+
+Global Feed
+
+No refresh required.
+
+⸻
+
+PART 7
+
+DESIGN GOAL
+
+The entire casino ecosystem should now operate through stake-based progression.
+
+Benefits:
+
+* Better matchmaking
+* Fairer competition
+* Cleaner economy
+* Easier bankroll management
+* Better player retention
+
+Three Card Poker should clearly explain Six Card Bonus wins.
+
+Hold’em matchmaking should use stake brackets.
+
+Every game should feel connected under one unified casino progression system.
+
+No game should bypass the stake selection process.

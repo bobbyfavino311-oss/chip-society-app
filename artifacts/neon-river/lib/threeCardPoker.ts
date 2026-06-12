@@ -37,9 +37,10 @@ export type SixCardRank =
   | 'flush' | 'straight' | 'three_of_a_kind' | 'two_pair' | 'pair' | 'high_card';
 
 export interface SixCardEval {
-  rank:  SixCardRank;
-  value: number;
-  label: string;
+  rank:         SixCardRank;
+  value:        number;
+  label:        string;
+  winningCards: Card[];
 }
 
 const SIX_CARD_LABELS: Record<SixCardRank, string> = {
@@ -174,16 +175,20 @@ function evaluate5CardHand(cards: Card[]): SixCardEval {
     rank = 'high_card';       value = baseVal;
   }
 
-  return { rank, value, label: SIX_CARD_LABELS[rank] };
+  return { rank, value, label: SIX_CARD_LABELS[rank], winningCards: cards };
 }
 
-/** Best 5-card hand from player's 3 + dealer's 3 (6 total). */
+/** Best 5-card hand from player's 3 + dealer's 3 (6 total).
+ *  Returns the eval plus the 5 cards that form the winning hand. */
 export function evaluateSixCardBonus(playerCards: Card[], dealerCards: Card[]): SixCardEval {
   const all6 = [...playerCards, ...dealerCards];
-  return all6
-    .map((_, i) => all6.filter((_, j) => j !== i))
-    .map(evaluate5CardHand)
-    .reduce((best, e) => (e.value > best.value ? e : best));
+  let best: SixCardEval | null = null;
+  for (let i = 0; i < all6.length; i++) {
+    const five = all6.filter((_, j) => j !== i);
+    const e    = evaluate5CardHand(five);
+    if (!best || e.value > best.value) best = e;
+  }
+  return best!;
 }
 
 // ─── Payout tables ────────────────────────────────────────────────────────────

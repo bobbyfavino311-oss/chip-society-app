@@ -9,10 +9,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
+import StakeSelectModal from '@/components/StakeSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
+import { STAKE_TIERS, type StakeTier } from '@/lib/stakeConfig';
 import {
   createTCPDeck, shuffleTCPDeck, dealBiasedHands,
   evaluateThreeCardHand, tcpDealerQualifies, compareThreeCardHands,
@@ -39,8 +41,7 @@ interface TCPResult {
   netDelta:       number;   // overall net chips change
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const BET_OPTIONS: number[] = [1_000, 5_000, 10_000, 25_000, 50_000, 100_000];
+// ─── Constants (unused chip list removed — ante is set by stake tier) ─────────
 
 const PAYTABLE = {
   'PAIR PLUS': [
@@ -258,20 +259,24 @@ export default function ThreeCardPokerScreen() {
     MusicEngine.configure({ muted: isMusicMuted });
   }, [isMusicMuted]);
 
+  const [selectedTier,   setSelectedTier]   = useState<StakeTier | null>(null);
+
   const [phase,          setPhase]          = useState<Phase>('betting');
-  const [anteBet,        setAnteBet]        = useState(1_000);
   const [ppMult,         setPpMult]         = useState<Mult>(0);
   const [scMult,         setScMult]         = useState<Mult>(0);
   const [playerCards,    setPlayerCards]    = useState<Card[]>([]);
   const [dealerCards,    setDealerCards]    = useState<Card[]>([]);
   const [dealerRevealed, setDealerRevealed] = useState(false);
   const [result,         setResult]         = useState<TCPResult | null>(null);
-  const [lastAnte,       setLastAnte]       = useState(1_000);
+  const [lastAnte,       setLastAnte]       = useState(0);
   const [lastPpMult,     setLastPpMult]     = useState<Mult>(0);
   const [lastScMult,     setLastScMult]     = useState<Mult>(0);
   const [busy,           setBusy]           = useState(false);
   const [showPT,         setShowPT]         = useState(false);
   const [played,         setPlayed]         = useState(false);
+
+  // Ante is always derived from the selected stake tier
+  const anteBet = selectedTier?.ante ?? 0;
 
   const ppBet         = anteBet * ppMult;
   const scBet         = anteBet * scMult;
@@ -279,7 +284,7 @@ export default function ThreeCardPokerScreen() {
   // Always reserve one extra anteBet for the Play wager so the player
   // is never forced to fold simply because side bets consumed all chips.
   const totalRequired = dealCost + anteBet;
-  const canDeal       = anteBet >= 1_000 && profile.chips >= totalRequired && !busy;
+  const canDeal       = anteBet > 0 && profile.chips >= totalRequired && !busy;
   const canPlay       = !busy && profile.chips >= anteBet;
 
   // ── Cycle side-bet multiplier (skip any amount that would eat the play reserve) ──
@@ -462,15 +467,13 @@ export default function ThreeCardPokerScreen() {
 
   // ── Rebet / New ───────────────────────────────────────────────────────────
   const handleRebet = useCallback(() => {
-    setAnteBet(lastAnte);
     setPpMult(lastPpMult);
     setScMult(lastScMult);
     setPhase('betting');
     setResult(null);
-  }, [lastAnte, lastPpMult, lastScMult]);
+  }, [lastPpMult, lastScMult]);
 
   const handleNew = useCallback(() => {
-    setAnteBet(0);
     setPpMult(0);
     setScMult(0);
     setPhase('betting');
@@ -481,6 +484,13 @@ export default function ThreeCardPokerScreen() {
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   const pEvalLabel = playerCards.length > 0 ? evaluateThreeCardHand(playerCards).label : '';
+
+  // 6CB winning card helper — identifies which cards form the bonus hand
+  const scWinCards = result?.sixCardEval?.winningCards ?? [];
+  function is6CBHighlight(c: Card): boolean {
+    return scWinCards.some(w => w.suit === c.suit && w.value === c.value);
+  }
+  const show6CBHighlight = (result?.sixCardWin ?? 0) > 0 && lastScMult > 0;
 
   return (
     <View style={gs.container}>
@@ -521,7 +531,12 @@ export default function ThreeCardPokerScreen() {
           <Text style={gs.areaLabel}>DEALER</Text>
           <View style={gs.cardRow}>
             {dealerCards.length > 0
-              ? dealerCards.map((c, i) => <PlayingCard key={i} card={c} faceDown={!dealerRevealed} size="lg" animated />)
+              ? dealerCards.map((c, i) => (
+                  <PlayingCard
+                    key={i} card={c} faceDown={!dealerRevealed} size="lg" animated
+                    highlighted={dealerRevealed && show6CBHighlight && is6CBHighlight(c)}
+                  />
+                ))
               : [0,1,2].map(i => <PlayingCard key={i} faceDown size="lg" />)
             }
           </View>
@@ -578,8 +593,14 @@ export default function ThreeCardPokerScreen() {
           <View style={gs.cardRow}>
             {playerCards.length > 0
               ? playerCards.map((c, i) => (
-                  <PlayingCard key={i} card={c} faceDown={false} size="lg" animated
-                    highlighted={result?.comparison === 'player' || result?.comparison === 'tie'} />
+                  <PlayingCard
+                    key={i} card={c} faceDown={false} size="lg" animated
+                    highlighted={
+                      show6CBHighlight
+                        ? is6CBHighlight(c)
+                        : (result?.comparison === 'player' || result?.comparison === 'tie')
+                    }
+                  />
                 ))
               : [0,1,2].map(i => <PlayingCard key={i} faceDown size="lg" />)
             }
@@ -728,17 +749,23 @@ export default function ThreeCardPokerScreen() {
         </View>
 
         {/* ── BETTING CONTROLS ── */}
-        {phase === 'betting' && (
+        {phase === 'betting' && selectedTier && (
           <View style={gs.controls}>
-            <Text style={gs.controlLabel}>SELECT ANTE</Text>
-            <View style={gs.chipRow}>
-              {BET_OPTIONS.map(v => (
-                <ChipBtn
-                  key={v} value={v} selected={anteBet === v}
-                  onPress={() => { setAnteBet(v); Haptics.selectionAsync(); }}
-                  disabled={profile.chips < v}
-                />
-              ))}
+            {/* Table info banner */}
+            <View style={[gs.tableBanner, { borderColor: `${selectedTier.color}35` }]}>
+              <LinearGradient
+                colors={[`${selectedTier.color}14`, 'transparent']}
+                style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={[gs.tableTierName, { color: selectedTier.color }]}>{selectedTier.label} TABLE</Text>
+                <Text style={gs.tableAnteInfo}>
+                  ANTE {fmt(anteBet)} · PAIR+ up to {fmt(anteBet * 2)} · 6CB up to {fmt(anteBet * 2)}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setSelectedTier(null)} style={gs.changeTableBtn} activeOpacity={0.75}>
+                <Text style={gs.changeTableText}>CHANGE</Text>
+              </TouchableOpacity>
             </View>
 
             <Text style={gs.controlHint}>
@@ -749,7 +776,7 @@ export default function ThreeCardPokerScreen() {
               <View style={gs.balInfo}>
                 <Ionicons name="wallet-outline" size={12} color="rgba(255,215,0,0.5)" />
                 <Text style={gs.balText}>{fmt(profile.chips)}</Text>
-                {!canDeal && anteBet >= 1_000 && profile.chips < totalRequired && (
+                {!canDeal && anteBet > 0 && profile.chips < totalRequired && (
                   <Text style={gs.reserveWarn}>  need {fmt(totalRequired - profile.chips)} more</Text>
                 )}
               </View>
@@ -827,6 +854,14 @@ export default function ThreeCardPokerScreen() {
       </ScrollView>
 
       <PaytableModal visible={showPT} onClose={() => setShowPT(false)} />
+
+      <StakeSelectModal
+        visible={selectedTier === null}
+        chips={profile.chips}
+        onSelect={(tier) => setSelectedTier(tier)}
+        onBack={() => router.back()}
+        title="SELECT YOUR TABLE"
+      />
     </View>
   );
 }
@@ -870,11 +905,20 @@ const gs = StyleSheet.create({
   resultDivider:{ height: 1, backgroundColor: 'rgba(255,255,255,0.07)', marginVertical: 4 },
 
   // Betting controls
-  controls:     { gap: 10 },
-  controlLabel: { fontSize: 8, fontWeight: '700', fontFamily: 'Orbitron_700Bold', letterSpacing: 2, color: 'rgba(255,215,0,0.45)', textAlign: 'center' },
-  controlHint:  { fontSize: 9, color: 'rgba(255,255,255,0.2)', textAlign: 'center', lineHeight: 13 },
-  chipRow:      { flexDirection: 'row', flexWrap: 'wrap', gap: 6, justifyContent: 'center' },
-  dealRow:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  controls:          { gap: 10 },
+  controlHint:       { fontSize: 9, color: 'rgba(255,255,255,0.2)', textAlign: 'center', lineHeight: 13 },
+  dealRow:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+
+  // Table tier banner
+  tableBanner:       {
+    flexDirection: 'row', alignItems: 'center',
+    padding: 12, borderRadius: 12, borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.2)', overflow: 'hidden', gap: 8,
+  },
+  tableTierName:     { fontSize: 10, fontFamily: 'Orbitron_900Black', letterSpacing: 1.5 },
+  tableAnteInfo:     { fontSize: 8, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,255,255,0.3)', marginTop: 2, letterSpacing: 0.3 },
+  changeTableBtn:    { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 7, borderWidth: 1, borderColor: 'rgba(0,212,255,0.3)', backgroundColor: 'rgba(0,212,255,0.07)' },
+  changeTableText:   { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(0,212,255,0.8)', letterSpacing: 1 },
   balInfo:      { flexDirection: 'row', alignItems: 'center', gap: 5 },
   balText:      { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: 'rgba(255,215,0,0.7)' },
   reserveWarn:  { fontSize: 10, color: '#ff4466', fontWeight: '700' },
