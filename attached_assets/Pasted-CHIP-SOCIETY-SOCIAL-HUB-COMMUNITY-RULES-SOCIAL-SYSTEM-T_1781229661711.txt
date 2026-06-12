@@ -1,0 +1,335 @@
+CHIP SOCIETY SOCIAL HUB
+
+COMMUNITY RULES & SOCIAL SYSTEM
+
+The goal is to make the social feed feel alive like X/Twitter, Reddit, and Instagram while remaining focused on poker, casino gaming, achievements, and community interaction.
+
+⸻
+
+GLOBAL FEED
+
+Players can see posts from users worldwide.
+
+Feed types:
+
+* Trending
+* Following
+* Global
+* Friends
+* Tournament Feed
+* Achievement Feed
+
+Posts should appear in real time.
+
+New posts always appear at the top of the feed.
+
+The feed should never feel empty.
+
+If activity is low, populate the feed with:
+
+* AI-generated player achievements
+* Tournament results
+* Jackpot wins
+* Achievement unlocks
+* Fortune Cookie rewards
+* Lottery ticket wins
+
+⸻
+
+ALLOWED CONTENT
+
+Players may post:
+
+✅ Big wins
+
+✅ Bad beats
+
+✅ Hand screenshots
+
+✅ Tournament victories
+
+✅ Achievement unlocks
+
+✅ Avatar showcases
+
+✅ Theme showcases
+
+✅ Fortune Cookie rewards
+
+✅ Lottery Ticket wins
+
+✅ Poker discussion
+
+✅ Friendly trash talk
+
+✅ Chip milestones
+
+✅ Strategy discussion
+
+⸻
+
+PROHIBITED CONTENT
+
+Remove immediately:
+
+❌ Hate speech
+
+❌ Threats
+
+❌ Harassment
+
+❌ Bullying
+
+❌ Racism
+
+❌ Sexually explicit content
+
+❌ Graphic violence
+
+❌ Illegal activity
+
+❌ Drug sales
+
+❌ Spam
+
+❌ Scam links
+
+❌ Personal information
+
+❌ Impersonation
+
+❌ Account selling
+
+❌ Chip selling
+
+❌ Third-party gambling advertisements
+
+These rules are modeled after the anti-harassment, anti-spam, anti-impersonation, and safety principles used by major social platforms.  ￼
+
+⸻
+
+PLAYER CONTROLS
+
+Every player can:
+
+* Delete their own posts
+* Edit their own posts
+* Follow players
+* Unfollow players
+* Mute players
+* Block players
+* Report posts
+* Report accounts
+
+⸻
+
+REPORT SYSTEM
+
+Every post should have:
+
+⋯ Menu
+
+Options:
+
+* Like
+* Share
+* Report
+* Block User
+* Mute User
+
+Report reasons:
+
+* Spam
+* Harassment
+* Hate Speech
+* Impersonation
+* Inappropriate Content
+* Scam
+* Other
+
+⸻
+
+ACCOUNT REPUTATION SYSTEM
+
+Create a hidden trust score.
+
+Positive actions:
+
+* Posting quality content
+* Receiving likes
+* Receiving follows
+* Daily activity
+* Playing games
+
+Negative actions:
+
+* Spam reports
+* Harassment reports
+* Multiple deleted posts
+* Excessive posting
+* Offensive content
+
+High trust accounts receive:
+
+* More visibility
+* Better ranking placement
+* Featured status
+
+⸻
+
+VERIFIED PLAYER STATUS
+
+Special badges:
+
+🥇 High Roller
+
+🏆 Tournament Champion
+
+👑 Poker King
+
+🔥 Hot Streak
+
+⭐ VIP
+
+💎 Elite
+
+These badges appear beside usernames.
+
+⸻
+
+AUTOMATIC FEED POSTS
+
+Generate automatic social content:
+
+“Vegas just won 2.5M in Hold’em”
+
+“Shadow unlocked Four Dragons”
+
+“Blaze opened a 🥠 Fortune Cookie and won 100K”
+
+“Ace completed Royal Flush Hunter”
+
+“Vegas hit a Straight Flush”
+
+This keeps the feed active 24/7.
+
+⸻
+
+TRENDING SYSTEM
+
+Trending should be determined by:
+
+* Likes
+* Comments
+* Shares
+* Recent activity
+* Achievement rarity
+* Win size
+
+Large wins should trend automatically.
+
+Examples:
+
+Royal Flush
+
+Jackpot Lottery Ticket
+
+Huge Tournament Victory
+
+Massive All-In Win
+
+Rare Achievement Unlock
+
+⸻
+
+COMMENTS
+
+Players can comment on posts.
+
+Examples:
+
+“Nice hand”
+
+“Sick river”
+
+“Unlucky”
+
+“What was the read?”
+
+“Huge win”
+
+Players can like comments.
+
+⸻
+
+SHARE FEATURE
+
+Allow players to share:
+
+* Hand results
+* Tournament wins
+* Achievements
+* Avatar unlocks
+* 🥠 Fortune Cookie rewards
+* Lottery ticket wins
+
+One tap:
+
+“Share to Social Feed”
+
+⸻
+
+ACHIEVEMENT FEED
+
+Special feed category:
+
+ACHIEVEMENTS
+
+Displays:
+
+🏆 First Tournament Win
+
+💎 Millionaire Club
+
+🔥 10 Win Streak
+
+👑 Poker King
+
+🐉 Four Dragons Theme Unlocked
+
+🥠 Fortune Master
+
+This creates constant social activity.
+
+⸻
+
+DAILY ENGAGEMENT FEATURES
+
+Daily Questions:
+
+“What was your biggest win?”
+
+“What’s your favorite theme?”
+
+“What’s the best starting hand in Hold’em?”
+
+Players can vote and comment.
+
+⸻
+
+SOCIAL HUB DESIGN GOAL
+
+The social feed should feel like a real global poker community.
+
+When a player opens the Social Hub they should immediately see:
+
+* New posts
+* Huge wins
+* Achievements
+* Tournament results
+* Community discussions
+* Avatar unlocks
+* 🥠 Fortune Cookie rewards
+* Trending content
+
+The social feed should never feel empty, inactive, or abandoned. It should feel like a living poker network with players posting and interacting around the clock.

@@ -1,11 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   FlatList,
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -46,13 +47,52 @@ const POST_TYPE_ICONS: Record<PostTag, React.ComponentProps<typeof Ionicons>['na
 const MAX_CHARS = 280;
 const ALL_TAGS: PostTag[] = ['WIN', 'BLUFF', 'BAD BEAT', 'ALL-IN', 'HIGHLIGHT', 'JACKPOT', 'TOURNAMENT'];
 
+const REPORT_REASONS: Array<{
+  id: string; label: string;
+  icon: React.ComponentProps<typeof Ionicons>['name']; color: string;
+}> = [
+  { id: 'spam',   label: 'Spam',                  icon: 'mail-unread-outline',   color: '#ff9900' },
+  { id: 'harass', label: 'Harassment',             icon: 'warning-outline',       color: '#ff3366' },
+  { id: 'hate',   label: 'Hate Speech',            icon: 'ban-outline',           color: '#ff3366' },
+  { id: 'impers', label: 'Impersonation',          icon: 'person-remove-outline', color: '#ff9900' },
+  { id: 'inapp',  label: 'Inappropriate Content',  icon: 'eye-off-outline',       color: '#ff9900' },
+  { id: 'scam',   label: 'Scam',                  icon: 'alert-circle-outline',  color: '#ff3366' },
+  { id: 'other',  label: 'Other',                  icon: 'ellipsis-horizontal-circle-outline', color: '#888' },
+];
+
+const MOCK_COMMENT_POOL: Array<{ username: string; avatarId: number; text: string }> = [
+  { username: 'NightShark99', avatarId: 12, text: 'Sick hand! Well played.' },
+  { username: 'VegasMirage',  avatarId: 7,  text: 'What was the read on the river?' },
+  { username: 'NeonWitch',    avatarId: 3,  text: 'GGs. That river was brutal.' },
+  { username: 'ShadowKing',   avatarId: 9,  text: 'How did they call that??' },
+  { username: 'PokerPhantom', avatarId: 13, text: 'Massive pot. Clean lines.' },
+  { username: 'Blaze_RNG',    avatarId: 15, text: 'I would have done the same thing.' },
+  { username: 'IceQueen_K',   avatarId: 4,  text: 'River bluff? Or did you have it?' },
+  { username: 'AceOfSpades_', avatarId: 1,  text: 'Standard shove there tbh' },
+  { username: 'CardShark',    avatarId: 6,  text: 'Would not have folded either.' },
+  { username: 'QuantumBluff', avatarId: 11, text: 'Incredible timing on that raise.' },
+  { username: 'NightShark99', avatarId: 12, text: 'Next level read. Respect.' },
+  { username: 'VegasMirage',  avatarId: 7,  text: 'The call was mandatory with those odds.' },
+];
+
+function seedComments(postId: string, count: number) {
+  const hash = postId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const n = Math.min(count, 3);
+  return Array.from({ length: n }, (_, i) => {
+    const idx = (hash + i * 7) % MOCK_COMMENT_POOL.length;
+    const p = MOCK_COMMENT_POOL[idx];
+    return { id: `${postId}_sc${i}`, username: p.username, avatarId: p.avatarId, text: p.text };
+  });
+}
+
 const FEED_TABS = [
-  { id: 'trending',    label: 'Trending',     icon: 'flame' as const },
-  { id: 'following',   label: 'Following',    icon: 'people' as const },
-  { id: 'pots',        label: 'Biggest Pots', icon: 'cash' as const },
-  { id: 'leaderboard', label: 'Leaderboard',  icon: 'podium' as const },
-  { id: 'search',      label: 'Search',       icon: 'search' as const },
-  { id: 'me',          label: 'Me',           icon: 'person-circle' as const },
+  { id: 'trending',     label: 'Trending',     icon: 'flame' as const },
+  { id: 'following',    label: 'Following',    icon: 'people' as const },
+  { id: 'achievements', label: 'Achievements', icon: 'trophy' as const },
+  { id: 'pots',         label: 'Biggest Pots', icon: 'cash' as const },
+  { id: 'leaderboard',  label: 'Leaderboard',  icon: 'podium' as const },
+  { id: 'search',       label: 'Search',       icon: 'search' as const },
+  { id: 'me',           label: 'Me',           icon: 'person-circle' as const },
 ];
 
 const ME_SUBTABS = [
@@ -238,19 +278,44 @@ const notifStyle = StyleSheet.create({
 
 // ─── Post Card ───────────────────────────────────────────────────────────────
 
+interface LocalComment { id: string; text: string; }
+
 function PostCard({ post }: { post: SocialPost }) {
-  const { isFollowing, follow, unfollow, isLiked, toggleLike, setReaction, getReaction } = useSocial();
+  const {
+    isFollowing, follow, unfollow, isLiked, toggleLike, setReaction, getReaction,
+    mute, block, reportPost, isReported,
+  } = useSocial();
+  const { profile } = useUser();
   const [showReactions, setShowReactions] = useState(false);
-  const player = MOCK_PLAYERS.find(p => p.id === post.playerId);
-  const typeColor = POST_TAG_COLORS[post.tag];
-  const myReaction = getReaction(post.id);
-  const liked = isLiked(post.id);
-  const following = isFollowing(post.playerId);
+  const [showMenu, setShowMenu]           = useState(false);
+  const [showReport, setShowReport]       = useState(false);
+  const [showComments, setShowComments]   = useState(false);
+  const [myComment, setMyComment]         = useState('');
+  const [localComments, setLocalComments] = useState<LocalComment[]>([]);
+
+  const player       = MOCK_PLAYERS.find(p => p.id === post.playerId);
+  const typeColor    = POST_TAG_COLORS[post.tag];
+  const myReaction   = getReaction(post.id);
+  const liked        = isLiked(post.id);
+  const following    = isFollowing(post.playerId);
+  const reported     = isReported(post.id);
+  const primaryBadge = player?.badges[0];
+  const seeded       = useMemo(() => seedComments(post.id, post.comments), [post.id, post.comments]);
+  const totalComments = post.comments + localComments.length;
 
   function handleFollow() {
     if (!player) return;
     if (following) unfollow(post.playerId);
     else follow(post.playerId, player.username);
+  }
+  function handleMute()  { setShowMenu(false); if (player) mute(post.playerId, player.username); }
+  function handleBlock() { setShowMenu(false); if (player) block(post.playerId, player.username); }
+  function handleReport(reason: string) { reportPost(post.id, reason); setShowReport(false); setShowMenu(false); }
+  function submitComment() {
+    const t = myComment.trim();
+    if (!t) return;
+    setLocalComments(prev => [{ id: `lc_${Date.now()}`, text: t }, ...prev]);
+    setMyComment('');
   }
 
   return (
@@ -259,18 +324,18 @@ function PostCard({ post }: { post: SocialPost }) {
 
       {/* Header */}
       <View style={cd.header}>
-        <TouchableOpacity
-          style={cd.avatarWrap}
-          onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}
-        >
+        <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}>
           <NeonAvatar avatarId={player?.avatarId ?? 1} size={44} />
-          {player?.status === 'online' && <View style={cd.onlineDot} />}
+          {player?.status === 'online'  && <View style={cd.onlineDot} />}
           {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
         </TouchableOpacity>
 
         <View style={{ flex: 1 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}>
-            <Text style={cd.username}>{player?.username ?? 'Unknown'}</Text>
+            <View style={cd.usernameRow}>
+              <Text style={cd.username}>{player?.username ?? 'Unknown'}</Text>
+              {primaryBadge && <Text style={cd.badgeIcon}>{primaryBadge.icon}</Text>}
+            </View>
           </TouchableOpacity>
           <Text style={cd.handle}>{player?.handle ?? ''} · {post.timeAgo}</Text>
         </View>
@@ -280,13 +345,12 @@ function PostCard({ post }: { post: SocialPost }) {
           <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
         </View>
 
-        <TouchableOpacity
-          style={[cd.followBtn, following && cd.followBtnActive]}
-          onPress={handleFollow}
-        >
-          <Text style={[cd.followText, following && cd.followTextActive]}>
-            {following ? 'Following' : 'Follow'}
-          </Text>
+        <TouchableOpacity style={[cd.followBtn, following && cd.followBtnActive]} onPress={handleFollow}>
+          <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => setShowMenu(true)} style={cd.moreBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Ionicons name="ellipsis-horizontal" size={16} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
 
@@ -338,9 +402,13 @@ function PostCard({ post }: { post: SocialPost }) {
           <Text style={[cd.actionCount, liked && { color: '#ff0090' }]}>{liked ? post.likes + 1 : post.likes}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={cd.actionBtn}>
-          <Ionicons name="chatbubble-outline" size={15} color={colors.textMuted} />
-          <Text style={cd.actionCount}>{post.comments}</Text>
+        <TouchableOpacity style={cd.actionBtn} onPress={() => setShowComments(v => !v)}>
+          <Ionicons
+            name={showComments ? 'chatbubble' : 'chatbubble-outline'}
+            size={15}
+            color={showComments ? colors.accent : colors.textMuted}
+          />
+          <Text style={[cd.actionCount, showComments && { color: colors.accent }]}>{totalComments}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={cd.actionBtn} onPress={() => setShowReactions(v => !v)}>
@@ -352,6 +420,103 @@ function PostCard({ post }: { post: SocialPost }) {
           <Ionicons name="share-outline" size={17} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
+
+      {/* ── Inline Comments ───────────────────────────────────────────────────── */}
+      {showComments && (
+        <View style={cd.commentsSection}>
+          {localComments.map(c => (
+            <View key={c.id} style={cd.commentRow}>
+              <View style={cd.meAvatar}>
+                <Text style={cd.meAvatarText}>{(profile.username || 'ME').substring(0, 2).toUpperCase()}</Text>
+              </View>
+              <View style={cd.commentBubble}>
+                <Text style={cd.commentName}>{profile.username || 'You'}</Text>
+                <Text style={cd.commentText}>{c.text}</Text>
+              </View>
+            </View>
+          ))}
+          {seeded.map(c => (
+            <View key={c.id} style={cd.commentRow}>
+              <NeonAvatar avatarId={c.avatarId} size={28} />
+              <View style={cd.commentBubble}>
+                <Text style={cd.commentName}>{c.username}</Text>
+                <Text style={cd.commentText}>{c.text}</Text>
+              </View>
+            </View>
+          ))}
+          <View style={cd.commentCompose}>
+            <TextInput
+              value={myComment}
+              onChangeText={setMyComment}
+              placeholder="Add a comment..."
+              placeholderTextColor={colors.textDim}
+              style={cd.commentInput}
+              returnKeyType="send"
+              onSubmitEditing={submitComment}
+            />
+            <TouchableOpacity onPress={submitComment} disabled={!myComment.trim()}>
+              <Ionicons name="send" size={16} color={myComment.trim() ? colors.primary : colors.textDim} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* ── Options Sheet ─────────────────────────────────────────────────────── */}
+      <Modal transparent visible={showMenu} animationType="fade" onRequestClose={() => setShowMenu(false)}>
+        <TouchableOpacity style={mnu.overlay} activeOpacity={1} onPress={() => setShowMenu(false)}>
+          <View style={mnu.sheet}>
+            <LinearGradient colors={['#1a002e', '#0a0018']} style={StyleSheet.absoluteFill} />
+            <View style={mnu.handle} />
+
+            <TouchableOpacity style={mnu.option} onPress={() => setShowMenu(false)}>
+              <Ionicons name="share-social-outline" size={18} color={colors.primary} />
+              <Text style={mnu.optionText}>Share Post</Text>
+            </TouchableOpacity>
+
+            <View style={mnu.divider} />
+
+            <TouchableOpacity
+              style={mnu.option}
+              onPress={() => { setShowMenu(false); setShowReport(true); }}
+              disabled={reported}
+            >
+              <Ionicons name="flag-outline" size={18} color={reported ? colors.textDim : '#ff9900'} />
+              <Text style={[mnu.optionText, reported && { color: colors.textDim }]}>
+                {reported ? 'Already Reported' : 'Report Post'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={mnu.option} onPress={handleMute}>
+              <Ionicons name="volume-mute-outline" size={18} color={colors.textMuted} />
+              <Text style={mnu.optionText}>Mute @{player?.username ?? 'User'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={mnu.option} onPress={handleBlock}>
+              <Ionicons name="ban-outline" size={18} color="#ff3366" />
+              <Text style={[mnu.optionText, { color: '#ff3366' }]}>Block @{player?.username ?? 'User'}</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* ── Report Modal ──────────────────────────────────────────────────────── */}
+      <Modal transparent visible={showReport} animationType="slide" onRequestClose={() => setShowReport(false)}>
+        <TouchableOpacity style={mnu.overlay} activeOpacity={1} onPress={() => setShowReport(false)}>
+          <View style={mnu.sheet}>
+            <LinearGradient colors={['#1a002e', '#0a0018']} style={StyleSheet.absoluteFill} />
+            <View style={mnu.handle} />
+            <Text style={rp.title}>REPORT POST</Text>
+            <Text style={rp.subtitle}>Select a reason</Text>
+            {REPORT_REASONS.map(r => (
+              <TouchableOpacity key={r.id} style={rp.reason} onPress={() => handleReport(r.label)}>
+                <Ionicons name={r.icon} size={16} color={r.color} />
+                <Text style={rp.reasonText}>{r.label}</Text>
+                <Ionicons name="chevron-forward" size={14} color={colors.textDim} style={{ marginLeft: 'auto' as unknown as number }} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -361,38 +526,32 @@ const cd = StyleSheet.create({
     borderRadius: 16, borderWidth: 1, borderColor: colors.border,
     overflow: 'hidden', padding: 14, gap: 10,
   },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  avatarWrap: { position: 'relative' },
-  avatar: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: colors.surface, borderWidth: 2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { fontSize: 18, fontWeight: '700' },
+  header:          { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  avatarWrap:      { position: 'relative' },
   onlineDot: {
     position: 'absolute', bottom: 0, right: 0,
     width: 10, height: 10, borderRadius: 5,
     backgroundColor: '#00ff88', borderWidth: 1.5, borderColor: '#080018',
   },
-  username: { color: colors.text, fontSize: 13, fontWeight: '700' },
-  handle: { color: colors.textDim, fontSize: 10, marginTop: 1 },
-  typeBadge: { borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 3, flexDirection: 'row', alignItems: 'center', gap: 3 },
-  typeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.3 },
-  followBtn: {
-    borderWidth: 1, borderColor: colors.primary, borderRadius: 14,
-    paddingHorizontal: 10, paddingVertical: 5,
-  },
+  usernameRow:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  username:        { color: colors.text, fontSize: 13, fontWeight: '700' },
+  badgeIcon:       { fontSize: 12 },
+  handle:          { color: colors.textDim, fontSize: 10, marginTop: 1 },
+  typeBadge:       { borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 3, flexDirection: 'row', alignItems: 'center', gap: 3 },
+  typeText:        { fontSize: 8, fontWeight: '800', letterSpacing: 0.3 },
+  followBtn:       { borderWidth: 1, borderColor: colors.primary, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 5 },
   followBtnActive: { backgroundColor: `${colors.primary}20`, borderColor: `${colors.primary}60` },
-  followText: { color: colors.primary, fontSize: 10, fontWeight: '700' },
-  followTextActive: { color: `${colors.primary}90` },
-  content: { color: colors.textMuted, fontSize: 13, lineHeight: 20 },
-  statsRow: { flexDirection: 'row', gap: 8 },
+  followText:      { color: colors.primary, fontSize: 10, fontWeight: '700' },
+  followTextActive:{ color: `${colors.primary}90` },
+  moreBtn:         { padding: 2 },
+  content:         { color: colors.textMuted, fontSize: 13, lineHeight: 20 },
+  statsRow:        { flexDirection: 'row', gap: 8 },
   statChip: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     backgroundColor: colors.surface, borderRadius: 6, borderWidth: 1,
     borderColor: colors.border, paddingHorizontal: 8, paddingVertical: 4,
   },
-  statText: { color: colors.textMuted, fontSize: 11 },
+  statText:     { color: colors.textMuted, fontSize: 11 },
   reactionsRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   reactionBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
@@ -405,8 +564,173 @@ const cd = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 14,
     paddingTop: 6, borderTopWidth: 1, borderTopColor: colors.border,
   },
-  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  actionCount: { color: colors.textMuted, fontSize: 12 },
+  actionBtn:    { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  actionCount:  { color: colors.textMuted, fontSize: 12 },
+
+  commentsSection: { gap: 10, paddingTop: 4, borderTopWidth: 1, borderTopColor: colors.border },
+  commentRow:      { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  meAvatar: {
+    width: 28, height: 28, borderRadius: 14,
+    backgroundColor: `${colors.accent}25`, borderWidth: 1, borderColor: `${colors.accent}50`,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  meAvatarText:  { color: colors.accent, fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  commentBubble: {
+    flex: 1, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10,
+    borderWidth: 1, borderColor: colors.border, padding: 8, gap: 2,
+  },
+  commentName:   { color: colors.primary, fontSize: 11, fontWeight: '700' },
+  commentText:   { color: colors.textMuted, fontSize: 12, lineHeight: 17 },
+  commentCompose: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 20,
+    borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 6,
+  },
+  commentInput: { flex: 1, color: colors.text, fontSize: 13, padding: 0 },
+});
+
+const mnu = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
+  sheet: {
+    borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    borderWidth: 1, borderBottomWidth: 0, borderColor: colors.border,
+    overflow: 'hidden', paddingHorizontal: 16, paddingBottom: 32, gap: 2,
+  },
+  handle: {
+    width: 36, height: 4, borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.15)', alignSelf: 'center',
+    marginTop: 10, marginBottom: 12,
+  },
+  divider:    { height: 1, backgroundColor: colors.border, marginVertical: 4 },
+  option:     { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: 4 },
+  optionText: { color: colors.text, fontSize: 15, fontWeight: '600' },
+});
+
+const rp = StyleSheet.create({
+  title: {
+    color: colors.primary, fontSize: 14, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 2, textAlign: 'center', marginBottom: 2,
+  },
+  subtitle:   { color: colors.textDim, fontSize: 12, textAlign: 'center', marginBottom: 8 },
+  reason: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingVertical: 12, paddingHorizontal: 4,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  reasonText: { color: colors.text, fontSize: 14, fontWeight: '600' },
+});
+
+// ─── Achievement Section ──────────────────────────────────────────────────────
+
+const ACHIEVEMENT_EVENTS = [
+  { id: 'ae1',  playerId: 'p1', icon: '🃏', label: 'Royal Flush Hunter',      desc: 'Hit a Royal Flush in a live hand',             rarity: 'LEGENDARY', color: '#ffd700', timeAgo: '5m',  xp:  50_000 },
+  { id: 'ae2',  playerId: 'p2', icon: '💎', label: 'Millionaire Club',         desc: 'Chip balance reached 1,000,000',               rarity: 'EPIC',      color: '#bf5fff', timeAgo: '23m', xp:  25_000 },
+  { id: 'ae3',  playerId: 'p4', icon: '🔥', label: 'Inferno — 10 Win Streak',  desc: 'Won 10 hands in a row',                       rarity: 'RARE',      color: '#ff6600', timeAgo: '1h',  xp:   8_000 },
+  { id: 'ae4',  playerId: 'p7', icon: '🏆', label: 'Tournament Champion',      desc: 'Won a featured tournament outright',           rarity: 'EPIC',      color: '#00d4ff', timeAgo: '2h',  xp:  20_000 },
+  { id: 'ae5',  playerId: 'p3', icon: '♠',  label: 'Straight Flush Club',      desc: "Made a Straight Flush in Texas Hold'em",       rarity: 'RARE',      color: '#ff0090', timeAgo: '3h',  xp:  10_000 },
+  { id: 'ae6',  playerId: 'p5', icon: '👑', label: 'Poker King',               desc: 'Reached Neon Legend rank',                    rarity: 'LEGENDARY', color: '#ffd700', timeAgo: '5h',  xp: 100_000 },
+  { id: 'ae7',  playerId: 'p8', icon: '⚡', label: 'Speed Demon',              desc: 'Won 5 hands in under 10 minutes',             rarity: 'COMMON',    color: '#00ff88', timeAgo: '6h',  xp:   2_000 },
+  { id: 'ae8',  playerId: 'p6', icon: '🐉', label: 'Dragon Master',            desc: 'Won with Four of a Kind three times',         rarity: 'EPIC',      color: '#bf5fff', timeAgo: '8h',  xp:  30_000 },
+  { id: 'ae9',  playerId: 'p9', icon: '💰', label: 'High Stakes Player',       desc: 'Played at the High Roller table tier',        rarity: 'RARE',      color: '#ffd700', timeAgo: '10h', xp:   5_000 },
+  { id: 'ae10', playerId: 'p2', icon: '🎯', label: 'Bluff Master',             desc: 'Won 10 pots with pure bluffs',                rarity: 'RARE',      color: '#ff6600', timeAgo: '12h', xp:   7_500 },
+];
+
+const RARITY_ORDER = ['LEGENDARY', 'EPIC', 'RARE', 'COMMON'] as const;
+type Rarity = typeof RARITY_ORDER[number];
+const RARITY_COLOR: Record<Rarity, string> = {
+  LEGENDARY: '#ffd700', EPIC: '#bf5fff', RARE: '#00d4ff', COMMON: '#00ff88',
+};
+
+function AchievementSection({ bottomInset }: { bottomInset: number }) {
+  const [filter, setFilter] = useState<Rarity | null>(null);
+  const displayed = filter ? ACHIEVEMENT_EVENTS.filter(e => e.rarity === filter) : ACHIEVEMENT_EVENTS;
+
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 14, gap: 12, paddingBottom: bottomInset + 90 }}>
+      <Text style={ach.sectionTitle}>COMMUNITY ACHIEVEMENTS</Text>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        <TouchableOpacity
+          style={[ach.rarityBtn, filter === null && ach.rarityBtnAll]}
+          onPress={() => setFilter(null)}
+        >
+          <Text style={[ach.rarityBtnText, filter === null && { color: colors.primary }]}>All</Text>
+        </TouchableOpacity>
+        {RARITY_ORDER.map(r => {
+          const c = RARITY_COLOR[r];
+          const active = filter === r;
+          return (
+            <TouchableOpacity
+              key={r}
+              style={[ach.rarityBtn, active && { borderColor: `${c}60`, backgroundColor: `${c}12` }]}
+              onPress={() => setFilter(active ? null : r)}
+            >
+              <Text style={[ach.rarityBtnText, active && { color: c }]}>{r}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      {displayed.map(ev => {
+        const player = MOCK_PLAYERS.find(p => p.id === ev.playerId);
+        const rc = RARITY_COLOR[ev.rarity as Rarity] ?? '#888';
+        return (
+          <View key={ev.id} style={ach.card}>
+            <LinearGradient
+              colors={[`${rc}10`, 'transparent']}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            />
+            <View style={ach.cardBody}>
+              <View style={[ach.iconWrap, { borderColor: `${rc}50`, backgroundColor: `${rc}12` }]}>
+                <Text style={ach.iconText}>{ev.icon}</Text>
+              </View>
+              <View style={{ flex: 1, gap: 3 }}>
+                <Text style={[ach.achieveLabel, { color: rc }]}>{ev.label}</Text>
+                <Text style={ach.achieveDesc}>{ev.desc}</Text>
+                <View style={ach.achieveMeta}>
+                  {player && <NeonAvatar avatarId={player.avatarId ?? 1} size={16} />}
+                  <Text style={ach.achieveBy}>{player?.username ?? 'Player'} · {ev.timeAgo}</Text>
+                </View>
+              </View>
+              <View style={[ach.rarityPill, { borderColor: `${rc}40` }]}>
+                <Text style={[ach.rarityPillText, { color: rc }]}>{ev.rarity}</Text>
+              </View>
+            </View>
+            <View style={ach.xpRow}>
+              <Ionicons name="flash" size={10} color="#00ff88" />
+              <Text style={ach.xpText}>+{ev.xp.toLocaleString()} XP earned</Text>
+            </View>
+          </View>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+const ach = StyleSheet.create({
+  sectionTitle: {
+    color: colors.primary, fontSize: 12, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 3, marginBottom: 4,
+  },
+  rarityBtn:     { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+  rarityBtnAll:  { borderColor: `${colors.primary}60`, backgroundColor: `${colors.primary}15` },
+  rarityBtnText: { color: colors.textDim, fontSize: 11, fontWeight: '700', letterSpacing: 0.3 },
+  card: {
+    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
+    overflow: 'hidden', padding: 14, gap: 8,
+  },
+  cardBody:      { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconWrap:      { width: 48, height: 48, borderRadius: 24, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  iconText:      { fontSize: 22 },
+  achieveLabel:  { fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.4 },
+  achieveDesc:   { color: colors.textMuted, fontSize: 12, lineHeight: 16 },
+  achieveMeta:   { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
+  achieveBy:     { color: colors.textDim, fontSize: 10 },
+  rarityPill:    { borderWidth: 1, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, alignSelf: 'flex-start' },
+  rarityPillText:{ fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
+  xpRow:         { flexDirection: 'row', alignItems: 'center', gap: 4, paddingTop: 6, borderTopWidth: 1, borderTopColor: colors.border },
+  xpText:        { color: '#00ff88', fontSize: 11, fontWeight: '700' },
 });
 
 // ─── Leaderboard Section ─────────────────────────────────────────────────────
@@ -1071,11 +1395,12 @@ export default function FeedScreen() {
   const [myPosts, setMyPosts] = useState<MePost[]>(INITIAL_MY_POSTS);
   const [notifVisible, setNotifVisible] = useState(false);
   const { posts: aiPosts } = useAISocial();
+  const { isMuted, isBlocked } = useSocial();
 
   const filteredPosts = useCallback(() => {
-    if (activeTab === 'trending') return SOCIAL_POSTS;
-    return SOCIAL_POSTS.filter(p => p.tab === activeTab);
-  }, [activeTab]);
+    const base = activeTab === 'trending' ? SOCIAL_POSTS : SOCIAL_POSTS.filter(p => p.tab === activeTab);
+    return base.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
+  }, [activeTab, isMuted, isBlocked]);
 
   return (
     <View style={[ss.container, { backgroundColor: cls.background }]}>
@@ -1150,6 +1475,8 @@ export default function FeedScreen() {
           onDeletePost={(id) => setMyPosts(prev => prev.filter(p => p.id !== id))}
           bottomInset={insets.bottom}
         />
+      ) : activeTab === 'achievements' ? (
+        <AchievementSection bottomInset={insets.bottom} />
       ) : activeTab === 'leaderboard' ? (
         <LeaderboardSection bottomInset={insets.bottom} />
       ) : activeTab === 'search' ? (
