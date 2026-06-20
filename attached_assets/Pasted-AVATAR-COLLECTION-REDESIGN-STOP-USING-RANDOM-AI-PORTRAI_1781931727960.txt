@@ -1,0 +1,338 @@
+AVATAR COLLECTION REDESIGN — STOP USING RANDOM AI PORTRAITS
+
+The current face-card avatar collection is unacceptable.
+
+It looks random, inconsistent, and not theme-based. Several avatars look like fantasy RPG characters instead of casino playing-card avatars. This must be rebuilt from a strict visual system.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MAIN ISSUE
+
+The avatars currently look like unrelated AI images placed inside circles.
+
+Problems:
+
+• Not consistent with Chip Society’s neon casino identity
+• Too many random fantasy portraits
+• Some avatars look medieval instead of casino/poker themed
+• Some have white backgrounds or square card edges
+• Some names do not match the artwork clearly
+• Jacks and Kings do not feel like part of the same collection
+• Joker is overdesigned and does not match the rest
+• Razor Blade looks too plain compared to the premium avatar set
+• Royal Flush avatar is missing the Jack
+
+This needs to be fixed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STYLE LOCK
+
+All card avatars must look like they belong to the same premium casino avatar pack.
+
+Use this style:
+
+• Dark circular background
+• Neon edge lighting
+• Clean playing-card symbols
+• Minimal portrait detail
+• Strong suit identity
+• High contrast
+• Vaporwave casino polish
+• Black, cyan, pink, purple, red, gold, and green depending on suit
+• No random fantasy art
+• No medieval realism
+• No RPG armor
+• No unrelated characters
+
+The collection should feel like:
+
+“Luxury casino playing cards turned into neon profile emblems.”
+
+NOT:
+
+“Random fantasy character portraits.”
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FACE CARD DESIGN RULES
+
+Every card avatar must clearly show:
+
+• Rank letter
+• Suit symbol
+• Matching color palette
+• Clean card-inspired design
+• Circular composition
+• No white square backgrounds
+• No cropped card corners unless intentional and clean
+
+Do NOT use full realistic portraits.
+
+Do NOT use random armor characters.
+
+Do NOT use fantasy elves, knights, or RPG warriors.
+
+Use stylized playing-card royalty only.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SUIT COLOR SYSTEM
+
+Use consistent colors:
+
+SPADES:
+Black, silver, cyan
+
+HEARTS:
+Red, pink, gold
+
+DIAMONDS:
+Red, orange, gold
+
+CLUBS:
+Green, emerald, black
+
+JOKER:
+Purple, cyan, pink
+
+RAZOR BLADE:
+Silver, black, cyan, magenta reflection
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACES
+
+Aces should be symbol-first.
+
+Each Ace should show a large clean suit symbol and rank.
+
+Required:
+
+ACE OF SPADES
+A♠
+
+ACE OF HEARTS
+A♥
+
+ACE OF DIAMONDS
+A♦
+
+ACE OF CLUBS
+A♣
+
+No portraits.
+
+No characters.
+
+Just premium neon card-symbol emblems.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+KINGS
+
+Kings should be regal playing-card designs, not random portraits.
+
+Each King should look like a stylized casino card king emblem.
+
+Required:
+
+KING OF SPADES
+K♠
+Black, silver, cyan
+
+KING OF HEARTS
+K♥
+Red, pink, gold
+
+KING OF DIAMONDS
+K♦
+Red, orange, gold
+
+KING OF CLUBS
+K♣
+Green, emerald, black
+
+Keep them consistent.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUEENS
+
+Queens should be elegant playing-card royalty.
+
+Required:
+
+QUEEN OF SPADES
+Q♠
+
+QUEEN OF HEARTS
+Q♥
+
+QUEEN OF DIAMONDS
+Q♦
+
+QUEEN OF CLUBS
+Q♣
+
+No white backgrounds.
+
+No mismatched suits.
+
+No fantasy elf designs.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JACKS
+
+Jacks must NOT look like Jokers.
+
+Jacks should look like sleek casino court cards or card guards.
+
+Required:
+
+JACK OF SPADES
+J♠
+
+JACK OF HEARTS
+J♥
+
+JACK OF DIAMONDS
+J♦
+
+JACK OF CLUBS
+J♣
+
+No jester hats.
+
+No clown faces.
+
+No Joker makeup.
+
+No monster faces.
+
+No fantasy armor portraits.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JOKER
+
+Only the Joker avatar may look chaotic or jester-inspired.
+
+Create one clean premium Joker avatar.
+
+Style:
+
+• Neon jester
+• Purple, cyan, pink
+• Dark background
+• Casino villain energy
+• Clean readable design
+• Not overly cluttered
+
+Label:
+
+JOKER
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ROYAL FLUSH AVATAR FIX
+
+The Royal Flush avatar is incorrect.
+
+It is missing the Jack.
+
+Fix immediately.
+
+Royal Flush must show:
+
+A♠ K♠ Q♠ J♠ 10♠
+
+All cards must be spades.
+
+All five cards must be visible.
+
+Do not use mixed suits.
+
+Do not omit the Jack.
+
+Label:
+
+ROYAL FLUSH
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STRAIGHT FLUSH AVATAR FIX
+
+Straight Flush must show five cards of the same suit in sequence.
+
+Example:
+
+10♠ 9♠ 8♠ 7♠ 6♠
+
+or
+
+9♠ 8♠ 7♠ 6♠ 5♠
+
+All same suit.
+
+No mixed suits.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RAZOR BLADE AVATAR REDESIGN
+
+Redesign Razor Blade so it feels premium and sharp.
+
+Use:
+
+• Brushed steel razor blade
+• Black background
+• Cyan neon reflection
+• Magenta rim light
+• Centered composition
+• Larger blade
+• Realistic metal texture
+
+Do not make it look like a syringe.
+
+Do not make it look like a random rectangle.
+
+It must clearly read as a razor blade.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CROP RULES
+
+Every avatar must:
+
+• Fill the circular frame
+• Be centered
+• Have no white background
+• Have no square border
+• Be readable at small size
+• Match its label
+• Match its suit
+• Match Chip Society style
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VALIDATION
+
+Before finishing, review each avatar one by one.
+
+Confirm:
+
+• Correct rank
+• Correct suit
+• Correct name
+• Clean crop
+• No white background
+• No random fantasy portrait
+• No mismatched theme
+• No Joker-style Jack
+• Royal Flush includes A♠ K♠ Q♠ J♠ 10♠
+• Straight Flush uses same suit
+• Razor Blade looks like a razor blade
+
+The final result should look like one cohesive premium casino avatar collection, not a grid of random AI-generated images.

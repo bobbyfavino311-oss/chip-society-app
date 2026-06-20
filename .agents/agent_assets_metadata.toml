@@ -340,7 +340,7 @@ title = "generated_image"
 id = "2veItkrK399ZBWr5NN-Ta"
 uri = "file://artifacts/neon-river/assets/avatars/royal_flush.png"
 type = "image"
-title = "straight flush all spades"
+title = "royal flush five spades fan"
 
 [[generated]]
 id = "NQAzJdplG9Bf8GOqUaT7_"
@@ -538,109 +538,109 @@ title = "generated_image"
 id = "dF3PAlZcoLJUHQjGTycDe"
 uri = "file://artifacts/neon-river/assets/avatars/ace_spades.png"
 type = "image"
-title = "ace of spades symbol card"
+title = "ace spades neon emblem"
 
 [[generated]]
 id = "PDYz0FvwV8x-B84zRRh-z"
 uri = "file://artifacts/neon-river/assets/avatars/ace_hearts.png"
 type = "image"
-title = "ace of hearts symbol card"
+title = "ace hearts neon emblem"
 
 [[generated]]
 id = "LLhngLQnAkQli2PMo1E2Z"
 uri = "file://artifacts/neon-river/assets/avatars/ace_diamonds.png"
 type = "image"
-title = "ace of diamonds symbol card"
+title = "ace diamonds neon emblem"
 
 [[generated]]
 id = "u4hq5P-qnS4ddYHmQYUOy"
 uri = "file://artifacts/neon-river/assets/avatars/ace_clubs.png"
 type = "image"
-title = "ace of clubs symbol card"
+title = "ace clubs neon emblem"
 
 [[generated]]
 id = "3EqlGqTPrIzbyAJQJdpJc"
 uri = "file://artifacts/neon-river/assets/avatars/king_spades.png"
 type = "image"
-title = "king of spades royal portrait"
+title = "king spades card illustration"
 
 [[generated]]
 id = "cjrptiIXVmzQ7DrpGmswl"
 uri = "file://artifacts/neon-river/assets/avatars/king_hearts.png"
 type = "image"
-title = "king of hearts royal portrait"
+title = "king hearts card illustration"
 
 [[generated]]
 id = "rxIA7Wvte1nxUZPigyorl"
 uri = "file://artifacts/neon-river/assets/avatars/king_diamonds.png"
 type = "image"
-title = "king of diamonds royal portrait"
+title = "king diamonds card illustration"
 
 [[generated]]
 id = "5bzH8Fg31zpy3Zv8h39i_"
 uri = "file://artifacts/neon-river/assets/avatars/king_clubs.png"
 type = "image"
-title = "king of clubs royal portrait"
+title = "king clubs card illustration"
 
 [[generated]]
 id = "4tMKhix0VpCNPsv52jIQs"
 uri = "file://artifacts/neon-river/assets/avatars/queen_spades.png"
 type = "image"
-title = "queen of spades dark queen"
+title = "queen spades card illustration"
 
 [[generated]]
 id = "-U7_fWxvSCAlkUOURL8tZ"
 uri = "file://artifacts/neon-river/assets/avatars/queen_hearts.png"
 type = "image"
-title = "queen of hearts elegant queen"
+title = "queen hearts card illustration"
 
 [[generated]]
 id = "pKkalPjLrUdoSzPqUKcrK"
 uri = "file://artifacts/neon-river/assets/avatars/queen_diamonds.png"
 type = "image"
-title = "queen of diamonds luxury queen"
+title = "queen diamonds card illustration"
 
 [[generated]]
 id = "qfnsfFqDbqPaNSt3uiCbq"
 uri = "file://artifacts/neon-river/assets/avatars/queen_clubs.png"
 type = "image"
-title = "queen of clubs emerald queen"
+title = "queen clubs card illustration"
 
 [[generated]]
 id = "rm1stT49-nJR0Fqkr--PN"
 uri = "file://artifacts/neon-river/assets/avatars/jack_spades.png"
 type = "image"
-title = "jack of spades royal knight"
+title = "jack spades card illustration"
 
 [[generated]]
 id = "cLRzeo1SPupXhtIpPcYnJ"
 uri = "file://artifacts/neon-river/assets/avatars/jack_hearts.png"
 type = "image"
-title = "jack of hearts royal prince"
+title = "jack hearts card illustration"
 
 [[generated]]
 id = "bY_jQnX7PadtMlwjBKKN6"
 uri = "file://artifacts/neon-river/assets/avatars/jack_diamonds.png"
 type = "image"
-title = "jack of diamonds noble soldier"
+title = "jack diamonds card illustration"
 
 [[generated]]
 id = "c4kXIMLL5YvxaMJJCNeUx"
 uri = "file://artifacts/neon-river/assets/avatars/jack_clubs.png"
 type = "image"
-title = "jack of clubs emerald knight"
+title = "jack clubs card illustration"
 
 [[generated]]
 id = "DkxdejPMR_qv7hourxpQF"
 uri = "file://artifacts/neon-river/assets/avatars/joker.png"
 type = "image"
-title = "joker casino wild card jester"
+title = "joker jester neon wild card"
 
 [[generated]]
 id = "GNTkmFePD9X9FNqwC-Dle"
 uri = "file://artifacts/neon-river/assets/avatars/razor_blade.png"
 type = "image"
-title = "metallic razor blade premium"
+title = "razor blade brushed steel"
 
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
