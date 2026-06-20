@@ -61,6 +61,7 @@
     "@expo-google-fonts/orbitron": "^0.4.2",
     "@expo-google-fonts/pacifico": "^0.4.1",
     "@expo-google-fonts/righteous": "^0.4.1",
+    "expo-asset": "^56.0.17",
     "expo-av": "~15.0.2",
     "socket.io-client": "4.8.1"
   }

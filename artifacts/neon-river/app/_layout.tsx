@@ -9,14 +9,16 @@ import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
+import { Asset } from 'expo-asset';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import AVATAR_IMAGES from '@/constants/avatarImages';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { UserProvider, useUser } from '@/context/UserContext';
@@ -167,9 +169,19 @@ export default function RootLayout() {
     Righteous_400Regular,
   });
 
+  const [assetsReady, setAssetsReady] = useState(false);
+
   useEffect(() => {
-    if (fontsLoaded || fontError) SplashScreen.hideAsync();
-  }, [fontsLoaded, fontError]);
+    // Preload all avatar PNGs into the native image cache while the splash
+    // screen is still showing — first render of any NeonAvatar is instant.
+    Asset.loadAsync(Object.values(AVATAR_IMAGES))
+      .catch(() => { /* non-fatal — graceful fallback to on-demand decode */ })
+      .finally(() => setAssetsReady(true));
+  }, []);
+
+  useEffect(() => {
+    if ((fontsLoaded || fontError) && assetsReady) SplashScreen.hideAsync();
+  }, [fontsLoaded, fontError, assetsReady]);
 
   if (!fontsLoaded && !fontError) return null;
 
