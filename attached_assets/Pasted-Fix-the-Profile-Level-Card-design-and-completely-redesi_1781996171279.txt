@@ -1,0 +1,464 @@
+Fix the Profile Level Card design and completely redesign the Fortune Cookie system, including the addition of a new Mythic Cookie tier.
+
+⸻
+
+PROFILE LEVEL CARD REDESIGN
+
+CURRENT PROBLEM
+
+The profile level card currently feels oversized, bulky, and visually outdated.
+
+Issues:
+
+* Takes up too much vertical space.
+* Dominates the profile page.
+* Large fonts feel clunky.
+* The card lacks a premium casino appearance.
+* Does not fit the modern Miami Vice luxury aesthetic.
+
+The profile should feel elegant, exclusive, and high-end.
+
+⸻
+
+LEVEL CARD REDESIGN
+
+Reduce the card height by approximately 40%.
+
+Create a thinner luxury status card.
+
+Goals:
+
+* Modern
+* Minimal
+* Premium
+* Miami Vice inspired
+* Luxury casino atmosphere
+
+⸻
+
+LEVEL NUMBER
+
+Current display:
+
+13
+
+Requirements:
+
+* Reduce size by 25-35%.
+* Maintain prominence.
+* Increase spacing.
+* Use cleaner typography.
+* Thin modern font style.
+
+The number should feel prestigious rather than oversized.
+
+⸻
+
+RANK TITLE
+
+Current:
+
+LOCAL
+
+Requirements:
+
+* Reduce font size.
+* Increase letter spacing.
+* Use thin uppercase text.
+* Treat as secondary information.
+
+Example:
+
+13
+
+LOCAL
+
+⸻
+
+PROGRESS BAR
+
+Replace current progress bar.
+
+Requirements:
+
+* Thin horizontal luxury line.
+* 2-4 pixel height.
+* Rounded edges.
+* Smooth animation.
+* Premium appearance.
+
+Colors:
+
+* Cyan
+* Pink
+* Purple
+
+Use subtle glow only.
+
+Avoid arcade-style progress bars.
+
+⸻
+
+BORDER STYLING
+
+Current border feels flat.
+
+Replace with:
+
+* Thin neon outline.
+* Soft glow effect.
+* Rounded corners.
+* Elegant premium styling.
+
+Avoid thick borders.
+
+⸻
+
+PROGRESS LABEL
+
+Replace:
+
+TO LEVEL 14
+
+With one of:
+
+NEXT LEVEL
+
+31% COMPLETE
+
+LEVEL PROGRESS
+
+Keep wording clean and modern.
+
+⸻
+
+FORTUNE COOKIE SYSTEM REDESIGN
+
+CURRENT PROBLEM
+
+The Fortune Cookie reward economy is completely unbalanced.
+
+Examples:
+
+* Common cookies awarding rewards that belong in higher tiers.
+* Low-tier rewards occasionally exceeding high-tier rewards.
+* Cookie rarity does not properly reflect prize value.
+
+This damages:
+
+* Reward progression
+* Excitement
+* Fairness
+* Player trust
+* Long-term retention
+
+Higher rarity cookies must always provide higher value rewards.
+
+⸻
+
+NEW COOKIE TIER STRUCTURE
+
+COMMON
+
+UNCOMMON
+
+RARE
+
+EPIC
+
+LEGENDARY
+
+MYTHIC
+
+⸻
+
+COMMON COOKIE
+
+Drop Rate:
+
+60%
+
+Rewards:
+
+500 - 5,000 Chips
+
+1 Lottery Ticket
+
+Tiny XP rewards
+
+No cosmetics
+
+No jackpots
+
+No premium rewards
+
+⸻
+
+UNCOMMON COOKIE
+
+Drop Rate:
+
+25%
+
+Rewards:
+
+5,000 - 25,000 Chips
+
+1-3 Lottery Tickets
+
+Small XP rewards
+
+Tiny cosmetic chance
+
+⸻
+
+RARE COOKIE
+
+Drop Rate:
+
+10%
+
+Rewards:
+
+25,000 - 150,000 Chips
+
+3-5 Lottery Tickets
+
+Medium XP rewards
+
+Occasional profile cosmetics
+
+⸻
+
+EPIC COOKIE
+
+Drop Rate:
+
+4%
+
+Rewards:
+
+150,000 - 1,000,000 Chips
+
+5-15 Lottery Tickets
+
+Large XP rewards
+
+Premium profile cosmetics
+
+Exclusive emotes
+
+⸻
+
+LEGENDARY COOKIE
+
+Drop Rate:
+
+0.9%
+
+Rewards:
+
+1,000,000 - 10,000,000 Chips
+
+15-50 Lottery Tickets
+
+Exclusive profile cosmetics
+
+Premium collectibles
+
+Seasonal exclusives
+
+Rare profile rewards
+
+⸻
+
+MYTHIC COOKIE
+
+NEW HIGHEST TIER
+
+Drop Rate:
+
+0.1%
+
+Purpose:
+
+The ultimate Fortune Cookie reward.
+
+A Mythic Cookie should feel like winning a jackpot.
+
+Rewards:
+
+10,000,000 - 100,000,000 Chips
+
+50-250 Lottery Tickets
+
+Exclusive collectibles
+
+Animated profile frames
+
+Exclusive profile borders
+
+Unique social feed cosmetics
+
+Special profile titles
+
+Ultra rare seasonal items
+
+VIP-only visual effects
+
+Limited edition collectibles
+
+Future prestige rewards
+
+⸻
+
+MYTHIC PROFILE TITLES
+
+Examples:
+
+Lucky Dragon
+
+Fortune Master
+
+Vice Royalty
+
+Golden Tiger
+
+Dragon Emperor
+
+Neon Legend
+
+Cookie King
+
+These should only be obtainable from Mythic rewards.
+
+⸻
+
+REWARD RESTRICTIONS
+
+COMMON
+
+Cannot award:
+
+* Epic rewards
+* Legendary rewards
+* Mythic rewards
+
+UNCOMMON
+
+Cannot award:
+
+* Legendary rewards
+* Mythic rewards
+
+RARE
+
+Cannot award:
+
+* Mythic rewards
+
+EPIC
+
+Cannot exceed Legendary reward values.
+
+LEGENDARY
+
+Must always feel valuable.
+
+MYTHIC
+
+Must always feel extraordinary.
+
+⸻
+
+VISUAL TIER COLORS
+
+COMMON
+
+Silver
+
+UNCOMMON
+
+Emerald Green
+
+RARE
+
+Electric Blue
+
+EPIC
+
+Purple
+
+LEGENDARY
+
+Gold
+
+MYTHIC
+
+Pink + Gold
+
+Animated glow
+
+Special particle effects
+
+Players should instantly recognize rarity.
+
+⸻
+
+COOKIE OPENING EXPERIENCE
+
+MYTHIC cookies should have a unique opening animation.
+
+Requirements:
+
+* Separate sound effect
+* Gold and pink particle burst
+* Longer reveal sequence
+* Distinctive reward presentation
+* Premium celebration animation
+
+Players should immediately know they received something extremely rare.
+
+⸻
+
+STATISTICS
+
+Track:
+
+Common Opened
+
+Uncommon Opened
+
+Rare Opened
+
+Epic Opened
+
+Legendary Opened
+
+Mythic Opened
+
+Highest Cookie Tier Found
+
+Lifetime Cookie Rewards
+
+⸻
+
+FINAL REQUIREMENTS
+
+Verify:
+
+* Level card is significantly smaller.
+* Fonts are cleaner and more premium.
+* Borders are redesigned.
+* Progress bar feels luxurious.
+* Profile page feels less cluttered.
+* Mythic Cookie tier has been added.
+* Cookie rarity hierarchy is respected.
+* Common rewards remain common.
+* Legendary rewards remain rare.
+* Mythic rewards feel extraordinary.
+* Every cookie tier has a clear purpose.
+* Players are incentivized to chase Mythic Cookies long-term.
+* Fortune Cookies become one of the game’s major retention systems.
+
+The one thing I’d add beyond this is a global social feed announcement when someone pulls a Mythic Cookie. That creates instant FOMO and makes Mythic rewards feel like a server-wide event rather than just another prize.
