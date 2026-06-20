@@ -215,7 +215,7 @@ const TICKET_H = Math.round(TICKET_W * 0.9);
 
 export default function ScratchScreen() {
   const insets   = useSafeAreaInsets();
-  const { profile, useScratchTicket, addChips } = useUser();
+  const { profile, useScratchTicket, consumeScratchTickets, addChips } = useUser();
 
   const [theme]       = useState<TicketTheme>(() => THEMES[Math.floor(Math.random() * THEMES.length)]);
   const [ticket]      = useState(buildTicket);
@@ -265,6 +265,70 @@ export default function ScratchScreen() {
   const winPulse     = useRef(new Animated.Value(1)).current;
   const chipCount    = useRef(new Animated.Value(0)).current;
   const [displayChips, setDisplayChips] = useState(0);
+
+  // ── Bulk scratch state ────────────────────────────────────────────────────
+  type BulkPhase = 'idle' | 'animating' | 'summary';
+  interface BulkResult {
+    scratched: number; winners: number;
+    totalChips: number; bestWin: number; isLegendary: boolean;
+  }
+  const [bulkPhase,  setBulkPhase]  = useState<BulkPhase>('idle');
+  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
+  const [bulkFlash,  setBulkFlash]  = useState(0);          // ticking display number
+  const bulkCardScale = useRef(new Animated.Value(0)).current;
+  const bulkChipAnim  = useRef(new Animated.Value(0)).current;
+  const [bulkChipDisplay, setBulkChipDisplay] = useState(0);
+  const bulkIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const handleScratchBulk = useCallback(async (n: number) => {
+    const available = profile.scratchTickets;
+    const count = Math.min(n, available);
+    if (count <= 0) return;
+
+    setBulkPhase('animating');
+    setBulkFlash(0);
+    bulkChipAnim.setValue(0);
+    setBulkChipDisplay(0);
+
+    // Simulate all tickets instantly
+    let totalChips = 0, winners = 0, bestWin = 0;
+    for (let i = 0; i < count; i++) {
+      const t = buildTicket();
+      if (t.prize > 0) { winners++; totalChips += t.prize; bestWin = Math.max(bestWin, t.prize); }
+    }
+    const isLegendary = bestWin >= PRIZES[PRIZES.length - 1];
+
+    // Rapid flicker animation during animating phase
+    let elapsed = 0;
+    bulkIntervalRef.current = setInterval(() => {
+      elapsed += 80;
+      // Gradually approach real value — random within narrowing range
+      const progress = Math.min(elapsed / 1600, 1);
+      const noise = (1 - progress) * totalChips * 0.8;
+      setBulkFlash(Math.round(totalChips * progress + (Math.random() - 0.5) * noise));
+      if (elapsed >= 1600) {
+        if (bulkIntervalRef.current) clearInterval(bulkIntervalRef.current);
+      }
+    }, 80);
+
+    // After animation: award chips, consume tickets, show summary
+    setTimeout(async () => {
+      if (bulkIntervalRef.current) clearInterval(bulkIntervalRef.current);
+      if (totalChips > 0) await addChips(totalChips);
+      await consumeScratchTickets(count);
+      SoundEngine.claim();
+      const result: BulkResult = { scratched: count, winners, totalChips, bestWin, isLegendary };
+      setBulkResult(result);
+      bulkCardScale.setValue(0);
+      setBulkPhase('summary');
+      Animated.spring(bulkCardScale, { toValue: 1, tension: 55, friction: 7, useNativeDriver: false }).start();
+      // Count up chip display
+      bulkChipAnim.setValue(0);
+      Animated.timing(bulkChipAnim, { toValue: totalChips, duration: 1200, useNativeDriver: false }).start();
+      bulkChipAnim.addListener(({ value }) => setBulkChipDisplay(Math.round(value)));
+      if (isLegendary) void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }, 1800);
+  }, [profile.scratchTickets, addChips, consumeScratchTickets]);
 
   const won      = ticket.prize > 0;
   const canRevealAll = coverage >= 0.50;
@@ -524,6 +588,59 @@ export default function ScratchScreen() {
             <Text style={[st.ticketCount, { color: theme.accent }]}>×{profile.scratchTickets}</Text>
           </View>
         </View>
+
+        {/* ── Bulk scratch buttons (only when idle and has tickets) ─────────── */}
+        {bulkPhase === 'idle' && hasTickets && (
+          <View style={st.bulkRow}>
+            <View style={st.bulkInventory}>
+              <Text style={st.bulkInventoryIcon}>🎴</Text>
+              <Text style={st.bulkInventoryNum}>{profile.scratchTickets}</Text>
+              <Text style={st.bulkInventoryLbl}>AVAILABLE</Text>
+            </View>
+            <View style={st.bulkBtns}>
+              {profile.scratchTickets >= 10 && (
+                <TouchableOpacity
+                  style={[st.bulkBtn, { borderColor: '#00d4ff66', backgroundColor: '#00d4ff10' }]}
+                  onPress={() => handleScratchBulk(10)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[st.bulkBtnText, { color: '#00d4ff' }]}>SCRATCH 10</Text>
+                  <Text style={[st.bulkBtnSub, { color: '#00d4ff88' }]}>Quick open ×10</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={[st.bulkBtn, { borderColor: '#ff009066', backgroundColor: '#ff009010', flex: 1 }]}
+                onPress={() => handleScratchBulk(profile.scratchTickets)}
+                activeOpacity={0.8}
+              >
+                <Text style={[st.bulkBtnText, { color: '#ff0090' }]}>SCRATCH ALL</Text>
+                <Text style={[st.bulkBtnSub, { color: '#ff009088' }]}>Open all ×{profile.scratchTickets}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {/* ── Bulk animating overlay ──────────────────────────────────────────── */}
+        {bulkPhase === 'animating' && (
+          <View style={[st.ticketWrap, { height: TICKET_H + 80, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }]}>
+            <LinearGradient
+              colors={['#0a0030', '#050018', '#0a0030']}
+              style={StyleSheet.absoluteFill}
+            />
+            {/* Rapid flicker lines */}
+            {Array.from({ length: 6 }).map((_, i) => (
+              <View key={i} style={[st.bulkFlickerLine, { top: 20 + i * 38, opacity: 0.07 + (i % 2) * 0.04 }]} />
+            ))}
+            <Text style={st.bulkAnimTitle}>SCRATCHING TICKETS</Text>
+            <Text style={st.bulkAnimNum}>{formatChips(bulkFlash)}</Text>
+            <Text style={st.bulkAnimSub}>chips calculating…</Text>
+            <View style={st.bulkAnimDots}>
+              {[0,1,2,3,4].map(i => (
+                <View key={i} style={[st.bulkAnimDot, { backgroundColor: i % 2 === 0 ? '#00d4ff' : '#ff0090' }]} />
+              ))}
+            </View>
+          </View>
+        )}
 
         {/* Match progress banner */}
         {matchRevealCount > 0 && !done && (
@@ -811,6 +928,110 @@ export default function ScratchScreen() {
           </Animated.View>
         )}
 
+        {/* ── Bulk summary card ──────────────────────────────────────────────── */}
+        {bulkPhase === 'summary' && bulkResult && (
+          <Animated.View style={[st.bulkSummaryCard, { transform: [{ scale: bulkCardScale }] }]}>
+            <LinearGradient
+              colors={bulkResult.isLegendary
+                ? ['rgba(255,215,0,0.18)', 'rgba(255,215,0,0.04)']
+                : ['rgba(0,212,255,0.12)', 'rgba(0,212,255,0.02)']}
+              style={[StyleSheet.absoluteFill, { borderRadius: 20 }]}
+            />
+
+            {/* Title */}
+            <View style={st.bulkSummaryHeader}>
+              <Text style={st.bulkSummaryTitle}>LOTTERY RESULTS</Text>
+              {bulkResult.isLegendary && (
+                <View style={st.legendaryBadge}>
+                  <Text style={st.legendaryBadgeText}>🏆 LEGENDARY WIN</Text>
+                </View>
+              )}
+            </View>
+
+            {/* Stats grid */}
+            <View style={st.bulkStatsGrid}>
+              <View style={st.bulkStatBox}>
+                <Text style={st.bulkStatVal}>{bulkResult.scratched}</Text>
+                <Text style={st.bulkStatLbl}>TICKETS{'\n'}SCRATCHED</Text>
+              </View>
+              <View style={[st.bulkStatBox, st.bulkStatBoxMid]}>
+                <Text style={[st.bulkStatVal, { color: bulkResult.winners > 0 ? '#ffd700' : '#555' }]}>
+                  {bulkResult.winners}
+                </Text>
+                <Text style={st.bulkStatLbl}>WINNING{'\n'}TICKETS</Text>
+              </View>
+              <View style={st.bulkStatBox}>
+                <Text style={[st.bulkStatVal, { color: '#00ccaa', fontSize: bulkResult.bestWin >= 10000 ? 16 : 20 }]}>
+                  {formatChips(bulkResult.bestWin)}
+                </Text>
+                <Text style={st.bulkStatLbl}>BEST{'\n'}SINGLE WIN</Text>
+              </View>
+            </View>
+
+            {/* Main chip total */}
+            <View style={st.bulkChipTotal}>
+              <Text style={st.bulkChipLabel}>TOTAL CHIPS WON</Text>
+              <Text style={[st.bulkChipAmount, { color: bulkResult.totalChips > 0 ? '#ffd700' : '#333' }]}>
+                {bulkResult.totalChips > 0 ? `+${formatChips(bulkChipDisplay)}` : 'No wins this time'}
+              </Text>
+              {bulkResult.totalChips > 0 && (
+                <Text style={st.bulkChipSub}>Added to your balance</Text>
+              )}
+            </View>
+
+            {/* Social announcement for legendary win */}
+            {bulkResult.isLegendary && (
+              <View style={st.bulkAnnounce}>
+                <LinearGradient
+                  colors={['rgba(255,215,0,0.14)', 'rgba(255,215,0,0.06)']}
+                  style={StyleSheet.absoluteFill}
+                />
+                <Text style={st.bulkAnnounceIcon}>🌐</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={st.bulkAnnounceLbl}>GLOBAL ANNOUNCEMENT</Text>
+                  <Text style={st.bulkAnnounceText}>
+                    <Text style={{ color: '#ffd700' }}>{profile.username}</Text>
+                    {` scratched ${bulkResult.scratched} tickets and won a `}
+                    <Text style={{ color: '#ffd700' }}>Legendary Jackpot</Text>
+                    {` worth ${formatChips(bulkResult.bestWin)} chips!`}
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* Scratch more / done buttons */}
+            <View style={st.bulkSummaryActions}>
+              {profile.scratchTickets > 0 && (
+                <TouchableOpacity
+                  style={[st.bulkActionBtn, { borderColor: '#00d4ff44', backgroundColor: '#00d4ff0a' }]}
+                  onPress={() => {
+                    setBulkPhase('idle');
+                    setBulkResult(null);
+                    setBulkChipDisplay(0);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[st.bulkActionText, { color: '#00d4ff' }]}>
+                    SCRATCH MORE ({profile.scratchTickets} left)
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={[st.bulkActionBtn, { overflow: 'hidden' }]}
+                onPress={() => router.back()}
+                activeOpacity={0.85}
+              >
+                <LinearGradient
+                  colors={bulkResult.isLegendary ? ['#ffd700', '#ff9900'] : ['#bf5fff', '#7700ff']}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                />
+                <Text style={[st.bulkActionText, { color: '#050010', fontFamily: 'Orbitron_900Black' }]}>DONE</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        )}
+
         {!hasTickets && !done && (
           <View style={st.noTicketCard}>
             <Text style={st.noTicketEmoji}>🎴</Text>
@@ -922,4 +1143,121 @@ const st = StyleSheet.create({
   noTicketSub: { color: colors.textDim, fontSize: 12, textAlign: 'center' },
   wheelBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 12, overflow: 'hidden', paddingHorizontal: 20, paddingVertical: 12, marginTop: 8 },
   wheelBtnText: { color: '#fff', fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+
+  // ── Bulk scratch ──────────────────────────────────────────────────────────
+  bulkRow: { width: '100%', gap: 10 },
+  bulkInventory: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    paddingHorizontal: 14, paddingVertical: 8,
+  },
+  bulkInventoryIcon: { fontSize: 16 },
+  bulkInventoryNum:  { fontSize: 20, fontFamily: 'Inter_700Bold', color: '#fff', fontWeight: '900' },
+  bulkInventoryLbl:  { fontSize: 8,  fontFamily: 'Orbitron_400Regular', color: '#555', letterSpacing: 1.5, marginLeft: 2 },
+  bulkBtns:       { flexDirection: 'row', gap: 8 },
+  bulkBtn: {
+    flex: 1, borderRadius: 12, borderWidth: 1,
+    paddingVertical: 11, paddingHorizontal: 12,
+    alignItems: 'center', justifyContent: 'center', gap: 2,
+  },
+  bulkBtnText: { fontSize: 11, fontFamily: 'Orbitron_900Black', fontWeight: '900', letterSpacing: 1.5 },
+  bulkBtnSub:  { fontSize: 8,  fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5 },
+
+  bulkFlickerLine: { position: 'absolute', left: 0, right: 0, height: 1, backgroundColor: '#00d4ff' },
+  bulkAnimTitle: {
+    color: 'rgba(255,255,255,0.35)', fontSize: 9,
+    fontFamily: 'Orbitron_400Regular', letterSpacing: 3, marginBottom: 12,
+  },
+  bulkAnimNum: {
+    color: '#00d4ff', fontSize: 44, fontFamily: 'Inter_700Bold',
+    fontWeight: '900', letterSpacing: -1,
+  },
+  bulkAnimSub: {
+    color: 'rgba(0,212,255,0.4)', fontSize: 10,
+    fontFamily: 'Orbitron_400Regular', letterSpacing: 1, marginTop: 6,
+  },
+  bulkAnimDots: { flexDirection: 'row', gap: 6, marginTop: 20 },
+  bulkAnimDot:  { width: 8, height: 8, borderRadius: 4 },
+
+  bulkSummaryCard: {
+    width: '100%', borderRadius: 20, borderWidth: 1.5,
+    borderColor: 'rgba(0,212,255,0.25)',
+    backgroundColor: 'rgba(5,0,16,0.97)',
+    padding: 20, gap: 14, overflow: 'hidden',
+  },
+  bulkSummaryHeader: { alignItems: 'center', gap: 8 },
+  bulkSummaryTitle: {
+    color: '#fff', fontSize: 15, fontFamily: 'Orbitron_900Black',
+    fontWeight: '900', letterSpacing: 2,
+  },
+  legendaryBadge: {
+    borderRadius: 8, borderWidth: 1, borderColor: '#ffd70066',
+    backgroundColor: '#ffd70018', paddingHorizontal: 14, paddingVertical: 5,
+  },
+  legendaryBadgeText: {
+    color: '#ffd700', fontSize: 10, fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 1.5,
+  },
+  bulkStatsGrid: {
+    flexDirection: 'row',
+    borderRadius: 12, borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+    overflow: 'hidden',
+  },
+  bulkStatBox: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 14, gap: 4,
+  },
+  bulkStatBoxMid: {
+    borderLeftWidth: 1, borderRightWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+  },
+  bulkStatVal: {
+    color: '#fff', fontSize: 22, fontFamily: 'Inter_700Bold', fontWeight: '900',
+  },
+  bulkStatLbl: {
+    color: '#444', fontSize: 7, fontFamily: 'Orbitron_400Regular',
+    letterSpacing: 1, textAlign: 'center', lineHeight: 11,
+  },
+  bulkChipTotal: {
+    alignItems: 'center', gap: 4,
+    paddingVertical: 10,
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)',
+  },
+  bulkChipLabel: {
+    color: '#555', fontSize: 8, fontFamily: 'Orbitron_400Regular',
+    letterSpacing: 2,
+  },
+  bulkChipAmount: {
+    fontSize: 32, fontFamily: 'Inter_700Bold', fontWeight: '900', letterSpacing: -1,
+  },
+  bulkChipSub: {
+    color: 'rgba(255,255,255,0.25)', fontSize: 9,
+    fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5,
+  },
+  bulkAnnounce: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,215,0,0.30)',
+    paddingVertical: 10, paddingHorizontal: 12, overflow: 'hidden',
+  },
+  bulkAnnounceIcon: { fontSize: 18 },
+  bulkAnnounceLbl:  {
+    color: '#ffd700', fontSize: 7, fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 2, marginBottom: 3,
+  },
+  bulkAnnounceText: {
+    color: 'rgba(255,255,255,0.80)', fontSize: 10,
+    fontFamily: 'Orbitron_400Regular', letterSpacing: 0.3, lineHeight: 15,
+  },
+  bulkSummaryActions: { gap: 8 },
+  bulkActionBtn: {
+    borderRadius: 12, height: 46,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'transparent',
+  },
+  bulkActionText: {
+    fontSize: 12, fontFamily: 'Orbitron_700Bold',
+    fontWeight: '900', letterSpacing: 1.5,
+  },
 });

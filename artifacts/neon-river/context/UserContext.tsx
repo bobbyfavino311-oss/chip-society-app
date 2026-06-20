@@ -260,6 +260,7 @@ interface UserContextValue {
   awardRankedPoints: (delta: number) => Promise<void>;
   claimWheelSpin: (chips: number, tickets: number) => Promise<void>;
   useScratchTicket: () => Promise<boolean>;
+  consumeScratchTickets: (n: number) => Promise<void>;
   addScratchTickets: (n: number) => Promise<void>;
   completeTutorial: () => Promise<void>;
   registerAccount: (username: string, pin: string, email: string, avatarIndex: number) => Promise<{ success: boolean; error?: string }>;
@@ -510,6 +511,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, [profile, updateProfile]);
 
+  const consumeScratchTickets = useCallback(async (n: number) => {
+    await updateProfile({ scratchTickets: Math.max(0, profile.scratchTickets - n) });
+  }, [profile, updateProfile]);
+
   const addScratchTickets = useCallback(async (n: number) => {
     await updateProfile({ scratchTickets: profile.scratchTickets + n });
   }, [profile, updateProfile]);
@@ -746,7 +751,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       profile, updateProfile, addChips, removeChips, recordWin, recordLoss,
       recordTournamentResult,
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
-      awardRankedPoints, claimWheelSpin, useScratchTicket, addScratchTickets,
+      awardRankedPoints, claimWheelSpin, useScratchTicket, consumeScratchTickets, addScratchTickets,
       completeTutorial, registerAccount, signIn, signOut,
       changePin, forgotPin, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,

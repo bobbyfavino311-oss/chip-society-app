@@ -1,0 +1,237 @@
+Add a “Scratch All” feature to the Lottery Ticket system.
+
+CURRENT PROBLEM
+
+The current Lottery Ticket experience is too slow.
+
+Players must manually scratch every individual ticket.
+
+This becomes tedious when players accumulate large numbers of tickets from:
+
+* Fortune Cookies
+* Daily Rewards
+* Events
+* Tournaments
+* Achievements
+
+Players need a faster way to redeem multiple tickets.
+
+⸻
+
+NEW FEATURE
+
+Add a new button:
+
+SCRATCH ALL
+
+This button should appear on the Lottery Ticket screen.
+
+Placement:
+
+* Top right corner
+    or
+* Bottom center above ticket inventory
+
+The button should be clearly visible but not overpower the UI.
+
+⸻
+
+SCRATCH ALL FUNCTION
+
+When pressed:
+
+1. Reveal all tickets currently owned.
+2. Instantly calculate all rewards.
+3. Combine rewards into one total.
+4. Display a reward summary screen.
+5. Award all prizes at once.
+6. Save rewards server-side.
+
+The player should not need to scratch tickets one-by-one.
+
+⸻
+
+REWARD SUMMARY SCREEN
+
+After Scratch All is pressed:
+
+Display:
+
+LOTTERY RESULTS
+
+Tickets Scratched:
+125
+
+Total Chips Won:
+2,750,000
+
+Lottery Tickets Won:
+15
+
+XP Earned:
+5,000
+
+Special Rewards:
+2
+
+The player should immediately see everything they earned.
+
+⸻
+
+ANIMATION
+
+Do not simply make tickets disappear.
+
+Create a stylish reveal sequence.
+
+Suggested flow:
+
+1. Player taps SCRATCH ALL.
+2. Tickets rapidly scratch themselves.
+3. Reveal animation plays across all tickets.
+4. Prize totals begin counting upward.
+5. Final reward summary appears.
+
+Duration:
+
+2–4 seconds.
+
+The experience should feel exciting but efficient.
+
+⸻
+
+FAST SCRATCH MODE
+
+Add:
+
+FAST SCRATCH
+
+Option in settings.
+
+When enabled:
+
+* No ticket animations.
+* No scratching animation.
+* Instant reward summary.
+
+Useful for power users with hundreds of tickets.
+
+⸻
+
+MANUAL SCRATCH OPTION
+
+Do NOT remove manual scratching.
+
+Players should still be able to:
+
+* Scratch individual tickets.
+* Reveal prizes manually.
+* Enjoy the original experience.
+
+The new feature is an additional convenience option.
+
+⸻
+
+REWARD CONSOLIDATION
+
+If 100 tickets are scratched:
+
+Do NOT display 100 separate popups.
+
+Combine everything.
+
+Example:
+
+You Won
+
+3,250,000 Chips
+
++18 Lottery Tickets
+
++7,500 XP
+
++1 Rare Reward
+
+Single clean reward screen.
+
+⸻
+
+SERVER VALIDATION
+
+All Scratch All rewards must be processed server-side.
+
+Requirements:
+
+* Verify ticket count.
+* Verify prize generation.
+* Prevent duplicate rewards.
+* Prevent reward exploits.
+* Save results immediately.
+
+The player should never lose rewards due to connection issues.
+
+⸻
+
+UI IMPROVEMENTS
+
+Add ticket inventory display.
+
+Example:
+
+Tickets Available
+
+127
+
+Place this above the Scratch All button.
+
+This allows players to quickly understand how many tickets they have accumulated.
+
+⸻
+
+SPECIAL REWARD CELEBRATIONS
+
+If Scratch All reveals:
+
+* Rare reward
+* Epic reward
+* Legendary reward
+* Mythic reward
+
+Trigger a special celebration screen.
+
+Do not let rare rewards get buried inside large reward batches.
+
+⸻
+
+SOCIAL FEED INTEGRATION
+
+If a player wins:
+
+* Legendary reward
+* Mythic reward
+* Massive chip jackpot
+
+Create a social feed announcement.
+
+Example:
+
+officialbobbyf scratched 250 lottery tickets and won a Legendary Jackpot worth 10,000,000 chips.
+
+⸻
+
+FINAL REQUIREMENTS
+
+Verify:
+
+* Scratch All button exists.
+* Manual scratching still works.
+* Rewards combine correctly.
+* Reward totals are accurate.
+* Server validation is functioning.
+* No duplicate rewards occur.
+* Large ticket inventories can be redeemed quickly.
+* Rare rewards still feel special.
+* The experience remains stylish and premium.
+* Players can redeem hundreds of tickets in seconds.
+
+I’d also add a second button called “Scratch 10” next to Scratch All. Players often want to open a few tickets without burning their entire inventory, and “Scratch 10” becomes a useful middle ground between individual scratching and mass redemption.
