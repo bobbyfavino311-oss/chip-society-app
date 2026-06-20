@@ -530,12 +530,20 @@ function PrivateTableModal({ visible, onClose }: { visible: boolean; onClose: ()
 
   return (
     <Modal transparent visible animationType="fade" onRequestClose={onClose}>
-      <View style={pt.overlay}>
+      <Pressable style={pt.overlay} onPress={onClose}>
         <Animated.View style={[pt.card, { transform: [{ scale: scaleAnim }] }]}>
+          {/* Stop tap-through so tapping inside the card doesn't dismiss */}
+          <Pressable onPress={e => e.stopPropagation()}>
           <LinearGradient colors={['#14002e', '#07001a']} style={StyleSheet.absoluteFill} />
           <View style={[pt.topBar, { backgroundColor: '#ff0090' }]} />
 
-          <Text style={pt.heading}>PRIVATE TABLE</Text>
+          {/* Header row with close button */}
+          <View style={pt.headingRow}>
+            <Text style={pt.heading}>PRIVATE TABLE</Text>
+            <TouchableOpacity style={pt.xBtn} onPress={onClose} hitSlop={12}>
+              <Ionicons name="close" size={20} color="rgba(255,255,255,0.55)" />
+            </TouchableOpacity>
+          </View>
 
           {mode === 'menu' && (
             <>
@@ -578,9 +586,6 @@ function PrivateTableModal({ visible, onClose }: { visible: boolean; onClose: ()
                 ))}
               </View>
 
-              <TouchableOpacity style={pt.closeBtn} onPress={onClose}>
-                <Text style={pt.closeTxt}>Close</Text>
-              </TouchableOpacity>
             </>
           )}
 
@@ -618,8 +623,9 @@ function PrivateTableModal({ visible, onClose }: { visible: boolean; onClose: ()
               </TouchableOpacity>
             </>
           )}
+          </Pressable>
         </Animated.View>
-      </View>
+      </Pressable>
     </Modal>
   );
 }
@@ -628,7 +634,9 @@ const pt = StyleSheet.create({
   overlay:       { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   card:          { width: '100%', borderRadius: 22, borderWidth: 1, borderColor: '#ff009030', overflow: 'hidden', padding: 22, gap: 14 },
   topBar:        { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  heading:       { fontSize: 18, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2, color: '#fff', textAlign: 'center' },
+  headingRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  heading:       { fontSize: 18, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2, color: '#fff', flex: 1 },
+  xBtn:          { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' },
   sub:           { fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: -6 },
   bigBtn:        { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderColor: '#bf5fff40', borderRadius: 14, padding: 16, overflow: 'hidden' },
   bigBtnTitle:   { fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 1 },
