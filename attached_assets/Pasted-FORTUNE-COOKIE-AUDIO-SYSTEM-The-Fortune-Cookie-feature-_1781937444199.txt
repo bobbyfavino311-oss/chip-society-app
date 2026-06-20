@@ -1,0 +1,201 @@
+FORTUNE COOKIE 🥠 AUDIO SYSTEM
+
+The Fortune Cookie feature should not feel like a simple reward popup.
+
+Opening a cookie should feel like a premium casino event with satisfying audio feedback from start to finish.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE OPEN SOUND
+
+When the player taps OPEN COOKIE:
+
+Play a realistic fortune cookie cracking sound.
+
+Sound characteristics:
+
+• Crisp cookie snap
+• Crunching shell sound
+• Light cracking texture
+• Satisfying ASMR quality
+• Short and clean
+
+Avoid:
+
+• Cartoon crack sounds
+• Explosions
+• Generic button clicks
+
+The player should instantly feel like they physically cracked open a real fortune cookie.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE REVEAL SOUND
+
+After the cookie cracks:
+
+The fortune slip slowly rises.
+
+As it rises:
+
+Play a subtle magical sound.
+
+Examples:
+
+• Soft chime
+• Wind bell
+• Gentle sparkle sound
+• Rising shimmer effect
+
+The audio should build anticipation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REWARD REVEAL SOUND
+
+When the reward is revealed:
+
+Play a premium Asian-inspired reward sound.
+
+Style inspiration:
+
+• Chinese temple bell
+• Jade chime
+• Soft gong
+• Traditional casino luck sound
+• Ancient prosperity theme
+
+Audio should feel:
+
+• Lucky
+• Rewarding
+• Premium
+• Elegant
+
+NOT:
+
+• Slot machine jackpot sounds
+• Loud casino alarms
+• Cheap mobile game effects
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STANDARD COOKIE 🥠
+
+Reward Sound:
+
+Single soft bell
+
+Short prosperity chime
+
+Example feeling:
+
+"You received a small blessing."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GOLDEN COOKIE 🥠
+
+Reward Sound:
+
+Multiple layered chimes
+
+Small gong
+
+Gold sparkle effect
+
+Example feeling:
+
+"You found something special."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DRAGON COOKIE 🥠
+
+Reward Sound:
+
+Deep ceremonial gong
+
+Dragon roar ambience
+
+Large prosperity bell
+
+Gold coin sparkle layer
+
+Example feeling:
+
+"You discovered an ultra rare reward."
+
+This should immediately sound different from all other cookies.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REWARD RARITY AUDIO
+
+Common Reward
+
+• Soft bell
+
+Rare Reward
+
+• Bell + sparkle
+
+Epic Reward
+
+• Bell + gong + sparkle
+
+Legendary Reward
+
+• Full prosperity sound sequence
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AUDIO TIMING
+
+Tap Cookie
+
+CRACK
+
+0.5 seconds
+
+Fortune rises
+
+CHIME
+
+1 second
+
+Reward reveal
+
+PROSPERITY SOUND
+
+Result displayed
+
+This creates a complete audio journey.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SETTINGS MENU
+
+Add:
+
+Fortune Cookie Sounds
+
+ON / OFF
+
+Allow players to disable sounds if desired.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+The player should immediately recognize a Fortune Cookie reward sequence without looking at the screen.
+
+The combination of:
+
+🥠 Cookie Crack
+
+✨ Fortune Reveal Chime
+
+🏮 Prosperity Reward Sound
+
+should become one of the signature audio experiences of Chip Society and make opening cookies feel exciting every single time.
