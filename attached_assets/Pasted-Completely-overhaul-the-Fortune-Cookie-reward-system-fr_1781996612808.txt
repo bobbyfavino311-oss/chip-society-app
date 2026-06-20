@@ -1,0 +1,372 @@
+Completely overhaul the Fortune Cookie reward system from the ground up.
+
+The current cookie system is still incorrect and cannot be patched with small adjustments. It needs a full rebuild.
+
+CURRENT PROBLEM
+
+The Fortune Cookie system is not respecting tier value.
+
+Low-tier cookies are still giving rewards that are too valuable.
+
+The reward table appears to be mixed, shared, or incorrectly weighted across tiers.
+
+This breaks the entire reward economy.
+
+Problems to fix:
+
+* Common cookies are giving rewards that should only belong to higher tiers.
+* Low-tier cookies can sometimes feel better than rare cookies.
+* Rewards are not properly separated by tier.
+* The system does not feel fair, predictable, or trustworthy.
+* The prize values do not match rarity.
+* The reward logic needs to be rebuilt, not lightly adjusted.
+
+⸻
+
+CORE RULE
+
+Each cookie tier must have its own separate reward pool.
+
+Do not use one shared reward table.
+
+Do not allow low-tier cookies to pull from high-tier rewards.
+
+Do not allow random prize values outside the allowed range for that tier.
+
+Higher tier must always mean higher reward value.
+
+⸻
+
+COOKIE TIERS
+
+Create six cookie tiers:
+
+1. Common
+2. Uncommon
+3. Rare
+4. Epic
+5. Legendary
+6. Mythic
+
+⸻
+
+TIER DROP RATES
+
+Common:
+60%
+
+Uncommon:
+25%
+
+Rare:
+10%
+
+Epic:
+4%
+
+Legendary:
+0.9%
+
+Mythic:
+0.1%
+
+Total:
+100%
+
+⸻
+
+SEPARATE REWARD POOLS
+
+COMMON COOKIE
+
+Allowed rewards only:
+
+* 500 to 5,000 chips
+* 1 lottery ticket
+* Tiny XP reward
+
+Common cookies must NEVER award:
+
+* More than 5,000 chips
+* More than 1 lottery ticket
+* Cosmetics
+* Premium rewards
+* Rare rewards
+* Epic rewards
+* Legendary rewards
+* Mythic rewards
+
+⸻
+
+UNCOMMON COOKIE
+
+Allowed rewards only:
+
+* 5,000 to 25,000 chips
+* 1 to 3 lottery tickets
+* Small XP reward
+
+Uncommon cookies must NEVER award:
+
+* More than 25,000 chips
+* More than 3 lottery tickets
+* Legendary rewards
+* Mythic rewards
+* Jackpot rewards
+* Premium exclusive cosmetics
+
+⸻
+
+RARE COOKIE
+
+Allowed rewards only:
+
+* 25,000 to 150,000 chips
+* 3 to 5 lottery tickets
+* Medium XP reward
+* Small chance of basic profile cosmetic
+
+Rare cookies must NEVER award:
+
+* More than 150,000 chips
+* More than 5 lottery tickets
+* Mythic rewards
+* Ultra-rare cosmetics
+* Jackpot rewards
+
+⸻
+
+EPIC COOKIE
+
+Allowed rewards only:
+
+* 150,000 to 1,000,000 chips
+* 5 to 15 lottery tickets
+* Large XP reward
+* Premium profile cosmetic
+* Exclusive emote
+
+Epic cookies must NEVER award:
+
+* More than 1,000,000 chips
+* More than 15 lottery tickets
+* Mythic rewards
+* Ultra-rare jackpot rewards
+
+⸻
+
+LEGENDARY COOKIE
+
+Allowed rewards only:
+
+* 1,000,000 to 10,000,000 chips
+* 15 to 50 lottery tickets
+* Exclusive profile cosmetic
+* Premium collectible
+* Seasonal exclusive
+* Rare profile reward
+
+Legendary cookies must NEVER award:
+
+* More than 10,000,000 chips
+* More than 50 lottery tickets
+* Mythic-only titles
+* Mythic-only animated frames
+* Mythic-only collectibles
+
+⸻
+
+MYTHIC COOKIE
+
+Highest tier.
+
+Allowed rewards only:
+
+* 10,000,000 to 100,000,000 chips
+* 50 to 250 lottery tickets
+* Mythic-only collectible
+* Animated profile frame
+* Exclusive profile border
+* Unique social feed cosmetic
+* Special profile title
+* Ultra-rare seasonal item
+* VIP-only visual effect
+
+Mythic cookies must feel like a true jackpot.
+
+⸻
+
+REWARD LOGIC REQUIREMENTS
+
+The cookie opening logic must work in this exact order:
+
+1. Determine cookie tier.
+2. Load only that tier’s reward pool.
+3. Select reward type from that tier’s allowed rewards.
+4. Select reward amount inside that tier’s min/max range.
+5. Display reward.
+6. Grant reward to player account.
+7. Save reward server-side.
+8. Log the reward for testing.
+
+Never determine reward value before determining tier.
+
+Never use a global reward table.
+
+Never allow fallback rewards from another tier.
+
+Never use the same reward array for multiple tiers.
+
+⸻
+
+SERVER-SIDE VALIDATION
+
+All Fortune Cookie rewards must be validated server-side.
+
+The client should not be trusted to determine prize value.
+
+Server must check:
+
+* Cookie tier
+* Allowed chip range
+* Allowed ticket range
+* Allowed XP range
+* Allowed cosmetic reward pool
+* Player inventory
+* Reward history
+
+If a reward is outside the allowed tier range, reject it.
+
+⸻
+
+BUG PREVENTION
+
+Add hard caps per tier.
+
+Example:
+
+If cookieTier = Common:
+maxChips = 5000
+maxTickets = 1
+
+If cookieTier = Uncommon:
+maxChips = 25000
+maxTickets = 3
+
+If cookieTier = Rare:
+maxChips = 150000
+maxTickets = 5
+
+If cookieTier = Epic:
+maxChips = 1000000
+maxTickets = 15
+
+If cookieTier = Legendary:
+maxChips = 10000000
+maxTickets = 50
+
+If cookieTier = Mythic:
+maxChips = 100000000
+maxTickets = 250
+
+These caps must be enforced even if the UI, database, or reward config is wrong.
+
+⸻
+
+COOKIE UI REDESIGN
+
+The Fortune Cookie screen should clearly show that each tier has different value.
+
+Each cookie card should display:
+
+* Cookie tier name
+* Tier color
+* Drop chance
+* Possible chip range
+* Possible ticket range
+* Exclusive reward possibility if applicable
+
+Tier colors:
+
+Common:
+Silver / Gray
+
+Uncommon:
+Green
+
+Rare:
+Blue
+
+Epic:
+Purple
+
+Legendary:
+Gold
+
+Mythic:
+Pink + Gold with animated glow
+
+⸻
+
+MYTHIC COOKIE EXPERIENCE
+
+Add Mythic Cookie as the ultra-rare chase reward.
+
+Mythic should include:
+
+* Unique animation
+* Unique sound effect
+* Gold and pink particle burst
+* Longer reveal
+* Special reward screen
+* Social feed announcement
+
+Example social feed announcement:
+
+officialbobbyf just cracked a MYTHIC Fortune Cookie and won 50,000,000 chips.
+
+⸻
+
+TESTING REQUIREMENTS
+
+Run reward simulation tests.
+
+Test at least:
+
+* 1,000 Common cookies
+* 1,000 Uncommon cookies
+* 1,000 Rare cookies
+* 1,000 Epic cookies
+* 1,000 Legendary cookies
+* 1,000 Mythic cookies
+
+Verify:
+
+* No Common cookie exceeds 5,000 chips.
+* No Common cookie gives more than 1 ticket.
+* No Uncommon cookie exceeds 25,000 chips.
+* No Rare cookie exceeds 150,000 chips.
+* No Epic cookie exceeds 1,000,000 chips.
+* No Legendary cookie exceeds 10,000,000 chips.
+* No Mythic cookie exceeds 100,000,000 chips.
+* No tier pulls rewards from another tier.
+* All rewards save correctly to the player account.
+* UI reward display matches the actual granted reward.
+
+⸻
+
+FINAL REQUIREMENT
+
+Do not patch the existing Fortune Cookie logic.
+
+Rebuild the system with separate tier-based reward pools, strict reward caps, server-side validation, and full testing.
+
+The final result must feel fair, exciting, premium, and balanced.
+
+Low-tier cookies should feel small but useful.
+
+High-tier cookies should feel exciting.
+
+Legendary cookies should feel rare.
+
+Mythic cookies should feel unforgettable.

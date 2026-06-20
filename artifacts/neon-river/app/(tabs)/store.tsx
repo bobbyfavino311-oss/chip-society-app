@@ -115,7 +115,7 @@ function FortuneCookieSection() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [claiming, setClaiming] = useState(false);
 
-  const total = (profile.fortuneCookies ?? 0) + (profile.goldenCookies ?? 0) + (profile.dragonCookies ?? 0);
+  const total = (profile.commonCookies ?? 0) + (profile.uncommonCookies ?? 0) + (profile.rareCookies ?? 0) + (profile.epicCookies ?? 0) + (profile.legendaryCookies ?? 0) + (profile.mythicCookies ?? 0);
   const hasAny = total > 0;
   const canOpen = hasAny || canClaimFreeCookie;
 
@@ -174,9 +174,12 @@ function FortuneCookieSection() {
             </Text>
             {hasAny && (
               <View style={fc.typeRow}>
-                {(profile.fortuneCookies ?? 0) > 0 && <Text style={fc.typeTag}>🥠 Standard ×{profile.fortuneCookies}</Text>}
-                {(profile.goldenCookies ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#FFD700' }]}>🥠 Golden ×{profile.goldenCookies}</Text>}
-                {(profile.dragonCookies ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#C89B3C' }]}>🥠 Dragon ×{profile.dragonCookies}</Text>}
+                {(profile.commonCookies    ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#9CA3AF' }]}>🥠 Common ×{profile.commonCookies}</Text>}
+                {(profile.uncommonCookies  ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#22C55E' }]}>🥠 Uncommon ×{profile.uncommonCookies}</Text>}
+                {(profile.rareCookies      ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#60A5FA' }]}>🥠 Rare ×{profile.rareCookies}</Text>}
+                {(profile.epicCookies      ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#A855F7' }]}>🥠 Epic ×{profile.epicCookies}</Text>}
+                {(profile.legendaryCookies ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#F59E0B' }]}>🥠 Legendary ×{profile.legendaryCookies}</Text>}
+                {(profile.mythicCookies    ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#FF0090' }]}>🥠 Mythic ×{profile.mythicCookies}</Text>}
               </View>
             )}
             {/* Daily status — always visible inside the card */}

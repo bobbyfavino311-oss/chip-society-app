@@ -1,6 +1,13 @@
 /**
- * Fortune Cookie Bonus Screen
- * Premium casino-style animated fortune cookie reveal.
+ * Fortune Cookie — 6-tier reward system
+ *
+ * Architecture: Each tier has a SEPARATE reward pool with hard caps.
+ * No cross-tier fallback. No shared reward table. pickReward() reads
+ * only from the tier it receives. Hard caps enforce limits even if
+ * config is somehow wrong.
+ *
+ * Tier hierarchy: COMMON → UNCOMMON → RARE → EPIC → LEGENDARY → MYTHIC
+ * Drop rates:      60%       25%      10%    4%      0.9%        0.1%
  */
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -27,6 +34,7 @@ import Svg, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '@/context/UserContext';
+import type { CookieTier } from '@/context/UserContext';
 import { formatChips } from '@/utils/chipColor';
 import { SoundEngine } from '@/lib/soundEngine';
 
@@ -34,93 +42,169 @@ const { width: W } = Dimensions.get('window');
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type CookieType = 'standard' | 'golden' | 'dragon';
 type Phase = 'idle' | 'shaking' | 'cracked' | 'rising' | 'reveal';
-type RewardTier = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
+type RewardType = 'chips' | 'tickets' | 'xp';
 
 interface FortuneReward {
-  tier: RewardTier;
-  type: 'chips' | 'xp' | 'token';
+  type: RewardType;
   amount: number;
   label: string;
   color: string;
-  icon: string;
+  tier: CookieTier;
 }
 
-// ─── Content ──────────────────────────────────────────────────────────────────
+// ─── Tier Configuration — STRICT separate pools ───────────────────────────────
+
+interface TierCfg {
+  color: string;
+  label: string;
+  dropRate: string;
+  chipRange:   [number, number];
+  ticketRange: [number, number];
+  xpRange:     [number, number];
+  // Hard caps (enforced after random draw, BUG PREVENTION)
+  maxChips:   number;
+  maxTickets: number;
+}
+
+const TIER_CFG: Record<CookieTier, TierCfg> = {
+  common: {
+    color: '#9CA3AF', label: 'COMMON', dropRate: '60%',
+    chipRange:   [500,        5_000],
+    ticketRange: [1,          1],
+    xpRange:     [100,        500],
+    maxChips: 5_000, maxTickets: 1,
+  },
+  uncommon: {
+    color: '#22C55E', label: 'UNCOMMON', dropRate: '25%',
+    chipRange:   [5_000,      25_000],
+    ticketRange: [1,          3],
+    xpRange:     [500,        2_500],
+    maxChips: 25_000, maxTickets: 3,
+  },
+  rare: {
+    color: '#60A5FA', label: 'RARE', dropRate: '10%',
+    chipRange:   [25_000,     150_000],
+    ticketRange: [3,          5],
+    xpRange:     [2_500,      10_000],
+    maxChips: 150_000, maxTickets: 5,
+  },
+  epic: {
+    color: '#A855F7', label: 'EPIC', dropRate: '4%',
+    chipRange:   [150_000,    1_000_000],
+    ticketRange: [5,          15],
+    xpRange:     [10_000,     50_000],
+    maxChips: 1_000_000, maxTickets: 15,
+  },
+  legendary: {
+    color: '#F59E0B', label: 'LEGENDARY', dropRate: '0.9%',
+    chipRange:   [1_000_000,  10_000_000],
+    ticketRange: [15,         50],
+    xpRange:     [50_000,     250_000],
+    maxChips: 10_000_000, maxTickets: 50,
+  },
+  mythic: {
+    color: '#FF0090', label: 'MYTHIC', dropRate: '0.1%',
+    chipRange:   [10_000_000, 100_000_000],
+    ticketRange: [50,         250],
+    xpRange:     [250_000,    1_000_000],
+    maxChips: 100_000_000, maxTickets: 250,
+  },
+};
+
+// Ordered from highest to lowest for "best available" auto-select
+const TIER_ORDER: CookieTier[] = ['mythic', 'legendary', 'epic', 'rare', 'uncommon', 'common'];
+
+// ─── Reward picker — ONLY uses that tier's pool, enforces hard caps ────────────
+
+function pickReward(tier: CookieTier): FortuneReward {
+  const cfg = TIER_CFG[tier];
+  const color = cfg.color;
+
+  // Weight: 70% chips, 20% tickets, 10% XP
+  const roll = Math.random();
+
+  if (roll < 0.70) {
+    // ── Chips ──────────────────────────────────────────────────────────────
+    const [min, max] = cfg.chipRange;
+    const raw    = Math.round(min + Math.random() * (max - min));
+    const amount = Math.min(raw, cfg.maxChips); // hard cap
+    return { type: 'chips', amount, label: `+${formatChips(amount)} Chips`, color, tier };
+
+  } else if (roll < 0.90) {
+    // ── Lottery tickets ────────────────────────────────────────────────────
+    const [min, max] = cfg.ticketRange;
+    const raw    = Math.floor(min + Math.random() * (max - min + 1));
+    const amount = Math.min(raw, cfg.maxTickets); // hard cap
+    return { type: 'tickets', amount, label: `+${amount} Lottery Ticket${amount !== 1 ? 's' : ''}`, color, tier };
+
+  } else {
+    // ── XP ─────────────────────────────────────────────────────────────────
+    const [min, max] = cfg.xpRange;
+    const amount = Math.round(min + Math.random() * (max - min));
+    return { type: 'xp', amount, label: `+${amount.toLocaleString()} XP`, color, tier };
+  }
+}
+
+// ─── Fortune messages ─────────────────────────────────────────────────────────
 
 const FORTUNE_MESSAGES = [
   'Great wealth approaches.',
   'Luck favors the bold.',
   'A royal hand awaits.',
-  'The dragon smiles upon you.',
-  'A jackpot is in your future.',
-  'Your next hand may change everything.',
+  'The next hand may change everything.',
   'Prosperity is near.',
   'The cards are aligned.',
   'Fortune follows confidence.',
   'A lucky streak begins today.',
+  'The chips are in your favor.',
+  'Destiny smiles upon the patient.',
 ];
 
-const TIER_COLOR: Record<RewardTier, string> = {
-  COMMON:    '#9CA3AF',
-  RARE:      '#60A5FA',
-  EPIC:      '#A855F7',
-  LEGENDARY: '#F59E0B',
+const MYTHIC_MESSAGES = [
+  'The universe has chosen you.',
+  'This moment will be remembered.',
+  'Legends are born from moments like this.',
+  'Fortune has never been so generous.',
+  'The rarest reward. The greatest win.',
+];
+
+// ─── Cookie SVG palettes — one per tier ───────────────────────────────────────
+
+const COOKIE_PAL: Record<CookieTier, { body: string; dark: string; light: string; rim: string }> = {
+  common:    { body: '#C4813A', dark: '#7A4E1E', light: '#E8A458', rim: '#D4A017' },
+  uncommon:  { body: '#166534', dark: '#052e16', light: '#22C55E', rim: '#4ADE80' },
+  rare:      { body: '#1E40AF', dark: '#1e3a8a', light: '#60A5FA', rim: '#93C5FD' },
+  epic:      { body: '#6B21A8', dark: '#3b0764', light: '#A855F7', rim: '#C084FC' },
+  legendary: { body: '#D4A017', dark: '#8A6808', light: '#FFE06A', rim: '#FFF08A' },
+  mythic:    { body: '#831843', dark: '#3d0720', light: '#FF0090', rim: '#FFD700' },
 };
 
-const TIER_REWARDS: Record<RewardTier, FortuneReward[]> = {
-  COMMON: [
-    { tier:'COMMON',    type:'chips', amount:5_000,   label:'+5,000 Chips',   color:'#9CA3AF', icon:'💰' },
-    { tier:'COMMON',    type:'chips', amount:10_000,  label:'+10,000 Chips',  color:'#9CA3AF', icon:'💰' },
-    { tier:'COMMON',    type:'xp',   amount:250,     label:'+250 XP',        color:'#9CA3AF', icon:'⚡' },
-  ],
-  RARE: [
-    { tier:'RARE',      type:'chips', amount:25_000,  label:'+25,000 Chips',  color:'#60A5FA', icon:'💎' },
-    { tier:'RARE',      type:'chips', amount:50_000,  label:'+50,000 Chips',  color:'#60A5FA', icon:'💎' },
-    { tier:'RARE',      type:'xp',   amount:500,     label:'+500 XP',        color:'#60A5FA', icon:'⚡' },
-  ],
-  EPIC: [
-    { tier:'EPIC',      type:'chips', amount:100_000, label:'+100,000 Chips', color:'#A855F7', icon:'⭐' },
-    { tier:'EPIC',      type:'chips', amount:250_000, label:'+250,000 Chips', color:'#A855F7', icon:'⭐' },
-    { tier:'EPIC',      type:'xp',   amount:1_000,   label:'+1,000 XP',      color:'#A855F7', icon:'⚡' },
-  ],
-  LEGENDARY: [
-    { tier:'LEGENDARY', type:'chips', amount:500_000,   label:'+500,000 Chips',   color:'#F59E0B', icon:'👑' },
-    { tier:'LEGENDARY', type:'chips', amount:1_000_000, label:'+1,000,000 Chips', color:'#F59E0B', icon:'👑' },
-    { tier:'LEGENDARY', type:'chips', amount:2_500_000, label:'+2,500,000 Chips', color:'#F59E0B', icon:'👑' },
-    { tier:'LEGENDARY', type:'xp',   amount:5_000,     label:'+5,000 XP',        color:'#F59E0B', icon:'⚡' },
-  ],
+// ─── Particle configs ─────────────────────────────────────────────────────────
+
+const PARTICLE_COLORS: Record<CookieTier, string[]> = {
+  common:    ['#D4A017','#E8A458','#FFD700','#C4813A','#F0B020'],
+  uncommon:  ['#22C55E','#4ADE80','#16A34A','#86EFAC','#BBF7D0'],
+  rare:      ['#60A5FA','#93C5FD','#3B82F6','#BFDBFE','#2563EB'],
+  epic:      ['#A855F7','#C084FC','#7C3AED','#DDD6FE','#8B5CF6'],
+  legendary: ['#FFD700','#FFF08A','#F59E0B','#FBBF24','#FDE68A'],
+  mythic:    ['#FF0090','#FFD700','#FF69B4','#FFA500','#FF1493',
+              '#FFE000','#FF00CC','#FFAA00','#FF0066','#FFCC00',
+              '#FF0090','#FFD700','#FF69B4','#FFA500','#FF1493',
+              '#FFE000','#FF00CC','#FFAA00','#FF0066','#FFCC00'],
 };
 
-function pickReward(type: CookieType): FortuneReward {
-  const r = Math.random();
-  let tier: RewardTier;
-  if (type === 'dragon') {
-    tier = r < 0.60 ? 'EPIC' : 'LEGENDARY';
-  } else if (type === 'golden') {
-    tier = r < 0.50 ? 'RARE' : r < 0.90 ? 'EPIC' : 'LEGENDARY';
-  } else {
-    tier = r < 0.60 ? 'COMMON' : r < 0.90 ? 'RARE' : r < 0.99 ? 'EPIC' : 'LEGENDARY';
-  }
-  const pool = TIER_REWARDS[tier];
-  return pool[Math.floor(Math.random() * pool.length)];
-}
+const N_PARTICLES_NORMAL = 10;
+const N_PARTICLES_MYTHIC  = 20;
+const PARTICLE_SIZES = [7, 5, 9, 6, 8, 5, 7, 6, 9, 5, 8, 6, 7, 5, 9, 6, 8, 5, 7, 6];
 
-// ─── Cookie SVG palette ───────────────────────────────────────────────────────
+// ─── Cookie SVG ───────────────────────────────────────────────────────────────
 
-const COOKIE_PAL = {
-  standard: { body: '#C4813A', dark: '#7A4E1E', light: '#E8A458', rim: '#D4A017' },
-  golden:   { body: '#D4A017', dark: '#8A6808', light: '#FFE06A', rim: '#FFF08A' },
-  dragon:   { body: '#8B1800', dark: '#4A0800', light: '#C44A1A', rim: '#D4A017' },
-};
-
-// ─── Cookie SVG (whole) ───────────────────────────────────────────────────────
-function CookieSvg({ type, viewBoxX = 0, viewBoxW = 120, width = 180, height = 120 }: {
-  type: CookieType; viewBoxX?: number; viewBoxW?: number; width?: number; height?: number;
+function CookieSvg({ tier, viewBoxX = 0, viewBoxW = 120, width = 180, height = 120 }: {
+  tier: CookieTier; viewBoxX?: number; viewBoxW?: number; width?: number; height?: number;
 }) {
-  const c = COOKIE_PAL[type];
-  const gid = `cg_${type}_${viewBoxX}`;
+  const c = COOKIE_PAL[tier];
+  const gid = `cg_${tier}_${viewBoxX}`;
   return (
     <Svg width={width} height={height} viewBox={`${viewBoxX} 0 ${viewBoxW} 80`}>
       <Defs>
@@ -130,76 +214,98 @@ function CookieSvg({ type, viewBoxX = 0, viewBoxW = 120, width = 180, height = 1
           <Stop offset="100%" stopColor={c.dark}  />
         </SvgGrad>
       </Defs>
-      {/* Main body */}
       <Path d="M 10 42 Q 60 4 110 42 Q 88 72 60 74 Q 32 72 10 42 Z" fill={`url(#${gid})`} />
-      {/* Top rim */}
       <Path d="M 10 42 Q 60 4 110 42" stroke={c.rim} strokeWidth="2.5" fill="none" strokeOpacity="0.75" />
-      {/* Horizontal fold */}
       <Path d="M 10 42 Q 60 50 110 42" stroke={c.dark} strokeWidth="2" fill="none" strokeOpacity="0.55" />
-      {/* Vertical crease */}
       <Path d="M 60 4 Q 57 38 60 74" stroke={c.dark} strokeWidth="1.4" fill="none" strokeOpacity="0.30" />
       <Path d="M 60 4 Q 63 38 60 74" stroke={c.dark} strokeWidth="1.4" fill="none" strokeOpacity="0.30" />
-      {/* Dragon: gold medallion */}
-      {type === 'dragon' && (
+
+      {/* Tier-specific embellishments */}
+      {tier === 'mythic' && (
         <G>
-          <Circle cx={60} cy={37} r={9}  stroke="#D4A017" strokeWidth="1.5" fill="none" strokeOpacity="0.80" />
-          <Circle cx={60} cy={37} r={3}  fill="#D4A017" fillOpacity="0.55" />
+          <Circle cx={60} cy={37} r={9}  stroke="#FFD700" strokeWidth="2" fill="none" strokeOpacity="0.90" />
+          <Circle cx={60} cy={37} r={4}  fill="#FF0090" fillOpacity="0.70" />
+          <Circle cx={60} cy={37} r={2}  fill="#FFD700" fillOpacity="0.90" />
         </G>
       )}
-      {/* Golden: sparkle dots */}
-      {type === 'golden' && (
+      {tier === 'legendary' && (
         <G>
           <Ellipse cx={60} cy={26} rx={5} ry={3}  fill="#FFF08A" fillOpacity="0.65" />
           <Circle cx={44} cy={46} r={2.5} fill="#FFF08A" fillOpacity="0.45" />
           <Circle cx={76} cy={46} r={2.5} fill="#FFF08A" fillOpacity="0.45" />
         </G>
       )}
+      {tier === 'epic' && (
+        <G>
+          <Circle cx={60} cy={35} r={7} stroke="#C084FC" strokeWidth="1.5" fill="none" strokeOpacity="0.75" />
+          <Circle cx={60} cy={35} r={2.5} fill="#A855F7" fillOpacity="0.60" />
+        </G>
+      )}
+      {tier === 'rare' && (
+        <G>
+          <Circle cx={60} cy={36} r={6} stroke="#93C5FD" strokeWidth="1.5" fill="none" strokeOpacity="0.70" />
+          <Ellipse cx={60} cy={26} rx={4} ry={2.5} fill="#BFDBFE" fillOpacity="0.50" />
+        </G>
+      )}
+      {tier === 'uncommon' && (
+        <G>
+          <Ellipse cx={60} cy={28} rx={4} ry={2.5} fill="#86EFAC" fillOpacity="0.55" />
+          <Circle cx={46} cy={46} r={2} fill="#4ADE80" fillOpacity="0.45" />
+          <Circle cx={74} cy={46} r={2} fill="#4ADE80" fillOpacity="0.45" />
+        </G>
+      )}
     </Svg>
   );
 }
 
-// ─── Gold particle burst ──────────────────────────────────────────────────────
-const N_PARTICLES = 10;
-const PARTICLE_COLORS_STD = ['#D4A017','#E8A458','#FFD700','#FF6600','#C4813A'];
-const PARTICLE_COLORS_GLD = ['#FFD700','#FFF08A','#FFEE55','#FFB800','#FFFACD'];
-const PARTICLE_COLORS_DRG = ['#D4A017','#FF2200','#FF6600','#CC0000','#FFD700'];
-const PARTICLE_SIZES = [7, 5, 9, 6, 8, 5, 7, 6, 9, 5];
+// ─── Background colors per tier ───────────────────────────────────────────────
+
+const TIER_BG: Record<CookieTier, readonly [string, string, string]> = {
+  common:    ['#1A0600', '#0D0400', '#060200'],
+  uncommon:  ['#021A0A', '#010D05', '#000602'],
+  rare:      ['#00061A', '#00030D', '#000206'],
+  epic:      ['#0D001A', '#06000D', '#030006'],
+  legendary: ['#1A0E00', '#0D0800', '#050300'],
+  mythic:    ['#1A0010', '#0D0008', '#060004'],
+};
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
+
 export default function FortuneCookieScreen() {
   const insets = useSafeAreaInsets();
   const {
-    profile, addChips, addXP, consumeFortuneCookie,
-    canClaimFreeCookie, claimFreeCookie, addFortuneCookies,
+    profile, addChips, addXP, addScratchTickets,
+    consumeFortuneCookie, canClaimFreeCookie, claimFreeCookie,
   } = useUser();
 
-  // Determine best cookie type
-  const bestType: CookieType = profile.dragonCookies > 0 ? 'dragon'
-    : profile.goldenCookies > 0 ? 'golden'
-    : 'standard';
+  // ── Cookie inventory totals ────────────────────────────────────────────────
+  const inv: Record<CookieTier, number> = {
+    common:    profile.commonCookies    ?? 0,
+    uncommon:  profile.uncommonCookies  ?? 0,
+    rare:      profile.rareCookies      ?? 0,
+    epic:      profile.epicCookies      ?? 0,
+    legendary: profile.legendaryCookies ?? 0,
+    mythic:    profile.mythicCookies    ?? 0,
+  };
+  const totalCookies = Object.values(inv).reduce((s, n) => s + n, 0);
+  const hasCookies   = totalCookies > 0;
 
-  const hasCookies = profile.fortuneCookies > 0
-    || profile.goldenCookies > 0
-    || profile.dragonCookies > 0;
+  // Best available tier = highest non-zero tier (or 'common' as fallback)
+  const bestTier: CookieTier = TIER_ORDER.find(t => inv[t] > 0) ?? 'common';
 
-  const [cookieType, setCookieType]   = useState<CookieType>(bestType);
-  const [phase,      setPhase]        = useState<Phase>('idle');
-  const [reward,     setReward]       = useState<FortuneReward | null>(null);
-  const [fortuneMsg, setFortuneMsg]   = useState('');
+  const [cookieTier, setCookieTier] = useState<CookieTier>(bestTier);
+  const [phase,      setPhase]      = useState<Phase>('idle');
+  const [reward,     setReward]     = useState<FortuneReward | null>(null);
+  const [fortuneMsg, setFortuneMsg] = useState('');
 
-  // Auto-switch to best available type when selected type is depleted
+  // Auto-switch to best when selected tier runs out
   useEffect(() => {
     if (phase !== 'idle') return;
-    const hasCurrent = cookieType === 'dragon' ? profile.dragonCookies > 0
-      : cookieType === 'golden' ? profile.goldenCookies > 0
-      : profile.fortuneCookies > 0;
-    if (!hasCurrent) {
-      const next: CookieType = profile.dragonCookies > 0 ? 'dragon'
-        : profile.goldenCookies > 0 ? 'golden'
-        : 'standard';
-      setCookieType(next);
+    if (inv[cookieTier] <= 0) {
+      const next = TIER_ORDER.find(t => inv[t] > 0) ?? 'common';
+      setCookieTier(next);
     }
-  }, [profile.fortuneCookies, profile.goldenCookies, profile.dragonCookies, phase, cookieType]);
+  }, [inv.common, inv.uncommon, inv.rare, inv.epic, inv.legendary, inv.mythic, phase, cookieTier]);
 
   // ── Animations ──────────────────────────────────────────────────────────────
   const shakeX       = useRef(new Animated.Value(0)).current;
@@ -215,11 +321,14 @@ export default function FortuneCookieScreen() {
   const cardY        = useRef(new Animated.Value(60)).current;
   const cardOp       = useRef(new Animated.Value(0)).current;
   const rewardScale  = useRef(new Animated.Value(0)).current;
+  const mythicGlow   = useRef(new Animated.Value(0)).current;
+  const announceBannerOp = useRef(new Animated.Value(0)).current;
 
+  // Particle pool — always allocate maximum (mythic size = 20)
   const particles = useRef(
-    Array.from({ length: N_PARTICLES }, () => ({
-      x: new Animated.Value(0),
-      y: new Animated.Value(0),
+    Array.from({ length: N_PARTICLES_MYTHIC }, () => ({
+      x:  new Animated.Value(0),
+      y:  new Animated.Value(0),
       op: new Animated.Value(0),
     }))
   ).current;
@@ -235,77 +344,105 @@ export default function FortuneCookieScreen() {
     return () => loop.stop();
   }, [phase]);
 
+  // Mythic glow pulse (runs when MYTHIC is selected in idle)
+  useEffect(() => {
+    if (phase !== 'idle' || cookieTier !== 'mythic') return;
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(mythicGlow, { toValue: 1, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+      Animated.timing(mythicGlow, { toValue: 0, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+    ]));
+    loop.start();
+    return () => { loop.stop(); mythicGlow.setValue(0); };
+  }, [phase, cookieTier]);
+
   const handleOpen = useCallback(async () => {
     if (phase !== 'idle') return;
 
-    // Claim daily if available
-    if (canClaimFreeCookie) await claimFreeCookie();
+    let tierToOpen = cookieTier;
 
-    // Use the player's selected cookie type
-    const type = cookieType;
+    // Claim daily if no cookies in inventory — auto-open the claimed tier
+    if (canClaimFreeCookie && !hasCookies) {
+      const claimed = await claimFreeCookie();
+      if (claimed) {
+        tierToOpen = claimed;
+        setCookieTier(claimed);
+      }
+    } else if (canClaimFreeCookie) {
+      // Has cookies already — just claim the daily (adds to inventory silently)
+      await claimFreeCookie();
+    }
 
-    const ok = await consumeFortuneCookie(type);
+    // Consume one cookie of the selected tier
+    const ok = await consumeFortuneCookie(tierToOpen);
     if (!ok) return;
 
-    const picked = pickReward(type);
-    const msg    = FORTUNE_MESSAGES[Math.floor(Math.random() * FORTUNE_MESSAGES.length)];
-    setCookieType(type);
+    // Pick reward STRICTLY from this tier's pool
+    const picked = pickReward(tierToOpen);
+    const isMythic = tierToOpen === 'mythic';
+    const msgs = isMythic ? MYTHIC_MESSAGES : FORTUNE_MESSAGES;
+    const msg  = msgs[Math.floor(Math.random() * msgs.length)];
+
     setReward(picked);
     setFortuneMsg(msg);
 
-    // Apply reward immediately
-    if (picked.type === 'chips') await addChips(picked.amount);
-    if (picked.type === 'xp')    await addXP(picked.amount);
+    // Apply reward immediately (server-side validation would go here in production)
+    if (picked.type === 'chips')   await addChips(picked.amount);
+    if (picked.type === 'xp')      await addXP(picked.amount);
+    if (picked.type === 'tickets') await addScratchTickets(picked.amount);
 
-    // Phase: shake
+    // ── Phase: SHAKE ──────────────────────────────────────────────────────
     setPhase('shaking');
     breatheScale.setValue(1);
+    mythicGlow.setValue(0);
 
-    const shakeSeq = Array.from({ length: 5 }, (_, i) => [
-      Animated.timing(shakeX, { toValue: i % 2 === 0 ? 9 : -9, duration: 48, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: 0,                     duration: 48, useNativeDriver: true }),
+    const shakeCount = isMythic ? 8 : 5;
+    const shakeSeq = Array.from({ length: shakeCount }, (_, i) => [
+      Animated.timing(shakeX, { toValue: i % 2 === 0 ? 11 : -11, duration: 44, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 0,                       duration: 44, useNativeDriver: true }),
     ]).flat();
 
     Animated.sequence([
       ...shakeSeq,
-      Animated.timing(cookieScale, { toValue: 1.18, duration: 90, useNativeDriver: true }),
+      Animated.timing(cookieScale, { toValue: 1.22, duration: 90, useNativeDriver: true }),
     ]).start(() => {
-      // Phase: cracked — 🥠 CRACK SOUND
+      // ── Phase: CRACKED ────────────────────────────────────────────────
       setPhase('cracked');
-      SoundEngine.cookieCrack(type);
+      SoundEngine.cookieCrack(tierToOpen);
       cookieScale.setValue(1);
 
       // Flash
       Animated.sequence([
-        Animated.timing(flashOp, { toValue: 0.90, duration: 110, useNativeDriver: true }),
-        Animated.timing(flashOp, { toValue: 0,    duration: 260, useNativeDriver: true }),
+        Animated.timing(flashOp, { toValue: isMythic ? 1.0 : 0.90, duration: isMythic ? 150 : 110, useNativeDriver: true }),
+        Animated.timing(flashOp, { toValue: 0, duration: isMythic ? 400 : 260, useNativeDriver: true }),
       ]).start();
 
-      // Halves spring apart
+      // Cookie halves spring apart
       Animated.parallel([
-        Animated.spring(leftX,   { toValue: -80,  friction: 4, tension: 90, useNativeDriver: true }),
-        Animated.spring(leftRot, { toValue: -1,   friction: 4, tension: 90, useNativeDriver: true }),
-        Animated.spring(rightX,  { toValue:  80,  friction: 4, tension: 90, useNativeDriver: true }),
-        Animated.spring(rightRot,{ toValue:  1,   friction: 4, tension: 90, useNativeDriver: true }),
+        Animated.spring(leftX,    { toValue: -80, friction: 4, tension: 90, useNativeDriver: true }),
+        Animated.spring(leftRot,  { toValue: -1,  friction: 4, tension: 90, useNativeDriver: true }),
+        Animated.spring(rightX,   { toValue:  80, friction: 4, tension: 90, useNativeDriver: true }),
+        Animated.spring(rightRot, { toValue:  1,  friction: 4, tension: 90, useNativeDriver: true }),
       ]).start();
 
-      // Particles burst
-      const pCols = type === 'golden' ? PARTICLE_COLORS_GLD
-        : type === 'dragon' ? PARTICLE_COLORS_DRG
-        : PARTICLE_COLORS_STD;
-      particles.forEach((p, i) => {
-        const angle = (i * 36 * Math.PI) / 180;
-        const dist  = 55 + Math.random() * 35;
+      // Particle burst
+      const pColors = PARTICLE_COLORS[tierToOpen];
+      const nParticles = isMythic ? N_PARTICLES_MYTHIC : N_PARTICLES_NORMAL;
+      const burstDist  = isMythic ? 80 : 55;
+
+      particles.slice(0, nParticles).forEach((p, i) => {
+        const angle = (i * (360 / nParticles) * Math.PI) / 180;
+        const dist  = burstDist + Math.random() * (isMythic ? 50 : 35);
         p.x.setValue(0); p.y.setValue(0); p.op.setValue(0);
         Animated.parallel([
           Animated.timing(p.op, { toValue: 1, duration: 80, useNativeDriver: true }),
-          Animated.timing(p.x,  { toValue: Math.cos(angle) * dist, duration: 620, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-          Animated.timing(p.y,  { toValue: Math.sin(angle) * dist, duration: 620, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-          Animated.timing(p.op, { toValue: 0, duration: 500, delay: 180, useNativeDriver: true }),
+          Animated.timing(p.x,  { toValue: Math.cos(angle) * dist, duration: isMythic ? 820 : 620, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+          Animated.timing(p.y,  { toValue: Math.sin(angle) * dist, duration: isMythic ? 820 : 620, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+          Animated.timing(p.op, { toValue: 0, duration: isMythic ? 650 : 500, delay: isMythic ? 220 : 180, useNativeDriver: true }),
         ]).start();
       });
 
-      // Phase: fortune slip rises — ✨ RISE CHIME
+      // ── Phase: RISING fortune slip ─────────────────────────────────────
+      const riseDelay = isMythic ? 500 : 380;
       setTimeout(() => {
         setPhase('rising');
         SoundEngine.fortuneRise();
@@ -314,40 +451,39 @@ export default function FortuneCookieScreen() {
           Animated.timing(slipY,  { toValue: 0, duration: 450, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
           Animated.timing(slipOp, { toValue: 1, duration: 320, useNativeDriver: true }),
         ]).start(() => {
-          // Phase: reveal reward card — 🏮 PROSPERITY REWARD SOUND
+          // ── Phase: REVEAL reward card ────────────────────────────────
+          const revealDelay = isMythic ? 500 : 320;
           setTimeout(() => {
             setPhase('reveal');
-            SoundEngine.fortuneReward(picked.tier);
+            SoundEngine.fortuneReward(tierToOpen.toUpperCase() as any);
             cardY.setValue(50); cardOp.setValue(0); rewardScale.setValue(0);
             Animated.parallel([
               Animated.timing(cardY,  { toValue: 0, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
               Animated.timing(cardOp, { toValue: 1, duration: 280, useNativeDriver: true }),
               Animated.spring(rewardScale, { toValue: 1, friction: 5, tension: 90, delay: 200, useNativeDriver: true }),
-            ]).start();
-          }, 320);
+            ]).start(() => {
+              if (isMythic) {
+                // MYTHIC social announcement banner fade-in
+                Animated.timing(announceBannerOp, { toValue: 1, duration: 600, delay: 400, useNativeDriver: true }).start();
+              }
+            });
+          }, revealDelay);
         });
-      }, 380);
+      }, riseDelay);
     });
-  }, [phase, profile, canClaimFreeCookie]);
+  }, [phase, cookieTier, hasCookies, canClaimFreeCookie, profile]);
 
-  const leftRotDeg = leftRot.interpolate({ inputRange: [-1, 0, 1], outputRange: ['-32deg', '0deg', '32deg'] });
-  const rightRotDeg = rightRot.interpolate({ inputRange: [-1, 0, 1], outputRange: ['-32deg', '0deg', '32deg'] });
+  const leftRotDeg  = leftRot.interpolate({ inputRange: [-1,0,1], outputRange: ['-32deg','0deg','32deg'] });
+  const rightRotDeg = rightRot.interpolate({ inputRange: [-1,0,1], outputRange: ['-32deg','0deg','32deg'] });
 
-  const pColors = cookieType === 'golden' ? PARTICLE_COLORS_GLD
-    : cookieType === 'dragon' ? PARTICLE_COLORS_DRG
-    : PARTICLE_COLORS_STD;
+  const cfg        = TIER_CFG[cookieTier];
+  const pColors    = PARTICLE_COLORS[cookieTier];
+  const bgColors   = TIER_BG[cookieTier];
+  const glowColor  = cfg.color;
+  const isMythicSelected = cookieTier === 'mythic';
 
-  const bgColors = cookieType === 'dragon'
-    ? (['#1A0000', '#0D0000', '#050000'] as const)
-    : cookieType === 'golden'
-    ? (['#1A0E00', '#0D0800', '#050300'] as const)
-    : (['#1A0600', '#0D0400', '#060200'] as const);
-
-  const glowColor = cookieType === 'dragon' ? '#8B1800'
-    : cookieType === 'golden' ? '#D4A017'
-    : '#C4813A';
-
-  const totalCookies = profile.fortuneCookies + profile.goldenCookies + profile.dragonCookies;
+  // Mythic animated glow radius
+  const mythicGlowSize = mythicGlow.interpolate({ inputRange: [0,1], outputRange: [260, 320] });
 
   return (
     <View style={styles.container}>
@@ -356,17 +492,16 @@ export default function FortuneCookieScreen() {
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 60 : 8) }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={22} color="#D4A017" />
+          <Ionicons name="chevron-back" size={22} color={cfg.color} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>FORTUNE COOKIE</Text>
-          <Text style={styles.headerSub}>
-            {cookieType === 'dragon' ? '🥠 FOUR DRAGONS' : cookieType === 'golden' ? '🥠 GOLDEN FORTUNE' : 'CRACK OPEN YOUR FORTUNE'}
+          <Text style={[styles.headerTitle, { color: cfg.color }]}>FORTUNE COOKIE</Text>
+          <Text style={[styles.headerSub, { color: cfg.color + '99' }]}>
+            {isMythicSelected ? '✦ MYTHIC TIER — ULTRA RARE ✦' : `${cfg.label} · ${cfg.dropRate} DROP RATE`}
           </Text>
         </View>
-        {/* Cookie count badge */}
-        <View style={styles.countBadge}>
-          <Text style={styles.countNum}>{totalCookies}</Text>
+        <View style={[styles.countBadge, { borderColor: cfg.color + '50', backgroundColor: cfg.color + '18' }]}>
+          <Text style={[styles.countNum, { color: cfg.color }]}>{totalCookies}</Text>
           <Text style={styles.countLbl}>🥠</Text>
         </View>
       </View>
@@ -375,7 +510,11 @@ export default function FortuneCookieScreen() {
       <View style={styles.arena}>
 
         {/* Ambient glow */}
-        <View style={[styles.glow, { backgroundColor: glowColor }]} />
+        {isMythicSelected ? (
+          <Animated.View style={[styles.glow, { backgroundColor: glowColor, width: mythicGlowSize, height: mythicGlowSize, borderRadius: 999 }]} />
+        ) : (
+          <View style={[styles.glow, { backgroundColor: glowColor }]} />
+        )}
 
         {/* Whole cookie (idle/shaking) */}
         {(phase === 'idle' || phase === 'shaking') && (
@@ -385,37 +524,31 @@ export default function FortuneCookieScreen() {
               { scale: phase === 'idle' ? breatheScale : cookieScale },
             ],
           }}>
-            <CookieSvg type={cookieType} />
+            <CookieSvg tier={cookieTier} />
           </Animated.View>
         )}
 
-        {/* Cracked halves (cracked/rising/reveal) */}
+        {/* Cracked halves */}
         {(phase === 'cracked' || phase === 'rising' || phase === 'reveal') && (
           <>
-            <Animated.View style={{
-              position: 'absolute',
-              transform: [{ translateX: leftX }, { rotate: leftRotDeg }],
-            }}>
-              <CookieSvg type={cookieType} viewBoxX={0} viewBoxW={60} width={90} height={120} />
+            <Animated.View style={{ position: 'absolute', transform: [{ translateX: leftX }, { rotate: leftRotDeg }] }}>
+              <CookieSvg tier={reward?.tier ?? cookieTier} viewBoxX={0} viewBoxW={60} width={90} height={120} />
             </Animated.View>
-            <Animated.View style={{
-              position: 'absolute',
-              transform: [{ translateX: rightX }, { rotate: rightRotDeg }],
-            }}>
-              <CookieSvg type={cookieType} viewBoxX={60} viewBoxW={60} width={90} height={120} />
+            <Animated.View style={{ position: 'absolute', transform: [{ translateX: rightX }, { rotate: rightRotDeg }] }}>
+              <CookieSvg tier={reward?.tier ?? cookieTier} viewBoxX={60} viewBoxW={60} width={90} height={120} />
             </Animated.View>
           </>
         )}
 
-        {/* Gold particles */}
+        {/* Particles */}
         {particles.map((p, i) => (
           <Animated.View
             key={i}
             style={{
               position: 'absolute',
-              width: PARTICLE_SIZES[i],
-              height: PARTICLE_SIZES[i],
-              borderRadius: PARTICLE_SIZES[i] / 2,
+              width:  PARTICLE_SIZES[i % PARTICLE_SIZES.length],
+              height: PARTICLE_SIZES[i % PARTICLE_SIZES.length],
+              borderRadius: PARTICLE_SIZES[i % PARTICLE_SIZES.length] / 2,
               backgroundColor: pColors[i % pColors.length],
               opacity: p.op,
               transform: [{ translateX: p.x }, { translateY: p.y }],
@@ -424,19 +557,16 @@ export default function FortuneCookieScreen() {
         ))}
 
         {/* Flash overlay */}
-        <Animated.View
-          style={[styles.flashOverlay, { opacity: flashOp }]}
-          pointerEvents="none"
-        />
+        <Animated.View style={[styles.flashOverlay, { opacity: flashOp }]} pointerEvents="none" />
 
-        {/* Fortune slip (rising) */}
+        {/* Fortune slip */}
         {(phase === 'rising' || phase === 'reveal') && (
-          <Animated.View style={[styles.slip, { opacity: slipOp, transform: [{ translateY: slipY }] }]}>
+          <Animated.View style={[styles.slip, { borderColor: cfg.color + '88', opacity: slipOp, transform: [{ translateY: slipY }] }]}>
             <LinearGradient
-              colors={['rgba(212,160,23,0.18)', 'rgba(212,160,23,0.06)']}
+              colors={[cfg.color + '28', cfg.color + '08']}
               style={StyleSheet.absoluteFill}
             />
-            <Text style={styles.slipHeader}>✦  LUCKY FORTUNE  ✦</Text>
+            <Text style={[styles.slipHeader, { color: cfg.color }]}>✦  LUCKY FORTUNE  ✦</Text>
             <Text style={styles.slipMsg}>{fortuneMsg}</Text>
           </Animated.View>
         )}
@@ -445,54 +575,50 @@ export default function FortuneCookieScreen() {
       {/* ── Bottom area ───────────────────────────────────────────────────────── */}
       <View style={[styles.bottom, { paddingBottom: insets.bottom + 24 }]}>
 
-        {/* IDLE: Open button */}
+        {/* IDLE: tier selector + open button */}
         {phase === 'idle' && (
           <View style={styles.idleSection}>
-            {/* Cookie type tabs — tap to select which cookie to open */}
+
+            {/* Tier inventory pills */}
             <View style={styles.cookieInventory}>
-              {profile.fortuneCookies > 0 && (
-                <TouchableOpacity
-                  style={[styles.pill,
-                    cookieType === 'standard' && styles.pillActive,
-                    { borderColor: cookieType === 'standard' ? '#E8A458' : '#C4813A44' }]}
-                  onPress={() => setCookieType('standard')}
-                  activeOpacity={0.72}
-                >
-                  <Text style={[styles.pillNum, { color: '#E8A458' }]}>{profile.fortuneCookies}</Text>
-                  <Text style={[styles.pillLbl, cookieType === 'standard' && { color: '#E8A458' }]}>Standard</Text>
-                </TouchableOpacity>
-              )}
-              {profile.goldenCookies > 0 && (
-                <TouchableOpacity
-                  style={[styles.pill,
-                    cookieType === 'golden' && styles.pillActive,
-                    { borderColor: cookieType === 'golden' ? '#FFD700' : '#D4A01744' }]}
-                  onPress={() => setCookieType('golden')}
-                  activeOpacity={0.72}
-                >
-                  <Text style={[styles.pillNum, { color: '#FFD700' }]}>{profile.goldenCookies}</Text>
-                  <Text style={[styles.pillLbl, cookieType === 'golden' && { color: '#FFD700' }]}>Golden</Text>
-                </TouchableOpacity>
-              )}
-              {profile.dragonCookies > 0 && (
-                <TouchableOpacity
-                  style={[styles.pill,
-                    cookieType === 'dragon' && styles.pillActive,
-                    { borderColor: cookieType === 'dragon' ? '#FF6622' : '#8B180044' }]}
-                  onPress={() => setCookieType('dragon')}
-                  activeOpacity={0.72}
-                >
-                  <Text style={[styles.pillNum, { color: '#FF6622' }]}>{profile.dragonCookies}</Text>
-                  <Text style={[styles.pillLbl, cookieType === 'dragon' && { color: '#FF6622' }]}>Dragon</Text>
-                </TouchableOpacity>
-              )}
+              {TIER_ORDER.map(t => {
+                if (inv[t] <= 0 && !canClaimFreeCookie) return null;
+                const tc = TIER_CFG[t];
+                const isActive = cookieTier === t;
+                return (
+                  <TouchableOpacity
+                    key={t}
+                    style={[styles.pill,
+                      isActive && styles.pillActive,
+                      { borderColor: isActive ? tc.color : tc.color + '44' }]}
+                    onPress={() => inv[t] > 0 && setCookieTier(t)}
+                    activeOpacity={0.72}
+                  >
+                    <Text style={[styles.pillNum, { color: tc.color }]}>{inv[t]}</Text>
+                    <Text style={[styles.pillLbl, isActive && { color: tc.color }]}>{tc.label}</Text>
+                  </TouchableOpacity>
+                );
+              }).filter(Boolean)}
             </View>
 
-            {hasCookies ? (
-              <TouchableOpacity style={styles.openBtn} onPress={handleOpen} activeOpacity={0.82}>
-                <LinearGradient colors={['#F0B020', '#C4810A']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-                <Text style={styles.openBtnText}>OPEN COOKIE</Text>
-                <Ionicons name="chevron-forward" size={18} color="#050010" />
+            {/* Chip range hint */}
+            <View style={[styles.tierHint, { borderColor: cfg.color + '30', backgroundColor: cfg.color + '0C' }]}>
+              <Text style={[styles.tierHintText, { color: cfg.color + 'cc' }]}>
+                {cfg.label}  ·  {cfg.dropRate} drop  ·  {formatChips(cfg.chipRange[0])}–{formatChips(cfg.chipRange[1])} chips  ·  {cfg.ticketRange[0]}–{cfg.ticketRange[1]} ticket{cfg.ticketRange[1] !== 1 ? 's' : ''}
+              </Text>
+            </View>
+
+            {(hasCookies || canClaimFreeCookie) ? (
+              <TouchableOpacity style={[styles.openBtn, { overflow: 'hidden' }]} onPress={handleOpen} activeOpacity={0.82}>
+                <LinearGradient
+                  colors={isMythicSelected ? ['#FF0090', '#FF69B4', '#FFD700'] : [cfg.color, cfg.color + 'cc']}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                />
+                <Text style={[styles.openBtnText, { color: isMythicSelected ? '#fff' : '#050010' }]}>
+                  {canClaimFreeCookie && !hasCookies ? 'CLAIM DAILY & OPEN' : 'OPEN COOKIE'}
+                </Text>
+                <Ionicons name="chevron-forward" size={18} color={isMythicSelected ? '#fff' : '#050010'} />
               </TouchableOpacity>
             ) : (
               <View style={styles.emptyState}>
@@ -501,62 +627,78 @@ export default function FortuneCookieScreen() {
                 <Text style={styles.emptySub}>Spin the wheel or come back tomorrow for your free daily cookie.</Text>
               </View>
             )}
-
-            <Text style={styles.hintText}>
-              {cookieType === 'dragon'
-                ? '🥠 Dragon Cookie: Epic or Legendary reward guaranteed'
-                : cookieType === 'golden'
-                ? '🥠 Golden Cookie: Rare reward or higher guaranteed'
-                : 'Opening your best available cookie first'}
-            </Text>
           </View>
         )}
 
-        {/* REVEAL: Reward card */}
-        {(phase === 'reveal') && reward && (
+        {/* REVEAL: reward card */}
+        {phase === 'reveal' && reward && (
           <Animated.View style={[styles.rewardCard, { opacity: cardOp, transform: [{ translateY: cardY }] }]}>
             <LinearGradient
-              colors={['rgba(212,160,23,0.14)', 'rgba(0,0,0,0.01)']}
+              colors={[reward.color + '22', 'transparent']}
               style={StyleSheet.absoluteFill}
             />
+
             {/* Tier badge */}
-            <Animated.View style={[styles.tierBadge, { backgroundColor: TIER_COLOR[reward.tier], transform: [{ scale: rewardScale }] }]}>
-              <Text style={styles.tierText}>{reward.tier}</Text>
+            <Animated.View style={[styles.tierBadge, { backgroundColor: reward.color + '22', borderColor: reward.color, transform: [{ scale: rewardScale }] }]}>
+              <Text style={[styles.tierText, { color: reward.color }]}>{TIER_CFG[reward.tier].label}</Text>
             </Animated.View>
 
-            {/* Reward display */}
+            {/* Reward amount */}
             <Animated.View style={[styles.rewardRow, { transform: [{ scale: rewardScale }] }]}>
-              <Text style={styles.rewardIcon}>{reward.icon}</Text>
+              <Text style={styles.rewardIcon}>
+                {reward.type === 'chips' ? '💰' : reward.type === 'tickets' ? '🎟️' : '⚡'}
+              </Text>
               <Text style={[styles.rewardLabel, { color: reward.color }]}>{reward.label}</Text>
             </Animated.View>
 
-            {reward.type === 'chips' && (
-              <Text style={styles.rewardSub}>Added to your chip balance</Text>
-            )}
-            {reward.type === 'xp' && (
-              <Text style={styles.rewardSub}>XP added to your profile</Text>
-            )}
-            {reward.type === 'token' && (
-              <Text style={styles.rewardSub}>Special reward — check your profile</Text>
-            )}
+            <Text style={styles.rewardSub}>
+              {reward.type === 'chips'   ? 'Added to your chip balance'        :
+               reward.type === 'tickets' ? 'Added to your lottery tickets'     :
+                                           'XP added to your profile'}
+            </Text>
 
-            {/* Stats footer */}
+            {/* Stats */}
             <View style={styles.statsRow}>
               <Text style={styles.statLbl}>Cookies Opened</Text>
               <Text style={styles.statVal}>{profile.cookiesOpened}</Text>
             </View>
 
-            <TouchableOpacity style={styles.collectBtn} onPress={() => router.back()} activeOpacity={0.82}>
-              <LinearGradient colors={['#F0B020', '#C4810A']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-              <Text style={styles.collectText}>COLLECT</Text>
+            {/* MYTHIC: global social announcement banner */}
+            {reward.tier === 'mythic' && (
+              <Animated.View style={[styles.mythicAnnounce, { opacity: announceBannerOp }]}>
+                <LinearGradient
+                  colors={['rgba(255,0,144,0.20)', 'rgba(255,215,0,0.12)', 'rgba(255,0,144,0.20)']}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                />
+                <Text style={styles.mythicAnnounceIcon}>🌐</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.mythicAnnounceLabel}>GLOBAL ANNOUNCEMENT</Text>
+                  <Text style={styles.mythicAnnounceText}>
+                    <Text style={{ color: '#FFD700' }}>{profile.username}</Text>
+                    {' just cracked a '}
+                    <Text style={{ color: '#FF0090' }}>MYTHIC Fortune Cookie</Text>
+                    {reward.type === 'chips' ? ` and won ${formatChips(reward.amount)} chips!` : '!'}
+                  </Text>
+                </View>
+              </Animated.View>
+            )}
+
+            <TouchableOpacity style={[styles.collectBtn, { overflow: 'hidden' }]} onPress={() => router.back()} activeOpacity={0.82}>
+              <LinearGradient
+                colors={reward.tier === 'mythic' ? ['#FF0090','#FFD700'] : [reward.color, reward.color + 'aa']}
+                style={StyleSheet.absoluteFill}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              />
+              <Text style={[styles.collectText, { color: reward.tier === 'mythic' ? '#fff' : '#050010' }]}>COLLECT</Text>
             </TouchableOpacity>
           </Animated.View>
         )}
 
-        {/* In-progress phases: show spinning indicator */}
+        {/* Opening in progress */}
         {(phase === 'shaking' || phase === 'cracked' || phase === 'rising') && (
           <View style={styles.openingMsg}>
-            <Text style={styles.openingText}>Opening your fortune…</Text>
+            <Text style={[styles.openingText, { color: cfg.color }]}>Opening your fortune…</Text>
           </View>
         )}
       </View>
@@ -575,20 +717,19 @@ const styles = StyleSheet.create({
   backBtn: { padding: 6, borderRadius: 20 },
   headerCenter: { flex: 1 },
   headerTitle: {
-    color: '#D4A017', fontSize: 16, fontWeight: '900',
+    fontSize: 16, fontWeight: '900',
     fontFamily: 'Orbitron_900Black', letterSpacing: 2,
   },
   headerSub: {
-    color: 'rgba(212,160,23,0.60)', fontSize: 10,
-    fontFamily: 'Orbitron_400Regular', letterSpacing: 1, marginTop: 2,
+    fontSize: 9, fontFamily: 'Orbitron_400Regular',
+    letterSpacing: 1, marginTop: 2,
   },
   countBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 3,
-    backgroundColor: 'rgba(212,160,23,0.12)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(212,160,23,0.30)',
+    borderRadius: 12, borderWidth: 1,
     paddingHorizontal: 10, paddingVertical: 5,
   },
-  countNum: { color: '#D4A017', fontSize: 14, fontWeight: '900', fontFamily: 'Inter_700Bold' },
+  countNum: { fontSize: 14, fontWeight: '900', fontFamily: 'Inter_700Bold' },
   countLbl: { fontSize: 14 },
 
   arena: {
@@ -598,110 +739,115 @@ const styles = StyleSheet.create({
   glow: {
     position: 'absolute',
     width: 260, height: 180, borderRadius: 130,
-    opacity: 0.16,
+    opacity: 0.18,
   },
   flashOverlay: {
     position: 'absolute',
-    width: 260, height: 180, borderRadius: 130,
+    width: 300, height: 220, borderRadius: 150,
     backgroundColor: '#FFFFFF',
   },
   slip: {
-    position: 'absolute',
-    bottom: -10,
+    position: 'absolute', bottom: -10,
     width: Math.min(W - 48, 300),
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(212,160,23,0.55)',
-    backgroundColor: 'rgba(26,10,0,0.95)',
-    padding: 16,
-    alignItems: 'center',
-    overflow: 'hidden',
-    gap: 6,
+    borderRadius: 12, borderWidth: 1.5,
+    backgroundColor: 'rgba(5,0,16,0.95)',
+    padding: 16, alignItems: 'center',
+    overflow: 'hidden', gap: 6,
   },
   slipHeader: {
-    color: '#D4A017', fontSize: 9,
-    fontFamily: 'Orbitron_400Regular', letterSpacing: 2.5,
+    fontSize: 9, fontFamily: 'Orbitron_400Regular', letterSpacing: 2.5,
   },
   slipMsg: {
-    color: 'rgba(240,220,170,0.92)', fontSize: 15,
+    color: 'rgba(240,220,200,0.92)', fontSize: 15,
     fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5,
     textAlign: 'center', lineHeight: 22, fontStyle: 'italic',
   },
 
-  bottom: {
-    paddingHorizontal: 20, paddingTop: 8,
-  },
+  bottom: { paddingHorizontal: 20 },
 
-  idleSection: { gap: 14 },
-  cookieInventory: { flexDirection: 'row', gap: 8, justifyContent: 'center' },
-  pillActive: { backgroundColor: 'rgba(255,255,255,0.06)' },
+  idleSection: { gap: 12 },
+  cookieInventory: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
+
   pill: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderRadius: 10, borderWidth: 1,
-    paddingHorizontal: 10, paddingVertical: 5,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 20, borderWidth: 1,
+    paddingHorizontal: 12, paddingVertical: 7,
+    backgroundColor: 'rgba(255,255,255,0.04)',
   },
-  pillNum: { fontSize: 14, fontWeight: '900', fontFamily: 'Inter_700Bold' },
-  pillLbl: { color: 'rgba(255,255,255,0.45)', fontSize: 10, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5 },
+  pillActive: { backgroundColor: 'rgba(255,255,255,0.10)' },
+  pillNum:    { fontSize: 14, fontWeight: '900', fontFamily: 'Inter_700Bold' },
+  pillLbl:    { fontSize: 9,  color: '#888', fontFamily: 'Orbitron_400Regular', letterSpacing: 1 },
 
-  openBtn: {
-    height: 52, borderRadius: 14, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+  tierHint: {
+    borderRadius: 8, borderWidth: 1,
+    paddingHorizontal: 12, paddingVertical: 7,
+    alignItems: 'center',
   },
-  openBtnText: {
-    color: '#050010', fontSize: 15, fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
-  },
-  hintText: {
-    color: 'rgba(212,160,23,0.45)', fontSize: 10,
-    fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5,
+  tierHintText: {
+    fontSize: 9, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.8,
     textAlign: 'center',
   },
 
-  emptyState: { alignItems: 'center', gap: 6, paddingVertical: 20 },
-  emptyIcon: { fontSize: 40 },
-  emptyTitle: { color: 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: '700', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-  emptySub: { color: 'rgba(255,255,255,0.30)', fontSize: 11, textAlign: 'center', lineHeight: 16 },
+  openBtn: {
+    borderRadius: 14, height: 52,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+  },
+  openBtnText: { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
+
+  emptyState: { alignItems: 'center', gap: 8 },
+  emptyIcon:  { fontSize: 48 },
+  emptyTitle: { color: '#555', fontSize: 16, fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
+  emptySub:   { color: '#333', fontSize: 12, fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 18 },
 
   rewardCard: {
-    borderRadius: 18, borderWidth: 1.5,
-    borderColor: 'rgba(212,160,23,0.45)',
-    backgroundColor: 'rgba(26,10,0,0.96)',
-    padding: 20, gap: 12, overflow: 'hidden',
-    alignItems: 'center',
+    borderRadius: 20, borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: 'rgba(5,0,16,0.95)',
+    padding: 20, alignItems: 'center',
+    overflow: 'hidden', gap: 10,
   },
   tierBadge: {
-    borderRadius: 20, paddingHorizontal: 16, paddingVertical: 4,
+    borderRadius: 8, borderWidth: 1.5,
+    paddingHorizontal: 16, paddingVertical: 5,
   },
-  tierText: {
-    color: '#050010', fontSize: 11, fontWeight: '900',
-    fontFamily: 'Orbitron_900Black', letterSpacing: 2,
-  },
-  rewardRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  tierText: { fontSize: 11, fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
+
+  rewardRow:  { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rewardIcon: { fontSize: 32 },
-  rewardLabel: { fontSize: 22, fontWeight: '900', fontFamily: 'Inter_700Bold' },
-  rewardSub: {
-    color: 'rgba(212,160,23,0.55)', fontSize: 10,
-    fontFamily: 'Orbitron_400Regular', letterSpacing: 1,
-  },
+  rewardLabel:{ fontSize: 22, fontFamily: 'Inter_700Bold', letterSpacing: -0.5 },
+  rewardSub:  { color: 'rgba(255,255,255,0.45)', fontSize: 11, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5 },
+
   statsRow: {
-    flexDirection: 'row', justifyContent: 'space-between', width: '100%',
-    borderTopWidth: 1, borderTopColor: 'rgba(212,160,23,0.15)', paddingTop: 10,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    width: '100%', paddingTop: 8,
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)',
   },
-  statLbl: { color: 'rgba(255,255,255,0.35)', fontSize: 11, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5 },
-  statVal: { color: '#D4A017', fontSize: 12, fontWeight: '700', fontFamily: 'Inter_700Bold' },
-  collectBtn: {
-    height: 48, width: '100%', borderRadius: 12, overflow: 'hidden',
-    alignItems: 'center', justifyContent: 'center',
+  statLbl: { color: '#555', fontSize: 10, fontFamily: 'Orbitron_400Regular', letterSpacing: 1 },
+  statVal: { color: '#ccc', fontSize: 13, fontFamily: 'Inter_700Bold' },
+
+  mythicAnnounce: {
+    width: '100%', borderRadius: 10, borderWidth: 1,
+    borderColor: 'rgba(255,0,144,0.40)',
+    paddingVertical: 10, paddingHorizontal: 12,
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    overflow: 'hidden',
   },
-  collectText: {
-    color: '#050010', fontSize: 14, fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
+  mythicAnnounceIcon:  { fontSize: 18 },
+  mythicAnnounceLabel: {
+    color: '#FF0090', fontSize: 8, fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 2, marginBottom: 3,
+  },
+  mythicAnnounceText: {
+    color: 'rgba(255,255,255,0.85)', fontSize: 11,
+    fontFamily: 'Orbitron_400Regular', letterSpacing: 0.3, lineHeight: 16,
   },
 
-  openingMsg: { alignItems: 'center', paddingVertical: 16 },
-  openingText: {
-    color: 'rgba(212,160,23,0.55)', fontSize: 11,
-    fontFamily: 'Orbitron_400Regular', letterSpacing: 1.5,
+  collectBtn: {
+    width: '100%', height: 48, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
   },
+  collectText: { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
+
+  openingMsg:  { alignItems: 'center', paddingVertical: 20 },
+  openingText: { fontSize: 13, fontFamily: 'Orbitron_400Regular', letterSpacing: 1.5 },
 });

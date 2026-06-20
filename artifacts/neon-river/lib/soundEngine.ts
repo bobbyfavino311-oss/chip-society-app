@@ -262,24 +262,31 @@ export const SoundEngine = {
    * Crisp high-freq snap + mid crunch texture.
    * Native: repurposes fold.wav at high pitch rate for the snap impact.
    */
-  cookieCrack(cookieType: 'standard' | 'golden' | 'dragon' = 'standard') {
+  cookieCrack(cookieType: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'standard' | 'golden' | 'dragon' = 'common') {
     haptic(Haptics.ImpactFeedbackStyle.Heavy);
     if (_muted || !_fxEnabled) return;
 
+    const isPremium = cookieType === 'epic' || cookieType === 'legendary' || cookieType === 'mythic' || cookieType === 'dragon';
+    const isHeavy   = cookieType === 'legendary' || cookieType === 'mythic';
+
     if (Platform.OS !== 'web') {
-      play('fold', { rate: 1.85, volume: 0.80 });
-      if (cookieType === 'dragon') play('allin', { rate: 1.6, volume: 0.40 });
+      play('fold', { rate: isPremium ? 1.60 : 1.85, volume: 0.80 });
+      if (isPremium) play('allin', { rate: isHeavy ? 1.4 : 1.6, volume: isPremium ? 0.50 : 0.40 });
       return;
     }
 
-    // Web Audio — crack/snap
+    // Web Audio — crack/snap intensity scales with tier
     noise(0.032, 0.42, 3500, 14000, 0);
     noise(0.072, 0.28, 500,  4500,  0.012);
     tone(160, 'sine', 0.055, 0.30, 0);
-    if (cookieType !== 'standard') {
-      // Golden / Dragon: extra resonant impact
-      tone(90, 'sine', 0.18, cookieType === 'dragon' ? 0.25 : 0.14, 0.01);
-      noise(0.06, cookieType === 'dragon' ? 0.18 : 0.10, 80, 700, 0.01);
+    if (isPremium) {
+      tone(90, 'sine', 0.18, isHeavy ? 0.30 : 0.14, 0.01);
+      noise(0.06, isHeavy ? 0.22 : 0.10, 80, 700, 0.01);
+    }
+    if (isHeavy) {
+      // Extra floor rumble for legendary + mythic
+      tone(40, 'sine', 1.20, 0.18, 0.005);
+      noise(0.08, 0.12, 30, 200, 0.008);
     }
   },
 
@@ -307,12 +314,14 @@ export const SoundEngine = {
    * fortuneReward — called when the reward card appears.
    * Routes to tier-specific sound.
    */
-  fortuneReward(tier: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY') {
+  fortuneReward(tier: 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC') {
     switch (tier) {
       case 'COMMON':    return SoundEngine._rewardCommon();
+      case 'UNCOMMON':  return SoundEngine._rewardUncommon();
       case 'RARE':      return SoundEngine._rewardRare();
       case 'EPIC':      return SoundEngine._rewardEpic();
       case 'LEGENDARY': return SoundEngine._rewardLegendary();
+      case 'MYTHIC':    return SoundEngine._rewardMythic();
     }
   },
 
@@ -330,6 +339,20 @@ export const SoundEngine = {
     tone(1047, 'sine', 0.75, 0.22, 0);
     tone(2093, 'sine', 0.55, 0.09, 0.012);
     tone(523,  'sine', 0.40, 0.07, 0.020); // warm low resonance
+  },
+
+  _rewardUncommon() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    if (_muted || !_fxEnabled) return;
+    if (Platform.OS !== 'web') {
+      play('notification', { rate: 1.04, volume: 0.88 });
+      return;
+    }
+    // Soft double bell — slightly warmer than Common
+    tone(1047, 'sine', 0.75, 0.22, 0);
+    tone(1319, 'sine', 0.50, 0.14, 0.10);
+    tone(2093, 'sine', 0.40, 0.08, 0.018);
+    noise(0.12, 0.05, 3000, 8000, 0.06);
   },
 
   _rewardRare() {
@@ -398,6 +421,38 @@ export const SoundEngine = {
     // Prosperity sparkle shower
     noise(0.55, 0.11, 5000, 15000, 0.32);
     noise(0.35, 0.08, 2000, 7000,  0.60);
+  },
+
+  _rewardMythic() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    if (_muted || !_fxEnabled) return;
+
+    if (Platform.OS !== 'web') {
+      // Mythic: maximum ceremony — win fanfare + level-up + delayed level-up echo
+      play('win',     { volume: 0.95 });
+      setTimeout(() => play('level_up', { rate: 0.90, volume: 0.70 }), 300);
+      setTimeout(() => play('level_up', { rate: 1.10, volume: 0.50 }), 780);
+      return;
+    }
+
+    // Full mythic ceremony — deep gong + cascading bells + sparkle explosion
+    // Ultra deep power chord
+    tone(55,  'sine', 3.50, 0.38, 0);
+    tone(110, 'sine', 2.80, 0.22, 0.01);
+    tone(82,  'sine', 2.40, 0.14, 0.03);
+    // Mid power swells
+    tone(220, 'sine', 2.00, 0.20, 0.10);
+    tone(165, 'sine', 1.80, 0.13, 0.12);
+    // Bell cascade — fast ascending
+    const bells = [523, 659, 784, 880, 1047, 1175, 1319, 1568, 1760, 2093, 2637];
+    bells.forEach((freq, i) => {
+      tone(freq, 'sine', Math.max(0.30, 0.90 - i * 0.05), Math.max(0.07, 0.24 - i * 0.01), 0.20 + i * 0.08);
+    });
+    // Pink + gold shimmer — two sparkle bursts
+    noise(0.70, 0.12, 8000, 18000, 0.30);
+    noise(0.55, 0.10, 5000, 12000, 0.55);
+    noise(0.40, 0.09, 2000,  6000, 0.80);
+    noise(0.30, 0.08,  800,  2400, 1.05);
   },
 
   /**
