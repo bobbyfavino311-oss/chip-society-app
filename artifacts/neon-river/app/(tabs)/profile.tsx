@@ -1,9 +1,10 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Alert,
+  Animated,
   Image,
   Modal,
   Platform,
@@ -44,38 +45,64 @@ const RANK_COLORS: Record<string, string> = {
   'CHIP SOCIETY ELITE': colors.accent,
 };
 
-function StatBox({ label, value, color = colors.text }: { label: string; value: string | number; color?: string }) {
+type RankTheme = {
+  cardBorder: string;
+  gradColors: [string, string, string];
+  numColor: string;
+  barStart: string;
+  barMid: string;
+  barEnd: string;
+  glowColor: string;
+};
+function getLevelCardTheme(rank: string): RankTheme {
+  if (rank === 'CHIP SOCIETY ELITE') return { cardBorder:'#ffd700', gradColors:['rgba(255,215,0,0.18)','rgba(0,212,255,0.10)','transparent'], numColor:'#ffd700', barStart:'#ffd700', barMid:'#00d4ff', barEnd:'#ff0090', glowColor:'rgba(255,215,0,0.5)' };
+  if (rank === 'VICE ROYALTY')       return { cardBorder:'#ff2090', gradColors:['rgba(255,32,144,0.20)','rgba(191,95,255,0.08)','transparent'], numColor:'#ff2090', barStart:'#ff2090', barMid:'#bf5fff', barEnd:'#7700ff', glowColor:'rgba(255,32,144,0.5)' };
+  if (rank === 'IMMORTAL')           return { cardBorder:'#ff5fff', gradColors:['rgba(255,95,255,0.18)','rgba(255,0,144,0.06)','transparent'], numColor:'#ff5fff', barStart:'#ff5fff', barMid:'#ff0090', barEnd:'#bf5fff', glowColor:'rgba(255,95,255,0.5)' };
+  if (rank === 'LEGEND')             return { cardBorder:'#00d4ff', gradColors:['rgba(0,212,255,0.16)','rgba(191,95,255,0.08)','transparent'], numColor:'#00d4ff', barStart:'#00d4ff', barMid:'#bf5fff', barEnd:'#ff0090', glowColor:'rgba(0,212,255,0.5)' };
+  if (rank === 'DYNASTY')            return { cardBorder:'#d070ff', gradColors:['rgba(208,112,255,0.18)','rgba(119,0,255,0.08)','transparent'], numColor:'#d070ff', barStart:'#d070ff', barMid:'#bf5fff', barEnd:'#7700ff', glowColor:'rgba(208,112,255,0.5)' };
+  if (rank === 'EMPIRE')             return { cardBorder:'#bf5fff', gradColors:['rgba(191,95,255,0.18)','rgba(119,0,255,0.08)','transparent'], numColor:'#bf5fff', barStart:'#ff0090', barMid:'#bf5fff', barEnd:'#7700ff', glowColor:'rgba(191,95,255,0.5)' };
+  if (rank === 'SYNDICATE')          return { cardBorder:'#ff7700', gradColors:['rgba(255,119,0,0.16)','rgba(255,165,0,0.06)','transparent'], numColor:'#ff9900', barStart:'#ff7700', barMid:'#ffaa00', barEnd:'#ffd700', glowColor:'rgba(255,119,0,0.5)' };
+  if (rank === 'CARTEL')             return { cardBorder:'#ffaa00', gradColors:['rgba(255,170,0,0.16)','rgba(255,215,0,0.06)','transparent'], numColor:'#ffaa00', barStart:'#ff7700', barMid:'#ffaa00', barEnd:'#ffd700', glowColor:'rgba(255,170,0,0.5)' };
+  if (rank === 'KINGPIN')            return { cardBorder:'#ffd700', gradColors:['rgba(255,215,0,0.14)','rgba(255,170,0,0.06)','transparent'], numColor:'#ffd700', barStart:'#ffaa00', barMid:'#ffd700', barEnd:'#fff0a0', glowColor:'rgba(255,215,0,0.5)' };
+  return { cardBorder:'#00d4ff', gradColors:['rgba(0,212,255,0.10)','rgba(255,0,144,0.06)','transparent'], numColor:'#00d4ff', barStart:'#ff0090', barMid:'#bf5fff', barEnd:'#00d4ff', glowColor:'rgba(0,212,255,0.4)' };
+}
+
+// ─── Neon section title ─────────────────────────────────────────────────────
+function NeonSectionTitle({ label, color = '#00d4ff88' }: { label: string; color?: string }) {
   return (
-    <View style={statStyles.box}>
-      <Text style={[statStyles.value, { color }]}>{value}</Text>
-      <Text style={statStyles.label}>{label}</Text>
+    <View style={{ gap: 5, marginTop: 6 }}>
+      <Text style={[styles.sectionTitle, { color: 'rgba(255,255,255,0.45)', letterSpacing: 3 }]}>{label}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <View style={{ width: 28, height: 1, backgroundColor: color, borderRadius: 1 }} />
+        <View style={{ width: 8, height: 1, backgroundColor: color, opacity: 0.4, borderRadius: 1 }} />
+      </View>
     </View>
   );
 }
 
-const statStyles = StyleSheet.create({
+// ─── Neon stat box ──────────────────────────────────────────────────────────
+function NeonStatBox({ label, value, accentColor }: { label: string; value: string | number; accentColor: string }) {
+  return (
+    <View style={[neonStat.box, { borderColor: accentColor + '35' }]}>
+      <LinearGradient
+        colors={[accentColor + '14', 'transparent']}
+        style={StyleSheet.absoluteFill}
+      />
+      <Text style={[neonStat.value, { color: accentColor }]}>{value}</Text>
+      <Text style={neonStat.label}>{label}</Text>
+    </View>
+  );
+}
+const neonStat = StyleSheet.create({
   box: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 14,
-    backgroundColor: colors.surface,
-    borderRadius: colors.radius,
-    borderWidth: 1,
-    borderColor: colors.border,
+    flex: 1, alignItems: 'center', paddingVertical: 16,
+    backgroundColor: 'rgba(5,0,16,0.85)',
+    borderRadius: 14, borderWidth: 1, overflow: 'hidden', gap: 4,
   },
-  value: {
-    fontSize: 22,
-    fontWeight: '700',
-    fontFamily: 'Inter_700Bold',
-  },
-  label: {
-    color: colors.textDim,
-    fontSize: 9,
-    letterSpacing: 1,
-    marginTop: 4,
-    fontWeight: '600',
-  },
+  value: { fontSize: 26, fontWeight: '900', fontFamily: 'Inter_700Bold', letterSpacing: -0.5 },
+  label: { color: 'rgba(255,255,255,0.3)', fontSize: 8, letterSpacing: 2, fontFamily: 'Orbitron_400Regular', marginTop: 1 },
 });
+
 
 const snd = StyleSheet.create({
   row: {
@@ -234,11 +261,23 @@ export default function ProfileScreen() {
   const { theme: tableTheme } = useTableTheme();
 
   const rankColor   = RANK_COLORS[profile.rank] ?? c.primary;
+  const cardTheme   = getLevelCardTheme(profile.rank);
   const thisLevelXP = getXPForLevel(profile.level);
   const nextLevelXP = getXPForLevel(profile.level + 1);
   const xpProgress  = nextLevelXP > thisLevelXP
     ? Math.min(1, (profile.xp - thisLevelXP) / (nextLevelXP - thisLevelXP))
     : 1;
+
+  // Glow pulse animation for level card
+  const glowAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, { toValue: 1, duration: 2200, useNativeDriver: true }),
+        Animated.timing(glowAnim, { toValue: 0, duration: 2200, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
 
   const saveName = async () => {
     if (name.trim().length === 0) return;
@@ -327,55 +366,95 @@ export default function ProfileScreen() {
             </View>
           ) : (
             <TouchableOpacity style={styles.nameRow} onPress={() => setEditing(true)}>
-              <Text style={styles.username}>{profile.username}</Text>
-              <Ionicons name="pencil" size={14} color={c.textDim} style={{ marginLeft: 6 }} />
+              <Text style={[styles.username, { color: cardTheme.numColor, textShadowColor: cardTheme.glowColor, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10 }]}>
+                {profile.username}
+              </Text>
+              <Ionicons name="pencil" size={12} color={`${cardTheme.numColor}88`} style={{ marginLeft: 8 }} />
             </TouchableOpacity>
           )}
 
-          <View style={[styles.rankBadge, { borderColor: rankColor }]}>
-            <Text style={[styles.rankText, { color: rankColor }]}>{profile.rank}</Text>
+          <View style={[styles.rankBadge, { borderColor: cardTheme.cardBorder + '80', backgroundColor: cardTheme.cardBorder + '14' }]}>
+            <Text style={[styles.rankText, { color: cardTheme.cardBorder, letterSpacing: 2.5 }]}>{profile.rank}</Text>
           </View>
 
         </View>
 
-        {/* ── Level hero card ─────────────────────────────────── */}
-        <View style={[styles.card, styles.levelCard]}>
+        {/* ── Level hero card — neon VIP card ────────────────── */}
+        <Animated.View style={[
+          styles.levelCard,
+          {
+            borderColor: cardTheme.cardBorder + '70',
+            shadowColor: cardTheme.cardBorder,
+            shadowOpacity: glowAnim.interpolate({ inputRange: [0,1], outputRange: [0.25, 0.6] }) as unknown as number,
+            shadowRadius: 18,
+            shadowOffset: { width: 0, height: 0 },
+            elevation: 12,
+          }
+        ]}>
           <LinearGradient
-            colors={[`${rankColor}1a`, 'transparent']}
+            colors={cardTheme.gradColors}
             style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
           />
+
+          {/* Corner accent lines */}
+          <View style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 2, backgroundColor: cardTheme.cardBorder, opacity: 0.7, borderTopLeftRadius: 14 }} />
+          <View style={{ position: 'absolute', top: 0, left: 0, width: 2, height: 20, backgroundColor: cardTheme.cardBorder, opacity: 0.7, borderTopLeftRadius: 14 }} />
+          <View style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 2, backgroundColor: cardTheme.barEnd, opacity: 0.5, borderBottomRightRadius: 14 }} />
+          <View style={{ position: 'absolute', bottom: 0, right: 0, width: 2, height: 20, backgroundColor: cardTheme.barEnd, opacity: 0.5, borderBottomRightRadius: 14 }} />
+
           <View style={styles.levelHeroRow}>
-            <Text style={[styles.levelHeroNumber, { color: rankColor }]}>{profile.level}</Text>
+            {/* Big level number */}
+            <View style={{ alignItems: 'center', justifyContent: 'center', width: 72 }}>
+              <Text style={[styles.levelHeroNumber, { color: cardTheme.numColor, textShadowColor: cardTheme.glowColor, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16 }]}>
+                {profile.level}
+              </Text>
+              <Text style={{ fontSize: 7, fontFamily: 'Orbitron_400Regular', color: `${cardTheme.numColor}70`, letterSpacing: 2, marginTop: -4 }}>LEVEL</Text>
+            </View>
+
+            {/* Divider */}
+            <View style={{ width: 1, height: 48, backgroundColor: `${cardTheme.cardBorder}30` }} />
+
             <View style={styles.levelHeroMeta}>
-              <Text style={[styles.levelHeroRank, { color: rankColor }]}>{profile.rank}</Text>
+              {/* Rank */}
+              <Text style={[styles.levelHeroRank, { color: cardTheme.numColor, textShadowColor: cardTheme.glowColor, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 }]}>
+                {profile.rank}
+              </Text>
+
+              {/* Neon gradient progress bar */}
               <View style={styles.levelProgressRow}>
                 <View style={styles.levelProgressTrack}>
-                  <View style={[styles.levelProgressFill, {
-                    width: `${Math.round(xpProgress * 100)}%`,
-                    backgroundColor: rankColor,
-                  }]} />
+                  <LinearGradient
+                    colors={[cardTheme.barStart, cardTheme.barMid, cardTheme.barEnd]}
+                    style={[styles.levelProgressFill, { width: `${Math.round(xpProgress * 100)}%` }]}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  />
                 </View>
-                <Text style={[styles.levelProgressPct, { color: `${rankColor}cc` }]}>
+                <Text style={[styles.levelProgressPct, { color: cardTheme.numColor + 'cc' }]}>
                   {Math.round(xpProgress * 100)}%
                 </Text>
               </View>
-              <Text style={styles.levelProgressSub}>TO LEVEL {profile.level + 1}</Text>
+
+              {/* Progress label */}
+              <Text style={[styles.levelProgressSub, { color: `${cardTheme.barEnd}60`, letterSpacing: 2 }]}>
+                NEXT LEVEL {profile.level + 1}
+              </Text>
             </View>
           </View>
-        </View>
+        </Animated.View>
 
-        <Text style={styles.sectionTitle}>STATISTICS</Text>
+        <NeonSectionTitle label="STATISTICS" color={`${cardTheme.barMid}aa`} />
         <View style={styles.statsGrid}>
-          <StatBox label="WIN RATE" value={`${winRate}%`} color={c.success} />
-          <StatBox label="HANDS" value={profile.handsPlayed} />
+          <NeonStatBox label="WIN RATE"  value={`${winRate}%`}         accentColor="#ff0090" />
+          <NeonStatBox label="HANDS"     value={profile.handsPlayed}   accentColor="#00d4ff" />
         </View>
         <View style={styles.statsGrid}>
-          <StatBox label="WINS" value={profile.wins} color={c.gold} />
-          <StatBox label="LOSSES" value={profile.losses} color={c.error} />
+          <NeonStatBox label="WINS"      value={profile.wins}          accentColor="#ffd700" />
+          <NeonStatBox label="LOSSES"    value={profile.losses}        accentColor="#ff4466" />
         </View>
 
         {/* Tournament stats section — locked preview */}
-        <Text style={styles.sectionTitle}>TOURNAMENTS</Text>
+        <NeonSectionTitle label="TOURNAMENTS" color="rgba(191,95,255,0.8)" />
         <View style={styles.tournamentCard}>
           {/* Background tint */}
           <LinearGradient
@@ -442,13 +521,13 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>SOCIAL</Text>
+        <NeonSectionTitle label="SOCIAL" color="rgba(0,212,255,0.8)" />
         <View style={styles.statsGrid}>
-          <StatBox label="FOLLOWING" value={socialFollowingCount} color={c.primary} />
-          <StatBox label="ACHIEVEMENTS" value={claimedCount} color={c.accent} />
+          <NeonStatBox label="FOLLOWING"    value={socialFollowingCount} accentColor="#4488ff" />
+          <NeonStatBox label="ACHIEVEMENTS" value={claimedCount}         accentColor="#bf5fff" />
         </View>
 
-        <Text style={styles.sectionTitle}>CHIP BALANCE</Text>
+        <NeonSectionTitle label="CHIP BALANCE" color="rgba(255,215,0,0.8)" />
         <View style={styles.chipCard}>
           <LinearGradient
             colors={['rgba(255,215,0,0.1)', 'transparent']}
@@ -539,7 +618,7 @@ export default function ProfileScreen() {
           <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.7)" />
         </TouchableOpacity>
 
-        <Text style={styles.sectionTitle}>STREAK</Text>
+        <NeonSectionTitle label="STREAK" color="rgba(255,150,50,0.8)" />
         <View style={styles.card}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <Ionicons name="flame" size={32} color={c.warning} />
@@ -857,54 +936,41 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   // ── Level hero card ─────────────────────────────────────────
-  levelCard: { overflow: 'hidden' },
-  levelHeroRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 18,
-  },
-  levelHeroNumber: {
-    fontSize: 64,
-    fontWeight: '200',
-    fontFamily: 'Inter_700Bold',
-    letterSpacing: -2,
-    lineHeight: 70,
-  },
-  levelHeroMeta: { flex: 1, gap: 6 },
-  levelHeroRank: {
-    fontSize: 12,
-    fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 2,
-  },
-  levelProgressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  levelProgressTrack: {
-    flex: 1,
-    height: 2,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 1,
+  levelCard: {
+    backgroundColor: 'rgba(5,0,16,0.95)',
+    borderRadius: 16,
+    borderWidth: 1.5,
+    padding: 14,
     overflow: 'hidden',
   },
-  levelProgressFill: {
-    height: '100%',
-    borderRadius: 1,
-  },
-  levelProgressPct: {
-    fontSize: 10,
-    fontWeight: '600',
+  levelHeroRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  levelHeroNumber: {
+    fontSize: 48,
+    fontWeight: '900',
     fontFamily: 'Inter_700Bold',
-    minWidth: 30,
-    textAlign: 'right',
+    letterSpacing: -2,
+    lineHeight: 50,
+  },
+  levelHeroMeta: { flex: 1, gap: 7 },
+  levelHeroRank: {
+    fontSize: 11,
+    fontWeight: '900',
+    fontFamily: 'Orbitron_900Black',
+    letterSpacing: 2.5,
+  },
+  levelProgressRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  levelProgressTrack: {
+    flex: 1, height: 5, borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.07)', overflow: 'hidden',
+  },
+  levelProgressFill: { height: '100%', borderRadius: 3 },
+  levelProgressPct: {
+    fontSize: 10, fontWeight: '700', fontFamily: 'Inter_700Bold',
+    minWidth: 30, textAlign: 'right',
   },
   levelProgressSub: {
-    fontSize: 8,
-    color: 'rgba(255,255,255,0.2)',
-    fontFamily: 'Orbitron_400Regular',
-    letterSpacing: 1.5,
+    fontSize: 7, color: 'rgba(255,255,255,0.2)',
+    fontFamily: 'Orbitron_400Regular', letterSpacing: 2,
   },
   sectionTitle: {
     color: colors.textMuted,

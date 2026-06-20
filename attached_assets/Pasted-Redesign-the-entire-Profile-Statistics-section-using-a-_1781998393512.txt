@@ -1,0 +1,400 @@
+Redesign the entire Profile Statistics section using a true Miami Vice / Neon Nights luxury aesthetic.
+
+Use the attached reference image as the design direction.
+
+The current profile statistics section still looks generic.
+
+Problems:
+
+* The level card is still too large.
+* The progress bar is gray and boring.
+* Typography is generic.
+* No personality.
+* No visual excitement.
+* Does not match the premium Miami Vice casino identity of the game.
+* Looks like a placeholder UI instead of a finished product.
+
+The profile page should be one of the coolest screens in the entire game.
+
+⸻
+
+DESIGN GOAL
+
+Create a profile page that feels like:
+
+* Miami Vice
+* GTA Vice City
+* Neon Nights
+* Luxury casino
+* 1980s synthwave
+* High-end social platform
+
+The profile should instantly communicate:
+
+“I’m a high-status player.”
+
+⸻
+
+LEVEL CARD COMPLETE REDESIGN
+
+Current card:
+
+* Too tall
+* Too plain
+* Gray
+* Generic
+* Boring
+
+Replace it entirely.
+
+⸻
+
+NEW CARD DESIGN
+
+Card Height:
+
+Reduce height by approximately 40%.
+
+Make it feel sleek and wide.
+
+Use:
+
+* Dark black background
+* Subtle purple gradient
+* Neon cyan border
+* Neon pink accent glow
+* Rounded corners
+
+The card should feel like a glowing VIP membership card.
+
+⸻
+
+BORDER DESIGN
+
+Remove the gray border.
+
+Replace with:
+
+Dual-color neon border.
+
+Colors:
+
+* Cyan
+* Pink
+
+The border should softly transition between colors.
+
+Do not make it static.
+
+Add subtle animated glow movement.
+
+The card should feel alive.
+
+⸻
+
+LEVEL NUMBER
+
+Current:
+
+19
+
+Looks generic.
+
+Replace with:
+
+Large stylized brush-style 80s number.
+
+Reference:
+
+* GTA Vice City
+* Synthwave posters
+* Retro neon artwork
+
+Colors:
+
+Pink to Cyan gradient.
+
+Example:
+
+19
+
+using a stylized neon brush font.
+
+The level number should be the hero element.
+
+⸻
+
+RANK TITLE
+
+Current:
+
+LOCAL
+
+Too plain.
+
+Requirements:
+
+* Neon cyan text
+* Increased spacing
+* Thin retro typography
+* Small but premium
+
+Examples:
+
+LOCAL
+
+PLAYER
+
+VIP
+
+KINGPIN
+
+CARTEL
+
+EMPIRE
+
+DYNASTY
+
+VICE ROYALTY
+
+⸻
+
+PROGRESS BAR
+
+Current:
+
+Gray line.
+
+This must be removed.
+
+⸻
+
+NEW PROGRESS BAR
+
+Use:
+
+Neon gradient progress bar.
+
+Color Flow:
+
+Pink → Purple → Cyan
+
+Requirements:
+
+* Soft glow
+* Rounded ends
+* Animated fill
+* Thin luxury appearance
+
+The progress bar should feel futuristic.
+
+No gray.
+
+No flat colors.
+
+No basic mobile game styling.
+
+⸻
+
+PROGRESS TEXT
+
+Remove:
+
+TO LEVEL 20
+
+Replace with:
+
+NEXT LEVEL 20
+
+or
+
+44% COMPLETE
+
+or
+
+LEVEL PROGRESS
+
+Use a neon synthwave font style.
+
+⸻
+
+PROFILE NAME
+
+Current username styling is too basic.
+
+Redesign:
+
+officialbobbyf
+
+Use:
+
+* Neon gradient text
+* Pink to Cyan transition
+* Slight glow
+* Custom 80s-inspired font
+
+The username should feel like a player brand.
+
+⸻
+
+STATISTICS CARDS REDESIGN
+
+Current cards:
+
+* Too plain
+* Lack identity
+
+⸻
+
+NEW CARD STYLE
+
+Use:
+
+Dark card backgrounds.
+
+Thin neon borders.
+
+Different neon accent colors per category.
+
+Example:
+
+WIN RATE
+
+Pink
+
+HANDS
+
+Cyan
+
+BIGGEST POT
+
+Blue
+
+TOURNAMENTS
+
+Purple
+
+ACHIEVEMENTS
+
+Gold
+
+SOCIAL SCORE
+
+Pink/Cyan
+
+⸻
+
+STAT NUMBER FONT
+
+Current:
+
+Generic.
+
+Replace with:
+
+Stylized retro brush font.
+
+Large.
+
+Bright.
+
+High contrast.
+
+Examples:
+
+32%
+
+135
+
+91
+
+43
+
+Should feel like they belong on a synthwave poster.
+
+⸻
+
+SECTION HEADERS
+
+Current:
+
+STATISTICS
+
+Too plain.
+
+Replace with:
+
+STATISTICS
+
+using:
+
+* Thin neon typography
+* Increased spacing
+* Cyan glow accent line
+
+Reference:
+
+1980s arcade and nightclub signage.
+
+⸻
+
+OVERALL VISUAL STYLE
+
+Everything should feel:
+
+* Premium
+* Fashionable
+* Instagram-worthy
+* Screenshot-worthy
+* Neon luxury
+
+Avoid:
+
+* Gray
+* Flat colors
+* Generic fonts
+* Default mobile UI styling
+
+Favor:
+
+* Cyan
+* Pink
+* Purple
+* Electric blue
+* Neon gradients
+* Subtle glow effects
+
+⸻
+
+ANIMATION
+
+Add subtle animations:
+
+* Border glow pulse
+* Progress bar shimmer
+* Rank title glow
+* Card hover effects
+* Number glow flicker
+
+Keep animations elegant.
+
+Do not make them distracting.
+
+⸻
+
+FINAL REQUIREMENTS
+
+Verify:
+
+* Level card is significantly smaller.
+* Gray progress bar is removed.
+* Neon progress bar is implemented.
+* Pink/Cyan border is added.
+* Fonts are replaced with retro 80s-inspired typography.
+* Statistics cards receive unique neon color identities.
+* Username receives premium neon treatment.
+* Entire profile page matches the Miami Vice / Neon Nights theme.
+* The profile becomes one of the most visually impressive screens in the game.
+* The design feels premium, luxurious, and uniquely Chip Society.
+
+One additional change: when a player reaches Kingpin, Cartel, Empire, Dynasty, Legend, Immortal, Vice Royalty, or Chip Society Elite, the entire level card should change theme colors. That gives progression a visual payoff beyond just a number going up.
