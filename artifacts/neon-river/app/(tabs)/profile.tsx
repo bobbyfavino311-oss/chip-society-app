@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import ChipAmount from '@/components/ChipAmount';
 import colors from '@/constants/colors';
-import { useUser } from '@/context/UserContext';
+import { useUser, getXPForLevel } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
 import NeonAvatar from '@/components/NeonAvatar';
 import { useSoundSettings } from '@/context/SoundContext';
@@ -28,20 +28,21 @@ import { useTableTheme } from '@/context/TableThemeContext';
 import { ALL_ACHIEVEMENTS } from '@/lib/achievements';
 
 const RANK_COLORS: Record<string, string> = {
-  'Neon Bronze': '#cd7f32',
-  'Neon Silver': '#a0a8c0',
-  'Neon Gold': colors.gold,
-  'Neon Platinum': '#a0f0ff',
-  'Neon Diamond': '#b8f0ff',
-  'Neon Elite': colors.secondary,
-  'Neon Legend': colors.accent,
+  'LOCAL':              'rgba(255,255,255,0.45)',
+  'PLAYER':             '#00e887',
+  'HIGH ROLLER':        '#00d4ff',
+  'VIP':                '#00b8e6',
+  'EXECUTIVE':          '#a0a8c0',
+  'KINGPIN':            colors.gold,
+  'CARTEL':             '#ffaa00',
+  'SYNDICATE':          '#ff7700',
+  'EMPIRE':             colors.secondary,
+  'DYNASTY':            '#d070ff',
+  'LEGEND':             colors.accent,
+  'IMMORTAL':           '#ff5fff',
+  'VICE ROYALTY':       '#ff2090',
+  'CHIP SOCIETY ELITE': colors.accent,
 };
-
-const RANK_ORDER = [
-  'Neon Bronze', 'Neon Silver', 'Neon Gold', 'Neon Platinum',
-  'Neon Diamond', 'Neon Elite', 'Neon Legend',
-];
-const RANK_XP = [0, 500, 1500, 4000, 10000, 25000, 60000];
 
 function StatBox({ label, value, color = colors.text }: { label: string; value: string | number; color?: string }) {
   return (
@@ -232,11 +233,11 @@ export default function ProfileScreen() {
   const claimedCount = achievementCompletion(unlockedIds);
   const { theme: tableTheme } = useTableTheme();
 
-  const rankColor = RANK_COLORS[profile.rank] ?? c.primary;
-  const rankIdx = RANK_ORDER.indexOf(profile.rank);
-  const nextRankXP = RANK_XP[rankIdx + 1] ?? profile.xp;
-  const xpProgress = nextRankXP > 0
-    ? Math.min(1, (profile.xp - RANK_XP[rankIdx]) / (nextRankXP - RANK_XP[rankIdx]))
+  const rankColor   = RANK_COLORS[profile.rank] ?? c.primary;
+  const thisLevelXP = getXPForLevel(profile.level);
+  const nextLevelXP = getXPForLevel(profile.level + 1);
+  const xpProgress  = nextLevelXP > thisLevelXP
+    ? Math.min(1, (profile.xp - thisLevelXP) / (nextLevelXP - thisLevelXP))
     : 1;
 
   const saveName = async () => {
@@ -337,30 +338,40 @@ export default function ProfileScreen() {
 
         </View>
 
-        <View style={styles.card}>
-          <View style={styles.xpHeader}>
-            <Text style={styles.xpLabel}>XP Progress</Text>
-            <Text style={[styles.xpValue, { color: rankColor }]}>{profile.xp.toLocaleString()} XP</Text>
+        {/* ── Level hero card ─────────────────────────────────── */}
+        <View style={[styles.card, styles.levelCard]}>
+          <LinearGradient
+            colors={[`${rankColor}1a`, 'transparent']}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.levelHeroRow}>
+            <Text style={[styles.levelHeroNumber, { color: rankColor }]}>{profile.level}</Text>
+            <View style={styles.levelHeroMeta}>
+              <Text style={[styles.levelHeroRank, { color: rankColor }]}>{profile.rank}</Text>
+              <View style={styles.levelProgressRow}>
+                <View style={styles.levelProgressTrack}>
+                  <View style={[styles.levelProgressFill, {
+                    width: `${Math.round(xpProgress * 100)}%`,
+                    backgroundColor: rankColor,
+                  }]} />
+                </View>
+                <Text style={[styles.levelProgressPct, { color: `${rankColor}cc` }]}>
+                  {Math.round(xpProgress * 100)}%
+                </Text>
+              </View>
+              <Text style={styles.levelProgressSub}>TO LEVEL {profile.level + 1}</Text>
+            </View>
           </View>
-          <View style={styles.xpBar}>
-            <View style={[styles.xpFill, { width: `${xpProgress * 100}%`, backgroundColor: rankColor }]} />
-          </View>
-          {rankIdx < RANK_ORDER.length - 1 && (
-            <Text style={styles.xpNext}>
-              {(nextRankXP - profile.xp).toLocaleString()} XP to {RANK_ORDER[rankIdx + 1]}
-            </Text>
-          )}
         </View>
 
         <Text style={styles.sectionTitle}>STATISTICS</Text>
         <View style={styles.statsGrid}>
-          <StatBox label="LEVEL" value={`Lv.${profile.level}`} color={c.primary} />
           <StatBox label="WIN RATE" value={`${winRate}%`} color={c.success} />
+          <StatBox label="HANDS" value={profile.handsPlayed} />
         </View>
         <View style={styles.statsGrid}>
           <StatBox label="WINS" value={profile.wins} color={c.gold} />
           <StatBox label="LOSSES" value={profile.losses} color={c.error} />
-          <StatBox label="HANDS" value={profile.handsPlayed} />
         </View>
 
         {/* Tournament stats section — locked preview */}
@@ -845,17 +856,56 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: 16,
   },
-  xpHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  xpLabel: { color: colors.textMuted, fontSize: 12, fontWeight: '600' },
-  xpValue: { fontSize: 12, fontWeight: '700' },
-  xpBar: {
-    height: 6,
-    backgroundColor: colors.border,
-    borderRadius: 3,
+  // ── Level hero card ─────────────────────────────────────────
+  levelCard: { overflow: 'hidden' },
+  levelHeroRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+  },
+  levelHeroNumber: {
+    fontSize: 64,
+    fontWeight: '200',
+    fontFamily: 'Inter_700Bold',
+    letterSpacing: -2,
+    lineHeight: 70,
+  },
+  levelHeroMeta: { flex: 1, gap: 6 },
+  levelHeroRank: {
+    fontSize: 12,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 2,
+  },
+  levelProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  levelProgressTrack: {
+    flex: 1,
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 1,
     overflow: 'hidden',
   },
-  xpFill: { height: '100%', borderRadius: 3 },
-  xpNext: { color: colors.textDim, fontSize: 10, marginTop: 6 },
+  levelProgressFill: {
+    height: '100%',
+    borderRadius: 1,
+  },
+  levelProgressPct: {
+    fontSize: 10,
+    fontWeight: '600',
+    fontFamily: 'Inter_700Bold',
+    minWidth: 30,
+    textAlign: 'right',
+  },
+  levelProgressSub: {
+    fontSize: 8,
+    color: 'rgba(255,255,255,0.2)',
+    fontFamily: 'Orbitron_400Regular',
+    letterSpacing: 1.5,
+  },
   sectionTitle: {
     color: colors.textMuted,
     fontSize: 10,

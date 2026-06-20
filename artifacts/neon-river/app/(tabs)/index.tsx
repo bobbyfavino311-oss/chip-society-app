@@ -29,13 +29,20 @@ import NeonAvatar from '@/components/NeonAvatar';
 const { width } = Dimensions.get('window');
 
 const RANK_COLORS: Record<string, string> = {
-  'Neon Bronze': '#cd7f32',
-  'Neon Silver': '#a0a8c0',
-  'Neon Gold': colors.gold,
-  'Neon Platinum': '#a0f0ff',
-  'Neon Diamond': '#b8f0ff',
-  'Neon Elite': colors.secondary,
-  'Neon Legend': colors.accent,
+  'LOCAL':              'rgba(255,255,255,0.45)',
+  'PLAYER':             '#00e887',
+  'HIGH ROLLER':        '#00d4ff',
+  'VIP':                '#00b8e6',
+  'EXECUTIVE':          '#a0a8c0',
+  'KINGPIN':            colors.gold,
+  'CARTEL':             '#ffaa00',
+  'SYNDICATE':          '#ff7700',
+  'EMPIRE':             colors.secondary,
+  'DYNASTY':            '#d070ff',
+  'LEGEND':             colors.accent,
+  'IMMORTAL':           '#ff5fff',
+  'VICE ROYALTY':       '#ff2090',
+  'CHIP SOCIETY ELITE': colors.accent,
 };
 
 // ─── Tournament Preview Hub ────────────────────────────────────────────────────
@@ -796,7 +803,7 @@ export default function HomeScreen() {
             <Text style={styles.statLbl}>CHIPS</Text>
           </View>
           <View style={[styles.statCard, { borderColor: `${rankColor}30` }]}>
-            <Text style={[styles.statVal, { color: rankColor }]}>Lv.{profile.level}</Text>
+            <Text style={[styles.statVal, { color: rankColor }]}>{profile.level}</Text>
             <Text style={styles.statLbl}>LEVEL</Text>
           </View>
         </View>

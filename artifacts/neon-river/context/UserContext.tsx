@@ -2,25 +2,96 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export type Rank =
-  | 'Neon Bronze'
-  | 'Neon Silver'
-  | 'Neon Gold'
-  | 'Neon Platinum'
-  | 'Neon Diamond'
-  | 'Neon Elite'
-  | 'Neon Legend';
+  | 'LOCAL'
+  | 'PLAYER'
+  | 'HIGH ROLLER'
+  | 'VIP'
+  | 'EXECUTIVE'
+  | 'KINGPIN'
+  | 'CARTEL'
+  | 'SYNDICATE'
+  | 'EMPIRE'
+  | 'DYNASTY'
+  | 'LEGEND'
+  | 'IMMORTAL'
+  | 'VICE ROYALTY'
+  | 'CHIP SOCIETY ELITE';
 
 export type AccountType = 'registered';
 
-const RANKS: { rank: Rank; minXP: number }[] = [
-  { rank: 'Neon Bronze',   minXP: 0 },
-  { rank: 'Neon Silver',   minXP: 500 },
-  { rank: 'Neon Gold',     minXP: 1500 },
-  { rank: 'Neon Platinum', minXP: 4000 },
-  { rank: 'Neon Diamond',  minXP: 10000 },
-  { rank: 'Neon Elite',    minXP: 25000 },
-  { rank: 'Neon Legend',   minXP: 60000 },
+// ── Progression system — aggressive exponential XP curve ─────────────────────
+// Each entry is [level, cumulative XP needed to REACH that level].
+// Level 1 = 0 XP (everyone starts here).
+const XP_MILESTONES: [number, number][] = [
+  [1,    0],
+  [10,   10_000],
+  [25,   100_000],
+  [50,   1_000_000],
+  [100,  10_000_000],
+  [250,  100_000_000],
+  [500,  500_000_000],
+  [750,  1_500_000_000],
+  [1000, 5_000_000_000],
+  [1500, 15_000_000_000],
+  [2000, 50_000_000_000],
+  [3000, 150_000_000_000],
+  [4000, 350_000_000_000],
+  [5000, 1_000_000_000_000],
 ];
+
+// Cumulative XP required to START a given level (log-interpolated between milestones)
+export function getXPForLevel(level: number): number {
+  const L = Math.min(Math.max(level, 1), 5000);
+  for (let i = 1; i < XP_MILESTONES.length; i++) {
+    const [l0, xp0] = XP_MILESTONES[i - 1];
+    const [l1, xp1] = XP_MILESTONES[i];
+    if (L <= l1) {
+      if (xp0 === 0) return Math.round((xp1 * (L - l0)) / (l1 - l0));
+      const t = (L - l0) / (l1 - l0);
+      return Math.round(Math.exp(Math.log(xp0) + t * (Math.log(xp1) - Math.log(xp0))));
+    }
+  }
+  return 1_000_000_000_000;
+}
+
+function getLevelFromXP(xp: number): number {
+  if (xp <= 0) return 1;
+  let lo = 0, hi = XP_MILESTONES.length - 1;
+  while (lo < hi - 1) {
+    const mid = (lo + hi) >> 1;
+    if (XP_MILESTONES[mid][1] <= xp) lo = mid; else hi = mid;
+  }
+  const [l0, xp0] = XP_MILESTONES[lo];
+  const [l1, xp1] = XP_MILESTONES[hi];
+  if (xp >= xp1) return l1;
+  const t = xp0 === 0
+    ? xp / xp1
+    : (Math.log(xp) - Math.log(xp0)) / (Math.log(xp1) - Math.log(xp0));
+  return Math.min(5000, Math.max(1, Math.floor(l0 + t * (l1 - l0))));
+}
+
+const LEVEL_RANKS: { rank: Rank; minLevel: number }[] = [
+  { rank: 'LOCAL',              minLevel: 1    },
+  { rank: 'PLAYER',             minLevel: 50   },
+  { rank: 'HIGH ROLLER',        minLevel: 100  },
+  { rank: 'VIP',                minLevel: 200  },
+  { rank: 'EXECUTIVE',          minLevel: 350  },
+  { rank: 'KINGPIN',            minLevel: 500  },
+  { rank: 'CARTEL',             minLevel: 750  },
+  { rank: 'SYNDICATE',          minLevel: 1000 },
+  { rank: 'EMPIRE',             minLevel: 1250 },
+  { rank: 'DYNASTY',            minLevel: 1500 },
+  { rank: 'LEGEND',             minLevel: 2000 },
+  { rank: 'IMMORTAL',           minLevel: 2500 },
+  { rank: 'VICE ROYALTY',       minLevel: 3000 },
+  { rank: 'CHIP SOCIETY ELITE', minLevel: 4000 },
+];
+
+function getRankFromLevel(level: number): Rank {
+  let rank: Rank = 'LOCAL';
+  for (const r of LEVEL_RANKS) { if (level >= r.minLevel) rank = r.rank; }
+  return rank;
+}
 
 const DAILY_REWARDS: Record<number, number> = {
   1:  5_000, 2: 10_000, 3: 15_000, 4: 20_000, 5: 25_000, 6: 30_000, 7: 35_000,
@@ -102,7 +173,7 @@ const DEFAULT_PROFILE: UserProfile = {
   email: '',
   chips: REGISTERED_CHIPS,
   xp: 0,
-  rank: 'Neon Bronze',
+  rank: 'LOCAL',
   level: 1,
   wins: 0,
   losses: 0,
@@ -133,16 +204,6 @@ const DEFAULT_PROFILE: UserProfile = {
   bestTournamentFinish: 0,
   biggestTournamentPrize: 0,
 };
-
-function getRankFromXP(xp: number): Rank {
-  let rank: Rank = 'Neon Bronze';
-  for (const r of RANKS) { if (xp >= r.minXP) rank = r.rank; }
-  return rank;
-}
-
-function getLevelFromXP(xp: number): number {
-  return Math.floor(xp / 200) + 1;
-}
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -280,8 +341,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
     setProfile(prev => {
       const next = { ...prev, ...updates };
-      const rank  = getRankFromXP(next.xp);
       const level = getLevelFromXP(next.xp);
+      const rank  = getRankFromLevel(level);
       const final = { ...next, rank, level };
       save(final);
       return final;
@@ -306,13 +367,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const recordWin = useCallback(async (chipsWon: number) => {
     setProfile(prev => {
-      const xpGain = 50 + Math.floor(chipsWon / 1000);
+      const xpGain = 500 + Math.min(500, Math.floor(chipsWon / 200));
       const next = {
         ...prev, wins: prev.wins + 1, handsPlayed: prev.handsPlayed + 1,
         chips: prev.chips + chipsWon, xp: prev.xp + xpGain,
       };
-      next.rank  = getRankFromXP(next.xp);
       next.level = getLevelFromXP(next.xp);
+      next.rank  = getRankFromLevel(next.level);
       save(next);
       return next;
     });
@@ -320,9 +381,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const recordLoss = useCallback(async () => {
     setProfile(prev => {
-      const next = { ...prev, losses: prev.losses + 1, handsPlayed: prev.handsPlayed + 1, xp: prev.xp + 10 };
-      next.rank  = getRankFromXP(next.xp);
+      const next = { ...prev, losses: prev.losses + 1, handsPlayed: prev.handsPlayed + 1, xp: prev.xp + 150 };
       next.level = getLevelFromXP(next.xp);
+      next.rank  = getRankFromLevel(next.level);
       save(next);
       return next;
     });
@@ -403,8 +464,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [profile, updateProfile]);
 
   const addXP = useCallback(async (amount: number) => {
-    const newXP = profile.xp + amount;
-    await updateProfile({ xp: newXP, rank: getRankFromXP(newXP), level: getLevelFromXP(newXP) });
+    const newXP   = profile.xp + amount;
+    const newLevel = getLevelFromXP(newXP);
+    await updateProfile({ xp: newXP, level: newLevel, rank: getRankFromLevel(newLevel) });
   }, [profile, updateProfile]);
 
   const consumeFortuneCookie = useCallback(async (type: 'standard' | 'golden' | 'dragon'): Promise<boolean> => {

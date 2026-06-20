@@ -1,0 +1,402 @@
+Complete overhaul of the XP, Level, Prestige, and Rank system.
+
+CURRENT PROBLEM
+
+The current progression system is completely broken.
+
+Players can currently gain hundreds of levels within minutes.
+
+This destroys:
+
+* Long-term retention
+* Prestige
+* Player status
+* Rank significance
+* Achievement value
+* VIP aspirations
+
+Levels should be one of the most important status symbols in Chip Society.
+
+The progression system should be designed around months and years of gameplay, not hours.
+
+⸻
+
+CORE DESIGN PHILOSOPHY
+
+A player’s level should immediately communicate:
+
+* Experience
+* Dedication
+* Time invested
+* Skill
+* Social status
+
+Most players should never reach the highest levels.
+
+The highest ranks should feel legendary.
+
+When players encounter a Level 1000+ player, it should feel rare.
+
+When players encounter a Level 2000+ player, it should feel almost mythical.
+
+⸻
+
+REMOVE CURRENT SYSTEM
+
+Completely remove the existing XP formula.
+
+Completely remove the current rank structure.
+
+Remove rank names such as:
+
+* Neon Gold
+* Neon Platinum
+* Similar generic gaming titles
+
+These feel cheap, generic, and do not match the premium luxury casino atmosphere of Chip Society.
+
+⸻
+
+NEW LEVEL CAP
+
+Increase maximum level cap to:
+
+Level 5000
+
+This creates years of progression.
+
+Very few players should ever reach the upper levels.
+
+⸻
+
+NEW XP SCALING SYSTEM
+
+Use aggressive exponential scaling.
+
+The XP curve should become progressively more difficult at higher levels.
+
+Example milestones:
+
+Level 1
+100 XP
+
+Level 10
+10,000 XP
+
+Level 25
+100,000 XP
+
+Level 50
+1,000,000 XP
+
+Level 100
+10,000,000 XP
+
+Level 250
+100,000,000 XP
+
+Level 500
+500,000,000 XP
+
+Level 750
+1,500,000,000 XP
+
+Level 1000
+5,000,000,000 XP
+
+Level 1500
+15,000,000,000 XP
+
+Level 2000
+50,000,000,000 XP
+
+Level 3000
+150,000,000,000 XP
+
+Level 4000
+350,000,000,000 XP
+
+Level 5000
+1,000,000,000,000 XP
+
+These values can be adjusted but the progression philosophy should remain.
+
+Leveling should become increasingly difficult.
+
+⸻
+
+EXPECTED PROGRESSION
+
+Level 50
+Several days
+
+Level 100
+Several weeks
+
+Level 250
+Several months
+
+Level 500
+6–12 months
+
+Level 1000
+1–3 years
+
+Level 2000
+Several years
+
+Level 5000
+Reserved for the most dedicated players in the entire game.
+
+⸻
+
+XP REWARDS
+
+Award XP for:
+
+* Hands played
+* Winning hands
+* Tournament entries
+* Tournament placements
+* Tournament wins
+* Daily objectives
+* Weekly objectives
+* Monthly objectives
+* Seasonal objectives
+* Achievements
+* Fortune Cookies
+* Lottery Tickets
+* Social engagement
+* Special events
+* Milestone accomplishments
+
+Avoid massive XP spikes.
+
+Progression should feel consistent and earned.
+
+⸻
+
+ANTI-FARMING SYSTEM
+
+Prevent abuse.
+
+Reduce XP gains for:
+
+* Intentional folding
+* AFK behavior
+* Repetitive farming
+* Rapid table switching
+* Suspicious activity
+
+Reward actual participation.
+
+⸻
+
+NEW RANK STRUCTURE
+
+Replace all existing rank titles.
+
+Use the following hierarchy:
+
+Level 1-49
+LOCAL
+
+Level 50-99
+PLAYER
+
+Level 100-199
+HIGH ROLLER
+
+Level 200-349
+VIP
+
+Level 350-499
+EXECUTIVE
+
+Level 500-749
+KINGPIN
+
+Level 750-999
+CARTEL
+
+Level 1000-1249
+SYNDICATE
+
+Level 1250-1499
+EMPIRE
+
+Level 1500-1999
+DYNASTY
+
+Level 2000-2499
+LEGEND
+
+Level 2500-2999
+IMMORTAL
+
+Level 3000-3999
+VICE ROYALTY
+
+Level 4000-5000
+CHIP SOCIETY ELITE
+
+⸻
+
+PRESTIGE RANK REQUIREMENTS
+
+VICE ROYALTY
+
+Should require:
+
+* Level requirement
+* Lifetime winnings requirement
+* Tournament participation requirement
+
+CHIP SOCIETY ELITE
+
+Should require:
+
+* Level requirement
+* Lifetime winnings requirement
+* Achievement completion requirement
+* Exclusive prestige unlock
+
+Not every player should qualify.
+
+⸻
+
+PROFILE DISPLAY
+
+The player’s level should become the primary status symbol.
+
+Example:
+
+1784
+
+DYNASTY
+
+or
+
+542
+
+KINGPIN
+
+or
+
+3122
+
+VICE ROYALTY
+
+The number should be the focal point.
+
+The rank supports the number.
+
+⸻
+
+STATISTICS SCREEN REDESIGN
+
+Current:
+
+Lv.57
+
+LEVEL
+
+Remove:
+
+* Lv.
+* LEVEL label
+
+Replace with:
+
+57
+
+HIGH ROLLER
+
+or
+
+57
+
+PLAYER
+
+depending on current rank.
+
+⸻
+
+VISUAL DESIGN REQUIREMENTS
+
+The statistics section should feel:
+
+* Luxury casino
+* Miami Vice inspired
+* Modern fintech
+* Premium social platform
+
+Use:
+
+* Large level number
+* Thin typography
+* Minimal wording
+* Strong spacing
+* Elegant hierarchy
+
+Avoid:
+
+* Generic gaming labels
+* Cartoon styling
+* Cheap gradients
+* Cluttered interfaces
+
+The level number should be the hero element.
+
+⸻
+
+ADDITIONAL PRESTIGE FEATURES
+
+Add optional profile flair for high-rank players.
+
+Examples:
+
+KINGPIN
+Small crown icon
+
+CARTEL
+Luxury badge
+
+EMPIRE
+Animated profile accent
+
+DYNASTY
+Premium profile border
+
+LEGEND
+Exclusive profile frame
+
+IMMORTAL
+Animated prestige frame
+
+VICE ROYALTY
+Custom luxury profile treatment
+
+CHIP SOCIETY ELITE
+Unique profile presentation unavailable to other players
+
+These rewards should feel exclusive and aspirational.
+
+⸻
+
+FINAL REQUIREMENTS
+
+Verify:
+
+* Players cannot gain hundreds of levels in minutes.
+* XP scales aggressively.
+* Progression lasts years, not days.
+* Rank names match the luxury casino atmosphere.
+* “Lv.” is removed everywhere.
+* Level number becomes the primary status indicator.
+* Rank titles support the level number.
+* High-level players feel rare and prestigious.
+* Vice Royalty and Chip Society Elite feel legendary.
+* Progression becomes one of the core retention systems of the game.
+
+One additional change I’d make: don’t show progress as “XP / Next Level” once players get into the higher ranks. Instead, use a thin luxury progress bar and percentages. Seeing “4,832,500,000 / 5,000,000,000 XP” starts to feel ridiculous, while a sleek progress indicator keeps the UI premium and easier to read.

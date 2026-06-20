@@ -15,30 +15,46 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser, Rank } from '@/context/UserContext';
 
-// RP thresholds per rank
+// RP thresholds per rank (level ranges mapped to RP bands)
 const RANK_RP: Record<Rank, [number, number]> = {
-  'Neon Bronze':   [0,     500],
-  'Neon Silver':   [500,   1500],
-  'Neon Gold':     [1500,  4000],
-  'Neon Platinum': [4000,  10000],
-  'Neon Diamond':  [10000, 25000],
-  'Neon Elite':    [25000, 60000],
-  'Neon Legend':   [60000, 60000],
+  'LOCAL':              [0,      1000],
+  'PLAYER':             [1000,   5000],
+  'HIGH ROLLER':        [5000,   15000],
+  'VIP':                [15000,  35000],
+  'EXECUTIVE':          [35000,  70000],
+  'KINGPIN':            [70000,  120000],
+  'CARTEL':             [120000, 200000],
+  'SYNDICATE':          [200000, 300000],
+  'EMPIRE':             [300000, 450000],
+  'DYNASTY':            [450000, 650000],
+  'LEGEND':             [650000, 900000],
+  'IMMORTAL':           [900000, 1200000],
+  'VICE ROYALTY':       [1200000, 1600000],
+  'CHIP SOCIETY ELITE': [1600000, 1600000],
 };
 
 const RANK_COLORS: Record<Rank, string> = {
-  'Neon Bronze':   '#cd7f32',
-  'Neon Silver':   '#a0a8c0',
-  'Neon Gold':     '#ffd700',
-  'Neon Platinum': '#a0f0ff',
-  'Neon Diamond':  '#b8f0ff',
-  'Neon Elite':    '#ff0090',
-  'Neon Legend':   '#bf5fff',
+  'LOCAL':              'rgba(255,255,255,0.45)',
+  'PLAYER':             '#00e887',
+  'HIGH ROLLER':        '#00d4ff',
+  'VIP':                '#00b8e6',
+  'EXECUTIVE':          '#a0a8c0',
+  'KINGPIN':            '#ffd700',
+  'CARTEL':             '#ffaa00',
+  'SYNDICATE':          '#ff7700',
+  'EMPIRE':             '#bf5fff',
+  'DYNASTY':            '#d070ff',
+  'LEGEND':             '#ff0090',
+  'IMMORTAL':           '#ff5fff',
+  'VICE ROYALTY':       '#ff2090',
+  'CHIP SOCIETY ELITE': '#bf5fff',
 };
 
 const RANK_ICONS: Record<Rank, string> = {
-  'Neon Bronze': '🥉', 'Neon Silver': '🥈', 'Neon Gold': '🥇',
-  'Neon Platinum': '💎', 'Neon Diamond': '💠', 'Neon Elite': '⚡', 'Neon Legend': '👑',
+  'LOCAL': '◦', 'PLAYER': '▸', 'HIGH ROLLER': '◈', 'VIP': '◆',
+  'EXECUTIVE': '✦', 'KINGPIN': '♛', 'CARTEL': '⚔', 'SYNDICATE': '⚑',
+  'EMPIRE': '✺', 'DYNASTY': '♚', 'LEGEND': '★', 'IMMORTAL': '✦',
+  'VICE ROYALTY': '♾', 'CHIP SOCIETY ELITE': '👑',
 };
 
 type SearchPhase = 'idle' | 'searching' | 'found';
@@ -132,12 +148,12 @@ export default function RankedScreen() {
           <Text style={s.rankEmoji}>{RANK_ICONS[rank]}</Text>
           <Text style={[s.rankName, { color: rankColor }]}>{rank.toUpperCase()}</Text>
           <Text style={[s.rankRp, { color: rankColor }]}>{rp.toLocaleString()} RP</Text>
-          {rank !== 'Neon Legend' && (
+          {rank !== 'CHIP SOCIETY ELITE' && (
             <View style={s.rpBar}>
               <View style={[s.rpFill, { width: `${progress * 100}%` as any, backgroundColor: rankColor }]} />
             </View>
           )}
-          {rank !== 'Neon Legend' && (
+          {rank !== 'CHIP SOCIETY ELITE' && (
             <Text style={s.rpNext}>{rp}/{rpMax} RP to next rank</Text>
           )}
         </View>
