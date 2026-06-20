@@ -88,8 +88,8 @@ const TIER_REWARDS: Record<RewardTier, FortuneReward[]> = {
   LEGENDARY: [
     { tier:'LEGENDARY', type:'chips', amount:500_000,   label:'+500,000 Chips',   color:'#F59E0B', icon:'👑' },
     { tier:'LEGENDARY', type:'chips', amount:1_000_000, label:'+1,000,000 Chips', color:'#F59E0B', icon:'👑' },
-    { tier:'LEGENDARY', type:'token', amount:1,         label:'Avatar Token',      color:'#F59E0B', icon:'🃏' },
-    { tier:'LEGENDARY', type:'token', amount:1,         label:'Tournament Ticket', color:'#F59E0B', icon:'🎟' },
+    { tier:'LEGENDARY', type:'chips', amount:2_500_000, label:'+2,500,000 Chips', color:'#F59E0B', icon:'👑' },
+    { tier:'LEGENDARY', type:'xp',   amount:5_000,     label:'+5,000 XP',        color:'#F59E0B', icon:'⚡' },
   ],
 };
 
@@ -187,6 +187,20 @@ export default function FortuneCookieScreen() {
   const [reward,     setReward]       = useState<FortuneReward | null>(null);
   const [fortuneMsg, setFortuneMsg]   = useState('');
 
+  // Auto-switch to best available type when selected type is depleted
+  useEffect(() => {
+    if (phase !== 'idle') return;
+    const hasCurrent = cookieType === 'dragon' ? profile.dragonCookies > 0
+      : cookieType === 'golden' ? profile.goldenCookies > 0
+      : profile.fortuneCookies > 0;
+    if (!hasCurrent) {
+      const next: CookieType = profile.dragonCookies > 0 ? 'dragon'
+        : profile.goldenCookies > 0 ? 'golden'
+        : 'standard';
+      setCookieType(next);
+    }
+  }, [profile.fortuneCookies, profile.goldenCookies, profile.dragonCookies, phase, cookieType]);
+
   // ── Animations ──────────────────────────────────────────────────────────────
   const shakeX       = useRef(new Animated.Value(0)).current;
   const cookieScale  = useRef(new Animated.Value(1)).current;
@@ -227,9 +241,8 @@ export default function FortuneCookieScreen() {
     // Claim daily if available
     if (canClaimFreeCookie) await claimFreeCookie();
 
-    const type = profile.dragonCookies > 0 ? 'dragon'
-      : profile.goldenCookies > 0 ? 'golden'
-      : 'standard';
+    // Use the player's selected cookie type
+    const type = cookieType;
 
     const ok = await consumeFortuneCookie(type);
     if (!ok) return;
@@ -435,25 +448,43 @@ export default function FortuneCookieScreen() {
         {/* IDLE: Open button */}
         {phase === 'idle' && (
           <View style={styles.idleSection}>
-            {/* Cookie type pills */}
+            {/* Cookie type tabs — tap to select which cookie to open */}
             <View style={styles.cookieInventory}>
               {profile.fortuneCookies > 0 && (
-                <View style={[styles.pill, { borderColor: '#C4813A55' }]}>
+                <TouchableOpacity
+                  style={[styles.pill,
+                    cookieType === 'standard' && styles.pillActive,
+                    { borderColor: cookieType === 'standard' ? '#E8A458' : '#C4813A44' }]}
+                  onPress={() => setCookieType('standard')}
+                  activeOpacity={0.72}
+                >
                   <Text style={[styles.pillNum, { color: '#E8A458' }]}>{profile.fortuneCookies}</Text>
-                  <Text style={styles.pillLbl}>Standard</Text>
-                </View>
+                  <Text style={[styles.pillLbl, cookieType === 'standard' && { color: '#E8A458' }]}>Standard</Text>
+                </TouchableOpacity>
               )}
               {profile.goldenCookies > 0 && (
-                <View style={[styles.pill, { borderColor: '#D4A01755' }]}>
+                <TouchableOpacity
+                  style={[styles.pill,
+                    cookieType === 'golden' && styles.pillActive,
+                    { borderColor: cookieType === 'golden' ? '#FFD700' : '#D4A01744' }]}
+                  onPress={() => setCookieType('golden')}
+                  activeOpacity={0.72}
+                >
                   <Text style={[styles.pillNum, { color: '#FFD700' }]}>{profile.goldenCookies}</Text>
-                  <Text style={styles.pillLbl}>Golden</Text>
-                </View>
+                  <Text style={[styles.pillLbl, cookieType === 'golden' && { color: '#FFD700' }]}>Golden</Text>
+                </TouchableOpacity>
               )}
               {profile.dragonCookies > 0 && (
-                <View style={[styles.pill, { borderColor: '#8B180055' }]}>
+                <TouchableOpacity
+                  style={[styles.pill,
+                    cookieType === 'dragon' && styles.pillActive,
+                    { borderColor: cookieType === 'dragon' ? '#FF6622' : '#8B180044' }]}
+                  onPress={() => setCookieType('dragon')}
+                  activeOpacity={0.72}
+                >
                   <Text style={[styles.pillNum, { color: '#FF6622' }]}>{profile.dragonCookies}</Text>
-                  <Text style={styles.pillLbl}>Dragon</Text>
-                </View>
+                  <Text style={[styles.pillLbl, cookieType === 'dragon' && { color: '#FF6622' }]}>Dragon</Text>
+                </TouchableOpacity>
               )}
             </View>
 
@@ -603,6 +634,7 @@ const styles = StyleSheet.create({
 
   idleSection: { gap: 14 },
   cookieInventory: { flexDirection: 'row', gap: 8, justifyContent: 'center' },
+  pillActive: { backgroundColor: 'rgba(255,255,255,0.06)' },
   pill: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     borderRadius: 10, borderWidth: 1,

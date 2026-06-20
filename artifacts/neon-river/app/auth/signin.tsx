@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,9 +17,13 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 
+type Phase = 'username' | 'pin';
+
 export default function SignInScreen() {
   const { signIn } = useUser();
+  const [phase, setPhase] = useState<Phase>('username');
   const [username, setUsername] = useState('');
+  const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const shake = useRef(new Animated.Value(0)).current;
@@ -33,31 +38,51 @@ export default function SignInScreen() {
     ]).start();
   };
 
+  const handleContinue = () => {
+    if (!username.trim()) return;
+    setError('');
+    setPhase('pin');
+  };
+
+  const handlePinKey = (key: string) => {
+    setError('');
+    if (key === '⌫') { setPin(p => p.slice(0, -1)); return; }
+    if (pin.length < 4) setPin(p => p + key);
+  };
+
   const handleSignIn = async () => {
-    if (!username.trim() || loading) return;
+    if (pin.length !== 4 || loading) return;
     setLoading(true);
     setError('');
-    const result = await signIn(username.trim());
+    const result = await signIn(username.trim(), pin);
     setLoading(false);
     if (result.success) {
       router.replace('/(tabs)');
     } else {
       setError(result.error ?? 'Sign in failed.');
       doShake();
+      setPin('');
+    }
+  };
+
+  const handleBack = () => {
+    if (phase === 'pin') {
+      setPhase('username');
+      setPin('');
+      setError('');
+    } else {
+      router.back();
     }
   };
 
   return (
     <View style={s.screen}>
-      <LinearGradient
-        colors={['#050010', '#0a0022', '#050010']}
-        style={StyleSheet.absoluteFill}
-      />
+      <LinearGradient colors={['#050010', '#0a0022', '#050010']} style={StyleSheet.absoluteFill} />
       <SafeAreaView style={s.safe} edges={['top', 'bottom']}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
           <View style={s.header}>
-            <Pressable style={s.backBtn} onPress={() => router.back()}>
+            <Pressable style={s.backBtn} onPress={handleBack}>
               <Ionicons name="chevron-back" size={20} color="rgba(255,255,255,0.6)" />
             </Pressable>
           </View>
@@ -66,57 +91,109 @@ export default function SignInScreen() {
             <View style={s.logoMark}>
               <Text style={s.logoSymbol}>♠</Text>
             </View>
-            <Text style={s.title}>WELCOME{'\n'}BACK</Text>
-            <Text style={s.subtitle}>Sign in with your username to resume your game.</Text>
 
-            <Animated.View style={[s.inputWrap, { transform: [{ translateX: shake }] }]}>
-              <Ionicons name="person-outline" size={18} color="rgba(0,212,255,0.5)" />
-              <TextInput
-                style={s.input}
-                placeholder="Username"
-                placeholderTextColor="rgba(255,255,255,0.25)"
-                value={username}
-                onChangeText={val => { setUsername(val); setError(''); }}
-                autoCapitalize="none"
-                autoCorrect={false}
-                onSubmitEditing={handleSignIn}
-                returnKeyType="go"
-              />
-            </Animated.View>
+            {/* ── Phase: Username ── */}
+            {phase === 'username' && (
+              <>
+                <Text style={s.title}>WELCOME{'\n'}BACK</Text>
+                <Text style={s.subtitle}>Enter your username to continue.</Text>
 
-            {error ? (
-              <View style={s.errorRow}>
-                <Ionicons name="warning-outline" size={14} color={colors.error} />
-                <Text style={s.errorText}>{error}</Text>
-              </View>
-            ) : null}
+                <Animated.View style={[s.inputWrap, { transform: [{ translateX: shake }] }]}>
+                  <Ionicons name="person-outline" size={18} color="rgba(0,212,255,0.5)" />
+                  <TextInput
+                    style={s.input}
+                    placeholder="Username"
+                    placeholderTextColor="rgba(255,255,255,0.25)"
+                    value={username}
+                    onChangeText={v => { setUsername(v); setError(''); }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    onSubmitEditing={handleContinue}
+                    returnKeyType="next"
+                  />
+                </Animated.View>
 
-            <Pressable
-              style={({ pressed }) => [s.signinBtn, (!username.trim() || loading) && s.signinBtnDisabled, pressed && { opacity: 0.8 }]}
-              onPress={handleSignIn}
-              disabled={!username.trim() || loading}
-            >
-              <Text style={s.signinText}>{loading ? 'SIGNING IN...' : 'SIGN IN'}</Text>
-              {!loading && <Ionicons name="arrow-forward" size={16} color={colors.primary} />}
-            </Pressable>
+                {error ? (
+                  <View style={s.errorRow}>
+                    <Ionicons name="warning-outline" size={14} color={colors.error} />
+                    <Text style={s.errorText}>{error}</Text>
+                  </View>
+                ) : null}
 
-            <View style={s.divider}>
-              <View style={s.dividerLine} />
-              <Text style={s.dividerText}>OR</Text>
-              <View style={s.dividerLine} />
-            </View>
+                <Pressable
+                  style={({ pressed }) => [s.mainBtn, !username.trim() && s.mainBtnDisabled, pressed && { opacity: 0.8 }]}
+                  onPress={handleContinue}
+                  disabled={!username.trim()}
+                >
+                  <Text style={s.mainBtnText}>CONTINUE</Text>
+                  <Ionicons name="arrow-forward" size={16} color={colors.primary} />
+                </Pressable>
 
-            <Pressable style={s.createBtn} onPress={() => router.replace('/auth/signup')}>
-              <Text style={s.createText}>Create a new account</Text>
-              <Ionicons name="chevron-forward" size={14} color="rgba(0,212,255,0.5)" />
-            </Pressable>
+                <View style={s.divider}>
+                  <View style={s.dividerLine} />
+                  <Text style={s.dividerText}>OR</Text>
+                  <View style={s.dividerLine} />
+                </View>
 
-            <View style={s.noteBox}>
-              <Ionicons name="information-circle-outline" size={14} color="rgba(255,255,255,0.3)" />
-              <Text style={s.noteText}>
-                Accounts are stored locally on this device. Email/password login coming in a future update.
-              </Text>
-            </View>
+                <Pressable style={s.createBtn} onPress={() => router.replace('/auth/signup')}>
+                  <Text style={s.createText}>Create a new account</Text>
+                  <Ionicons name="chevron-forward" size={14} color="rgba(0,212,255,0.5)" />
+                </Pressable>
+
+                <Pressable style={s.forgotBtn} onPress={() => router.push('/auth/forgot-pin' as any)}>
+                  <Text style={s.forgotText}>Forgot PIN?</Text>
+                </Pressable>
+              </>
+            )}
+
+            {/* ── Phase: PIN ── */}
+            {phase === 'pin' && (
+              <>
+                <Text style={s.title}>ENTER{'\n'}YOUR PIN</Text>
+                <Text style={s.subtitle}>4-digit PIN for{'\n'}<Text style={{ color: colors.primary }}>{username}</Text></Text>
+
+                {/* Dots */}
+                <Animated.View style={[s.pinDots, { transform: [{ translateX: shake }] }]}>
+                  {[0,1,2,3].map(i => (
+                    <View key={i} style={[s.pinDot, pin.length > i && s.pinDotFilled]} />
+                  ))}
+                </Animated.View>
+
+                {error ? (
+                  <View style={s.errorRow}>
+                    <Ionicons name="warning-outline" size={14} color={colors.error} />
+                    <Text style={s.errorText}>{error}</Text>
+                  </View>
+                ) : null}
+
+                {/* Numpad */}
+                <View style={s.numpad}>
+                  {['1','2','3','4','5','6','7','8','9','','0','⌫'].map((k, idx) => {
+                    if (!k) return <View key={idx} style={s.numKey} />;
+                    const isBack = k === '⌫';
+                    return (
+                      <TouchableOpacity
+                        key={idx}
+                        style={[s.numKey, s.numKeyBtn, isBack && s.numKeyBack]}
+                        onPress={() => handlePinKey(k)}
+                        activeOpacity={0.65}
+                      >
+                        <Text style={[s.numKeyText, isBack && s.numKeyBackText]}>{k}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                <Pressable
+                  style={({ pressed }) => [s.mainBtn, (pin.length !== 4 || loading) && s.mainBtnDisabled, pressed && { opacity: 0.8 }]}
+                  onPress={handleSignIn}
+                  disabled={pin.length !== 4 || loading}
+                >
+                  <Text style={s.mainBtnText}>{loading ? 'SIGNING IN...' : 'SIGN IN'}</Text>
+                  {!loading && <Ionicons name="arrow-forward" size={16} color={colors.primary} />}
+                </Pressable>
+              </>
+            )}
           </View>
 
         </KeyboardAvoidingView>
@@ -130,8 +207,7 @@ const s = StyleSheet.create({
   safe:   { flex: 1 },
   header: { paddingHorizontal: 16, paddingTop: 8 },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-
-  content: { flex: 1, paddingHorizontal: 28, paddingTop: 16, gap: 18 },
+  content: { flex: 1, paddingHorizontal: 28, paddingTop: 8, gap: 16 },
 
   logoMark: {
     width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center',
@@ -153,16 +229,16 @@ const s = StyleSheet.create({
   },
   input: { flex: 1, fontSize: 15, color: '#fff', fontFamily: 'Orbitron_400Regular' },
 
-  errorRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: -10 },
+  errorRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: -8 },
   errorText: { fontSize: 12, color: colors.error },
 
-  signinBtn: {
+  mainBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
     borderRadius: 14, borderWidth: 1.5, borderColor: colors.primary,
     backgroundColor: 'rgba(0,212,255,0.12)', paddingVertical: 16,
   },
-  signinBtnDisabled: { borderColor: 'rgba(255,255,255,0.15)', backgroundColor: 'rgba(255,255,255,0.04)' },
-  signinText: { fontFamily: 'Orbitron_700Bold', fontSize: 13, color: colors.primary, letterSpacing: 2 },
+  mainBtnDisabled: { borderColor: 'rgba(255,255,255,0.15)', backgroundColor: 'rgba(255,255,255,0.04)' },
+  mainBtnText: { fontFamily: 'Orbitron_700Bold', fontSize: 13, color: colors.primary, letterSpacing: 2 },
 
   divider: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
@@ -176,10 +252,25 @@ const s = StyleSheet.create({
   },
   createText: { fontSize: 13, color: 'rgba(0,212,255,0.7)', letterSpacing: 1 },
 
-  noteBox: {
-    flexDirection: 'row', gap: 8, alignItems: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 10,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', padding: 12,
+  forgotBtn: { alignItems: 'center', paddingVertical: 6 },
+  forgotText: { fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecorationLine: 'underline' },
+
+  // PIN
+  pinDots: { flexDirection: 'row', justifyContent: 'center', gap: 20, marginVertical: 4 },
+  pinDot: {
+    width: 24, height: 24, borderRadius: 12,
+    borderWidth: 2, borderColor: 'rgba(0,212,255,0.3)',
+    backgroundColor: 'transparent',
   },
-  noteText: { flex: 1, fontSize: 11, color: 'rgba(255,255,255,0.3)', lineHeight: 16 },
+  pinDotFilled: { backgroundColor: colors.primary, borderColor: colors.primary },
+
+  numpad: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center' },
+  numKey:     { width: '28%', aspectRatio: 1.6, alignItems: 'center', justifyContent: 'center' },
+  numKeyBtn:  {
+    borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0,212,255,0.2)',
+    backgroundColor: 'rgba(0,212,255,0.06)',
+  },
+  numKeyBack: { borderColor: 'rgba(255,255,255,0.12)', backgroundColor: 'rgba(255,255,255,0.04)' },
+  numKeyText: { fontSize: 22, color: '#fff', fontFamily: 'Orbitron_400Regular' },
+  numKeyBackText: { fontSize: 20, color: 'rgba(255,255,255,0.5)' },
 });

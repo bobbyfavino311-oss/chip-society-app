@@ -1,0 +1,259 @@
+HOME SCREEN TOURNAMENT SECTION REDESIGN
+
+The current Featured Tournaments section on the Home Screen needs to be redesigned.
+
+The goal is to keep the Home Screen visually full and professional while avoiding fake tournaments, fake player counts, fake prize pools, fake registrations, or placeholder statistics.
+
+Players should understand that tournaments are a future feature currently under development.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REMOVE FAKE DATA
+
+Remove all placeholder tournament information.
+
+Examples:
+
+❌ Fake Prize Pools
+
+❌ Fake Seat Counts
+
+❌ Fake Registered Counts
+
+❌ Fake Active Tournament Counts
+
+❌ Fake Progress Bars
+
+❌ Fake Buy-Ins
+
+❌ Fake Timers
+
+❌ Fake Player Numbers
+
+❌ Fake Availability
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+KEEP THE FEATURED TOURNAMENTS SECTION
+
+Do NOT remove the section entirely.
+
+The Home Screen feels empty without it.
+
+Instead:
+
+Convert the area into a Tournament Preview Hub.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NEW HEADER
+
+Replace existing tournament information with:
+
+FEATURED TOURNAMENTS
+
+Subtext:
+
+“The next major feature coming to Chip Society.”
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MAIN FEATURE CARD
+
+Display a premium tournament preview card.
+
+Title:
+
+🏆 CHIP SOCIETY CHAMPIONSHIP
+
+Description:
+
+Compete against players worldwide in multi-table poker tournaments featuring championship prize pools, final table action, and future competitive events.
+
+Badge:
+
+COMING SOON
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ADDITIONAL TOURNAMENT PREVIEW CARDS
+
+Use horizontal scrolling cards.
+
+These cards are previews only.
+
+Do not show fake statistics.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD 1
+
+🏆 CHIP SOCIETY CHAMPIONSHIP
+
+Preview:
+
+• Multi-table tournament
+• Championship events
+• Final table spotlight
+• Massive future prize pools
+
+COMING SOON
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD 2
+
+⚡ TURBO SHOWDOWN
+
+Preview:
+
+• Fast blind increases
+• Shorter tournament sessions
+• Faster action
+• Quick competitive play
+
+COMING SOON
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD 3
+
+🐉 FOUR DRAGONS EVENT
+
+Preview:
+
+• Four Dragons themed event
+• Limited-time format
+• Special rewards
+• Seasonal competition
+
+COMING SOON
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD 4
+
+💰 HIGH ROLLER SERIES
+
+Preview:
+
+• Elite stakes
+• Premium competition
+• Exclusive events
+• Large future prize pools
+
+COMING SOON
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD 5
+
+🎭 CHIP SOCIETY SEASONAL EVENTS
+
+Preview:
+
+• Holiday events
+• Community competitions
+• Special game modes
+• Limited-time rewards
+
+COMING SOON
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMING SOON BADGES
+
+Each preview card should include:
+
+COMING SOON
+
+or
+
+IN DEVELOPMENT
+
+Badge styling should match Chip Society branding.
+
+Use:
+
+• Gold
+• Cyan
+• Pink
+• Purple
+
+depending on card theme.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NOTIFY ME BUTTON
+
+Add button:
+
+NOTIFY ME
+
+When pressed:
+
+Display confirmation:
+
+✓ We’ll notify you when tournaments launch.
+
+Store player preference for future notifications.
+
+No tournament registration is required.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL DESIGN
+
+The section should feel premium.
+
+Use:
+
+• Tournament trophy icons
+• Poker chip accents
+• Championship imagery
+• Four Dragons branding
+• Neon casino styling
+
+Avoid:
+
+❌ Fake statistics
+
+❌ Fake player counts
+
+❌ Fake prize values
+
+❌ Fake progress bars
+
+❌ Fake seat availability
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FUTURE TOURNAMENT PAGE
+
+When tournaments are eventually released:
+
+This section can transition naturally into live tournament listings.
+
+The visual layout should already support:
+
+• Tournament Name
+• Buy-In
+• Prize Pool
+• Registration Count
+• Start Time
+• Status
+
+But these should remain hidden until real tournament functionality exists.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+Players should immediately understand:
+
+• Tournaments are planned.
+• Tournaments are not currently live.
+• Chip Society is actively expanding.
+• Future tournament formats are being previewed.
+
+The section should feel exciting, professional, and informative without misleading players through fake data or placeholder statistics.

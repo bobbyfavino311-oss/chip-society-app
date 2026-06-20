@@ -83,7 +83,19 @@ interface StoredAccount {
   email: string;
   avatarIndex: number;
   createdAt: string;
+  pinHash: string;
   profile: UserProfile;
+}
+
+// FNV-1a 32-bit hash for PIN — never store PINs in plaintext
+function hashPin(pin: string, salt: string): string {
+  const input = `chip_society::${salt.toLowerCase()}::${pin}`;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -154,9 +166,11 @@ interface UserContextValue {
   addScratchTickets: (n: number) => Promise<void>;
   completeTutorial: () => Promise<void>;
   loginAsGuest: () => Promise<void>;
-  registerAccount: (username: string, email: string, avatarIndex: number) => Promise<{ success: boolean; error?: string }>;
-  signIn: (username: string) => Promise<{ success: boolean; error?: string }>;
+  registerAccount: (username: string, pin: string, email: string, avatarIndex: number) => Promise<{ success: boolean; error?: string }>;
+  signIn: (username: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
+  changePin: (oldPin: string, newPin: string) => Promise<{ success: boolean; error?: string }>;
+  forgotPin: (username: string, email: string, newPin: string) => Promise<{ success: boolean; error?: string }>;
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   canClaimWheel: boolean;
   nextWheelIn: number;
@@ -444,6 +458,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const registerAccount = useCallback(async (
     username: string,
+    pin: string,
     email: string,
     avatarIndex: number,
   ): Promise<{ success: boolean; error?: string }> => {
@@ -452,6 +467,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (!/^[a-zA-Z0-9_]+$/.test(username)) return { success: false, error: 'Only letters, numbers, and underscores.' };
     if (hasProfanity(username)) return { success: false, error: 'That username is not allowed.' };
     if (isReserved(username)) return { success: false, error: 'That username is reserved.' };
+    if (!/^\d{4}$/.test(pin)) return { success: false, error: 'PIN must be exactly 4 digits.' };
 
     const accounts = await loadAccounts();
     const taken = accounts.some(a => a.username.toLowerCase() === username.toLowerCase());
@@ -472,7 +488,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       createdAt: now2,
     };
 
-    const account: StoredAccount = { username, email, avatarIndex, createdAt: now2, profile: newProfile };
+    const pinHash = hashPin(pin, username);
+    const account: StoredAccount = { username, email, avatarIndex, createdAt: now2, pinHash, profile: newProfile };
     await saveAccounts([...accounts, account]);
 
     setProfile(newProfile);
@@ -480,14 +497,51 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     return { success: true };
   }, []);
 
-  const signIn = useCallback(async (username: string): Promise<{ success: boolean; error?: string }> => {
+  const signIn = useCallback(async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
     const accounts = await loadAccounts();
     const found = accounts.find(a => a.username.toLowerCase() === username.toLowerCase());
     if (!found) return { success: false, error: 'No account found with that username.' };
 
+    // Verify PIN (backward-compat: allow no-pin accounts created before this update)
+    if (found.pinHash) {
+      const expected = hashPin(pin, username);
+      if (found.pinHash !== expected) return { success: false, error: 'Incorrect PIN.' };
+    }
+
     const restored: UserProfile = { ...found.profile, isNewUser: false };
     setProfile(restored);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+    return { success: true };
+  }, []);
+
+  const changePin = useCallback(async (oldPin: string, newPin: string): Promise<{ success: boolean; error?: string }> => {
+    if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'New PIN must be exactly 4 digits.' };
+    const accounts = await loadAccounts();
+    const idx = accounts.findIndex(a => a.username.toLowerCase() === profile.username.toLowerCase());
+    if (idx < 0) return { success: false, error: 'Account not found.' };
+    const acc = accounts[idx];
+    if (acc.pinHash) {
+      const expected = hashPin(oldPin, profile.username);
+      if (acc.pinHash !== expected) return { success: false, error: 'Current PIN is incorrect.' };
+    }
+    const updated = [...accounts];
+    updated[idx] = { ...acc, pinHash: hashPin(newPin, profile.username) };
+    await saveAccounts(updated);
+    return { success: true };
+  }, [profile.username]);
+
+  const forgotPin = useCallback(async (username: string, email: string, newPin: string): Promise<{ success: boolean; error?: string }> => {
+    if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'New PIN must be exactly 4 digits.' };
+    const accounts = await loadAccounts();
+    const idx = accounts.findIndex(a => a.username.toLowerCase() === username.toLowerCase());
+    if (idx < 0) return { success: false, error: 'No account found with that username.' };
+    const acc = accounts[idx];
+    if (acc.email && acc.email.toLowerCase() !== email.toLowerCase()) {
+      return { success: false, error: 'Email does not match our records.' };
+    }
+    const updated = [...accounts];
+    updated[idx] = { ...acc, pinHash: hashPin(newPin, username) };
+    await saveAccounts(updated);
     return { success: true };
   }, []);
 
@@ -554,7 +608,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       recordTournamentResult,
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
       awardRankedPoints, claimWheelSpin, useScratchTicket, addScratchTickets,
-      completeTutorial, loginAsGuest, registerAccount, signIn, signOut, checkUsernameAvailable,
+      completeTutorial, loginAsGuest, registerAccount, signIn, signOut,
+      changePin, forgotPin, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,
       canClaimFreeCookie, nextCookieIn,

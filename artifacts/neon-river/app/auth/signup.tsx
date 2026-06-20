@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,15 +21,21 @@ import NeonAvatar from '@/components/NeonAvatar';
 import { NEON_AVATARS, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
 
 const STARTER_AVATARS = NEON_AVATARS.filter(a => a.rarity === 'COMMON');
-
-const STEPS = ['USERNAME', 'AVATAR', 'WELCOME'];
+const STEPS = ['USERNAME', 'PIN', 'AVATAR', 'WELCOME'];
 
 export default function SignupScreen() {
   const { registerAccount, checkUsernameAvailable } = useUser();
   const [step, setStep] = useState(0);
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [avatarIndex, setAvatarIndex] = useState(1);
+
+  const [pin, setPin] = useState('');
+  const [confirmPin, setConfirmPin] = useState('');
+  const [pinPhase, setPinPhase] = useState<'enter' | 'confirm'>('enter');
+  const [pinError, setPinError] = useState('');
+
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'ok' | 'error'>('idle');
   const [usernameError, setUsernameError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,10 +48,10 @@ export default function SignupScreen() {
   useEffect(() => {
     fadeIn.setValue(0);
     Animated.timing(fadeIn, { toValue: 1, duration: 400, useNativeDriver: true }).start();
-  }, [step]);
+  }, [step, pinPhase]);
 
   useEffect(() => {
-    if (step === 2) {
+    if (step === 3) {
       Animated.timing(chipAnim, { toValue: 1, duration: 1200, useNativeDriver: false }).start();
     }
   }, [step]);
@@ -71,6 +78,20 @@ export default function SignupScreen() {
     }, 600);
   };
 
+  const handlePinKey = (key: string) => {
+    setPinError('');
+    if (key === '⌫') {
+      if (pinPhase === 'enter') setPin(p => p.slice(0, -1));
+      else setConfirmPin(p => p.slice(0, -1));
+      return;
+    }
+    if (pinPhase === 'enter') {
+      if (pin.length < 4) setPin(p => p + key);
+    } else {
+      if (confirmPin.length < 4) setConfirmPin(p => p + key);
+    }
+  };
+
   const handleNext = async () => {
     if (step === 0) {
       const err = validateUsername(username);
@@ -78,17 +99,47 @@ export default function SignupScreen() {
       if (usernameStatus !== 'ok' && usernameStatus !== 'idle') return;
       setStep(1);
     } else if (step === 1) {
+      // PIN step
+      const current = pinPhase === 'enter' ? pin : confirmPin;
+      if (current.length !== 4) return;
+      if (pinPhase === 'enter') {
+        setPinPhase('confirm');
+        return;
+      }
+      // Confirm
+      if (pin !== confirmPin) {
+        setPinError("PINs don't match. Try again.");
+        setConfirmPin('');
+        setPin('');
+        setPinPhase('enter');
+        return;
+      }
+      setStep(2);
+    } else if (step === 2) {
       setLoading(true);
       setError('');
-      const result = await registerAccount(username, email, avatarIndex);
+      const result = await registerAccount(username, pin, email, avatarIndex);
       setLoading(false);
       if (result.success) {
-        setStep(2);
+        setStep(3);
       } else {
         setError(result.error ?? 'Something went wrong.');
       }
     } else {
       router.replace('/terms');
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 1 && pinPhase === 'confirm') {
+      setPinPhase('enter');
+      setConfirmPin('');
+      setPinError('');
+    } else if (step > 0) {
+      setStep(s => s - 1);
+      if (step === 1) { setPin(''); setConfirmPin(''); setPinPhase('enter'); setPinError(''); }
+    } else {
+      router.back();
     }
   };
 
@@ -103,21 +154,25 @@ export default function SignupScreen() {
     usernameStatus === 'error' ? 'close-circle' :
     usernameStatus === 'checking' ? 'ellipsis-horizontal-circle' : null;
 
-  const chipsDisplay = chipAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 50000] });
+  const currentPin = pinPhase === 'enter' ? pin : confirmPin;
+  const pinReady   = currentPin.length === 4;
+  const ctaReady   = step === 0
+    ? (usernameStatus === 'ok')
+    : step === 1
+    ? pinReady
+    : step === 2
+    ? true
+    : true;
 
   return (
     <View style={s.screen}>
-      <LinearGradient
-        colors={['#050010', '#0a0022', '#050010']}
-        style={StyleSheet.absoluteFill}
-      />
-
+      <LinearGradient colors={['#050010', '#0a0022', '#050010']} style={StyleSheet.absoluteFill} />
       <SafeAreaView style={s.safe} edges={['top', 'bottom']}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
           {/* Header */}
           <View style={s.header}>
-            <Pressable style={s.backBtn} onPress={() => step > 0 ? setStep(s2 => s2 - 1) : router.back()}>
+            <Pressable style={s.backBtn} onPress={handleBack}>
               <Ionicons name="chevron-back" size={20} color="rgba(255,255,255,0.6)" />
             </Pressable>
             <View style={s.stepIndicator}>
@@ -134,9 +189,9 @@ export default function SignupScreen() {
               {/* ── STEP 0: Username ── */}
               {step === 0 && (
                 <View style={s.stepContent}>
-                  <Text style={s.stepLabel}>STEP 1 OF 2</Text>
+                  <Text style={s.stepLabel}>STEP 1 OF 3</Text>
                   <Text style={s.stepTitle}>Choose Your{'\n'}Username</Text>
-                  <Text style={s.stepDesc}>Your unique identity at the neon table. Choose wisely — it's permanent.</Text>
+                  <Text style={s.stepDesc}>Your unique identity at the neon table. Choose wisely.</Text>
 
                   <View style={[s.inputWrap, { borderColor: usernameColor }]}>
                     <TextInput
@@ -149,9 +204,7 @@ export default function SignupScreen() {
                       autoCorrect={false}
                       maxLength={20}
                     />
-                    {usernameIcon && (
-                      <Ionicons name={usernameIcon} size={20} color={usernameColor} />
-                    )}
+                    {usernameIcon && <Ionicons name={usernameIcon as any} size={20} color={usernameColor} />}
                   </View>
                   {usernameError ? (
                     <Text style={s.inputError}>{usernameError}</Text>
@@ -162,7 +215,7 @@ export default function SignupScreen() {
                   <View style={s.inputWrap2}>
                     <TextInput
                       style={s.input}
-                      placeholder="Email (optional — for recovery)"
+                      placeholder="Email (optional — for PIN recovery)"
                       placeholderTextColor="rgba(255,255,255,0.25)"
                       value={email}
                       onChangeText={setEmail}
@@ -173,12 +226,7 @@ export default function SignupScreen() {
 
                   <View style={s.rulesBox}>
                     <Text style={s.rulesTitle}>USERNAME RULES</Text>
-                    {[
-                      '3–20 characters',
-                      'Letters, numbers, underscores only',
-                      'No offensive or reserved names',
-                      'Cannot be changed later',
-                    ].map((r, i) => (
+                    {['3–20 characters', 'Letters, numbers, underscores only', 'No offensive or reserved names', 'Cannot be changed later'].map((r, i) => (
                       <View key={i} style={s.ruleRow}>
                         <View style={s.ruleDot} />
                         <Text style={s.ruleText}>{r}</Text>
@@ -188,10 +236,55 @@ export default function SignupScreen() {
                 </View>
               )}
 
-              {/* ── STEP 1: Avatar ── */}
+              {/* ── STEP 1: PIN ── */}
               {step === 1 && (
                 <View style={s.stepContent}>
-                  <Text style={s.stepLabel}>STEP 2 OF 2</Text>
+                  <Text style={s.stepLabel}>STEP 2 OF 3</Text>
+                  <Text style={s.stepTitle}>{pinPhase === 'enter' ? 'Set Your\nSecret PIN' : 'Confirm\nYour PIN'}</Text>
+                  <Text style={s.stepDesc}>
+                    {pinPhase === 'enter'
+                      ? '4-digit PIN keeps your account secure. Never share it.'
+                      : 'Enter your PIN one more time to confirm.'}
+                  </Text>
+
+                  {/* Dot indicators */}
+                  <View style={s.pinDots}>
+                    {[0,1,2,3].map(i => (
+                      <View key={i} style={[s.pinDot, currentPin.length > i && s.pinDotFilled]} />
+                    ))}
+                  </View>
+
+                  {pinError ? <Text style={s.pinError}>{pinError}</Text> : null}
+
+                  {/* Numpad */}
+                  <View style={s.numpad}>
+                    {['1','2','3','4','5','6','7','8','9','','0','⌫'].map((k, idx) => {
+                      if (!k) return <View key={idx} style={s.numKey} />;
+                      const isBack = k === '⌫';
+                      return (
+                        <TouchableOpacity
+                          key={idx}
+                          style={[s.numKey, s.numKeyBtn, isBack && s.numKeyBack]}
+                          onPress={() => handlePinKey(k)}
+                          activeOpacity={0.65}
+                        >
+                          <Text style={[s.numKeyText, isBack && s.numKeyBackText]}>{k}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <View style={s.pinHintBox}>
+                    <Ionicons name="shield-checkmark-outline" size={13} color="rgba(0,212,255,0.5)" />
+                    <Text style={s.pinHintText}>PIN is hashed and never stored in plain text.</Text>
+                  </View>
+                </View>
+              )}
+
+              {/* ── STEP 2: Avatar ── */}
+              {step === 2 && (
+                <View style={s.stepContent}>
+                  <Text style={s.stepLabel}>STEP 3 OF 3</Text>
                   <Text style={s.stepTitle}>Pick Your{'\n'}Avatar</Text>
                   <Text style={s.stepDesc}>Your face at the table. More avatars unlock as you level up.</Text>
 
@@ -215,13 +308,12 @@ export default function SignupScreen() {
                       );
                     })}
                   </View>
-
                   {error ? <Text style={s.errorText}>{error}</Text> : null}
                 </View>
               )}
 
-              {/* ── STEP 2: Welcome ── */}
-              {step === 2 && (
+              {/* ── STEP 3: Welcome ── */}
+              {step === 3 && (
                 <View style={s.stepContent}>
                   <View style={s.welcomeIconWrap}>
                     <View style={s.welcomeIcon}>
@@ -238,7 +330,7 @@ export default function SignupScreen() {
                   </View>
 
                   <View style={s.perksRow}>
-                    {['Ranked Mode', 'Tournaments', 'Social Feed', 'Cloud Save'].map(p => (
+                    {['Ranked Mode', 'Tournaments', 'Social Feed', 'PIN Security'].map(p => (
                       <View key={p} style={s.perkBadge}>
                         <Ionicons name="checkmark-circle" size={12} color={colors.success} />
                         <Text style={s.perkText}>{p}</Text>
@@ -252,22 +344,36 @@ export default function SignupScreen() {
           </ScrollView>
 
           {/* CTA */}
-          <View style={s.ctaArea}>
-            <Pressable
-              style={({ pressed }) => [
-                s.cta,
-                (step === 0 && (usernameStatus === 'error' || username.length < 3)) && s.ctaDisabled,
-                pressed && { opacity: 0.8 },
-              ]}
-              onPress={handleNext}
-              disabled={loading || (step === 0 && (usernameStatus === 'error' || username.length < 3))}
-            >
-              <Text style={s.ctaText}>
-                {loading ? 'CREATING ACCOUNT...' : step === 2 ? 'ENTER CHIP SOCIETY' : 'CONTINUE'}
-              </Text>
-              {!loading && <Ionicons name="arrow-forward" size={16} color={colors.primary} />}
-            </Pressable>
-          </View>
+          {step !== 1 && (
+            <View style={s.ctaArea}>
+              <Pressable
+                style={({ pressed }) => [s.cta, !ctaReady && s.ctaDisabled, pressed && { opacity: 0.8 }]}
+                onPress={handleNext}
+                disabled={loading || !ctaReady}
+              >
+                <Text style={s.ctaText}>
+                  {loading ? 'CREATING ACCOUNT...' : step === 3 ? 'ENTER CHIP SOCIETY' : 'CONTINUE'}
+                </Text>
+                {!loading && <Ionicons name="arrow-forward" size={16} color={colors.primary} />}
+              </Pressable>
+            </View>
+          )}
+
+          {/* PIN step CTA */}
+          {step === 1 && (
+            <View style={s.ctaArea}>
+              <Pressable
+                style={({ pressed }) => [s.cta, !pinReady && s.ctaDisabled, pressed && { opacity: 0.8 }]}
+                onPress={handleNext}
+                disabled={!pinReady}
+              >
+                <Text style={s.ctaText}>
+                  {pinPhase === 'enter' ? 'CONFIRM PIN' : 'SET PIN'}
+                </Text>
+                <Ionicons name="arrow-forward" size={16} color={colors.primary} />
+              </Pressable>
+            </View>
+          )}
 
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -314,6 +420,36 @@ const s = StyleSheet.create({
   ruleDot:    { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary },
   ruleText:   { fontSize: 12, color: 'rgba(255,255,255,0.5)' },
 
+  // PIN
+  pinDots: { flexDirection: 'row', justifyContent: 'center', gap: 18, marginVertical: 8 },
+  pinDot: {
+    width: 22, height: 22, borderRadius: 11,
+    borderWidth: 2, borderColor: 'rgba(0,212,255,0.3)',
+    backgroundColor: 'transparent',
+  },
+  pinDotFilled: { backgroundColor: colors.primary, borderColor: colors.primary },
+  pinError: { fontSize: 12, color: colors.error, textAlign: 'center', marginTop: -6 },
+
+  numpad: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 10,
+    justifyContent: 'center', marginTop: 4,
+  },
+  numKey:     { width: '28%', aspectRatio: 1.6, alignItems: 'center', justifyContent: 'center' },
+  numKeyBtn:  {
+    borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0,212,255,0.2)',
+    backgroundColor: 'rgba(0,212,255,0.06)',
+  },
+  numKeyBack: { borderColor: 'rgba(255,255,255,0.12)', backgroundColor: 'rgba(255,255,255,0.04)' },
+  numKeyText: { fontSize: 22, color: '#fff', fontFamily: 'Orbitron_400Regular', letterSpacing: 0 },
+  numKeyBackText: { fontSize: 20, color: 'rgba(255,255,255,0.5)' },
+
+  pinHintBox: {
+    flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(0,212,255,0.04)', borderRadius: 8,
+    borderWidth: 1, borderColor: 'rgba(0,212,255,0.12)', padding: 10,
+  },
+  pinHintText: { fontSize: 11, color: 'rgba(255,255,255,0.35)', lineHeight: 16 },
+
   avatarGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center', paddingVertical: 4 },
   avatarTile: {
     width: 80, height: 80, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
@@ -330,7 +466,6 @@ const s = StyleSheet.create({
     width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center',
     borderWidth: 2, borderColor: colors.primary,
     backgroundColor: 'rgba(0,212,255,0.1)',
-    ...Platform.select({ ios: { shadowColor: colors.primary, shadowOpacity: 0.6, shadowRadius: 16, shadowOffset: { width: 0, height: 0 } } }),
   },
   welcomeIconText: { fontSize: 36, color: colors.primary },
   welcomeTitle: {
@@ -343,7 +478,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,215,0,0.06)', padding: 20, alignItems: 'center', gap: 4,
   },
   chipsLabel:  { fontFamily: 'Orbitron_400Regular', fontSize: 9, color: 'rgba(255,215,0,0.6)', letterSpacing: 3 },
-  chipsAmount: { fontFamily: 'Inter_700Bold', fontSize: 38, color: colors.gold, letterSpacing: 0 },
+  chipsAmount: { fontFamily: 'Inter_700Bold', fontSize: 38, color: '#ffd700', letterSpacing: 0 },
   chipsUnit:   { fontFamily: 'Orbitron_400Regular', fontSize: 9, color: 'rgba(255,215,0,0.5)', letterSpacing: 3 },
 
   perksRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },

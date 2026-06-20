@@ -1,0 +1,384 @@
+CHIP SOCIETY MATCHMAKING & PRIVATE TABLE OVERHAUL
+
+Implement the following matchmaking and table selection changes across all multiplayer game modes.
+
+This applies to:
+
+• Texas Hold’em
+• Future Omaha
+• Future Multiplayer Games
+
+The goal is to give players full control over table stakes while still protecting new players from entering games beyond their bankroll.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK PLAY OVERHAUL
+
+Quick Play should remain the fastest way to enter a game.
+
+However, it should intelligently place players into tables within their own bankroll bracket.
+
+Example:
+
+Player Bankroll:
+
+50M Chips
+
+Quick Play automatically searches:
+
+ELITE tables
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Player Bankroll:
+
+750K Chips
+
+Quick Play automatically searches:
+
+STANDARD tables
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Player Bankroll:
+
+100K Chips
+
+Quick Play automatically searches:
+
+LOW STAKES tables
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Quick Play should never place:
+
+100K player
+
+into
+
+25M Elite tables.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK PLAY PLAYER TYPE SELECTION
+
+After selecting a game mode from the Home Screen:
+
+Display:
+
+WHO WOULD YOU LIKE TO PLAY AGAINST?
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OPTION 1
+
+🤖 YOU + AI PLAYERS
+
+Fastest Match
+
+Instant Game
+
+Fill remaining seats with bots
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OPTION 2
+
+🌎 YOU + LIVE PLAYERS
+
+Search for real players
+
+Fill remaining seats with AI if needed
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+This selection should appear before entering matchmaking.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE STAKE SELECTION SYSTEM
+
+Before joining ANY multiplayer table:
+
+Players should choose a blind structure.
+
+Do NOT automatically seat players into random blind levels.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Example:
+
+SELECT TABLE STAKES
+
+25K / 50K
+
+50K / 100K
+
+100K / 200K
+
+250K / 500K
+
+500K / 1M
+
+1M / 2M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+The player chooses their preferred blind level before matchmaking begins.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BANKROLL PROTECTION
+
+Only show tables the player can reasonably afford.
+
+Example:
+
+Player Bankroll:
+
+100K
+
+Available:
+
+5K / 10K
+
+10K / 20K
+
+25K / 50K
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Restricted:
+
+250K / 500K
+
+500K / 1M
+
+1M / 2M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Players should never see inaccessible tables.
+
+Hide them entirely.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE BUY-IN SYSTEM
+
+Each table should have:
+
+MIN BUY-IN
+
+MAX BUY-IN
+
+Displayed before joining.
+
+Example:
+
+25K / 50K Table
+
+Minimum Buy-In:
+500K
+
+Maximum Buy-In:
+5M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+100K / 200K Table
+
+Minimum Buy-In:
+2M
+
+Maximum Buy-In:
+20M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+This creates realistic poker room structure.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAY SCREEN OVERHAUL
+
+Current Tab:
+
+RANKED
+
+Remove completely.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Rename:
+
+PRIVATE TABLE
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+New Tabs:
+
+QUICK PLAY
+
+TOURNAMENTS
+
+PRIVATE TABLE
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PRIVATE TABLE SYSTEM
+
+When selecting:
+
+PRIVATE TABLE
+
+Take player to dedicated Private Table screen.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PRIVATE TABLE OPTIONS
+
+CREATE TABLE
+
+JOIN TABLE
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CREATE TABLE
+
+Host selects:
+
+• Game Type
+• Stakes
+• Buy-In Limits
+• Seat Count
+• Public or Private
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PRIVATE ROOM CODE
+
+When table is created:
+
+Generate unique code.
+
+Example:
+
+CS7284
+
+Poker728
+
+DRAGON55
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Host can share room code.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JOIN TABLE
+
+Player enters code.
+
+Example:
+
+ENTER ROOM CODE
+
+CS7284
+
+JOIN
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+If valid:
+
+Join private room.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PRIVATE TABLE FEATURES
+
+Allow:
+
+• Friends Games
+• Home Games
+• Streamer Games
+• Club Games
+• Family Games
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MATCHMAKING PRIORITY
+
+For Quick Play:
+
+1. Selected Stakes
+2. Same Bankroll Bracket
+3. Live Players
+4. AI Fill
+
+Example:
+
+Player selects:
+
+100K / 200K
+
+Search:
+
+Live Players
+
+Then:
+
+Similar Bankroll Players
+
+Then:
+
+AI Fill
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UI GOAL
+
+The player flow should become:
+
+SELECT GAME
+
+↓
+
+SELECT OPPONENT TYPE
+
+🤖 AI
+
+or
+
+🌎 Live Players
+
+↓
+
+SELECT TABLE STAKES
+
+↓
+
+MATCHMAKING
+
+↓
+
+ENTER TABLE
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL DESIGN GOAL
+
+Players should always know:
+
+• What stakes they are playing
+• What blinds they are playing
+• What buy-in range exists
+• Whether they are facing AI or live players
+• Whether they are joining a public game or private room
+
+Quick Play should intelligently match bankroll brackets.
+
+Private Tables should replace Ranked mode entirely.
+
+This creates a cleaner poker ecosystem, better table selection, and a more authentic casino experience.
