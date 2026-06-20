@@ -170,7 +170,7 @@ export default function FortuneCookieScreen() {
   const insets = useSafeAreaInsets();
   const {
     profile, addChips, addXP, consumeFortuneCookie,
-    canClaimFreeCookie, claimFreeCookie,
+    canClaimFreeCookie, claimFreeCookie, addFortuneCookies,
   } = useUser();
 
   // Determine best cookie type
@@ -352,9 +352,17 @@ export default function FortuneCookieScreen() {
           </Text>
         </View>
         {/* Cookie count badge */}
-        <View style={styles.countBadge}>
-          <Text style={styles.countNum}>{totalCookies}</Text>
-          <Text style={styles.countLbl}>🥠</Text>
+        <View style={{ alignItems: 'flex-end', gap: 4 }}>
+          <View style={styles.countBadge}>
+            <Text style={styles.countNum}>{totalCookies}</Text>
+            <Text style={styles.countLbl}>🥠</Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => addFortuneCookies(2, 2, 2)}
+            style={{ backgroundColor: '#ffffff12', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#ffffff22' }}
+          >
+            <Text style={{ color: '#ffffff55', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1 }}>＋2 EACH</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
