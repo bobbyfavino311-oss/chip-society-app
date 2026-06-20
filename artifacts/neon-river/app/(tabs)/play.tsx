@@ -408,6 +408,23 @@ export default function PlayScreen() {
           ]}
         />
 
+        {/* ── MULTIPLAYER ─────────────────────────────────────────────── */}
+        <SectionCard
+          section="MULTIPLAYER"
+          accent="#ff0090"
+          icon="people-outline"
+          title="LIVE TABLES"
+          lines={["Real players · Server-authoritative", "Up to 5 seats · 6 stake tiers"]}
+          options={[
+            {
+              label:   "PLAY ONLINE",
+              icon:    "globe-outline",
+              sub:     "Join or create a live table",
+              onPress: () => router.push('/multiplayer/lobby' as any),
+            },
+          ]}
+        />
+
         {/* ── TOURNAMENTS ─────────────────────────────────────────────── */}
         <SectionCard
           section="TOURNAMENTS"

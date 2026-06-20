@@ -25,6 +25,7 @@ import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
 import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
 import { SocialProvider } from '@/context/SocialContext';
 import { AISocialProvider } from '@/context/AISocialContext';
+import { MultiplayerProvider } from '@/context/MultiplayerContext';
 import { NotificationProvider } from '@/context/NotificationContext';
 import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
@@ -139,6 +140,14 @@ function RootLayoutNav() {
           name="casino"
           options={{ headerShown: false, animation: 'slide_from_right' }}
         />
+        <Stack.Screen
+          name="multiplayer/lobby"
+          options={{ headerShown: false, animation: 'slide_from_right' }}
+        />
+        <Stack.Screen
+          name="multiplayer/game"
+          options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+        />
       </Stack>
     </>
   );
@@ -176,6 +185,7 @@ export default function RootLayout() {
                   <AchievementProvider>
                     <SocialProvider>
                       <AISocialProvider>
+                      <MultiplayerProvider>
                       <NotificationBridge>
                         <GestureHandlerRootView style={{ flex: 1 }}>
                           <KeyboardProvider>
@@ -183,6 +193,7 @@ export default function RootLayout() {
                           </KeyboardProvider>
                         </GestureHandlerRootView>
                       </NotificationBridge>
+                      </MultiplayerProvider>
                       </AISocialProvider>
                     </SocialProvider>
                   </AchievementProvider>

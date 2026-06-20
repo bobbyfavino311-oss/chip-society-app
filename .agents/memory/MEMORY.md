@@ -1,3 +1,4 @@
+- [Multiplayer architecture](multiplayer-architecture.md) — Socket.IO path must be /api/socket.io (proxy doesn't rewrite); api-server uses http.createServer(app) not app.listen(); UserProfile has avatarIndex not avatarId.
 - [Short Deck variant architecture](short-deck-variant.md) — GameVariant lives in pokerEngine.ts; GameState carries variant field so all pure functions see it without extra params.
 - [Chip amount font](chip-font.md) — Inter_700Bold only for numbers, never Orbitron (user explicitly rejected Orbitron as "slanted sci-fi").
 - [AI Social Engine architecture](ai-social-engine.md) — 10 AI personalities, 7 post types, pure in-memory generation; AISocialContext seeds 8 posts and adds one every 10 min.
