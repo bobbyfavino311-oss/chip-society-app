@@ -1,5 +1,6 @@
-// ─── CHIP SOCIETY — 30 Collectible Scene Avatars ─────────────────────────────
+// ─── CHIP SOCIETY — Collectible Scene Avatars ────────────────────────────────
 // IDs 1-15: original set  |  IDs 16-30: premium vaporwave expansion
+// IDs 54-71: face card collection + specials
 
 export type NeonRarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
 
@@ -57,7 +58,7 @@ export const NEON_AVATARS: NeonAvatar[] = [
   { id: 17, name: 'VICE SKYLINE',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff0090', bgColor: '#12001a' },
   { id: 18, name: 'PALM PARADISE',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff6b35', bgColor: '#1a0800' },
   // ── RARE expansion (19–22) ────────────────────────────────────────────────────
-  { id: 19, name: 'FERRARI',        rarity: 'RARE',      unlockXP: 8000,   unlockCondition: 'Reach 8,000 XP',   color: '#ff1a1a', bgColor: '#1a0000' },
+  { id: 19, name: 'SPORTS CAR',     rarity: 'RARE',      unlockXP: 8000,   unlockCondition: 'Reach 8,000 XP',   color: '#ff1a1a', bgColor: '#1a0000' },
   { id: 20, name: 'OCEAN DRIVE',    rarity: 'RARE',      unlockXP: 14000,  unlockCondition: 'Reach 14,000 XP',  color: '#00d4ff', bgColor: '#001422' },
   { id: 21, name: 'CONVERTIBLE',    rarity: 'RARE',      unlockXP: 20000,  unlockCondition: 'Reach 20,000 XP',  color: '#ff6b35', bgColor: '#1a0600' },
   { id: 22, name: 'SYNTHWAVE MOON', rarity: 'RARE',      unlockXP: 28000,  unlockCondition: 'Reach 28,000 XP',  color: '#bf5fff', bgColor: '#0f001e' },
@@ -96,12 +97,39 @@ export const NEON_AVATARS: NeonAvatar[] = [
 
   // ── LEGENDARY ICON (53) ───────────────────────────────────────────────────────
   { id: 53, name: 'GOLDEN TIKI',    rarity: 'LEGENDARY', unlockXP: 500000, unlockCondition: 'Reach 500,000 XP', color: '#ffd700', bgColor: '#1a1100' },
+
+  // ── FACE CARD COLLECTION — ACES (54–57) ───────────────────────────────────────
+  { id: 54, name: 'ACE OF SPADES',   rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
+  { id: 55, name: 'ACE OF HEARTS',   rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#ff0090', bgColor: '#1a0012' },
+  { id: 56, name: 'ACE OF DIAMONDS', rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#ff4444', bgColor: '#1a0008' },
+  { id: 57, name: 'ACE OF CLUBS',    rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#00ff88', bgColor: '#001a0a' },
+
+  // ── FACE CARD COLLECTION — KINGS (58–61) ─────────────────────────────────────
+  { id: 58, name: 'KING OF SPADES',  rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#8b5cf6', bgColor: '#0e0018' },
+  { id: 59, name: 'KING OF HEARTS',  rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#ff0090', bgColor: '#1a0012' },
+  { id: 60, name: 'KING OF DIAMONDS',rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#ff8800', bgColor: '#1a0900' },
+  { id: 61, name: 'KING OF CLUBS',   rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
+
+  // ── FACE CARD COLLECTION — QUEENS (62–65) ────────────────────────────────────
+  { id: 62, name: 'QUEEN OF SPADES', rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#bf5fff', bgColor: '#120020' },
+  { id: 63, name: 'QUEEN OF HEARTS', rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#ff69b4', bgColor: '#1a000f' },
+  { id: 64, name: 'QUEEN OF DIAMONDS',rarity: 'RARE',     unlockXP: 0,      unlockCondition: '', color: '#ff6b35', bgColor: '#1a0600' },
+  { id: 65, name: 'QUEEN OF CLUBS',  rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
+
+  // ── FACE CARD COLLECTION — JACKS (66–69) ─────────────────────────────────────
+  { id: 66, name: 'JACK OF SPADES',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001422' },
+  { id: 67, name: 'JACK OF HEARTS',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#ff0090', bgColor: '#1a0012' },
+  { id: 68, name: 'JACK OF DIAMONDS',rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#ffd700', bgColor: '#1a1100' },
+  { id: 69, name: 'JACK OF CLUBS',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#00ff88', bgColor: '#001a0a' },
+
+  // ── SPECIALS (70–71) ─────────────────────────────────────────────────────────
+  { id: 70, name: 'JOKER',           rarity: 'LEGENDARY', unlockXP: 0,      unlockCondition: '', color: '#bf5fff', bgColor: '#120020' },
+  { id: 71, name: 'RAZOR BLADE',     rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001422' },
 ];
 
-/** Returns a valid NeonAvatar, always clamped to IDs 1-53. */
+/** Returns the NeonAvatar for a given id, falling back to id 1. */
 export function getNeonAvatar(id: number): NeonAvatar {
-  const safe = Math.min(53, Math.max(1, Math.round(id || 1)));
-  return NEON_AVATARS.find(a => a.id === safe) ?? NEON_AVATARS[0];
+  return NEON_AVATARS.find(a => a.id === Math.round(id || 1)) ?? NEON_AVATARS[0];
 }
 
 export function isNeonAvatarUnlocked(_avatar: NeonAvatar, _xp: number): boolean {

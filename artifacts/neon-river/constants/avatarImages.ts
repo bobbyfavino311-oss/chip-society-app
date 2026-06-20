@@ -54,6 +54,34 @@ const AVATAR_IMAGES: Record<number, any> = {
   52: require('../assets/avatars/camera_lens.png'),
   // Legendary Icon (53)
   53: require('../assets/avatars/golden_tiki.png'),
+
+  // ── Face Card Collection — Aces (54–57) ──────────────────────────────────────
+  54: require('../assets/avatars/ace_spades.png'),
+  55: require('../assets/avatars/ace_hearts.png'),
+  56: require('../assets/avatars/ace_diamonds.png'),
+  57: require('../assets/avatars/ace_clubs.png'),
+
+  // ── Face Card Collection — Kings (58–61) ─────────────────────────────────────
+  58: require('../assets/avatars/king_spades.png'),
+  59: require('../assets/avatars/king_hearts.png'),
+  60: require('../assets/avatars/king_diamonds.png'),
+  61: require('../assets/avatars/king_clubs.png'),
+
+  // ── Face Card Collection — Queens (62–65) ────────────────────────────────────
+  62: require('../assets/avatars/queen_spades.png'),
+  63: require('../assets/avatars/queen_hearts.png'),
+  64: require('../assets/avatars/queen_diamonds.png'),
+  65: require('../assets/avatars/queen_clubs.png'),
+
+  // ── Face Card Collection — Jacks (66–69) ─────────────────────────────────────
+  66: require('../assets/avatars/jack_spades.png'),
+  67: require('../assets/avatars/jack_hearts.png'),
+  68: require('../assets/avatars/jack_diamonds.png'),
+  69: require('../assets/avatars/jack_clubs.png'),
+
+  // ── Specials (70–71) ─────────────────────────────────────────────────────────
+  70: require('../assets/avatars/joker.png'),
+  71: require('../assets/avatars/razor_blade.png'),
 };
 
 export default AVATAR_IMAGES;

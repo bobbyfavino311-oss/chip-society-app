@@ -1,0 +1,291 @@
+CHIP SOCIETY – AVATAR SYSTEM UPDATE PROMPT
+
+Perform the following avatar system updates exactly as described. Do not create placeholders, substitute assets, or make stylistic assumptions. Existing avatars should be updated and new avatars should be added to expand the collection.
+
+⸻
+
+EXISTING AVATAR FIXES
+
+Vice Skyline Avatar
+
+Current Issue:
+
+* White background visible inside avatar.
+* Image does not fill avatar circle.
+
+Fix:
+
+* Remove all white background.
+* Crop and scale image correctly.
+* Fill entire circular avatar area edge-to-edge.
+* No white bars.
+* No empty space.
+* Skyline should appear centered and professionally framed.
+
+⸻
+
+Roulette Avatar
+
+Current Issue:
+
+* White background visible.
+* Does not properly fill avatar frame.
+
+Fix:
+
+* Remove all white background.
+* Scale image to completely fill avatar circle.
+* Ensure roulette wheel is centered.
+* No empty space visible.
+
+⸻
+
+Sports Car Avatar
+
+Current Name:
+
+* Ferrari
+
+Rename To:
+
+* Sports Car
+
+Additional Changes:
+
+* Remove all references to Ferrari.
+* Generic sports car only.
+* Keep avatar visually identical if desired.
+* Update avatar name everywhere in the game.
+
+⸻
+
+Straight Flush Avatar
+
+Current Issue:
+
+* Straight Flush avatar displays mixed suits.
+
+Fix:
+
+* Straight Flush avatar must show a true straight flush.
+* All cards must be spades.
+
+Example:
+
+A♠
+K♠
+Q♠
+J♠
+10♠
+
+or
+
+10♠
+9♠
+8♠
+7♠
+6♠
+
+No mixed suits.
+
+⸻
+
+Yacht Avatar Redesign
+
+Current yacht avatar is weak visually.
+
+Replace with:
+
+* Large luxury yacht viewed from the side.
+* Floating in calm water.
+* Premium casino lifestyle aesthetic.
+* Vaporwave-inspired color palette.
+* Neon reflections in water.
+* Cyan, purple, and pink lighting.
+* Full avatar circle utilized.
+* Yacht should be the dominant subject.
+
+No aerial view.
+
+No distant boat.
+
+Must feel luxurious and premium.
+
+⸻
+
+REMOVE AVATAR RARITY LABELS
+
+Remove:
+
+* Common
+* Rare
+* Epic
+* Legendary
+
+Remove rarity labels entirely from avatar selection.
+
+The system should simply display avatars.
+
+No rarity indicators.
+
+No rarity tabs.
+
+No rarity filters.
+
+⸻
+
+SELECT AN AVATAR SECTION
+
+Update:
+
+“Select an Avatar”
+
+Description text must automatically display the correct total avatar count.
+
+Example:
+
+“Choose from 62 unique avatars.”
+
+Do not hardcode values.
+
+Avatar count must update dynamically whenever avatars are added.
+
+⸻
+
+NEW PLAYING CARD AVATAR COLLECTION
+
+Create a complete premium face-card collection.
+
+All avatars should match existing Chip Society visual style.
+
+Neon.
+
+Premium.
+
+Clean.
+
+High-quality.
+
+Full avatar circle utilization.
+
+⸻
+
+Ace Collection
+
+Add:
+
+* Ace of Spades
+* Ace of Hearts
+* Ace of Diamonds
+* Ace of Clubs
+
+⸻
+
+King Collection
+
+Add:
+
+* King of Spades
+* King of Hearts
+* King of Diamonds
+* King of Clubs
+
+⸻
+
+Queen Collection
+
+Add:
+
+* Queen of Spades
+* Queen of Hearts
+* Queen of Diamonds
+* Queen of Clubs
+
+⸻
+
+Jack Collection
+
+Add:
+
+* Jack of Spades
+* Jack of Hearts
+* Jack of Diamonds
+* Jack of Clubs
+
+⸻
+
+JOKER COLLECTION
+
+Add:
+
+Joker Card
+
+Features:
+
+* Neon casino Joker card
+* Premium artwork
+* Vaporwave styling
+* Purple, cyan, pink color palette
+* Full avatar circle usage
+
+Name:
+
+* Joker
+
+⸻
+
+RAZOR BLADE AVATAR
+
+Using the uploaded razor blade image as inspiration:
+
+Create:
+
+Razor Blade Avatar
+
+Features:
+
+* Realistic metallic razor blade
+* Brushed steel texture
+* Premium polished finish
+* Floating on black background
+* Subtle neon glow
+* Vaporwave lighting reflections
+* Full avatar circle usage
+
+Name:
+
+* Razor Blade
+
+Style:
+
+* Clean
+* Sharp
+* Minimalist
+* Premium
+
+Do not cartoonize.
+
+Do not stylize into a mascot.
+
+Keep realistic metal appearance.
+
+⸻
+
+FINAL VALIDATION
+
+Before completion verify:
+
+* No white backgrounds exist inside any avatar.
+* All avatar artwork fills the entire avatar frame.
+* No stretching.
+* No clipping.
+* Avatar count updates correctly.
+* Removed rarity labels.
+* Updated Sports Car name.
+* Straight Flush avatar uses all spades.
+* Yacht redesign completed.
+* Face card collection added.
+* Joker avatar added.
+* Razor Blade avatar added.
+
+All new avatars must match the premium Chip Society visual style and feel like they belong in the existing collection.

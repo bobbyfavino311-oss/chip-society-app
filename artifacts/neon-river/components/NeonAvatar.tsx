@@ -47,7 +47,7 @@ export default function NeonAvatar({
   isEquipped = false,
   style,
 }: NeonAvatarProps) {
-  const safeId    = Math.min(53, Math.max(1, Math.round(avatarId || 1)));
+  const safeId    = Math.round(avatarId || 1);
   const avatar    = getNeonAvatar(safeId);
   const rarityColor = NEON_RARITY_COLORS[avatar.rarity];
   const borderWidth = NEON_RARITY_BORDER[avatar.rarity];

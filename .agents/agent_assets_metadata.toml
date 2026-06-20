@@ -310,13 +310,13 @@ title = "generated_image"
 id = "jrflt778tWN2FdHN_zV7h"
 uri = "file://artifacts/neon-river/assets/avatars/yacht.png"
 type = "image"
-title = "generated_image"
+title = "luxury yacht side view"
 
 [[generated]]
 id = "RTMrp57JaIsxCXMwm9Vlu"
 uri = "file://artifacts/neon-river/assets/avatars/vice_skyline.png"
 type = "image"
-title = "generated_image"
+title = "vice skyline night city"
 
 [[generated]]
 id = "hsOJA4whPbbzJpZBbl0Pl"
@@ -340,7 +340,7 @@ title = "generated_image"
 id = "2veItkrK399ZBWr5NN-Ta"
 uri = "file://artifacts/neon-river/assets/avatars/royal_flush.png"
 type = "image"
-title = "generated_image"
+title = "straight flush all spades"
 
 [[generated]]
 id = "NQAzJdplG9Bf8GOqUaT7_"
@@ -382,7 +382,7 @@ title = "generated_image"
 id = "2FKj6NYBPmXM5QsOqXPVN"
 uri = "file://artifacts/neon-river/assets/avatars/roulette.png"
 type = "image"
-title = "generated_image"
+title = "roulette wheel casino"
 
 [[generated]]
 id = "kiJjYT8LE3ihnJ2BekdOj"
@@ -533,6 +533,114 @@ id = "LQ2ZjEb-1iMe8icQNTHFQ"
 uri = "file://artifacts/neon-river/assets/avatars/golden_tiki.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "dF3PAlZcoLJUHQjGTycDe"
+uri = "file://artifacts/neon-river/assets/avatars/ace_spades.png"
+type = "image"
+title = "ace of spades avatar"
+
+[[generated]]
+id = "PDYz0FvwV8x-B84zRRh-z"
+uri = "file://artifacts/neon-river/assets/avatars/ace_hearts.png"
+type = "image"
+title = "ace of hearts avatar"
+
+[[generated]]
+id = "LLhngLQnAkQli2PMo1E2Z"
+uri = "file://artifacts/neon-river/assets/avatars/ace_diamonds.png"
+type = "image"
+title = "ace of diamonds avatar"
+
+[[generated]]
+id = "u4hq5P-qnS4ddYHmQYUOy"
+uri = "file://artifacts/neon-river/assets/avatars/ace_clubs.png"
+type = "image"
+title = "ace of clubs avatar"
+
+[[generated]]
+id = "3EqlGqTPrIzbyAJQJdpJc"
+uri = "file://artifacts/neon-river/assets/avatars/king_spades.png"
+type = "image"
+title = "king of spades avatar"
+
+[[generated]]
+id = "cjrptiIXVmzQ7DrpGmswl"
+uri = "file://artifacts/neon-river/assets/avatars/king_hearts.png"
+type = "image"
+title = "king of hearts avatar"
+
+[[generated]]
+id = "rxIA7Wvte1nxUZPigyorl"
+uri = "file://artifacts/neon-river/assets/avatars/king_diamonds.png"
+type = "image"
+title = "king of diamonds avatar"
+
+[[generated]]
+id = "5bzH8Fg31zpy3Zv8h39i_"
+uri = "file://artifacts/neon-river/assets/avatars/king_clubs.png"
+type = "image"
+title = "king of clubs avatar"
+
+[[generated]]
+id = "4tMKhix0VpCNPsv52jIQs"
+uri = "file://artifacts/neon-river/assets/avatars/queen_spades.png"
+type = "image"
+title = "queen of spades avatar"
+
+[[generated]]
+id = "-U7_fWxvSCAlkUOURL8tZ"
+uri = "file://artifacts/neon-river/assets/avatars/queen_hearts.png"
+type = "image"
+title = "queen of hearts avatar"
+
+[[generated]]
+id = "pKkalPjLrUdoSzPqUKcrK"
+uri = "file://artifacts/neon-river/assets/avatars/queen_diamonds.png"
+type = "image"
+title = "queen of diamonds avatar"
+
+[[generated]]
+id = "qfnsfFqDbqPaNSt3uiCbq"
+uri = "file://artifacts/neon-river/assets/avatars/queen_clubs.png"
+type = "image"
+title = "queen of clubs avatar"
+
+[[generated]]
+id = "rm1stT49-nJR0Fqkr--PN"
+uri = "file://artifacts/neon-river/assets/avatars/jack_spades.png"
+type = "image"
+title = "jack of spades avatar"
+
+[[generated]]
+id = "cLRzeo1SPupXhtIpPcYnJ"
+uri = "file://artifacts/neon-river/assets/avatars/jack_hearts.png"
+type = "image"
+title = "jack of hearts avatar"
+
+[[generated]]
+id = "bY_jQnX7PadtMlwjBKKN6"
+uri = "file://artifacts/neon-river/assets/avatars/jack_diamonds.png"
+type = "image"
+title = "jack of diamonds avatar"
+
+[[generated]]
+id = "c4kXIMLL5YvxaMJJCNeUx"
+uri = "file://artifacts/neon-river/assets/avatars/jack_clubs.png"
+type = "image"
+title = "jack of clubs avatar"
+
+[[generated]]
+id = "DkxdejPMR_qv7hourxpQF"
+uri = "file://artifacts/neon-river/assets/avatars/joker.png"
+type = "image"
+title = "neon joker card avatar"
+
+[[generated]]
+id = "GNTkmFePD9X9FNqwC-Dle"
+uri = "file://artifacts/neon-river/assets/avatars/razor_blade.png"
+type = "image"
+title = "metallic razor blade avatar"
 
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
