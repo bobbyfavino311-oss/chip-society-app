@@ -1,0 +1,378 @@
+CHIP SOCIETY AVATAR REDESIGN — FACE CARD COLLECTION FIX
+
+The current face card avatars need to be redesigned.
+
+They are visually inconsistent, several are incorrectly named, and the Jack avatars look too much like Jokers. This needs to be corrected so the collection feels premium, accurate, and professionally designed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CORE PROBLEM
+
+The current avatars are confusing because:
+
+• Jack avatars look like Joker avatars
+• Joker styling is being used on non-Joker cards
+• Some suit/name pairings do not visually match
+• Some avatars show fantasy characters instead of actual playing card identities
+• Some cards are cropped awkwardly
+• Some designs look inconsistent from the rest of the collection
+• Some backgrounds feel like random AI art instead of premium casino avatars
+
+Fix this by redesigning the full face card collection with a clean, consistent visual system.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FACE CARD COLLECTION RULES
+
+Each avatar must clearly represent its exact card.
+
+Do not make Jacks look like Jokers.
+
+Do not use jester hats for Jacks.
+
+Do not use Joker faces for Jacks.
+
+Do not use random fantasy characters.
+
+Each avatar should display:
+
+• Correct rank letter
+• Correct suit icon
+• Correct visual theme
+• Premium card-inspired artwork
+• Full circular crop
+• No white borders
+• No square crop
+• No incorrect suit
+• No confusing character design
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JACK AVATAR REDESIGN
+
+Redesign all Jack avatars.
+
+Jacks should look like royal court guards, princes, or card soldiers.
+
+NOT jesters.
+
+NOT clowns.
+
+NOT Jokers.
+
+NOT monsters.
+
+Each Jack should feel like a stylish playing card face character.
+
+Required Jacks:
+
+JACK OF SPADES
+
+Theme:
+Dark royal guard / black spade knight
+
+Colors:
+Black, silver, cyan glow
+
+Must show:
+J♠ clearly
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JACK OF HEARTS
+
+Theme:
+Red royal prince / heart court guard
+
+Colors:
+Crimson, pink, gold accents
+
+Must show:
+J♥ clearly
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JACK OF DIAMONDS
+
+Theme:
+Gold casino court soldier / diamond noble
+
+Colors:
+Gold, red, orange glow
+
+Must show:
+J♦ clearly
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JACK OF CLUBS
+
+Theme:
+Green club knight / royal guard
+
+Colors:
+Emerald, black, cyan accents
+
+Must show:
+J♣ clearly
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUEEN AVATAR FIXES
+
+Queens should look elegant, powerful, and royal.
+
+They should not look random.
+
+They should not look like elves unless specifically styled as playing card royalty.
+
+Required Queens:
+
+QUEEN OF SPADES
+
+Dark queen aesthetic.
+
+Black, silver, cyan.
+
+Q♠ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUEEN OF HEARTS
+
+Elegant heart queen.
+
+Pink, red, gold.
+
+Q♥ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUEEN OF DIAMONDS
+
+Luxury diamond queen.
+
+Gold, red, jewel lighting.
+
+Q♦ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUEEN OF CLUBS
+
+Emerald queen.
+
+Green, black, gold.
+
+Q♣ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+KING AVATAR COLLECTION
+
+Add or redesign King avatars if missing.
+
+Kings should look powerful, rich, and casino-premium.
+
+Required Kings:
+
+KING OF SPADES
+
+Black royal king.
+
+K♠ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+KING OF HEARTS
+
+Red royal king.
+
+K♥ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+KING OF DIAMONDS
+
+Gold diamond king.
+
+K♦ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+KING OF CLUBS
+
+Emerald club king.
+
+K♣ visible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACE AVATAR COLLECTION
+
+Aces should be bold symbol-first avatars.
+
+Required Aces:
+
+ACE OF SPADES
+
+Large spade symbol.
+
+A♠ visible.
+
+Dark premium design.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACE OF HEARTS
+
+Large heart symbol.
+
+A♥ visible.
+
+Red/pink premium design.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACE OF DIAMONDS
+
+Large diamond symbol.
+
+A♦ visible.
+
+Gold/red design.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACE OF CLUBS
+
+Large club symbol.
+
+A♣ visible.
+
+Green/black design.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JOKER AVATAR
+
+Only the Joker avatar should look like a Joker.
+
+Joker should be:
+
+• Wild
+• Chaotic
+• Neon
+• Casino villain style
+• Jester-inspired
+• Purple, cyan, pink
+• Clearly labeled JOKER
+
+No other avatar may use Joker styling.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RAZOR BLADE AVATAR FIX
+
+The current razor blade is acceptable directionally, but improve it.
+
+Make it:
+
+• Metallic
+• Brushed steel
+• Sharp
+• Premium
+• Realistic
+• Centered
+• Larger in frame
+• Floating on black background
+• Subtle cyan and pink reflection glow
+
+Do not make it look like a syringe.
+
+Do not make it look like a medical tool.
+
+It must clearly read as a razor blade.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NAMING FIXES
+
+Every avatar name must exactly match its artwork.
+
+Examples:
+
+If label says QUEEN OF HEARTS, the artwork must show Q♥.
+
+If label says JACK OF DIAMONDS, the artwork must show J♦.
+
+If label says ACE OF CLUBS, the artwork must show A♣.
+
+No mismatches.
+
+No wrong suits.
+
+No incorrect labels.
+
+No vague names.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STYLE REQUIREMENTS
+
+All avatars should share one unified art direction:
+
+• Premium casino card art
+• Neon edge lighting
+• Dark background
+• Circular composition
+• Clean crop
+• High contrast
+• Easy to identify at small size
+• Polished collectible look
+
+Avoid:
+
+• Random AI portraits
+• Square cards pasted into circles
+• White backgrounds
+• Cropped-off text
+• Fantasy clutter
+• Joker designs on Jacks
+• Blurry artwork
+• Overly detailed faces that become unreadable
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CROP RULES
+
+Every avatar must:
+
+• Fill the circular frame
+• Stay centered
+• Avoid white edges
+• Avoid square image borders
+• Avoid clipping important details
+• Be readable at feed-avatar size
+• Be readable at collection-grid size
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VALIDATION
+
+Before completion, check every avatar one by one.
+
+Verify:
+
+• Rank is correct
+• Suit is correct
+• Name matches artwork
+• Crop is clean
+• No white background
+• No square border
+• No Jack looks like Joker
+• Joker is the only Joker-style avatar
+• Razor Blade clearly looks like a razor blade
+• All avatars match Chip Society premium style
+
+The final face-card collection should feel superb, collectible, and professional — like luxury casino playing cards transformed into premium player avatars.
