@@ -326,6 +326,82 @@ export class PokerRoom {
     this.startTurnTimer();
   }
 
+  // ─── Side pot calculation ─────────────────────────────────────────────────
+
+  private awardSidePots(): void {
+    // Build contributor list — includes folded players (their chips ARE in pots)
+    const contributors = this.seats
+      .map((s, i) => ({ seat: s!, idx: i }))
+      .filter(x => x.seat !== null && x.seat.totalBet > 0);
+
+    if (contributors.length === 0) return;
+
+    // Unique contribution levels ascending — each creates one pot
+    const levels = [...new Set(contributors.map(c => c.seat.totalBet))].sort((a, b) => a - b);
+
+    this.winners = [];
+    let prevLevel = 0;
+
+    for (const level of levels) {
+      const perPlayer = level - prevLevel;
+
+      // Each contributor puts in up to perPlayer chips at this level
+      let potAmount = 0;
+      for (const c of contributors) {
+        potAmount += Math.min(Math.max(0, c.seat.totalBet - prevLevel), perPlayer);
+      }
+
+      // Eligible to win: non-folded AND contributed at least up to this level
+      const eligible = contributors.filter(
+        c => c.seat.status !== 'folded' && c.seat.totalBet >= level
+      );
+
+      if (potAmount > 0 && eligible.length === 1) {
+        // Uncalled bet — return chips to the sole eligible player (no contest)
+        eligible[0].seat.chips += potAmount;
+      } else if (potAmount > 0 && eligible.length > 1) {
+        // Contested pot — evaluate hands among eligible players
+        const evaluated = eligible.map(e => ({
+          idx: e.idx,
+          seat: e.seat,
+          hand: getBestHand(e.seat.cards, this.communityCards),
+        }));
+        evaluated.sort((a, b) => compareHands(b.hand, a.hand));
+        const best = evaluated[0].hand;
+        const potWinners = evaluated.filter(e => compareHands(e.hand, best) === 0);
+        const share = Math.floor(potAmount / potWinners.length);
+
+        for (const w of potWinners) {
+          w.seat.chips += share;
+          const existing = this.winners.find(x => x.seatIndex === w.idx);
+          if (existing) {
+            existing.amount += share;
+          } else {
+            this.winners.push({
+              seatIndex: w.idx,
+              username: w.seat.username,
+              amount: share,
+              handRank: w.hand.name,
+              cards: w.seat.cards,
+            });
+          }
+        }
+      }
+
+      prevLevel = level;
+    }
+
+    // Log results
+    for (const w of this.winners) {
+      this.addMessage(
+        `${w.username} wins ${w.amount.toLocaleString()}${w.handRank ? ` with ${w.handRank}` : ''}!`,
+        'result'
+      );
+    }
+
+    this.pot = 0;
+  }
+
   private endHand(): void {
     this.clearTurnTimer();
     this.phase = 'showdown';
@@ -335,35 +411,15 @@ export class PokerRoom {
       .filter(({ s }) => s !== null && s.status !== 'folded');
 
     if (nonFolded.length === 1) {
+      // Uncontested — sole survivor wins everything
       const { s, i } = nonFolded[0];
       s!.chips += this.pot;
       this.winners = [{ seatIndex: i, username: s!.username, amount: this.pot }];
       this.addMessage(`${s!.username} wins ${this.pot.toLocaleString()} (uncontested)`, 'result');
       this.pot = 0;
     } else {
-      // Evaluate hands
-      const evaluated = nonFolded.map(({ s, i }) => ({
-        i,
-        s: s!,
-        hand: getBestHand(s!.cards, this.communityCards),
-      }));
-      evaluated.sort((a, b) => compareHands(b.hand, a.hand));
-      const bestHand = evaluated[0].hand;
-      const winners = evaluated.filter(e => compareHands(e.hand, bestHand) === 0);
-      const split = Math.floor(this.pot / winners.length);
-      this.winners = [];
-      for (const w of winners) {
-        w.s.chips += split;
-        this.winners.push({
-          seatIndex: w.i,
-          username: w.s.username,
-          amount: split,
-          handRank: w.hand.name,
-          cards: w.s.cards,
-        });
-        this.addMessage(`${w.s.username} wins ${split.toLocaleString()} with ${w.hand.name}!`, 'result');
-      }
-      this.pot = 0;
+      // Full showdown with proper side pot calculation
+      this.awardSidePots();
     }
 
     this.broadcastState();

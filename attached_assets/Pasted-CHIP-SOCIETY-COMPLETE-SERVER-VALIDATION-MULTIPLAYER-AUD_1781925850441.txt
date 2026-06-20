@@ -1,0 +1,520 @@
+CHIP SOCIETY – COMPLETE SERVER VALIDATION & MULTIPLAYER AUDIT PROMPT
+
+Perform a complete audit of the current backend, multiplayer systems, economy systems, persistence systems, and social systems. Do not assume any system is working correctly simply because it appears functional. Verify every outcome through actual logic testing and validation.
+
+The goal is to ensure Chip Society is capable of supporting a public launch without economy exploits, payout errors, persistence issues, or multiplayer desync problems.
+
+⸻
+
+ACCOUNT SYSTEM VALIDATION
+
+Verify:
+
+* New account creation
+* Guest account creation
+* Returning account login
+* Account persistence after logout
+* Account persistence after app restart
+* Account persistence after app update
+
+Confirm all player data saves correctly:
+
+* Chip balance
+* XP
+* Level
+* Avatars
+* Themes
+* Achievements
+* Fortune Cookie inventory 🥠
+* Lottery Tickets
+* Statistics
+* Social profile information
+
+Verify no duplicate accounts are created.
+
+Verify account data cannot be lost during disconnects.
+
+⸻
+
+ECONOMY VALIDATION
+
+Perform a complete audit of all chip transactions.
+
+Verify:
+
+* Chips can never become negative
+* Chips can never duplicate
+* Chips cannot be awarded twice
+* Chips cannot be lost due to sync failures
+* Chips cannot be created through exploits
+
+Verify:
+
+* Wins save immediately
+* Losses save immediately
+* Rewards save immediately
+
+Test:
+
+* Disconnect during payout
+* Disconnect during reward claim
+* Disconnect during all-in hand
+* Disconnect during tournament payout
+
+Verify balances remain correct after reconnecting.
+
+⸻
+
+XP SYSTEM VALIDATION
+
+Verify:
+
+* XP awards correctly
+* XP only awards once
+* XP progression is accurate
+* Level ups occur correctly
+* XP saves immediately
+
+Test:
+
+* Disconnect during XP gain
+* Disconnect during level up
+
+Verify progress remains accurate.
+
+⸻
+
+ACHIEVEMENT VALIDATION
+
+Verify achievements:
+
+* Unlock correctly
+* Save correctly
+* Cannot unlock twice
+* Cannot claim twice
+
+Verify all achievement rewards:
+
+* Award correct chips
+* Award correct XP
+* Save immediately
+
+⸻
+
+HOLD’EM VALIDATION
+
+Perform a full multiplayer Hold’em audit.
+
+Verify:
+
+* Dealer button rotation
+* Small blind rotation
+* Big blind rotation
+* Turn order
+* Betting order
+
+Verify:
+
+* Fold
+* Check
+* Call
+* Raise
+* All-In
+
+All actions must function correctly.
+
+⸻
+
+POT VALIDATION
+
+Perform exhaustive pot testing.
+
+Verify:
+
+* Main pot calculations
+* Side pot calculations
+* Multiple side pot calculations
+* Split pot calculations
+
+Example:
+
+Player A = 100K
+
+Player B = 50K
+
+Player C = 25K
+
+Verify:
+
+* Only matched chips enter pots
+* Excess chips are returned
+* No player wins chips they are not eligible to win
+
+⸻
+
+ALL-IN PROTECTION
+
+Perform all-in stress testing.
+
+Verify:
+
+* Short stack protection
+* Side pot protection
+* Excess chip return
+
+Example:
+
+Player A all-in 500K
+
+Player B all-in 100K
+
+Player A must only risk and win the 100K that Player B matched.
+
+Remaining chips must automatically return to Player A.
+
+No exceptions.
+
+⸻
+
+SHOWDOWN VALIDATION
+
+Verify:
+
+* Hand rankings
+* Tie calculations
+* Split pots
+* Multiple winner scenarios
+
+Verify all payout calculations match poker rules.
+
+⸻
+
+THREE CARD POKER VALIDATION
+
+Verify:
+
+* Dealer qualification
+* Ante payouts
+* Play payouts
+* Pair Plus payouts
+* Ante Bonus payouts
+* Six Card Bonus payouts
+
+⸻
+
+SIX CARD BONUS VALIDATION
+
+Verify the system correctly identifies the best six-card hand from:
+
+Player 3 cards
+
+Dealer 3 cards
+
+Verify all hand rankings.
+
+Additionally:
+
+When a Six Card Bonus hand wins:
+
+Highlight all cards used in the winning combination.
+
+Example:
+
+Dealer:
+5♣ 6♠ 5♠
+
+Player:
+10♥ Q♠ 5♦
+
+Winning hand:
+
+Three of a Kind – 5s
+
+All three 5 cards must glow and highlight visually.
+
+Display:
+
+“THREE OF A KIND – 5s”
+
+so players immediately understand why they won.
+
+⸻
+
+THREE CARD BETTING PROTECTION
+
+Verify:
+
+Players cannot enter a hand if they do not have enough chips to complete the Play wager.
+
+Prevent:
+
+Player spends entire bankroll on Pair Plus and Six Card Bonus.
+
+Then cannot match Play wager.
+
+This situation must never occur.
+
+⸻
+
+BLACKJACK VALIDATION
+
+Perform full blackjack audit.
+
+Current testing mode:
+
+Single Deck
+
+Future production mode:
+
+Six Deck Shoe
+
+(Casino card shoe, not footwear.)
+
+⸻
+
+Verify:
+
+* Hit
+* Stand
+* Double
+* Split
+
+All function correctly.
+
+⸻
+
+SPLIT HAND VALIDATION
+
+Verify:
+
+Split hands are scored independently.
+
+Example:
+
+Hand 1 = Push
+
+Hand 2 = Loss
+
+Result screen must clearly show:
+
+Hand 1 → Push
+
+Hand 2 → Loss
+
+Net Result → -500K
+
+Players must understand exactly why they won, lost, or pushed.
+
+No ambiguous result screens.
+
+⸻
+
+SHOE VALIDATION
+
+Verify:
+
+Cards remove correctly from shoe.
+
+Card count remains accurate.
+
+Remaining card display remains accurate.
+
+⸻
+
+SHUFFLE VALIDATION
+
+Current issue:
+
+After shoe depletion:
+
+Game displays:
+
+“Shuffling Shoe”
+
+and sometimes requires exiting and re-entering.
+
+Fix:
+
+After shuffle completes:
+
+* Reset shoe
+* Continue gameplay automatically
+* No restart required
+* No table exit required
+
+Add:
+
+Card shuffle animation beneath:
+
+“Shuffling Shoe”
+
+during reset sequence.
+
+⸻
+
+SOCIAL FEED VALIDATION
+
+Verify:
+
+Posts appear immediately.
+
+Newest posts appear first.
+
+When a user creates a post:
+
+It automatically becomes the newest post on the feed.
+
+⸻
+
+Verify:
+
+Users can delete their own posts.
+
+Users cannot delete posts from others.
+
+⸻
+
+Verify:
+
+Likes save correctly.
+
+Comments save correctly.
+
+Feed refreshes correctly.
+
+⸻
+
+MATCHMAKING VALIDATION
+
+Open Ranked Play for all multiplayer games.
+
+Including:
+
+* Hold’em
+* Blackjack
+* Three Card Poker
+
+Match players according to bankroll brackets.
+
+Human players should always be prioritized.
+
+AI fills empty seats when necessary.
+
+⸻
+
+TABLE STAKE VALIDATION
+
+Implement stake brackets across every game.
+
+Players choose stake level BEFORE entering a table.
+
+Examples:
+
+Bankroll = 100K
+
+Allow:
+
+* 5K
+* 10K
+* 25K
+
+Disallow:
+
+* 100K+
+* 500K+
+* 1M+
+
+Bankroll = 1M
+
+Allow larger brackets.
+
+Match players with similar bankroll levels.
+
+Prevent extremely unbalanced tables.
+
+⸻
+
+FORTUNE COOKIE SYSTEM 🥠
+
+Validate complete Fortune Cookie feature.
+
+Verify:
+
+🥠 opens correctly
+
+🥠 animation works
+
+🥠 rewards save
+
+🥠 rewards award correctly
+
+🥠 inventory updates correctly
+
+⸻
+
+Daily Free Cookie:
+
+🥠 must connect directly to the first cookie tab.
+
+Players should immediately see their available daily cookie.
+
+⸻
+
+Wheel Integration:
+
+🥠 must appear as a wheel prize.
+
+Wheel must correctly award:
+
+🥠 Fortune Cookies
+
+⸻
+
+PERFORMANCE TESTING
+
+Stress test:
+
+* 100 players
+* 500 players
+* 1,000 players
+* 5,000 players
+
+Verify:
+
+* No crashes
+* No duplicate payouts
+* No economy corruption
+* No chip duplication
+* No account corruption
+
+⸻
+
+FINAL LAUNCH REQUIREMENTS
+
+Do not consider Chip Society launch-ready until all systems below pass validation:
+
+* Account persistence
+* Economy validation
+* Multiplayer Hold’em validation
+* Blackjack validation
+* Three Card Poker validation
+* Side pot validation
+* All-in protection
+* Social feed validation
+* Matchmaking validation
+* Fortune Cookie 🥠 validation
+* Shoe reshuffling validation
+* Achievement validation
+* Reward validation
+* Anti-duplication validation
+
+Generate a complete report showing:
+
+* Passed systems
+* Failed systems
+* Potential exploits
+* Economy vulnerabilities
+* Multiplayer vulnerabilities
+* Recommended fixes
+
+Do not provide assumptions. Test and verify actual behavior before marking any system as complete.
