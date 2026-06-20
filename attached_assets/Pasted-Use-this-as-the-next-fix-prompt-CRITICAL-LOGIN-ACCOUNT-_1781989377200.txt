@@ -1,0 +1,361 @@
+Use this as the next fix prompt:
+
+CRITICAL LOGIN / ACCOUNT PERSISTENCE / SOCIAL AVATAR BUG FIX
+
+The current account system is broken and must be fixed immediately before any new features are added.
+
+Players are creating accounts, logging out, logging back in, and the game is treating them like a brand-new player.
+
+This causes:
+
+• Progress not saving
+• Tutorial menu appearing again
+• Player getting stuck in tutorial
+• Chips resetting
+• Avatar selection not persisting
+• Social feed not using selected avatar
+• Account identity not being restored correctly
+
+This is a launch-blocking issue.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT LOGIN BUG
+
+Bug:
+
+Player creates profile using:
+
+Username
+4-digit PIN
+
+Player logs out.
+
+Player logs back in using the same username and PIN.
+
+Instead of restoring the existing account, the game:
+
+• Starts them over
+• Sends them to tutorial
+• Does not load saved progress
+• Does not restore selected avatar
+• Does not restore chip balance
+• Does not restore XP
+• Behaves like a new account
+
+This is incorrect.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED LOGIN BEHAVIOR
+
+When a player logs in with an existing username and 4-digit PIN:
+
+The server must locate the existing account.
+
+The game must restore the exact saved profile.
+
+Do NOT create a new account.
+
+Do NOT reset progress.
+
+Do NOT restart tutorial.
+
+Do NOT overwrite existing data.
+
+Do NOT assign new player ID.
+
+Do NOT assign default avatar unless none exists.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCOUNT IDENTITY RULE
+
+Username + PIN login must always resolve to the same permanent Player ID.
+
+Example:
+
+Username:
+
+Bobby
+
+PIN:
+
+1234
+
+must always load:
+
+Player ID:
+same permanent ID
+
+Saved chips:
+same balance
+
+Saved XP:
+same XP
+
+Saved level:
+same level
+
+Selected avatar:
+same avatar
+
+Tutorial status:
+completed if already completed
+
+Social profile:
+same display identity
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SERVER-SIDE SAVE DATA REQUIRED
+
+The following fields must persist server-side:
+
+• Player ID
+• Username
+• Hashed PIN
+• Chip balance
+• XP
+• Level
+• Selected avatar ID
+• Selected theme ID
+• Tutorial completed status
+• Achievements
+• Avatar collection
+• Fortune Cookie inventory 🥠
+• Lottery ticket inventory
+• Daily streak status
+• Social posts
+• Social likes/comments
+• Player statistics
+• Table stake bracket
+• Created date
+• Last login date
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TUTORIAL BUG FIX
+
+If tutorialCompleted = true:
+
+Do NOT show tutorial again.
+
+Do NOT route player into tutorial.
+
+Do NOT trap player in tutorial.
+
+After login, route player directly to Home Screen.
+
+If tutorialCompleted = false:
+
+Show tutorial once.
+
+When tutorial is completed:
+
+Set tutorialCompleted = true on server.
+
+Save immediately.
+
+Verify it remains true after logout/login.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UNESCAPABLE TUTORIAL MENU BUG
+
+Current issue:
+
+Player gets stuck on tutorial menu and cannot exit.
+
+Fix:
+
+Add a safe exit route.
+
+Tutorial screen must always have one of the following:
+
+• Continue
+• Skip Tutorial
+• Back to Home
+• Finish Tutorial
+
+Player should never be trapped.
+
+Even if tutorial state fails, the player must be able to return to Home Screen.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LOGOUT / LOGIN TEST CASE
+
+Test this exact flow:
+
+1. Create account
+2. Select avatar
+3. Earn chips
+4. Earn XP
+5. Complete tutorial
+6. Make social post
+7. Logout
+8. Close app
+9. Reopen app
+10. Login with same username + PIN
+
+Expected result:
+
+• Same account loads
+• Same chips load
+• Same XP loads
+• Same avatar loads
+• Tutorial does not reappear
+• Social post remains
+• Avatar appears correctly on post
+• Player returns to Home Screen
+
+If any step fails, account persistence is not fixed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DO NOT CREATE DUPLICATE ACCOUNTS
+
+Before creating a new account:
+
+Check if username already exists.
+
+If username exists:
+
+Do NOT create duplicate account.
+
+Show:
+
+Username already exists.
+
+Please login or choose another username.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PIN VALIDATION
+
+When logging in:
+
+Check username.
+
+Check hashed PIN.
+
+If PIN matches:
+
+Load existing account.
+
+If PIN fails:
+
+Show:
+
+Incorrect PIN.
+
+Do NOT create a new account.
+
+Do NOT reset account.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SELECTED AVATAR NOT SHOWING ON SOCIAL POSTS
+
+Current issue:
+
+Player-selected avatar is not reflected when the player makes a social feed post.
+
+Fix:
+
+Every post must use the current selectedAvatarId from the player’s account.
+
+When a player posts:
+
+Post object must include:
+
+• playerId
+• username
+• selectedAvatarId
+• timestamp
+• postText
+• postId
+
+The feed renderer must display the avatar from selectedAvatarId.
+
+Do NOT use:
+
+• initials
+• default icon
+• blank circle
+• old avatar
+• cached avatar
+• random avatar
+
+unless selectedAvatarId is genuinely missing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AVATAR PROPAGATION RULE
+
+The selected avatar must appear everywhere:
+
+• Player Profile
+• Social Feed Posts
+• Comments
+• Likes
+• Table Seats
+• Leaderboards
+• Notifications
+• Hand Results
+• Blackjack Table
+• Three Card Poker Table
+• Hold’em Table
+
+Changing avatar should update all future posts immediately.
+
+Optional:
+
+Existing posts may either keep the avatar used at the time of posting OR update to current avatar globally, but the behavior must be consistent.
+
+Recommended:
+
+Use current selectedAvatarId globally so profile identity stays consistent.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SERVER SAVE TIMING
+
+Save immediately when:
+
+• Account is created
+• Avatar is selected
+• Chips change
+• XP changes
+• Tutorial is completed
+• Post is created
+• Daily streak is claimed
+• Fortune Cookie 🥠 is opened
+• Lottery ticket is scratched
+• Achievement is unlocked
+
+Do not rely only on app close to save data.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL ACCEPTANCE TEST
+
+Before marking complete, verify:
+
+✅ Existing users can log back in
+✅ Username + PIN loads same account
+✅ No duplicate accounts are created
+✅ Chips persist
+✅ XP persists
+✅ Level persists
+✅ Tutorial completed status persists
+✅ Player is not trapped in tutorial
+✅ Avatar selection persists
+✅ Social posts persist
+✅ Social feed displays selected avatar
+✅ Logout/login does not reset player
+✅ App restart does not reset player
+✅ Server data is source of truth
+
+This issue must be fixed before adding any more gameplay, store, avatar, casino, or social features.

@@ -260,6 +260,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const save = useCallback(async (updated: UserProfile) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    // Keep the accounts list in sync so signIn() always restores the latest
+    // profile state, not the stale registration-time snapshot.
+    if (updated.username && updated.username !== DEFAULT_PROFILE.username) {
+      try {
+        const accounts = await loadAccounts();
+        const idx = accounts.findIndex(
+          a => a.username.toLowerCase() === updated.username.toLowerCase()
+        );
+        if (idx >= 0) {
+          const synced = [...accounts];
+          synced[idx] = { ...synced[idx], profile: updated };
+          await saveAccounts(synced);
+        }
+      } catch {}
+    }
   }, []);
 
   const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
@@ -456,7 +471,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       symbolIndex: avatarIndex,
       profileImageType: 'symbol',
       chips: REGISTERED_CHIPS,
-      isGuest: false,
       accountType: 'registered',
       isNewUser: false,
       createdAt: now2,
@@ -520,9 +534,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    const blank: UserProfile = { ...DEFAULT_PROFILE };
-    setProfile(blank);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(blank));
+    // Flush the current in-memory profile to accounts before clearing the session.
+    // This is the safety net for existing installs where save() may not have synced yet.
+    setProfile(current => {
+      if (current.username && current.username !== DEFAULT_PROFILE.username) {
+        void (async () => {
+          try {
+            const accounts = await loadAccounts();
+            const idx = accounts.findIndex(
+              a => a.username.toLowerCase() === current.username.toLowerCase()
+            );
+            if (idx >= 0) {
+              const synced = [...accounts];
+              synced[idx] = { ...synced[idx], profile: current };
+              await saveAccounts(synced);
+            }
+          } catch {}
+        })();
+      }
+      return { ...DEFAULT_PROFILE };
+    });
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...DEFAULT_PROFILE }));
   }, []);
 
   // ── Derived ───────────────────────────────────────────────────────────────────
