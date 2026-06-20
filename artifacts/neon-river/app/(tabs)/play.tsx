@@ -7,8 +7,53 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { G, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { useUser } from '@/context/UserContext';
 import { GuestBanner } from '@/components/GuestBanner';
+
+// ─── Casino SVG icons ─────────────────────────────────────────────────────────
+
+function ThreeCardPokerIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* Left card rotated into fan */}
+      <G transform="rotate(-22, 12, 20)">
+        <Rect x="6.5" y="4" width="11" height="16" rx="2"
+          fill={`${color}20`} stroke={color} strokeWidth="1.3" />
+      </G>
+      {/* Right card rotated into fan */}
+      <G transform="rotate(22, 12, 20)">
+        <Rect x="6.5" y="4" width="11" height="16" rx="2"
+          fill={`${color}20`} stroke={color} strokeWidth="1.3" />
+      </G>
+      {/* Center card — front */}
+      <Rect x="6.5" y="4" width="11" height="16" rx="2"
+        fill="#050010" stroke={color} strokeWidth="1.6" />
+      {/* Diamond pip */}
+      <Path d="M12 9 L14 12.5 L12 16 L10 12.5 Z" fill={color} />
+    </Svg>
+  );
+}
+
+function BlackjackIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* Back card (face card offset) */}
+      <Rect x="9" y="3" width="12" height="17" rx="2"
+        fill={`${color}18`} stroke={color} strokeWidth="1.3" />
+      {/* Front card (ace) */}
+      <Rect x="3" y="5" width="12" height="17" rx="2"
+        fill="#050010" stroke={color} strokeWidth="1.6" />
+      {/* "A" label */}
+      <SvgText x="5.8" y="17" fontSize="10" fontWeight="bold" fill={color}>A</SvgText>
+      {/* Spade — head (two curves + point) + stem */}
+      <Path
+        d="M9 8.5 C9 8.5 6 11 6 12.5 C6 13.6 7 14.2 8 13.6 C7.5 14.8 7 15.2 7 15.2 L11 15.2 C11 15.2 10.5 14.8 10 13.6 C11 14.2 12 13.6 12 12.5 C12 11 9 8.5 9 8.5Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
 
 // ─── Stake Tiers ──────────────────────────────────────────────────────────────
 
@@ -51,6 +96,7 @@ function getAutoTier(chips: number): StakeTier {
 interface OptionDef {
   label: string;
   icon: string;
+  iconNode?: React.ReactNode;
   sub?: string;
   onPress?: () => void;
   locked?: boolean;
@@ -77,7 +123,9 @@ function OptionRow({ opt, accent }: { opt: OptionDef; accent: string }) {
     <TouchableOpacity style={[or.row, { borderColor: `${accent}35`, overflow: 'hidden' }]} onPress={opt.onPress} activeOpacity={0.8}>
       <LinearGradient colors={[`${accent}18`, 'transparent']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
       <View style={[or.iconWrap, { backgroundColor: `${accent}1a`, borderColor: `${accent}45` }]}>
-        <Ionicons name={opt.icon as any} size={14} color={accent} />
+        {opt.iconNode
+          ? opt.iconNode
+          : <Ionicons name={opt.icon as any} size={14} color={accent} />}
       </View>
       <View style={{ flex: 1 }}>
         <Text style={[or.label, { color: accent }]}>{opt.label}</Text>
@@ -697,18 +745,25 @@ export default function PlayScreen() {
           lines={['House games · Win chips against the dealer']}
           options={[
             {
-              label:   'THREE CARD POKER',
-              icon:    'game-controller-outline',
-              sub:     'Ante · Pair Plus · 6 Card Bonus',
-              onPress: () => router.push('/casino/three-card-poker' as any),
+              label:    'THREE CARD POKER',
+              icon:     'card-outline',
+              iconNode: <ThreeCardPokerIcon size={15} color="#ffd700" />,
+              sub:      'Ante · Pair Plus · 6 Card Bonus',
+              onPress:  () => router.push('/casino/three-card-poker' as any),
             },
             {
-              label:   'BLACKJACK',
-              icon:    'card-outline',
-              sub:     'Six Deck · Beat the dealer',
-              onPress: () => router.push('/casino/blackjack' as any),
+              label:    'BLACKJACK',
+              icon:     'card-outline',
+              iconNode: <BlackjackIcon size={15} color="#ffd700" />,
+              sub:      'Six Deck · Beat the dealer',
+              onPress:  () => router.push('/casino/blackjack' as any),
             },
-            { label: 'ROULETTE', icon: 'radio-button-on-outline', sub: 'Coming soon', locked: true },
+            {
+              label:  'MORE GAMES COMING SOON',
+              icon:   'dice-outline',
+              sub:    'New casino games are currently in development',
+              locked: true,
+            },
           ]}
         />
 

@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
@@ -37,147 +38,145 @@ const RANK_COLORS: Record<string, string> = {
   'Neon Legend': colors.accent,
 };
 
-// ─── Live tournament pool ─────────────────────────────────────────────────────
+// ─── Tournament Preview Hub ────────────────────────────────────────────────────
 
 type TVariant = 'texas_holdem' | 'short_deck_holdem';
 
-interface LiveTournament {
+interface TPreviewCard {
   id: string;
+  emoji: string;
   name: string;
-  variant: TVariant;
-  variantLabel: string;
-  speed: 'Regular' | 'Turbo' | 'Hyper-Turbo';
-  prizePool: number;
-  buyIn: number;
-  totalSeats: number;
-  filledSeats: number;
-  registrations: number;
-  status: 'registering' | 'live' | 'late';
-  endTime: number;
-  accentColor: string;
+  color: string;
+  badge: string;
+  features: string[];
 }
 
-const TOURNAMENT_TEMPLATES: Omit<LiveTournament, 'id' | 'filledSeats' | 'registrations' | 'status' | 'endTime'>[] = [
-  { name: 'LOW STAKES LOUNGE',    variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 500,  prizePool: 50_000,   totalSeats: 128, accentColor: colors.primary },
-  { name: 'SIX CARD SPRINT',      variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Turbo',       buyIn: 500,  prizePool: 50_000,   totalSeats: 64,  accentColor: colors.secondary },
-  { name: 'MIDNIGHT RUN',         variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Turbo',       buyIn: 1000, prizePool: 100_000,  totalSeats: 256, accentColor: '#00ff88' },
-  { name: 'CUT DECK CLASH',       variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Regular',     buyIn: 1000, prizePool: 100_000,  totalSeats: 128, accentColor: '#bf5fff' },
-  { name: 'SKYLINE SERIES',       variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 2500, prizePool: 250_000,  totalSeats: 512, accentColor: colors.gold },
-  { name: 'HIGH HEAT SHORT DECK', variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Turbo',       buyIn: 2500, prizePool: 250_000,  totalSeats: 128, accentColor: '#ff4400' },
-  { name: 'RIVER KINGS',          variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 250,  prizePool: 25_000,   totalSeats: 64,  accentColor: '#00aaff' },
-  { name: 'TURBO SIX',            variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Hyper-Turbo', buyIn: 250,  prizePool: 25_000,   totalSeats: 64,  accentColor: '#aa44ff' },
-  { name: 'SUNDAY FREEZEOUT',     variant: 'texas_holdem',      variantLabel: "No Limit Hold'em", speed: 'Regular',     buyIn: 5000, prizePool: 1_000_000,totalSeats: 512, accentColor: '#44aaff' },
-  { name: 'ROYAL RUSH',           variant: 'short_deck_holdem', variantLabel: 'Short Deck',       speed: 'Regular',     buyIn: 5000, prizePool: 500_000,  totalSeats: 256, accentColor: '#ff6600' },
+const PREVIEW_CARDS: TPreviewCard[] = [
+  {
+    id: '1', emoji: '🏆', name: 'CHIP SOCIETY CHAMPIONSHIP', color: colors.gold,
+    badge: 'COMING SOON',
+    features: ['Multi-table tournament', 'Championship events', 'Final table spotlight', 'Massive future prize pools'],
+  },
+  {
+    id: '2', emoji: '⚡', name: 'TURBO SHOWDOWN', color: colors.primary,
+    badge: 'IN DEVELOPMENT',
+    features: ['Fast blind increases', 'Shorter tournament sessions', 'Faster action', 'Quick competitive play'],
+  },
+  {
+    id: '3', emoji: '🐉', name: 'FOUR DRAGONS EVENT', color: colors.secondary,
+    badge: 'COMING SOON',
+    features: ['Four Dragons themed event', 'Limited-time format', 'Special rewards', 'Seasonal competition'],
+  },
+  {
+    id: '4', emoji: '💰', name: 'HIGH ROLLER SERIES', color: '#bf5fff',
+    badge: 'IN DEVELOPMENT',
+    features: ['Elite stakes', 'Premium competition', 'Exclusive events', 'Large future prize pools'],
+  },
+  {
+    id: '5', emoji: '🎭', name: 'SEASONAL EVENTS', color: '#00e887',
+    badge: 'COMING SOON',
+    features: ['Holiday events', 'Community competitions', 'Special game modes', 'Limited-time rewards'],
+  },
 ];
 
-function makeTournament(usedNames: Set<string>): LiveTournament {
-  const pool = TOURNAMENT_TEMPLATES.filter(t => !usedNames.has(t.name));
-  const tmpl = (pool.length > 0 ? pool : TOURNAMENT_TEMPLATES)[Math.floor(Math.random() * Math.max(1, pool.length || TOURNAMENT_TEMPLATES.length))];
-  const totalSeats = tmpl.totalSeats;
-  const filledSeats = Math.floor(totalSeats * (0.22 + Math.random() * 0.70));
-  const roll = Math.random();
-  const status: LiveTournament['status'] = roll > 0.5 ? 'live' : roll > 0.25 ? 'registering' : 'late';
-  return {
-    ...tmpl,
-    id: `t_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
-    filledSeats,
-    registrations: filledSeats + Math.floor(Math.random() * 40),
-    status,
-    endTime: Date.now() + (4 + Math.floor(Math.random() * 56)) * 60_000,
-  };
-}
-
-function initTournamentPool(): LiveTournament[] {
-  const used = new Set<string>();
-  return Array.from({ length: 6 }, () => {
-    const t = makeTournament(used);
-    used.add(t.name);
-    return t;
-  });
-}
-
-function TournamentCard({ t }: { t: LiveTournament }) {
-  const fmtPrize = (n: number) => {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-    return String(n);
-  };
-  const fmtChips = (n: number) => n >= 1000 ? `${n / 1000}K` : String(n);
-
-  const fillPct    = Math.min(100, Math.round((t.filledSeats / t.totalSeats) * 100));
-  const seatsLeft  = t.totalSeats - t.filledSeats;
-  const isShortDeck = t.variant === 'short_deck_holdem';
-
+function TournamentPreviewCard({ card }: { card: TPreviewCard }) {
   return (
-    <View style={[tc.card, { borderColor: `${t.accentColor}28`, opacity: 0.72 }]}>
+    <View style={[tc.card, { borderColor: `${card.color}30` }]}>
       <LinearGradient
-        colors={['#160028', '#080018', '#050010']}
+        colors={['#120020', '#080018', '#050010']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
       <LinearGradient
-        colors={[`${t.accentColor}18`, 'transparent']}
+        colors={[`${card.color}15`, 'transparent']}
         style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 0.85, y: 0.65 }}
+        start={{ x: 0, y: 0 }} end={{ x: 0.9, y: 0.7 }}
       />
-      <View style={[tc.accentBar, { backgroundColor: t.accentColor }]} />
-
+      <View style={[tc.accentBar, { backgroundColor: card.color }]} />
       <View style={tc.body}>
-        {/* Top row: coming soon lock badge */}
         <View style={tc.topRow}>
-          <View style={[tc.badge, { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', gap: 5 }]}>
-            <Ionicons name="lock-closed-outline" size={8} color="rgba(255,255,255,0.3)" />
-            <Text style={[tc.badgeText, { color: 'rgba(255,255,255,0.3)' }]}>COMING SOON</Text>
-          </View>
-          <View style={tc.speedPill}>
-            <Text style={tc.speedText}>{t.speed.toUpperCase()}</Text>
+          <View style={[tc.badge, { backgroundColor: `${card.color}15`, borderColor: `${card.color}40` }]}>
+            <Ionicons name="time-outline" size={8} color={card.color} />
+            <Text style={[tc.badgeText, { color: card.color }]}>{card.badge}</Text>
           </View>
         </View>
-
-        {/* Variant badge */}
-        <View style={[tc.variantBadge, {
-          backgroundColor: isShortDeck ? `${colors.secondary}18` : `${colors.primary}18`,
-          borderColor:     isShortDeck ? `${colors.secondary}40` : `${colors.primary}40`,
-        }]}>
-          <Text style={[tc.variantText, { color: isShortDeck ? colors.secondary : colors.primary }]}>
-            {isShortDeck ? '36-CARD SHORT DECK' : "NO LIMIT HOLD'EM"}
-          </Text>
+        <Text style={tc.emoji}>{card.emoji}</Text>
+        <Text style={[tc.name, { color: card.color }]} numberOfLines={2}>{card.name}</Text>
+        <View style={tc.featureList}>
+          {card.features.map((f, i) => (
+            <View key={i} style={tc.featureRow}>
+              <Ionicons name="chevron-forward" size={9} color={`${card.color}80`} />
+              <Text style={tc.featureText}>{f}</Text>
+            </View>
+          ))}
         </View>
-
-        {/* Tournament name */}
-        <Text style={[tc.name, { color: t.accentColor }]} numberOfLines={1}>{t.name}</Text>
-
-        {/* Stats grid */}
-        <View style={tc.statsGrid}>
-          <View style={tc.statCell}>
-            <Text style={tc.statLbl}>PRIZE POOL</Text>
-            <Text style={[tc.statVal, { color: t.accentColor }]}>{fmtPrize(t.prizePool)}</Text>
-          </View>
-          <View style={tc.statCell}>
-            <Text style={tc.statLbl}>BUY-IN</Text>
-            <Text style={tc.statVal}>{fmtChips(t.buyIn)}</Text>
-          </View>
-          <View style={tc.statCell}>
-            <Text style={tc.statLbl}>SEATS LEFT</Text>
-            <Text style={tc.statVal}>{seatsLeft}</Text>
-          </View>
-          <View style={tc.statCell}>
-            <Text style={tc.statLbl}>REGISTERED</Text>
-            <Text style={tc.statVal}>{t.registrations}</Text>
-          </View>
-        </View>
-
-        {/* Fill bar */}
-        <View style={tc.barWrap}>
-          <View style={[tc.barFill, { width: `${fillPct}%` as any, backgroundColor: t.accentColor }]} />
-        </View>
-
-        {/* Locked CTA — replaces PLAY NOW */}
-        <View style={[tc.joinBtn, { borderColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', gap: 8 }]}>
-          <Ionicons name="lock-closed-outline" size={13} color="rgba(255,255,255,0.2)" />
-          <Text style={[tc.joinText, { color: 'rgba(255,255,255,0.22)' }]}>COMPETITIVE SERIES — ARRIVING SOON</Text>
+        <View style={[tc.comingSoonBar, { borderColor: `${card.color}30` }]}>
+          <Ionicons name="lock-closed-outline" size={10} color={`${card.color}60`} />
+          <Text style={[tc.comingSoonText, { color: `${card.color}70` }]}>ARRIVING IN A FUTURE UPDATE</Text>
         </View>
       </View>
+    </View>
+  );
+}
+
+function TournamentPreviewHub() {
+  const [notified, setNotified] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem('tournamentNotify').then(v => { if (v === '1') setNotified(true); });
+  }, []);
+
+  const handleNotify = async () => {
+    setNotified(true);
+    await AsyncStorage.setItem('tournamentNotify', '1');
+  };
+
+  return (
+    <View style={tour.wrap}>
+      {/* Main feature card */}
+      <View style={tour.featCard}>
+        <LinearGradient colors={['#1a0035', '#0a001f', '#050010']} style={StyleSheet.absoluteFill} />
+        <LinearGradient colors={[`${colors.gold}18`, 'transparent']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+        <View style={[tour.featBar, { backgroundColor: colors.gold }]} />
+        <View style={tour.featBody}>
+          <View style={tour.featBadgeRow}>
+            <View style={tour.featBadge}>
+              <Ionicons name="time-outline" size={9} color={colors.gold} />
+              <Text style={tour.featBadgeText}>COMING SOON</Text>
+            </View>
+          </View>
+          <Text style={tour.featEmoji}>🏆</Text>
+          <Text style={tour.featTitle}>CHIP SOCIETY{'\n'}CHAMPIONSHIP</Text>
+          <Text style={tour.featDesc}>
+            Compete against players worldwide in multi-table poker tournaments featuring championship prize pools, final table action, and competitive events.
+          </Text>
+          {/* Notify button */}
+          {notified ? (
+            <View style={tour.notifiedRow}>
+              <Ionicons name="checkmark-circle" size={14} color={colors.success} />
+              <Text style={tour.notifiedText}>We'll notify you when tournaments launch.</Text>
+            </View>
+          ) : (
+            <TouchableOpacity style={tour.notifyBtn} onPress={handleNotify} activeOpacity={0.8}>
+              <LinearGradient colors={[`${colors.gold}25`, `${colors.gold}10`]} style={StyleSheet.absoluteFill} />
+              <Ionicons name="notifications-outline" size={14} color={colors.gold} />
+              <Text style={tour.notifyBtnText}>NOTIFY ME</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      {/* Horizontal preview cards */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={width * 0.72 + 12}
+        decelerationRate="fast"
+        snapToAlignment="start"
+        contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+      >
+        {PREVIEW_CARDS.map(c => <TournamentPreviewCard key={c.id} card={c} />)}
+      </ScrollView>
     </View>
   );
 }
@@ -524,7 +523,6 @@ export default function HomeScreen() {
   const { posts: aiPosts } = useAISocial();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const dropAnim = useRef(new Animated.Value(0)).current;
-  const [tournaments, setTournaments] = useState<LiveTournament[]>(initTournamentPool);
   const trendScrollRef = useRef<ScrollView>(null);
   const trendIndexRef = useRef(0);
 
@@ -538,25 +536,6 @@ export default function HomeScreen() {
       router.replace('/onboarding');
     }
   }, [isLoaded, profile.isNewUser]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTournaments(prev => {
-        const now = Date.now();
-        const used = new Set(prev.map(t => t.name));
-        return prev.map(t => {
-          if (t.endTime <= now) {
-            used.delete(t.name);
-            const next = makeTournament(used);
-            used.add(next.name);
-            return next;
-          }
-          return { ...t };
-        });
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Auto-scroll trending carousel every 3.5 s (dep on aiPosts.length — same signal)
   useEffect(() => {
@@ -758,21 +737,13 @@ export default function HomeScreen() {
         {/* 4 ─── Featured Tournaments ─── */}
         <View style={styles.sectionRow}>
           <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>FEATURED TOURNAMENTS</Text>
-          <View style={styles.activeBadge}>
-            <View style={styles.activeDot} />
-            <Text style={styles.activeCount}>{tournaments.length} ACTIVE</Text>
+          <View style={[styles.activeBadge, { borderColor: `${colors.gold}40`, backgroundColor: `${colors.gold}10` }]}>
+            <Ionicons name="time-outline" size={9} color={colors.gold} />
+            <Text style={[styles.activeCount, { color: colors.gold }]}>COMING SOON</Text>
           </View>
         </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={width * 0.82 + 12}
-          decelerationRate="fast"
-          snapToAlignment="start"
-          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
-        >
-          {tournaments.map(t => <TournamentCard key={t.id} t={t} />)}
-        </ScrollView>
+        <Text style={tour.hubSub}>The next major feature coming to Chip Society.</Text>
+        <TournamentPreviewHub />
 
         {/* 5 ─── Player Stats ─── */}
         <View style={styles.sectionRow}>
@@ -809,54 +780,79 @@ const LOGO_SIZE = Math.min(46, width * 0.118);
 // native uses the font's own metrics (forcing it clips the descender).
 const LOGO_LINE_HEIGHT = Platform.select({ web: LOGO_SIZE * 1.12, default: undefined });
 
+// ─── Tournament preview card styles ───────────────────────────────────────────
 const tc = StyleSheet.create({
   card: {
-    width: width * 0.82,
+    width: width * 0.72,
     borderRadius: 18,
     borderWidth: 1,
     overflow: 'hidden',
     flexDirection: 'row',
   },
   accentBar: { width: 4 },
-  body: { flex: 1, padding: 14, gap: 7 },
-  topRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  body:      { flex: 1, padding: 14, gap: 8 },
+  topRow:    { flexDirection: 'row', alignItems: 'center', gap: 6 },
   badge: {
     borderRadius: 6, borderWidth: 1,
     paddingHorizontal: 6, paddingVertical: 2,
     flexDirection: 'row', alignItems: 'center', gap: 3,
   },
-  liveDot: { width: 5, height: 5, borderRadius: 2.5 },
-  badgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
-  speedPill: {
-    borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2,
-    backgroundColor: 'rgba(255,255,255,0.07)',
-  },
-  speedText: { color: 'rgba(255,255,255,0.45)', fontSize: 7, fontWeight: '700', letterSpacing: 0.3 },
-  timeLeft: { color: colors.textMuted, fontSize: 10, fontFamily: 'Inter_700Bold', marginLeft: 'auto' },
-  variantBadge: {
-    alignSelf: 'flex-start', borderRadius: 5, borderWidth: 1,
-    paddingHorizontal: 7, paddingVertical: 2,
-  },
-  variantText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.6 },
+  badgeText:    { fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
+  emoji:        { fontSize: 22, lineHeight: 28 },
   name: {
-    fontSize: 14, fontWeight: '800',
-    fontFamily: 'Inter_700Bold',
-    letterSpacing: 0.3, lineHeight: 18,
+    fontSize: 13, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 0.2, lineHeight: 17,
   },
-  statsGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2,
+  featureList:  { gap: 4, marginTop: 2 },
+  featureRow:   { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  featureText:  { color: 'rgba(255,255,255,0.45)', fontSize: 10, lineHeight: 14, flex: 1 },
+  comingSoonBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderRadius: 7, borderWidth: 1,
+    paddingHorizontal: 8, paddingVertical: 5, marginTop: 4,
   },
-  statCell: { minWidth: '44%', flex: 1 },
-  statLbl: { color: colors.textDim, fontSize: 7, letterSpacing: 1, marginBottom: 1 },
-  statVal: { color: colors.text, fontSize: 13, fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  barWrap: { height: 3, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 2 },
-  barFill: { height: 3, borderRadius: 2 },
-  joinBtn: {
-    borderRadius: 8, borderWidth: 1, overflow: 'hidden',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 8, gap: 5,
+  comingSoonText: { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8 },
+});
+
+// ─── Tournament hub wrapper styles ────────────────────────────────────────────
+const tour = StyleSheet.create({
+  wrap:     { gap: 12 },
+  hubSub:   { color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: -8, marginBottom: 2 },
+
+  featCard: {
+    borderRadius: 18, borderWidth: 1, borderColor: `${colors.gold}35`,
+    overflow: 'hidden', flexDirection: 'row',
   },
-  joinText: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6 },
+  featBar:  { width: 4, backgroundColor: colors.gold },
+  featBody: { flex: 1, padding: 16, gap: 10 },
+  featBadgeRow: { flexDirection: 'row' },
+  featBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    borderRadius: 6, borderWidth: 1,
+    borderColor: `${colors.gold}40`, backgroundColor: `${colors.gold}15`,
+    paddingHorizontal: 7, paddingVertical: 3,
+  },
+  featBadgeText: { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: colors.gold, letterSpacing: 0.5 },
+  featEmoji: { fontSize: 28, lineHeight: 34 },
+  featTitle: {
+    fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_900Black',
+    color: colors.gold, letterSpacing: 0.5, lineHeight: 22,
+  },
+  featDesc:  { color: 'rgba(255,255,255,0.42)', fontSize: 12, lineHeight: 18 },
+
+  notifyBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    borderRadius: 11, borderWidth: 1,
+    borderColor: `${colors.gold}50`, overflow: 'hidden',
+    paddingHorizontal: 14, paddingVertical: 10, alignSelf: 'flex-start',
+  },
+  notifyBtnText: {
+    fontFamily: 'Orbitron_700Bold', fontSize: 11,
+    color: colors.gold, letterSpacing: 1,
+  },
+  notifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  notifiedText: { color: 'rgba(255,255,255,0.5)', fontSize: 11 },
 });
 
 const logo = StyleSheet.create({
