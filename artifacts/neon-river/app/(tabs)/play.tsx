@@ -9,7 +9,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { G, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { useUser } from '@/context/UserContext';
-import { GuestBanner } from '@/components/GuestBanner';
 
 // ─── Casino SVG icons ─────────────────────────────────────────────────────────
 
@@ -684,9 +683,6 @@ export default function PlayScreen() {
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
 
-      {profile.isGuest && (
-        <GuestBanner message="Create a free account to save your progress and stats" />
-      )}
 
       <ScrollView
         contentContainerStyle={[s.scroll, {

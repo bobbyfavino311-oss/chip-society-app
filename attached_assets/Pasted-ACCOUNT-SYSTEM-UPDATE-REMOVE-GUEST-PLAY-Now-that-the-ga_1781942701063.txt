@@ -1,0 +1,185 @@
+ACCOUNT SYSTEM UPDATE — REMOVE GUEST PLAY
+
+Now that the game has a server, remove the Play as Guest option completely.
+
+All players must create an official Chip Society account before playing.
+
+The goal is simple:
+
+No email.
+No password.
+No complicated signup.
+Just username + 4-digit PIN.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REMOVE GUEST MODE
+
+Remove:
+
+• Play as Guest
+• Guest Account
+• Guest Login
+• Guest Starting Chips
+• Guest Profile
+• Guest Restrictions
+• Guest Mode references anywhere in the app
+
+Players should no longer be allowed to enter the game without creating an account.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NEW REQUIRED LOGIN SYSTEM
+
+Every player must create an account using:
+
+• Username
+• 4-Digit PIN
+
+That is the entire signup flow.
+
+Do NOT require:
+
+• Email
+• Password
+• Phone number
+• Social login
+• Verification code
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCOUNT CREATION SCREEN
+
+Display:
+
+CREATE YOUR ACCOUNT
+
+Choose a username and a 4-digit PIN to start playing.
+
+Fields:
+
+USERNAME
+
+4-DIGIT PIN
+
+Button:
+
+CREATE ACCOUNT
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LOGIN SCREEN
+
+Display:
+
+WELCOME BACK
+
+Fields:
+
+USERNAME
+
+4-DIGIT PIN
+
+Button:
+
+LOGIN
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+USERNAME RULES
+
+Username must be:
+
+• 3–20 characters
+• Letters allowed
+• Numbers allowed
+• Underscores allowed
+• Unique across the server
+
+Do not allow:
+
+• Duplicate usernames
+• Offensive names
+• Empty usernames
+• Special symbols
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PIN RULES
+
+PIN must be:
+
+• Exactly 4 digits
+• Numbers only
+
+Examples:
+
+2486
+1047
+9001
+
+Do not allow:
+
+• Letters
+• Symbols
+• Fewer than 4 digits
+• More than 4 digits
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PIN SECURITY
+
+Do not store the PIN as plain text.
+
+Store it securely as a hashed value on the server.
+
+The real PIN should never be visible in the database.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FIRST ACCOUNT REWARD
+
+All new players receive:
+
+50,000 starting chips
+
+This replaces the old guest/player split.
+
+There is no 25,000 guest balance anymore.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REMEMBER ME
+
+Add:
+
+Remember Me
+
+If enabled:
+
+• Player stays logged in
+• App opens directly to Home Screen
+• No repeated login unless player logs out
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+The account system should feel extremely simple.
+
+Player opens app:
+
+Create Username
+
+Create 4-Digit PIN
+
+Receive 50,000 chips
+
+Enter Home Screen
+
+Start playing
+
+No guest mode.
+No email.
+No password.
+No friction.

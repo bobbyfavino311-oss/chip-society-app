@@ -250,39 +250,6 @@ export default function EntryScreen() {
               </View>
             </Pressable>
 
-            {/* Social auth (coming soon) */}
-            <View style={s.socialRow}>
-              <View style={s.socialDividerLine} />
-              <Text style={s.socialDividerText}>OR</Text>
-              <View style={s.socialDividerLine} />
-            </View>
-
-            <View style={s.socialButtons}>
-              <Pressable style={s.socialBtn}>
-                <View style={s.socialBtnInner}>
-                  <Text style={s.socialIcon}></Text>
-                  <Text style={s.socialBtnText}>Apple</Text>
-                </View>
-                <View style={s.comingSoonBadge}><Text style={s.comingSoonText}>SOON</Text></View>
-              </Pressable>
-              <Pressable style={s.socialBtn}>
-                <View style={s.socialBtnInner}>
-                  <Text style={s.socialIcon}>G</Text>
-                  <Text style={s.socialBtnText}>Google</Text>
-                </View>
-                <View style={s.comingSoonBadge}><Text style={s.comingSoonText}>SOON</Text></View>
-              </Pressable>
-            </View>
-
-            {/* TERTIARY: Guest */}
-            <Pressable style={({ pressed }) => [s.btnGuest, pressed && s.btnPressed]} onPress={() => router.push('/auth/guest')}>
-              <View style={s.btnInner}>
-                <Ionicons name="eye-outline" size={16} color={colors.secondary} />
-                <Text style={s.btnGuestText}>CONTINUE AS GUEST</Text>
-              </View>
-              <Text style={s.btnGuestSub}>25,000 chips · limited access</Text>
-            </Pressable>
-
           </View>
 
           {/* Footer */}

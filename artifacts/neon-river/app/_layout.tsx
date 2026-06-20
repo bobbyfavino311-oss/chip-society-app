@@ -117,7 +117,6 @@ function RootLayoutNav() {
         <Stack.Screen name="entry"         options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="auth/signup"   options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="auth/signin"   options={{ headerShown: false, animation: 'slide_from_right' }} />
-        <Stack.Screen name="auth/guest"    options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="terms"         options={{ headerShown: false, animation: 'slide_from_bottom' }} />
         <Stack.Screen name="(tabs)"        options={{ headerShown: false }} />
         <Stack.Screen

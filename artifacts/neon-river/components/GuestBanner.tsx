@@ -92,9 +92,6 @@ export function GuestLockOverlay({ feature, onDismiss }: GuestLockOverlayProps) 
           <Text style={s.signInText}>Already have an account?  <Text style={{ color: colors.primary }}>Sign in</Text></Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={s.guestBtn} onPress={onDismiss} activeOpacity={0.7}>
-          <Text style={s.guestText}>CONTINUE AS GUEST</Text>
-        </TouchableOpacity>
       </Animated.View>
     </Animated.View>
   );

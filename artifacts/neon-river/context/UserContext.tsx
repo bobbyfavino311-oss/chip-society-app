@@ -10,7 +10,7 @@ export type Rank =
   | 'Neon Elite'
   | 'Neon Legend';
 
-export type AccountType = 'guest' | 'registered';
+export type AccountType = 'registered';
 
 const RANKS: { rank: Rank; minXP: number }[] = [
   { rank: 'Neon Bronze',   minXP: 0 },
@@ -31,7 +31,6 @@ const HOURLY_INTERVAL_MS    = 24 * 60 * 60 * 1000;
 const COMEBACK_THRESHOLD    = 500;
 const COMEBACK_BONUS        = 20_000;
 const REGISTERED_CHIPS      = 50_000;
-const GUEST_CHIPS           = 25_000;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -54,7 +53,7 @@ export interface UserProfile {
   streakDays: number;
   dailyMissionsCompleted: number;
   isNewUser: boolean;
-  isGuest: boolean;
+  isGuest?: false;
   accountType: AccountType;
   vipMember: boolean;
   rankedPoints: number;
@@ -116,7 +115,6 @@ const DEFAULT_PROFILE: UserProfile = {
   streakDays: 0,
   dailyMissionsCompleted: 0,
   isNewUser: true,
-  isGuest: false,
   accountType: 'registered',
   vipMember: false,
   rankedPoints: 0,
@@ -165,7 +163,6 @@ interface UserContextValue {
   useScratchTicket: () => Promise<boolean>;
   addScratchTickets: (n: number) => Promise<void>;
   completeTutorial: () => Promise<void>;
-  loginAsGuest: () => Promise<void>;
   registerAccount: (username: string, pin: string, email: string, avatarIndex: number) => Promise<{ success: boolean; error?: string }>;
   signIn: (username: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
@@ -220,13 +217,6 @@ function isReserved(s: string): boolean {
   return RESERVED_NAMES.some(r => s.toLowerCase() === r);
 }
 
-function generateGuestName(): string {
-  const prefixes = ['Neon', 'Ghost', 'Bluff', 'Ace', 'River', 'Stack', 'Shark', 'Wild'];
-  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-  const num = Math.floor(1000 + Math.random() * 8999);
-  return `${prefix}${num}`;
-}
-
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
@@ -251,8 +241,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             ...saved,
             chips: saved.chips ?? 0,
             // Backfill new fields for existing installs
-            isGuest: saved.isGuest ?? false,
-            accountType: saved.accountType ?? 'registered',
+            accountType: 'registered',
             email: saved.email ?? '',
             createdAt: saved.createdAt ?? new Date().toISOString(),
             tutorialCompleted: saved.tutorialCompleted ?? false,
@@ -436,21 +425,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   // ── Auth functions ────────────────────────────────────────────────────────────
 
-  const loginAsGuest = useCallback(async () => {
-    const guestName = generateGuestName();
-    const guestProfile: UserProfile = {
-      ...DEFAULT_PROFILE,
-      username: guestName,
-      chips: GUEST_CHIPS,
-      isGuest: true,
-      accountType: 'guest',
-      isNewUser: false,
-      createdAt: new Date().toISOString(),
-    };
-    setProfile(guestProfile);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(guestProfile));
-  }, []);
-
   const checkUsernameAvailable = useCallback(async (username: string): Promise<boolean> => {
     const accounts = await loadAccounts();
     return !accounts.some(a => a.username.toLowerCase() === username.toLowerCase());
@@ -608,7 +582,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       recordTournamentResult,
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
       awardRankedPoints, claimWheelSpin, useScratchTicket, addScratchTickets,
-      completeTutorial, loginAsGuest, registerAccount, signIn, signOut,
+      completeTutorial, registerAccount, signIn, signOut,
       changePin, forgotPin, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,

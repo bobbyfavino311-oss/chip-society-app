@@ -28,7 +28,6 @@ export default function SignupScreen() {
   const [step, setStep] = useState(0);
 
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [avatarIndex, setAvatarIndex] = useState(1);
 
   const [pin, setPin] = useState('');
@@ -118,7 +117,7 @@ export default function SignupScreen() {
     } else if (step === 2) {
       setLoading(true);
       setError('');
-      const result = await registerAccount(username, pin, email, avatarIndex);
+      const result = await registerAccount(username, pin, '', avatarIndex);
       setLoading(false);
       if (result.success) {
         setStep(3);
@@ -211,18 +210,6 @@ export default function SignupScreen() {
                   ) : usernameStatus === 'ok' ? (
                     <Text style={s.inputOk}>Username available!</Text>
                   ) : null}
-
-                  <View style={s.inputWrap2}>
-                    <TextInput
-                      style={s.input}
-                      placeholder="Email (optional — for PIN recovery)"
-                      placeholderTextColor="rgba(255,255,255,0.25)"
-                      value={email}
-                      onChangeText={setEmail}
-                      autoCapitalize="none"
-                      keyboardType="email-address"
-                    />
-                  </View>
 
                   <View style={s.rulesBox}>
                     <Text style={s.rulesTitle}>USERNAME RULES</Text>
