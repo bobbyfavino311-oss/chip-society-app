@@ -101,7 +101,7 @@ export default function StreakScreen() {
         </TouchableOpacity>
         <Text style={st.title}>DAILY STREAK</Text>
         <View style={[st.streakBadge, { borderColor: currentStreak > 0 ? 'rgba(255,215,0,0.4)' : colors.border }]}>
-          <Text style={st.streakEmoji}>{currentStreak > 0 ? '🔥' : '⬜'}</Text>
+          {currentStreak > 0 && <Text style={st.streakEmoji}>🔥</Text>}
           <Text style={[st.streakNum, { color: currentStreak > 0 ? '#ffd700' : colors.textDim }]}>{currentStreak}</Text>
         </View>
       </View>

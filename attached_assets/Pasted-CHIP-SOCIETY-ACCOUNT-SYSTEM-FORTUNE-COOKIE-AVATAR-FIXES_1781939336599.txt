@@ -1,0 +1,374 @@
+CHIP SOCIETY ACCOUNT SYSTEM + FORTUNE COOKIE + AVATAR FIXES
+
+Implement the following updates exactly as described.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OFFICIAL ACCOUNT SYSTEM
+
+Now that the server is active, create Chip Society’s first permanent account system.
+
+Players should no longer be limited to guest accounts.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCOUNT CREATION
+
+Required:
+
+• Username
+• 4-Digit PIN
+
+Optional:
+
+• Email Address (for recovery)
+
+No traditional password system.
+
+The login experience should be simple and mobile-friendly.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+USERNAME RULES
+
+• Minimum 3 characters
+• Maximum 20 characters
+• Letters allowed
+• Numbers allowed
+• Underscores allowed
+• No duplicate usernames
+• No offensive names
+• No special symbols
+
+Examples:
+
+Vegas
+
+PokerKing22
+
+ShadowAce
+
+FourDragons
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PIN RULES
+
+PIN must be:
+
+• Exactly 4 digits
+• Numbers only
+
+Examples:
+
+2486
+
+1111
+
+4567
+
+0001
+
+Do NOT allow:
+
+Letters
+
+Symbols
+
+Longer PINs
+
+Shorter PINs
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PIN SECURITY
+
+Never store PINs in plain text.
+
+Store only encrypted / hashed PIN values.
+
+The actual PIN should never be visible in the database.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LOGIN FEATURES
+
+Add:
+
+• Login
+• Logout
+• Create Account
+• Change PIN
+• Forgot PIN
+• Remember Me
+
+Remember Me should keep players logged in between sessions.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCOUNT RECOVERY
+
+Allow:
+
+Username + Email Recovery
+
+Forgot PIN
+
+↓
+
+Recovery Email
+
+↓
+
+Create New PIN
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FOUNDER ACCOUNT
+
+Create support for special account badges.
+
+Examples:
+
+👑 Founder
+
+Displayed on:
+
+• Social Feed
+• Player Profile
+• Tables
+• Comments
+• Posts
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DAILY STREAK PAGE BUG
+
+Current issue:
+
+A strange square box appears in the top-right corner of the Daily Streak page.
+
+Fix:
+
+• Identify source of square box
+• Remove unused element
+• Remove placeholder component
+• Remove debug container
+• Remove empty UI object
+
+The Daily Streak page should not display any unexplained boxes or placeholders.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE INVENTORY FIXES
+
+Current system has multiple cookie types.
+
+Examples:
+
+🥠 Standard Fortune Cookie
+
+🥠 Golden Fortune Cookie
+
+🥠 Dragon Fortune Cookie
+
+Players must be able to switch seamlessly between cookie types.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE TABS
+
+When multiple cookie types exist:
+
+Display tabs:
+
+🥠 Standard
+
+🥠 Golden
+
+🥠 Dragon
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TAB FUNCTIONALITY
+
+Verify tabs are fully wired.
+
+When player taps:
+
+🥠 Standard
+
+Show Standard inventory.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+When player taps:
+
+🥠 Golden
+
+Show Golden inventory.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+When player taps:
+
+🥠 Dragon
+
+Show Dragon inventory.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OPEN COOKIE BEHAVIOR
+
+When player selects a cookie type:
+
+OPEN COOKIE
+
+must open the currently selected cookie type.
+
+Examples:
+
+Selected:
+
+🥠 Dragon
+
+OPEN COOKIE
+
+must open Dragon Cookie.
+
+Not Standard Cookie.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE INVENTORY COUNTS
+
+Display:
+
+🥠 Standard x5
+
+🥠 Golden x2
+
+🥠 Dragon x1
+
+Counts should update immediately after opening.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE PRIZE POOL CHANGES
+
+Remove the following rewards completely:
+
+❌ Avatar Unlocks
+
+❌ Tournament Tickets
+
+These should no longer appear in Fortune Cookie rewards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FORTUNE COOKIE REWARDS SHOULD ONLY INCLUDE
+
+• Chips
+• XP
+• Lottery Tickets
+• Additional Fortune Cookies
+• Golden Cookies
+• Dragon Cookies
+• Future Economy Rewards
+
+Do not award avatars.
+
+Do not award tournament tickets.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AVATAR COUNT FIX
+
+Current issue:
+
+Avatar selection screen still displays:
+
+45 Avatars
+
+This is incorrect.
+
+We recently added:
+
+• Face Card Collection
+• Joker Avatar
+• Razor Blade Avatar
+• Additional redesigns
+
+Approximately 18 new avatars were added.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED FIX
+
+Update avatar count.
+
+Example:
+
+45 + 18 = 63
+
+The displayed count should reflect the actual number of avatars available.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DYNAMIC COUNT SYSTEM
+
+Do NOT hardcode avatar totals.
+
+Instead:
+
+Count avatars automatically.
+
+Display:
+
+“Choose from 63 avatars”
+
+or
+
+“Choose from 64 avatars”
+
+based on actual collection size.
+
+Future avatar additions should update automatically.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VALIDATION
+
+Before completion verify:
+
+✅ Account creation works
+
+✅ Username uniqueness works
+
+✅ 4-digit PIN works
+
+✅ PIN encryption works
+
+✅ Login works
+
+✅ Remember Me works
+
+✅ Founder badge support exists
+
+✅ Daily Streak square box removed
+
+✅ Fortune Cookie tabs switch correctly
+
+✅ Correct cookie opens
+
+✅ Inventory updates correctly
+
+✅ Avatar rewards removed from cookies
+
+✅ Tournament ticket rewards removed from cookies
+
+✅ Avatar count reflects actual collection size
+
+✅ Avatar count updates automatically in future
+
+The result should feel polished, professional, and fully integrated with the new server-backed Chip Society account system.

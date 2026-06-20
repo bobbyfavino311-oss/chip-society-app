@@ -63,6 +63,7 @@ export interface UserProfile {
   lastFreeScratch: string | null;
   createdAt: string;
   tutorialCompleted: boolean;
+  isFounder?: boolean;
   // Fortune Cookie inventory
   fortuneCookies: number;
   goldenCookies: number;
