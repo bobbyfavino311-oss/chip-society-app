@@ -1,0 +1,238 @@
+HOME SCREEN QUICK PLAY MATCHMAKING FIX
+
+This update specifically applies to the QUICK PLAY button located on the HOME SCREEN.
+
+It does NOT apply to:
+
+• Private Tables
+• Tournaments
+• Custom Games
+• Future Event Modes
+
+Only the HOME SCREEN QUICK PLAY feature.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT ISSUE
+
+When a player presses QUICK PLAY from the Home Screen, the system creates matches against opponents with dramatically smaller bankrolls.
+
+Example:
+
+Player:
+13.1M Chips
+
+Opponents:
+
+Ace:
+6.5K
+
+Blaze:
+8.4K
+
+Shadow:
+13.4K
+
+Vegas:
+18.4K
+
+This should never happen.
+
+A player with millions of chips should not be seated against opponents with only a few thousand chips.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED FIX
+
+When a player presses QUICK PLAY from the Home Screen:
+
+Step 1
+
+Read the player's current bankroll.
+
+Example:
+
+13.1M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Step 2
+
+Determine the player's stake bracket.
+
+Example:
+
+13.1M
+
+=
+VIP Bracket
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Step 3
+
+Generate opponents within the same bankroll range.
+
+Example:
+
+Player:
+13.1M
+
+AI Opponents:
+
+8.7M
+
+11.2M
+
+15.6M
+
+19.4M
+
+Acceptable.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NOT ACCEPTABLE
+
+Player:
+
+13.1M
+
+AI:
+
+6.5K
+
+8.4K
+
+13K
+
+18K
+
+This should never occur.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AI BANKROLL RULE
+
+For HOME SCREEN QUICK PLAY:
+
+Generate AI bankrolls approximately between:
+
+50% and 200%
+
+of the player's bankroll.
+
+Example:
+
+Player:
+10M
+
+Possible Opponents:
+
+5M
+
+8M
+
+11M
+
+14M
+
+18M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE BUY-IN RULE
+
+All players seated through HOME SCREEN QUICK PLAY must qualify for the same table.
+
+Example:
+
+100K / 200K Table
+
+Minimum Buy-In:
+2M
+
+Maximum Buy-In:
+20M
+
+Every player at the table must fit within those limits.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LIVE PLAYER MATCHMAKING
+
+If the player chooses:
+
+🌎 LIVE PLAYERS
+
+from the Home Screen Quick Play flow:
+
+Match players using:
+
+1. Selected blind level
+2. Stake bracket
+3. Buy-in range
+
+Do not seat:
+
+100K bankroll players
+
+with
+
+50M bankroll players
+
+at the same table.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HOME SCREEN QUICK PLAY FLOW
+
+Player presses:
+
+QUICK PLAY
+
+↓
+
+Select Game Mode
+
+↓
+
+Choose:
+
+🤖 AI PLAYERS
+
+or
+
+🌎 LIVE PLAYERS
+
+↓
+
+Select Stakes
+
+↓
+
+Determine Player Bankroll
+
+↓
+
+Determine Stake Bracket
+
+↓
+
+Generate Bankroll-Matched Opponents
+
+↓
+
+Enter Table
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+The Home Screen Quick Play button should always create realistic chip-matched games.
+
+A player with millions of chips should play against opponents with millions of chips.
+
+A player with thousands of chips should play against opponents with thousands of chips.
+
+Every Quick Play game should feel like a legitimate casino table rather than a table filled with random opponents that could never afford the same stakes.

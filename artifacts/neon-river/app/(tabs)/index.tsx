@@ -183,7 +183,25 @@ function TournamentPreviewHub() {
 
 // ─── Quick Play inline launcher ──────────────────────────────────────────────
 
+/** Maps a chip count to the matching practice stake-tier key. */
+function getAutoTierKey(chips: number): string {
+  if (chips >= 2_500_000) return 'elite';
+  if (chips >= 250_000)   return 'highroller';
+  if (chips >= 25_000)    return 'mid';
+  if (chips >= 5_000)     return 'casual';
+  return 'beginner';
+}
+
+const TIER_BLIND_LABELS: Record<string, string> = {
+  beginner:   '25 / 50',
+  casual:     '50 / 100',
+  mid:        '250 / 500',
+  highroller: '2.5K / 5K',
+  elite:      '25K / 50K',
+};
+
 function QuickPlayCard() {
+  const { profile } = useUser();
   const [variant, setVariant] = useState<TVariant>('texas_holdem');
   const [seats, setSeats] = useState<4 | 5>(5);
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -194,12 +212,18 @@ function QuickPlayCard() {
     ? [colors.primary, '#0066cc']
     : [colors.secondary, '#cc0077'];
 
+  // Determine stake level from player's actual bankroll
+  const tierKey    = getAutoTierKey(profile.chips);
+  const blindLabel = TIER_BLIND_LABELS[tierKey];
+
   const handleStart = () => {
     Animated.sequence([
       Animated.timing(scaleAnim, { toValue: 0.96, duration: 70, useNativeDriver: true }),
       Animated.timing(scaleAnim, { toValue: 1, duration: 120, useNativeDriver: true }),
     ]).start(() => {
-      router.push(`/game/practice?variant=${variant}&players=${seats}` as any);
+      // Pass tier so practice.tsx uses matching blinds and bot stacks scale
+      // to 50-200% of the player's bankroll (bankroll-matched opponents).
+      router.push(`/game/practice?variant=${variant}&players=${seats}&tier=${tierKey}` as any);
     });
   };
 
@@ -279,6 +303,14 @@ function QuickPlayCard() {
             </TouchableOpacity>
           );
         })}
+      </View>
+
+      {/* Stake indicator — bankroll-matched blinds */}
+      <View style={qp.stakeRow}>
+        <Ionicons name="stats-chart" size={12} color={colors.textMuted} />
+        <Text style={qp.stakeText}>
+          AUTO-MATCHED STAKES · <Text style={{ color: accentColor }}>{blindLabel} BLINDS</Text>
+        </Text>
       </View>
 
       {/* Step 3 — Start */}
@@ -945,6 +977,14 @@ const qp = StyleSheet.create({
   seatNum: { fontSize: 28, fontWeight: '900', fontFamily: 'Inter_700Bold', lineHeight: 32 },
   seatLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 1 },
   seatSub: { color: 'rgba(255,255,255,0.35)', fontSize: 9, marginTop: 2 },
+  stakeRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 4, paddingVertical: 6, marginBottom: 4,
+  },
+  stakeText: {
+    color: 'rgba(255,255,255,0.40)', fontSize: 10,
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8,
+  },
   startBtn: {
     borderRadius: 12, overflow: 'hidden',
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',

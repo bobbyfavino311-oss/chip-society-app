@@ -6,21 +6,25 @@ const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
 
 /**
- * Generates a realistic bot chip stack for the given table minimum buy-in.
- * Bots span an exponential spread (1.1× → 10×) so each seat looks like a real
- * player with their own history at this stake level. Jitter ensures stacks
- * differ between game sessions.
+ * Generates a bot chip stack matched to the human player's bankroll.
+ * Bots are spread between ~50% and ~200% of humanChips so every seat looks
+ * like a real player at the same stake level. Clamped to at least minBuyIn
+ * so every bot qualifies to sit at the table.
  */
-function generateBotStack(minBuyIn: number, botIndex: number): number {
-  const MULTIPLIERS = [1.12, 1.65, 2.73, 4.15, 10.2];
-  const base = MULTIPLIERS[botIndex % MULTIPLIERS.length];
-  const jitter = 0.82 + Math.random() * 0.36;
-  const raw = minBuyIn * base * jitter;
+function generateMatchedBotStack(humanChips: number, minBuyIn: number, botIndex: number): number {
+  // Predetermined spread: bots range from 62% to 185% of humanChips.
+  // This creates a realistic table — some opponents a little short, some deep.
+  const RATIOS = [0.62, 0.85, 1.10, 1.48, 1.85];
+  const ratio  = RATIOS[botIndex % RATIOS.length];
+  const jitter = 0.88 + Math.random() * 0.24; // ±12% session variance
+  const raw    = humanChips * ratio * jitter;
+  // Round to denomination appropriate for this chip level
   const denom =
-    minBuyIn >= 100_000 ? 10_000 :
-    minBuyIn >= 10_000  ? 1_000 :
-    minBuyIn >= 1_000   ? 500 : 100;
-  return Math.max(minBuyIn, Math.round(raw / denom) * denom);
+    humanChips >= 1_000_000 ? 100_000 :
+    humanChips >= 100_000   ? 10_000  :
+    humanChips >= 10_000    ? 1_000   :
+    humanChips >= 1_000     ? 500     : 100;
+  return Math.max(Math.round(raw / denom) * denom, minBuyIn);
 }
 const TIMER_SECONDS = 20;
 const AI_NAMES = ['Ace', 'Blaze', 'Shadow', 'Vegas', 'Ghost'];
@@ -699,9 +703,8 @@ export function usePokerGame(
       ...AI_NAMES.slice(0, numAI).map((name, i) => ({
         id: `ai_${i}`,
         name,
-        // Exponential spread: bots span 1.1× → 10× the min buy-in so each seat
-        // looks like a real player with their own history at this stake level.
-        chips: generateBotStack(tableConfig.minBuyIn, i),
+        // Bot stacks are 50-200% of humanChips so every opponent is bankroll-matched.
+        chips: generateMatchedBotStack(humanChips, tableConfig.minBuyIn, i),
         holeCards: [] as Card[],
         betInRound: 0,
         chipDelta: 0,
