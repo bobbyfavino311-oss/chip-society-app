@@ -28,6 +28,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '@/context/UserContext';
 import { formatChips } from '@/utils/chipColor';
+import { SoundEngine } from '@/lib/soundEngine';
 
 const { width: W } = Dimensions.get('window');
 
@@ -256,8 +257,9 @@ export default function FortuneCookieScreen() {
       ...shakeSeq,
       Animated.timing(cookieScale, { toValue: 1.18, duration: 90, useNativeDriver: true }),
     ]).start(() => {
-      // Phase: cracked
+      // Phase: cracked — 🥠 CRACK SOUND
       setPhase('cracked');
+      SoundEngine.cookieCrack(type);
       cookieScale.setValue(1);
 
       // Flash
@@ -290,17 +292,19 @@ export default function FortuneCookieScreen() {
         ]).start();
       });
 
-      // Phase: fortune slip rises
+      // Phase: fortune slip rises — ✨ RISE CHIME
       setTimeout(() => {
         setPhase('rising');
+        SoundEngine.fortuneRise();
         slipY.setValue(50); slipOp.setValue(0);
         Animated.parallel([
           Animated.timing(slipY,  { toValue: 0, duration: 450, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
           Animated.timing(slipOp, { toValue: 1, duration: 320, useNativeDriver: true }),
         ]).start(() => {
-          // Phase: reveal reward card
+          // Phase: reveal reward card — 🏮 PROSPERITY REWARD SOUND
           setTimeout(() => {
             setPhase('reveal');
+            SoundEngine.fortuneReward(picked.tier);
             cardY.setValue(50); cardOp.setValue(0); rewardScale.setValue(0);
             Animated.parallel([
               Animated.timing(cardY,  { toValue: 0, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
