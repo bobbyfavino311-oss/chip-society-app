@@ -220,7 +220,7 @@ function SoundSettingsCard() {
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
-  const { profile, updateProfile, winRate, signOut, addChips } = useUser();
+  const { profile, updateProfile, winRate, signOut, addChips, addFortuneCookies } = useUser();
   const { unlockedIds } = useAchievements();
   const { following } = useSocial();
   const socialFollowingCount = following.size;
@@ -459,6 +459,16 @@ export default function ProfileScreen() {
         >
           <Ionicons name="add-circle-outline" size={16} color="#00d4ff" />
           <Text style={devStyles.addChipsTxt}>+ 100K TEST CHIPS</Text>
+        </TouchableOpacity>
+
+        {/* Dev: add cookies for testing */}
+        <TouchableOpacity
+          style={[devStyles.addChipsBtn, { borderColor: '#D4A01760', marginTop: 6 }]}
+          activeOpacity={0.8}
+          onPress={() => addFortuneCookies(2, 2, 2)}
+        >
+          <Text style={{ fontSize: 14 }}>🥠</Text>
+          <Text style={[devStyles.addChipsTxt, { color: '#D4A017' }]}>+ TEST COOKIES  (2×each)</Text>
         </TouchableOpacity>
 
         <SoundSettingsCard />

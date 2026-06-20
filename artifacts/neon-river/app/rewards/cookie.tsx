@@ -435,14 +435,6 @@ export default function FortuneCookieScreen() {
         {/* IDLE: Open button */}
         {phase === 'idle' && (
           <View style={styles.idleSection}>
-            {/* Dev test button */}
-            <TouchableOpacity
-              onPress={() => addFortuneCookies(2, 2, 2)}
-              style={{ backgroundColor: '#D4A01722', borderWidth: 1, borderColor: '#D4A017', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginBottom: 14 }}
-            >
-              <Text style={{ color: '#D4A017', fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 1.5 }}>＋ ADD TEST COOKIES</Text>
-              <Text style={{ color: '#D4A01799', fontFamily: 'Orbitron_400Regular', fontSize: 10, marginTop: 3 }}>2× Standard · 2× Golden · 2× Dragon</Text>
-            </TouchableOpacity>
             {/* Cookie type pills */}
             <View style={styles.cookieInventory}>
               {profile.fortuneCookies > 0 && (
