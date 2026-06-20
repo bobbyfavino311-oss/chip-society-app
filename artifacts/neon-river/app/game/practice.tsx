@@ -373,6 +373,12 @@ export default function PracticeScreen() {
   const [numPlayers, setNumPlayers] = useState(initialPlayers);
   const [fxEnabled, setFxEnabled] = useState(true);
 
+  // ── Between-hand countdown ────────────────────────────────────────────────
+  const [betweenSecs, setBetweenSecs]         = useState(10);
+  const barAnim            = useRef(new Animated.Value(1)).current;
+  const betweenIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const onHandOverRef      = useRef<() => Promise<void>>(() => Promise.resolve());
+
   useEffect(() => {
     AsyncStorage.getItem('musicEnabled').then(v => {
       const enabled = v === null ? true : v === 'true';
@@ -597,6 +603,39 @@ export default function PracticeScreen() {
     continueAfterHand();
     SoundEngine.deal();
   };
+
+  // Always keep the ref current so the auto-timer calls the latest closure
+  onHandOverRef.current = onHandOver;
+
+  // 10-second neon countdown bar between hands; auto-advances when it reaches 0
+  useEffect(() => {
+    if (!isHandOver) {
+      if (betweenIntervalRef.current) { clearInterval(betweenIntervalRef.current); betweenIntervalRef.current = null; }
+      barAnim.stopAnimation();
+      setBetweenSecs(10);
+      barAnim.setValue(1);
+      return;
+    }
+    setBetweenSecs(10);
+    barAnim.setValue(1);
+    Animated.timing(barAnim, { toValue: 0, duration: 10_000, useNativeDriver: false }).start();
+    betweenIntervalRef.current = setInterval(() => {
+      setBetweenSecs(s => {
+        const next = s - 1;
+        if (next <= 0) {
+          clearInterval(betweenIntervalRef.current!);
+          betweenIntervalRef.current = null;
+          void onHandOverRef.current();
+          return 0;
+        }
+        return next;
+      });
+    }, 1_000);
+    return () => {
+      if (betweenIntervalRef.current) { clearInterval(betweenIntervalRef.current); betweenIntervalRef.current = null; }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHandOver]);
 
   return (
     <View style={styles.screen}>
@@ -984,13 +1023,38 @@ export default function PracticeScreen() {
                   </View>
                 )}
 
+                {/* ── Between-hand neon countdown bar ──────────────────── */}
+                {!isGameOver && (
+                  <View style={styles.countdownWrap}>
+                    <View style={styles.countdownTrack}>
+                      <Animated.View style={{ flex: barAnim, overflow: 'hidden' }}>
+                        <LinearGradient
+                          colors={['#00d4ff', '#bf5fff', '#ff0090']}
+                          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                          style={{ flex: 1 }}
+                        />
+                      </Animated.View>
+                      <Animated.View style={{ flex: barAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }) }} />
+                    </View>
+                    <Text style={styles.countdownLabel}>NEXT HAND IN {betweenSecs}…</Text>
+                  </View>
+                )}
+
                 {/* ── Next Hand button ──────────────────────────────────── */}
                 {isGameOver ? (
                   <TouchableOpacity style={styles.nextBtn} onPress={() => setGameStarted(false)}>
                     <Text style={[styles.nextBtnText, { color: colors.text }]}>BACK TO LOBBY</Text>
                   </TouchableOpacity>
                 ) : (
-                  <TouchableOpacity style={styles.nextBtn} onPress={onHandOver} activeOpacity={0.85}>
+                  <TouchableOpacity
+                    style={styles.nextBtn}
+                    onPress={() => {
+                      if (betweenIntervalRef.current) { clearInterval(betweenIntervalRef.current); betweenIntervalRef.current = null; }
+                      barAnim.stopAnimation();
+                      void onHandOver();
+                    }}
+                    activeOpacity={0.85}
+                  >
                     <LinearGradient
                       colors={['rgba(0,150,180,0.4)', 'rgba(0,100,130,0.5)']}
                       style={StyleSheet.absoluteFill}
@@ -1388,6 +1452,19 @@ const styles = StyleSheet.create({
   },
   hoPlayerDelta: {
     fontSize: 12, fontWeight: '800', fontFamily: 'Inter_700Bold',
+  },
+
+  countdownWrap: {
+    alignItems: 'center', gap: 5, paddingHorizontal: 4, marginBottom: 6,
+  },
+  countdownTrack: {
+    width: '100%', height: 3, flexDirection: 'row',
+    borderRadius: 2, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  countdownLabel: {
+    fontSize: 8, fontFamily: 'Orbitron_400Regular',
+    color: 'rgba(255,255,255,0.28)', letterSpacing: 1.5,
   },
 
   nextBtn: {

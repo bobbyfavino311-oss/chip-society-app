@@ -1,0 +1,114 @@
+Here’s the clean prompt to send to your AI app builder:
+
+Fix the Fortune Cookie sound effect system, ante selection flow, and hand transition timer across the entire game.
+
+1. Fortune Cookie Sound Effect Fix
+
+The Fortune Cookie reward/opening sound is still incorrect.
+
+Current problem:
+
+* It is still reflecting the regular achievement sound.
+* Sometimes it only pitch-shifts the achievement sound up or down.
+* It still sometimes plays the original copyrighted version.
+* This is not acceptable.
+
+Required fix:
+
+* The Fortune Cookie feature must have its own completely unique sound effect.
+* Do not reuse, remix, pitch-shift, or reference the regular achievement sound.
+* Do not use the copyrighted original version under any circumstance.
+* The Fortune Cookie sound must be a separate dedicated audio file, assigned only to Fortune Cookie rewards/opening.
+* Make sure the correct sound plays consistently on mobile and web preview.
+* Verify that no fallback, cached, or old achievement sound is being triggered.
+
+2. Ante Selection Pop-Up Across All Game Modes
+
+The ante stakes on the Play Mode screen are still incorrect.
+
+Current problem:
+
+* When a player joins an AI match from the Play tab, the game is placing them at a low-ante table.
+* This does not make sense because the player base is whale-style / high-chip users.
+* The game currently does not clearly let the player choose the table stakes before joining.
+
+Required fix:
+
+* Add a separate ante selection pop-up screen before joining a table.
+* This must apply across ALL game modes.
+* Before entering any match, the player must choose the ante/stakes level they want to play.
+* This applies to:
+    * AI poker matches
+    * Live player matches
+    * Three Card Poker
+    * Blackjack-style modes if applicable
+    * Any future table-based game mode
+* The selected ante must directly control the table stakes.
+* Do not default players into low-stakes tables from the Play tab.
+* The ante selection screen should look polished, casino-style, and easy to understand.
+
+Suggested ante pop-up layout:
+
+* Title: “Choose Your Table Stakes”
+* Options:
+    * Casual Table
+    * High Roller Table
+    * Whale Table
+    * VIP Table
+* Each option should clearly show:
+    * Ante amount
+    * Minimum chip requirement
+    * Possible payout range if relevant
+* Add a confirm button:
+    * “Join Table”
+* Add a back button:
+    * “Cancel”
+
+3. Timer Between Hands
+
+Live player matches need a mandatory delay between hands.
+
+Current problem:
+
+* Hands move too quickly.
+* Players need time to review the winning hand, pot result, and final cards before the next hand begins.
+
+Required fix for live multiplayer:
+
+* Add a mandatory 10-second timer between every hand.
+* During this timer, players cannot skip ahead.
+* The next hand should automatically begin when the timer reaches zero.
+* This gives all real players equal time to review the results.
+
+Timer design:
+
+* Use a thin horizontal line across the screen.
+* The line should slowly shrink or fade away over the 10 seconds.
+* The color should fade as time runs out.
+* Make it stylish, premium, and casino-themed.
+* It should not feel like a basic loading bar.
+
+Suggested style:
+
+* Thin neon horizontal countdown bar
+* Cyan-to-pink or gold-to-red gradient
+* Smooth animated fade
+* Positioned near the lower center or top edge of the game table UI
+* Optional small text: “Next hand in 10…”
+
+AI game mode behavior:
+
+* Add the same 10-second timer after each AI hand.
+* Since there are no real players, keep the “Next Hand” button.
+* The player can press “Next Hand” to skip the timer in AI games only.
+* Do not allow skipping in live multiplayer.
+
+Final requirement:
+Test this across all game modes and confirm:
+
+* Fortune Cookie uses its own unique sound every time.
+* No achievement sound or copyrighted sound plays.
+* Every game mode uses the new ante selection pop-up.
+* AI matches respect the selected ante.
+* Live matches have a mandatory 10-second between-hand timer.
+* AI matches have the timer but allow the player to skip with “Next Hand.”

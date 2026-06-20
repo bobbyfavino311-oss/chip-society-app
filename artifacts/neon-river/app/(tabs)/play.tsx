@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { G, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { useUser } from '@/context/UserContext';
+import StakeSelectModal from '@/components/StakeSelectModal';
 
 // ─── Casino SVG icons ─────────────────────────────────────────────────────────
 
@@ -75,6 +76,18 @@ const STAKES: StakeDef[] = [
   { tier: 'VIP',         label: 'VIP',         blinds: '10K / 20K',    minBuyIn: 400_000,  maxBuyIn: 2_000_000, color: '#ffd700' },
   { tier: 'ELITE',       label: 'ELITE',       blinds: '50K / 100K',   minBuyIn: 2_000_000,maxBuyIn:10_000_000, color: '#ff0090' },
 ];
+
+// Maps StakeTier (QuickPlayModal) → practice.tsx STAKE_CONFIGS key
+const QP_TO_GAME: Record<StakeTier, string> = {
+  MICRO: 'beginner', LOW: 'casual', STANDARD: 'mid',
+  HIGH_ROLLER: 'highroller', VIP: 'highroller', ELITE: 'elite',
+};
+
+// Maps stakeConfig.ts tier.key (StakeSelectModal) → practice.tsx STAKE_CONFIGS key
+const CONFIG_KEY_TO_GAME: Record<string, string> = {
+  micro: 'beginner', low: 'casual', standard: 'mid',
+  highroller: 'highroller', vip: 'highroller', elite: 'elite',
+};
 
 function formatChips(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
@@ -281,7 +294,7 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
         if (opponent === 'live') {
           router.push('/multiplayer/lobby' as any);
         } else {
-          router.push(`/game/practice?variant=${variant}&players=5` as any);
+          router.push(`/game/practice?variant=${variant}&players=5&tier=${QP_TO_GAME[stake?.tier ?? 'STANDARD'] ?? 'mid'}` as any);
         }
       }, 1000);
     }, 2400);
@@ -664,6 +677,7 @@ export default function PlayScreen() {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
   const [qpVisible, setQpVisible]       = useState(false);
+  const [anteVariant, setAnteVariant]   = useState<string | null>(null);
   const [qpVariant, setQpVariant]       = useState('texas_holdem');
   const [ptVisible, setPtVisible]       = useState(false);
 
@@ -706,7 +720,7 @@ export default function PlayScreen() {
               label:   'AI PRACTICE',
               icon:    'game-controller-outline',
               sub:     'vs AI bots — fully offline',
-              onPress: () => router.push('/game/practice?variant=texas_holdem&players=5' as any),
+              onPress: () => setAnteVariant('texas_holdem'),
             },
             {
               label:   'QUICK PLAY',
@@ -729,7 +743,7 @@ export default function PlayScreen() {
               label:   'AI PRACTICE',
               icon:    'game-controller-outline',
               sub:     'vs AI bots — fully offline',
-              onPress: () => router.push('/game/practice?variant=short_deck_holdem&players=5' as any),
+              onPress: () => setAnteVariant('short_deck_holdem'),
             },
             {
               label:   'QUICK PLAY',
@@ -824,6 +838,19 @@ export default function PlayScreen() {
       <PrivateTableModal
         visible={ptVisible}
         onClose={() => setPtVisible(false)}
+      />
+
+      <StakeSelectModal
+        visible={anteVariant !== null}
+        chips={profile.chips}
+        title="CHOOSE YOUR STAKES"
+        onBack={() => setAnteVariant(null)}
+        onSelect={tier => {
+          const gameTier = CONFIG_KEY_TO_GAME[tier.key] ?? 'casual';
+          const variant  = anteVariant ?? 'texas_holdem';
+          setAnteVariant(null);
+          router.push(`/game/practice?variant=${variant}&players=5&tier=${gameTier}` as any);
+        }}
       />
     </View>
   );

@@ -321,7 +321,8 @@ export const SoundEngine = {
     if (_muted || !_fxEnabled) return;
 
     if (Platform.OS !== 'web') {
-      play('claim_sound', { volume: 0.75 });
+      // Distinct notification ping — never claim_sound or achievement_unlock
+      play('notification', { volume: 0.82 });
       return;
     }
 
@@ -336,7 +337,9 @@ export const SoundEngine = {
     if (_muted || !_fxEnabled) return;
 
     if (Platform.OS !== 'web') {
-      play('claim_sound', { rate: 1.14, volume: 0.88 });
+      // Chips landing + bright ping = unique RARE reveal
+      play('chip_collect', { volume: 0.72 });
+      setTimeout(() => play('notification', { rate: 1.08, volume: 0.58 }), 190);
       return;
     }
 
@@ -353,9 +356,8 @@ export const SoundEngine = {
     if (_muted || !_fxEnabled) return;
 
     if (Platform.OS !== 'web') {
-      // Deep jade bell strike (rate 0.82 = warm lower pitch), then bright shimmer
-      play('claim_sound', { rate: 0.82, volume: 0.92 });
-      setTimeout(() => play('claim_sound', { rate: 1.22, volume: 0.42 }), 230);
+      // Level-up fanfare = EPIC upgrade feel — unique, not achievement/claim
+      play('level_up', { volume: 0.88 });
       return;
     }
 
@@ -374,11 +376,9 @@ export const SoundEngine = {
     if (_muted || !_fxEnabled) return;
 
     if (Platform.OS !== 'web') {
-      // Ceremonial gong: deep strike (rate 0.64), harmonic shimmer, then bright bell
-      // Never use achievement_unlock — that is for the achievements system only.
-      play('claim_sound', { rate: 0.64, volume: 1.0 });
-      setTimeout(() => play('claim_sound', { rate: 0.92, volume: 0.62 }), 200);
-      setTimeout(() => play('claim_sound', { rate: 1.30, volume: 0.38 }), 440);
+      // Ceremonial peak: hand-win fanfare + level-up — completely unique, never claim_sound
+      play('win', { volume: 0.90 });
+      setTimeout(() => play('level_up', { rate: 0.86, volume: 0.58 }), 360);
       return;
     }
 
