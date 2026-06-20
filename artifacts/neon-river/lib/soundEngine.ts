@@ -353,7 +353,9 @@ export const SoundEngine = {
     if (_muted || !_fxEnabled) return;
 
     if (Platform.OS !== 'web') {
-      play('win', { volume: 0.85 });
+      // Deep jade bell strike (rate 0.82 = warm lower pitch), then bright shimmer
+      play('claim_sound', { rate: 0.82, volume: 0.92 });
+      setTimeout(() => play('claim_sound', { rate: 1.22, volume: 0.42 }), 230);
       return;
     }
 
@@ -372,8 +374,11 @@ export const SoundEngine = {
     if (_muted || !_fxEnabled) return;
 
     if (Platform.OS !== 'web') {
-      play('achievement_unlock', { volume: 1.0 });
-      setTimeout(() => play('win', { volume: 0.72 }), 320);
+      // Ceremonial gong: deep strike (rate 0.64), harmonic shimmer, then bright bell
+      // Never use achievement_unlock — that is for the achievements system only.
+      play('claim_sound', { rate: 0.64, volume: 1.0 });
+      setTimeout(() => play('claim_sound', { rate: 0.92, volume: 0.62 }), 200);
+      setTimeout(() => play('claim_sound', { rate: 1.30, volume: 0.38 }), 440);
       return;
     }
 

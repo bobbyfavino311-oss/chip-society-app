@@ -1,0 +1,206 @@
+FORTUNE COOKIE MOBILE AUDIO BUG FIX — CRITICAL COPYRIGHT ISSUE
+
+The Fortune Cookie reward audio is incorrect on the mobile version.
+
+This must be fixed immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT ISSUE
+
+On the web preview:
+
+The Fortune Cookie reward reveal correctly plays the Asian-inspired reward sound effect.
+
+On the mobile version:
+
+The Fortune Cookie reward reveal incorrectly plays the same sound effect used for achievements.
+
+This is wrong.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COPYRIGHT RISK
+
+The achievement reward sound currently being triggered on mobile is the original copyrighted version.
+
+This sound must NOT play during Fortune Cookie rewards.
+
+The Fortune Cookie system must use the Asian-inspired Fortune Cookie reward audio only.
+
+Do not use the achievement sound.
+
+Do not use the original copyrighted version.
+
+Do not allow fallback to the achievement sound.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED FIX
+
+Wire the Fortune Cookie reward reveal audio correctly on mobile.
+
+The mobile version must use the same Asian-inspired sound effect that plays correctly in the web preview.
+
+Apply this to:
+
+• iOS build
+• Android build
+• Mobile preview
+• Production mobile app
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AUDIO EVENT MAPPING
+
+Fortune Cookie open sequence must use separate audio events:
+
+1. Cookie Crack Sound
+
+Triggered when the cookie breaks.
+
+2. Fortune Slip Reveal Sound
+
+Triggered when the fortune appears.
+
+3. Asian Reward Sound
+
+Triggered when the prize is revealed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DO NOT USE
+
+Do NOT use:
+
+• Achievement unlock sound
+• Achievement reward sound
+• Original copyrighted sound
+• Generic jackpot sound
+• Default reward fallback sound
+
+for any Fortune Cookie reward reveal.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED FORTUNE COOKIE AUDIO STYLE
+
+The Fortune Cookie prize reveal should use:
+
+• Chinese / Asian-inspired reward sound
+• Soft gong
+• Jade chime
+• Temple bell
+• Prosperity chime
+• Elegant reward flourish
+
+It should feel:
+
+• Lucky
+• Premium
+• Culturally inspired
+• Rewarding
+• Distinct from achievements
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MOBILE AUDIO ASSET CHECK
+
+Verify that the Asian Fortune Cookie audio asset is included in the mobile build bundle.
+
+Check:
+
+• Asset path
+• File name
+• Mobile export settings
+• Audio compression settings
+• Platform-specific audio loading
+• iOS build inclusion
+• Android build inclusion
+
+The issue may be caused by the correct asset existing in web preview but not being packaged into mobile.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FALLBACK RULE
+
+If the Asian Fortune Cookie reward sound fails to load:
+
+Do NOT fall back to the achievement sound.
+
+Instead:
+
+Use silence or a safe royalty-free placeholder.
+
+Never use the copyrighted achievement audio as fallback.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TEST CASES
+
+Test on:
+
+• Web Preview
+• iOS Simulator
+• iPhone Device Build
+• Android Device Build
+
+For each version:
+
+Open:
+
+🥠 Standard Fortune Cookie
+
+🥠 Golden Fortune Cookie
+
+🥠 Dragon Fortune Cookie
+
+Confirm each one plays the correct Fortune Cookie reward audio.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE TYPE AUDIO
+
+Standard Fortune Cookie:
+
+• Cookie crack
+• Light chime
+• Soft Asian reward sound
+
+Golden Fortune Cookie:
+
+• Cookie crack
+• Layered chimes
+• Small gong
+• Gold sparkle reward sound
+
+Dragon Fortune Cookie:
+
+• Cookie crack
+• Deep gong
+• Dragon ambience
+• Strong Asian reward flourish
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VALIDATION
+
+Before completion, verify:
+
+✅ Fortune Cookie mobile reward sound is fixed
+
+✅ Mobile uses Asian-inspired sound effect
+
+✅ Web and mobile audio match correctly
+
+✅ Achievement sound is not triggered
+
+✅ Copyrighted original sound is removed from Fortune Cookie flow
+
+✅ No fallback points to achievement audio
+
+✅ All Fortune Cookie variants use correct reward audio
+
+✅ Audio assets are packaged correctly into mobile builds
+
+The Fortune Cookie reward reveal must sound unique, premium, Asian-inspired, and completely separate from the achievement sound system.
