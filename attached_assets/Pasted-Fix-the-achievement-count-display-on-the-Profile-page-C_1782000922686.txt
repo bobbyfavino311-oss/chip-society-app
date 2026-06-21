@@ -1,0 +1,153 @@
+Fix the achievement count display on the Profile page.
+
+CURRENT PROBLEM
+
+The Profile page achievement count is incorrect.
+
+It currently says:
+
+31 Achievements
+
+This is impossible because the game only has:
+
+26 total available achievements
+
+My account currently has only:
+
+8 unlocked achievements
+
+The profile page should not display 31.
+
+⸻
+
+REQUIRED FIX
+
+Correct the achievement statistic so it displays the player’s actual unlocked achievements.
+
+The profile achievement stat should show:
+
+8 / 26
+
+or
+
+8 Achievements
+
+Preferred display:
+
+8 / 26
+
+ACHIEVEMENTS
+
+⸻
+
+DATA RULE
+
+The achievement count must be calculated from real achievement data.
+
+Do not use:
+
+* Hardcoded numbers
+* Fake placeholder stats
+* Total claim events
+* Achievement progress points
+* Repeated unlock logs
+* Old cached values
+* Test/demo data
+
+⸻
+
+CORRECT LOGIC
+
+The profile page should calculate:
+
+Unlocked Achievements = number of achievements where unlocked = true
+
+Total Achievements = total number of available achievements in the achievement database
+
+For my current account:
+
+Unlocked Achievements = 8
+
+Total Achievements = 26
+
+Display:
+
+8 / 26
+
+⸻
+
+BUGS TO CHECK
+
+Investigate whether the app is accidentally counting:
+
+* Duplicate achievement unlocks
+* Achievement progress updates
+* Claimed rewards
+* Social achievement posts
+* Old deleted achievements
+* Test achievements
+* Hidden achievements
+* Placeholder achievements
+* Backend achievement events instead of unique achievements
+
+The count should only include unique unlocked achievements.
+
+⸻
+
+PROFILE UI REQUIREMENT
+
+Update the Profile statistics card.
+
+Instead of showing a single incorrect number like:
+
+31
+
+Show:
+
+8 / 26
+
+ACHIEVEMENTS
+
+This is clearer and prevents confusion.
+
+⸻
+
+SERVER-SIDE VALIDATION
+
+Achievement progress must be stored and loaded server-side.
+
+The profile page should fetch the player’s saved achievement unlock status from the server.
+
+Do not rely only on local cache.
+
+Do not reset, inflate, or duplicate the achievement count after login, logout, republish, or app update.
+
+⸻
+
+TESTING REQUIREMENTS
+
+Test with my current account.
+
+Verify:
+
+* Total available achievements = 26
+* My unlocked achievements = 8
+* Profile displays 8 / 26
+* Achievement page also displays 8 / 26
+* No duplicate achievements are counted
+* Count stays correct after logout/login
+* Count stays correct after app republish
+* Count stays correct after earning a new achievement
+* Count updates to 9 / 26 only after one new unique achievement unlocks
+
+⸻
+
+FINAL REQUIREMENT
+
+The Profile achievement stat must always show the real unlocked achievement count out of total available achievements.
+
+For my current account, it must display:
+
+8 / 26
+
+Not 31.

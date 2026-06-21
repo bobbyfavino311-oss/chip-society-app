@@ -524,7 +524,7 @@ export default function ProfileScreen() {
         <NeonSectionTitle label="SOCIAL" color="rgba(0,212,255,0.8)" />
         <View style={styles.statsGrid}>
           <NeonStatBox label="FOLLOWING"    value={socialFollowingCount} accentColor="#4488ff" />
-          <NeonStatBox label="ACHIEVEMENTS" value={claimedCount}         accentColor="#bf5fff" />
+          <NeonStatBox label="ACHIEVEMENTS" value={`${unlockedIds.size} / ${ALL_ACHIEVEMENTS.length}`} accentColor="#bf5fff" />
         </View>
 
         <NeonSectionTitle label="CHIP BALANCE" color="rgba(255,215,0,0.8)" />
