@@ -45,7 +45,7 @@ function getAppName() {
   }
 }
 
-function serveManifest(platform, res) {
+function serveManifest(req, platform, res) {
   const manifestPath = path.join(STATIC_ROOT, platform, "manifest.json");
 
   if (!fs.existsSync(manifestPath)) {
@@ -56,13 +56,62 @@ function serveManifest(platform, res) {
     return;
   }
 
-  const manifest = fs.readFileSync(manifestPath, "utf-8");
+  // Derive the public origin from the incoming request so the manifest always
+  // points to the correct server — even when the baked-in domain is stale.
+  const forwardedProto = req.headers["x-forwarded-proto"];
+  const protocol = forwardedProto || "https";
+  const host = req.headers["x-forwarded-host"] || req.headers["host"];
+  const currentOrigin = `${protocol}://${host}`;
+
+  let manifestObj;
+  try {
+    manifestObj = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+  } catch {
+    res.writeHead(500, { "content-type": "application/json" });
+    res.end(JSON.stringify({ error: "Failed to parse manifest." }));
+    return;
+  }
+
+  // Rewrite any absolute URL in the manifest to use the current origin.
+  function rewriteUrl(url) {
+    if (!url || !url.startsWith("http")) return url;
+    try {
+      const u = new URL(url);
+      u.protocol = protocol + ":";
+      u.host = host;
+      return u.toString();
+    } catch {
+      return url;
+    }
+  }
+
+  if (manifestObj.launchAsset?.url) {
+    manifestObj.launchAsset.url = rewriteUrl(manifestObj.launchAsset.url);
+  }
+  if (manifestObj.assets) {
+    manifestObj.assets = manifestObj.assets.map((a) =>
+      a.url ? { ...a, url: rewriteUrl(a.url) } : a,
+    );
+  }
+  // Rewrite Expo Updates / project URLs if present
+  if (manifestObj.extra?.expoClient?.updates?.url) {
+    manifestObj.extra.expoClient.updates.url = rewriteUrl(
+      manifestObj.extra.expoClient.updates.url,
+    );
+  }
+  // Patch bundleUrl (SDK ≤48 classic manifest field) when present
+  if (manifestObj.bundleUrl) {
+    manifestObj.bundleUrl = rewriteUrl(manifestObj.bundleUrl);
+  }
+
+  const body = JSON.stringify(manifestObj);
   res.writeHead(200, {
     "content-type": "application/json",
     "expo-protocol-version": "1",
     "expo-sfv-version": "0",
+    "content-length": Buffer.byteLength(body),
   });
-  res.end(manifest);
+  res.end(body);
 }
 
 function serveLandingPage(req, res, landingPageTemplate, appName) {
@@ -118,7 +167,7 @@ const server = http.createServer((req, res) => {
   if (pathname === "/" || pathname === "/manifest") {
     const platform = req.headers["expo-platform"];
     if (platform === "ios" || platform === "android") {
-      return serveManifest(platform, res);
+      return serveManifest(req, platform, res);
     }
 
     if (pathname === "/") {
