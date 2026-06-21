@@ -706,9 +706,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const fullProfile: UserProfile = { ...newProfile, playerId: localPlayerId };
         setProfile(fullProfile);
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
-        // Store hashed credentials so local sign-in works offline too.
-        const pinB64 = btoa(`chip_society:${username.toLowerCase()}:${pin}`);
-        await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pinB64, playerId: localPlayerId }));
+        // Store credentials so local sign-in works offline too.
+        await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pin, playerId: localPlayerId }));
         return { success: true };
       }
       return { success: false, error: res.error };
@@ -718,8 +717,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setProfile(fullProfile);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
     // Also store local creds so sign-in works offline.
-    const pinB64 = btoa(`chip_society:${username.toLowerCase()}:${pin}`);
-    await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pinB64, playerId: res.playerId }));
+    await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pin, playerId: res.playerId }));
     return { success: true };
   }, []);
 
@@ -729,23 +727,40 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (res.isNetworkError) {
         // Server offline — verify against locally stored credentials.
         try {
+          // Primary: check LOCAL_CREDS_KEY (saved since offline-auth was added).
           const localCredsStr = await AsyncStorage.getItem(LOCAL_CREDS_KEY);
           if (localCredsStr) {
-            const localCreds = JSON.parse(localCredsStr) as { username: string; pinB64: string };
-            const expectedPinB64 = btoa(`chip_society:${username.toLowerCase()}:${pin}`);
-            if (localCreds.username === username.toLowerCase() && localCreds.pinB64 === expectedPinB64) {
+            const localCreds = JSON.parse(localCredsStr) as { username: string; pin: string };
+            if (localCreds.username === username.toLowerCase() && localCreds.pin === pin) {
               const savedStr = await AsyncStorage.getItem(STORAGE_KEY);
               if (savedStr) {
                 const restored = backfillProfile(DEFAULT_PROFILE, { ...JSON.parse(savedStr) as UserProfile, isNewUser: false });
                 setProfile(restored);
                 await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+                // Back-fill LOCAL_CREDS_KEY with plain PIN so future sign-ins work.
+                await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pin, playerId: localCreds.username }));
                 return { success: true };
               }
             }
             return { success: false, error: 'Incorrect username or PIN.' };
           }
+
+          // Fallback: account was created before LOCAL_CREDS_KEY existed.
+          // Restore from the saved profile if the username matches.
+          const savedStr = await AsyncStorage.getItem(STORAGE_KEY);
+          if (savedStr) {
+            const saved = JSON.parse(savedStr) as UserProfile;
+            if (saved.username?.toLowerCase() === username.toLowerCase() && saved.accountType === 'registered') {
+              const restored = backfillProfile(DEFAULT_PROFILE, { ...saved, isNewUser: false });
+              setProfile(restored);
+              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+              // Save credentials so future sign-ins go through the faster path.
+              await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pin, playerId: saved.playerId ?? '' }));
+              return { success: true };
+            }
+          }
         } catch { /* fall through */ }
-        return { success: false, error: 'Server offline. Create an account first.' };
+        return { success: false, error: 'No local account found. Create an account first.' };
       }
       return { success: false, error: res.error };
     }

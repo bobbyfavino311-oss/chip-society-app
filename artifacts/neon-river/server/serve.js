@@ -114,6 +114,14 @@ function serveManifest(req, platform, res) {
   if (!manifestObj.extra.expoClient.extra) manifestObj.extra.expoClient.extra = {};
   manifestObj.extra.expoClient.extra.apiUrl = correctApiUrl;
 
+  // Bust the Expo Go bundle cache by appending a serve-version suffix to the
+  // launchAsset key. Without this, Expo Go re-uses its cached bundle from
+  // before our serve-time URL patches were deployed, so fonts/images/audio
+  // remain broken even after we publish fixes to serve.js.
+  if (manifestObj.launchAsset) {
+    manifestObj.launchAsset.key = (manifestObj.launchAsset.key || 'bundle') + '-s3';
+  }
+
   const body = JSON.stringify(manifestObj);
   res.writeHead(200, {
     "content-type": "application/json",
