@@ -219,28 +219,4 @@ router.post('/auth/forgot-pin', async (req, res) => {
   }
 });
 
-// ── DELETE /api/auth/admin/player/:username — TEMPORARY, remove after use ─────
-router.delete('/auth/admin/player/:username', async (req, res) => {
-  if (req.headers['x-admin-secret'] !== 'chip-society-admin-2026') {
-    res.status(403).json({ error: 'Forbidden' });
-    return;
-  }
-  try {
-    const lower = (req.params['username'] ?? '').toLowerCase();
-    const result = await db
-      .delete(playersTable)
-      .where(eq(playersTable.usernameLower, lower))
-      .returning({ playerId: playersTable.playerId, username: playersTable.username });
-    if (result.length === 0) {
-      res.status(404).json({ error: 'Player not found.' });
-      return;
-    }
-    req.log.warn({ username: lower }, 'Admin deleted player');
-    res.json({ success: true, deleted: result[0] });
-  } catch (e) {
-    req.log.error(e, 'admin delete error');
-    res.status(500).json({ error: 'Server error.' });
-  }
-});
-
 export default router;

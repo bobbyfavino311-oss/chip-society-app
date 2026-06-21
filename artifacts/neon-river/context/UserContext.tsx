@@ -304,10 +304,12 @@ function getApiBase(): string {
 
 // ─── Server API helpers ───────────────────────────────────────────────────────
 
-// Throws on network failure — callers decide how to surface the error.
+// Throws on network failure OR server error — callers decide how to surface it.
+// IMPORTANT: never return false on a server error; that would silently report
+// every username as "taken" when the backend is unreachable or returns 5xx.
 async function serverCheckUsername(username: string): Promise<boolean> {
   const r = await fetch(`${getApiBase()}/auth/check-username/${encodeURIComponent(username)}`);
-  if (!r.ok) return false;       // 4xx/5xx → treat as unavailable/taken
+  if (!r.ok) throw new Error(`Server error: ${r.status}`);
   const d = await r.json() as { available: boolean };
   return d.available;
 }

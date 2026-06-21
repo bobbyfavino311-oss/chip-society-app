@@ -23,8 +23,25 @@ import { NEON_AVATARS, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
 const STARTER_AVATARS = NEON_AVATARS.filter(a => a.rarity === 'COMMON');
 const STEPS = ['USERNAME', 'PIN', 'AVATAR', 'WELCOME'];
 
+type ServerStatus = 'checking' | 'ok' | 'fail';
+function useServerPing(): ServerStatus {
+  const [status, setStatus] = useState<ServerStatus>('checking');
+  useEffect(() => {
+    let alive = true;
+    const base = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : (process.env['EXPO_PUBLIC_API_URL']?.replace(/\/api$/, '') ?? '');
+    fetch(`${base}/api/healthz`, { signal: AbortSignal.timeout(6000) })
+      .then(r => { if (alive) setStatus(r.ok ? 'ok' : 'fail'); })
+      .catch(() => { if (alive) setStatus('fail'); });
+    return () => { alive = false; };
+  }, []);
+  return status;
+}
+
 export default function SignupScreen() {
   const { registerAccount, checkUsernameAvailable } = useUser();
+  const serverStatus = useServerPing();
   const [step, setStep] = useState(0);
 
   const [username, setUsername] = useState('');
@@ -196,6 +213,14 @@ export default function SignupScreen() {
                   <Text style={s.stepLabel}>STEP 1 OF 3</Text>
                   <Text style={s.stepTitle}>Choose Your{'\n'}Username</Text>
                   <Text style={s.stepDesc}>Your unique identity at the neon table. Choose wisely.</Text>
+
+                  {/* Server status pill */}
+                  <View style={s.serverPill}>
+                    <View style={[s.serverDot, serverStatus === 'ok' ? s.dotOk : serverStatus === 'fail' ? s.dotFail : s.dotChecking]} />
+                    <Text style={s.serverPillText}>
+                      {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? 'Server Connection Failed' : 'Checking server…'}
+                    </Text>
+                  </View>
 
                   <View style={[s.inputWrap, { borderColor: usernameColor }]}>
                     <TextInput
@@ -491,4 +516,17 @@ const s = StyleSheet.create({
   },
   ctaDisabled: { borderColor: 'rgba(255,255,255,0.15)', backgroundColor: 'rgba(255,255,255,0.04)' },
   ctaText: { fontFamily: 'Orbitron_700Bold', fontSize: 13, color: colors.primary, letterSpacing: 2 },
+
+  serverPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 7,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10, paddingVertical: 5,
+    borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.05)', marginBottom: 4,
+  },
+  serverDot: { width: 7, height: 7, borderRadius: 4 },
+  dotOk:       { backgroundColor: '#00ff88' },
+  dotFail:     { backgroundColor: '#ff4466' },
+  dotChecking: { backgroundColor: 'rgba(255,255,255,0.35)' },
+  serverPillText: { fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: 0.5 },
 });

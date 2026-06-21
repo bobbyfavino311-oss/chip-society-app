@@ -1,0 +1,196 @@
+This sounds like a mobile build/config issue, not just an app version issue. If rollback didn’t fix it, the broken pieces are probably shared: server username check, mobile asset bundling, font loading, and audio manager.
+
+CHIP SOCIETY MOBILE BUILD EMERGENCY FIX
+
+The rollback did not fix the mobile version. The app is still unplayable on mobile.
+
+Critical mobile-only issues:
+
+• Orbitron font is not loading
+• No usernames are available
+• Every username appears taken
+• Music does not play
+• Music button/audio system is missing or broken
+• Mobile build does not match working preview behavior
+
+Stop all new feature work. Fix mobile stability first.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+1. MOBILE FONT FAILURE
+
+Orbitron font is not loading on mobile.
+
+Required fix:
+
+• Verify Orbitron font file is included in mobile build assets
+• Verify font is imported correctly
+• Verify font path works on iOS/Android
+• Verify fallback font is not replacing Orbitron
+• Apply Orbitron globally across the app
+
+Check every screen:
+
+• Login
+• Home
+• Play
+• Profile
+• Feed
+• Store
+• Casino tables
+• Buttons
+• Headers
+• Labels
+
+If Orbitron works in preview but not mobile, this is an asset packaging/export issue.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+2. USERNAME CHECK IS BROKEN
+
+Current bug:
+
+Every username says unavailable / already taken.
+
+This is incorrect.
+
+Required fix:
+
+The username availability check must only return “taken” when the exact username already exists on the server.
+
+Do NOT treat these as taken:
+
+• Server timeout
+• Null response
+• Empty response
+• Failed request
+• Offline state
+• API error
+• Database connection error
+
+Instead show:
+
+“Unable to check username. Try again.”
+
+Test:
+
+Username: test123_new_987
+
+Expected:
+
+Available.
+
+Username that already exists:
+
+Expected:
+
+Taken.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+3. ACCOUNT CREATION MUST WORK ON MOBILE
+
+Mobile account creation must support:
+
+• Username
+• 4-digit PIN
+• No email
+• No password
+• No guest mode
+
+If username is available:
+
+Create account.
+
+If username is taken:
+
+Show username taken.
+
+If server check fails:
+
+Show server error, not username taken.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+4. SERVER CONNECTION CHECK
+
+Add a visible backend status check during login.
+
+If server is reachable:
+
+Show:
+
+Server Connected
+
+If server is not reachable:
+
+Show:
+
+Server Connection Failed
+
+Do not allow the app to silently fail.
+
+Do not fake username-taken errors.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+5. MUSIC SYSTEM MOBILE FAILURE
+
+Music does not play on mobile.
+
+Required fix:
+
+• Verify music files are included in mobile build
+• Verify file paths are mobile-safe
+• Verify audio manager initializes on mobile
+• Verify audio is not muted by default
+• Verify iOS silent switch behavior is handled correctly
+• Verify music button exists on supported screens
+• Verify tapping music button starts/stops music
+
+Music must work on:
+
+• Poker tables
+• Three Card Poker
+• Blackjack
+• Main table screens
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+6. MOBILE ASSET PACKAGING AUDIT
+
+Audit all mobile packaged assets:
+
+• Orbitron font
+• Music tracks
+• Sound effects
+• Fortune Cookie audio
+• Avatar images
+• Theme assets
+• UI icons
+
+If an asset works in preview but not mobile, it must be explicitly included in the mobile bundle.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+7. FINAL MOBILE TEST
+
+Run this exact test on mobile device, not preview:
+
+1. Open app
+2. Confirm Orbitron font appears
+3. Create brand-new username
+4. Enter 4-digit PIN
+5. Account creates successfully
+6. Home Screen loads
+7. Music button appears on table
+8. Music plays
+9. Log out
+10. Log back in
+11. Same account loads
+12. Font remains correct
+13. Music still works
+
+Do not mark complete until this full mobile test passes.
+
+The key line: do not treat server failure as “username taken.” That’s probably why account creation is completely blocked.
