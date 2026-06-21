@@ -304,18 +304,12 @@ function getApiBase(): string {
 
 // ─── Server API helpers ───────────────────────────────────────────────────────
 
-// Throws on network failure OR server error — callers decide how to surface the error.
-// IMPORTANT: must NOT return false on server errors — that would silently show
-// "Username already taken" when the database is unreachable.  Only return false
-// when the server explicitly confirms the name is taken (available === false).
+// Throws on network failure — callers decide how to surface the error.
 async function serverCheckUsername(username: string): Promise<boolean> {
   const r = await fetch(`${getApiBase()}/auth/check-username/${encodeURIComponent(username)}`);
-  if (!r.ok) {
-    // 5xx / unexpected error — throw so signup.tsx catch shows "Could not reach server"
-    throw new Error(`Server returned ${r.status}`);
-  }
+  if (!r.ok) return false;       // 4xx/5xx → treat as unavailable/taken
   const d = await r.json() as { available: boolean };
-  return d.available === true;   // explicit truth-check; anything else is treated as unavailable
+  return d.available;
 }
 
 async function serverRegister(

@@ -1,25 +1,22 @@
 {
   "expo": {
     "name": "CHIP SOCIETY",
-    "slug": "chip-society",
+    "slug": "neon-river",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "chip-society",
+    "scheme": "neon-river",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#050010"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.chipsociety.poker"
+      "supportsTablet": false
     },
-    "android": {
-      "package": "com.chipsociety.poker"
-    },
+    "android": {},
     "web": {
       "favicon": "./assets/images/icon.png"
     },
