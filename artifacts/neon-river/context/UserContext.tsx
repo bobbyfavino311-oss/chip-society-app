@@ -277,14 +277,20 @@ const LEGACY_KEY   = '@neon_river_profile';
 // ─── API base URL ─────────────────────────────────────────────────────────────
 export function getApiBase(): string {
   // Web browser (Expo web / Safari): use window.location origin.
-  // In React Native, window.location is undefined so this is safely skipped.
+  // In React Native/Hermes, window.location is undefined so this is safely skipped.
   if (typeof window !== 'undefined' && window.location != null && window.location.origin) {
     return `${window.location.origin}/api`;
   }
 
-  // Native iOS — always use the confirmed production domain.
-  // Note: REPLIT_DOMAINS is replit.com during Replit production builds (Expo proxy),
-  // so any baked-in env var is unreliable. This constant is the real deployed domain.
+  // Native: read apiUrl injected into the manifest by build.js.
+  // Expo Go always re-fetches the manifest on open, so Constants.expoConfig.extra.apiUrl
+  // is always fresh — even when the JS bundle itself is cached on the device.
+  const fromManifest = (Constants.expoConfig?.extra as Record<string, unknown> | undefined)?.apiUrl;
+  if (typeof fromManifest === 'string' && fromManifest.startsWith('https://')) {
+    return fromManifest;
+  }
+
+  // Hardcoded production fallback — chip-society.replit.app confirmed reachable.
   return 'https://chip-society.replit.app/api';
 }
 

@@ -494,6 +494,13 @@ function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
       baseUrl.replace("https://", "") + "/" + platform;
     manifest.extra.expoGo.packagerOpts.dev = false;
 
+    // Inject the correct API URL into the manifest extra so that
+    // Constants.expoConfig.extra.apiUrl is always correct at runtime.
+    // The manifest is re-fetched by Expo Go on every open, so this value
+    // is always fresh even if the JS bundle is cached on the device.
+    if (!manifest.extra.expoClient.extra) manifest.extra.expoClient.extra = {};
+    manifest.extra.expoClient.extra.apiUrl = `${baseUrl}/api`;
+
     if (manifest.assets && manifest.assets.length > 0) {
       manifest.assets.forEach((asset) => {
         if (!asset.url) return;
