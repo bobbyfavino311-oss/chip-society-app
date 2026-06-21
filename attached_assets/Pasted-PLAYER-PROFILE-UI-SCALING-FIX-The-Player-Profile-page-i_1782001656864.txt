@@ -1,0 +1,173 @@
+PLAYER PROFILE UI SCALING FIX
+
+The Player Profile page is still oversized and does not feel like a polished mobile game profile screen.
+
+The current font sizes are too large and are causing the page to feel cramped and unbalanced.
+
+The profile should feel clean, premium, and information-dense rather than oversized and sparse.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT ISSUES
+
+• Username is too large
+• Level section is too large
+• Statistic numbers are too large
+• Labels are too large
+• Excessive spacing between sections
+• Too much vertical screen space being consumed
+• User must scroll unnecessarily
+• Layout feels more like a tablet UI than a mobile UI
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+USERNAME
+
+Reduce username font size by approximately:
+
+20–25%
+
+Current:
+
+realbobbyf appears oversized
+
+Target:
+
+Still prominent but more refined.
+
+The username should fit naturally beneath the avatar without dominating the page.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LEVEL CARD
+
+Current level display is too large.
+
+Reduce:
+
+• Level number size
+• Rank title size
+• Progress text size
+
+Approximately:
+
+15–20%
+
+The card itself can also be slightly shorter vertically.
+
+Goal:
+
+Show more information above the fold.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STATISTICS SECTION
+
+Reduce:
+
+WIN RATE
+
+HANDS
+
+WINS
+
+LOSSES
+
+number sizes by approximately:
+
+20%
+
+Current numbers feel oversized.
+
+Example:
+
+86%
+
+7
+
+6
+
+1
+
+should remain readable but no longer dominate their cards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STATISTIC LABELS
+
+Reduce:
+
+WIN RATE
+
+HANDS
+
+WINS
+
+LOSSES
+
+font size by:
+
+10–15%
+
+These labels should act as supporting text.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD HEIGHTS
+
+Reduce vertical height of:
+
+• Statistic cards
+• Level card
+• Tournament placeholder section
+
+Allow more content to fit on-screen without scrolling.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MOBILE FIRST DESIGN
+
+Optimize specifically for:
+
+• iPhone 14
+• iPhone 15
+• iPhone 16 Pro Max
+
+The entire profile should feel tighter and more efficient.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL REFERENCE
+
+Think:
+
+Modern social profile
+
+Modern banking app
+
+Premium gaming profile
+
+Not:
+
+Large accessibility mode
+
+Tablet layout
+
+Oversized kiosk interface
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TARGET RESULT
+
+The player should be able to see:
+
+• Avatar
+• Username
+• Level
+• Progress Bar
+• Statistics
+• Tournament Section
+
+with significantly less scrolling.
+
+The profile should feel sleek, compact, premium, and professionally designed while maintaining readability.
