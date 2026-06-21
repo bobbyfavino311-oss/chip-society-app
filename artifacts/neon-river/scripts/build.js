@@ -144,7 +144,9 @@ async function startMetro(expoPublicDomain, expoPublicReplId) {
   }
 
   console.log("Starting Metro...");
-  const apiUrl = `https://${expoPublicDomain}/api`;
+  // Prefer an explicitly set EXPO_PUBLIC_API_URL (e.g. from a Replit production env var)
+  // over the one computed from REPLIT_DOMAINS (which may be a dev session domain).
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL || `https://${expoPublicDomain}/api`;
   console.log(`Setting EXPO_PUBLIC_DOMAIN=${expoPublicDomain}`);
   console.log(`Setting EXPO_PUBLIC_API_URL=${apiUrl}`);
   const env = {
@@ -520,11 +522,6 @@ function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
 async function main() {
   console.log("Building static Expo Go deployment...");
   console.log(`REPLIT_DOMAINS=${process.env.REPLIT_DOMAINS ?? "unset"}`);
-
-  // Respect a pre-set EXPO_PUBLIC_API_URL (e.g. from a Replit production env var).
-  if (process.env.EXPO_PUBLIC_API_URL) {
-    console.log(`EXPO_PUBLIC_API_URL already set: ${process.env.EXPO_PUBLIC_API_URL} — skipping domain computation`);
-  }
 
   setupSignalHandlers();
 
