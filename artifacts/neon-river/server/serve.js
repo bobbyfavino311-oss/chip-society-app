@@ -119,7 +119,7 @@ function serveManifest(req, platform, res) {
   // before our serve-time URL patches were deployed, so fonts/images/audio
   // remain broken even after we publish fixes to serve.js.
   if (manifestObj.launchAsset) {
-    manifestObj.launchAsset.key = (manifestObj.launchAsset.key || 'bundle') + '-s3';
+    manifestObj.launchAsset.key = (manifestObj.launchAsset.key || 'bundle') + '-s4';
   }
 
   const body = JSON.stringify(manifestObj);
@@ -156,23 +156,34 @@ function serveLandingPage(req, res, landingPageTemplate, appName) {
 /**
  * Patch a JS bundle at serve time.
  *
- * The build step runs with REPLIT_DOMAINS="replit.com" (Expo proxy), so Metro
- * bakes that domain into:
- *   - EXPO_PUBLIC_API_URL  → "https://replit.com/api"
- *   - httpServerLocation   → "https://replit.com/{ts}/_expo/static/js/..."
- *     (used by React Native to fetch fonts, images, and audio at runtime)
+ * The build step runs with whatever REPLIT_DOMAINS is set to at build time
+ * (could be "replit.com", a janeway.replit.dev session domain, etc.). Metro
+ * bakes that domain into httpServerLocation values — the URLs React Native
+ * uses to fetch fonts, images, and audio at runtime.
  *
- * We replace every "https://replit.com" occurrence with the real production
- * origin derived from the incoming request host header.
+ * We detect whatever domain was baked in and replace it with the real
+ * production origin derived from the incoming request host header.
  */
 function patchBundle(content, correctOrigin) {
-  const wrongOrigins = ["https://replit.com", "http://replit.com"];
   let patched = content;
-  for (const wrong of wrongOrigins) {
-    // replaceAll is safe here: these strings only appear as Metro-baked string
-    // literals (always wrapped in quotes) and never as legitimate substrings.
-    patched = patched.replaceAll(wrong, correctOrigin);
+
+  // Dynamically detect the baked-in domain from the first httpServerLocation.
+  // This handles any Replit domain: replit.com, *.janeway.replit.dev, etc.
+  const locationMatch = patched.match(/httpServerLocation:"(https?:\/\/[^/"]+)\//);
+  if (locationMatch) {
+    const bakedOrigin = locationMatch[1];
+    if (bakedOrigin !== correctOrigin) {
+      patched = patched.replaceAll(bakedOrigin, correctOrigin);
+    }
   }
+
+  // Belt-and-suspenders: also replace the well-known static proxy domains.
+  for (const wrong of ["https://replit.com", "http://replit.com"]) {
+    if (patched.includes(wrong)) {
+      patched = patched.replaceAll(wrong, correctOrigin);
+    }
+  }
+
   return patched;
 }
 
@@ -187,6 +198,8 @@ function serveStaticFile(urlPath, req, res) {
   }
 
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+    // Log 404s so we can diagnose asset loading failures via deployment logs.
+    console.log(`[404] ${urlPath} -> ${filePath}`);
     res.writeHead(404);
     res.end("Not Found");
     return;
@@ -216,6 +229,41 @@ function serveStaticFile(urlPath, req, res) {
 
 const landingPageTemplate = fs.readFileSync(TEMPLATE_PATH, "utf-8");
 const appName = getAppName();
+
+// ─── Startup diagnostic: show what's in static-build so we can verify assets ──
+(function logStaticBuildContents() {
+  try {
+    if (!fs.existsSync(STATIC_ROOT)) {
+      console.log("[diag] static-build MISSING");
+      return;
+    }
+    // List top-level timestamp dirs
+    const top = fs.readdirSync(STATIC_ROOT);
+    console.log("[diag] static-build/:", top.join(", "));
+    for (const entry of top) {
+      const fullEntry = path.join(STATIC_ROOT, entry);
+      if (!fs.statSync(fullEntry).isDirectory()) continue;
+      // Count and sample asset files (non-.js) inside each timestamp dir
+      let assetCount = 0;
+      let samples = [];
+      function countAssets(dir, depth) {
+        if (depth > 8) return;
+        for (const f of fs.readdirSync(dir)) {
+          const fp = path.join(dir, f);
+          if (fs.statSync(fp).isDirectory()) { countAssets(fp, depth + 1); }
+          else if (!['.js', '.json', '.map'].includes(path.extname(f))) {
+            assetCount++;
+            if (samples.length < 5) samples.push(path.relative(STATIC_ROOT, fp));
+          }
+        }
+      }
+      countAssets(fullEntry, 0);
+      console.log(`[diag] ${entry}/: ${assetCount} assets. samples: ${samples.join(" | ")}`);
+    }
+  } catch (e) {
+    console.log("[diag] error:", e.message);
+  }
+})();
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url || "/", `http://${req.headers.host}`);
