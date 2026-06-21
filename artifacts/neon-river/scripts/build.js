@@ -55,12 +55,21 @@ function stripProtocol(domain) {
 }
 
 function getDeploymentDomain() {
-  if (process.env.REPLIT_INTERNAL_APP_DOMAIN) {
-    return stripProtocol(process.env.REPLIT_INTERNAL_APP_DOMAIN);
+  // REPLIT_DOMAINS is the public-facing domain — always reachable from iOS devices.
+  // Prefer it over REPLIT_INTERNAL_APP_DOMAIN which may be an internal hostname
+  // that is only accessible within Replit's infrastructure.
+  if (process.env.REPLIT_DOMAINS) {
+    // May be comma-separated; use the first entry.
+    const first = process.env.REPLIT_DOMAINS.split(",")[0].trim();
+    if (first) return stripProtocol(first);
   }
 
   if (process.env.REPLIT_DEV_DOMAIN) {
     return stripProtocol(process.env.REPLIT_DEV_DOMAIN);
+  }
+
+  if (process.env.REPLIT_INTERNAL_APP_DOMAIN) {
+    return stripProtocol(process.env.REPLIT_INTERNAL_APP_DOMAIN);
   }
 
   if (process.env.EXPO_PUBLIC_DOMAIN) {
@@ -68,7 +77,7 @@ function getDeploymentDomain() {
   }
 
   console.error(
-    "ERROR: No deployment domain found. Set REPLIT_INTERNAL_APP_DOMAIN, REPLIT_DEV_DOMAIN, or EXPO_PUBLIC_DOMAIN",
+    "ERROR: No deployment domain found. Set REPLIT_DOMAINS, REPLIT_DEV_DOMAIN, or EXPO_PUBLIC_DOMAIN",
   );
   process.exit(1);
 }

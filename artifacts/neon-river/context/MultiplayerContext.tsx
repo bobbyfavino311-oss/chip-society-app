@@ -2,13 +2,30 @@ import React, {
   createContext, useCallback, useContext, useEffect, useRef, useState,
 } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import Constants from 'expo-constants';
 import type { ClientGameState, LobbyTable, StakeTier } from '@/lib/multiplayerTypes';
 
 function getSocketUrl(): string {
+  // Web: use window.location origin — proxy handles /api/socket.io routing
   if (typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;
   }
-  return process.env.EXPO_PUBLIC_SOCKET_URL ?? '';
+  // Native: derive origin from EXPO_PUBLIC_API_URL (e.g. https://domain.com/api → https://domain.com)
+  const explicit = process.env['EXPO_PUBLIC_API_URL'];
+  if (explicit) return explicit.replace(/\/api\/?$/, '');
+  // Native: derive from Expo manifest bundle URL
+  try {
+    const bundleUrl =
+      (Constants.manifest as Record<string, unknown> | null)?.['bundleUrl'] as string | undefined ??
+      (Constants as unknown as { manifest2?: { launchAsset?: { url?: string } } }).manifest2?.launchAsset?.url;
+    if (bundleUrl) {
+      const parsed = new URL(bundleUrl);
+      return `${parsed.protocol}//${parsed.host}`;
+    }
+  } catch { /* ignore */ }
+  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
+  if (domain) return `https://${domain}`;
+  return '';
 }
 
 const SOCKET_PATH = '/api/socket.io';
