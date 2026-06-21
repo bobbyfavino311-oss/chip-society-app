@@ -20,11 +20,14 @@ import { useUser, getApiBase } from '@/context/UserContext';
 type Phase = 'username' | 'pin';
 type ServerStatus = 'checking' | 'ok' | 'fail';
 
-function useServerPing(): ServerStatus {
+function useServerPing(): { status: ServerStatus; url: string } {
   const [status, setStatus] = useState<ServerStatus>('checking');
+  const [url, setUrl] = useState('');
   useEffect(() => {
     let alive = true;
-    const base = getApiBase().replace(/\/api$/, '');
+    const apiBase = getApiBase();
+    const base = apiBase.replace(/\/api$/, '');
+    setUrl(apiBase);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 6000);
     fetch(`${base}/api/healthz`, { signal: controller.signal })
@@ -33,7 +36,7 @@ function useServerPing(): ServerStatus {
       .finally(() => clearTimeout(timer));
     return () => { alive = false; controller.abort(); };
   }, []);
-  return status;
+  return { status, url };
 }
 
 export default function SignInScreen() {
@@ -44,7 +47,7 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const shake = useRef(new Animated.Value(0)).current;
-  const serverStatus = useServerPing();
+  const { status: serverStatus, url: serverUrl } = useServerPing();
 
   const doShake = () => {
     Animated.sequence([
@@ -110,7 +113,7 @@ export default function SignInScreen() {
             <View style={s.serverPill}>
               <View style={[s.serverDot, serverStatus === 'ok' ? s.dotOk : serverStatus === 'fail' ? s.dotFail : s.dotChecking]} />
               <Text style={s.serverPillText}>
-                {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? 'Server Connection Failed' : 'Checking server…'}
+                {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? `Failed — ${serverUrl}` : 'Checking server…'}
               </Text>
             </View>
 

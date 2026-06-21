@@ -24,11 +24,14 @@ const STARTER_AVATARS = NEON_AVATARS.filter(a => a.rarity === 'COMMON');
 const STEPS = ['USERNAME', 'PIN', 'AVATAR', 'WELCOME'];
 
 type ServerStatus = 'checking' | 'ok' | 'fail';
-function useServerPing(): ServerStatus {
+function useServerPing(): { status: ServerStatus; url: string } {
   const [status, setStatus] = useState<ServerStatus>('checking');
+  const [url, setUrl] = useState('');
   useEffect(() => {
     let alive = true;
-    const base = getApiBase().replace(/\/api$/, '');
+    const apiBase = getApiBase();
+    const base = apiBase.replace(/\/api$/, '');
+    setUrl(apiBase);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 6000);
     fetch(`${base}/api/healthz`, { signal: controller.signal })
@@ -37,12 +40,12 @@ function useServerPing(): ServerStatus {
       .finally(() => clearTimeout(timer));
     return () => { alive = false; controller.abort(); };
   }, []);
-  return status;
+  return { status, url };
 }
 
 export default function SignupScreen() {
   const { registerAccount, checkUsernameAvailable } = useUser();
-  const serverStatus = useServerPing();
+  const { status: serverStatus, url: serverUrl } = useServerPing();
   const [step, setStep] = useState(0);
 
   const [username, setUsername] = useState('');
@@ -219,7 +222,7 @@ export default function SignupScreen() {
                   <View style={s.serverPill}>
                     <View style={[s.serverDot, serverStatus === 'ok' ? s.dotOk : serverStatus === 'fail' ? s.dotFail : s.dotChecking]} />
                     <Text style={s.serverPillText}>
-                      {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? 'Server Connection Failed' : 'Checking server…'}
+                      {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? `Failed — ${serverUrl}` : 'Checking server…'}
                     </Text>
                   </View>
 

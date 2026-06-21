@@ -1,0 +1,355 @@
+This is the exact issue: the mobile app cannot reach the Replit server, so login, fonts, music, and account creation are breaking after the server was added.
+
+CRITICAL REPLIT SERVER MOBILE CONNECTION FIX
+
+The mobile version of Chip Society became unplayable after the Replit server was added.
+
+Current mobile error:
+
+“Could not reach server on mobile, try again.”
+
+This must be fixed immediately.
+
+The goal is simple:
+
+The Replit build/server must be reachable from the mobile app so the mobile version can create accounts, log in, load saved progress, load fonts, load music, and play the game properly.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CORE PROBLEM
+
+The app works in preview/web but fails on mobile.
+
+This means the mobile build is likely trying to connect to:
+
+• localhost
+• 127.0.0.1
+• a preview-only URL
+• an internal Replit URL
+• a blocked development URL
+• an HTTP URL instead of HTTPS
+• a server route not exposed publicly
+
+Mobile devices cannot reach localhost or private preview URLs.
+
+The mobile app must connect to the public HTTPS Replit server URL.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED FIX
+
+Update the mobile app API/server base URL.
+
+Do NOT use:
+
+localhost
+
+127.0.0.1
+
+http://localhost
+
+http://127.0.0.1
+
+Replit preview-only URLs
+
+Temporary development URLs
+
+Use the live public Replit HTTPS URL instead.
+
+Example format:
+
+https://your-replit-project-name.your-username.replit.app
+
+or the correct public deployed Replit server URL.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MOBILE SERVER CONNECTION REQUIREMENTS
+
+The Replit server must:
+
+• Be publicly reachable from mobile devices
+• Use HTTPS
+• Accept requests from the mobile app
+• Respond to account creation requests
+• Respond to login requests
+• Respond to username availability checks
+• Respond to save/load profile requests
+• Not require local network access
+• Not depend on preview-only environment variables
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TEST SERVER ENDPOINT
+
+Create a simple health check endpoint:
+
+/health
+
+Expected response:
+
+{
+“status”: “ok”,
+“server”: “online”
+}
+
+The mobile app should call this first.
+
+If successful:
+
+Show:
+
+Server Connected
+
+If failed:
+
+Show:
+
+Server Connection Failed
+
+Do not continue account creation until this works.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+USERNAME BUG FIX
+
+The current system says every username is already taken because the mobile app cannot reach the server.
+
+Fix this logic.
+
+If the server request fails, do NOT show:
+
+Username already taken
+
+Instead show:
+
+Could not reach server. Check connection and try again.
+
+Only show:
+
+Username already taken
+
+when the server actually confirms that the exact username already exists.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCOUNT CREATION FLOW
+
+When mobile server connection works:
+
+Player enters:
+
+Username
+
+4-digit PIN
+
+App sends request to Replit server.
+
+Server checks username.
+
+If username is available:
+
+Create account.
+
+Save profile.
+
+Give player 50,000 chips.
+
+Route to Home Screen.
+
+If username exists:
+
+Show username already taken.
+
+If server fails:
+
+Show server connection error.
+
+Do NOT create fake local account.
+
+Do NOT reset player.
+
+Do NOT trap player.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LOGIN FLOW
+
+When player logs in:
+
+Username + 4-digit PIN must be sent to the Replit server.
+
+If valid:
+
+Load existing account.
+
+Restore:
+
+• Player ID
+• Username
+• Chips
+• XP
+• Level
+• Avatar
+• Tutorial status
+• Inventory
+• Social posts
+• Settings
+
+If invalid PIN:
+
+Show:
+
+Incorrect PIN
+
+Do NOT create new account.
+
+If server unreachable:
+
+Show:
+
+Could not reach server.
+
+Do NOT say username is taken.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MOBILE BUILD CONFIG CHECK
+
+Verify mobile build uses the correct production server URL.
+
+Check:
+
+• API base URL
+• Environment variables
+• Mobile build config
+• Replit deployment URL
+• CORS settings
+• HTTPS requirement
+• Server port binding
+• Public route exposure
+
+Mobile must not use a web-preview-only config.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REPLIT SERVER CHECK
+
+Verify the Replit server is actually running and accessible externally.
+
+Server must bind to:
+
+0.0.0.0
+
+not only localhost.
+
+Example:
+
+app.listen(PORT, “0.0.0.0”)
+
+Do not bind only to:
+
+localhost
+
+127.0.0.1
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CORS / REQUEST PERMISSIONS
+
+Allow the mobile app to communicate with the server.
+
+Configure CORS to allow requests from:
+
+• Mobile app
+• Web preview
+• Production build
+
+For testing, allow all origins temporarily.
+
+Then tighten later if needed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FONT AND MUSIC SIDE EFFECTS
+
+Orbitron font and music issues may be caused by the app failing server initialization.
+
+After server connection is fixed, verify:
+
+• Orbitron loads on mobile
+• Music assets load on mobile
+• Music button appears
+• Music plays
+• Audio manager initializes
+• Fortune Cookie sounds still work
+
+If these assets are local, they must still be bundled into the mobile build.
+
+If these assets are server-hosted, their URLs must also use reachable HTTPS paths.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MOBILE TESTING REQUIREMENT
+
+Test this on a real phone, not only web preview.
+
+Test using:
+
+• Mobile Safari
+• Installed mobile app build
+• Replit public URL
+• Real cellular connection
+• Real Wi-Fi connection
+
+Do not mark complete until the mobile version connects successfully.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL ACCEPTANCE TEST
+
+Perform this exact test:
+
+1. Open mobile app
+2. App calls /health
+3. Server returns online
+4. Create brand-new username
+5. Enter 4-digit PIN
+6. Account creates successfully
+7. Home Screen loads
+8. Chips show 50,000
+9. Orbitron font displays correctly
+10. Music button appears
+11. Music plays
+12. Select avatar
+13. Log out
+14. Log back in with same username + PIN
+15. Same account loads
+16. Avatar persists
+17. Chips persist
+18. XP persists
+19. Tutorial does not reset
+20. Social avatar displays correctly
+
+If any step fails, the mobile server integration is not fixed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+The Replit server must support the mobile version of Chip Society.
+
+The mobile app should no longer be disconnected, blocked, or dependent on web preview behavior.
+
+After this fix:
+
+• Account creation works
+• Login works
+• Usernames validate correctly
+• Progress saves
+• Progress loads
+• Fonts load
+• Music loads
+• Mobile app becomes playable again
+
+Fix server connectivity before adding any new features.

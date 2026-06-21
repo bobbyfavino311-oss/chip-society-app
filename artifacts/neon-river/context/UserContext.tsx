@@ -280,23 +280,41 @@ export function getApiBase(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}/api`;
   }
-  // Native: EXPO_PUBLIC_API_URL is baked in by the build script from REPLIT_DOMAINS
-  // and is always correct — check it before any runtime URL derivation.
-  const explicit = process.env['EXPO_PUBLIC_API_URL'];
-  if (explicit) return explicit;
-  // Native dev: EXPO_PUBLIC_DOMAIN is injected by the dev workflow command
-  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
-  if (domain) return `https://${domain}/api`;
-  // Last resort: derive from the Expo manifest bundle URL (may be a CDN host)
+
+  // Native — try sources in reliability order:
+
+  // 1. Constants.linkingUri is set by Expo Go from the URL the user actually opened
+  //    e.g. "exp://chip-society.replit.app" — most reliable on native.
+  try {
+    const linkingUri: string | undefined = (Constants as unknown as Record<string, unknown>)['linkingUri'] as string | undefined;
+    const match = linkingUri?.match(/^exp:\/\/([^/?#]+)/);
+    const host = match?.[1];
+    if (host && !host.startsWith('127.') && !host.includes('localhost')) {
+      return `https://${host}/api`;
+    }
+  } catch { /* ignore */ }
+
+  // 2. Manifest launchAsset URL — serve.js rewrites this to the request host
   try {
     const bundleUrl =
       (Constants.manifest as Record<string, unknown> | null)?.['bundleUrl'] as string | undefined ??
       (Constants as unknown as { manifest2?: { launchAsset?: { url?: string } } }).manifest2?.launchAsset?.url;
     if (bundleUrl) {
       const parsed = new URL(bundleUrl);
-      return `${parsed.protocol}//${parsed.host}/api`;
+      if (!parsed.hostname.startsWith('127.') && !parsed.hostname.includes('localhost')) {
+        return `https://${parsed.host}/api`;
+      }
     }
-  } catch { /* ignore parse errors */ }
+  } catch { /* ignore */ }
+
+  // 3. Explicit env var baked at build time from REPLIT_DOMAINS
+  const explicit = process.env['EXPO_PUBLIC_API_URL'];
+  if (explicit) return explicit;
+
+  // 4. Domain env var (dev workflow injects this)
+  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
+  if (domain) return `https://${domain}/api`;
+
   return '/api';
 }
 
