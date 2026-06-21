@@ -280,25 +280,23 @@ export function getApiBase(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}/api`;
   }
-  // Native: derive from the Expo manifest bundle URL first — the serve.js always
-  // rewrites this to the correct public origin, so it beats any stale baked-in env var.
+  // Native: EXPO_PUBLIC_API_URL is baked in by the build script from REPLIT_DOMAINS
+  // and is always correct — check it before any runtime URL derivation.
+  const explicit = process.env['EXPO_PUBLIC_API_URL'];
+  if (explicit) return explicit;
+  // Native dev: EXPO_PUBLIC_DOMAIN is injected by the dev workflow command
+  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
+  if (domain) return `https://${domain}/api`;
+  // Last resort: derive from the Expo manifest bundle URL (may be a CDN host)
   try {
     const bundleUrl =
-      // Expo SDK ≤48 classic manifest
       (Constants.manifest as Record<string, unknown> | null)?.['bundleUrl'] as string | undefined ??
-      // Expo SDK 49+ new manifest
       (Constants as unknown as { manifest2?: { launchAsset?: { url?: string } } }).manifest2?.launchAsset?.url;
     if (bundleUrl) {
       const parsed = new URL(bundleUrl);
       return `${parsed.protocol}//${parsed.host}/api`;
     }
   } catch { /* ignore parse errors */ }
-  // Native fallback: explicit env override baked at build time
-  const explicit = process.env['EXPO_PUBLIC_API_URL'];
-  if (explicit) return explicit;
-  // Native dev: EXPO_PUBLIC_DOMAIN is injected by the dev workflow command
-  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
-  if (domain) return `https://${domain}/api`;
   return '/api';
 }
 
