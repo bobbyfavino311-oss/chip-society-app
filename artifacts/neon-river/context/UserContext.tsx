@@ -281,37 +281,14 @@ export function getApiBase(): string {
     return `${window.location.origin}/api`;
   }
 
-  // Native — try sources in reliability order:
-
-  // 1. Constants.linkingUri is set by Expo Go from the URL the user actually opened
-  //    e.g. "exp://chip-society.replit.app" — most reliable on native.
-  try {
-    const linkingUri: string | undefined = (Constants as unknown as Record<string, unknown>)['linkingUri'] as string | undefined;
-    const match = linkingUri?.match(/^exp:\/\/([^/?#]+)/);
-    const host = match?.[1];
-    if (host && !host.startsWith('127.') && !host.includes('localhost')) {
-      return `https://${host}/api`;
-    }
-  } catch { /* ignore */ }
-
-  // 2. Manifest launchAsset URL — serve.js rewrites this to the request host
-  try {
-    const bundleUrl =
-      (Constants.manifest as Record<string, unknown> | null)?.['bundleUrl'] as string | undefined ??
-      (Constants as unknown as { manifest2?: { launchAsset?: { url?: string } } }).manifest2?.launchAsset?.url;
-    if (bundleUrl) {
-      const parsed = new URL(bundleUrl);
-      if (!parsed.hostname.startsWith('127.') && !parsed.hostname.includes('localhost')) {
-        return `https://${parsed.host}/api`;
-      }
-    }
-  } catch { /* ignore */ }
-
-  // 3. Explicit env var baked at build time from REPLIT_DOMAINS
+  // Native — EXPO_PUBLIC_API_URL is baked in at build time from REPLIT_DOMAINS.
+  // This is the production deployment domain and is correct for native iOS.
+  // Do NOT use Constants.linkingUri (routes through replit.com) or manifest URLs
+  // (serve from Expo subdomain which differs from the API domain).
   const explicit = process.env['EXPO_PUBLIC_API_URL'];
   if (explicit) return explicit;
 
-  // 4. Domain env var (dev workflow injects this)
+  // Dev fallback: EXPO_PUBLIC_DOMAIN injected by the dev workflow
   const domain = process.env['EXPO_PUBLIC_DOMAIN'];
   if (domain) return `https://${domain}/api`;
 

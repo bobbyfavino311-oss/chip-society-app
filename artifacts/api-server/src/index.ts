@@ -15,6 +15,8 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+logger.info({ domains: process.env['REPLIT_DOMAINS'] ?? 'unset' }, 'Production domains');
+
 const httpServer = createServer(app);
 setupSocketIO(httpServer);
 
