@@ -1,6 +1,6 @@
 kind = "mobile"
 previewPath = "/"
-title = "NEON RIVER - Poker"
+title = "CHIP SOCIETY"
 version = "1.0.0"
 id = "artifacts/neon-river"
 router = "expo-domain"
