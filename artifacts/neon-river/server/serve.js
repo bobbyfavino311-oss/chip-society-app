@@ -110,6 +110,11 @@ function serveManifest(req, platform, res) {
     "expo-protocol-version": "1",
     "expo-sfv-version": "0",
     "content-length": Buffer.byteLength(body),
+    // Force Expo Go to always re-fetch the manifest — never serve from cache.
+    // This ensures the device sees the latest bundle URL after each publish.
+    "cache-control": "no-store, no-cache, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "0",
   });
   res.end(body);
 }
@@ -130,6 +135,25 @@ function serveLandingPage(req, res, landingPageTemplate, appName) {
   res.end(html);
 }
 
+// Correct production API URL. REPLIT_DOMAINS is "replit.com" during the build
+// step (Expo proxy domain), so bundles get baked with the wrong URL. We patch
+// it at serve time so every bundle version delivers the right endpoint.
+const CORRECT_API_URL = "https://chip-society.replit.app/api";
+const WRONG_API_URLS = [
+  "https://replit.com/api",
+  "http://replit.com/api",
+];
+
+function patchBundle(content) {
+  let patched = content;
+  for (const wrong of WRONG_API_URLS) {
+    // Replace quoted string forms that Metro bakes in as env var substitutions
+    patched = patched.replaceAll(`"${wrong}"`, `"${CORRECT_API_URL}"`);
+    patched = patched.replaceAll(`'${wrong}'`, `'${CORRECT_API_URL}'`);
+  }
+  return patched;
+}
+
 function serveStaticFile(urlPath, res) {
   const safePath = path.normalize(urlPath).replace(/^(\.\.(\/|\\|$))+/, "");
   const filePath = path.join(STATIC_ROOT, safePath);
@@ -148,6 +172,17 @@ function serveStaticFile(urlPath, res) {
 
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
+
+  // Patch JS bundles to fix build-time API URL baking errors
+  if (ext === ".js") {
+    const text = fs.readFileSync(filePath, "utf-8");
+    const patched = patchBundle(text);
+    const buf = Buffer.from(patched, "utf-8");
+    res.writeHead(200, { "content-type": contentType, "content-length": buf.length });
+    res.end(buf);
+    return;
+  }
+
   const content = fs.readFileSync(filePath);
   res.writeHead(200, { "content-type": contentType });
   res.end(content);
