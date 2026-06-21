@@ -280,10 +280,8 @@ function getApiBase(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}/api`;
   }
-  // Native: explicit override (e.g. EXPO_PUBLIC_API_URL set in env/secrets)
-  const explicit = process.env['EXPO_PUBLIC_API_URL'];
-  if (explicit) return explicit;
-  // Native: derive from the Expo manifest bundle URL (works in Expo Go + production)
+  // Native: derive from the Expo manifest bundle URL first — the serve.js always
+  // rewrites this to the correct public origin, so it beats any stale baked-in env var.
   try {
     const bundleUrl =
       // Expo SDK ≤48 classic manifest
@@ -295,6 +293,9 @@ function getApiBase(): string {
       return `${parsed.protocol}//${parsed.host}/api`;
     }
   } catch { /* ignore parse errors */ }
+  // Native fallback: explicit env override baked at build time
+  const explicit = process.env['EXPO_PUBLIC_API_URL'];
+  if (explicit) return explicit;
   // Native dev: EXPO_PUBLIC_DOMAIN is injected by the dev workflow command
   const domain = process.env['EXPO_PUBLIC_DOMAIN'];
   if (domain) return `https://${domain}/api`;
