@@ -109,11 +109,11 @@ export default function SignInScreen() {
           </View>
 
           <View style={s.content}>
-            {/* Server status pill */}
+            {/* Server status pill — informational only */}
             <View style={s.serverPill}>
-              <View style={[s.serverDot, serverStatus === 'ok' ? s.dotOk : serverStatus === 'fail' ? s.dotFail : s.dotChecking]} />
+              <View style={[s.serverDot, serverStatus === 'ok' ? s.dotOk : serverStatus === 'fail' ? s.dotOffline : s.dotChecking]} />
               <Text style={s.serverPillText}>
-                {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? `Failed — ${serverUrl}` : 'Checking server…'}
+                {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? 'Offline mode' : 'Connecting…'}
               </Text>
             </View>
 
@@ -313,6 +313,7 @@ const s = StyleSheet.create({
   serverDot: { width: 7, height: 7, borderRadius: 4 },
   dotOk:       { backgroundColor: '#00ff88' },
   dotFail:     { backgroundColor: '#ff4466' },
-  dotChecking: { backgroundColor: 'rgba(255,255,255,0.35)' },
+  dotOffline:  { backgroundColor: 'rgba(255,255,255,0.35)' },
+  dotChecking: { backgroundColor: 'rgba(255,255,255,0.2)' },
   serverPillText: { fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: 0.5 },
 });

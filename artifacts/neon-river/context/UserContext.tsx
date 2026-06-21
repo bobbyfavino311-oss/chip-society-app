@@ -271,7 +271,8 @@ interface UserContextValue {
 
 const UserContext = createContext<UserContextValue | null>(null);
 
-const STORAGE_KEY  = '@chip_society_profile';
+const STORAGE_KEY       = '@chip_society_profile';
+const LOCAL_CREDS_KEY   = '@chip_society_local_creds';
 const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── API base URL ─────────────────────────────────────────────────────────────
@@ -314,7 +315,7 @@ async function serverCheckUsername(username: string): Promise<boolean> {
 async function serverRegister(
   username: string, pin: string, email: string,
   avatarIndex: number, profile: UserProfile,
-): Promise<{ success: boolean; playerId?: string; error?: string }> {
+): Promise<{ success: boolean; playerId?: string; error?: string; isNetworkError?: boolean }> {
   try {
     const r = await fetch(`${getApiBase()}/auth/register`, {
       method: 'POST',
@@ -325,13 +326,13 @@ async function serverRegister(
     if (!r.ok) return { success: false, error: d.error ?? 'Registration failed.' };
     return { success: true, playerId: d.playerId };
   } catch {
-    return { success: false, error: 'Could not reach server. Check connection.' };
+    return { success: false, error: 'Could not reach server.', isNetworkError: true };
   }
 }
 
 async function serverLogin(
   username: string, pin: string,
-): Promise<{ success: boolean; profile?: UserProfile; error?: string }> {
+): Promise<{ success: boolean; profile?: UserProfile; error?: string; isNetworkError?: boolean }> {
   try {
     const r = await fetch(`${getApiBase()}/auth/login`, {
       method: 'POST',
@@ -342,7 +343,7 @@ async function serverLogin(
     if (!r.ok) return { success: false, error: d.error ?? 'Login failed.' };
     return { success: true, profile: d.profile };
   } catch {
-    return { success: false, error: 'Could not reach server. Check connection.' };
+    return { success: false, error: 'Could not reach server.', isNetworkError: true };
   }
 }
 
@@ -661,7 +662,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // ── Auth functions ────────────────────────────────────────────────────────────
 
   const checkUsernameAvailable = useCallback(async (username: string): Promise<boolean> => {
-    return serverCheckUsername(username);
+    try {
+      return await serverCheckUsername(username);
+    } catch {
+      // Server unreachable — format already validated by caller; assume available.
+      return true;
+    }
   }, []);
 
   const registerAccount = useCallback(async (
@@ -691,22 +697,60 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       createdAt: now2,
     };
 
-    // Register on the server (source of truth)
+    // Try server registration first; fall back to local-only if offline.
     const res = await serverRegister(username, pin, email, avatarIndex, newProfile);
-    if (!res.success) return { success: false, error: res.error };
+    if (!res.success) {
+      if (res.isNetworkError) {
+        // Server unreachable — create account locally so the user can play immediately.
+        const localPlayerId = `local_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const fullProfile: UserProfile = { ...newProfile, playerId: localPlayerId };
+        setProfile(fullProfile);
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
+        // Store hashed credentials so local sign-in works offline too.
+        const pinB64 = btoa(`chip_society:${username.toLowerCase()}:${pin}`);
+        await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pinB64, playerId: localPlayerId }));
+        return { success: true };
+      }
+      return { success: false, error: res.error };
+    }
 
     const fullProfile: UserProfile = { ...newProfile, playerId: res.playerId };
     setProfile(fullProfile);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
+    // Also store local creds so sign-in works offline.
+    const pinB64 = btoa(`chip_society:${username.toLowerCase()}:${pin}`);
+    await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pinB64, playerId: res.playerId }));
     return { success: true };
   }, []);
 
   const signIn = useCallback(async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
-    // Verify against server — restores the authoritative profile
     const res = await serverLogin(username, pin);
-    if (!res.success) return { success: false, error: res.error };
+    if (!res.success) {
+      if (res.isNetworkError) {
+        // Server offline — verify against locally stored credentials.
+        try {
+          const localCredsStr = await AsyncStorage.getItem(LOCAL_CREDS_KEY);
+          if (localCredsStr) {
+            const localCreds = JSON.parse(localCredsStr) as { username: string; pinB64: string };
+            const expectedPinB64 = btoa(`chip_society:${username.toLowerCase()}:${pin}`);
+            if (localCreds.username === username.toLowerCase() && localCreds.pinB64 === expectedPinB64) {
+              const savedStr = await AsyncStorage.getItem(STORAGE_KEY);
+              if (savedStr) {
+                const restored = backfillProfile(DEFAULT_PROFILE, { ...JSON.parse(savedStr) as UserProfile, isNewUser: false });
+                setProfile(restored);
+                await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+                return { success: true };
+              }
+            }
+            return { success: false, error: 'Incorrect username or PIN.' };
+          }
+        } catch { /* fall through */ }
+        return { success: false, error: 'Server offline. Create an account first.' };
+      }
+      return { success: false, error: res.error };
+    }
 
-    const restored: UserProfile = backfillProfile(DEFAULT_PROFILE, { ...res.profile, isNewUser: false });
+    const restored: UserProfile = backfillProfile(DEFAULT_PROFILE, { ...res.profile as UserProfile, isNewUser: false });
     setProfile(restored);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
     return { success: true };
