@@ -104,6 +104,16 @@ function serveManifest(req, platform, res) {
     manifestObj.bundleUrl = rewriteUrl(manifestObj.bundleUrl);
   }
 
+  // Always inject the correct production API URL into the manifest extra.
+  // The build step runs with REPLIT_DOMAINS="replit.com" (Expo proxy domain),
+  // so any build-time computation of apiUrl ends up wrong. We fix it here at
+  // serve time using the actual request host from the Replit proxy headers.
+  const correctApiUrl = `${protocol}://${host}/api`;
+  if (!manifestObj.extra) manifestObj.extra = {};
+  if (!manifestObj.extra.expoClient) manifestObj.extra.expoClient = {};
+  if (!manifestObj.extra.expoClient.extra) manifestObj.extra.expoClient.extra = {};
+  manifestObj.extra.expoClient.extra.apiUrl = correctApiUrl;
+
   const body = JSON.stringify(manifestObj);
   res.writeHead(200, {
     "content-type": "application/json",

@@ -282,15 +282,20 @@ export function getApiBase(): string {
     return `${window.location.origin}/api`;
   }
 
-  // Native: read apiUrl injected into the manifest by build.js.
-  // Expo Go always re-fetches the manifest on open, so Constants.expoConfig.extra.apiUrl
-  // is always fresh — even when the JS bundle itself is cached on the device.
+  // Native: read apiUrl injected live into the manifest by serve.js.
+  // serve.js sets this from the request host headers (always correct at runtime).
+  // Reject any value that contains "replit.com" — that is the Expo proxy host,
+  // not the actual app domain, and cannot serve the API.
   const fromManifest = (Constants.expoConfig?.extra as Record<string, unknown> | undefined)?.apiUrl;
-  if (typeof fromManifest === 'string' && fromManifest.startsWith('https://')) {
+  if (
+    typeof fromManifest === 'string' &&
+    fromManifest.startsWith('https://') &&
+    !fromManifest.includes('replit.com')
+  ) {
     return fromManifest;
   }
 
-  // Hardcoded production fallback — chip-society.replit.app confirmed reachable.
+  // Hardcoded production fallback — chip-society.replit.app confirmed reachable (HTTP 200).
   return 'https://chip-society.replit.app/api';
 }
 
