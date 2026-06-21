@@ -1,0 +1,232 @@
+Fix the account persistence issue immediately.
+
+CURRENT PROBLEM
+
+Every time the app is republished or updated, my player account gets deleted or reset.
+
+This is a critical bug.
+
+The app will have constant updates, patches, and republishing during development and after launch. Player accounts cannot be wiped every time the app is republished.
+
+This must be fixed before any public release.
+
+⸻
+
+REQUIRED BEHAVIOR
+
+Player accounts must persist permanently across:
+
+* App republishes
+* App updates
+* New builds
+* Bug fix deployments
+* UI changes
+* Feature updates
+* Server updates
+* Client refreshes
+* Device restarts
+* Player logout/login
+
+Republishing the app must never delete player accounts.
+
+⸻
+
+ACCOUNT DATA THAT MUST BE SAVED
+
+The following data must persist server-side:
+
+* Username
+* 4-digit PIN login
+* Player ID
+* Avatar selection
+* Chip balance
+* Lottery tickets
+* Fortune cookies
+* XP
+* Level
+* Rank
+* Achievements
+* Tutorial completion
+* Player stats
+* Social posts
+* Inventory items
+* Cosmetics
+* Tournament history
+* Settings
+* Daily reward progress
+* Login streak
+* All purchased or earned items
+
+⸻
+
+ROOT CAUSE TO CHECK
+
+Investigate whether the app is currently storing player accounts in temporary/local build storage.
+
+Possible causes:
+
+* Accounts are being stored only in localStorage.
+* Accounts are being stored only on device memory.
+* Database is being reset on publish.
+* Player data is tied to build version.
+* Republish process wipes seed/demo data.
+* Authentication system creates a new account every time.
+* Player ID is not being reused correctly.
+* Username/PIN login is not pulling the existing server record.
+* Tutorial completion is not saved server-side.
+* App is overwriting existing users with blank starter profiles.
+
+⸻
+
+REQUIRED FIX
+
+Move all player account data to persistent server-side storage.
+
+Use a stable unique Player ID that never changes.
+
+Username + 4-digit PIN must log the player back into the same account every time.
+
+When a player logs in:
+
+1. Search server database for username.
+2. Verify PIN.
+3. Load existing Player ID.
+4. Load saved account data.
+5. Restore avatar, chips, XP, level, rank, inventory, tutorial completion, stats, and progress.
+6. Do NOT create a new account if the username already exists.
+
+⸻
+
+DO NOT RESET DATABASE ON PUBLISH
+
+Republishing the app must not clear:
+
+* Users table
+* Player profiles
+* Inventory
+* Progress
+* Stats
+* Social data
+* Rewards
+* Tutorial status
+
+No update should reset production player data.
+
+⸻
+
+SEPARATE DEVELOPMENT DATA FROM REAL PLAYER DATA
+
+Create separate environments:
+
+* Development
+* Testing
+* Production
+
+Test accounts may be reset only in development/testing.
+
+Production player accounts must never be reset during a republish.
+
+⸻
+
+MIGRATION SAFETY
+
+If database schema changes are required, use safe migrations.
+
+Do not drop existing tables.
+
+Do not wipe user records.
+
+Do not recreate the database from scratch.
+
+Do not overwrite existing profiles with default data.
+
+Use additive migrations when possible.
+
+Example:
+
+Add new column:
+safe
+
+Delete users table:
+not allowed
+
+⸻
+
+LOGIN FLOW REQUIREMENTS
+
+Username + 4-digit PIN login must work consistently.
+
+If account exists:
+
+* Load existing account.
+
+If account does not exist:
+
+* Create new account.
+
+If PIN is wrong:
+
+* Show incorrect PIN error.
+
+Do not create duplicate accounts with the same username.
+
+Do not reset the account.
+
+⸻
+
+TUTORIAL COMPLETION BUG
+
+The tutorial state must persist.
+
+If a player already completed the tutorial:
+
+* Do not force tutorial again.
+* Do not trap player in tutorial menu.
+* Do not reset progress.
+
+Tutorial completion must be stored server-side under the player profile.
+
+⸻
+
+TESTING REQUIREMENTS
+
+Test this exact flow:
+
+1. Create account.
+2. Choose avatar.
+3. Earn chips.
+4. Earn XP.
+5. Receive cookies/tickets.
+6. Complete tutorial.
+7. Log out.
+8. Republish app.
+9. Reopen app.
+10. Login with same username and PIN.
+11. Confirm the same account loads.
+
+Verify:
+
+* Same username
+* Same Player ID
+* Same avatar
+* Same chip balance
+* Same XP
+* Same level
+* Same rank
+* Same inventory
+* Same tutorial status
+* Same stats
+* Same posts
+* Same rewards
+
+⸻
+
+CRITICAL REQUIREMENT
+
+No player account should ever be deleted because of a republish.
+
+No player should ever lose progress because of an update.
+
+No login should create a duplicate account when the username already exists.
+
+This is a launch-blocking issue and must be fixed immediately.

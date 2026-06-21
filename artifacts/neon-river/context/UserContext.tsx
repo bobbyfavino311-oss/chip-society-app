@@ -125,6 +125,7 @@ const REGISTERED_CHIPS      = 50_000;
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface UserProfile {
+  playerId?: string;
   username: string;
   email: string;
   chips: number;
@@ -176,26 +177,6 @@ export interface UserProfile {
   biggestTournamentPrize: number;
 }
 
-// Stored account record (for sign-in lookup)
-interface StoredAccount {
-  username: string;
-  email: string;
-  avatarIndex: number;
-  createdAt: string;
-  pinHash: string;
-  profile: UserProfile;
-}
-
-// FNV-1a 32-bit hash for PIN — never store PINs in plaintext
-function hashPin(pin: string, salt: string): string {
-  const input = `chip_society::${salt.toLowerCase()}::${pin}`;
-  let h = 0x811c9dc5;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h.toString(16).padStart(8, '0');
-}
 
 const DEFAULT_PROFILE: UserProfile = {
   username: 'CS_Player',
@@ -291,19 +272,130 @@ const UserContext = createContext<UserContextValue | null>(null);
 
 const STORAGE_KEY  = '@chip_society_profile';
 const LEGACY_KEY   = '@neon_river_profile';
-const ACCOUNTS_KEY = '@chip_society_accounts';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-async function loadAccounts(): Promise<StoredAccount[]> {
-  try {
-    const raw = await AsyncStorage.getItem(ACCOUNTS_KEY);
-    return raw ? (JSON.parse(raw) as StoredAccount[]) : [];
-  } catch { return []; }
+// ─── API base URL ─────────────────────────────────────────────────────────────
+function getApiBase(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}/api`;
+  }
+  return process.env['EXPO_PUBLIC_API_URL'] ?? '/api';
 }
 
-async function saveAccounts(accounts: StoredAccount[]): Promise<void> {
-  await AsyncStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+// ─── Server API helpers ───────────────────────────────────────────────────────
+
+async function serverCheckUsername(username: string): Promise<boolean> {
+  try {
+    const r = await fetch(`${getApiBase()}/auth/check-username/${encodeURIComponent(username)}`);
+    if (!r.ok) return true; // assume available on error (server will enforce)
+    const d = await r.json() as { available: boolean };
+    return d.available;
+  } catch { return true; }
+}
+
+async function serverRegister(
+  username: string, pin: string, email: string,
+  avatarIndex: number, profile: UserProfile,
+): Promise<{ success: boolean; playerId?: string; error?: string }> {
+  try {
+    const r = await fetch(`${getApiBase()}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, pin, email, avatarIndex, profile }),
+    });
+    const d = await r.json() as { success?: boolean; playerId?: string; error?: string };
+    if (!r.ok) return { success: false, error: d.error ?? 'Registration failed.' };
+    return { success: true, playerId: d.playerId };
+  } catch {
+    return { success: false, error: 'Could not reach server. Check connection.' };
+  }
+}
+
+async function serverLogin(
+  username: string, pin: string,
+): Promise<{ success: boolean; profile?: UserProfile; error?: string }> {
+  try {
+    const r = await fetch(`${getApiBase()}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, pin }),
+    });
+    const d = await r.json() as { success?: boolean; profile?: UserProfile; error?: string };
+    if (!r.ok) return { success: false, error: d.error ?? 'Login failed.' };
+    return { success: true, profile: d.profile };
+  } catch {
+    return { success: false, error: 'Could not reach server. Check connection.' };
+  }
+}
+
+async function serverSaveProfile(playerId: string, profile: UserProfile): Promise<void> {
+  try {
+    await fetch(`${getApiBase()}/auth/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerId, profile }),
+    });
+  } catch { /* silent — local cache still has data */ }
+}
+
+async function serverChangePin(playerId: string, oldPin: string, newPin: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const r = await fetch(`${getApiBase()}/auth/change-pin`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerId, oldPin, newPin }),
+    });
+    const d = await r.json() as { success?: boolean; error?: string };
+    if (!r.ok) return { success: false, error: d.error ?? 'Failed to change PIN.' };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Could not reach server.' };
+  }
+}
+
+async function serverForgotPin(username: string, email: string, newPin: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const r = await fetch(`${getApiBase()}/auth/forgot-pin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, newPin }),
+    });
+    const d = await r.json() as { success?: boolean; error?: string };
+    if (!r.ok) return { success: false, error: d.error ?? 'Failed to reset PIN.' };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Could not reach server.' };
+  }
+}
+
+// ─── Profile backfill (merge saved fields onto defaults) ──────────────────────
+function backfillProfile(base: UserProfile, saved: Partial<UserProfile>): UserProfile {
+  return {
+    ...base,
+    ...saved,
+    chips: saved.chips ?? 0,
+    accountType: 'registered',
+    email: saved.email ?? '',
+    createdAt: saved.createdAt ?? new Date().toISOString(),
+    tutorialCompleted: saved.tutorialCompleted ?? false,
+    profileImageType: saved.profileImageType ?? (saved.avatarUri ? 'custom' : 'symbol'),
+    symbolIndex: saved.symbolIndex ?? 0,
+    tournamentWins: saved.tournamentWins ?? 0,
+    tournamentLosses: saved.tournamentLosses ?? 0,
+    bestTournamentFinish: saved.bestTournamentFinish ?? 0,
+    biggestTournamentPrize: saved.biggestTournamentPrize ?? 0,
+    commonCookies:    saved.commonCookies    ?? (saved as any).fortuneCookies ?? 0,
+    uncommonCookies:  saved.uncommonCookies  ?? (saved as any).goldenCookies  ?? 0,
+    rareCookies:      saved.rareCookies      ?? (saved as any).dragonCookies  ?? 0,
+    epicCookies:      saved.epicCookies      ?? 0,
+    legendaryCookies: saved.legendaryCookies ?? 0,
+    mythicCookies:    saved.mythicCookies    ?? 0,
+    commonCookiesOpened:    saved.commonCookiesOpened    ?? 0,
+    uncommonCookiesOpened:  saved.uncommonCookiesOpened  ?? 0,
+    rareCookiesOpened:      saved.rareCookiesOpened      ?? 0,
+    epicCookiesOpened:      saved.epicCookiesOpened      ?? 0,
+    legendaryCookiesOpened: saved.legendaryCookiesOpened ?? 0,
+    mythicCookiesOpened:    saved.mythicCookiesOpened    ?? 0,
+  };
 }
 
 const PROFANITY_LIST = ['fuck', 'shit', 'ass', 'bitch', 'dick', 'cunt', 'nigger', 'faggot'];
@@ -323,6 +415,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [isLoaded, setIsLoaded] = useState(false);
   const [now, setNow] = useState(Date.now());
+  const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30_000);
@@ -331,64 +424,34 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     (async () => {
+      // 1. Load local cache instantly for snappy UI
       let data = await AsyncStorage.getItem(STORAGE_KEY);
       if (!data) data = await AsyncStorage.getItem(LEGACY_KEY);
       if (data) {
         try {
           const saved = JSON.parse(data) as Partial<UserProfile>;
-          setProfile(p => ({
-            ...p,
-            ...saved,
-            chips: saved.chips ?? 0,
-            // Backfill new fields for existing installs
-            accountType: 'registered',
-            email: saved.email ?? '',
-            createdAt: saved.createdAt ?? new Date().toISOString(),
-            tutorialCompleted: saved.tutorialCompleted ?? false,
-            profileImageType: saved.profileImageType ?? (saved.avatarUri ? 'custom' : 'character'),
-            symbolIndex: saved.symbolIndex ?? 0,
-            tournamentWins: saved.tournamentWins ?? 0,
-            tournamentLosses: saved.tournamentLosses ?? 0,
-            bestTournamentFinish: saved.bestTournamentFinish ?? 0,
-            biggestTournamentPrize: saved.biggestTournamentPrize ?? 0,
-            // Migrate old cookie field names → new 6-tier system
-            commonCookies:    saved.commonCookies    ?? (saved as any).fortuneCookies ?? 0,
-            uncommonCookies:  saved.uncommonCookies   ?? (saved as any).goldenCookies  ?? 0,
-            rareCookies:      saved.rareCookies       ?? (saved as any).dragonCookies  ?? 0,
-            epicCookies:      saved.epicCookies      ?? 0,
-            legendaryCookies: saved.legendaryCookies ?? 0,
-            mythicCookies:    saved.mythicCookies    ?? 0,
-            commonCookiesOpened:    saved.commonCookiesOpened    ?? 0,
-            uncommonCookiesOpened:  saved.uncommonCookiesOpened  ?? 0,
-            rareCookiesOpened:      saved.rareCookiesOpened      ?? 0,
-            epicCookiesOpened:      saved.epicCookiesOpened      ?? 0,
-            legendaryCookiesOpened: saved.legendaryCookiesOpened ?? 0,
-            mythicCookiesOpened:    saved.mythicCookiesOpened    ?? 0,
-          }));
+          setProfile(p => backfillProfile(p, saved));
         } catch {}
       }
       setIsLoaded(true);
     })();
   }, []);
 
-  const save = useCallback(async (updated: UserProfile) => {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    // Keep the accounts list in sync so signIn() always restores the latest
-    // profile state, not the stale registration-time snapshot.
-    if (updated.username && updated.username !== DEFAULT_PROFILE.username) {
-      try {
-        const accounts = await loadAccounts();
-        const idx = accounts.findIndex(
-          a => a.username.toLowerCase() === updated.username.toLowerCase()
-        );
-        if (idx >= 0) {
-          const synced = [...accounts];
-          synced[idx] = { ...synced[idx], profile: updated };
-          await saveAccounts(synced);
-        }
-      } catch {}
-    }
+  // Debounced server sync — fires 8 s after the last save() call
+  const scheduleSyncToServer = useCallback((updated: UserProfile) => {
+    if (!updated.playerId || updated.username === DEFAULT_PROFILE.username) return;
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    syncTimerRef.current = setTimeout(() => {
+      void serverSaveProfile(updated.playerId!, updated);
+    }, 8_000);
   }, []);
+
+  const save = useCallback(async (updated: UserProfile) => {
+    // Always write to local cache immediately (fast / offline-safe)
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    // Queue a server sync so data survives republishes
+    scheduleSyncToServer(updated);
+  }, [scheduleSyncToServer]);
 
   const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
     setProfile(prev => {
@@ -579,8 +642,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // ── Auth functions ────────────────────────────────────────────────────────────
 
   const checkUsernameAvailable = useCallback(async (username: string): Promise<boolean> => {
-    const accounts = await loadAccounts();
-    return !accounts.some(a => a.username.toLowerCase() === username.toLowerCase());
+    return serverCheckUsername(username);
   }, []);
 
   const registerAccount = useCallback(async (
@@ -596,10 +658,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (isReserved(username)) return { success: false, error: 'That username is reserved.' };
     if (!/^\d{4}$/.test(pin)) return { success: false, error: 'PIN must be exactly 4 digits.' };
 
-    const accounts = await loadAccounts();
-    const taken = accounts.some(a => a.username.toLowerCase() === username.toLowerCase());
-    if (taken) return { success: false, error: 'Username is already taken.' };
-
     const now2 = new Date().toISOString();
     const newProfile: UserProfile = {
       ...DEFAULT_PROFILE,
@@ -614,27 +672,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       createdAt: now2,
     };
 
-    const pinHash = hashPin(pin, username);
-    const account: StoredAccount = { username, email, avatarIndex, createdAt: now2, pinHash, profile: newProfile };
-    await saveAccounts([...accounts, account]);
+    // Register on the server (source of truth)
+    const res = await serverRegister(username, pin, email, avatarIndex, newProfile);
+    if (!res.success) return { success: false, error: res.error };
 
-    setProfile(newProfile);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newProfile));
+    const fullProfile: UserProfile = { ...newProfile, playerId: res.playerId };
+    setProfile(fullProfile);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
     return { success: true };
   }, []);
 
   const signIn = useCallback(async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
-    const accounts = await loadAccounts();
-    const found = accounts.find(a => a.username.toLowerCase() === username.toLowerCase());
-    if (!found) return { success: false, error: 'No account found with that username.' };
+    // Verify against server — restores the authoritative profile
+    const res = await serverLogin(username, pin);
+    if (!res.success) return { success: false, error: res.error };
 
-    // Verify PIN (backward-compat: allow no-pin accounts created before this update)
-    if (found.pinHash) {
-      const expected = hashPin(pin, username);
-      if (found.pinHash !== expected) return { success: false, error: 'Incorrect PIN.' };
-    }
-
-    const restored: UserProfile = { ...found.profile, isNewUser: false };
+    const restored: UserProfile = backfillProfile(DEFAULT_PROFILE, { ...res.profile, isNewUser: false });
     setProfile(restored);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
     return { success: true };
@@ -642,56 +695,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const changePin = useCallback(async (oldPin: string, newPin: string): Promise<{ success: boolean; error?: string }> => {
     if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'New PIN must be exactly 4 digits.' };
-    const accounts = await loadAccounts();
-    const idx = accounts.findIndex(a => a.username.toLowerCase() === profile.username.toLowerCase());
-    if (idx < 0) return { success: false, error: 'Account not found.' };
-    const acc = accounts[idx];
-    if (acc.pinHash) {
-      const expected = hashPin(oldPin, profile.username);
-      if (acc.pinHash !== expected) return { success: false, error: 'Current PIN is incorrect.' };
-    }
-    const updated = [...accounts];
-    updated[idx] = { ...acc, pinHash: hashPin(newPin, profile.username) };
-    await saveAccounts(updated);
-    return { success: true };
-  }, [profile.username]);
+    if (!profile.playerId) return { success: false, error: 'Account not found. Please sign in again.' };
+    return serverChangePin(profile.playerId, oldPin, newPin);
+  }, [profile.playerId]);
 
   const forgotPin = useCallback(async (username: string, email: string, newPin: string): Promise<{ success: boolean; error?: string }> => {
     if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'New PIN must be exactly 4 digits.' };
-    const accounts = await loadAccounts();
-    const idx = accounts.findIndex(a => a.username.toLowerCase() === username.toLowerCase());
-    if (idx < 0) return { success: false, error: 'No account found with that username.' };
-    const acc = accounts[idx];
-    if (acc.email && acc.email.toLowerCase() !== email.toLowerCase()) {
-      return { success: false, error: 'Email does not match our records.' };
-    }
-    const updated = [...accounts];
-    updated[idx] = { ...acc, pinHash: hashPin(newPin, username) };
-    await saveAccounts(updated);
-    return { success: true };
+    return serverForgotPin(username, email, newPin);
   }, []);
 
   const signOut = useCallback(async () => {
-    // Flush the current in-memory profile to accounts before clearing the session.
-    // This is the safety net for existing installs where save() may not have synced yet.
+    // Flush to server immediately before clearing session
     setProfile(current => {
-      if (current.username && current.username !== DEFAULT_PROFILE.username) {
-        void (async () => {
-          try {
-            const accounts = await loadAccounts();
-            const idx = accounts.findIndex(
-              a => a.username.toLowerCase() === current.username.toLowerCase()
-            );
-            if (idx >= 0) {
-              const synced = [...accounts];
-              synced[idx] = { ...synced[idx], profile: current };
-              await saveAccounts(synced);
-            }
-          } catch {}
-        })();
+      if (current.playerId && current.username !== DEFAULT_PROFILE.username) {
+        void serverSaveProfile(current.playerId, current);
       }
       return { ...DEFAULT_PROFILE };
     });
+    if (syncTimerRef.current) { clearTimeout(syncTimerRef.current); syncTimerRef.current = null; }
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...DEFAULT_PROFILE }));
   }, []);
 
