@@ -276,20 +276,15 @@ const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── API base URL ─────────────────────────────────────────────────────────────
 export function getApiBase(): string {
-  // Web (Expo web / Safari): use window.location so relative routing works
-  if (typeof window !== 'undefined' && window.location?.origin) {
+  // Web browser (Expo web / Safari): use window.location origin.
+  // In React Native, window.location is undefined so this is safely skipped.
+  if (typeof window !== 'undefined' && window.location != null && window.location.origin) {
     return `${window.location.origin}/api`;
   }
 
-  // Native: EXPO_PUBLIC_API_URL is baked in at build time.
-  // Accept it only if it's NOT the replit.com proxy domain — during production
-  // builds, REPLIT_DOMAINS is replit.com (Expo routing proxy), not the actual
-  // deployed app domain. Dev builds bake the janeway.replit.dev domain, which works.
-  const explicit = process.env['EXPO_PUBLIC_API_URL'];
-  if (explicit && !explicit.includes('replit.com')) return explicit;
-
-  // Production hardcoded fallback — chip-society.replit.app confirmed reachable.
-  // This is the permanent public deployment domain for this app.
+  // Native iOS — always use the confirmed production domain.
+  // Note: REPLIT_DOMAINS is replit.com during Replit production builds (Expo proxy),
+  // so any baked-in env var is unreliable. This constant is the real deployed domain.
   return 'https://chip-society.replit.app/api';
 }
 
