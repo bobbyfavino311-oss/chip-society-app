@@ -32,7 +32,7 @@ import { NotificationProvider } from '@/context/NotificationContext';
 import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import TutorialOverlay from '@/components/TutorialOverlay';
-import { SoundEngine } from '@/lib/soundEngine';
+import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 
 SplashScreen.preventAutoHideAsync();
@@ -43,6 +43,11 @@ const queryClient = new QueryClient();
 
 function SoundSyncer() {
   const { masterVolume, effectsVolume, isMuted, isVibrationEnabled, musicVolume, isMusicMuted } = useSoundSettings();
+  React.useEffect(() => {
+    // Prime the audio session on mount — enables playsInSilentModeIOS and
+    // shouldDuckAndroid so the first sound plays without any gap on mobile.
+    void unlockAudio();
+  }, []);
   React.useEffect(() => {
     SoundEngine.configure({ masterVolume, effectsVolume, muted: isMuted, vibration: isVibrationEnabled });
   }, [masterVolume, effectsVolume, isMuted, isVibrationEnabled]);

@@ -252,7 +252,7 @@ export default function WheelScreen() {
     await claimWheelSpin(seg.chips, seg.ticket);
     if (seg.xp > 0) await updateProfile({ xp: profile.xp + seg.xp });
     if (seg.cookie > 0 || seg.goldenCookie > 0) await addFortuneCookies(seg.cookie, seg.goldenCookie, 0);
-    SoundEngine.claim();
+    SoundEngine.prizeCollect();
   }, [winner, claimed, claimWheelSpin, updateProfile, profile.xp]);
 
   const seg = winner !== null ? SEGMENTS[winner] : null;

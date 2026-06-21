@@ -1,26 +1,38 @@
 /**
- * CHIP SOCIETY — Sound Engine
+ * CHIP SOCIETY — Sound Engine  v2
  *
- * All SFX use expo-av on EVERY platform (web + native) so the sounds are
- * always identical. Web Audio API is kept only for sounds that have no
- * bundled asset (neonBuzz, showdown).
+ * Every sound uses expo-av on ALL platforms (web + native) so behaviour is
+ * identical everywhere.  The Web Audio API is kept ONLY for web-only ambient
+ * atmosphere (showdown hit, neonBuzz).  It is NEVER used as a fallback for a
+ * sound that has a bundled WAV asset.
  *
- * Volume / mute / FX state injected by SoundProvider via configure().
+ * New in v2
+ * ─────────
+ * • 19 new dedicated WAV files — no more pitch-shifting one file for another
+ * • unlockAudio() — call on first user tap to prime iOS / Android audio context
+ * • prizeCollect() — distinct coin-shower sound (≠ chipCollect, ≠ achievement)
+ * • lotteryScratch() — dedicated scratch texture
+ * • lotteryReveal() — dedicated 3-note reveal fanfare
+ * • tournamentWin() — grand fanfare
+ * • error() — descending buzz
+ * • betPlaced() — single chip thump
+ * • All Fortune Cookie sounds now use dedicated WAV files on every platform
+ *
+ * Volume / mute state injected by SoundProvider via configure().
  * DO NOT touch background music here — only SFX.
  */
 
-import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Audio } from 'expo-av';
+import { Audio }    from 'expo-av';
 
-// ── Runtime config ────────────────────────────────────────────────────────────
+// ── Runtime config ─────────────────────────────────────────────────────────────
 
 let _volume    = 0.72;
 let _muted     = false;
 let _fxEnabled = true;
 let _vibration = true;
 
-// ── Audio session ─────────────────────────────────────────────────────────────
+// ── Audio session ──────────────────────────────────────────────────────────────
 
 let _audioReady = false;
 async function ensureAudio() {
@@ -35,9 +47,19 @@ async function ensureAudio() {
   } catch {}
 }
 
+/**
+ * unlockAudio — call on the very first user interaction (e.g. first tap).
+ * Primes the iOS / Android audio context so subsequent sounds play without
+ * any delay.  Safe to call multiple times (no-ops after first call).
+ */
+export async function unlockAudio() {
+  await ensureAudio();
+}
+
 // ── Asset map (static requires — Metro needs them at build time) ───────────────
 
 const ASSETS = {
+  // ── Poker table ──────────────────────────────────────────────────────────────
   deal:               require('../assets/sounds/deal.wav'),
   chip_click:         require('../assets/sounds/chip_click.wav'),
   chip_collect:       require('../assets/sounds/chip_collect.wav'),
@@ -48,28 +70,53 @@ const ASSETS = {
   allin:              require('../assets/sounds/allin.wav'),
   win:                require('../assets/sounds/win.wav'),
   lose:               require('../assets/sounds/lose.wav'),
+  card_flip:          require('../assets/sounds/card_flip.wav'),
+  // ── UI ───────────────────────────────────────────────────────────────────────
   button:             require('../assets/sounds/button.wav'),
   notification:       require('../assets/sounds/notification.wav'),
-  card_flip:          require('../assets/sounds/card_flip.wav'),
+  // ── Progression ──────────────────────────────────────────────────────────────
   achievement_unlock: require('../assets/sounds/achievement_unlock.wav'),
   level_up:           require('../assets/sounds/level_up.wav'),
-  claim_sound:        require('../assets/sounds/claim_sound.mp3'),
+  // ── Rewards (new, dedicated) ─────────────────────────────────────────────────
+  prize_collect:      require('../assets/sounds/prize_collect.wav'),
+  bet_placed:         require('../assets/sounds/bet_placed.wav'),
+  // ── Lottery ──────────────────────────────────────────────────────────────────
+  lottery_scratch:    require('../assets/sounds/lottery_scratch.wav'),
+  lottery_reveal:     require('../assets/sounds/lottery_reveal.wav'),
+  // ── Tournament ───────────────────────────────────────────────────────────────
+  tournament_win:     require('../assets/sounds/tournament_win.wav'),
+  // ── Feedback ─────────────────────────────────────────────────────────────────
+  error:              require('../assets/sounds/error.wav'),
+  // ── Fortune Cookie — crack (per tier) ────────────────────────────────────────
+  cookie_crack_common:    require('../assets/sounds/cookie_crack_common.wav'),
+  cookie_crack_uncommon:  require('../assets/sounds/cookie_crack_uncommon.wav'),
+  cookie_crack_rare:      require('../assets/sounds/cookie_crack_rare.wav'),
+  cookie_crack_epic:      require('../assets/sounds/cookie_crack_epic.wav'),
+  cookie_crack_legendary: require('../assets/sounds/cookie_crack_legendary.wav'),
+  cookie_crack_mythic:    require('../assets/sounds/cookie_crack_mythic.wav'),
+  // ── Fortune Cookie — reward reveal (per tier) ────────────────────────────────
+  cookie_reveal_common:    require('../assets/sounds/cookie_reveal_common.wav'),
+  cookie_reveal_uncommon:  require('../assets/sounds/cookie_reveal_uncommon.wav'),
+  cookie_reveal_rare:      require('../assets/sounds/cookie_reveal_rare.wav'),
+  cookie_reveal_epic:      require('../assets/sounds/cookie_reveal_epic.wav'),
+  cookie_reveal_legendary: require('../assets/sounds/cookie_reveal_legendary.wav'),
+  cookie_reveal_mythic:    require('../assets/sounds/cookie_reveal_mythic.wav'),
+  // ── Fortune Cookie — slip rise ───────────────────────────────────────────────
+  fortune_rise:       require('../assets/sounds/fortune_rise.wav'),
 } as const;
 
 type SoundName = keyof typeof ASSETS;
 
-// ── Core playback — works on web AND native via expo-av ───────────────────────
+// ── Core playback — expo-av on every platform ──────────────────────────────────
 
-function play(name: SoundName, opts: { rate?: number; volume?: number } = {}) {
+function play(name: SoundName, opts: { volume?: number } = {}) {
   if (_muted || !_fxEnabled || _volume <= 0) return;
   void (async () => {
     try {
       await ensureAudio();
       const { sound } = await Audio.Sound.createAsync(ASSETS[name], {
-        volume:             Math.min(1, (opts.volume ?? 1) * _volume),
-        shouldPlay:         true,
-        rate:               opts.rate ?? 1.0,
-        shouldCorrectPitch: opts.rate !== undefined ? false : true,
+        volume:     Math.min(1, (opts.volume ?? 1) * _volume),
+        shouldPlay: true,
       });
       sound.setOnPlaybackStatusUpdate(status => {
         if (status.isLoaded && status.didJustFinish) void sound.unloadAsync();
@@ -78,11 +125,10 @@ function play(name: SoundName, opts: { rate?: number; volume?: number } = {}) {
   })();
 }
 
-// ── Web Audio helpers (only used for sounds with NO bundled asset) ─────────────
+// ── Web Audio helpers — ONLY for atmosphere with no bundled asset ──────────────
 
 let _ctx: AudioContext | null = null;
 function getCtx(): AudioContext | null {
-  if (Platform.OS !== 'web') return null;
   try {
     if (typeof window === 'undefined') return null;
     const Win = window as Window & { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext };
@@ -93,7 +139,7 @@ function getCtx(): AudioContext | null {
     return _ctx;
   } catch { return null; }
 }
-function tone(freq: number, type: OscillatorType, duration: number, vol = 0.3, delay = 0, freqEnd?: number) {
+function waTone(freq: number, type: OscillatorType, duration: number, vol = 0.3, delay = 0, freqEnd?: number) {
   const ctx = getCtx(); if (!ctx) return;
   const t = ctx.currentTime + delay;
   const osc = ctx.createOscillator(); const gain = ctx.createGain();
@@ -104,7 +150,7 @@ function tone(freq: number, type: OscillatorType, duration: number, vol = 0.3, d
   gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
   osc.connect(gain); gain.connect(ctx.destination); osc.start(t); osc.stop(t + duration + 0.02);
 }
-function noise(duration: number, vol = 0.12, loFreq = 200, hiFreq = 3000, delay = 0) {
+function waNoise(duration: number, vol = 0.12, loFreq = 200, hiFreq = 3000, delay = 0) {
   const ctx = getCtx(); if (!ctx) return;
   const sr = ctx.sampleRate; const len = Math.ceil(sr * duration);
   const buf = ctx.createBuffer(1, len, sr); const d = buf.getChannelData(0);
@@ -120,7 +166,7 @@ function noise(duration: number, vol = 0.12, loFreq = 200, hiFreq = 3000, delay 
   src.start(t); src.stop(t + duration + 0.02);
 }
 
-// ── Haptics ───────────────────────────────────────────────────────────────────
+// ── Haptics ────────────────────────────────────────────────────────────────────
 
 function haptic(style: Haptics.ImpactFeedbackStyle) {
   if (_vibration) void Haptics.impactAsync(style);
@@ -132,7 +178,7 @@ function hapticSel() {
   if (_vibration) void Haptics.selectionAsync();
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+// ── Public API ─────────────────────────────────────────────────────────────────
 
 export const SoundEngine = {
 
@@ -153,6 +199,8 @@ export const SoundEngine = {
   setFxEnabled(enabled: boolean) { _fxEnabled = enabled; },
   getFxEnabled()                 { return _fxEnabled; },
 
+  // ── Poker table ──────────────────────────────────────────────────────────────
+
   deal() {
     haptic(Haptics.ImpactFeedbackStyle.Light);
     play('deal');
@@ -166,6 +214,11 @@ export const SoundEngine = {
   chipCollect() {
     haptic(Haptics.ImpactFeedbackStyle.Medium);
     play('chip_collect');
+  },
+
+  betPlaced() {
+    haptic(Haptics.ImpactFeedbackStyle.Medium);
+    play('bet_placed');
   },
 
   check() {
@@ -208,6 +261,8 @@ export const SoundEngine = {
     play('card_flip');
   },
 
+  // ── UI ───────────────────────────────────────────────────────────────────────
+
   button() {
     hapticSel();
     play('button');
@@ -217,6 +272,13 @@ export const SoundEngine = {
     hapticNotif(Haptics.NotificationFeedbackType.Success);
     play('notification');
   },
+
+  error() {
+    hapticNotif(Haptics.NotificationFeedbackType.Error);
+    play('error');
+  },
+
+  // ── Progression ──────────────────────────────────────────────────────────────
 
   achievementUnlock() {
     hapticNotif(Haptics.NotificationFeedbackType.Success);
@@ -228,253 +290,113 @@ export const SoundEngine = {
     play('level_up');
   },
 
-  // Low cinematic tension hit — Web Audio only (no bundled asset)
+  // ── Rewards ──────────────────────────────────────────────────────────────────
+
+  /** Coin-shower collect sound — for daily rewards, wheel prizes, scratch payouts */
+  prizeCollect() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    play('prize_collect');
+  },
+
+  // ── Lottery ──────────────────────────────────────────────────────────────────
+
+  lotteryScratch() {
+    haptic(Haptics.ImpactFeedbackStyle.Light);
+    play('lottery_scratch');
+  },
+
+  lotteryReveal() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    play('lottery_reveal');
+  },
+
+  // ── Tournament ───────────────────────────────────────────────────────────────
+
+  tournamentWin() {
+    hapticNotif(Haptics.NotificationFeedbackType.Success);
+    play('tournament_win');
+  },
+
+  // ── Web-only atmosphere (no bundled asset needed) ─────────────────────────────
+
+  /** Low cinematic tension hit — web only */
   showdown() {
     haptic(Haptics.ImpactFeedbackStyle.Heavy);
-    if (_muted || !_fxEnabled) return;
-    if (Platform.OS !== 'web') return;
-    tone(70,  'sine', 0.45, 0.22, 0,    50);
-    tone(130, 'sine', 0.40, 0.18, 0.05, 90);
-    noise(0.08, 0.14, 50,  600,  0);
-    noise(0.06, 0.08, 600, 2500, 0.12);
+    waTone(70,  'sine', 0.45, 0.22, 0,    50);
+    waTone(130, 'sine', 0.40, 0.18, 0.05, 90);
+    waNoise(0.08, 0.14, 50,  600,  0);
+    waNoise(0.06, 0.08, 600, 2500, 0.12);
   },
 
-  // Ambient neon buzz — Web Audio only (atmosphere, no bundled asset)
+  /** Ambient neon sign flicker — web only */
   neonBuzz() {
-    if (Platform.OS !== 'web' || _muted || !_fxEnabled) return;
+    if (_muted || !_fxEnabled) return;
     const dur = 0.18 + Math.random() * 0.22;
-    tone(60,  'sawtooth', dur, 0.055);
-    tone(120, 'sawtooth', dur, 0.028);
-    tone(240, 'sawtooth', dur * 0.6, 0.012);
+    waTone(60,  'sawtooth', dur, 0.055);
+    waTone(120, 'sawtooth', dur, 0.028);
+    waTone(240, 'sawtooth', dur * 0.6, 0.012);
     const cracks = 2 + Math.floor(Math.random() * 4);
     for (let i = 0; i < cracks; i++) {
-      noise(0.006 + Math.random() * 0.018, 0.10 + Math.random() * 0.08,
-            1800, 14000, Math.random() * dur * 0.8);
+      waNoise(0.006 + Math.random() * 0.018, 0.10 + Math.random() * 0.08,
+        1800, 14000, Math.random() * dur * 0.8);
     }
     if (Math.random() < 0.5)
-      tone(3200 + Math.random() * 1800, 'sine', 0.012, 0.04, Math.random() * dur * 0.5);
+      waTone(3200 + Math.random() * 1800, 'sine', 0.012, 0.04, Math.random() * dur * 0.5);
   },
 
-  // ── Fortune Cookie audio journey ────────────────────────────────────────────
+  // ── Fortune Cookie ────────────────────────────────────────────────────────────
 
   /**
    * cookieCrack — called when the cookie splits apart.
-   * Crisp high-freq snap + mid crunch texture.
-   * Native: repurposes fold.wav at high pitch rate for the snap impact.
+   * Each tier has its own dedicated WAV file on every platform.
    */
-  cookieCrack(cookieType: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'standard' | 'golden' | 'dragon' = 'common') {
+  cookieCrack(tier: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'standard' | 'golden' | 'dragon' = 'common') {
     haptic(Haptics.ImpactFeedbackStyle.Heavy);
     if (_muted || !_fxEnabled) return;
-
-    const isPremium = cookieType === 'epic' || cookieType === 'legendary' || cookieType === 'mythic' || cookieType === 'dragon';
-    const isHeavy   = cookieType === 'legendary' || cookieType === 'mythic';
-
-    if (Platform.OS !== 'web') {
-      play('fold', { rate: isPremium ? 1.60 : 1.85, volume: 0.80 });
-      if (isPremium) play('allin', { rate: isHeavy ? 1.4 : 1.6, volume: isPremium ? 0.50 : 0.40 });
-      return;
-    }
-
-    // Web Audio — crack/snap intensity scales with tier
-    noise(0.032, 0.42, 3500, 14000, 0);
-    noise(0.072, 0.28, 500,  4500,  0.012);
-    tone(160, 'sine', 0.055, 0.30, 0);
-    if (isPremium) {
-      tone(90, 'sine', 0.18, isHeavy ? 0.30 : 0.14, 0.01);
-      noise(0.06, isHeavy ? 0.22 : 0.10, 80, 700, 0.01);
-    }
-    if (isHeavy) {
-      // Extra floor rumble for legendary + mythic
-      tone(40, 'sine', 1.20, 0.18, 0.005);
-      noise(0.08, 0.12, 30, 200, 0.008);
-    }
+    // Map legacy tier names
+    const mapped =
+      tier === 'standard' ? 'common' :
+      tier === 'golden'   ? 'uncommon' :
+      tier === 'dragon'   ? 'rare' :
+      tier;
+    const key = `cookie_crack_${mapped}` as SoundName;
+    play(key);
   },
 
   /**
    * fortuneRise — called as the fortune slip floats up.
-   * Ascending pentatonic arpeggio + shimmer.
+   * Uses the dedicated fortune_rise.wav on every platform.
    */
   fortuneRise() {
     if (_muted || !_fxEnabled) return;
-
-    if (Platform.OS !== 'web') {
-      play('card_flip', { rate: 0.68, volume: 0.55 });
-      return;
-    }
-
-    // Ascending pentatonic: C5 E5 G5 C6 E6
-    const notes = [523, 659, 784, 1047, 1319];
-    notes.forEach((freq, i) => {
-      tone(freq, 'sine', 0.38, Math.max(0.04, 0.13 - i * 0.01), i * 0.092);
-    });
-    noise(0.28, 0.038, 4000, 10000, 0.04); // airy shimmer
+    play('fortune_rise', { volume: 0.85 });
   },
 
   /**
    * fortuneReward — called when the reward card appears.
-   * Routes to tier-specific sound.
+   * Routes to the tier-specific dedicated reveal WAV.
    */
   fortuneReward(tier: 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC') {
-    switch (tier) {
-      case 'COMMON':    return SoundEngine._rewardCommon();
-      case 'UNCOMMON':  return SoundEngine._rewardUncommon();
-      case 'RARE':      return SoundEngine._rewardRare();
-      case 'EPIC':      return SoundEngine._rewardEpic();
-      case 'LEGENDARY': return SoundEngine._rewardLegendary();
-      case 'MYTHIC':    return SoundEngine._rewardMythic();
-    }
-  },
-
-  _rewardCommon() {
     hapticNotif(Haptics.NotificationFeedbackType.Success);
     if (_muted || !_fxEnabled) return;
-
-    if (Platform.OS !== 'web') {
-      // Distinct notification ping — never claim_sound or achievement_unlock
-      play('notification', { volume: 0.82 });
-      return;
-    }
-
-    // Single soft prosperity bell
-    tone(1047, 'sine', 0.75, 0.22, 0);
-    tone(2093, 'sine', 0.55, 0.09, 0.012);
-    tone(523,  'sine', 0.40, 0.07, 0.020); // warm low resonance
+    const mapped = tier.toLowerCase() as 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+    const key = `cookie_reveal_${mapped}` as SoundName;
+    play(key);
   },
 
-  _rewardUncommon() {
-    hapticNotif(Haptics.NotificationFeedbackType.Success);
-    if (_muted || !_fxEnabled) return;
-    if (Platform.OS !== 'web') {
-      play('notification', { rate: 1.04, volume: 0.88 });
-      return;
-    }
-    // Soft double bell — slightly warmer than Common
-    tone(1047, 'sine', 0.75, 0.22, 0);
-    tone(1319, 'sine', 0.50, 0.14, 0.10);
-    tone(2093, 'sine', 0.40, 0.08, 0.018);
-    noise(0.12, 0.05, 3000, 8000, 0.06);
-  },
-
-  _rewardRare() {
-    hapticNotif(Haptics.NotificationFeedbackType.Success);
-    if (_muted || !_fxEnabled) return;
-
-    if (Platform.OS !== 'web') {
-      // Chips landing + bright ping = unique RARE reveal
-      play('chip_collect', { volume: 0.72 });
-      setTimeout(() => play('notification', { rate: 1.08, volume: 0.58 }), 190);
-      return;
-    }
-
-    // Bell + sparkle
-    tone(1047, 'sine', 0.75, 0.22, 0);
-    tone(2093, 'sine', 0.55, 0.11, 0.012);
-    tone(1319, 'sine', 0.42, 0.16, 0.16);
-    tone(1568, 'sine', 0.32, 0.12, 0.27);
-    noise(0.22, 0.07, 5000, 13000, 0.08);
-  },
-
-  _rewardEpic() {
-    hapticNotif(Haptics.NotificationFeedbackType.Success);
-    if (_muted || !_fxEnabled) return;
-
-    if (Platform.OS !== 'web') {
-      // Level-up fanfare = EPIC upgrade feel — unique, not achievement/claim
-      play('level_up', { volume: 0.88 });
-      return;
-    }
-
-    // Jade gong + bell + sparkle cascade
-    tone(220, 'sine', 1.50, 0.28, 0);     // gong body
-    tone(440, 'sine', 1.10, 0.15, 0.022); // gong harmonic
-    tone(880, 'sine', 0.65, 0.09, 0.05);  // gong overtone
-    tone(1047,'sine', 0.72, 0.20, 0.20);  // bell strike
-    tone(2093,'sine', 0.50, 0.09, 0.21);
-    tone(1319,'sine', 0.40, 0.14, 0.32);  // sparkle note
-    noise(0.32, 0.09, 3500, 11000, 0.16);
-  },
-
-  _rewardLegendary() {
-    hapticNotif(Haptics.NotificationFeedbackType.Success);
-    if (_muted || !_fxEnabled) return;
-
-    if (Platform.OS !== 'web') {
-      // Ceremonial peak: hand-win fanfare + level-up — completely unique, never claim_sound
-      play('win', { volume: 0.90 });
-      setTimeout(() => play('level_up', { rate: 0.86, volume: 0.58 }), 360);
-      return;
-    }
-
-    // Full ceremonial prosperity sequence
-    // Deep ceremonial gong
-    tone(110, 'sine', 2.40, 0.32, 0);
-    tone(220, 'sine', 1.90, 0.17, 0.02);
-    tone(165, 'sine', 1.60, 0.11, 0.04);
-    // Rising bell cascade
-    tone(523, 'sine', 0.80, 0.20, 0.26);
-    tone(659, 'sine', 0.72, 0.18, 0.38);
-    tone(784, 'sine', 0.64, 0.16, 0.50);
-    tone(1047,'sine', 0.62, 0.22, 0.62);
-    tone(1319,'sine', 0.54, 0.18, 0.74);
-    tone(1568,'sine', 0.46, 0.15, 0.86);
-    tone(2093,'sine', 0.40, 0.12, 0.98);
-    // Prosperity sparkle shower
-    noise(0.55, 0.11, 5000, 15000, 0.32);
-    noise(0.35, 0.08, 2000, 7000,  0.60);
-  },
-
-  _rewardMythic() {
-    hapticNotif(Haptics.NotificationFeedbackType.Success);
-    if (_muted || !_fxEnabled) return;
-
-    if (Platform.OS !== 'web') {
-      // Mythic: maximum ceremony — win fanfare + level-up + delayed level-up echo
-      play('win',     { volume: 0.95 });
-      setTimeout(() => play('level_up', { rate: 0.90, volume: 0.70 }), 300);
-      setTimeout(() => play('level_up', { rate: 1.10, volume: 0.50 }), 780);
-      return;
-    }
-
-    // Full mythic ceremony — deep gong + cascading bells + sparkle explosion
-    // Ultra deep power chord
-    tone(55,  'sine', 3.50, 0.38, 0);
-    tone(110, 'sine', 2.80, 0.22, 0.01);
-    tone(82,  'sine', 2.40, 0.14, 0.03);
-    // Mid power swells
-    tone(220, 'sine', 2.00, 0.20, 0.10);
-    tone(165, 'sine', 1.80, 0.13, 0.12);
-    // Bell cascade — fast ascending
-    const bells = [523, 659, 784, 880, 1047, 1175, 1319, 1568, 1760, 2093, 2637];
-    bells.forEach((freq, i) => {
-      tone(freq, 'sine', Math.max(0.30, 0.90 - i * 0.05), Math.max(0.07, 0.24 - i * 0.01), 0.20 + i * 0.08);
-    });
-    // Pink + gold shimmer — two sparkle bursts
-    noise(0.70, 0.12, 8000, 18000, 0.30);
-    noise(0.55, 0.10, 5000, 12000, 0.55);
-    noise(0.40, 0.09, 2000,  6000, 0.80);
-    noise(0.30, 0.08,  800,  2400, 1.05);
-  },
+  // Keep these for backward-compat (used nowhere new, but may be referenced)
+  _rewardCommon()    { SoundEngine.fortuneReward('COMMON'); },
+  _rewardUncommon()  { SoundEngine.fortuneReward('UNCOMMON'); },
+  _rewardRare()      { SoundEngine.fortuneReward('RARE'); },
+  _rewardEpic()      { SoundEngine.fortuneReward('EPIC'); },
+  _rewardLegendary() { SoundEngine.fortuneReward('LEGENDARY'); },
+  _rewardMythic()    { SoundEngine.fortuneReward('MYTHIC'); },
 
   /**
-   * Reward claim — pitch-shifted −5 semitones for a distinct premium feel.
-   * Uses expo-av on all platforms (already cross-platform).
+   * @deprecated Use prizeCollect() instead.
+   * Kept for any call sites not yet migrated.
    */
   claim() {
-    hapticNotif(Haptics.NotificationFeedbackType.Success);
-    if (_muted || _volume <= 0) return;
-    void (async () => {
-      try {
-        await ensureAudio();
-        const { sound } = await Audio.Sound.createAsync(ASSETS.claim_sound, {
-          shouldPlay:         true,
-          volume:             Math.min(1, _volume),
-          rate:               0.749,
-          shouldCorrectPitch: false,
-        });
-        sound.setOnPlaybackStatusUpdate(status => {
-          if (status.isLoaded && status.didJustFinish) void sound.unloadAsync();
-        });
-      } catch {}
-    })();
+    SoundEngine.prizeCollect();
   },
 };

@@ -316,7 +316,7 @@ export default function ScratchScreen() {
       if (bulkIntervalRef.current) clearInterval(bulkIntervalRef.current);
       if (totalChips > 0) await addChips(totalChips);
       await consumeScratchTickets(count);
-      SoundEngine.claim();
+      SoundEngine.prizeCollect();
       const result: BulkResult = { scratched: count, winners, totalChips, bestWin, isLegendary };
       setBulkResult(result);
       bulkCardScale.setValue(0);
@@ -473,7 +473,7 @@ export default function ScratchScreen() {
 
         const now = Date.now();
         if (now - lastSoundRef.current > 70) {
-          SoundEngine.chip();
+          SoundEngine.lotteryScratch();
           lastSoundRef.current = now;
         }
         if (now - lastHapticRef.current > 45) {
@@ -538,7 +538,7 @@ export default function ScratchScreen() {
     if (claimed) return;
     setClaimed(true);
     if (won) await addChips(ticket.prize);
-    SoundEngine.claim();
+    SoundEngine.prizeCollect();
     await useScratchTicket();
   }, [claimed, won, ticket.prize, addChips, useScratchTicket]);
 

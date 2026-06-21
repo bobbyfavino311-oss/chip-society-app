@@ -1,0 +1,374 @@
+Fix all mobile sound effects across the entire app.
+
+CURRENT PROBLEM
+
+Sound effects are not working correctly on mobile.
+
+This is a critical polish issue.
+
+The app must have working sound feedback on mobile, not just web preview.
+
+The current sound system is inconsistent, and some sounds are either:
+
+* Not playing at all on mobile
+* Playing the wrong sound
+* Reusing the achievement sound
+* Playing copyrighted or outdated audio
+* Pitch-shifting the wrong sound instead of using a separate file
+* Failing because of mobile audio restrictions
+
+⸻
+
+REQUIRED FIX
+
+Audit and rebuild the sound effect system for mobile.
+
+All sound effects must work on:
+
+* iOS mobile
+* Android mobile
+* Mobile browser preview
+* Installed app / published app
+* Web preview
+
+Do not only test web preview.
+
+Mobile must be tested directly.
+
+⸻
+
+MOBILE AUDIO REQUIREMENTS
+
+Fix mobile audio behavior.
+
+Check for:
+
+* Muted audio context
+* Missing user interaction unlock
+* iOS autoplay restrictions
+* Android audio permission issues
+* Incorrect asset paths
+* Missing mobile audio files
+* Unsupported file formats
+* Cached old sounds
+* Sound pool not preloaded
+* Volume set to zero
+* Audio being blocked until first tap
+
+The app should unlock audio after the first player tap or first game interaction.
+
+Once unlocked, all sound effects should play normally.
+
+⸻
+
+SOUND CATEGORIES
+
+Create separate sound categories.
+
+Do not reuse one sound for multiple reward types.
+
+Required categories:
+
+1. Button tap sound
+2. Chip movement sound
+3. Card deal sound
+4. Card flip sound
+5. Bet placed sound
+6. Win hand sound
+7. Lose hand sound
+8. Achievement unlock sound
+9. Prize collection sound
+10. Fortune Cookie opening sound
+11. Fortune Cookie reward reveal sound
+12. Lottery scratch sound
+13. Lottery prize reveal sound
+14. Level up sound
+15. Tournament win sound
+16. Error / invalid action sound
+
+⸻
+
+IMPORTANT SOUND DISTINCTIONS
+
+The following sounds must be different from each other:
+
+ACHIEVEMENT SOUND
+
+Used only when:
+
+* A player unlocks an achievement
+* A badge is completed
+* A milestone is reached
+
+Style:
+
+* Short
+* Clean
+* Celebratory
+* Not too dramatic
+
+⸻
+
+PRIZE COLLECTION SOUND
+
+Used only when:
+
+* Chips are collected
+* Lottery rewards are collected
+* Daily rewards are claimed
+* Scratch All rewards are collected
+* General rewards are added to the account
+
+Style:
+
+* Coin sparkle
+* Chip collection
+* Reward pickup
+* Smooth and satisfying
+
+This must not be the achievement sound.
+
+⸻
+
+FORTUNE COOKIE OPENING SOUND
+
+Used only when:
+
+* A Fortune Cookie is opened
+* The cookie cracks
+* The reward reveal begins
+
+Style:
+
+* Unique
+* Asian-inspired
+* Clean
+* Premium
+* Not copyrighted
+* Not a pitch-shifted achievement sound
+
+This must be its own dedicated audio file.
+
+⸻
+
+FORTUNE COOKIE REWARD REVEAL SOUND
+
+Used only when:
+
+* The Fortune Cookie prize is revealed
+
+Style should vary by tier:
+
+Common:
+Small soft reveal
+
+Uncommon:
+Slight green sparkle reveal
+
+Rare:
+Blue shimmer reveal
+
+Epic:
+Purple magical reveal
+
+Legendary:
+Gold premium reveal
+
+Mythic:
+Pink/gold jackpot reveal
+
+These should not reuse the regular achievement sound.
+
+⸻
+
+COPYRIGHT SAFETY
+
+Remove the copyrighted original sound completely.
+
+Do not reference it.
+
+Do not pitch-shift it.
+
+Do not keep it as a fallback.
+
+Do not allow it to exist in the active sound library.
+
+Replace it with safe original or royalty-free audio only.
+
+⸻
+
+FORTUNE COOKIE SOUND REQUIREMENTS BY TIER
+
+Common Cookie:
+
+* Soft cookie crack
+* Light reward chime
+* Minimal sound
+
+Uncommon Cookie:
+
+* Cookie crack
+* Green sparkle chime
+* Slightly richer than Common
+
+Rare Cookie:
+
+* Cookie crack
+* Blue shimmer reveal
+* Noticeable but not dramatic
+
+Epic Cookie:
+
+* Deeper crack
+* Purple magical burst
+* Premium reveal
+
+Legendary Cookie:
+
+* Gold shimmer
+* Strong premium casino reveal
+* Longer celebration sound
+
+Mythic Cookie:
+
+* Unique Mythic-only sound
+* Pink/gold jackpot burst
+* Bigger celebration
+* Distinct from every other sound in the game
+* Must feel ultra rare
+
+⸻
+
+TECHNICAL IMPLEMENTATION
+
+Create a centralized sound manager.
+
+The sound manager should:
+
+* Preload all audio files
+* Unlock audio after first user interaction
+* Handle mobile playback
+* Control volume by category
+* Prevent overlapping sound spam
+* Use separate audio IDs for each effect
+* Avoid fallback to the wrong sound
+* Log missing audio errors during testing
+
+Example sound IDs:
+
+sfx_button_tap
+
+sfx_chip_collect
+
+sfx_card_deal
+
+sfx_card_flip
+
+sfx_achievement_unlock
+
+sfx_prize_collect
+
+sfx_cookie_open_common
+
+sfx_cookie_open_uncommon
+
+sfx_cookie_open_rare
+
+sfx_cookie_open_epic
+
+sfx_cookie_open_legendary
+
+sfx_cookie_open_mythic
+
+sfx_cookie_reveal_common
+
+sfx_cookie_reveal_uncommon
+
+sfx_cookie_reveal_rare
+
+sfx_cookie_reveal_epic
+
+sfx_cookie_reveal_legendary
+
+sfx_cookie_reveal_mythic
+
+sfx_lottery_scratch
+
+sfx_lottery_reveal
+
+sfx_level_up
+
+sfx_tournament_win
+
+sfx_error
+
+⸻
+
+DO NOT DO THIS
+
+Do not pitch-shift the achievement sound for Fortune Cookies.
+
+Do not reuse prize collection sound for achievements.
+
+Do not reuse Fortune Cookie sounds for regular rewards.
+
+Do not let mobile fall back to the copyrighted sound.
+
+Do not rely on web preview testing only.
+
+Do not use the same audio file under different names.
+
+⸻
+
+SETTINGS REQUIREMENTS
+
+Add sound settings:
+
+* Master Volume
+* Music Volume
+* Sound Effects Volume
+* Mute All
+
+Settings must persist after logout, app restart, and republish.
+
+⸻
+
+TESTING REQUIREMENTS
+
+Test each sound effect directly on mobile.
+
+Required test checklist:
+
+* Button tap works on mobile.
+* Card deal works on mobile.
+* Card flip works on mobile.
+* Chip collection works on mobile.
+* Achievement unlock sound works and is unique.
+* Prize collection sound works and is unique.
+* Fortune Cookie opening sound works and is unique.
+* Fortune Cookie reward reveal sounds work by tier.
+* Lottery scratch sound works.
+* Lottery reveal sound works.
+* Level up sound works.
+* Tournament win sound works.
+* Error sound works.
+* No copyrighted sound plays anywhere.
+* No achievement sound plays for Fortune Cookies.
+* No Fortune Cookie sound plays for regular achievements.
+* Sounds work after app republish.
+* Sounds work after logout/login.
+* Sounds work on iOS and Android.
+
+⸻
+
+FINAL REQUIREMENT
+
+All mobile sound effects must work consistently.
+
+Achievement sounds, prize collection sounds, and Fortune Cookie sounds must be clearly different.
+
+Fortune Cookie sounds must have their own dedicated sound set.
+
+The copyrighted sound must be fully removed.
+
+Mobile audio must be fixed across the entire app before launch.

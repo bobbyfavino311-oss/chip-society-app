@@ -81,7 +81,7 @@ export default function StreakScreen() {
       Animated.timing(claimScale, { toValue: 1, duration: 100, useNativeDriver: false }),
     ]).start();
     const amount = await claimDailyReward();
-    SoundEngine.claim();
+    SoundEngine.prizeCollect();
     setClaimedAmount(amount);
     setJustClaimed(true);
     setClaiming(false);
