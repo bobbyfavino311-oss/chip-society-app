@@ -145,26 +145,30 @@ function serveLandingPage(req, res, landingPageTemplate, appName) {
   res.end(html);
 }
 
-// Correct production API URL. REPLIT_DOMAINS is "replit.com" during the build
-// step (Expo proxy domain), so bundles get baked with the wrong URL. We patch
-// it at serve time so every bundle version delivers the right endpoint.
-const CORRECT_API_URL = "https://chip-society.replit.app/api";
-const WRONG_API_URLS = [
-  "https://replit.com/api",
-  "http://replit.com/api",
-];
-
-function patchBundle(content) {
+/**
+ * Patch a JS bundle at serve time.
+ *
+ * The build step runs with REPLIT_DOMAINS="replit.com" (Expo proxy), so Metro
+ * bakes that domain into:
+ *   - EXPO_PUBLIC_API_URL  → "https://replit.com/api"
+ *   - httpServerLocation   → "https://replit.com/{ts}/_expo/static/js/..."
+ *     (used by React Native to fetch fonts, images, and audio at runtime)
+ *
+ * We replace every "https://replit.com" occurrence with the real production
+ * origin derived from the incoming request host header.
+ */
+function patchBundle(content, correctOrigin) {
+  const wrongOrigins = ["https://replit.com", "http://replit.com"];
   let patched = content;
-  for (const wrong of WRONG_API_URLS) {
-    // Replace quoted string forms that Metro bakes in as env var substitutions
-    patched = patched.replaceAll(`"${wrong}"`, `"${CORRECT_API_URL}"`);
-    patched = patched.replaceAll(`'${wrong}'`, `'${CORRECT_API_URL}'`);
+  for (const wrong of wrongOrigins) {
+    // replaceAll is safe here: these strings only appear as Metro-baked string
+    // literals (always wrapped in quotes) and never as legitimate substrings.
+    patched = patched.replaceAll(wrong, correctOrigin);
   }
   return patched;
 }
 
-function serveStaticFile(urlPath, res) {
+function serveStaticFile(urlPath, req, res) {
   const safePath = path.normalize(urlPath).replace(/^(\.\.(\/|\\|$))+/, "");
   const filePath = path.join(STATIC_ROOT, safePath);
 
@@ -183,10 +187,14 @@ function serveStaticFile(urlPath, res) {
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
-  // Patch JS bundles to fix build-time API URL baking errors
+  // Patch JS bundles: rewrite every "replit.com" reference (API URLs AND
+  // httpServerLocation asset paths) to use the real production origin.
   if (ext === ".js") {
+    const forwardedProto = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers["host"] || "chip-society.replit.app";
+    const correctOrigin = `${forwardedProto}://${host}`;
     const text = fs.readFileSync(filePath, "utf-8");
-    const patched = patchBundle(text);
+    const patched = patchBundle(text, correctOrigin);
     const buf = Buffer.from(patched, "utf-8");
     res.writeHead(200, { "content-type": contentType, "content-length": buf.length });
     res.end(buf);
@@ -220,7 +228,7 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  serveStaticFile(pathname, res);
+  serveStaticFile(pathname, req, res);
 });
 
 const port = parseInt(process.env.PORT || "3000", 10);
