@@ -281,18 +281,16 @@ export function getApiBase(): string {
     return `${window.location.origin}/api`;
   }
 
-  // Native — EXPO_PUBLIC_API_URL is baked in at build time from REPLIT_DOMAINS.
-  // This is the production deployment domain and is correct for native iOS.
-  // Do NOT use Constants.linkingUri (routes through replit.com) or manifest URLs
-  // (serve from Expo subdomain which differs from the API domain).
+  // Native: EXPO_PUBLIC_API_URL is baked in at build time.
+  // Accept it only if it's NOT the replit.com proxy domain — during production
+  // builds, REPLIT_DOMAINS is replit.com (Expo routing proxy), not the actual
+  // deployed app domain. Dev builds bake the janeway.replit.dev domain, which works.
   const explicit = process.env['EXPO_PUBLIC_API_URL'];
-  if (explicit) return explicit;
+  if (explicit && !explicit.includes('replit.com')) return explicit;
 
-  // Dev fallback: EXPO_PUBLIC_DOMAIN injected by the dev workflow
-  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
-  if (domain) return `https://${domain}/api`;
-
-  return '/api';
+  // Production hardcoded fallback — chip-society.replit.app confirmed reachable.
+  // This is the permanent public deployment domain for this app.
+  return 'https://chip-society.replit.app/api';
 }
 
 // ─── Server API helpers ───────────────────────────────────────────────────────
