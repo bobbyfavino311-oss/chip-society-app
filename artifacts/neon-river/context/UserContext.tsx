@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export type Rank =
@@ -275,21 +276,39 @@ const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── API base URL ─────────────────────────────────────────────────────────────
 function getApiBase(): string {
+  // Web (Expo web / Safari): use window.location so relative routing works
   if (typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}/api`;
   }
-  return process.env['EXPO_PUBLIC_API_URL'] ?? '/api';
+  // Native: explicit override (e.g. EXPO_PUBLIC_API_URL set in env/secrets)
+  const explicit = process.env['EXPO_PUBLIC_API_URL'];
+  if (explicit) return explicit;
+  // Native: derive from the Expo manifest bundle URL (works in Expo Go + production)
+  try {
+    const bundleUrl =
+      // Expo SDK ≤48 classic manifest
+      (Constants.manifest as Record<string, unknown> | null)?.['bundleUrl'] as string | undefined ??
+      // Expo SDK 49+ new manifest
+      (Constants as unknown as { manifest2?: { launchAsset?: { url?: string } } }).manifest2?.launchAsset?.url;
+    if (bundleUrl) {
+      const parsed = new URL(bundleUrl);
+      return `${parsed.protocol}//${parsed.host}/api`;
+    }
+  } catch { /* ignore parse errors */ }
+  // Native dev: EXPO_PUBLIC_DOMAIN is injected by the dev workflow command
+  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
+  if (domain) return `https://${domain}/api`;
+  return '/api';
 }
 
 // ─── Server API helpers ───────────────────────────────────────────────────────
 
+// Throws on network failure — callers decide how to surface the error.
 async function serverCheckUsername(username: string): Promise<boolean> {
-  try {
-    const r = await fetch(`${getApiBase()}/auth/check-username/${encodeURIComponent(username)}`);
-    if (!r.ok) return true; // assume available on error (server will enforce)
-    const d = await r.json() as { available: boolean };
-    return d.available;
-  } catch { return true; }
+  const r = await fetch(`${getApiBase()}/auth/check-username/${encodeURIComponent(username)}`);
+  if (!r.ok) return false;       // 4xx/5xx → treat as unavailable/taken
+  const d = await r.json() as { available: boolean };
+  return d.available;
 }
 
 async function serverRegister(

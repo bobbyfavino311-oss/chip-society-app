@@ -71,9 +71,14 @@ export default function SignupScreen() {
     setUsernameStatus('checking');
     if (checkDebounce.current) clearTimeout(checkDebounce.current);
     checkDebounce.current = setTimeout(async () => {
-      const available = await checkUsernameAvailable(val);
-      setUsernameStatus(available ? 'ok' : 'error');
-      setUsernameError(available ? '' : 'Username already taken.');
+      try {
+        const available = await checkUsernameAvailable(val);
+        setUsernameStatus(available ? 'ok' : 'error');
+        setUsernameError(available ? '' : 'Username already taken.');
+      } catch {
+        setUsernameStatus('error');
+        setUsernameError('Could not reach server. Try again.');
+      }
     }, 600);
   };
 
