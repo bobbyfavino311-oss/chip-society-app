@@ -27,10 +27,13 @@ function useServerPing(): ServerStatus {
     const base = typeof window !== 'undefined' && window.location?.origin
       ? window.location.origin
       : (process.env['EXPO_PUBLIC_API_URL']?.replace(/\/api$/, '') ?? '');
-    fetch(`${base}/api/healthz`, { signal: AbortSignal.timeout(6000) })
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    fetch(`${base}/api/healthz`, { signal: controller.signal })
       .then(r => { if (alive) setStatus(r.ok ? 'ok' : 'fail'); })
-      .catch(() => { if (alive) setStatus('fail'); });
-    return () => { alive = false; };
+      .catch(() => { if (alive) setStatus('fail'); })
+      .finally(() => clearTimeout(timer));
+    return () => { alive = false; controller.abort(); };
   }, []);
   return status;
 }
