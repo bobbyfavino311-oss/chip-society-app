@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
-import { useUser } from '@/context/UserContext';
+import { useUser, getApiBase } from '@/context/UserContext';
 import NeonAvatar from '@/components/NeonAvatar';
 import { NEON_AVATARS, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
 
@@ -28,9 +28,7 @@ function useServerPing(): ServerStatus {
   const [status, setStatus] = useState<ServerStatus>('checking');
   useEffect(() => {
     let alive = true;
-    const base = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : (process.env['EXPO_PUBLIC_API_URL']?.replace(/\/api$/, '') ?? '');
+    const base = getApiBase().replace(/\/api$/, '');
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 6000);
     fetch(`${base}/api/healthz`, { signal: controller.signal })

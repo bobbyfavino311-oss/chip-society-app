@@ -275,7 +275,7 @@ const STORAGE_KEY  = '@chip_society_profile';
 const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── API base URL ─────────────────────────────────────────────────────────────
-function getApiBase(): string {
+export function getApiBase(): string {
   // Web (Expo web / Safari): use window.location so relative routing works
   if (typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}/api`;
