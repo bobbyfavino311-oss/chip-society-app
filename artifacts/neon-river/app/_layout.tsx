@@ -15,35 +15,8 @@ import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Platform } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-
-// On web the bundled TTF assets from @expo-google-fonts often fail to serve
-// correctly from the static build. Supply CDN string URLs on web so expo-font
-// creates working @font-face rules. Native keeps the local require() path.
-const ORBITRON_CDN = 'https://fonts.gstatic.com/s/orbitron/v35/yMJRMIlzdpvBhQQL_Qq7dy0.woff2';
-const INTER_400_CDN = 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2';
-const INTER_700_CDN = 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2';
-
-const WEB_FONTS: Record<string, string> = {
-  Orbitron_400Regular: ORBITRON_CDN,
-  Orbitron_700Bold:    ORBITRON_CDN,
-  Orbitron_900Black:   ORBITRON_CDN,
-  Inter_400Regular:    INTER_400_CDN,
-  Inter_700Bold:       INTER_700_CDN,
-};
-
-const NATIVE_FONTS = {
-  Orbitron_400Regular,
-  Orbitron_700Bold,
-  Orbitron_900Black,
-  Inter_400Regular,
-  Inter_700Bold,
-  Pacifico_400Regular,
-  BebasNeue_400Regular,
-  Righteous_400Regular,
-};
 
 import AVATAR_IMAGES from '@/constants/avatarImages';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -189,9 +162,16 @@ function RootLayoutNav() {
 // ─── Root layout ──────────────────────────────────────────────────────────────
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts(
-    Platform.OS === 'web' ? WEB_FONTS : NATIVE_FONTS
-  );
+  const [fontsLoaded, fontError] = useFonts({
+    Orbitron_400Regular,
+    Orbitron_700Bold,
+    Orbitron_900Black,
+    Inter_400Regular,
+    Inter_700Bold,
+    Pacifico_400Regular,
+    BebasNeue_400Regular,
+    Righteous_400Regular,
+  });
 
   const [assetsReady, setAssetsReady] = useState(false);
 
