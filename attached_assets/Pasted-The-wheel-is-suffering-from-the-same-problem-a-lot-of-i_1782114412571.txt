@@ -1,0 +1,394 @@
+The wheel is suffering from the same problem a lot of indie casino games have:
+
+Everything has equal visual importance.
+
+When the wheel stops, getting a 🥠 Fortune Cookie feels almost the same as getting 2K chips because:
+
+* The prize wedges are nearly identical sizes.
+* The colors don’t communicate rarity.
+* The center looks unfinished.
+* The spin sounds don’t build anticipation.
+* There is no “near miss” excitement.
+* The Mythic prize doesn’t feel mythic.
+
+I would completely redesign it like this:
+
+WHEEL 2.0 — CHIP SOCIETY REWARD WHEEL
+
+CENTER HUB
+
+Remove:
+
+CHIP SOCIETY text
+
+Replace with:
+
+Neon Casino Chip Hub
+
+Large premium casino chip.
+
+Colors:
+
+* Deep black center
+* Cyan glow
+* Pink glow ring
+* Gold metallic trim
+
+Center Icon:
+
+🎰
+
+or
+
+♠
+
+or
+
+a glowing Chip Society logo
+
+The hub should look like an actual casino chip rather than text pasted in a circle.
+
+⸻
+
+PRIZE LAYOUT
+
+Not every wedge should be equal rarity.
+
+Common prizes should occupy more wheel space.
+
+Rare prizes should occupy less wheel space.
+
+Example:
+
+Common
+
+* 2K Chips
+* 5K Chips
+* XP
+* 10K Chips
+
+Large wedges.
+
+⸻
+
+Uncommon
+
+* Lottery Ticket
+* 25K Chips
+* 50K Chips
+
+Medium wedges.
+
+⸻
+
+Rare
+
+🥠 Common Fortune Cookie
+
+Smaller wedge.
+
+⸻
+
+Epic
+
+100K Chips
+
+Small wedge.
+
+⸻
+
+MYTHIC
+
+🥠 Mythic Fortune Cookie
+
+Tiny wedge.
+
+Only one wedge.
+
+Should occupy roughly:
+
+3–5% of the wheel.
+
+Players should get excited when they even pass over it.
+
+⸻
+
+COOKIE REDESIGN
+
+Remove:
+
+🥠 Golden Cookie
+
+Keep:
+
+🥠 Common Fortune Cookie
+
+🥠 Mythic Fortune Cookie
+
+Only.
+
+⸻
+
+COMMON COOKIE WEDGE
+
+Color:
+
+Amber Gold
+
+Visual:
+
+Small fortune cookie icon.
+
+Reward Pool:
+
+* Chips
+* XP
+* Small collectibles
+
+Feels rewarding.
+
+Not game-changing.
+
+⸻
+
+MYTHIC COOKIE WEDGE
+
+Color:
+
+Deep Purple
++
+Electric Cyan
++
+Gold
+
+Animated glow.
+
+Visual:
+
+Glowing Mythic Cookie.
+
+This wedge should look dramatically different from every other prize.
+
+The player should immediately know:
+
+“I just hit the jackpot.”
+
+⸻
+
+WHEEL COLORS
+
+Current wheel colors feel random.
+
+Instead:
+
+Chips
+
+Blue
+
+XP
+
+Green
+
+Tickets
+
+Pink
+
+Common Cookie
+
+Gold
+
+Mythic Cookie
+
+Purple/Cyan
+
+Jackpot
+
+Royal Gold
+
+Every prize should have its own visual language.
+
+⸻
+
+SPIN AUDIO REDESIGN
+
+Current sound:
+
+tick tick tick tick
+
+Feels basic.
+
+Replace with:
+
+Start
+
+Metallic casino spin sound.
+
+WHOOSH
+
+⸻
+
+Mid Spin
+
+Soft wheel ticks.
+
+Tick…
+Tick…
+Tick…
+
+Not loud.
+
+Not repetitive.
+
+⸻
+
+Slow Down
+
+Ticks become heavier.
+
+TICK
+
+TICK
+
+TICK
+
+TICK
+
+Building anticipation.
+
+⸻
+
+Rare Prize Near Miss
+
+Add subtle:
+
+“shimmer”
+
+sound.
+
+When wheel narrowly passes:
+
+🥠 Mythic Cookie
+
+or
+
+100K
+
+Creates excitement.
+
+⸻
+
+Prize Landed
+
+Common Prize:
+
+Small reward chime.
+
+⸻
+
+Uncommon Prize:
+
+Larger reward flourish.
+
+⸻
+
+🥠 Common Cookie:
+
+Cookie crack sound.
+
+Asian prosperity chime.
+
+⸻
+
+🥠 Mythic Cookie:
+
+Deep gong.
+
+Dragon flourish.
+
+Premium Asian reward sound.
+
+This should feel completely different from every other reward.
+
+⸻
+
+WHEEL ANIMATION
+
+Add:
+
+Neon Pulse
+
+Entire wheel glows brighter as it slows.
+
+⸻
+
+Prize Spotlight
+
+Winning wedge lights up.
+
+Everything else dims.
+
+⸻
+
+Mythic Win
+
+If Mythic Cookie lands:
+
+* Screen darkens
+* Purple glow expands
+* Gong sound
+* Cookie spins into center
+* Mythic reveal animation
+
+Should feel like opening a legendary loot box.
+
+⸻
+
+POSSIBLE REWARDS SECTION
+
+Current:
+
+Small boxes.
+
+Low impact.
+
+Replace with:
+
+Rarity Rows
+
+COMMON
+
+* 2K
+* 5K
+* XP
+
+UNCOMMON
+
+* Ticket
+* 25K
+* 50K
+
+RARE
+
+* 🥠 Common Fortune Cookie
+
+EPIC
+
+* 100K
+
+MYTHIC
+
+* 🥠 Mythic Fortune Cookie
+
+Now players immediately understand what they’re chasing.
+
+⸻
+
+FINAL DESIGN GOAL
+
+The wheel should feel less like a placeholder reward spinner and more like a casino attraction.
+
+When players open the Daily Spin page they should immediately think:
+
+“I want that Mythic Cookie.”
+
+Right now the wheel gives equal visual weight to 2K chips and the highest-value reward in the game. The redesign should make the Mythic Cookie the star of the entire feature.
