@@ -34,8 +34,6 @@ import DragonBackground from '@/components/DragonBackground';
 import DragonCardFrame from '@/components/DragonCardFrame';
 import MasqueradeBackground from '@/components/MasqueradeBackground';
 import MasqueradeCardFrame from '@/components/MasqueradeCardFrame';
-import TigerBackground from '@/components/TigerBackground';
-import TigerCardFrame from '@/components/TigerCardFrame';
 import SakuraBackground from '@/components/SakuraBackground';
 import SakuraCardFrame from '@/components/SakuraCardFrame';
 import FrozenNeonBackground from '@/components/FrozenNeonBackground';
@@ -412,11 +410,10 @@ export default function PracticeScreen() {
   const { theme } = useTableTheme();
   const isDragon      = theme.id === 'dragon_fortune';
   const isMasquerade  = theme.id === 'royal_masquerade';
-  const isTiger       = theme.id === 'tiger_fortune';
   const isSakura      = theme.id === 'sakura_garden';
   const isFrozenNeon  = theme.id === 'frozen_neon';
   const isCrimsonNoir = theme.id === 'crimson_noir';
-  const needsFrame    = isDragon || isMasquerade || isTiger || isSakura || isFrozenNeon || isCrimsonNoir;
+  const needsFrame    = isDragon || isMasquerade || isSakura || isFrozenNeon || isCrimsonNoir;
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -660,7 +657,6 @@ export default function PracticeScreen() {
       {/* Theme atmospheric backgrounds */}
       {isDragon     && <DragonBackground />}
       {isMasquerade && <MasqueradeBackground />}
-      {isTiger      && <TigerBackground />}
       {isSakura     && <SakuraBackground />}
       {isFrozenNeon && <FrozenNeonBackground />}
       {isCrimsonNoir && <CrimsonNoirBackground />}
@@ -760,9 +756,6 @@ export default function PracticeScreen() {
           )}
           {isMasquerade && tableLayout.w > 0 && (
             <MasqueradeCardFrame width={tableLayout.w} height={tableLayout.h} />
-          )}
-          {isTiger && tableLayout.w > 0 && (
-            <TigerCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
           {isSakura && tableLayout.w > 0 && (
             <SakuraCardFrame width={tableLayout.w} height={tableLayout.h} />
