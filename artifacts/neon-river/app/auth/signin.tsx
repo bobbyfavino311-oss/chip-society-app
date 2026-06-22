@@ -20,23 +20,40 @@ import { useUser, getApiBase } from '@/context/UserContext';
 type Phase = 'username' | 'pin';
 type ServerStatus = 'checking' | 'ok' | 'fail';
 
-function useServerPing(): { status: ServerStatus; url: string } {
+function useServerPing(): { status: ServerStatus; url: string; retry: () => void } {
   const [status, setStatus] = useState<ServerStatus>('checking');
   const [url, setUrl] = useState('');
+  const [attempt, setAttempt] = useState(0);
+
   useEffect(() => {
     let alive = true;
     const apiBase = getApiBase();
     const base = apiBase.replace(/\/api$/, '');
     setUrl(apiBase);
+    setStatus('checking');
+
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
+    // 12 s timeout — Railway cold-start can take up to 10 s after idle
+    const timer = setTimeout(() => controller.abort(), 12000);
+
     fetch(`${base}/api/healthz`, { signal: controller.signal })
       .then(r => { if (alive) setStatus(r.ok ? 'ok' : 'fail'); })
-      .catch(() => { if (alive) setStatus('fail'); })
+      .catch(() => {
+        if (!alive) return;
+        // On first failure, auto-retry once after 3 s in case of cold-start lag
+        if (attempt < 1) {
+          setTimeout(() => { if (alive) setAttempt(a => a + 1); }, 3000);
+        } else {
+          setStatus('fail');
+        }
+      })
       .finally(() => clearTimeout(timer));
+
     return () => { alive = false; controller.abort(); };
-  }, []);
-  return { status, url };
+  }, [attempt]);
+
+  const retry = () => { setStatus('checking'); setAttempt(a => a + 1); };
+  return { status, url, retry };
 }
 
 export default function SignInScreen() {
@@ -47,7 +64,7 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const shake = useRef(new Animated.Value(0)).current;
-  const { status: serverStatus, url: serverUrl } = useServerPing();
+  const { status: serverStatus, url: serverUrl, retry: retryPing } = useServerPing();
 
   const doShake = () => {
     Animated.sequence([
@@ -109,13 +126,21 @@ export default function SignInScreen() {
           </View>
 
           <View style={s.content}>
-            {/* Server status pill — informational only */}
-            <View style={s.serverPill}>
+            {/* Server status pill — tap to retry when offline */}
+            <TouchableOpacity
+              style={s.serverPill}
+              onPress={serverStatus !== 'ok' ? retryPing : undefined}
+              activeOpacity={serverStatus !== 'ok' ? 0.7 : 1}
+            >
               <View style={[s.serverDot, serverStatus === 'ok' ? s.dotOk : serverStatus === 'fail' ? s.dotOffline : s.dotChecking]} />
               <Text style={s.serverPillText}>
-                {serverStatus === 'ok' ? 'Server Connected' : serverStatus === 'fail' ? 'Offline mode' : 'Connecting…'}
+                {serverStatus === 'ok'
+                  ? 'Server Connected'
+                  : serverStatus === 'fail'
+                    ? 'Tap to retry'
+                    : 'Connecting…'}
               </Text>
-            </View>
+            </TouchableOpacity>
 
             <View style={s.logoMark}>
               <Text style={s.logoSymbol}>♠</Text>
