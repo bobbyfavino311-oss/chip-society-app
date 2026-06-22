@@ -1,0 +1,511 @@
+DAILY SPIN WHEEL 2.0 COMPLETE REDESIGN
+
+The current Daily Spin wheel feels unfinished and low effort.
+
+The goal is NOT to create a new wheel from scratch.
+
+The goal is to transform the existing wheel into a premium casino attraction that feels exciting, rewarding, and worthy of being a daily feature players look forward to using.
+
+Keep the wheel circular layout.
+
+Keep the pointer at the top.
+
+Keep the overall screen structure.
+
+Redesign the wheel itself, center hub, prize hierarchy, rarity presentation, audio, and visual effects.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BIGGEST PROBLEM
+
+The current wheel gives nearly equal visual importance to every prize.
+
+Getting:
+
+2K Chips
+
+feels almost identical to getting:
+
+🥠 Mythic Fortune Cookie
+
+This is wrong.
+
+The wheel should immediately communicate rarity and value.
+
+Players should instantly know:
+
+"I want that Mythic Cookie."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SLICE SIZE REDESIGN
+
+Prize slices should be proportionally sized based on rarity.
+
+Common prizes should occupy larger portions of the wheel.
+
+Rare prizes should occupy smaller portions.
+
+However:
+
+DO NOT make the Mythic Cookie slice so small that it looks like a rendering error.
+
+Players must be able to clearly see every prize.
+
+Use weighted reward logic behind the scenes.
+
+The wheel should visually look exciting while the reward odds control actual rarity.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RECOMMENDED WHEEL DISTRIBUTION
+
+COMMON
+
+2K Chips
+
+5K Chips
+
+XP
+
+10K Chips
+
+Large slices.
+
+These should make up most of the wheel.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UNCOMMON
+
+25K Chips
+
+50K Chips
+
+Lottery Ticket
+
+Medium slices.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RARE
+
+🥠 Common Fortune Cookie
+
+Smaller slice.
+
+Still visible and desirable.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+EPIC
+
+100K Chips
+
+Small slice.
+
+Should feel exciting.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MYTHIC
+
+🥠 Mythic Fortune Cookie
+
+Single slice.
+
+Approximately 8–10% of the wheel visually.
+
+Do NOT make it a microscopic sliver.
+
+The odds should be controlled by reward weighting, not by making the slice invisible.
+
+Players need to see it and want it.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE SYSTEM UPDATE
+
+Remove:
+
+🥠 Golden Fortune Cookie
+
+Completely.
+
+Only keep:
+
+🥠 Common Fortune Cookie
+
+🥠 Mythic Fortune Cookie
+
+No other cookie variants appear on the wheel.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMMON COOKIE WEDGE
+
+Color:
+
+Rich Gold
+
+Visual:
+
+Fortune Cookie icon
+
+Soft glow
+
+Gold particles
+
+Reward Pool:
+
+Small chip prizes
+
+XP
+
+Minor collectibles
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MYTHIC COOKIE WEDGE
+
+This should become the centerpiece reward of the wheel.
+
+Color Palette:
+
+Deep Purple
+
+Electric Cyan
+
+Gold
+
+Animated glow.
+
+Dragon-themed visual accents.
+
+The Mythic Cookie wedge should be instantly recognizable.
+
+When players see it:
+
+They should immediately know:
+
+"That's the jackpot."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CENTER HUB COMPLETE REDESIGN
+
+Remove:
+
+CHIP SOCIETY text
+
+Completely.
+
+The center currently looks empty and low effort.
+
+Replace it with:
+
+Large premium casino chip hub.
+
+Design:
+
+Black center
+
+Gold metallic trim
+
+Cyan neon inner ring
+
+Pink neon outer ring
+
+Subtle glow animation
+
+Particle effects
+
+The center should feel like a luxury casino chip.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CENTER ICON
+
+Place one of the following in the middle:
+
+♠
+
+or
+
+Chip Society crest
+
+or
+
+Premium poker emblem
+
+Do NOT use plain text.
+
+The center should look iconic and collectible.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OUTER RIM REDESIGN
+
+The wheel currently looks flat.
+
+Add:
+
+Vegas-style illuminated outer rim.
+
+Features:
+
+Small glowing bulbs
+
+Neon accents
+
+Gold trim
+
+Subtle reflections
+
+Casino marquee feel
+
+The outer rim should feel expensive.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RARITY COLOR SYSTEM
+
+Every rarity should have a consistent visual language.
+
+COMMON
+
+Blue
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UNCOMMON
+
+Green
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RARE
+
+Gold
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+EPIC
+
+Gold + White
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MYTHIC
+
+Purple + Cyan + Gold
+
+Strongest glow in the entire wheel.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SPIN ANIMATION REDESIGN
+
+Current spin feels basic.
+
+Add:
+
+Wheel acceleration animation.
+
+Neon pulse effect.
+
+Prize glow effects.
+
+Particle trails.
+
+Near-miss effects.
+
+Winning slice spotlight.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SPIN AUDIO REDESIGN
+
+Current audio feels repetitive.
+
+Replace with layered casino-style audio.
+
+Spin Start:
+
+Mechanical casino spin
+
+WHOOSH effect
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Mid Spin:
+
+Soft wheel ticks
+
+Light mechanical clicks
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Slowdown:
+
+Ticks become heavier
+
+More deliberate
+
+Build anticipation
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Near Miss:
+
+Subtle shimmer sound
+
+Only when passing:
+
+🥠 Mythic Cookie
+
+100K
+
+Creates excitement.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REWARD AUDIO
+
+COMMON PRIZES
+
+Small reward chime
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UNCOMMON PRIZES
+
+Larger flourish
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🥠 COMMON COOKIE
+
+Cookie crack sound
+
+Asian prosperity chime
+
+Soft reward flourish
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🥠 MYTHIC COOKIE
+
+Cookie crack sound
+
+Deep temple gong
+
+Dragon ambience
+
+Premium prosperity flourish
+
+Most exciting audio in the game.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+WINNING WEDGE EFFECT
+
+When wheel stops:
+
+Winning slice illuminates.
+
+All other slices dim slightly.
+
+Prize pulses.
+
+Center hub glows brighter.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MYTHIC WIN EFFECT
+
+When player wins:
+
+🥠 Mythic Fortune Cookie
+
+Trigger special sequence.
+
+Screen darkens slightly.
+
+Purple glow expands.
+
+Temple gong plays.
+
+Dragon particle effects.
+
+Mythic Cookie rises into center screen.
+
+Special reward reveal animation.
+
+This should feel like opening a legendary loot box.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+POSSIBLE REWARDS SECTION REDESIGN
+
+Current reward boxes feel disconnected.
+
+Group rewards by rarity.
+
+COMMON
+
+2K
+
+5K
+
+10K
+
+XP
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UNCOMMON
+
+25K
+
+50K
+
+Ticket
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RARE
+
+🥠 Common Fortune Cookie
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+EPIC
+
+100K
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MYTHIC
+
+🥠 Mythic Fortune Cookie
+
+Players should instantly understand what prizes they are chasing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL DESIGN GOAL
+
+The Daily Spin should feel like a premium casino attraction.
+
+Not a pie chart.
+
+Not a placeholder spinner.
+
+Not a basic reward wheel.
+
+It should feel like a feature players are genuinely excited to return for every day.
+
+The Mythic Fortune Cookie should become the star of the entire wheel, while common rewards remain visually clear and proportionally larger.
+
+Maintain proportional slice sizing based on rarity, keep the wheel readable, keep the layout clean, and make the entire feature feel premium, exciting, and worthy of Chip Society.
