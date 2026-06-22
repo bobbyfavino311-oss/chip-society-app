@@ -40,6 +40,8 @@ import SakuraBackground from '@/components/SakuraBackground';
 import SakuraCardFrame from '@/components/SakuraCardFrame';
 import FrozenNeonBackground from '@/components/FrozenNeonBackground';
 import FrozenNeonCardFrame from '@/components/FrozenNeonCardFrame';
+import CrimsonNoirBackground from '@/components/CrimsonNoirBackground';
+import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -413,7 +415,8 @@ export default function PracticeScreen() {
   const isTiger       = theme.id === 'tiger_fortune';
   const isSakura      = theme.id === 'sakura_garden';
   const isFrozenNeon  = theme.id === 'frozen_neon';
-  const needsFrame    = isDragon || isMasquerade || isTiger || isSakura || isFrozenNeon;
+  const isCrimsonNoir = theme.id === 'crimson_noir';
+  const needsFrame    = isDragon || isMasquerade || isTiger || isSakura || isFrozenNeon || isCrimsonNoir;
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -660,6 +663,7 @@ export default function PracticeScreen() {
       {isTiger      && <TigerBackground />}
       {isSakura     && <SakuraBackground />}
       {isFrozenNeon && <FrozenNeonBackground />}
+      {isCrimsonNoir && <CrimsonNoirBackground />}
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -765,6 +769,9 @@ export default function PracticeScreen() {
           )}
           {isFrozenNeon && tableLayout.w > 0 && (
             <FrozenNeonCardFrame width={tableLayout.w} height={tableLayout.h} />
+          )}
+          {isCrimsonNoir && tableLayout.w > 0 && (
+            <CrimsonNoirCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
         <View style={[styles.tableSurface, {
           borderColor: theme.tableSurfaceBorder,

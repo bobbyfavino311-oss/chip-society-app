@@ -1,0 +1,214 @@
+🔴 Crimson Noir — Chip Society Theme Prompt
+
+Theme Name:
+
+Crimson Noir
+
+Design Goal:
+
+Create an ultra-premium high-stakes poker theme inspired by luxury private poker clubs, exotic sports cars, expensive whiskey lounges, dark casinos, and modern noir aesthetics.
+
+This should feel like a secret underground poker room where million-dollar pots are normal.
+
+Not horror.
+
+Not sci-fi.
+
+Not cyberpunk.
+
+Pure luxury.
+
+⸻
+
+Environment Style
+
+The entire screen must feel like a seamless full-screen environment.
+
+No visible panels.
+
+No rectangular wallpaper effect.
+
+No borders.
+
+No obvious background sections.
+
+Everything should blend together into one cohesive atmosphere.
+
+⸻
+
+Background
+
+Use:
+
+* Deep black background
+* Subtle crimson gradients
+* Soft black-to-red transitions
+* Large overlapping translucent shapes
+* Elegant flowing ribbon forms
+* Massive curved silhouettes fading into darkness
+
+The background should feel like:
+
+* Red velvet illuminated by hidden lighting
+* Luxury automotive paint reflections
+* Dark private casino interiors
+* High-end whiskey lounge atmosphere
+
+⸻
+
+Color Palette
+
+Primary:
+
+* Crimson Red (#D4002A)
+* Deep Ruby (#A0001C)
+* Black (#050505)
+
+Secondary:
+
+* Dark Burgundy (#3A0010)
+* Smoked Red (#650014)
+
+Highlights:
+
+* Soft White
+* Metallic Silver
+
+⸻
+
+Lighting
+
+Use:
+
+* Soft crimson bloom
+* Elegant edge lighting
+* Refined glow effects
+* Gentle reflections
+
+Avoid:
+
+* Harsh neon
+* Bright red everywhere
+* Excessive bloom
+* Flashy effects
+
+The glow should feel expensive.
+
+⸻
+
+Background Shapes
+
+Instead of circles:
+
+Use flowing ribbon forms.
+
+Think:
+
+* Silk ribbons
+* Luxury car body reflections
+* Smooth curved architecture
+
+Shapes should:
+
+* Drift across the screen
+* Extend beyond edges
+* Fade naturally
+* Create depth
+
+⸻
+
+Community Card Tray
+
+Create a premium tray that feels carved from smoked black glass.
+
+Features:
+
+* Dark glass body
+* Thin crimson illuminated edge
+* Soft internal reflections
+* Minimal glow
+* Precision-machined appearance
+
+The tray should feel like a luxury object.
+
+⸻
+
+Pot Display
+
+Design:
+
+* Floating black glass capsule
+* Crimson edge lighting
+* Bright white chip count
+* Luxury typography
+
+Inspired by:
+
+* Aston Martin dashboard
+* Porsche interior display
+* High-end watch design
+
+⸻
+
+Player Positions
+
+Use:
+
+* Dark glass seat platforms
+* Crimson accent rings
+* Soft glow beneath avatars
+
+No bright effects.
+
+Keep elegant.
+
+⸻
+
+Typography
+
+Style:
+
+* Premium
+* Modern
+* Thin
+* High-end
+
+Think:
+
+* Luxury watch branding
+* High-performance automotive UI
+
+⸻
+
+Atmosphere
+
+The player should feel like they’re sitting in:
+
+* A private penthouse poker room
+* An invitation-only casino
+* A billionaire’s card game
+
+Mood:
+
+* Powerful
+* Sophisticated
+* Expensive
+* Exclusive
+
+⸻
+
+Critical Instructions
+
+Do NOT create a bright red theme.
+
+Do NOT create a cyberpunk theme.
+
+Do NOT create a horror theme.
+
+Do NOT create a casino cartoon theme.
+
+Everything must remain:
+
+minimal, luxurious, dark, elegant, seamless, and premium.
+
+The final result should feel like a $500,000 poker table designed by Aston Martin and illuminated by hidden crimson ambient lighting.

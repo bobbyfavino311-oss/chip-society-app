@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'tiger_fortune' | 'sakura_garden' | 'frozen_neon';
+export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'tiger_fortune' | 'sakura_garden' | 'frozen_neon' | 'crimson_noir';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'tiger_claw' | 'sakura_blossom' | 'frozen_glass';
+  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'tiger_claw' | 'sakura_blossom' | 'frozen_glass' | 'crimson_silk';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -329,6 +329,53 @@ export const FROZEN_NEON: TableTheme = {
   previewColors: ['#08101E', '#00D9FF', '#8FEFFF'],
 };
 
+export const CRIMSON_NOIR: TableTheme = {
+  id: 'crimson_noir',
+  name: 'CRIMSON NOIR',
+  tagline: 'An invitation-only underground poker room. Deep black, smoked glass, and hidden crimson light.',
+  rarity: 'LEGENDARY',
+
+  bgGradient: ['#0A0004', '#050505', '#070002', '#050505', '#0A0004'],
+
+  glowA: 'rgba(160,0,28,0.22)',
+  glowB: 'rgba(58,0,16,0.14)',
+  glowCenter: 'rgba(101,0,20,0.12)',
+
+  tableSurfaceBg: 'rgba(5,3,4,0.90)',
+  tableSurfaceBorder: 'rgba(212,0,42,0.38)',
+  tableSurfaceShadow: '#D4002A',
+  tableCenterGlow: 'rgba(80,0,20,0.16)',
+
+  cardBackBg: '#0A0003',
+  cardBackAccent: '#D4002A',
+  cardBackPattern: 'crimson_silk',
+  cardHighlightColor: '#D4002A',
+
+  chipTokenColor: '#D4002A',
+  chipWinTokenColor: '#F0F0F0',
+
+  potBg: 'rgba(5,3,4,0.94)',
+  potBorder: 'rgba(212,0,42,0.38)',
+  potShadow: '#D4002A',
+  potLabelColor: 'rgba(212,0,42,0.55)',
+  potAmountColor: '#F0F0F0',
+
+  foldAccent: '#6B0018',
+  checkAccent: '#A0001C',
+  callAccent: '#285030',
+  raiseAccent: '#D4002A',
+  allInAccent: '#F0F0F0',
+
+  accentPrimary: '#D4002A',
+  accentSecondary: '#A0001C',
+  textColor: '#F0E8E8',
+
+  winEffectStyle: 'gold_shimmer',
+  winGoldColor: '#D4002A',
+
+  previewColors: ['#050505', '#A0001C', '#D4002A'],
+};
+
 export const ALL_TABLE_THEMES: TableTheme[] = [
   NEON_DEFAULT,
   DRAGON_FORTUNE,
@@ -336,4 +383,5 @@ export const ALL_TABLE_THEMES: TableTheme[] = [
   TIGER_FORTUNE,
   SAKURA_GARDEN,
   FROZEN_NEON,
+  CRIMSON_NOIR,
 ];

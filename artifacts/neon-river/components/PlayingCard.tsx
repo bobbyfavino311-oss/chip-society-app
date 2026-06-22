@@ -402,6 +402,97 @@ function FrozenGlassBack({ w, h, r }: { w: number; h: number; r: number }) {
 }
 
 // ─── Card back router ──────────────────────────────────────────────────────────
+// ─── Crimson Silk card back ─────────────────────────────────────────────────────
+function CrimsonSilkBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const crimson  = '#D4002A';
+  const ruby     = '#A0001C';
+  const silver   = 'rgba(200,200,200,0.18)';
+  const cx = w / 2;
+  const cy = h / 2;
+  const med = Math.min(w, h) * 0.26;
+
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#0A0003' }]}>
+      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+        {/* Flowing ribbon A — upper-left to lower-right */}
+        <Path
+          d={`M ${-w * 0.1} ${h * 0.15}
+              C ${w * 0.25} ${h * 0.05}, ${w * 0.65} ${h * 0.38}, ${w * 1.1} ${h * 0.55}
+              C ${w * 1.1} ${h * 0.68}, ${w * 0.70} ${h * 0.46}, ${-w * 0.1} ${h * 0.32} Z`}
+          fill={ruby} fillOpacity={0.22}
+        />
+        {/* Flowing ribbon B — lower-right to upper-left */}
+        <Path
+          d={`M ${w * 1.1} ${h * 0.58}
+              C ${w * 0.72} ${h * 0.48}, ${w * 0.38} ${h * 0.70}, ${-w * 0.1} ${h * 0.60}
+              C ${-w * 0.1} ${h * 0.74}, ${w * 0.35} ${h * 0.84}, ${w * 1.1} ${h * 0.80} Z`}
+          fill={crimson} fillOpacity={0.16}
+        />
+        {/* Outer rings */}
+        <Circle cx={cx} cy={cy} r={med * 1.4}
+          fill="none" stroke={ruby} strokeWidth={0.8} strokeOpacity={0.28} />
+        <Circle cx={cx} cy={cy} r={med * 0.95}
+          fill="none" stroke={crimson} strokeWidth={0.6} strokeOpacity={0.22} />
+        <Circle cx={cx} cy={cy} r={med * 0.52}
+          fill="none" stroke={silver} strokeWidth={0.5} />
+
+        {/* Cardinal spoke lines */}
+        {([0, 1, 2, 3] as const).map((i) => {
+          const angle = (i * Math.PI) / 2;
+          return (
+            <Line key={i}
+              x1={cx} y1={cy}
+              x2={cx + Math.cos(angle) * med * 1.4}
+              y2={cy + Math.sin(angle) * med * 1.4}
+              stroke={ruby} strokeWidth={0.4} strokeOpacity={0.22}
+            />
+          );
+        })}
+
+        {/* Central diamond */}
+        <Polygon
+          points={`${cx},${cy - med * 0.40} ${cx + med * 0.40},${cy} ${cx},${cy + med * 0.40} ${cx - med * 0.40},${cy}`}
+          fill={ruby} fillOpacity={0.18}
+          stroke={crimson} strokeWidth={0.9} strokeOpacity={0.55}
+        />
+        {/* Inner diamond */}
+        <Polygon
+          points={`${cx},${cy - med * 0.20} ${cx + med * 0.20},${cy} ${cx},${cy + med * 0.20} ${cx - med * 0.20},${cy}`}
+          fill={crimson} fillOpacity={0.12}
+          stroke={silver} strokeWidth={0.5}
+        />
+
+        {/* Cardinal tick marks on outer ring */}
+        {([0, 1, 2, 3] as const).map((i) => {
+          const angle = (i * Math.PI) / 2;
+          const bx = cx + Math.cos(angle) * med * 1.4;
+          const by = cy + Math.sin(angle) * med * 1.4;
+          const nx = -Math.sin(angle);
+          const ny = Math.cos(angle);
+          return (
+            <Line key={`t${i}`}
+              x1={bx - nx * 3.5} y1={by - ny * 3.5}
+              x2={bx + nx * 3.5} y2={by + ny * 3.5}
+              stroke={silver} strokeWidth={1.2}
+            />
+          );
+        })}
+
+        {/* Centre dot */}
+        <Circle cx={cx} cy={cy} r={med * 0.09} fill={ruby}    fillOpacity={0.80} />
+        <Circle cx={cx} cy={cy} r={med * 0.05} fill="#F0E8E8" fillOpacity={0.90} />
+
+        {/* Silver sheen — top highlight */}
+        <Ellipse cx={cx} cy={h * 0.12} rx={w * 0.35} ry={h * 0.06}
+          fill="rgba(200,200,200,0.05)" />
+      </Svg>
+      {/* Crimson inset border */}
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 1, borderWidth: 1, borderColor: 'rgba(212,0,42,0.30)' }} />
+    </View>
+  );
+}
+
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
   if (theme.cardBackPattern === 'dragon_scale')    return <DragonScaleBack    w={w} h={h} r={r} />;
@@ -409,6 +500,7 @@ function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   if (theme.cardBackPattern === 'tiger_claw')      return <TigerClawBack      w={w} h={h} r={r} />;
   if (theme.cardBackPattern === 'sakura_blossom')  return <SakuraBlossomBack  w={w} h={h} r={r} />;
   if (theme.cardBackPattern === 'frozen_glass')    return <FrozenGlassBack    w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'crimson_silk')    return <CrimsonSilkBack    w={w} h={h} r={r} />;
   return <MandalaBack w={w} h={h} r={r} />;
 }
 
