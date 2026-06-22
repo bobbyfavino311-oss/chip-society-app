@@ -457,13 +457,20 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
-  // Debounced server sync — fires 8 s after the last save() call
+  // Debounced server sync — fires 3 s after the last save() call.
+  // For critical one-time events (tutorial completion) we bypass the debounce and save immediately.
   const scheduleSyncToServer = useCallback((updated: UserProfile) => {
     if (!updated.playerId || updated.username === DEFAULT_PROFILE.username) return;
     if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    // tutorialCompleted transitioning to true is a once-in-a-lifetime event —
+    // save immediately so it can never be lost to a premature app close.
+    if (updated.tutorialCompleted) {
+      void serverSaveProfile(updated.playerId, updated);
+      return;
+    }
     syncTimerRef.current = setTimeout(() => {
       void serverSaveProfile(updated.playerId!, updated);
-    }, 8_000);
+    }, 3_000);
   }, []);
 
   const save = useCallback(async (updated: UserProfile) => {
@@ -781,9 +788,46 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: res.error };
     }
 
-    const restored: UserProfile = backfillProfile(DEFAULT_PROFILE, { ...res.profile as UserProfile, isNewUser: false });
+    // Server is the authoritative source.  Build the restored profile by spreading
+    // DEFAULT_PROFILE first (gives sane defaults for fields added after the account
+    // was created), then the server profile on top so every saved value wins.
+    const serverProf = res.profile as Partial<UserProfile>;
+
+    // Also check local storage: if the player completed the tutorial but the
+    // debounced server sync hadn't fired yet before sign-out, the local profile
+    // will have tutorialCompleted=true while the server still has false.
+    let localTutorial = false;
+    try {
+      const localStr = await AsyncStorage.getItem(STORAGE_KEY);
+      if (localStr) {
+        const localProf = JSON.parse(localStr) as Partial<UserProfile>;
+        // Only trust local tutorialCompleted for the SAME player
+        if (localProf.username?.toLowerCase() === username.toLowerCase()) {
+          localTutorial = !!localProf.tutorialCompleted;
+        }
+      }
+    } catch { /* ignore parse errors */ }
+
+    const restored: UserProfile = {
+      ...DEFAULT_PROFILE,                              // sane defaults for new fields
+      ...serverProf,                                   // server data wins
+      // Critical fields that must NEVER fall back to DEFAULT_PROFILE values:
+      username: serverProf.username ?? username,       // use login username as last resort
+      isNewUser: false,                                // never re-trigger the new-user gate
+      accountType: 'registered',
+      // tutorialCompleted: trust it if EITHER source says true.
+      // This prevents the tutorial from re-appearing when the server sync lagged.
+      tutorialCompleted: !!(serverProf.tutorialCompleted || localTutorial),
+    };
+
     setProfile(restored);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+
+    // If local knew tutorial was done but server didn't, fix the server now.
+    if (restored.tutorialCompleted && !serverProf.tutorialCompleted && restored.playerId) {
+      void serverSaveProfile(restored.playerId, restored);
+    }
+
     return { success: true };
   }, []);
 

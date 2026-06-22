@@ -1,0 +1,114 @@
+Use this as a stricter bug-fix prompt:
+
+CRITICAL ACCOUNT IDENTITY BUG FIX
+The account system is still broken.
+Example:
+Created account:
+realbobbyf
+But after login, the profile shows:
+CSplayer
+Then the game starts a fresh account.
+This means the app is NOT loading the saved server account correctly.
+This is a launch-blocking bug.
+━━━━━━━━━━━━━━━━━━━━━━
+BUGS TO FIX
+1. Username is not persisting.
+2. Created username is being replaced with default name CSplayer.
+3. Existing account is not being restored.
+4. Login creates or loads a fresh default profile.
+5. Tutorial appears again after login.
+6. Player gets trapped on tutorial screen.
+7. Progress is not saving or loading correctly.
+━━━━━━━━━━━━━━━━━━━━━━
+REQUIRED BEHAVIOR
+When account realbobbyf is created:
+Save server-side:
+playerId
+username: realbobbyf
+hashedPin
+chips
+xp
+level
+avatar
+tutorialCompleted
+inventory
+stats
+When realbobbyf logs back in:
+Load the SAME playerId.
+Do NOT create a new player.
+Do NOT assign CSplayer.
+Do NOT reset chips.
+Do NOT reset tutorial.
+Do NOT reset avatar.
+Do NOT overwrite saved data with defaults.
+━━━━━━━━━━━━━━━━━━━━━━
+DEFAULT PROFILE RULE
+CSplayer should ONLY be used before account creation.
+Once a username exists, CSplayer must never overwrite it.
+If server returns a valid username, always display that username.
+If server fails to return username, show an error.
+Do NOT silently fall back to CSplayer.
+━━━━━━━━━━━━━━━━━━━━━━
+LOGIN FLOW FIX
+On login:
+1. Send username + 4-digit PIN to server.
+2. Server validates PIN.
+3. Server returns existing player profile.
+4. App stores returned playerId.
+5. App loads returned profile data.
+6. App routes to Home Screen.
+If login fails:
+Show error.
+Do NOT create fresh account.
+Do NOT create local fallback profile.
+━━━━━━━━━━━━━━━━━━━━━━
+TUTORIAL FIX
+tutorialCompleted must be saved server-side.
+If tutorialCompleted = true:
+Go directly to Home Screen.
+If tutorialCompleted = false:
+Show tutorial once.
+After tutorial completes:
+Set tutorialCompleted = true.
+Save immediately to server.
+Player must never be trapped on tutorial.
+Add safe buttons:
+Skip Tutorial
+Finish Tutorial
+Go to Home
+━━━━━━━━━━━━━━━━━━━━━━
+DO NOT OVERWRITE SERVER DATA
+On app start, do NOT initialize default values over saved profile data.
+Bad behavior:
+load default profile
+username = CSplayer
+chips = 50000
+tutorialCompleted = false
+then overwrite server account
+This must not happen.
+Correct behavior:
+wait for server profile
+load saved values
+only use defaults when creating a brand-new account
+━━━━━━━━━━━━━━━━━━━━━━
+TEST CASE
+1. Create username: realbobbyf
+2. Create PIN
+3. Confirm profile shows realbobbyf
+4. Select avatar
+5. Complete tutorial
+6. Earn chips / XP
+7. Logout
+8. Close app
+9. Reopen app
+10. Login as realbobbyf
+Expected:
+Profile still says realbobbyf.
+Same playerId loads.
+Same chips load.
+Same XP loads.
+Same avatar loads.
+Tutorial does not appear.
+No CSplayer fallback.
+No fresh account created.
+If any of this fails, account persistence is still broken.
