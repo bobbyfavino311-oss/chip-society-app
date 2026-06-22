@@ -329,7 +329,6 @@ const g = StyleSheet.create({
   seatFolded: { opacity: 0.2 },
   avatarRing: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.05)',
     borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center', justifyContent: 'center',
   },
@@ -649,10 +648,14 @@ export default function PracticeScreen() {
         style={StyleSheet.absoluteFill}
         start={{ x: 0.3, y: 0 }} end={{ x: 0.7, y: 1 }}
       />
-      {/* Ambient glow blobs */}
-      <View style={[styles.glowPurple, { backgroundColor: theme.glowA }]} />
-      <View style={[styles.glowCyan,   { backgroundColor: theme.glowB }]} />
-      <View style={[styles.glowCenter, { backgroundColor: theme.glowCenter }]} />
+      {/* Ambient glow blobs — only for the default neon theme */}
+      {!isDragon && !isMasquerade && !isSakura && !isFrozenNeon && !isCrimsonNoir && (
+        <>
+          <View style={[styles.glowPurple, { backgroundColor: theme.glowA }]} />
+          <View style={[styles.glowCyan,   { backgroundColor: theme.glowB }]} />
+          <View style={[styles.glowCenter, { backgroundColor: theme.glowCenter }]} />
+        </>
+      )}
 
       {/* Theme atmospheric backgrounds */}
       {isDragon     && <DragonBackground />}
@@ -1188,7 +1191,6 @@ const styles = StyleSheet.create({
   iconBtn: {
     width: 32, height: 32, borderRadius: 16,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
   },
   iconBtnOn: { backgroundColor: 'rgba(0,212,255,0.07)' },
   phaseLabel: {
@@ -1495,7 +1497,6 @@ const styles = StyleSheet.create({
   skipBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
   },
   runItOutBtn: { backgroundColor: 'rgba(255,215,0,0.06)' },
   skipText: {
