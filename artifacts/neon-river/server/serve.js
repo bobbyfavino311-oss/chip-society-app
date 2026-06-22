@@ -104,22 +104,22 @@ function serveManifest(req, platform, res) {
     manifestObj.bundleUrl = rewriteUrl(manifestObj.bundleUrl);
   }
 
-  // Always inject the correct production API URL into the manifest extra.
-  // The build step runs with REPLIT_DOMAINS="replit.com" (Expo proxy domain),
-  // so any build-time computation of apiUrl ends up wrong. We fix it here at
-  // serve time using the actual request host from the Replit proxy headers.
-  const correctApiUrl = `${protocol}://${host}/api`;
+  // Always inject the Railway API URL into the manifest extra.
+  // The game server is hosted on Railway (permanent, 24/7) — not on Replit.
+  // The Expo bundle is still served from Replit (chip-society.replit.app) but
+  // all API calls and Socket.IO connections go directly to Railway.
+  const RAILWAY_API_URL = 'https://api-server-production-bbc2.up.railway.app/api';
   if (!manifestObj.extra) manifestObj.extra = {};
   if (!manifestObj.extra.expoClient) manifestObj.extra.expoClient = {};
   if (!manifestObj.extra.expoClient.extra) manifestObj.extra.expoClient.extra = {};
-  manifestObj.extra.expoClient.extra.apiUrl = correctApiUrl;
+  manifestObj.extra.expoClient.extra.apiUrl = RAILWAY_API_URL;
 
   // Bust the Expo Go bundle cache by appending a serve-version suffix to the
   // launchAsset key. Without this, Expo Go re-uses its cached bundle from
   // before our serve-time URL patches were deployed, so fonts/images/audio
   // remain broken even after we publish fixes to serve.js.
   if (manifestObj.launchAsset) {
-    manifestObj.launchAsset.key = (manifestObj.launchAsset.key || 'bundle') + '-s4';
+    manifestObj.launchAsset.key = (manifestObj.launchAsset.key || 'bundle') + '-s5';
   }
 
   const body = JSON.stringify(manifestObj);

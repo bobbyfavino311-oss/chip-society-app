@@ -25,7 +25,8 @@ function getSocketUrl(): string {
   } catch { /* ignore */ }
   const domain = process.env['EXPO_PUBLIC_DOMAIN'];
   if (domain) return `https://${domain}`;
-  return '';
+  // Hardcoded Railway fallback — permanent 24/7 multiplayer server.
+  return 'https://api-server-production-bbc2.up.railway.app';
 }
 
 const SOCKET_PATH = '/api/socket.io';

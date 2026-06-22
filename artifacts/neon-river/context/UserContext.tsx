@@ -296,8 +296,8 @@ export function getApiBase(): string {
     return fromManifest;
   }
 
-  // Hardcoded production fallback — chip-society.replit.app confirmed reachable (HTTP 200).
-  return 'https://chip-society.replit.app/api';
+  // Hardcoded production fallback — Railway server (permanent 24/7 hosting).
+  return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 
 // ─── Server API helpers ───────────────────────────────────────────────────────
