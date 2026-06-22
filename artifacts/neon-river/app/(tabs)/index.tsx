@@ -740,7 +740,7 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 80 }]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 80, paddingTop: insets.top + 56 }]}
         showsVerticalScrollIndicator={false}
       >
         <ChipSocietyLogo />
@@ -1058,7 +1058,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, borderWidth: 2,
     alignItems: 'center', justifyContent: 'center',
   },
-  scroll: { paddingHorizontal: 16, gap: 16, paddingTop: 72 },
+  scroll: { paddingHorizontal: 16, gap: 16 },
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionTitle: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
   seeAll: { color: colors.primary, fontSize: 11, fontWeight: '600' },

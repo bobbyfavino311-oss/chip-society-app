@@ -173,6 +173,16 @@ export default function RootLayout() {
     Righteous_400Regular,
   });
 
+  // Hard timeout: if fonts haven't loaded within 6 s (e.g. slow CDN on first
+  // Expo Go launch), proceed anyway rather than blocking the app indefinitely.
+  const [fontTimeout, setFontTimeout] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setFontTimeout(true), 6000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const fontsReady = fontsLoaded || fontError || fontTimeout;
+
   const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
@@ -184,10 +194,10 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if ((fontsLoaded || fontError) && assetsReady) SplashScreen.hideAsync();
-  }, [fontsLoaded, fontError, assetsReady]);
+    if (fontsReady && assetsReady) SplashScreen.hideAsync();
+  }, [fontsReady, assetsReady]);
 
-  if (!fontsLoaded && !fontError) return null;
+  if (!fontsReady) return null;
 
   return (
     <SafeAreaProvider>

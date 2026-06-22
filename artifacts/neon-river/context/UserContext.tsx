@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export type Rank =
@@ -277,26 +278,20 @@ const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── API base URL ─────────────────────────────────────────────────────────────
 export function getApiBase(): string {
-  // Web browser (Expo web / Safari): use window.location origin.
-  // In React Native/Hermes, window.location is undefined so this is safely skipped.
-  if (typeof window !== 'undefined' && window.location != null && window.location.origin) {
+  // Web browser only — derive the API origin from the page URL so the app works
+  // on any Replit domain, custom domain, or local dev server.
+  //
+  // IMPORTANT: do NOT use window.location on native.  Expo Router injects a
+  // synthetic window.location (from app.json's expo-router `origin` config)
+  // even in React Native / Hermes, so the window check alone is not enough.
+  if (Platform.OS === 'web') {
     return `${window.location.origin}/api`;
   }
 
-  // Native: read apiUrl injected live into the manifest by serve.js.
-  // serve.js sets this from the request host headers (always correct at runtime).
-  // Reject any value that contains "replit.com" — that is the Expo proxy host,
-  // not the actual app domain, and cannot serve the API.
-  const fromManifest = (Constants.expoConfig?.extra as Record<string, unknown> | undefined)?.apiUrl;
-  if (
-    typeof fromManifest === 'string' &&
-    fromManifest.startsWith('https://') &&
-    !fromManifest.includes('replit.com')
-  ) {
-    return fromManifest;
-  }
-
-  // Hardcoded production fallback — Railway server (permanent 24/7 hosting).
+  // Native (iOS / Android) — always talk to the permanent Railway server.
+  // We intentionally skip the manifest apiUrl here: Expo Go injects the Replit
+  // dev-server URL which is only accessible from inside the Replit sandbox, not
+  // from a real device on a different network.
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 
