@@ -308,6 +308,99 @@ function SakuraBlossomBack({ w, h, r }: { w: number; h: number; r: number }) {
   );
 }
 
+// ─── Frozen Glass card back ─────────────────────────────────────────────────────
+function FrozenGlassBack({ w, h, r }: { w: number; h: number; r: number }) {
+  const cyan     = '#00D9FF';
+  const ice      = '#8FEFFF';
+  const iceDim   = 'rgba(143,239,255,0.18)';
+  const cyanDim  = 'rgba(0,217,255,0.12)';
+  const cx = w / 2;
+  const cy = h / 2;
+  const med = Math.min(w, h) * 0.26;
+
+  // Geometric lattice points — 8 directions
+  const dirs: [number, number][] = [
+    [0, -1], [0.707, -0.707], [1, 0], [0.707, 0.707],
+    [0, 1], [-0.707, 0.707], [-1, 0], [-0.707, -0.707],
+  ];
+
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { borderRadius: r, overflow: 'hidden', backgroundColor: '#040D18' }]}>
+      <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+        {/* Outer frosted ring */}
+        <Circle cx={cx} cy={cy} r={med * 1.45}
+          fill="none" stroke={cyanDim} strokeWidth={1.2} />
+        {/* Mid ring */}
+        <Circle cx={cx} cy={cy} r={med * 1.0}
+          fill="none" stroke={iceDim} strokeWidth={0.8} />
+        {/* Inner ring */}
+        <Circle cx={cx} cy={cy} r={med * 0.58}
+          fill="none" stroke={cyanDim} strokeWidth={0.6} />
+
+        {/* Spoke lines from center — geometric lattice */}
+        {dirs.map(([dx, dy], i) => (
+          <Line key={i}
+            x1={cx} y1={cy}
+            x2={cx + dx * med * 1.45}
+            y2={cy + dy * med * 1.45}
+            stroke={cyan} strokeWidth={0.4} strokeOpacity={0.18}
+          />
+        ))}
+
+        {/* Corner tick marks on outer ring */}
+        {[0, 1, 2, 3].map((i) => {
+          const angle = (i * Math.PI) / 2;
+          const bx = cx + Math.cos(angle) * med * 1.45;
+          const by = cy + Math.sin(angle) * med * 1.45;
+          const nx = -Math.sin(angle);
+          const ny = Math.cos(angle);
+          return (
+            <Line key={`t${i}`}
+              x1={bx - nx * 3} y1={by - ny * 3}
+              x2={bx + nx * 3} y2={by + ny * 3}
+              stroke={ice} strokeWidth={1.2} strokeOpacity={0.55}
+            />
+          );
+        })}
+
+        {/* Central diamond (rotated square) */}
+        <Polygon
+          points={`${cx},${cy - med * 0.42} ${cx + med * 0.42},${cy} ${cx},${cy + med * 0.42} ${cx - med * 0.42},${cy}`}
+          fill="none" stroke={cyan} strokeWidth={0.9} strokeOpacity={0.50}
+        />
+        {/* Inner diamond */}
+        <Polygon
+          points={`${cx},${cy - med * 0.22} ${cx + med * 0.22},${cy} ${cx},${cy + med * 0.22} ${cx - med * 0.22},${cy}`}
+          fill={cyan} fillOpacity={0.08}
+          stroke={ice} strokeWidth={0.6} strokeOpacity={0.40}
+        />
+
+        {/* Center glow dot */}
+        <Circle cx={cx} cy={cy} r={med * 0.09}
+          fill={ice} fillOpacity={0.75} />
+        <Circle cx={cx} cy={cy} r={med * 0.06}
+          fill="#F5FCFF" fillOpacity={0.9} />
+
+        {/* Corner accent dots at outer ring intersections */}
+        {[0, 1, 2, 3].map((i) => {
+          const angle = (i * Math.PI) / 2;
+          return (
+            <Circle key={`d${i}`}
+              cx={cx + Math.cos(angle) * med * 1.0}
+              cy={cy + Math.sin(angle) * med * 1.0}
+              r={2.2}
+              fill={ice} fillOpacity={0.45}
+            />
+          );
+        })}
+      </Svg>
+      {/* Cyan inset border */}
+      <View style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3,
+        borderRadius: r - 1, borderWidth: 1, borderColor: 'rgba(0,217,255,0.28)' }} />
+    </View>
+  );
+}
+
 // ─── Card back router ──────────────────────────────────────────────────────────
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
@@ -315,6 +408,7 @@ function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   if (theme.cardBackPattern === 'masquerade_veil') return <MasqueradeVeilBack w={w} h={h} r={r} />;
   if (theme.cardBackPattern === 'tiger_claw')      return <TigerClawBack      w={w} h={h} r={r} />;
   if (theme.cardBackPattern === 'sakura_blossom')  return <SakuraBlossomBack  w={w} h={h} r={r} />;
+  if (theme.cardBackPattern === 'frozen_glass')    return <FrozenGlassBack    w={w} h={h} r={r} />;
   return <MandalaBack w={w} h={h} r={r} />;
 }
 

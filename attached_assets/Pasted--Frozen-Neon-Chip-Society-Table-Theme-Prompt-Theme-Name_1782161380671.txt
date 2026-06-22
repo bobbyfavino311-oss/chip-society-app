@@ -1,0 +1,119 @@
+❄️ Frozen Neon — Chip Society Table Theme Prompt
+
+Theme Name: Frozen Neon
+
+Design Goal:
+Create a premium futuristic poker table theme inspired by ice, glass, luxury technology, and neon lighting. The theme should feel like a high-end casino inside an Apple-designed arctic resort. Minimalist, elegant, and highly readable. Avoid cartoon elements, snowflakes, winter scenery, or anything gimmicky.
+
+⸻
+
+Background
+
+Use a deep midnight blue to near-black gradient background.
+
+The background should feature:
+
+* Massive translucent frosted-glass circles
+* Soft overlapping icy blue shapes
+* Blurred glass-like gradients
+* Subtle depth and layering
+* Very low visual noise
+* No realistic environment
+* No table felt texture
+
+The effect should feel like looking through premium frozen glass illuminated by neon lighting.
+
+⸻
+
+Color Palette
+
+Primary Colors:
+
+* Ice Blue (#8FEFFF)
+* Electric Cyan (#00D9FF)
+* Arctic White (#F5FCFF)
+
+Accent Colors:
+
+* Frost Silver (#DDE8F0)
+* Deep Navy (#08101E)
+
+Glow Colors:
+
+* Cyan glow
+* White glow
+* Subtle blue aura
+
+No purple.
+No pink.
+No warm colors.
+
+⸻
+
+Table Elements
+
+Community Card Tray:
+
+* Frosted glass panel
+* Thin cyan illuminated border
+* Soft internal glow
+* Rounded corners
+* Glassmorphism styling
+
+Pot Display:
+
+* Floating glass capsule
+* Bright cyan numbers
+* White labels
+* Premium casino appearance
+
+Player Areas:
+
+* Frosted glass circular platforms
+* Soft cyan edge lighting
+* Clean futuristic design
+
+⸻
+
+Lighting
+
+* Soft bloom effects
+* Delicate cyan rim lighting
+* Frosted glass reflections
+* Minimal neon accents
+* Subtle volumetric glow
+
+Everything should feel premium and expensive.
+
+⸻
+
+Visual Style
+
+Inspired By:
+
+* Apple Vision Pro
+* Luxury yacht interiors
+* High-end casino lounges
+* Frosted glass UI design
+* Modern electric vehicles
+* Scandinavian luxury architecture
+
+Keywords:
+
+minimalist, futuristic, luxury, frozen glass, premium casino, glassmorphism, cyan glow, ice blue lighting, elegant, sophisticated, atmospheric, ultra-clean, high-end UI, modern poker environment
+
+⸻
+
+Important Constraints
+
+* No snowflakes
+* No ice crystals
+* No mountains
+* No winter scenery
+* No cartoon effects
+* No fantasy elements
+* No clutter
+* No busy patterns
+
+Focus entirely on:
+dark luxury + frozen glass + cyan neon + premium poker atmosphere.

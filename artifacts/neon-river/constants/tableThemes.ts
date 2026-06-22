@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'tiger_fortune' | 'sakura_garden';
+export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'tiger_fortune' | 'sakura_garden' | 'frozen_neon';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'tiger_claw' | 'sakura_blossom';
+  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'tiger_claw' | 'sakura_blossom' | 'frozen_glass';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -282,10 +282,58 @@ export const SAKURA_GARDEN: TableTheme = {
   previewColors: ['#160510', '#C4407C', '#F4A8C0'],
 };
 
+export const FROZEN_NEON: TableTheme = {
+  id: 'frozen_neon',
+  name: 'FROZEN NEON',
+  tagline: 'A luxury arctic casino lit by pure cyan neon. Frosted glass, deep navy, and ice-blue light.',
+  rarity: 'LEGENDARY',
+
+  bgGradient: ['#0A1628', '#060E1C', '#030A14', '#060E1C', '#0A1628'],
+
+  glowA: 'rgba(0,217,255,0.16)',
+  glowB: 'rgba(143,239,255,0.08)',
+  glowCenter: 'rgba(0,160,200,0.10)',
+
+  tableSurfaceBg: 'rgba(4,10,20,0.82)',
+  tableSurfaceBorder: 'rgba(0,217,255,0.36)',
+  tableSurfaceShadow: '#00D9FF',
+  tableCenterGlow: 'rgba(0,160,200,0.12)',
+
+  cardBackBg: '#040D18',
+  cardBackAccent: '#00D9FF',
+  cardBackPattern: 'frozen_glass',
+  cardHighlightColor: '#8FEFFF',
+
+  chipTokenColor: '#00D9FF',
+  chipWinTokenColor: '#F5FCFF',
+
+  potBg: 'rgba(4,10,20,0.92)',
+  potBorder: 'rgba(0,217,255,0.36)',
+  potShadow: '#00D9FF',
+  potLabelColor: 'rgba(143,239,255,0.55)',
+  potAmountColor: '#8FEFFF',
+
+  foldAccent: '#3E7A8C',
+  checkAccent: '#00D9FF',
+  callAccent: '#00B8A8',
+  raiseAccent: '#8FEFFF',
+  allInAccent: '#F5FCFF',
+
+  accentPrimary: '#00D9FF',
+  accentSecondary: '#8FEFFF',
+  textColor: '#F5FCFF',
+
+  winEffectStyle: 'neon_burst',
+  winGoldColor: '#8FEFFF',
+
+  previewColors: ['#08101E', '#00D9FF', '#8FEFFF'],
+};
+
 export const ALL_TABLE_THEMES: TableTheme[] = [
   NEON_DEFAULT,
   DRAGON_FORTUNE,
   ROYAL_MASQUERADE,
   TIGER_FORTUNE,
   SAKURA_GARDEN,
+  FROZEN_NEON,
 ];
