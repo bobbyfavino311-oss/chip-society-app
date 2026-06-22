@@ -1,0 +1,139 @@
+Frozen Neon Theme — Revision Prompt
+
+The Frozen Neon theme is close, but it currently looks like a wallpaper panel placed on top of a dark background rather than a true full-screen environment.
+
+The most noticeable issue is the dark blue vertical strip on the right side of the screen. This breaks immersion and makes the theme feel unfinished. The background must extend seamlessly edge-to-edge across the entire display with no visible borders, panels, rectangles, containers, or hard transitions.
+
+⸻
+
+Required Changes
+
+Full-Screen Environment
+
+The Frozen Neon theme must become a complete screen environment.
+
+Remove:
+
+* Right-side dark blue strip
+* Any visible rectangular background panel
+* Any hard edges
+* Any visible theme boundaries
+* Any feeling that the theme is a layer sitting on top of another background
+
+Replace with:
+
+* One continuous full-screen composition
+* Seamless gradients extending to all screen edges
+* Background elements flowing naturally across the entire display
+
+The player should never be able to identify where the background begins or ends.
+
+⸻
+
+Background Design
+
+Use:
+
+* Deep navy-to-black gradients
+* Large translucent frosted-glass circles
+* Massive overlapping icy-blue glass forms
+* Soft cyan atmospheric glow
+* Smooth layered depth
+
+The background should feel like:
+
+* Looking through luxury frozen glass
+* Apple Vision Pro marketing imagery
+* High-end futuristic architecture
+* Premium electric vehicle interior lighting
+
+Everything should blend together naturally.
+
+⸻
+
+Shape Improvements
+
+Current circles feel disconnected.
+
+Update them to:
+
+* Extend beyond screen edges
+* Overlap naturally
+* Vary greatly in scale
+* Fade softly into each other
+* Create a sense of depth
+
+Think:
+
+Giant glass structures floating behind the UI rather than decorative circles.
+
+⸻
+
+Lighting Improvements
+
+Add:
+
+* Soft cyan bloom
+* Subtle glass reflections
+* Frosted highlights
+* Gentle volumetric glow
+
+Do NOT add:
+
+* Lens flares
+* Bright neon streaks
+* Excessive glow
+* Busy visual effects
+
+The theme should remain elegant and minimal.
+
+⸻
+
+Community Card Tray
+
+Keep the existing tray design but improve it.
+
+Requirements:
+
+* Frosted glass appearance
+* More depth
+* Stronger edge lighting
+* Subtle internal reflections
+* Premium luxury finish
+
+The tray should feel like it was machined from illuminated crystal glass.
+
+⸻
+
+Pot Display
+
+Keep centered.
+
+Enhancements:
+
+* Slightly thicker glass effect
+* Soft cyan glow
+* More premium typography
+* Greater contrast against background
+
+⸻
+
+Design Philosophy
+
+This theme should not look like a casino game background.
+
+It should look like:
+
+* Apple designed a poker app
+* Porsche designed a poker app
+* Vision Pro meets luxury poker
+
+Keywords:
+
+ultra-premium, frozen glass, cyan neon, glassmorphism, luxury technology, minimalist, futuristic, elegant, seamless full-screen environment, atmospheric depth, Apple-level design quality
+
+⸻
+
+Critical Instruction
+
+The entire screen must feel like one continuous frozen-neon world. There can be no visible panels, borders, strips, boxes, or background sections. Everything must blend seamlessly edge-to-edge across the display.
