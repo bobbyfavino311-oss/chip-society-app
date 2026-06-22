@@ -237,7 +237,7 @@ export const SAKURA_GARDEN: TableTheme = {
 
 export const FROZEN_NEON: TableTheme = {
   id: 'frozen_neon',
-  name: 'FROZEN NEON',
+  name: 'FROZEN',
   tagline: 'A luxury arctic casino lit by pure cyan neon. Frosted glass, deep navy, and ice-blue light.',
   rarity: 'LEGENDARY',
 
