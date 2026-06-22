@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  Animated, Dimensions, Alert,
+  View, Text, StyleSheet, TouchableOpacity,
+  Animated, Dimensions, Alert, ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useMultiplayer } from '@/context/MultiplayerContext';
 import { formatChips } from '@/lib/multiplayerTypes';
 import type { Card, SeatView, ClientGameState } from '@/lib/multiplayerTypes';
@@ -19,154 +20,220 @@ const VALUE_LABELS: Record<number, string> = {
 };
 const RED_SUITS = new Set(['H', 'D']);
 
-// ─── Card Component ───────────────────────────────────────────────────────────
+const AVATAR_COLORS = [
+  '#00d4ff','#ff0090','#bf5fff','#ffd700','#00ff88',
+  '#ff6600','#00ccff','#ff44aa','#88ff44','#ffcc00',
+  '#6644ff','#ff4488','#44ffcc','#ff8844','#44aaff',
+];
 
-function PokerCard({ card, faceDown = false, size = 'md' }: {
-  card?: Card; faceDown?: boolean; size?: 'sm' | 'md' | 'lg';
+function avatarColor(idx: number): string {
+  return AVATAR_COLORS[idx % AVATAR_COLORS.length] ?? '#00d4ff';
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+
+function PokerCard({ card, faceDown = false, size = 'md', highlight = false }: {
+  card?: Card; faceDown?: boolean; size?: 'sm' | 'md' | 'lg'; highlight?: boolean;
 }) {
-  const dims = size === 'lg' ? { w: 52, h: 74, fz: 18, sfz: 12 }
-    : size === 'sm' ? { w: 34, h: 48, fz: 13, sfz: 9 }
-    : { w: 42, h: 60, fz: 16, sfz: 11 };
+  const dims = size === 'lg' ? { w: 56, h: 80, fz: 20, sfz: 13 }
+    : size === 'sm' ? { w: 32, h: 46, fz: 12, sfz: 9 }
+    : { w: 42, h: 60, fz: 15, sfz: 10 };
 
   if (faceDown || !card) {
     return (
-      <View style={[styles.card, { width: dims.w, height: dims.h, backgroundColor: '#1a0040', borderColor: '#bf5fff40' }]}>
+      <View style={[g.card, { width: dims.w, height: dims.h, backgroundColor: '#1a0040', borderColor: '#bf5fff50' }]}>
         <LinearGradient colors={['#2a0060', '#0d0030']} style={StyleSheet.absoluteFill} />
-        <Text style={{ color: '#bf5fff', fontSize: dims.fz }}>★</Text>
+        <Text style={{ color: '#bf5fff60', fontSize: dims.fz }}>★</Text>
       </View>
     );
   }
 
   const isRed = RED_SUITS.has(card.suit);
-  const color = isRed ? '#ff4466' : '#e8e8e8';
+  const color = isRed ? '#ff4466' : '#dde8ff';
   const sym = SUIT_SYMBOLS[card.suit] ?? card.suit;
   const val = VALUE_LABELS[card.value] ?? String(card.value);
 
   return (
-    <View style={[styles.card, { width: dims.w, height: dims.h, backgroundColor: '#f8f4ff', borderColor: '#ddd' }]}>
+    <View style={[g.card, {
+      width: dims.w, height: dims.h,
+      backgroundColor: '#f0eeff',
+      borderColor: highlight ? '#ffd700' : '#ccc',
+      shadowColor: highlight ? '#ffd700' : 'transparent',
+      shadowRadius: highlight ? 8 : 0,
+      shadowOpacity: highlight ? 0.8 : 0,
+      elevation: highlight ? 6 : 0,
+    }]}>
+      {highlight && <View style={[StyleSheet.absoluteFill, { backgroundColor: '#ffd70015', borderRadius: 7 }]} />}
       <Text style={{ color, fontSize: dims.fz, fontFamily: 'Inter_700Bold', lineHeight: dims.fz + 2 }}>{val}</Text>
-      <Text style={{ color, fontSize: dims.sfz }}>{sym}</Text>
+      <Text style={{ color, fontSize: dims.sfz, lineHeight: dims.sfz + 2 }}>{sym}</Text>
     </View>
   );
 }
 
-// ─── Opponent Seat ────────────────────────────────────────────────────────────
-
-function OpponentSeat({ seat, gameState }: { seat: SeatView; gameState: ClientGameState }) {
-  const isActive = seat.isTurn;
-  const isFolded = seat.status === 'folded';
-  const isAllin = seat.status === 'allin';
-  const isDealer = seat.isDealer;
-  const glow = isActive ? '#00d4ff' : 'transparent';
-
-  const revealedCards = gameState.phase === 'showdown' && seat.revealedCards && seat.revealedCards.length > 0
-    ? seat.revealedCards : null;
-
-  return (
-    <View style={[styles.oppSeat, { opacity: isFolded ? 0.35 : 1, borderColor: isActive ? '#00d4ff' : '#222' }]}>
-      {isActive && <View style={[styles.activePulse, { borderColor: glow }]} />}
-      <View style={styles.oppAvatar}>
-        <LinearGradient
-          colors={isActive ? ['#00d4ff', '#0088cc'] : ['#2a2a3a', '#1a1a2a']}
-          style={styles.oppAvatarInner}
-        >
-          <Text style={[styles.oppAvatarText, { color: isActive ? '#000' : '#fff' }]}>
-            {seat.username.slice(0, 2).toUpperCase()}
-          </Text>
-        </LinearGradient>
-        {isDealer && <View style={styles.dealerBadge}><Text style={styles.dealerText}>D</Text></View>}
-        {isAllin && <View style={styles.allinBadge}><Text style={styles.allinText}>ALL IN</Text></View>}
-      </View>
-
-      {/* Cards */}
-      <View style={styles.oppCards}>
-        {revealedCards ? (
-          <>
-            <PokerCard card={revealedCards[0]} size="sm" />
-            <PokerCard card={revealedCards[1]} size="sm" />
-          </>
-        ) : (
-          Array.from({ length: Math.max(0, seat.cardCount) }).map((_, i) => (
-            <PokerCard key={i} faceDown size="sm" />
-          ))
-        )}
-      </View>
-
-      <Text style={styles.oppName} numberOfLines={1}>{seat.username}</Text>
-      <Text style={styles.oppChips}>{formatChips(seat.chips)}</Text>
-
-      {seat.currentBet > 0 && (
-        <View style={styles.betChip}>
-          <Text style={styles.betChipText}>{formatChips(seat.currentBet)}</Text>
-        </View>
-      )}
-
-      {seat.revealedHand && (
-        <View style={styles.handLabel}>
-          <Text style={styles.handLabelText}>{seat.revealedHand}</Text>
-        </View>
-      )}
-    </View>
-  );
-}
-
-// ─── Community Cards ──────────────────────────────────────────────────────────
-
-function CommunityCards({ cards, phase }: { cards: Card[]; phase: string }) {
-  return (
-    <View style={styles.communityRow}>
-      {[0, 1, 2, 3, 4].map(i => (
-        <PokerCard key={i} card={cards[i]} faceDown={i >= cards.length} size="md" />
-      ))}
-    </View>
-  );
-}
-
-// ─── Turn Timer ───────────────────────────────────────────────────────────────
+// ─── Turn Timer Bar ────────────────────────────────────────────────────────────
 
 function TurnTimer({ timeoutAt }: { timeoutAt: number | null }) {
   const [secondsLeft, setSecondsLeft] = useState(30);
-  const anim = useRef(new Animated.Value(1)).current;
+  const widthAnim = useRef(new Animated.Value(1)).current;
+  const animRef = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
-    if (!timeoutAt) { setSecondsLeft(30); return; }
+    if (!timeoutAt) { setSecondsLeft(30); widthAnim.setValue(1); return; }
+    animRef.current?.stop();
+    const remaining = Math.max(0, (timeoutAt - Date.now()) / 1000);
+    widthAnim.setValue(remaining / 30);
+    animRef.current = Animated.timing(widthAnim, {
+      toValue: 0,
+      duration: remaining * 1000,
+      useNativeDriver: false,
+    });
+    animRef.current.start();
+
+    let raf: ReturnType<typeof setTimeout>;
     const update = () => {
       const left = Math.max(0, Math.ceil((timeoutAt - Date.now()) / 1000));
       setSecondsLeft(left);
-      if (left <= 0) return;
-      requestAnimationFrame(update);
+      if (left > 0) raf = setTimeout(update, 250);
     };
-    const raf = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(raf);
+    update();
+    return () => { clearTimeout(raf); animRef.current?.stop(); };
   }, [timeoutAt]);
 
-  useEffect(() => {
-    if (!timeoutAt) return;
-    Animated.timing(anim, { toValue: 0, duration: 30000, useNativeDriver: false }).start();
-    return () => anim.setValue(1);
-  }, [timeoutAt]);
-
-  const color = secondsLeft <= 5 ? '#ff4444' : secondsLeft <= 10 ? '#ffcc00' : '#00d4ff';
+  const urgent = secondsLeft <= 8;
+  const color = secondsLeft <= 5 ? '#ff4444' : urgent ? '#ffcc00' : '#00d4ff';
 
   return (
-    <View style={styles.timerRow}>
-      <View style={styles.timerTrack}>
-        <Animated.View style={[styles.timerBar, {
-          width: anim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+    <View style={g.timerWrap}>
+      <View style={g.timerTrack}>
+        <Animated.View style={[g.timerFill, {
+          width: widthAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
           backgroundColor: color,
         }]} />
       </View>
-      <Text style={[styles.timerText, { color }]}>{secondsLeft}s</Text>
+      <Text style={[g.timerNum, { color }]}>{secondsLeft}s</Text>
     </View>
   );
 }
 
-// ─── Main Game Screen ─────────────────────────────────────────────────────────
+// ─── Opponent Seat Bubble ──────────────────────────────────────────────────────
+
+function SeatBubble({ seat, gameState, style }: {
+  seat: SeatView; gameState: ClientGameState; style?: object;
+}) {
+  const isActive = seat.isTurn;
+  const isFolded = seat.status === 'folded';
+  const isAllin  = seat.status === 'allin';
+  const color    = avatarColor(seat.avatarId);
+  const initials = seat.username.slice(0, 2).toUpperCase();
+
+  const revealedCards = gameState.phase === 'showdown' && seat.revealedCards?.length
+    ? seat.revealedCards : null;
+
+  return (
+    <View style={[g.seatBubble, style, isFolded && g.seatFolded]}>
+      {isActive && (
+        <LinearGradient
+          colors={[`${color}30`, 'transparent']}
+          style={[StyleSheet.absoluteFill, { borderRadius: 14 }]}
+        />
+      )}
+      <View style={[g.seatBorder, { borderColor: isActive ? color : '#2a2a3a' }]}>
+        {/* Avatar circle */}
+        <View style={[g.seatAvatar, { backgroundColor: `${color}25`, borderColor: `${color}80` }]}>
+          <Text style={[g.seatInitials, { color }]}>{initials}</Text>
+          {seat.isDealer && <View style={g.dealerDot}><Text style={g.dealerDotTxt}>D</Text></View>}
+          {isAllin && <View style={g.allinTag}><Text style={g.allinTxt}>ALL IN</Text></View>}
+        </View>
+
+        {/* Cards */}
+        <View style={g.seatCards}>
+          {revealedCards ? (
+            <>
+              <PokerCard card={revealedCards[0]} size="sm" />
+              <PokerCard card={revealedCards[1]} size="sm" />
+            </>
+          ) : (
+            Array.from({ length: Math.max(0, seat.cardCount) }).map((_, i) => (
+              <PokerCard key={i} faceDown size="sm" />
+            ))
+          )}
+        </View>
+
+        {/* Name + chips */}
+        <Text style={g.seatName} numberOfLines={1}>{seat.username}</Text>
+        <Text style={[g.seatChips, { color: '#ffcc00' }]}>{formatChips(seat.chips)}</Text>
+
+        {/* Bet chip */}
+        {seat.currentBet > 0 && (
+          <View style={[g.betPill, { borderColor: `${color}60` }]}>
+            <Text style={[g.betPillTxt, { color }]}>{formatChips(seat.currentBet)}</Text>
+          </View>
+        )}
+
+        {/* Hand label */}
+        {seat.revealedHand && (
+          <View style={g.handTag}>
+            <Text style={g.handTagTxt}>{seat.revealedHand}</Text>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ─── Oval Table Surface ────────────────────────────────────────────────────────
+
+function TableSurface({ gs }: { gs: ClientGameState }) {
+  const phase = gs.phase;
+  const isWaiting = phase === 'waiting';
+
+  return (
+    <View style={g.tableOuter}>
+      <LinearGradient
+        colors={['#0a2e12', '#0d3a16', '#082510']}
+        style={g.tableInner}
+      >
+        {/* Felt ring */}
+        <View style={g.feltRing} />
+
+        {/* Blinds */}
+        <View style={g.blindsRow}>
+          <Text style={g.blindTxt}>SB {formatChips(gs.smallBlind)}</Text>
+          <Text style={g.blindTxt}>BB {formatChips(gs.bigBlind)}</Text>
+        </View>
+
+        {/* Community cards */}
+        <View style={g.communityRow}>
+          {[0,1,2,3,4].map(i => (
+            <PokerCard key={i} card={gs.communityCards[i]} faceDown={i >= gs.communityCards.length} size="md" />
+          ))}
+        </View>
+
+        {/* Pot */}
+        {gs.pot > 0 && (
+          <View style={g.potRow}>
+            <Ionicons name="layers" size={11} color="#ffd700" />
+            <Text style={g.potTxt}>{formatChips(gs.pot)}</Text>
+          </View>
+        )}
+
+        {isWaiting && (
+          <Text style={g.waitingTxt}>
+            {gs.seats.filter(Boolean).length < 2 ? 'Need 2+ players...' : 'Hand starting soon...'}
+          </Text>
+        )}
+      </LinearGradient>
+    </View>
+  );
+}
+
+// ─── Main Screen ──────────────────────────────────────────────────────────────
 
 export default function MultiplayerGame() {
   const { gameState, sendAction, leaveTable, tableId } = useMultiplayer();
   const [raiseAmount, setRaiseAmount] = useState(0);
   const [showRaise, setShowRaise] = useState(false);
+  const winAnim = useRef(new Animated.Value(0)).current;
 
   const gs: ClientGameState | null = gameState;
 
@@ -178,238 +245,248 @@ export default function MultiplayerGame() {
     if (gs) setRaiseAmount(gs.minRaise);
   }, [gs?.minRaise]);
 
+  useEffect(() => {
+    if (gs?.winners && gs.winners.length > 0) {
+      winAnim.setValue(0);
+      Animated.sequence([
+        Animated.timing(winAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.delay(2000),
+        Animated.timing(winAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [gs?.winners]);
+
   const handleLeave = () => {
     Alert.alert('Leave Table', 'Leave this table? You will be folded if in a hand.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Leave', style: 'destructive', onPress: () => { leaveTable(); router.replace('/multiplayer/lobby' as any); } },
+      { text: 'Stay', style: 'cancel' },
+      { text: 'Leave', style: 'destructive', onPress: () => {
+        leaveTable();
+        router.replace('/multiplayer/lobby' as any);
+      }},
     ]);
-  };
-
-  const handleRaise = () => {
-    sendAction('raise', raiseAmount);
-    setShowRaise(false);
   };
 
   if (!gs) {
     return (
-      <LinearGradient colors={['#050010', '#0a0020']} style={styles.root}>
-        <SafeAreaView style={[styles.safe, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 14 }}>JOINING TABLE...</Text>
+      <LinearGradient colors={['#050010', '#0a0020']} style={g.root}>
+        <SafeAreaView style={[g.safe, { alignItems: 'center', justifyContent: 'center' }]}>
+          <Text style={g.joiningTxt}>JOINING TABLE...</Text>
         </SafeAreaView>
       </LinearGradient>
     );
   }
 
-  const mySeatData = gs.mySeat !== -1 ? gs.seats[gs.mySeat] : null;
-  const opponents = gs.seats.filter((s, i) => s !== null && i !== gs.mySeat) as SeatView[];
-  const canCheck = gs.isMyTurn && gs.callAmount === 0;
-  const canCall = gs.isMyTurn && gs.callAmount > 0;
-  const canRaise = gs.isMyTurn && gs.maxRaise > gs.callAmount;
-  const phase = gs.phase.toUpperCase();
+  const mySeat      = gs.mySeat !== -1 ? gs.seats[gs.mySeat] : null;
+  const opponents   = gs.seats.filter((s, i) => s !== null && i !== gs.mySeat) as SeatView[];
+  const canCheck    = gs.isMyTurn && gs.callAmount === 0;
+  const canCall     = gs.isMyTurn && gs.callAmount > 0;
+  const canRaise    = gs.isMyTurn && gs.maxRaise > 0;
+  const phase       = gs.phase.toUpperCase();
+  const myWin       = (gs.winners ?? []).find(w => w.seatIndex === gs.mySeat);
 
-  const winners = gs.winners ?? [];
-  const myWin = winners.find(w => w.seatIndex === gs.mySeat);
+  const handleRaise = () => { sendAction('raise', raiseAmount); setShowRaise(false); };
+
+  // Layout: top row (up to 4 opponents), table, my section
+  // Split opponents into top-row (max 3) and side (up to 1 each side)
+  const topOpps  = opponents.slice(0, Math.min(opponents.length, 3));
+  const leftOpp  = opponents[3] ?? null;
+  const rightOpp = opponents[4] ?? null;
 
   return (
-    <LinearGradient colors={['#050010', '#080018', '#050010']} style={styles.root}>
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <LinearGradient colors={['#050010', '#080018', '#050010']} style={g.root}>
+      <SafeAreaView style={g.safe} edges={['top', 'bottom']}>
 
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleLeave} style={styles.leaveBtn}>
-            <Text style={styles.leaveBtnText}>LEAVE</Text>
+        {/* ── Header ── */}
+        <View style={g.header}>
+          <TouchableOpacity style={g.leaveBtn} onPress={handleLeave}>
+            <Ionicons name="exit-outline" size={16} color="#ff4444" />
+            <Text style={g.leaveTxt}>LEAVE</Text>
           </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.phaseText}>{phase}</Text>
-            <Text style={styles.tableIdText}>#{gs.tableId.slice(-6).toUpperCase()}</Text>
+
+          <View style={g.headerCenter}>
+            <Text style={g.phaseTxt}>{phase}</Text>
+            <Text style={g.tableIdTxt}>#{gs.tableId.slice(-6).toUpperCase()}</Text>
           </View>
-          <View style={styles.potDisplay}>
-            <Text style={styles.potLabel}>POT</Text>
-            <Text style={styles.potValue}>{formatChips(gs.pot)}</Text>
+
+          <View style={g.potBadge}>
+            <Text style={g.potLabel}>POT</Text>
+            <Text style={g.potBig}>{formatChips(gs.pot)}</Text>
           </View>
         </View>
 
-        {/* Opponents */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.oppsRow}
-          style={styles.oppsScroll}
-        >
-          {opponents.length === 0 ? (
-            <View style={styles.waitingBox}>
-              <Text style={styles.waitingText}>
-                {gs.phase === 'waiting'
-                  ? 'Waiting for players to join...'
-                  : 'You are the only player'}
+        {/* ── Top opponents row ── */}
+        <View style={g.topRow}>
+          {topOpps.length === 0 ? (
+            <View style={g.emptySeats}>
+              <Text style={g.emptyTxt}>
+                {gs.phase === 'waiting' ? 'Waiting for players...' : ''}
               </Text>
             </View>
           ) : (
-            opponents.map(opp => (
-              <OpponentSeat key={opp.seatIndex} seat={opp} gameState={gs} />
+            topOpps.map(opp => (
+              <SeatBubble key={opp.seatIndex} seat={opp} gameState={gs} style={g.topSeat} />
             ))
-          )}
-        </ScrollView>
-
-        {/* Community cards + blinds */}
-        <View style={styles.tableCenter}>
-          <View style={styles.blindsRow}>
-            <Text style={styles.blindLabel}>SB {formatChips(gs.smallBlind)}</Text>
-            <Text style={styles.blindLabel}>BB {formatChips(gs.bigBlind)}</Text>
-          </View>
-          <CommunityCards cards={gs.communityCards} phase={gs.phase} />
-          {gs.phase === 'waiting' && (
-            <Text style={styles.dealingText}>
-              {gs.seats.filter(s => s !== null).length < 2
-                ? 'Waiting for 2+ players...'
-                : 'Hand starts soon...'}
-            </Text>
           )}
         </View>
 
-        {/* Divider */}
-        <View style={styles.divider} />
+        {/* ── Middle: side seats + table ── */}
+        <View style={g.middleRow}>
+          <View style={g.sideCol}>
+            {leftOpp && <SeatBubble seat={leftOpp} gameState={gs} />}
+          </View>
 
-        {/* My hand */}
-        {gs.phase !== 'waiting' && (
-          <View style={styles.mySection}>
-            <View style={styles.myInfo}>
-              <View style={styles.myCards}>
-                {gs.myCards.length > 0 ? (
-                  gs.myCards.map((c, i) => <PokerCard key={i} card={c} size="lg" />)
-                ) : (
-                  <>
-                    <PokerCard faceDown size="lg" />
-                    <PokerCard faceDown size="lg" />
-                  </>
-                )}
-              </View>
-              <View style={styles.myStats}>
-                <Text style={styles.myLabel}>MY CHIPS</Text>
-                <Text style={styles.myChips}>{formatChips(mySeatData?.chips ?? 0)}</Text>
-                {(mySeatData?.currentBet ?? 0) > 0 && (
-                  <>
-                    <Text style={styles.myLabel}>BET</Text>
-                    <Text style={styles.myBet}>{formatChips(mySeatData!.currentBet)}</Text>
-                  </>
-                )}
-                {mySeatData?.isDealer && <View style={styles.myDealerBadge}><Text style={styles.dealerText}>D</Text></View>}
-              </View>
+          <TableSurface gs={gs} />
+
+          <View style={g.sideCol}>
+            {rightOpp && <SeatBubble seat={rightOpp} gameState={gs} />}
+          </View>
+        </View>
+
+        {/* ── Divider ── */}
+        <View style={g.divider} />
+
+        {/* ── My section ── */}
+        <View style={g.mySection}>
+
+          {/* My hand + stats */}
+          <View style={g.myRow}>
+            <View style={g.myCards}>
+              {gs.phase !== 'waiting' ? (
+                gs.myCards.length > 0
+                  ? gs.myCards.map((c, i) => <PokerCard key={i} card={c} size="lg" />)
+                  : [0,1].map(i => <PokerCard key={i} faceDown size="lg" />)
+              ) : (
+                [0,1].map(i => <PokerCard key={i} faceDown size="lg" />)
+              )}
             </View>
 
-            {/* Turn timer */}
-            {gs.isMyTurn && gs.turnTimeoutAt && <TurnTimer timeoutAt={gs.turnTimeoutAt} />}
-
-            {/* Winner banner */}
-            {gs.phase === 'showdown' && myWin && (
-              <View style={styles.winBanner}>
-                <Text style={styles.winText}>YOU WIN {formatChips(myWin.amount)}! {myWin.handRank ?? ''}</Text>
-              </View>
-            )}
-
-            {/* Action buttons */}
-            {gs.isMyTurn && gs.phase !== 'showdown' ? (
-              <View style={styles.actionsArea}>
-                {showRaise ? (
-                  <View style={styles.raiseArea}>
-                    <Text style={styles.raiseLabel}>RAISE TO</Text>
-                    <View style={styles.raiseRow}>
-                      <TouchableOpacity
-                        style={styles.raiseAdj}
-                        onPress={() => setRaiseAmount(v => Math.max(gs.minRaise, v - gs.bigBlind))}
-                      >
-                        <Text style={styles.raiseAdjText}>−</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.raiseValue}>{formatChips(raiseAmount)}</Text>
-                      <TouchableOpacity
-                        style={styles.raiseAdj}
-                        onPress={() => setRaiseAmount(v => Math.min(gs.maxRaise, v + gs.bigBlind))}
-                      >
-                        <Text style={styles.raiseAdjText}>+</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.raisePresets}>
-                      {[2, 3, 4].map(mult => {
-                        const val = Math.min(gs.maxRaise, gs.currentBet * mult);
-                        return (
-                          <TouchableOpacity key={mult} style={styles.presetBtn} onPress={() => setRaiseAmount(val)}>
-                            <Text style={styles.presetText}>{mult}x</Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                      <TouchableOpacity style={styles.presetBtn} onPress={() => setRaiseAmount(gs.maxRaise)}>
-                        <Text style={styles.presetText}>MAX</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.raiseActions}>
-                      <TouchableOpacity style={styles.cancelRaiseBtn} onPress={() => setShowRaise(false)}>
-                        <Text style={styles.cancelRaiseTxt}>BACK</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.confirmRaiseBtn} onPress={handleRaise}>
-                        <LinearGradient colors={['#ff0090', '#cc0070']} style={styles.confirmRaiseGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
-                          <Text style={styles.confirmRaiseTxt}>RAISE {formatChips(raiseAmount)}</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ) : (
-                  <View style={styles.btnRow}>
-                    <TouchableOpacity style={[styles.actionBtn, styles.foldBtn]} onPress={() => sendAction('fold')}>
-                      <Text style={styles.foldText}>FOLD</Text>
-                    </TouchableOpacity>
-
-                    {canCheck && (
-                      <TouchableOpacity style={[styles.actionBtn, styles.checkBtn]} onPress={() => sendAction('check')}>
-                        <Text style={styles.checkText}>CHECK</Text>
-                      </TouchableOpacity>
-                    )}
-
-                    {canCall && (
-                      <TouchableOpacity style={[styles.actionBtn, styles.callBtn]} onPress={() => sendAction('call')}>
-                        <LinearGradient colors={['#00d4ff', '#0088cc']} style={styles.actionGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
-                          <Text style={styles.callText}>CALL {formatChips(gs.callAmount)}</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
-
-                    {canRaise && (
-                      <TouchableOpacity style={[styles.actionBtn, styles.raiseBtn]} onPress={() => setShowRaise(true)}>
-                        <LinearGradient colors={['#ff0090', '#cc0070']} style={styles.actionGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
-                          <Text style={styles.raiseText}>RAISE</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
-
-                    <TouchableOpacity style={[styles.actionBtn, styles.allinBtn]} onPress={() => sendAction('allin')}>
-                      <LinearGradient colors={['#bf5fff', '#7b2fff']} style={styles.actionGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
-                        <Text style={styles.raiseText}>ALL IN</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            ) : gs.phase !== 'showdown' ? (
-              <View style={styles.waitTurn}>
-                <Text style={styles.waitTurnText}>
-                  {gs.activeSeat !== -1 && gs.seats[gs.activeSeat]
-                    ? `Waiting for ${gs.seats[gs.activeSeat]!.username}...`
-                    : 'Waiting for action...'}
-                </Text>
-              </View>
-            ) : null}
+            <View style={g.myStats}>
+              {mySeat?.isDealer && (
+                <View style={g.myDealerBadge}><Text style={g.dealerDotTxt}>D</Text></View>
+              )}
+              <Text style={g.myName} numberOfLines={1}>{mySeat?.username ?? 'YOU'}</Text>
+              <Text style={g.myChips}>{formatChips(mySeat?.chips ?? 0)}</Text>
+              {(mySeat?.currentBet ?? 0) > 0 && (
+                <View style={g.myBetRow}>
+                  <Text style={g.myBetLabel}>BET </Text>
+                  <Text style={g.myBetValue}>{formatChips(mySeat!.currentBet)}</Text>
+                </View>
+              )}
+              {mySeat?.status === 'allin' && (
+                <View style={[g.allinTag, { marginTop: 4 }]}><Text style={g.allinTxt}>ALL IN</Text></View>
+              )}
+            </View>
           </View>
-        )}
 
-        {/* Action log */}
+          {/* Timer */}
+          {gs.isMyTurn && gs.turnTimeoutAt && (
+            <TurnTimer timeoutAt={gs.turnTimeoutAt} />
+          )}
+
+          {/* Win banner */}
+          {myWin && (
+            <Animated.View style={[g.winBanner, { opacity: winAnim }]}>
+              <Ionicons name="trophy" size={16} color="#ffd700" />
+              <Text style={g.winTxt}>YOU WIN {formatChips(myWin.amount)}!</Text>
+              {myWin.handRank && <Text style={g.winHand}>{myWin.handRank}</Text>}
+            </Animated.View>
+          )}
+
+          {/* Actions */}
+          {gs.isMyTurn && gs.phase !== 'showdown' && gs.phase !== 'waiting' ? (
+            showRaise ? (
+              <View style={g.raisePanel}>
+                <View style={g.raiseHeader}>
+                  <Text style={g.raiseHeaderTxt}>RAISE AMOUNT</Text>
+                  <TouchableOpacity onPress={() => setShowRaise(false)}>
+                    <Ionicons name="close" size={18} color="#666" />
+                  </TouchableOpacity>
+                </View>
+                <View style={g.raiseControls}>
+                  <TouchableOpacity style={g.raiseAdj} onPress={() => setRaiseAmount(v => Math.max(gs.minRaise, v - gs.bigBlind))}>
+                    <Text style={g.raiseAdjTxt}>−</Text>
+                  </TouchableOpacity>
+                  <Text style={g.raiseVal}>{formatChips(raiseAmount)}</Text>
+                  <TouchableOpacity style={g.raiseAdj} onPress={() => setRaiseAmount(v => Math.min(gs.maxRaise, v + gs.bigBlind))}>
+                    <Text style={g.raiseAdjTxt}>+</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={g.presets}>
+                  {[2, 3, 4].map(mult => {
+                    const v = Math.min(gs.maxRaise, gs.bigBlind * mult * 2);
+                    return (
+                      <TouchableOpacity key={mult} style={g.presetBtn} onPress={() => setRaiseAmount(v)}>
+                        <Text style={g.presetTxt}>{mult}x</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                  <TouchableOpacity style={[g.presetBtn, { borderColor: '#bf5fff50' }]} onPress={() => setRaiseAmount(gs.maxRaise)}>
+                    <Text style={[g.presetTxt, { color: '#bf5fff' }]}>MAX</Text>
+                  </TouchableOpacity>
+                </View>
+                <TouchableOpacity style={g.confirmRaise} onPress={handleRaise}>
+                  <LinearGradient colors={['#ff0090', '#cc0070']} style={g.confirmRaiseGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
+                    <Text style={g.confirmRaiseTxt}>RAISE {formatChips(raiseAmount)}</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={g.actionRow}>
+                <TouchableOpacity style={g.foldBtn} onPress={() => sendAction('fold')}>
+                  <Text style={g.foldTxt}>FOLD</Text>
+                </TouchableOpacity>
+
+                {canCheck && (
+                  <TouchableOpacity style={g.checkBtn} onPress={() => sendAction('check')}>
+                    <Text style={g.checkTxt}>CHECK</Text>
+                  </TouchableOpacity>
+                )}
+
+                {canCall && (
+                  <TouchableOpacity style={g.callBtn} onPress={() => sendAction('call')}>
+                    <LinearGradient colors={['#00d4ff', '#0088cc']} style={g.btnGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
+                      <Text style={g.callTxt}>CALL{'\n'}{formatChips(gs.callAmount)}</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                )}
+
+                {canRaise && (
+                  <TouchableOpacity style={g.raiseBtn} onPress={() => setShowRaise(true)}>
+                    <LinearGradient colors={['#ff0090', '#cc0070']} style={g.btnGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
+                      <Text style={g.raiseTxt}>RAISE</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity style={g.allinBtn} onPress={() => sendAction('allin')}>
+                  <LinearGradient colors={['#bf5fff', '#7b2fff']} style={g.btnGrad} start={{x:0,y:0}} end={{x:1,y:0}}>
+                    <Text style={g.raiseTxt}>ALL IN</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            )
+          ) : gs.phase !== 'showdown' && gs.phase !== 'waiting' ? (
+            <View style={g.waitRow}>
+              <Ionicons name="time-outline" size={14} color="#444" />
+              <Text style={g.waitTxt}>
+                {gs.activeSeat !== -1 && gs.seats[gs.activeSeat]
+                  ? `Waiting for ${gs.seats[gs.activeSeat]!.username}...`
+                  : 'Waiting for action...'}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* ── Action log ── */}
         <ScrollView
-          style={styles.logScroll}
-          contentContainerStyle={styles.logContent}
+          style={g.logScroll}
+          contentContainerStyle={g.logContent}
           showsVerticalScrollIndicator={false}
         >
-          {gs.messages.slice(0, 6).map((msg, i) => (
-            <Text key={i} style={[styles.logMsg,
+          {gs.messages.slice(0, 5).map((msg, i) => (
+            <Text key={i} style={[g.logMsg,
               msg.type === 'result' ? { color: '#ffcc00' } :
-              msg.type === 'info' ? { color: '#555' } : { color: '#888' }
+              msg.type === 'info'   ? { color: '#444' }    : { color: '#555' }
             ]}>
               {msg.text}
             </Text>
@@ -421,104 +498,124 @@ export default function MultiplayerGame() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1 },
-  safe: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10 },
-  leaveBtn: { borderWidth: 1, borderColor: '#ff444440', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 },
-  leaveBtnText: { color: '#ff4444', fontFamily: 'Orbitron_700Bold', fontSize: 10, letterSpacing: 1 },
-  headerCenter: { alignItems: 'center' },
-  phaseText: { color: '#00d4ff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 2 },
-  tableIdText: { color: '#333', fontFamily: 'Orbitron_400Regular', fontSize: 9 },
-  potDisplay: { alignItems: 'flex-end' },
-  potLabel: { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 9, letterSpacing: 1 },
-  potValue: { color: '#ffcc00', fontFamily: 'Inter_700Bold', fontSize: 16 },
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
-  oppsScroll: { maxHeight: 160, flexGrow: 0 },
-  oppsRow: { paddingHorizontal: 16, gap: 10, alignItems: 'flex-start', paddingVertical: 8 },
-  waitingBox: { flex: 1, alignItems: 'center', paddingVertical: 20, paddingHorizontal: 30 },
-  waitingText: { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 12, textAlign: 'center' },
+const g = StyleSheet.create({
+  root:     { flex: 1 },
+  safe:     { flex: 1 },
+  joiningTxt: { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 14, letterSpacing: 1 },
 
-  oppSeat: { alignItems: 'center', borderWidth: 1, borderRadius: 14, padding: 10, minWidth: 100, backgroundColor: 'rgba(255,255,255,0.02)' },
-  activePulse: { position: 'absolute', top: -2, left: -2, right: -2, bottom: -2, borderRadius: 16, borderWidth: 2 },
-  oppAvatar: { position: 'relative', marginBottom: 4 },
-  oppAvatarInner: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  oppAvatarText: { fontFamily: 'Orbitron_700Bold', fontSize: 13 },
-  dealerBadge: { position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: '#ffcc00', alignItems: 'center', justifyContent: 'center' },
-  dealerText: { color: '#000', fontSize: 8, fontFamily: 'Orbitron_700Bold' },
-  allinBadge: { position: 'absolute', bottom: -4, left: -8, right: -8, backgroundColor: '#ff0090', borderRadius: 4, alignItems: 'center' },
-  allinText: { color: '#fff', fontSize: 7, fontFamily: 'Orbitron_700Bold' },
-  oppCards: { flexDirection: 'row', gap: 3, marginBottom: 4 },
-  oppName: { color: '#ccc', fontFamily: 'Orbitron_400Regular', fontSize: 9, letterSpacing: 0.5, maxWidth: 90, textAlign: 'center' },
-  oppChips: { color: '#ffcc00', fontFamily: 'Inter_700Bold', fontSize: 12, marginTop: 2 },
-  betChip: { marginTop: 4, backgroundColor: '#00d4ff20', borderWidth: 1, borderColor: '#00d4ff40', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  betChipText: { color: '#00d4ff', fontFamily: 'Inter_700Bold', fontSize: 10 },
-  handLabel: { marginTop: 4, backgroundColor: '#ffcc0020', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
-  handLabelText: { color: '#ffcc00', fontFamily: 'Orbitron_400Regular', fontSize: 8 },
+  // Header
+  header:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8 },
+  leaveBtn:     { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: '#ff444430', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+  leaveTxt:     { color: '#ff4444', fontFamily: 'Orbitron_700Bold', fontSize: 9, letterSpacing: 1 },
+  headerCenter: { flex: 1, alignItems: 'center' },
+  phaseTxt:     { color: '#00d4ff', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 2 },
+  tableIdTxt:   { color: '#2a2a3a', fontFamily: 'Orbitron_400Regular', fontSize: 8, marginTop: 1 },
+  potBadge:     { alignItems: 'flex-end' },
+  potLabel:     { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1 },
+  potBig:       { color: '#ffcc00', fontFamily: 'Inter_700Bold', fontSize: 16 },
 
-  tableCenter: { alignItems: 'center', paddingVertical: 10 },
-  blindsRow: { flexDirection: 'row', gap: 20, marginBottom: 8 },
-  blindLabel: { color: '#333', fontFamily: 'Orbitron_400Regular', fontSize: 9, letterSpacing: 1 },
-  communityRow: { flexDirection: 'row', gap: 6 },
-  dealingText: { marginTop: 10, color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 11, letterSpacing: 1 },
+  // Seat layout
+  topRow:     { flexDirection: 'row', justifyContent: 'center', paddingHorizontal: 8, gap: 6, minHeight: 110 },
+  topSeat:    { flex: 1, maxWidth: 110 },
+  emptySeats: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  emptyTxt:   { color: '#2a2a3a', fontFamily: 'Orbitron_400Regular', fontSize: 11 },
 
-  divider: { height: 1, backgroundColor: '#ffffff08', marginVertical: 8 },
+  middleRow:  { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4 },
+  sideCol:    { width: 100, alignItems: 'center' },
 
-  mySection: { paddingHorizontal: 16 },
-  myInfo: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 10 },
-  myCards: { flexDirection: 'row', gap: 6 },
-  myStats: { flex: 1 },
-  myLabel: { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 9, letterSpacing: 1 },
-  myChips: { color: '#ffcc00', fontFamily: 'Inter_700Bold', fontSize: 18, marginBottom: 4 },
-  myBet: { color: '#00d4ff', fontFamily: 'Inter_700Bold', fontSize: 14 },
-  myDealerBadge: { marginTop: 4, width: 18, height: 18, borderRadius: 9, backgroundColor: '#ffcc00', alignItems: 'center', justifyContent: 'center' },
+  // Seat bubble
+  seatBubble:   { alignItems: 'center', borderRadius: 14, padding: 4, overflow: 'hidden' },
+  seatFolded:   { opacity: 0.3 },
+  seatBorder:   { alignItems: 'center', borderWidth: 1, borderRadius: 13, padding: 8, backgroundColor: 'rgba(255,255,255,0.02)', minWidth: 90 },
+  seatAvatar:   { width: 38, height: 38, borderRadius: 19, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', marginBottom: 4, position: 'relative' },
+  seatInitials: { fontFamily: 'Orbitron_700Bold', fontSize: 12 },
+  seatCards:    { flexDirection: 'row', gap: 3, marginBottom: 4 },
+  seatName:     { color: '#bbb', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 0.5, maxWidth: 80, textAlign: 'center' },
+  seatChips:    { fontFamily: 'Inter_700Bold', fontSize: 12, marginTop: 1 },
+  betPill:      { marginTop: 4, borderWidth: 1, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, backgroundColor: 'rgba(0,212,255,0.1)' },
+  betPillTxt:   { fontFamily: 'Inter_700Bold', fontSize: 9 },
+  handTag:      { marginTop: 4, backgroundColor: '#ffcc0018', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2 },
+  handTagTxt:   { color: '#ffcc00', fontFamily: 'Orbitron_400Regular', fontSize: 7 },
+  dealerDot:    { position: 'absolute', top: -4, right: -4, width: 15, height: 15, borderRadius: 8, backgroundColor: '#ffd700', alignItems: 'center', justifyContent: 'center' },
+  dealerDotTxt: { color: '#000', fontSize: 7, fontFamily: 'Orbitron_700Bold' },
+  allinTag:     { position: 'absolute', bottom: -6, backgroundColor: '#ff0090', borderRadius: 4, paddingHorizontal: 4, paddingVertical: 1 },
+  allinTxt:     { color: '#fff', fontSize: 6, fontFamily: 'Orbitron_700Bold' },
 
-  timerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  timerTrack: { flex: 1, height: 4, backgroundColor: '#1a1a2a', borderRadius: 2, overflow: 'hidden' },
-  timerBar: { height: 4, borderRadius: 2 },
-  timerText: { fontFamily: 'Inter_700Bold', fontSize: 13, minWidth: 28, textAlign: 'right' },
+  // Table surface
+  tableOuter: { flex: 1, aspectRatio: 1.5, borderRadius: 80, overflow: 'hidden', borderWidth: 4, borderColor: '#3d1800', elevation: 8, shadowColor: '#000', shadowRadius: 12, shadowOpacity: 0.5, maxHeight: 180 },
+  tableInner: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  feltRing:   { position: 'absolute', top: 8, left: 8, right: 8, bottom: 8, borderRadius: 72, borderWidth: 2, borderColor: '#1a5c2a50' },
+  blindsRow:  { flexDirection: 'row', gap: 14 },
+  blindTxt:   { color: '#1a5c2a', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 0.5 },
+  communityRow: { flexDirection: 'row', gap: 4 },
+  potRow:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  potTxt:     { color: '#ffd700', fontFamily: 'Inter_700Bold', fontSize: 13 },
+  waitingTxt: { color: '#1a5c2a', fontFamily: 'Orbitron_400Regular', fontSize: 9, textAlign: 'center' },
 
-  winBanner: { backgroundColor: '#ffcc0020', borderWidth: 1, borderColor: '#ffcc00', borderRadius: 10, paddingVertical: 10, alignItems: 'center', marginBottom: 10 },
-  winText: { color: '#ffcc00', fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 1.5 },
+  divider:    { height: 1, backgroundColor: '#ffffff08', marginVertical: 6 },
 
-  actionsArea: { marginBottom: 8 },
-  btnRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  actionBtn: { flex: 1, minWidth: 70, borderRadius: 10, overflow: 'hidden' },
-  actionGrad: { paddingVertical: 13, alignItems: 'center' },
-  foldBtn: { borderWidth: 1, borderColor: '#ff444440', paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(255,68,68,0.1)' },
-  foldText: { color: '#ff4444', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
-  checkBtn: { borderWidth: 1, borderColor: '#00ff8840', paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(0,255,136,0.08)' },
-  checkText: { color: '#00ff88', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
-  callBtn: {}, callText: { color: '#000', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
-  raiseBtn: {}, raiseText: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
-  allinBtn: {},
+  // My section
+  mySection:  { paddingHorizontal: 14 },
+  myRow:      { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 },
+  myCards:    { flexDirection: 'row', gap: 6 },
+  myStats:    { flex: 1 },
+  myDealerBadge: { width: 18, height: 18, borderRadius: 9, backgroundColor: '#ffd700', alignItems: 'center', justifyContent: 'center', marginBottom: 3 },
+  myName:     { color: '#888', fontFamily: 'Orbitron_400Regular', fontSize: 9, letterSpacing: 0.5, marginBottom: 2 },
+  myChips:    { color: '#ffcc00', fontFamily: 'Inter_700Bold', fontSize: 20 },
+  myBetRow:   { flexDirection: 'row', alignItems: 'baseline', marginTop: 2 },
+  myBetLabel: { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 9 },
+  myBetValue: { color: '#00d4ff', fontFamily: 'Inter_700Bold', fontSize: 14 },
 
-  raiseArea: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#ff009040' },
-  raiseLabel: { color: '#888', fontFamily: 'Orbitron_400Regular', fontSize: 10, letterSpacing: 1, textAlign: 'center', marginBottom: 8 },
-  raiseRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 20, marginBottom: 10 },
-  raiseAdj: { width: 36, height: 36, borderRadius: 18, borderWidth: 1, borderColor: '#333', alignItems: 'center', justifyContent: 'center' },
-  raiseAdjText: { color: '#fff', fontSize: 18, fontFamily: 'Inter_700Bold' },
-  raiseValue: { color: '#ff0090', fontFamily: 'Inter_700Bold', fontSize: 22, minWidth: 80, textAlign: 'center' },
-  raisePresets: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 12 },
-  presetBtn: { borderWidth: 1, borderColor: '#333', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 6 },
-  presetText: { color: '#888', fontFamily: 'Orbitron_700Bold', fontSize: 10 },
-  raiseActions: { flexDirection: 'row', gap: 10 },
-  cancelRaiseBtn: { flex: 1, borderWidth: 1, borderColor: '#333', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
-  cancelRaiseTxt: { color: '#555', fontFamily: 'Orbitron_700Bold', fontSize: 11 },
-  confirmRaiseBtn: { flex: 2, borderRadius: 10, overflow: 'hidden' },
-  confirmRaiseGrad: { paddingVertical: 12, alignItems: 'center' },
-  confirmRaiseTxt: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
+  // Timer
+  timerWrap:  { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  timerTrack: { flex: 1, height: 4, backgroundColor: '#111128', borderRadius: 2, overflow: 'hidden' },
+  timerFill:  { height: 4, borderRadius: 2 },
+  timerNum:   { fontFamily: 'Inter_700Bold', fontSize: 12, minWidth: 30, textAlign: 'right' },
 
-  waitTurn: { paddingVertical: 12, alignItems: 'center' },
-  waitTurnText: { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 11, letterSpacing: 1 },
+  // Win banner
+  winBanner:  { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#ffd70015', borderWidth: 1, borderColor: '#ffd70060', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 8, justifyContent: 'center' },
+  winTxt:     { color: '#ffd700', fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 1 },
+  winHand:    { color: '#ffcc00', fontFamily: 'Orbitron_400Regular', fontSize: 10 },
 
-  logScroll: { flex: 1, paddingHorizontal: 16 },
-  logContent: { paddingTop: 4, paddingBottom: 8, gap: 2 },
-  logMsg: { fontFamily: 'Inter_400Regular', fontSize: 11, letterSpacing: 0.3 },
+  // Action buttons
+  actionRow:   { flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 6 },
+  foldBtn:     { flex: 1, minWidth: 60, paddingVertical: 13, alignItems: 'center', borderRadius: 10, borderWidth: 1, borderColor: '#ff444440', backgroundColor: 'rgba(255,68,68,0.08)' },
+  foldTxt:     { color: '#ff4444', fontFamily: 'Orbitron_700Bold', fontSize: 10, letterSpacing: 1 },
+  checkBtn:    { flex: 1.2, paddingVertical: 13, alignItems: 'center', borderRadius: 10, borderWidth: 1, borderColor: '#00ff8840', backgroundColor: 'rgba(0,255,136,0.07)' },
+  checkTxt:    { color: '#00ff88', fontFamily: 'Orbitron_700Bold', fontSize: 10, letterSpacing: 1 },
+  callBtn:     { flex: 1.4, borderRadius: 10, overflow: 'hidden' },
+  raiseBtn:    { flex: 1.2, borderRadius: 10, overflow: 'hidden' },
+  allinBtn:    { flex: 1, borderRadius: 10, overflow: 'hidden' },
+  btnGrad:     { paddingVertical: 13, alignItems: 'center' },
+  callTxt:     { color: '#000', fontFamily: 'Orbitron_700Bold', fontSize: 9, letterSpacing: 1, textAlign: 'center' },
+  raiseTxt:    { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 10, letterSpacing: 1 },
 
-  card: {
-    borderRadius: 6, borderWidth: 1, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3, shadowRadius: 4,
-  },
+  // Raise panel
+  raisePanel:  { backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: '#ff009030', borderRadius: 14, padding: 14, marginBottom: 6 },
+  raiseHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  raiseHeaderTxt: { color: '#888', fontFamily: 'Orbitron_400Regular', fontSize: 9, letterSpacing: 1 },
+  raiseControls:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 10 },
+  raiseAdj:    { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1a1a2a', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#333' },
+  raiseAdjTxt: { color: '#fff', fontSize: 20, fontFamily: 'Inter_700Bold' },
+  raiseVal:    { color: '#ff0090', fontFamily: 'Inter_700Bold', fontSize: 22, minWidth: 80, textAlign: 'center' },
+  presets:     { flexDirection: 'row', gap: 8, marginBottom: 12 },
+  presetBtn:   { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 8, borderWidth: 1, borderColor: '#333' },
+  presetTxt:   { color: '#888', fontFamily: 'Orbitron_700Bold', fontSize: 10 },
+  confirmRaise: { borderRadius: 10, overflow: 'hidden' },
+  confirmRaiseGrad: { paddingVertical: 13, alignItems: 'center' },
+  confirmRaiseTxt: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1 },
+
+  // Wait
+  waitRow:   { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 12, justifyContent: 'center' },
+  waitTxt:   { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 11 },
+
+  // Card
+  card: { borderRadius: 7, borderWidth: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+
+  // Log
+  logScroll:   { flex: 1, marginTop: 4 },
+  logContent:  { paddingHorizontal: 14, paddingBottom: 8, gap: 2 },
+  logMsg:      { fontSize: 10, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.3 },
 });

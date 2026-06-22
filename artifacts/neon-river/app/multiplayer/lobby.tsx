@@ -63,6 +63,8 @@ export default function MultiplayerLobby() {
     }
   }, [error]);
 
+  const userId = profile.playerId ?? profile.username;
+
   const handleJoin = (table: LobbyTable) => {
     const chips = profile.chips ?? 0;
     if (chips < table.minBuyIn) {
@@ -70,7 +72,8 @@ export default function MultiplayerLobby() {
       return;
     }
     setJoining(table.id);
-    joinTable(table.id, profile.username, profile.username, profile.avatarIndex ?? 1, Math.min(chips, table.minBuyIn * 5));
+    const buyIn = Math.min(chips, table.minBuyIn * 5);
+    joinTable(table.id, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
   };
 
   const handleCreate = () => {
@@ -81,11 +84,8 @@ export default function MultiplayerLobby() {
       return;
     }
     setShowCreate(false);
-    createTable(
-      selectedTier, maxPlayers,
-      profile.username, profile.username, profile.avatarIndex ?? 1,
-      Math.min(chips, minBuy * 5)
-    );
+    const buyIn = Math.min(chips, minBuy * 5);
+    createTable(selectedTier, maxPlayers, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
   };
 
   const renderTable = ({ item }: { item: LobbyTable }) => {
