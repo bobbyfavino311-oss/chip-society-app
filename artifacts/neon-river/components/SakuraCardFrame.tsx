@@ -1,107 +1,153 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Svg, { Circle, Defs, Ellipse, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, Ellipse, LinearGradient, Path, RadialGradient, Rect, Stop, Line } from 'react-native-svg';
 
-interface SakuraCardFrameProps {
-  width: number;
-  height: number;
-}
+interface SakuraCardFrameProps { width: number; height: number; }
 
-const PINK = '#F4A8C0';
-const ROSE = '#E8627A';
-const PLUM = '#C4407C';
-
-// 4-petal blossom corner ornament
-function CornerBlossom({ cx, cy, r }: { cx: number; cy: number; r: number }) {
-  const offsets: [number, number][] = [[0, -r], [r, 0], [0, r], [-r, 0]];
-  return (
-    <>
-      <Circle cx={cx} cy={cy} r={r * 0.55}
-        fill={PINK} fillOpacity={0.55} />
-      {offsets.map(([ox, oy], i) => (
-        <Ellipse key={i}
-          cx={cx + ox * 0.5} cy={cy + oy * 0.5}
-          rx={r * 0.65} ry={r * 0.48}
-          fill={PINK} fillOpacity={0.42}
-          transform={`rotate(${i * 90}, ${cx + ox * 0.5}, ${cy + oy * 0.5})`}
-        />
-      ))}
-      {/* Center dot */}
-      <Circle cx={cx} cy={cy} r={r * 0.20}
-        fill={ROSE} fillOpacity={0.70} />
-    </>
-  );
-}
+const SAKURA  = '#F5A9C6';
+const ROSE    = '#E88DB0';
+const ROSEGLD = '#E8B4C0';
+const WHITE   = '#FFF0F8';
+const PLUM    = '#7A2050';
 
 export default function SakuraCardFrame({ width: w, height: h }: SakuraCardFrameProps) {
   if (w === 0 || h === 0) return null;
 
-  const PAD  = 6;
-  const PAD2 = 10;
-  const CR   = 8; // corner blossom radius
+  const PAD   = 4;
+  const PAD2  = 9;
+  const PAD3  = 14;
+  const R_OUT = 10;
+  const R_IN  = 6;
+  const R_IN2 = 3;
 
   const corners: [number, number][] = [
-    [PAD + CR, PAD + CR],
-    [w - PAD - CR, PAD + CR],
-    [PAD + CR, h - PAD - CR],
-    [w - PAD - CR, h - PAD - CR],
+    [PAD + 8,       PAD + 8],
+    [w - PAD - 8,   PAD + 8],
+    [PAD + 8,       h - PAD - 8],
+    [w - PAD - 8,   h - PAD - 8],
   ];
 
   return (
-    <View
-      style={[StyleSheet.absoluteFillObject, { zIndex: 10 }]}
-      pointerEvents="none"
-    >
+    <View style={[StyleSheet.absoluteFillObject, { zIndex: 10 }]} pointerEvents="none">
       <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
         <Defs>
+          {/* Top edge — rose-gold hot at center */}
           <LinearGradient id="skTopEdge" x1="0" y1="0" x2="1" y2="0">
-            <Stop offset="0"   stopColor={ROSE} stopOpacity="0" />
-            <Stop offset="0.3" stopColor={ROSE} stopOpacity="0.55" />
-            <Stop offset="0.7" stopColor={ROSE} stopOpacity="0.55" />
-            <Stop offset="1"   stopColor={ROSE} stopOpacity="0" />
+            <Stop offset="0"    stopColor={ROSE}    stopOpacity="0"    />
+            <Stop offset="0.15" stopColor={ROSE}    stopOpacity="0.55" />
+            <Stop offset="0.40" stopColor={ROSEGLD} stopOpacity="0.80" />
+            <Stop offset="0.50" stopColor={WHITE}   stopOpacity="0.90" />
+            <Stop offset="0.60" stopColor={ROSEGLD} stopOpacity="0.80" />
+            <Stop offset="0.85" stopColor={ROSE}    stopOpacity="0.55" />
+            <Stop offset="1"    stopColor={ROSE}    stopOpacity="0"    />
           </LinearGradient>
+
           <LinearGradient id="skBotEdge" x1="0" y1="0" x2="1" y2="0">
-            <Stop offset="0"   stopColor={PLUM} stopOpacity="0" />
-            <Stop offset="0.3" stopColor={PLUM} stopOpacity="0.40" />
-            <Stop offset="0.7" stopColor={PLUM} stopOpacity="0.40" />
-            <Stop offset="1"   stopColor={PLUM} stopOpacity="0" />
+            <Stop offset="0"    stopColor={ROSE}    stopOpacity="0"    />
+            <Stop offset="0.20" stopColor={ROSE}    stopOpacity="0.40" />
+            <Stop offset="0.50" stopColor={ROSEGLD} stopOpacity="0.58" />
+            <Stop offset="0.80" stopColor={ROSE}    stopOpacity="0.40" />
+            <Stop offset="1"    stopColor={ROSE}    stopOpacity="0"    />
           </LinearGradient>
+
+          <LinearGradient id="skSideEdge" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0"    stopColor={ROSE}    stopOpacity="0"    />
+            <Stop offset="0.25" stopColor={ROSE}    stopOpacity="0.32" />
+            <Stop offset="0.50" stopColor={ROSEGLD} stopOpacity="0.45" />
+            <Stop offset="0.75" stopColor={ROSE}    stopOpacity="0.32" />
+            <Stop offset="1"    stopColor={ROSE}    stopOpacity="0"    />
+          </LinearGradient>
+
+          {/* Smoked glass fill — dark plum tint */}
+          <LinearGradient id="skFill" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0"   stopColor="#2D102F" stopOpacity="0.10" />
+            <Stop offset="0.5" stopColor="#1A0820" stopOpacity="0.05" />
+            <Stop offset="1"   stopColor="#0C030A" stopOpacity="0.02" />
+          </LinearGradient>
+
+          {/* Top sheen — rose quartz */}
+          <LinearGradient id="skSheen" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0"   stopColor={WHITE}   stopOpacity="0.08" />
+            <Stop offset="0.5" stopColor={WHITE}   stopOpacity="0.02" />
+            <Stop offset="1"   stopColor={WHITE}   stopOpacity="0"    />
+          </LinearGradient>
+
+          {/* Outer pink glow bloom */}
+          <RadialGradient id="skGlow" cx="50%" cy="50%" r="60%">
+            <Stop offset="0"   stopColor={PLUM}    stopOpacity="0.12" />
+            <Stop offset="1"   stopColor={PLUM}    stopOpacity="0"    />
+          </RadialGradient>
         </Defs>
 
-        {/* Outer border */}
-        <Rect
-          x={PAD} y={PAD} width={w - PAD * 2} height={h - PAD * 2}
-          rx={6} ry={6}
-          fill="none" stroke={ROSE} strokeWidth={1.2} strokeOpacity={0.50}
-        />
-        {/* Inner border */}
-        <Rect
-          x={PAD2} y={PAD2} width={w - PAD2 * 2} height={h - PAD2 * 2}
-          rx={4} ry={4}
-          fill="none" stroke={PINK} strokeWidth={0.5} strokeOpacity={0.28}
-        />
+        {/* Outer ambient bloom */}
+        <Rect x={-6} y={-6} width={w + 12} height={h + 12}
+          rx={R_OUT + 4} ry={R_OUT + 4} fill="url(#skGlow)" />
 
-        {/* Gradient edge bars */}
-        <Rect x={PAD} y={PAD} width={w - PAD * 2} height={1.5}
-          fill="url(#skTopEdge)" />
-        <Rect x={PAD} y={h - PAD - 1.5} width={w - PAD * 2} height={1.5}
-          fill="url(#skBotEdge)" />
+        {/* Smoked glass fill */}
+        <Rect x={PAD + 1} y={PAD + 1}
+          width={w - (PAD + 1) * 2} height={h - (PAD + 1) * 2}
+          rx={R_IN} ry={R_IN} fill="url(#skFill)" />
 
-        {/* Corner blossom ornaments */}
+        {/* Outer border — rose-gold */}
+        <Rect x={PAD} y={PAD}
+          width={w - PAD * 2} height={h - PAD * 2}
+          rx={R_OUT} ry={R_OUT}
+          fill="none" stroke={ROSE} strokeWidth={1.3} strokeOpacity={0.60} />
+
+        {/* Middle border — sakura pink */}
+        <Rect x={PAD2} y={PAD2}
+          width={w - PAD2 * 2} height={h - PAD2 * 2}
+          rx={R_IN} ry={R_IN}
+          fill="none" stroke={SAKURA} strokeWidth={0.6} strokeOpacity={0.28} />
+
+        {/* Inner border — barely there */}
+        <Rect x={PAD3} y={PAD3}
+          width={w - PAD3 * 2} height={h - PAD3 * 2}
+          rx={R_IN2} ry={R_IN2}
+          fill="none" stroke={WHITE} strokeWidth={0.35} strokeOpacity={0.12} />
+
+        {/* Glowing edge bars */}
+        <Rect x={PAD} y={PAD}             width={w - PAD * 2} height={2.0} fill="url(#skTopEdge)" />
+        <Rect x={PAD} y={h - PAD - 2.0}   width={w - PAD * 2} height={2.0} fill="url(#skBotEdge)" />
+        <Rect x={PAD} y={PAD}             width={1.8} height={h - PAD * 2} fill="url(#skSideEdge)" />
+        <Rect x={w - PAD - 1.8} y={PAD}   width={1.8} height={h - PAD * 2} fill="url(#skSideEdge)" />
+
+        {/* Inner sheen — rose quartz glass */}
+        <Rect x={PAD + 2} y={PAD + 2}
+          width={w - (PAD + 2) * 2} height={(h - PAD * 2) * 0.28}
+          rx={R_IN} ry={R_IN} fill="url(#skSheen)" />
+
+        {/* Corner diamond accents — rose-gold */}
         {corners.map(([cx, cy], i) => (
-          <CornerBlossom key={i} cx={cx} cy={cy} r={CR} />
+          <React.Fragment key={i}>
+            <Circle cx={cx} cy={cy} r={5} fill={ROSE} fillOpacity={0.10} />
+            <Path
+              d={`M ${cx} ${cy - 5.5} L ${cx + 4.5} ${cy} L ${cx} ${cy + 5.5} L ${cx - 4.5} ${cy} Z`}
+              fill={ROSE} fillOpacity={0.28}
+              stroke={ROSEGLD} strokeWidth={0.8} strokeOpacity={0.72}
+            />
+            <Circle cx={cx} cy={cy} r={1.4} fill={WHITE} fillOpacity={0.82} />
+          </React.Fragment>
         ))}
 
-        {/* Center-top petal accent */}
-        <Path
-          d={`M ${w / 2} ${PAD - 2} Q ${w / 2 - 5} ${PAD + 4} ${w / 2} ${PAD + 8} Q ${w / 2 + 5} ${PAD + 4} ${w / 2} ${PAD - 2} Z`}
-          fill={PINK} fillOpacity={0.30}
-        />
-        {/* Center-bottom petal accent */}
-        <Path
-          d={`M ${w / 2} ${h - PAD + 2} Q ${w / 2 - 5} ${h - PAD - 4} ${w / 2} ${h - PAD - 8} Q ${w / 2 + 5} ${h - PAD - 4} ${w / 2} ${h - PAD + 2} Z`}
-          fill={PINK} fillOpacity={0.30}
-        />
+        {/* Top center marker */}
+        <Line x1={w / 2 - 10} y1={PAD + 1} x2={w / 2 + 10} y2={PAD + 1}
+          stroke={WHITE} strokeWidth={1.0} strokeOpacity={0.42} />
+        <Circle cx={w / 2} cy={PAD + 1} r={1.6} fill={WHITE} fillOpacity={0.65} />
+
+        {/* Bottom center marker */}
+        <Line x1={w / 2 - 8} y1={h - PAD - 1} x2={w / 2 + 8} y2={h - PAD - 1}
+          stroke={ROSE} strokeWidth={0.8} strokeOpacity={0.35} />
+
+        {/* Side mid ticks */}
+        <Line x1={PAD + 1} y1={h / 2 - 5} x2={PAD + 1} y2={h / 2 + 5}
+          stroke={ROSE} strokeWidth={0.9} strokeOpacity={0.40} />
+        <Line x1={w - PAD - 1} y1={h / 2 - 5} x2={w - PAD - 1} y2={h / 2 + 5}
+          stroke={ROSE} strokeWidth={0.9} strokeOpacity={0.40} />
+
+        {/* Glass reflection arc */}
+        <Ellipse cx={w / 2} cy={PAD + 7} rx={w * 0.30} ry={5}
+          fill={WHITE} fillOpacity={0.04} />
       </Svg>
     </View>
   );

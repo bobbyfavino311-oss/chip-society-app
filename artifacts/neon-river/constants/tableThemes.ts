@@ -190,7 +190,7 @@ export const ROYAL_MASQUERADE: TableTheme = {
 
 export const SAKURA_GARDEN: TableTheme = {
   id: 'sakura_garden',
-  name: 'SAKURA GARDEN',
+  name: 'SAKURA',
   tagline: 'Play beneath the cherry blossoms. Peaceful, graceful, and luxuriously elegant.',
   rarity: 'LEGENDARY',
 
