@@ -1,0 +1,228 @@
+LIVE BONUS NOTIFICATION FIX — REAL-TIME SERVER PUSH REQUIRED
+
+The admin bonus system is still not sending notifications live.
+
+Current issue:
+
+Admin gives player chips from the admin page, but the player does not receive the notification in real time.
+
+This must be fixed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED BEHAVIOR
+
+When admin gives a player a casino bonus:
+
+1. Server adds chips to player balance.
+2. Server creates transaction log.
+3. Server creates notification record.
+4. If player is online, server pushes notification instantly.
+5. Player receives popup immediately without refreshing.
+6. Player balance updates immediately.
+7. Notification center badge updates immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+IMPORTANT
+
+Do NOT rely only on database polling.
+
+Do NOT require player to refresh.
+
+Do NOT require logout/login.
+
+Do NOT wait until app restart.
+
+This must be real-time.
+
+Use one of:
+
+• WebSocket
+• Socket.IO
+• Server-Sent Events
+• Realtime database listener
+• Push notification system
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SOCKET CONNECTION REQUIREMENT
+
+When player logs in:
+
+Client must open a live socket connection to the server.
+
+Register the player connection:
+
+playerId
+username
+socketId
+onlineStatus = true
+
+When player disconnects:
+
+onlineStatus = false
+
+Remove socketId.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ADMIN BONUS EVENT
+
+When admin gives bonus:
+
+Emit real-time event to that player only:
+
+event name:
+
+casino_bonus_received
+
+Payload:
+
+{
+playerId,
+username,
+amount,
+message,
+reason,
+previousBalance,
+newBalance,
+transactionId,
+timestamp
+}
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CLIENT LISTENER
+
+Mobile app must listen for:
+
+casino_bonus_received
+
+When received:
+
+• Show popup
+• Play reward sound
+• Animate chip balance
+• Update notification badge
+• Add notification to notification list
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ONLINE PLAYER TEST
+
+Test:
+
+Player realbobbyf is logged in and on Home Screen.
+
+Admin gives:
+
+500,000 chips.
+
+Expected:
+
+Within 1–2 seconds:
+
+Popup appears:
+
+CASINO BONUS RECEIVED
+
++500,000 chips
+
+Balance updates instantly.
+
+Notification badge increases.
+
+No refresh.
+
+No screen change.
+
+No app restart.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OFFLINE PLAYER FALLBACK
+
+If player is offline:
+
+Still save:
+
+• Bonus transaction
+• Notification record
+• New balance
+
+When player logs in later:
+
+Show pending bonus notification.
+
+This is fallback only.
+
+Live players must receive real-time events.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DEBUG REQUIREMENT
+
+Add server logs:
+
+Admin bonus created for playerId:
+
+Socket found:
+
+yes/no
+
+Event emitted:
+
+casino_bonus_received
+
+Client acknowledged:
+
+yes/no
+
+Add client logs:
+
+Socket connected
+
+Subscribed to playerId
+
+Bonus event received
+
+Popup displayed
+
+Balance updated
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMMON BUGS TO CHECK
+
+Check for:
+
+• Player socket not registered after login
+• Admin emitting to username instead of playerId
+• Client listening to wrong event name
+• Socket disconnecting silently on mobile
+• Replit server not supporting WebSocket properly
+• CORS blocking socket connection
+• Mobile build using wrong server URL
+• Notification created in database but never emitted
+• Event emitted globally but client filters it out
+• Event emitted before player subscription completes
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCEPTANCE TEST
+
+Do not mark complete until this works:
+
+1. Open mobile app.
+2. Login as realbobbyf.
+3. Stay on Home Screen.
+4. Open admin page separately.
+5. Give realbobbyf 500,000 chips.
+6. Mobile app receives popup live.
+7. Balance updates instantly.
+8. Notification badge updates instantly.
+9. Notification appears in notification center.
+10. Transaction appears in admin log.
+
+If the player only sees the bonus after refresh, logout, or app restart, the system is not real-time and is not fixed.

@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { io, type Socket } from 'socket.io-client';
 
 export type Rank =
   | 'LOCAL'
@@ -286,6 +287,18 @@ const STORAGE_KEY       = '@chip_society_profile';
 const LOCAL_CREDS_KEY   = '@chip_society_local_creds';
 const LEGACY_KEY   = '@neon_river_profile';
 
+// ─── Notification socket URL ──────────────────────────────────────────────────
+// On web: connect to the current page origin (dev proxy or production domain).
+// On native (iOS/Android): always connect directly to the Railway production
+// server — same server that receives admin bonus requests, so emitToPlayer fires
+// on the same Socket.IO instance that the mobile client is registered to.
+function getNotificationSocketUrl(): string {
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
+  return 'https://api-server-production-bbc2.up.railway.app';
+}
+
 // ─── API base URL ─────────────────────────────────────────────────────────────
 export function getApiBase(): string {
   // Web browser only — derive the API origin from the page URL so the app works
@@ -442,6 +455,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [pendingBonuses, setPendingBonuses] = useState<PendingBonus[]>([]);
   const checkedBonusIds = React.useRef<Set<string>>(new Set());
+  const notifSocketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30_000);
@@ -859,6 +873,91 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (syncTimerRef.current) { clearTimeout(syncTimerRef.current); syncTimerRef.current = null; }
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...DEFAULT_PROFILE }));
   }, []);
+
+  // ── Persistent notification socket ───────────────────────────────────────────
+  // Opens a Socket.IO connection as soon as the player logs in and registers
+  // their playerId so the server can push casino_bonus_received in real time.
+  // Falls back to 30 s polling (below) for offline players.
+
+  useEffect(() => {
+    const pid = profile.playerId;
+    const username = profile.username;
+
+    if (!pid || pid === DEFAULT_PROFILE.playerId) {
+      // Not logged in — disconnect any stale socket
+      if (notifSocketRef.current) {
+        notifSocketRef.current.disconnect();
+        notifSocketRef.current = null;
+      }
+      return;
+    }
+
+    // Already connected for this player — nothing to do
+    if (notifSocketRef.current?.connected) return;
+
+    const url = getNotificationSocketUrl();
+    console.log('[BonusSocket] connecting to', url, 'as', pid);
+
+    const socket = io(url, {
+      path: '/api/socket.io',
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 2000,
+      reconnectionAttempts: Infinity,
+    });
+
+    socket.on('connect', () => {
+      console.log('[BonusSocket] connected, registering player', pid);
+      socket.emit('register_player', { playerId: pid, username });
+    });
+
+    socket.on('disconnect', (reason: string) => {
+      console.log('[BonusSocket] disconnected:', reason);
+    });
+
+    socket.on('connect_error', (err: Error) => {
+      console.log('[BonusSocket] connect_error:', err.message);
+    });
+
+    socket.on('casino_bonus_received', (data: {
+      playerId: string;
+      amount: number;
+      reason: string;
+      message?: string | null;
+      newBalance: number;
+      notificationId: string;
+      timestamp: string;
+    }) => {
+      console.log('[BonusSocket] casino_bonus_received', data);
+
+      // Deduplicate — polling might have already queued this
+      if (checkedBonusIds.current.has(data.notificationId)) return;
+      checkedBonusIds.current.add(data.notificationId);
+
+      // Update chip balance immediately
+      setProfile(prev => {
+        const next = { ...prev, chips: data.newBalance };
+        void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        return next;
+      });
+
+      // Queue the bonus popup
+      setPendingBonuses(prev => [...prev, {
+        notificationId: data.notificationId,
+        amount: data.amount,
+        reason: data.reason,
+        message: data.message ?? null,
+        createdAt: data.timestamp,
+      }]);
+    });
+
+    notifSocketRef.current = socket;
+
+    return () => {
+      socket.disconnect();
+      notifSocketRef.current = null;
+    };
+  }, [profile.playerId]);
 
   // ── Casino bonus polling ──────────────────────────────────────────────────────
   // Runs on login and every 30 s (piggybacks on the existing `now` tick).

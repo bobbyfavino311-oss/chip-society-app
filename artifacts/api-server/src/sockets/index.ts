@@ -3,6 +3,28 @@ import type { Server as HttpServer } from 'http';
 import { RoomManager } from '../poker/roomManager.js';
 import { logger } from '../lib/logger.js';
 
+// ── Player presence registry ───────────────────────────────────────────────────
+// Maps playerId → socketId so admin routes can push events to a specific player.
+const playerSockets = new Map<string, string>(); // playerId → socketId
+const socketPlayers = new Map<string, string>(); // socketId → playerId (for disconnect cleanup)
+
+let _io: SocketIOServer | null = null;
+
+/**
+ * Emit a real-time event to a specific online player by playerId.
+ * Returns true if the player was online and the event was delivered.
+ */
+export function emitToPlayer(playerId: string, event: string, data: unknown): boolean {
+  const socketId = playerSockets.get(playerId);
+  if (!socketId || !_io) {
+    logger.info({ playerId, event, socketFound: false }, 'emitToPlayer: player offline or server not ready');
+    return false;
+  }
+  _io.to(socketId).emit(event, data);
+  logger.info({ playerId, socketId, event, socketFound: true }, 'emitToPlayer: event emitted');
+  return true;
+}
+
 export function setupSocketIO(httpServer: HttpServer): void {
   const io = new SocketIOServer(httpServer, {
     path: '/api/socket.io',
@@ -10,12 +32,13 @@ export function setupSocketIO(httpServer: HttpServer): void {
     transports: ['websocket', 'polling'],
   });
 
+  _io = io;
+
   const emit = (socketId: string, event: string, data: unknown) => {
     io.to(socketId).emit(event, data);
   };
 
   const broadcast = (roomId: string, _event: string, _data: unknown) => {
-    // Notify lobby watchers (non-table sockets) of lobby update
     const tables = manager.getLobbyTables();
     io.emit('lobby_state', { tables });
   };
@@ -24,6 +47,22 @@ export function setupSocketIO(httpServer: HttpServer): void {
 
   io.on('connection', (socket) => {
     logger.info({ socketId: socket.id }, 'Socket connected');
+
+    // ─── Player presence registration ─────────────────────────────────────
+    // Called immediately after login so admin routes can push events to the right player.
+    socket.on('register_player', (payload: { playerId: string; username?: string }) => {
+      const { playerId } = payload;
+      if (!playerId) return;
+      // Evict any stale socket for this player (e.g. reconnect)
+      const oldSocketId = playerSockets.get(playerId);
+      if (oldSocketId && oldSocketId !== socket.id) {
+        socketPlayers.delete(oldSocketId);
+      }
+      playerSockets.set(playerId, socket.id);
+      socketPlayers.set(socket.id, playerId);
+      socket.join(`player:${playerId}`);
+      logger.info({ playerId, socketId: socket.id, username: payload.username ?? 'unknown' }, 'Player registered for push notifications');
+    });
 
     // ─── Lobby ────────────────────────────────────────────────────────────
     socket.on('get_lobby', () => {
@@ -106,6 +145,12 @@ export function setupSocketIO(httpServer: HttpServer): void {
     // ─── Disconnect ───────────────────────────────────────────────────────
     socket.on('disconnect', () => {
       logger.info({ socketId: socket.id }, 'Socket disconnected');
+      const pid = socketPlayers.get(socket.id);
+      if (pid) {
+        playerSockets.delete(pid);
+        socketPlayers.delete(socket.id);
+        logger.info({ playerId: pid, socketId: socket.id }, 'Player presence removed on disconnect');
+      }
       const room = manager.getRoomForSocket(socket.id);
       if (room) socket.leave(room.id);
       manager.leaveRoom(socket.id);

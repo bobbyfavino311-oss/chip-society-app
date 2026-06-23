@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db, playersTable, chipTransactionsTable, playerReportsTable, playerNotificationsTable } from '@workspace/db';
 import { eq, or, desc } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
+import { emitToPlayer } from '../sockets/index.js';
 
 const router = Router();
 
@@ -196,8 +197,22 @@ router.post('/admin/players/:id/bonus', async (req, res) => {
       read:     false,
     });
 
-    req.log.info({ playerId: player.playerId, amount, reason, notificationId }, 'casino bonus awarded');
-    res.json({ success: true, newBalance, notificationId, txId });
+    // Push real-time event to the player if they're currently online
+    const online = emitToPlayer(player.playerId, 'casino_bonus_received', {
+      playerId:        player.playerId,
+      username:        player.username,
+      amount:          Math.abs(amount),
+      message:         message ?? null,
+      reason,
+      previousBalance: currentChips,
+      newBalance,
+      transactionId:   txId,
+      notificationId,
+      timestamp:       new Date().toISOString(),
+    });
+
+    req.log.info({ playerId: player.playerId, amount, reason, notificationId, playerOnline: online }, 'casino bonus awarded');
+    res.json({ success: true, newBalance, notificationId, txId, playerOnline: online });
   } catch (e) {
     req.log.error(e, 'admin/bonus error');
     res.status(500).json({ error: 'Server error' });
