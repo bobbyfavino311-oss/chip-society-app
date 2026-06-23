@@ -288,14 +288,9 @@ export function getApiBase(): string {
     return `${window.location.origin}/api`;
   }
 
-  // Native (iOS / Android) — use the Replit public dev URL so accounts created
-  // on a real device are stored in the same database as the admin panel.
-  // EXPO_PUBLIC_API_URL is injected by the workflow and points to the public
-  // Replit HTTPS domain, which is reachable from any network.
-  const expoApiUrl = process.env['EXPO_PUBLIC_API_URL'];
-  if (expoApiUrl) return expoApiUrl;
-
-  // Fallback to Railway if env var is missing (e.g. standalone production build).
+  // Native (iOS / Android) — always talk to the Railway production server.
+  // This is the canonical backend for all player accounts and gameplay data.
+  // The admin panel also points here, so everything is in one database.
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 

@@ -61,3 +61,4 @@ EXPO_PUBLIC_API_URL = "https://chip-society.replit.app/api"
 
 [userenv.shared]
 ADMIN_SECRET = "chipsociety_admin_2024"
+VITE_API_BASE = "https://api-server-production-bbc2.up.railway.app/api"

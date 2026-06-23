@@ -19,12 +19,19 @@ description: API server and Postgres hosted on Railway — URLs, project IDs, de
 
 ## App config
 - `serve.js` injects `RAILWAY_API_URL` into manifest `extra.expoClient.extra.apiUrl`
-- `UserContext.tsx` hardcoded fallback: `https://api-server-production-bbc2.up.railway.app/api`
+- `UserContext.tsx` native hardcoded: `https://api-server-production-bbc2.up.railway.app/api` (single source of truth)
 - `MultiplayerContext.tsx` socket URL fallback: `https://api-server-production-bbc2.up.railway.app`
+- Admin panel `VITE_API_BASE` = `https://api-server-production-bbc2.up.railway.app/api` (set in shared env)
+- Admin routes `/api/admin/*` protected by `ADMIN_SECRET` env var (set on Railway); key: see Secrets tab
+- `ADMIN_SECRET` must be set on Railway via GraphQL variableUpsert — it was NOT present by default
 
 ## Deployment method (how to update the server)
 The Railway service is connected to GitHub repo `bobbyfavino311-oss/chip-society`.
-To redeploy: upload new built files to GitHub via GitHub Contents API (PUT /repos/.../contents/dist/...) and trigger redeploy via Railway GraphQL `serviceInstanceDeploy` mutation.
+To redeploy:
+1. Build: `pnpm --filter @workspace/api-server run build`
+2. Upload `dist/index.mjs` blob via GitHub Git Data API (blob → tree → commit → ref update)
+3. Trigger: Railway GraphQL `serviceInstanceDeploy` mutation
+4. If schema changed: run `pnpm --filter @workspace/db run push` with public Railway Postgres URL
 
 **Why not Railway CLI**: CLI v5 `whoami` returns "Unauthorized" even with valid account tokens. Use Railway GraphQL API directly with token.
 

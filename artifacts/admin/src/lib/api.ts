@@ -1,4 +1,4 @@
-const BASE = '/api';
+const BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? '/api';
 
 export function adminHeaders(): Record<string, string> {
   const key = localStorage.getItem('admin_key') ?? '';
@@ -19,11 +19,11 @@ async function req<T>(method: string, path: string, body?: unknown): Promise<T> 
 }
 
 export const api = {
-  stats:          ()                          => req<any>('GET',  '/admin/stats'),
+  stats:          ()                            => req<any>('GET',  '/admin/stats'),
   players:        (q?: string, status?: string) => req<any>('GET',  `/admin/players?q=${q??''}&status=${status??'all'}`),
-  player:         (id: string)                => req<any>('GET',  `/admin/players/${id}`),
-  adjustChips:    (id: string, b: any)        => req<any>('POST', `/admin/players/${id}/chips`, b),
-  setStatus:      (id: string, b: any)        => req<any>('POST', `/admin/players/${id}/status`, b),
-  reports:        (status?: string)           => req<any>('GET',  `/admin/reports?status=${status??'open'}`),
-  resolveReport:  (id: string, b: any)        => req<any>('PUT',  `/admin/reports/${id}`, b),
+  player:         (id: string)                  => req<any>('GET',  `/admin/players/${id}`),
+  adjustChips:    (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/chips`, b),
+  setStatus:      (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/status`, b),
+  reports:        (status?: string)             => req<any>('GET',  `/admin/reports?status=${status??'open'}`),
+  resolveReport:  (id: string, b: any)          => req<any>('PUT',  `/admin/reports/${id}`, b),
 };
