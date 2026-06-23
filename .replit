@@ -47,6 +47,10 @@ externalPort = 80
 localPort = 22744
 externalPort = 3001
 
+[[ports]]
+localPort = 23744
+externalPort = 3000
+
 [nix]
 channel = "stable-25_05"
 
@@ -54,3 +58,6 @@ channel = "stable-25_05"
 
 [userenv.production]
 EXPO_PUBLIC_API_URL = "https://chip-society.replit.app/api"
+
+[userenv.shared]
+ADMIN_SECRET = "chipsociety_admin_2024"
