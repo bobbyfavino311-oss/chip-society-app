@@ -297,20 +297,11 @@ function getNotificationSocketUrl(): string {
 }
 
 // ─── API base URL ─────────────────────────────────────────────────────────────
+// Always talk to the Railway production server — this is the single source of
+// truth for all player accounts, chip balances, and notifications.
+// The admin panel also points here so bonus pushes arrive on the same server
+// instance that holds the Socket.IO registry.
 export function getApiBase(): string {
-  // Web browser only — derive the API origin from the page URL so the app works
-  // on any Replit domain, custom domain, or local dev server.
-  //
-  // IMPORTANT: do NOT use window.location on native.  Expo Router injects a
-  // synthetic window.location (from app.json's expo-router `origin` config)
-  // even in React Native / Hermes, so the window check alone is not enough.
-  if (Platform.OS === 'web') {
-    return `${window.location.origin}/api`;
-  }
-
-  // Native (iOS / Android) — always talk to the Railway production server.
-  // This is the canonical backend for all player accounts and gameplay data.
-  // The admin panel also points here, so everything is in one database.
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 
@@ -990,23 +981,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         createdAt: n.createdAt,
       }));
       setPendingBonuses(prev => [...prev, ...bonuses]);
-      // Also update local chip balance to match server
-      const latest = data.notifications[0];
-      if (latest) {
-        // Server already added chips — refresh profile from server
-        try {
-          const pr = await fetch(`${getApiBase()}/auth/profile?playerId=${pid}`);
-          if (pr.ok) {
-            const pd = (await pr.json()) as { profile?: Record<string, unknown> };
-            if (pd.profile && typeof pd.profile['chips'] === 'number') {
-              setProfile(prev => {
-                const next = { ...prev, chips: pd.profile!['chips'] as number };
-                void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-                return next;
-              });
-            }
-          }
-        } catch {}
+      // Update chip balance — add the total of all fresh bonus amounts to the
+      // current local balance (the server already credited them when the bonus
+      // was sent; we just need to reflect that in the UI immediately).
+      const totalBonusAmount = fresh.reduce((sum, n) => sum + n.amount, 0);
+      if (totalBonusAmount > 0) {
+        setProfile(prev => {
+          const next = { ...prev, chips: prev.chips + totalBonusAmount };
+          void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          return next;
+        });
       }
     } catch {}
   }, []);

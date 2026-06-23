@@ -117,6 +117,32 @@ router.post('/auth/login', async (req, res) => {
   }
 });
 
+// ── GET /api/auth/profile?playerId=xxx ────────────────────────────────────────
+// Returns the latest profile JSON for a player (used by mobile polling to sync
+// chip balance after a bonus is received).
+router.get('/auth/profile', async (req, res) => {
+  try {
+    const { playerId } = req.query as { playerId?: string };
+    if (!playerId) {
+      res.status(400).json({ error: 'playerId query param required.' });
+      return;
+    }
+    const rows = await db
+      .select()
+      .from(playersTable)
+      .where(eq(playersTable.playerId, playerId))
+      .limit(1);
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'Player not found.' });
+      return;
+    }
+    res.json({ success: true, profile: rows[0]!.profileJson });
+  } catch (e) {
+    req.log.error(e, 'get profile error');
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 // ── PUT /api/auth/profile ─────────────────────────────────────────────────────
 router.put('/auth/profile', async (req, res) => {
   try {
