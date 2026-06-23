@@ -6,6 +6,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useColors } from '@/hooks/useColors';
 import { useTheme } from '@/context/ThemeContext';
 import { useSocial } from '@/context/SocialContext';
+import { useUser } from '@/context/UserContext';
 
 function TabBarBg() {
   const { isDark } = useTheme();
@@ -35,6 +36,28 @@ function FeedTabIcon({ color, size }: { color: string; size: number }) {
         }}>
           <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>
             {unreadCount > 9 ? '9+' : unreadCount}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function ProfileTabIcon({ color, size }: { color: string; size: number }) {
+  const { pendingBonuses } = useUser();
+  const count = pendingBonuses.length;
+  return (
+    <View style={{ position: 'relative' }}>
+      <Ionicons name="person" size={size} color={color} />
+      {count > 0 && (
+        <View style={{
+          position: 'absolute', top: -3, right: -6,
+          minWidth: 14, height: 14, borderRadius: 7,
+          backgroundColor: '#ffd700', alignItems: 'center', justifyContent: 'center',
+          paddingHorizontal: 2,
+        }}>
+          <Text style={{ color: '#1a0900', fontSize: 8, fontWeight: '900' }}>
+            {count > 9 ? '9+' : count}
           </Text>
         </View>
       )}
@@ -112,9 +135,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <ProfileTabIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen

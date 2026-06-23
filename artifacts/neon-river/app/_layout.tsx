@@ -32,6 +32,7 @@ import { NotificationProvider } from '@/context/NotificationContext';
 import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import TutorialOverlay from '@/components/TutorialOverlay';
+import BonusNotificationModal from '@/components/BonusNotificationModal';
 import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 
@@ -90,6 +91,19 @@ function AchievementPopupRenderer() {
   return <AchievementUnlockPopup achievement={pendingUnlock} onDismiss={dismissPending} />;
 }
 
+// ─── Casino bonus notification renderer ───────────────────────────────────────
+
+function BonusNotificationRenderer() {
+  const { pendingBonuses, dismissBonus } = useUser();
+  const current = pendingBonuses[0] ?? null;
+  return (
+    <BonusNotificationModal
+      notification={current}
+      onDismiss={() => { if (current) dismissBonus(current.notificationId); }}
+    />
+  );
+}
+
 // ─── Notification bridge — connects UserContext → NotificationProvider ────────
 
 function NotificationBridge({ children }: { children: React.ReactNode }) {
@@ -117,6 +131,7 @@ function RootLayoutNav() {
       <SoundSyncer />
       <GateController />
       <AchievementPopupRenderer />
+      <BonusNotificationRenderer />
       <TutorialOverlay />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="entry"         options={{ headerShown: false, animation: 'fade' }} />

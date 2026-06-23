@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { db, playersTable, chipTransactionsTable, playerReportsTable } from '@workspace/db';
-import { eq, ilike, or, desc, and } from 'drizzle-orm';
+import { db, playersTable, chipTransactionsTable, playerReportsTable, playerNotificationsTable } from '@workspace/db';
+import { eq, or, desc } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 
 const router = Router();
@@ -136,6 +136,74 @@ router.post('/admin/players/:id/chips', async (req, res) => {
   }
 });
 
+// ── POST /api/admin/players/:id/bonus ─────────────────────────────────────────
+// Casino bonus: adds chips + creates a push notification for the player
+router.post('/admin/players/:id/bonus', async (req, res) => {
+  try {
+    const { amount, reason, message } = req.body as {
+      amount: number;
+      reason: string;
+      message?: string;
+    };
+
+    if (!amount || amount <= 0) {
+      res.status(400).json({ error: 'amount must be a positive number' });
+      return;
+    }
+    if (!reason) {
+      res.status(400).json({ error: 'reason is required' });
+      return;
+    }
+
+    const rows = await db
+      .select()
+      .from(playersTable)
+      .where(eq(playersTable.playerId, req.params['id']!))
+      .limit(1);
+
+    if (!rows.length) { res.status(404).json({ error: 'Player not found' }); return; }
+
+    const player = rows[0]!;
+    const profile = player.profileJson as Record<string, unknown>;
+    const currentChips = typeof profile['chips'] === 'number' ? profile['chips'] : 0;
+    const newBalance = currentChips + Math.abs(amount);
+    const updatedProfile = { ...profile, chips: newBalance };
+
+    await db.update(playersTable)
+      .set({ profileJson: updatedProfile, updatedAt: new Date() })
+      .where(eq(playersTable.playerId, player.playerId));
+
+    const txId = randomUUID();
+    await db.insert(chipTransactionsTable).values({
+      txId,
+      playerId:     player.playerId,
+      type:         'bonus',
+      amount:       Math.abs(amount),
+      balanceAfter: newBalance,
+      note:         `${reason}${message ? ` — ${message}` : ''}`,
+      adminId:      'admin',
+    });
+
+    const notificationId = randomUUID();
+    await db.insert(playerNotificationsTable).values({
+      notificationId,
+      playerId: player.playerId,
+      type:     'bonus',
+      title:    reason,
+      amount:   Math.abs(amount),
+      message:  message ?? null,
+      reason,
+      read:     false,
+    });
+
+    req.log.info({ playerId: player.playerId, amount, reason, notificationId }, 'casino bonus awarded');
+    res.json({ success: true, newBalance, notificationId, txId });
+  } catch (e) {
+    req.log.error(e, 'admin/bonus error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // ── POST /api/admin/players/:id/status ────────────────────────────────────────
 router.post('/admin/players/:id/status', async (req, res) => {
   try {
@@ -176,7 +244,6 @@ router.get('/admin/reports', async (req, res) => {
       rows = rows.filter(r => r.status === statusFilter);
     }
 
-    // Attach reporter/reported usernames
     const playerIds = [...new Set([
       ...rows.map(r => r.reportedId),
       ...rows.map(r => r.reporterId).filter(Boolean),
@@ -280,6 +347,45 @@ router.post('/players/:id/report', async (req, res) => {
     res.json({ success: true });
   } catch (e) {
     req.log.error(e, 'report player error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── GET /api/players/:id/notifications  (player polling) ─────────────────────
+router.get('/players/:id/notifications', async (req, res) => {
+  try {
+    const rows = await db
+      .select()
+      .from(playerNotificationsTable)
+      .where(eq(playerNotificationsTable.playerId, req.params['id']!))
+      .orderBy(desc(playerNotificationsTable.createdAt))
+      .limit(20);
+
+    res.json({ notifications: rows });
+  } catch (e) {
+    req.log.error(e, 'player notifications error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── POST /api/players/:id/notifications/read  (mark as read) ─────────────────
+router.post('/players/:id/notifications/read', async (req, res) => {
+  try {
+    const { notificationIds } = req.body as { notificationIds: string[] };
+    if (!Array.isArray(notificationIds) || !notificationIds.length) {
+      res.status(400).json({ error: 'notificationIds array is required' });
+      return;
+    }
+
+    for (const nid of notificationIds) {
+      await db.update(playerNotificationsTable)
+        .set({ read: true })
+        .where(eq(playerNotificationsTable.notificationId, nid));
+    }
+
+    res.json({ success: true });
+  } catch (e) {
+    req.log.error(e, 'mark notification read error');
     res.status(500).json({ error: 'Server error' });
   }
 });

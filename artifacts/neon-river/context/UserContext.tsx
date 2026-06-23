@@ -268,6 +268,16 @@ interface UserContextValue {
   consumeFortuneCookie: (tier: CookieTier) => Promise<boolean>;
   addFortuneCookies: (common?: number, uncommon?: number, rare?: number, epic?: number, legendary?: number, mythic?: number) => Promise<void>;
   claimFreeCookie: () => Promise<CookieTier | false>;
+  pendingBonuses: PendingBonus[];
+  dismissBonus: (notificationId: string) => void;
+}
+
+export interface PendingBonus {
+  notificationId: string;
+  amount: number;
+  reason: string;
+  message?: string | null;
+  createdAt: string;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -430,6 +440,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [now, setNow] = useState(Date.now());
   const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [pendingBonuses, setPendingBonuses] = useState<PendingBonus[]>([]);
+  const checkedBonusIds = React.useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30_000);
@@ -848,6 +860,79 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...DEFAULT_PROFILE }));
   }, []);
 
+  // ── Casino bonus polling ──────────────────────────────────────────────────────
+  // Runs on login and every 30 s (piggybacks on the existing `now` tick).
+  // Fetches unread notifications from the server, deduplicates, and queues
+  // them for display. Marks them read on the server after showing.
+
+  const checkBonuses = useCallback(async (pid: string) => {
+    try {
+      const r = await fetch(`${getApiBase()}/players/${pid}/notifications`);
+      if (!r.ok) return;
+      const data = (await r.json()) as { notifications: Array<{
+        notificationId: string; type: string; amount: number;
+        reason: string; message: string | null; read: boolean; createdAt: string;
+      }> };
+      const fresh = data.notifications.filter(
+        n => !n.read && !checkedBonusIds.current.has(n.notificationId)
+      );
+      if (!fresh.length) return;
+      // Mark all as read on server immediately so we don't re-show on next poll
+      const ids = fresh.map(n => n.notificationId);
+      ids.forEach(id => checkedBonusIds.current.add(id));
+      fetch(`${getApiBase()}/players/${pid}/notifications/read`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationIds: ids }),
+      }).catch(() => {});
+      // Queue for display (oldest first)
+      const bonuses = fresh.reverse().map(n => ({
+        notificationId: n.notificationId,
+        amount: n.amount,
+        reason: n.reason,
+        message: n.message,
+        createdAt: n.createdAt,
+      }));
+      setPendingBonuses(prev => [...prev, ...bonuses]);
+      // Also update local chip balance to match server
+      const latest = data.notifications[0];
+      if (latest) {
+        // Server already added chips — refresh profile from server
+        try {
+          const pr = await fetch(`${getApiBase()}/auth/profile?playerId=${pid}`);
+          if (pr.ok) {
+            const pd = (await pr.json()) as { profile?: Record<string, unknown> };
+            if (pd.profile && typeof pd.profile['chips'] === 'number') {
+              setProfile(prev => {
+                const next = { ...prev, chips: pd.profile!['chips'] as number };
+                void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+                return next;
+              });
+            }
+          }
+        } catch {}
+      }
+    } catch {}
+  }, []);
+
+  // Poll on login (when playerId is set)
+  useEffect(() => {
+    if (profile.playerId) {
+      void checkBonuses(profile.playerId);
+    }
+  }, [profile.playerId]);
+
+  // Poll every 30 s via the existing now ticker
+  useEffect(() => {
+    if (profile.playerId) {
+      void checkBonuses(profile.playerId);
+    }
+  }, [now]);
+
+  const dismissBonus = useCallback((notificationId: string) => {
+    setPendingBonuses(prev => prev.filter(b => b.notificationId !== notificationId));
+  }, []);
+
   // ── Derived ───────────────────────────────────────────────────────────────────
 
   const today = new Date().toDateString();
@@ -911,6 +996,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,
       canClaimFreeCookie, nextCookieIn,
       addXP, consumeFortuneCookie, addFortuneCookies, claimFreeCookie,
+      pendingBonuses, dismissBonus,
     }}>
       {children}
     </UserContext.Provider>

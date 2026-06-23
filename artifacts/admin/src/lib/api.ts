@@ -23,6 +23,7 @@ export const api = {
   players:        (q?: string, status?: string) => req<any>('GET',  `/admin/players?q=${q??''}&status=${status??'all'}`),
   player:         (id: string)                  => req<any>('GET',  `/admin/players/${id}`),
   adjustChips:    (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/chips`, b),
+  giveBonus:      (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/bonus`, b),
   setStatus:      (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/status`, b),
   reports:        (status?: string)             => req<any>('GET',  `/admin/reports?status=${status??'open'}`),
   resolveReport:  (id: string, b: any)          => req<any>('PUT',  `/admin/reports/${id}`, b),

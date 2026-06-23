@@ -1,0 +1,237 @@
+ADMIN BONUS REAL-TIME NOTIFICATION SYSTEM
+
+Add a real-time casino bonus notification system connected to the admin page.
+
+When an admin manually gives chips to a player account, the player should immediately receive an in-game notification telling them they received a casino bonus.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ADMIN PAGE REQUIREMENT
+
+On the admin page, when selecting a player account, add an option:
+
+GIVE CASINO BONUS
+
+Admin fields:
+
+• Player username / player ID
+• Bonus amount
+• Optional message
+• Reason / category
+
+Example reasons:
+
+• Welcome Bonus
+• Loyalty Bonus
+• Bug Compensation
+• Event Reward
+• Casino Gift
+• Admin Adjustment
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SERVER-SIDE BONUS HANDLING
+
+When the admin submits a bonus:
+
+1. Validate admin permission.
+2. Validate player account exists.
+3. Validate bonus amount is positive.
+4. Add chips to player balance server-side.
+5. Save transaction record.
+6. Send real-time notification to the player.
+7. Update player balance instantly if they are online.
+
+Do not rely on the client to add the chips.
+
+The server must be the source of truth.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REAL-TIME PLAYER NOTIFICATION
+
+If the player is online when the bonus is given:
+
+Show an immediate popup:
+
+CASINO BONUS RECEIVED
+
+You received 500,000 chips from Chip Society.
+
+Button:
+
+CLAIM / OK
+
+After closing:
+
+Player balance should already be updated.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OFFLINE PLAYER BEHAVIOR
+
+If the player is offline:
+
+Store the bonus notification in their account.
+
+When they next log in:
+
+Show:
+
+CASINO BONUS RECEIVED
+
+You received 500,000 chips while you were away.
+
+Then update/display their current balance.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NOTIFICATION STYLE
+
+The notification should feel premium and exciting.
+
+Use:
+
+• Gold chip icon
+• Casino glow effect
+• Soft reward animation
+• Chip count animation
+• Reward chime sound
+
+Do not make it look like an error message.
+
+Do not make it feel like a plain system alert.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OPTIONAL ADMIN MESSAGE
+
+If admin enters a message:
+
+Example:
+
+“Thanks for helping test the beta.”
+
+Player sees:
+
+CASINO BONUS RECEIVED
+
+500,000 chips
+
+Message from Chip Society:
+
+Thanks for helping test the beta.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TRANSACTION LOG
+
+Every admin bonus must create a permanent transaction record:
+
+• Transaction ID
+• Player ID
+• Username
+• Amount added
+• Admin ID
+• Reason
+• Optional message
+• Timestamp
+• Previous balance
+• New balance
+
+This prevents disputes and helps track economy changes.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER NOTIFICATION CENTER
+
+Also add the bonus to the player’s notification center.
+
+Example notification:
+
+Chip Society gave you 500,000 chips.
+
+Timestamp:
+
+Just now
+
+If unread:
+
+Show notification badge.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BALANCE UPDATE RULE
+
+When bonus is awarded:
+
+The player’s chip balance must update immediately everywhere:
+
+• Home Screen
+• Profile
+• Store
+• Tables
+• Daily Spin
+• Casino Games
+• Social Profile
+
+No app restart required.
+
+No logout/login required.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SECURITY RULES
+
+Only admin accounts can give bonuses.
+
+Players cannot trigger this endpoint.
+
+Players cannot edit bonus amounts.
+
+Players cannot fake bonus notifications.
+
+Server must validate all admin actions.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCEPTANCE TEST
+
+Test this exact flow:
+
+1. Log into admin page.
+2. Select player: realbobbyf.
+3. Give bonus: 500,000 chips.
+4. Player is currently online.
+5. Player instantly receives popup.
+6. Player balance updates immediately.
+7. Notification appears in notification center.
+8. Transaction appears in admin log.
+9. Player logs out.
+10. Player logs back in.
+11. Bonus balance remains saved.
+
+Also test offline flow:
+
+1. Player is offline.
+2. Admin gives bonus.
+3. Player logs in later.
+4. Bonus popup appears.
+5. Balance is correct.
+6. Notification center shows unread bonus notification.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+Whenever Chip Society gives a player chips from the admin page, the player should know immediately.
+
+The experience should feel like:
+
+“Chip Society just rewarded me.”
+
+Not:
+
+“My balance randomly changed.”
+
+This builds trust, improves communication, and makes admin bonuses feel premium.

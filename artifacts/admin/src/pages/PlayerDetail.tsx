@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRoute, Link } from "wouter";
 import { api } from "@/lib/api";
-import { ChevronLeft, Coins, ShieldAlert, Circle, Clock } from "lucide-react";
+import { ChevronLeft, Coins, ShieldAlert, Circle, Clock, Gift, Sparkles } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   active:    'text-emerald-400',
@@ -10,9 +10,143 @@ const STATUS_COLORS: Record<string, string> = {
   banned:    'text-destructive',
 };
 
+const BONUS_REASONS = [
+  'Welcome Bonus',
+  'Loyalty Bonus',
+  'Bug Compensation',
+  'Event Reward',
+  'Casino Gift',
+  'Admin Adjustment',
+];
+
 function formatDate(d: string | null) {
   if (!d) return '—';
   return new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function BonusModal({ playerId, username, currentBalance, onClose, onDone }: any) {
+  const [amount, setAmount] = useState('');
+  const [reason, setReason] = useState(BONUS_REASONS[0]!);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState<{ newBalance: number } | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!amount) return;
+    const n = parseInt(amount);
+    if (isNaN(n) || n <= 0) { setError('Amount must be a positive number'); return; }
+    setLoading(true); setError('');
+    try {
+      const res = await api.giveBonus(playerId, {
+        amount: n,
+        reason,
+        message: message.trim() || undefined,
+      });
+      setSuccess({ newBalance: res.newBalance });
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div className="bg-card border border-amber-500/40 rounded-xl p-6 w-full max-w-sm text-center shadow-lg shadow-amber-500/10">
+          <div className="w-14 h-14 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto mb-4">
+            <Sparkles size={24} className="text-amber-400" />
+          </div>
+          <h3 className="text-base font-bold text-foreground mb-1">Bonus Sent!</h3>
+          <p className="text-sm text-muted-foreground mb-1">
+            <span className="text-amber-400 font-bold">+{parseInt(amount).toLocaleString()} chips</span> sent to <span className="text-foreground font-semibold">{username}</span>
+          </p>
+          <p className="text-xs text-muted-foreground mb-5">
+            New balance: <span className="text-foreground font-semibold">{success.newBalance.toLocaleString()}</span>
+          </p>
+          <p className="text-xs text-muted-foreground mb-5 italic">
+            Player will receive an in-app notification next time the app checks for bonuses (within 30 seconds if online).
+          </p>
+          <button onClick={onDone}
+            className="w-full py-2.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-400 text-sm font-semibold hover:bg-amber-500/30 transition-colors">
+            Done
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-card border border-amber-500/30 rounded-xl p-6 w-full max-w-sm shadow-lg shadow-amber-500/10" onClick={e => e.stopPropagation()}>
+        <h3 className="text-sm font-bold text-foreground mb-1 flex items-center gap-2">
+          <Gift size={14} className="text-amber-400" />
+          Give Casino Bonus
+        </h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Current balance: <span className="text-foreground font-semibold">{Number(currentBalance).toLocaleString()}</span>
+        </p>
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1.5">Bonus Amount</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              placeholder="e.g. 500000"
+              className="w-full px-3 py-2 rounded-md bg-muted border border-input text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+              min="1"
+              required
+            />
+            <div className="flex gap-1.5 mt-1.5 flex-wrap">
+              {[10000, 50000, 100000, 500000, 1000000].map(v => (
+                <button key={v} type="button"
+                  onClick={() => setAmount(String(v))}
+                  className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-medium hover:bg-amber-500/20 transition-colors">
+                  {v >= 1000000 ? `${v/1000000}M` : `${v/1000}K`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1.5">Reason / Category</label>
+            <select value={reason} onChange={e => setReason(e.target.value)}
+              className="w-full px-3 py-2 rounded-md bg-muted border border-input text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-amber-500/50">
+              {BONUS_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1.5">
+              Message to player <span className="text-muted-foreground/60">(optional)</span>
+            </label>
+            <input
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              placeholder="e.g. Thanks for helping test the beta."
+              className="w-full px-3 py-2 rounded-md bg-muted border border-input text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+            />
+          </div>
+
+          {error && <p className="text-xs text-destructive">{error}</p>}
+
+          <div className="flex gap-2 pt-1">
+            <button type="button" onClick={onClose}
+              className="flex-1 py-2 rounded-md border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Cancel
+            </button>
+            <button type="submit" disabled={loading}
+              className="flex-1 py-2 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-400 text-sm font-semibold disabled:opacity-40 hover:bg-amber-500/30 transition-colors">
+              {loading ? 'Sending…' : '🎰 Give Bonus'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 function ChipModal({ playerId, currentBalance, onClose, onDone }: any) {
@@ -131,6 +265,7 @@ export default function PlayerDetail() {
   const id = params?.id ?? '';
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showBonus, setShowBonus] = useState(false);
   const [showChips, setShowChips] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
 
@@ -170,10 +305,15 @@ export default function PlayerDetail() {
           </div>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => setShowBonus(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-400 text-xs font-semibold hover:bg-amber-500/25 transition-colors">
+            <Gift size={12} />
+            Casino Bonus
+          </button>
           <button onClick={() => setShowChips(true)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-primary/10 border border-primary/30 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors">
             <Coins size={12} />
-            Chips
+            Adjust Chips
           </button>
           <button onClick={() => setShowStatus(true)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-destructive/10 border border-destructive/30 text-destructive text-xs font-semibold hover:bg-destructive/20 transition-colors">
@@ -223,7 +363,7 @@ export default function PlayerDetail() {
             <tbody>
               {transactions.map((tx: any, i: number) => (
                 <tr key={tx.txId} className={i < transactions.length - 1 ? 'border-b border-border/30' : ''}>
-                  <td className="px-5 py-2.5 capitalize text-foreground text-xs font-medium">{tx.type}</td>
+                  <td className={`px-5 py-2.5 capitalize text-xs font-medium ${tx.type === 'bonus' ? 'text-amber-400' : 'text-foreground'}`}>{tx.type}</td>
                   <td className={`px-4 py-2.5 font-mono text-xs font-semibold ${tx.amount >= 0 ? 'text-emerald-400' : 'text-destructive'}`}>
                     {tx.amount >= 0 ? '+' : ''}{tx.amount.toLocaleString()}
                   </td>
@@ -271,6 +411,15 @@ export default function PlayerDetail() {
         ))}
       </div>
 
+      {showBonus && (
+        <BonusModal
+          playerId={id}
+          username={player.username}
+          currentBalance={chips}
+          onClose={() => setShowBonus(false)}
+          onDone={() => { setShowBonus(false); load(); }}
+        />
+      )}
       {showChips && (
         <ChipModal
           playerId={id}

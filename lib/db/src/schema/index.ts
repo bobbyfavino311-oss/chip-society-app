@@ -1,4 +1,4 @@
-import { pgTable, text, jsonb, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, jsonb, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
 
 export const playersTable = pgTable('players', {
   playerId:      text('player_id').primaryKey(),
@@ -36,7 +36,20 @@ export const playerReportsTable = pgTable('player_reports', {
   createdAt:     timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
-export type Player           = typeof playersTable.$inferSelect;
-export type NewPlayer        = typeof playersTable.$inferInsert;
-export type ChipTransaction  = typeof chipTransactionsTable.$inferSelect;
-export type PlayerReport     = typeof playerReportsTable.$inferSelect;
+export const playerNotificationsTable = pgTable('player_notifications', {
+  notificationId: text('notification_id').primaryKey(),
+  playerId:       text('player_id').notNull().references(() => playersTable.playerId),
+  type:           text('type').notNull().default('bonus'),
+  title:          text('title').notNull(),
+  amount:         integer('amount').notNull().default(0),
+  message:        text('message'),
+  reason:         text('reason').notNull().default(''),
+  read:           boolean('read').notNull().default(false),
+  createdAt:      timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export type Player                = typeof playersTable.$inferSelect;
+export type NewPlayer             = typeof playersTable.$inferInsert;
+export type ChipTransaction       = typeof chipTransactionsTable.$inferSelect;
+export type PlayerReport          = typeof playerReportsTable.$inferSelect;
+export type PlayerNotification    = typeof playerNotificationsTable.$inferSelect;
