@@ -288,14 +288,11 @@ const LOCAL_CREDS_KEY   = '@chip_society_local_creds';
 const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── Notification socket URL ──────────────────────────────────────────────────
-// On web: connect to the current page origin (dev proxy or production domain).
-// On native (iOS/Android): always connect directly to the Railway production
-// server — same server that receives admin bonus requests, so emitToPlayer fires
-// on the same Socket.IO instance that the mobile client is registered to.
+// Always connect directly to the Railway production server — this is the same
+// server instance that receives admin bonus requests via POST /api/admin/players/:id/bonus,
+// so emitToPlayer() fires on the correct Socket.IO registry whether the player
+// is on iOS, Android, or the web preview. CORS is open (*) on Railway.
 function getNotificationSocketUrl(): string {
-  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
   return 'https://api-server-production-bbc2.up.railway.app';
 }
 
