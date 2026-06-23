@@ -288,10 +288,14 @@ export function getApiBase(): string {
     return `${window.location.origin}/api`;
   }
 
-  // Native (iOS / Android) — always talk to the permanent Railway server.
-  // We intentionally skip the manifest apiUrl here: Expo Go injects the Replit
-  // dev-server URL which is only accessible from inside the Replit sandbox, not
-  // from a real device on a different network.
+  // Native (iOS / Android) — use the Replit public dev URL so accounts created
+  // on a real device are stored in the same database as the admin panel.
+  // EXPO_PUBLIC_API_URL is injected by the workflow and points to the public
+  // Replit HTTPS domain, which is reachable from any network.
+  const expoApiUrl = process.env['EXPO_PUBLIC_API_URL'];
+  if (expoApiUrl) return expoApiUrl;
+
+  // Fallback to Railway if env var is missing (e.g. standalone production build).
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 
