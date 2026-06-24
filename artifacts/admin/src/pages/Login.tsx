@@ -1,10 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Spade, Lock } from "lucide-react";
 
 export default function Login() {
   const [key, setKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const autoKey = params.get('key');
+    if (!autoKey) return;
+    setLoading(true);
+    fetch('/api/admin/stats', { headers: { 'x-admin-key': autoKey } })
+      .then(r => {
+        if (r.ok) {
+          localStorage.setItem('admin_key', autoKey);
+          window.location.replace(window.location.pathname);
+        } else {
+          setError("Auto-login failed. Enter key manually.");
+          setLoading(false);
+        }
+      })
+      .catch(() => { setError("Could not reach the server."); setLoading(false); });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
