@@ -383,13 +383,16 @@ export default function PlayerDetail() {
 
   function load() {
     setLoading(true);
-    Promise.all([
-      api.player(id),
-      api.moderationHistory(),
-    ]).then(([playerData, modData]) => {
-      setData(playerData);
-      setModHistory((modData.actions ?? []).filter((a: any) => a.playerId === id));
-    }).finally(() => setLoading(false));
+    api.player(id)
+      .then(playerData => {
+        setData(playerData);
+        return api.moderationHistory().then(modData => {
+          setModHistory((modData.actions ?? []).filter((a: any) => a.playerId === id));
+        }).catch(() => {
+          setModHistory([]);
+        });
+      })
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => { if (id) load(); }, [id]);
