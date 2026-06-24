@@ -1,0 +1,460 @@
+I’d add this as a combined Player Search + Friends + Inbox prompt. I would still include reporting, mute, block, and admin moderation tools even if the language rules are loose, because private messages can still become spam or harassment.
+
+CHIP SOCIETY SOCIAL SEARCH + FRIENDS + INBOX SYSTEM
+
+Add a complete player search, friend/follow, and private inbox system to the Social Feed.
+
+The current Feed search box does not work correctly. When searching for an existing player by username, nothing appears. This must be fixed so players can find each other, follow/add each other, and message each other.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PART 1 — PLAYER SEARCH FIX
+
+Current issue:
+
+Typing an existing username into the Feed search box returns no results.
+
+Required behavior:
+
+When a player searches a username, the app should search the server user database and return matching players.
+
+Search should support:
+
+• Exact username search
+• Partial username search
+• Case-insensitive search
+• Display name search if added later
+
+Example:
+
+Search:
+
+realbobbyf
+
+Result:
+
+realbobbyf
+
+Player card appears.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER SEARCH RESULTS
+
+Each result card should show:
+
+• Avatar
+• Username
+• Level
+• Chip bracket / status
+• Follow/Add button
+• Message button
+• View Profile button
+
+Example:
+
+realbobbyf
+Level 6
+High Roller
+
+[Follow] [Message] [View Profile]
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SEARCH RULES
+
+If no players found:
+
+Show:
+
+No players found.
+
+If server error:
+
+Show:
+
+Could not search players. Try again.
+
+Do NOT silently show blank results.
+
+Do NOT only search posts.
+
+The search box must search actual player accounts.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PART 2 — FOLLOW / ADD PLAYER SYSTEM
+
+Players should be able to connect with each other.
+
+Add:
+
+• Follow Player
+• Unfollow Player
+• View Followers
+• View Following
+
+Optional future feature:
+
+• Friend Requests
+
+For now, Follow is simpler and better for launch.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FOLLOW BEHAVIOR
+
+When Player A follows Player B:
+
+• Player B can appear in Player A’s Following Feed
+• Player B’s posts appear in Following tab
+• Player A count updates
+• Player B follower count updates
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PART 3 — DIRECT MESSAGE / INBOX SYSTEM
+
+Add private player inboxes.
+
+Players should be able to message each other directly.
+
+Add navigation:
+
+Inbox
+
+Accessible from:
+
+• Feed screen
+• Player profile
+• Search results
+• Notification center
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+INBOX STRUCTURE
+
+Inbox screen shows conversations.
+
+Each conversation row displays:
+
+• Player avatar
+• Username
+• Last message preview
+• Timestamp
+• Unread badge
+
+Example:
+
+VegasMirage
+“Nice hand earlier.”
+2m ago
+Unread badge: 1
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CONVERSATION SCREEN
+
+Inside a private message thread:
+
+Show:
+
+• Recipient avatar
+• Username
+• Message history
+• Text input
+• Send button
+
+Messages should appear in chronological order.
+
+Newest message at the bottom.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TEXT ONLY RULE
+
+Private inboxes must be text-only.
+
+DO NOT allow:
+
+• Images
+• Photo uploads
+• Camera uploads
+• GIFs
+• Videos
+• Audio clips
+• File attachments
+
+Only text messages are allowed.
+
+This keeps inboxes safer, simpler, and easier to moderate.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MESSAGE LIMITS
+
+Add basic limits:
+
+• Maximum message length: 500 characters
+• Rate limit messages to prevent spam
+• Prevent sending empty messages
+• Prevent excessive repeated messages
+
+Example:
+
+If player sends too fast:
+
+Show:
+
+Please slow down before sending another message.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REAL-TIME MESSAGING
+
+Messages should appear in real time if both players are online.
+
+Use same live system as casino bonus notifications.
+
+When Player A sends message:
+
+Player B receives:
+
+• Inbox badge update
+• Push/in-app notification
+• Message appears instantly if conversation is open
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MESSAGE NOTIFICATIONS
+
+If recipient is online:
+
+Show subtle notification:
+
+New message from VegasMirage
+
+If offline:
+
+Store unread message.
+
+When they log in:
+
+Show unread badge.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PRIVACY CONTROLS
+
+Players need control over who can message them.
+
+Add setting:
+
+WHO CAN MESSAGE ME?
+
+Options:
+
+• Everyone
+• People I Follow
+• Followers Only
+• No One
+
+Default recommendation:
+
+Everyone
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BLOCK / MUTE SYSTEM
+
+Players must be able to block or mute others.
+
+Block means:
+
+• User cannot message you
+• User cannot follow you
+• User cannot comment on your posts
+• User is hidden from your feed
+
+Mute means:
+
+• User is hidden from feed
+• User can still exist socially
+• No notifications from that user
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REPORT SYSTEM
+
+Even if social posts allow free language, users still need safety tools.
+
+Add report option for:
+
+• Posts
+• Comments
+• Private messages
+• User profiles
+
+Report reasons:
+
+• Spam
+• Harassment
+• Threats
+• Impersonation
+• Scam
+• Other
+
+Reported messages should be visible to admins for moderation review.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LANGUAGE POLICY
+
+Social Feed and posts should allow open player expression.
+
+Do not over-filter ordinary language.
+
+Do not block casual trash talk.
+
+Do not block normal profanity automatically.
+
+However, still allow players to:
+
+• Report
+• Block
+• Mute
+• Delete their own posts
+• Control inbox privacy
+
+Admin tools should still allow warnings, suspensions, and bans for severe behavior.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ADMIN TOOLS FOR INBOX
+
+Admin panel should include:
+
+• View reported messages
+• View reported users
+• Warn player
+• Suspend player
+• Ban player
+• Delete abusive message if needed
+
+Private messages should not be public, but reported messages must be reviewable by admins.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DATABASE REQUIREMENTS
+
+Create database collections/tables for:
+
+Users
+
+• playerId
+• username
+• avatarId
+• level
+• followerCount
+• followingCount
+
+Follows
+
+• followerId
+• followingId
+• timestamp
+
+Conversations
+
+• conversationId
+• participantIds
+• lastMessage
+• lastMessageTime
+• unreadCounts
+
+Messages
+
+• messageId
+• conversationId
+• senderId
+• receiverId
+• text
+• timestamp
+• readStatus
+• reportedStatus
+
+Blocks
+
+• blockerId
+• blockedId
+• timestamp
+
+Reports
+
+• reportId
+• reporterId
+• reportedUserId
+• messageId/postId
+• reason
+• timestamp
+• status
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCEPTANCE TEST
+
+PLAYER SEARCH
+
+1. Login as realbobbyf.
+2. Open Feed search.
+3. Search for existing username.
+4. Matching player appears.
+5. Player card shows avatar, username, level, Follow, Message, View Profile.
+
+INBOX
+
+1. Search player.
+2. Tap Message.
+3. Send text message.
+4. Other player receives real-time inbox notification.
+5. Message appears in conversation.
+6. No images or attachments are available.
+
+FOLLOW
+
+1. Search player.
+2. Tap Follow.
+3. Following count updates.
+4. Player posts appear in Following feed.
+
+BLOCK
+
+1. Block player.
+2. Blocked player cannot message you.
+3. Blocked player is hidden from feed.
+
+REPORT
+
+1. Report message.
+2. Admin can see reported message.
+3. Admin can warn, suspend, or ban if necessary.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+The Social Feed search should become a true player discovery system.
+
+Players should be able to:
+
+• Search usernames
+• Find existing players
+• Follow players
+• View profiles
+• Message players
+• Receive inbox notifications
+• Block or report problem users
+
+The inbox must be text-only with no image, file, video, GIF, or audio upload options.
+
+The social system should feel alive, interactive, and player-driven while still giving users control over who can contact them.

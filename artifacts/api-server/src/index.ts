@@ -64,6 +64,63 @@ async function runMigrations() {
         created_at       TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS moderation_actions (
+        id            TEXT PRIMARY KEY,
+        player_id     TEXT NOT NULL REFERENCES players(player_id),
+        admin_id      TEXT NOT NULL DEFAULT 'system',
+        type          TEXT NOT NULL,
+        reason        TEXT NOT NULL DEFAULT '',
+        message       TEXT,
+        duration_hours INTEGER,
+        expires_at    TIMESTAMPTZ,
+        created_at    TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      ALTER TABLE players
+        ADD COLUMN IF NOT EXISTS suspension_expires_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS ban_reason TEXT;
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS follows (
+        follower_id   TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+        following_id  TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+        created_at    TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (follower_id, following_id)
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS conversations (
+        id            TEXT PRIMARY KEY,
+        p1_id         TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+        p2_id         TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+        last_preview  TEXT NOT NULL DEFAULT '',
+        last_at       TIMESTAMPTZ DEFAULT NOW(),
+        unread1       INTEGER NOT NULL DEFAULT 0,
+        unread2       INTEGER NOT NULL DEFAULT 0
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS direct_messages (
+        id              TEXT PRIMARY KEY,
+        conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+        sender_id       TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+        text            TEXT NOT NULL,
+        read_at         TIMESTAMPTZ,
+        is_reported     BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at      TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS dm_conversation_idx ON direct_messages(conversation_id, created_at);
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS blocks (
+        blocker_id  TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+        blocked_id  TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+        created_at  TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (blocker_id, blocked_id)
+      );
+    `);
     logger.info('Startup migrations complete');
   } catch (err) {
     logger.error({ err }, 'Startup migration failed — continuing anyway');

@@ -273,6 +273,18 @@ interface UserContextValue {
   dismissBonus: (notificationId: string) => void;
   pendingModeration: PendingModeration | null;
   dismissModeration: () => void;
+  unreadDmCount: number;
+  clearDmUnread: () => void;
+  onDmReceived: (cb: (msg: DmReceivedPayload) => void) => () => void;
+}
+
+export interface DmReceivedPayload {
+  messageId: string;
+  conversationId: string;
+  senderId: string;
+  senderUsername: string;
+  text: string;
+  createdAt: string;
 }
 
 export interface PendingBonus {
@@ -461,6 +473,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [pendingModeration, setPendingModeration] = useState<PendingModeration | null>(null);
   const checkedBonusIds = React.useRef<Set<string>>(new Set());
   const notifSocketRef = useRef<Socket | null>(null);
+  const [unreadDmCount, setUnreadDmCount] = useState(0);
+  const dmListenersRef = useRef<Set<(msg: DmReceivedPayload) => void>>(new Set());
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30_000);
@@ -978,6 +992,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setPendingModeration({ type: 'ban', reason: data.reason, message: data.message ?? null, actionId: data.actionId });
     });
 
+    socket.on('dm_received', (data: DmReceivedPayload) => {
+      setUnreadDmCount(n => n + 1);
+      dmListenersRef.current.forEach(cb => cb(data));
+    });
+
     notifSocketRef.current = socket;
 
     return () => {
@@ -1056,6 +1075,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setPendingModeration(null);
   }, []);
 
+  const clearDmUnread = useCallback(() => setUnreadDmCount(0), []);
+
+  const onDmReceived = useCallback((cb: (msg: DmReceivedPayload) => void) => {
+    dmListenersRef.current.add(cb);
+    return () => { dmListenersRef.current.delete(cb); };
+  }, []);
+
   // ── Derived ───────────────────────────────────────────────────────────────────
 
   const today = new Date().toDateString();
@@ -1121,6 +1147,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       addXP, consumeFortuneCookie, addFortuneCookies, claimFreeCookie,
       pendingBonuses, dismissBonus,
       pendingModeration, dismissModeration,
+      unreadDmCount, clearDmUnread, onDmReceived,
     }}>
       {children}
     </UserContext.Provider>

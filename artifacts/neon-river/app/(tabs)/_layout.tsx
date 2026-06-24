@@ -44,20 +44,22 @@ function FeedTabIcon({ color, size }: { color: string; size: number }) {
 }
 
 function ProfileTabIcon({ color, size }: { color: string; size: number }) {
-  const { pendingBonuses } = useUser();
-  const count = pendingBonuses.length;
+  const { pendingBonuses, unreadDmCount } = useUser();
+  const bonusCount = pendingBonuses.length;
+  const totalBadge = bonusCount + unreadDmCount;
   return (
     <View style={{ position: 'relative' }}>
       <Ionicons name="person" size={size} color={color} />
-      {count > 0 && (
+      {totalBadge > 0 && (
         <View style={{
           position: 'absolute', top: -3, right: -6,
           minWidth: 14, height: 14, borderRadius: 7,
-          backgroundColor: '#ffd700', alignItems: 'center', justifyContent: 'center',
+          backgroundColor: unreadDmCount > 0 ? '#00d4ff' : '#ffd700',
+          alignItems: 'center', justifyContent: 'center',
           paddingHorizontal: 2,
         }}>
-          <Text style={{ color: '#1a0900', fontSize: 8, fontWeight: '900' }}>
-            {count > 9 ? '9+' : count}
+          <Text style={{ color: '#050010', fontSize: 8, fontWeight: '900' }}>
+            {totalBadge > 9 ? '9+' : totalBadge}
           </Text>
         </View>
       )}

@@ -324,7 +324,12 @@ export default function ProfileScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.header}>PLAYER PROFILE</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.header}>PLAYER PROFILE</Text>
+          <TouchableOpacity style={styles.inboxBtn} onPress={() => router.push('/inbox')}>
+            <Ionicons name="chatbubbles-outline" size={20} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.avatarSection}>
           <View style={{ position: 'relative' }}>
@@ -857,13 +862,23 @@ const achStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { paddingHorizontal: 16, gap: 10 },
+  headerRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  inboxBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: `${colors.primary}18`,
+    borderWidth: 1, borderColor: `${colors.primary}40`,
+    alignItems: 'center', justifyContent: 'center',
+  },
   header: {
     fontFamily: 'Orbitron_700Bold',
     fontSize: 18,
     color: colors.primary,
     letterSpacing: 3,
     textAlign: 'center',
-    marginBottom: 8,
+    flex: 1,
   },
   avatarSection: { alignItems: 'center', gap: 6 },
   avatar: {

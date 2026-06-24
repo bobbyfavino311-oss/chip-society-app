@@ -1,4 +1,4 @@
-import { pgTable, text, jsonb, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, jsonb, timestamp, integer, boolean, primaryKey } from 'drizzle-orm/pg-core';
 
 export const playersTable = pgTable('players', {
   playerId:             text('player_id').primaryKey(),
@@ -61,9 +61,49 @@ export const moderationActionsTable = pgTable('moderation_actions', {
   createdAt:     timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
+// ── Social tables ──────────────────────────────────────────────────────────────
+
+export const followsTable = pgTable('follows', {
+  followerId:  text('follower_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  followingId: text('following_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (t) => [primaryKey({ columns: [t.followerId, t.followingId] })]);
+
+export const conversationsTable = pgTable('conversations', {
+  id:           text('id').primaryKey(),
+  p1Id:         text('p1_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  p2Id:         text('p2_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  lastPreview:  text('last_preview').notNull().default(''),
+  lastAt:       timestamp('last_at', { withTimezone: true }).defaultNow(),
+  unread1:      integer('unread1').notNull().default(0),
+  unread2:      integer('unread2').notNull().default(0),
+});
+
+export const directMessagesTable = pgTable('direct_messages', {
+  id:             text('id').primaryKey(),
+  conversationId: text('conversation_id').notNull().references(() => conversationsTable.id, { onDelete: 'cascade' }),
+  senderId:       text('sender_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  text:           text('text').notNull(),
+  readAt:         timestamp('read_at', { withTimezone: true }),
+  isReported:     boolean('is_reported').notNull().default(false),
+  createdAt:      timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const blocksTable = pgTable('blocks', {
+  blockerId:  text('blocker_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  blockedId:  text('blocked_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  createdAt:  timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (t) => [primaryKey({ columns: [t.blockerId, t.blockedId] })]);
+
+// ── Types ──────────────────────────────────────────────────────────────────────
+
 export type Player                = typeof playersTable.$inferSelect;
 export type NewPlayer             = typeof playersTable.$inferInsert;
 export type ChipTransaction       = typeof chipTransactionsTable.$inferSelect;
 export type PlayerReport          = typeof playerReportsTable.$inferSelect;
 export type PlayerNotification    = typeof playerNotificationsTable.$inferSelect;
 export type ModerationAction      = typeof moderationActionsTable.$inferSelect;
+export type Follow                = typeof followsTable.$inferSelect;
+export type Conversation          = typeof conversationsTable.$inferSelect;
+export type DirectMessage         = typeof directMessagesTable.$inferSelect;
+export type Block                 = typeof blocksTable.$inferSelect;

@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   FlatList,
   Image,
@@ -28,6 +29,7 @@ import {
   AVATAR_SYMBOLS, AVATAR_COLORS, getLeaderboard,
   type SocialPost, type PostTag,
 } from '@/lib/socialData';
+import { searchPlayers, startConversation, followPlayer, type SearchPlayer } from '@/lib/socialApi';
 import NeonAvatar from '@/components/NeonAvatar';
 import { getNeonAvatar } from '@/constants/neonAvatars';
 
@@ -847,77 +849,149 @@ const lb = StyleSheet.create({
 
 function SearchSection({ bottomInset }: { bottomInset: number }) {
   const [query, setQuery] = useState('');
-  const { isFollowing, follow, unfollow } = useSocial();
+  const [results, setResults] = useState<SearchPlayer[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchErr, setSearchErr] = useState('');
+  const [messagingId, setMessagingId] = useState<string | null>(null);
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
+  const { profile } = useUser();
+  const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const results = query.trim().length === 0
-    ? MOCK_PLAYERS
-    : MOCK_PLAYERS.filter(p =>
-        p.username.toLowerCase().includes(query.toLowerCase()) ||
-        p.handle.toLowerCase().includes(query.toLowerCase()) ||
-        p.rank.toLowerCase().includes(query.toLowerCase()),
-      );
-
-  const STATUS_LABEL: Record<string, string> = {
-    online: 'Online', in_game: 'In Game', offline: 'Offline',
+  const formatChips = (n: number) => {
+    const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
+    return n >= 1_000_000_000 ? v(n / 1_000_000_000) + 'B'
+      : n >= 1_000_000 ? v(n / 1_000_000) + 'M'
+      : v(n / 1_000) + 'K';
   };
+
   const STATUS_COLOR: Record<string, string> = {
-    online: '#00ff88', in_game: '#ffd700', offline: colors.textDim,
+    online: '#00ff88', in_game: '#ffd700', offline: colors.textDim, suspended: '#ff4466',
+  };
+  const STATUS_LABEL: Record<string, string> = {
+    online: 'Online', in_game: 'In Game', offline: 'Offline', suspended: 'Suspended',
+  };
+
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) { setResults([]); setSearchErr(''); return; }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true);
+      setSearchErr('');
+      try {
+        const data = await searchPlayers(q);
+        setResults(data);
+      } catch {
+        setSearchErr('Search failed. Try again.');
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 350);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [query]);
+
+  const handleFollow = async (targetId: string) => {
+    if (!profile.playerId) return;
+    try {
+      await followPlayer(profile.playerId, targetId);
+      setFollowingIds(prev => new Set([...prev, targetId]));
+    } catch { /* silent */ }
+  };
+
+  const handleMessage = async (targetId: string) => {
+    if (!profile.playerId || messagingId === targetId) return;
+    setMessagingId(targetId);
+    try {
+      const convId = await startConversation(profile.playerId, targetId);
+      const player = results.find(r => r.playerId === targetId);
+      router.push(`/inbox/${convId}?otherUsername=${encodeURIComponent(player?.username ?? 'Player')}&otherAvatarIndex=${player?.avatarIndex ?? 1}`);
+    } catch { /* silent */ } finally {
+      setMessagingId(null);
+    }
   };
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Search bar */}
       <View style={srch.inputWrap}>
         <Ionicons name="search" size={16} color={colors.textDim} />
         <TextInput
           style={srch.input}
-          placeholder="Search players, ranks..."
+          placeholder="Search players by username…"
           placeholderTextColor={colors.textDim}
           value={query}
           onChangeText={setQuery}
           selectionColor={colors.primary}
+          autoCapitalize="none"
+          autoCorrect={false}
         />
-        {query.length > 0 && (
-          <TouchableOpacity onPress={() => setQuery('')}>
-            <Ionicons name="close-circle" size={16} color={colors.textDim} />
-          </TouchableOpacity>
-        )}
+        {searching
+          ? <ActivityIndicator size="small" color={colors.primary} />
+          : query.length > 0
+            ? <TouchableOpacity onPress={() => setQuery('')}>
+                <Ionicons name="close-circle" size={16} color={colors.textDim} />
+              </TouchableOpacity>
+            : null
+        }
       </View>
+
+      {query.trim().length < 2 && query.trim().length > 0 && (
+        <Text style={srch.hint}>Type at least 2 characters to search</Text>
+      )}
+      {searchErr ? <Text style={srch.errText}>{searchErr}</Text> : null}
 
       <FlatList
         data={results}
-        keyExtractor={p => p.id}
+        keyExtractor={p => p.playerId}
         contentContainerStyle={{ padding: 14, gap: 10, paddingBottom: bottomInset + 100 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        ListEmptyComponent={
+          query.trim().length >= 2 && !searching && !searchErr
+            ? <View style={srch.emptyWrap}><Text style={srch.emptyText}>No players found</Text></View>
+            : null
+        }
         renderItem={({ item: p }) => {
-          const following = isFollowing(p.id);
+          const isFollowed = followingIds.has(p.playerId);
           return (
             <TouchableOpacity
               style={srch.card}
-              onPress={() => router.push(`/social/player-profile?id=${p.id}`)}
+              onPress={() => router.push(`/social/player-profile?id=${p.playerId}`)}
             >
               <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
-              <NeonAvatar avatarId={p.avatarId ?? 1} size={38} />
+              <NeonAvatar avatarId={p.avatarIndex ?? 1} size={38} />
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text style={srch.username}>{p.username}</Text>
-                  <View style={[srch.statusDot, { backgroundColor: STATUS_COLOR[p.status] }]} />
-                  <Text style={[srch.statusLabel, { color: STATUS_COLOR[p.status] }]}>
-                    {STATUS_LABEL[p.status]}
-                  </Text>
+                  {p.status in STATUS_COLOR && (
+                    <>
+                      <View style={[srch.statusDot, { backgroundColor: STATUS_COLOR[p.status] ?? colors.textDim }]} />
+                      <Text style={[srch.statusLabel, { color: STATUS_COLOR[p.status] ?? colors.textDim }]}>
+                        {STATUS_LABEL[p.status] ?? p.status}
+                      </Text>
+                    </>
+                  )}
                 </View>
-                <Text style={srch.handle}>{p.handle} · {p.rank}</Text>
-                <Text style={srch.chips}>{(() => { const n = p.chips; const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1); return n >= 1_000_000_000 ? v(n/1_000_000_000)+'B' : n >= 1_000_000 ? v(n/1_000_000)+'M' : v(n/1_000)+'K'; })()} chips · Lv.{p.level}</Text>
+                <Text style={srch.handle}>{p.rank} · {formatChips(p.chips)} chips · Lv.{p.level}</Text>
               </View>
-              <TouchableOpacity
-                style={[srch.followBtn, following && srch.followBtnActive]}
-                onPress={() => following ? unfollow(p.id) : follow(p.id, p.username)}
-              >
-                <Text style={[srch.followText, following && srch.followTextActive]}>
-                  {following ? 'Following' : 'Follow'}
-                </Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', gap: 6 }}>
+                {!isFollowed && (
+                  <TouchableOpacity style={srch.followBtn} onPress={() => handleFollow(p.playerId)}>
+                    <Text style={srch.followText}>+ Follow</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  style={srch.msgBtn}
+                  onPress={() => handleMessage(p.playerId)}
+                  disabled={messagingId === p.playerId}
+                >
+                  <Ionicons
+                    name={messagingId === p.playerId ? 'time-outline' : 'chatbubble-outline'}
+                    size={14}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
           );
         }}
@@ -956,6 +1030,16 @@ const srch = StyleSheet.create({
   followBtnActive: { backgroundColor: `${colors.primary}20`, borderColor: `${colors.primary}50` },
   followText: { color: colors.primary, fontSize: 11, fontWeight: '700' },
   followTextActive: { color: `${colors.primary}80` },
+  msgBtn: {
+    width: 32, height: 32, borderRadius: 16,
+    borderWidth: 1, borderColor: `${colors.primary}50`,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: `${colors.primary}15`,
+  },
+  hint: { color: colors.textDim, fontSize: 12, textAlign: 'center', marginTop: 4 },
+  errText: { color: '#ff4466', fontSize: 12, textAlign: 'center', marginVertical: 8 },
+  emptyWrap: { alignItems: 'center', marginTop: 40 },
+  emptyText: { color: colors.textDim, fontSize: 14 },
 });
 
 // ─── Compose Sheet ───────────────────────────────────────────────────────────
