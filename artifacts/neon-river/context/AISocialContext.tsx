@@ -9,12 +9,14 @@ interface AISocialContextValue {
   posts: AIPost[];
   latestPost: AIPost | null;
   nextPostIn: number; // seconds until next AI post
+  refresh: () => void;
 }
 
 const AISocialContext = createContext<AISocialContextValue>({
   posts: [],
   latestPost: null,
   nextPostIn: POST_INTERVAL_MS / 1000,
+  refresh: () => {},
 });
 
 export function AISocialProvider({ children }: { children: React.ReactNode }) {
@@ -54,8 +56,16 @@ export function AISocialProvider({ children }: { children: React.ReactNode }) {
 
   const latestPost = posts.length > 0 ? posts[0] : null;
 
+  const refresh = useCallback(() => {
+    const newPost = generateAIPost(`refresh_${Date.now()}`);
+    setPosts(prev => {
+      const updated = [newPost, ...prev];
+      return updated.length > MAX_POSTS ? updated.slice(0, MAX_POSTS) : updated;
+    });
+  }, []);
+
   return (
-    <AISocialContext.Provider value={{ posts, latestPost, nextPostIn }}>
+    <AISocialContext.Provider value={{ posts, latestPost, nextPostIn, refresh }}>
       {children}
     </AISocialContext.Provider>
   );

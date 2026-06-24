@@ -1,8 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  FlatList,
+  ActivityIndicator,
   Platform,
   ScrollView,
   StyleSheet,
@@ -19,17 +19,70 @@ import {
   MOCK_PLAYERS, SOCIAL_POSTS, POST_TAG_COLORS, POKER_REACTIONS,
   type MockPlayer, type SocialPost,
 } from '@/lib/socialData';
+import { getPlayerProfile, type PlayerProfile } from '@/lib/socialApi';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatBig(n: number): string {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
+  if (n >= 1_000_000) return v(n / 1_000_000) + 'M';
+  if (n >= 1_000) return v(n / 1_000) + 'K';
   return String(n);
 }
 
 const STATUS_LABEL: Record<string, string> = { online: 'Online', in_game: 'In Game', offline: 'Offline' };
 const STATUS_COLOR: Record<string, string> = { online: '#00ff88', in_game: '#ffd700', offline: '#4a4060' };
+
+// ── Unified player shape (covers both mock and API players) ───────────────────
+
+interface DisplayPlayer {
+  id: string;
+  username: string;
+  handle: string;
+  avatar?: string;
+  avatarColor: string;
+  avatarId: number;
+  bannerColors: [string, string];
+  rank: string;
+  level: number;
+  chips: number;
+  winRate: number;
+  handsPlayed: number;
+  biggestPot: number;
+  followers: number;
+  following: number;
+  achievementCount: number;
+  status: string;
+  badges: Array<{ id: string; label: string; icon: string; color: string }>;
+  bio: string;
+  isMock: boolean;
+}
+
+function mockToDisplay(p: MockPlayer): DisplayPlayer {
+  return {
+    id: p.id, username: p.username, handle: p.handle, avatar: p.avatar,
+    avatarColor: p.avatarColor, avatarId: p.avatarId ?? 1,
+    bannerColors: p.bannerColors, rank: p.rank, level: p.level,
+    chips: p.chips, winRate: p.winRate, handsPlayed: p.handsPlayed,
+    biggestPot: p.biggestPot, followers: p.followers, following: p.following,
+    achievementCount: p.achievementCount, status: p.status,
+    badges: p.badges, bio: p.bio, isMock: true,
+  };
+}
+
+function apiToDisplay(p: PlayerProfile): DisplayPlayer {
+  return {
+    id: p.playerId, username: p.username,
+    handle: `@${p.username.toLowerCase().replace(/\s+/g, '')}`,
+    avatarColor: '#00d4ff', avatarId: p.avatarIndex ?? 1,
+    bannerColors: ['#001a40', '#000d20'],
+    rank: p.rank, level: p.level,
+    chips: p.chips, winRate: p.winRate, handsPlayed: p.handsPlayed,
+    biggestPot: 0, followers: 0, following: 0,
+    achievementCount: 0, status: p.status,
+    badges: [], bio: 'Chip Society player.', isMock: false,
+  };
+}
 
 // ── Mini Post Card ────────────────────────────────────────────────────────────
 
@@ -110,25 +163,56 @@ export default function PlayerProfileScreen() {
   const insets = useSafeAreaInsets();
   const { isFollowing, follow, unfollow } = useSocial();
 
-  const player: MockPlayer | undefined = MOCK_PLAYERS.find(p => p.id === id);
-  const posts: SocialPost[] = SOCIAL_POSTS.filter(p => p.playerId === id);
+  const [player, setPlayer] = useState<DisplayPlayer | null>(() => {
+    const mock = MOCK_PLAYERS.find(p => p.id === id);
+    return mock ? mockToDisplay(mock) : null;
+  });
+  const [loading, setLoading] = useState(!player);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (player || !id) return;
+    setLoading(true);
+    getPlayerProfile(id).then(p => {
+      if (p) setPlayer(apiToDisplay(p));
+      else setError(true);
+    }).catch(() => setError(true)).finally(() => setLoading(false));
+  }, [id]);
+
+  const posts: SocialPost[] = player?.isMock
+    ? SOCIAL_POSTS.filter(p => p.playerId === id)
+    : [];
+
   const following = isFollowing(id ?? '');
 
-  if (!player) {
+  function handleFollow() {
+    if (!player) return;
+    if (following) unfollow(player.id);
+    else follow(player.id, player.username);
+  }
+
+  if (loading) {
     return (
       <View style={[s.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: colors.textDim }}>Player not found</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 16 }}>
-          <Text style={{ color: colors.primary }}>Go back</Text>
+        <ActivityIndicator color={colors.primary} size="large" />
+        <Text style={{ color: colors.textDim, marginTop: 12, fontSize: 12 }}>Loading profile…</Text>
+      </View>
+    );
+  }
+
+  if (!player || error) {
+    return (
+      <View style={[s.container, { justifyContent: 'center', alignItems: 'center', gap: 16 }]}>
+        <Ionicons name="person-outline" size={48} color={colors.textDim} />
+        <Text style={{ color: colors.textDim, fontSize: 14 }}>Player not found</Text>
+        <TouchableOpacity onPress={() => router.back()} style={s.backPillBtn}>
+          <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '700' }}>Go back</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  function handleFollow() {
-    if (following) unfollow(player!.id);
-    else follow(player!.id, player!.username);
-  }
+  const statusColor = STATUS_COLOR[player.status] ?? STATUS_COLOR.offline;
 
   return (
     <View style={s.container}>
@@ -138,27 +222,23 @@ export default function PlayerProfileScreen() {
         style={[s.banner, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       >
-        {/* Back */}
         <TouchableOpacity style={s.backBtn} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={20} color="rgba(255,255,255,0.8)" />
         </TouchableOpacity>
 
-        {/* Avatar */}
         <View style={s.avatarWrap}>
-          <NeonAvatar avatarId={player.avatarId ?? 1} size={72} />
+          <NeonAvatar avatarId={player.avatarId} size={72} />
           <LinearGradient colors={[`${player.avatarColor}50`, 'transparent']} style={s.avatarGlow} />
         </View>
 
-        {/* Names */}
         <Text style={s.username}>{player.username}</Text>
         <Text style={s.handle}>{player.handle}</Text>
         <Text style={s.bio}>{player.bio}</Text>
 
-        {/* Status + rank row */}
         <View style={s.metaRow}>
-          <View style={[s.statusPill, { backgroundColor: `${STATUS_COLOR[player.status]}20`, borderColor: `${STATUS_COLOR[player.status]}50` }]}>
-            <View style={[s.statusDot, { backgroundColor: STATUS_COLOR[player.status] }]} />
-            <Text style={[s.statusText, { color: STATUS_COLOR[player.status] }]}>{STATUS_LABEL[player.status]}</Text>
+          <View style={[s.statusPill, { backgroundColor: `${statusColor}20`, borderColor: `${statusColor}50` }]}>
+            <View style={[s.statusDot, { backgroundColor: statusColor }]} />
+            <Text style={[s.statusText, { color: statusColor }]}>{STATUS_LABEL[player.status] ?? 'Offline'}</Text>
           </View>
           <View style={[s.rankPill, { borderColor: `${player.avatarColor}50`, backgroundColor: `${player.avatarColor}15` }]}>
             <Ionicons name="star" size={10} color={player.avatarColor} />
@@ -167,20 +247,10 @@ export default function PlayerProfileScreen() {
           <Text style={s.levelText}>Lv.{player.level}</Text>
         </View>
 
-        {/* Follow / message row */}
         <View style={s.actionRow}>
-          <TouchableOpacity
-            style={[s.followBtn, following && s.followBtnActive]}
-            onPress={handleFollow}
-          >
-            <Ionicons
-              name={following ? 'checkmark-circle' : 'person-add'}
-              size={14}
-              color={following ? `${colors.primary}90` : colors.primary}
-            />
-            <Text style={[s.followText, following && s.followTextActive]}>
-              {following ? 'Following' : 'Follow'}
-            </Text>
+          <TouchableOpacity style={[s.followBtn, following && s.followBtnActive]} onPress={handleFollow}>
+            <Ionicons name={following ? 'checkmark-circle' : 'person-add'} size={14} color={following ? `${colors.primary}90` : colors.primary} />
+            <Text style={[s.followText, following && s.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.msgBtn}>
             <Ionicons name="chatbubble-ellipses-outline" size={14} color={colors.textMuted} />
@@ -188,7 +258,6 @@ export default function PlayerProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Badges */}
         {player.badges.length > 0 && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.badgeRow}>
             {player.badges.map(b => (
@@ -209,23 +278,27 @@ export default function PlayerProfileScreen() {
         {/* Social counts */}
         <View style={s.socialRow}>
           <View style={s.socialStat}>
-            <Text style={s.socialVal}>{(player.followers / 1000).toFixed(1)}K</Text>
+            <Text style={s.socialVal}>
+              {player.followers >= 1000 ? `${(player.followers / 1000).toFixed(1)}K` : player.followers}
+            </Text>
             <Text style={s.socialLabel}>Followers</Text>
           </View>
           <View style={s.socialDiv} />
           <View style={s.socialStat}>
-            <Text style={s.socialVal}>{(player.following / 1000).toFixed(1)}K</Text>
+            <Text style={s.socialVal}>
+              {player.following >= 1000 ? `${(player.following / 1000).toFixed(1)}K` : player.following}
+            </Text>
             <Text style={s.socialLabel}>Following</Text>
           </View>
           <View style={s.socialDiv} />
           <View style={s.socialStat}>
-            <Text style={s.socialVal}>{player.tournamentWins}</Text>
-            <Text style={s.socialLabel}>Tourney Wins</Text>
+            <Text style={[s.socialVal, { color: colors.gold }]}>{player.achievementCount}/26</Text>
+            <Text style={s.socialLabel}>Achievements</Text>
           </View>
           <View style={s.socialDiv} />
           <View style={s.socialStat}>
-            <Text style={s.socialVal}>{player.achievementCount}</Text>
-            <Text style={s.socialLabel}>Achievements</Text>
+            <Text style={[s.socialVal, { color: colors.success }]}>{player.winRate}%</Text>
+            <Text style={s.socialLabel}>Win Rate</Text>
           </View>
         </View>
 
@@ -238,11 +311,24 @@ export default function PlayerProfileScreen() {
           </View>
           <View style={s.statsRow}>
             <StatItem label="HANDS PLAYED" value={player.handsPlayed.toLocaleString()} icon="card" />
-            <StatItem label="BIGGEST POT" value={formatBig(player.biggestPot)} color={colors.secondary} icon="trophy" />
+            {player.biggestPot > 0 && (
+              <StatItem label="BIGGEST POT" value={formatBig(player.biggestPot)} color={colors.secondary} icon="trophy" />
+            )}
           </View>
         </View>
 
-        {/* Recent posts */}
+        {/* Tournaments — COMING SOON */}
+        <View style={s.statsSection}>
+          <Text style={s.sectionTitle}>TOURNAMENTS</Text>
+          <View style={s.comingSoonBox}>
+            <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
+            <Ionicons name="trophy-outline" size={28} color={`${colors.accent}60`} />
+            <Text style={s.comingSoonTitle}>COMING SOON</Text>
+            <Text style={s.comingSoonSub}>Tournament leaderboards and match history are launching soon.</Text>
+          </View>
+        </View>
+
+        {/* Recent posts (mock players only) */}
         {posts.length > 0 && (
           <View style={s.statsSection}>
             <Text style={s.sectionTitle}>RECENT POSTS</Text>
@@ -254,24 +340,26 @@ export default function PlayerProfileScreen() {
           </View>
         )}
 
-        {/* Similar players */}
-        <View style={s.statsSection}>
-          <Text style={s.sectionTitle}>SIMILAR PLAYERS</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
-            {MOCK_PLAYERS.filter(p => p.id !== player.id && p.rank === player.rank).slice(0, 4).map(p => (
-              <TouchableOpacity
-                key={p.id}
-                style={s.simCard}
-                onPress={() => router.replace(`/social/player-profile?id=${p.id}`)}
-              >
-                <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
-                <NeonAvatar avatarId={p.avatarId ?? 1} size={40} />
-                <Text style={s.simName}>{p.username}</Text>
-                <Text style={s.simRank}>{p.rank}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+        {/* Similar players (mock only) */}
+        {player.isMock && (
+          <View style={s.statsSection}>
+            <Text style={s.sectionTitle}>SIMILAR PLAYERS</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
+              {MOCK_PLAYERS.filter(p => p.id !== player.id && p.rank === player.rank).slice(0, 4).map(p => (
+                <TouchableOpacity
+                  key={p.id}
+                  style={s.simCard}
+                  onPress={() => router.replace(`/social/player-profile?id=${p.id}`)}
+                >
+                  <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
+                  <NeonAvatar avatarId={p.avatarId ?? 1} size={40} />
+                  <Text style={s.simName}>{p.username}</Text>
+                  <Text style={s.simRank}>{p.rank}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -281,9 +369,8 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050010' },
   banner: { paddingHorizontal: 20, paddingBottom: 20, alignItems: 'center', gap: 6 },
   backBtn: { position: 'absolute', top: 0, left: 16, padding: 8, alignSelf: 'flex-start' },
+  backPillBtn: { borderWidth: 1, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10 },
   avatarWrap: { position: 'relative', marginTop: 8 },
-  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#0e0025', borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 38, fontWeight: '700' },
   avatarGlow: { position: 'absolute', top: -6, left: -6, right: -6, bottom: -6, borderRadius: 46 },
   username: { color: '#fff', fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1, marginTop: 4 },
   handle: { color: 'rgba(255,255,255,0.5)', fontSize: 12 },
@@ -313,9 +400,10 @@ const s = StyleSheet.create({
   statsSection: { paddingHorizontal: 16, gap: 10 },
   sectionTitle: { color: colors.primary, fontSize: 10, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
   statsRow: { flexDirection: 'row', gap: 10 },
+  comingSoonBox: { borderRadius: 14, borderWidth: 1, borderColor: `${colors.accent}30`, overflow: 'hidden', padding: 24, alignItems: 'center', gap: 8 },
+  comingSoonTitle: { color: colors.accent, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
+  comingSoonSub: { color: colors.textDim, fontSize: 11, textAlign: 'center', lineHeight: 16 },
   simCard: { width: 110, alignItems: 'center', borderRadius: 14, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', padding: 14, gap: 6 },
-  simAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#0e0025', borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
-  simAvatarText: { fontSize: 20, fontWeight: '700' },
   simName: { color: colors.text, fontSize: 11, fontWeight: '700', textAlign: 'center' },
   simRank: { color: colors.textDim, fontSize: 9, textAlign: 'center' },
 });

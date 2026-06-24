@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,7 +26,7 @@ import { useSocial } from '@/context/SocialContext';
 import { useAISocial } from '@/context/AISocialContext';
 import type { AIPost } from '@/lib/aiSocialEngine';
 import {
-  SOCIAL_POSTS, MOCK_PLAYERS, LIVE_EVENTS, POKER_REACTIONS, POST_TAG_COLORS,
+  SOCIAL_POSTS, MOCK_PLAYERS, POKER_REACTIONS, POST_TAG_COLORS,
   AVATAR_SYMBOLS, AVATAR_COLORS, getLeaderboard,
   type SocialPost, type PostTag,
 } from '@/lib/socialData';
@@ -88,13 +89,11 @@ function seedComments(postId: string, count: number) {
 }
 
 const FEED_TABS = [
-  { id: 'trending',     label: 'Trending',     icon: 'flame' as const },
-  { id: 'following',    label: 'Following',    icon: 'people' as const },
-  { id: 'achievements', label: 'Achievements', icon: 'trophy' as const },
-  { id: 'pots',         label: 'Biggest Pots', icon: 'cash' as const },
-  { id: 'leaderboard',  label: 'Leaderboard',  icon: 'podium' as const },
-  { id: 'search',       label: 'Search',       icon: 'search' as const },
-  { id: 'me',           label: 'Me',           icon: 'person-circle' as const },
+  { id: 'all',         label: 'All',         icon: 'globe' as const },
+  { id: 'trending',    label: 'Trending',    icon: 'flame' as const },
+  { id: 'leaderboard', label: 'Leaderboard', icon: 'podium' as const },
+  { id: 'search',      label: 'Search',      icon: 'search' as const },
+  { id: 'me',          label: 'Me',          icon: 'person-circle' as const },
 ];
 
 const ME_SUBTABS = [
@@ -102,53 +101,6 @@ const ME_SUBTABS = [
   { id: 'reposts', label: 'Reposts', icon: 'repeat' as const },
   { id: 'likes',   label: 'Likes',   icon: 'heart-outline' as const },
 ];
-
-// ─── Live Ticker ─────────────────────────────────────────────────────────────
-
-function LiveTicker() {
-  const [idx, setIdx] = useState(0);
-  const opacity = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    const cycle = () => {
-      Animated.timing(opacity, { toValue: 0, duration: 400, useNativeDriver: false }).start(() => {
-        setIdx(i => (i + 1) % LIVE_EVENTS.length);
-        Animated.timing(opacity, { toValue: 1, duration: 400, useNativeDriver: false }).start();
-      });
-    };
-    const timer = setInterval(cycle, 3500);
-    return () => clearInterval(timer);
-  }, [opacity]);
-
-  const ev = LIVE_EVENTS[idx];
-
-  return (
-    <View style={tickerStyle.wrap}>
-      <View style={tickerStyle.dot} />
-      <Text style={tickerStyle.label}>LIVE</Text>
-      <Animated.Text style={[tickerStyle.text, { opacity, color: ev.color }]} numberOfLines={1}>
-        {ev.text}
-      </Animated.Text>
-    </View>
-  );
-}
-
-const tickerStyle = StyleSheet.create({
-  wrap: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 14, paddingVertical: 8,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  dot: {
-    width: 6, height: 6, borderRadius: 3, backgroundColor: '#ff0090',
-  },
-  label: {
-    color: '#ff0090', fontSize: 9, fontWeight: '800', letterSpacing: 1.5,
-    fontFamily: 'Orbitron_700Bold',
-  },
-  text: { flex: 1, fontSize: 12, fontWeight: '600' },
-});
 
 // ─── Notification Bell ───────────────────────────────────────────────────────
 
@@ -176,6 +128,22 @@ const hdrStyle = StyleSheet.create({
   },
   badgeText: { color: '#fff', fontSize: 9, fontWeight: '800' },
 });
+
+// ─── Inbox Bubble ─────────────────────────────────────────────────────────────
+
+function InboxBubble() {
+  const { unreadDmCount } = useUser();
+  return (
+    <TouchableOpacity style={hdrStyle.bell} onPress={() => router.push('/inbox')}>
+      <Ionicons name="chatbubble-ellipses-outline" size={20} color={colors.textMuted} />
+      {unreadDmCount > 0 && (
+        <View style={[hdrStyle.badge, { backgroundColor: colors.primary }]}>
+          <Text style={hdrStyle.badgeText}>{unreadDmCount > 9 ? '9+' : unreadDmCount}</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+}
 
 // ─── Notifications panel ──────────────────────────────────────────────────────
 
@@ -738,11 +706,10 @@ const ach = StyleSheet.create({
 // ─── Leaderboard Section ─────────────────────────────────────────────────────
 
 const LB_CATS = [
-  { id: 'chips' as const,       label: 'Chips',      icon: '💰' },
-  { id: 'winrate' as const,     label: 'Win Rate',   icon: '🎯' },
-  { id: 'pots' as const,        label: 'Biggest Pot',icon: '♠️' },
-  { id: 'xp' as const,          label: 'XP Level',   icon: '⚡' },
-  { id: 'tournaments' as const, label: 'Tourney Wins',icon: '🏆' },
+  { id: 'chips' as const,   label: 'Chips',      icon: '💰' },
+  { id: 'winrate' as const, label: 'Win Rate',   icon: '🎯' },
+  { id: 'pots' as const,    label: 'Biggest Pot',icon: '♠️' },
+  { id: 'xp' as const,      label: 'XP Level',   icon: '⚡' },
 ];
 
 function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
@@ -1474,17 +1441,27 @@ const stripStyle = StyleSheet.create({
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
   const cls = useColors();
-  const [activeTab, setActiveTab] = useState('trending');
+  const [activeTab, setActiveTab] = useState('all');
   const [composeVisible, setComposeVisible] = useState(false);
   const [myPosts, setMyPosts] = useState<MePost[]>(INITIAL_MY_POSTS);
   const [notifVisible, setNotifVisible] = useState(false);
-  const { posts: aiPosts } = useAISocial();
+  const [refreshing, setRefreshing] = useState(false);
+  const { posts: aiPosts, refresh: refreshAIPosts } = useAISocial();
   const { isMuted, isBlocked } = useSocial();
 
   const filteredPosts = useCallback(() => {
-    const base = activeTab === 'trending' ? SOCIAL_POSTS : SOCIAL_POSTS.filter(p => p.tab === activeTab);
+    const base = (activeTab === 'all' || activeTab === 'trending')
+      ? SOCIAL_POSTS
+      : SOCIAL_POSTS.filter(p => p.tab === activeTab);
     return base.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
   }, [activeTab, isMuted, isBlocked]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    if (typeof refreshAIPosts === 'function') refreshAIPosts();
+    await new Promise(r => setTimeout(r, 900));
+    setRefreshing(false);
+  }, [refreshAIPosts]);
 
   return (
     <View style={[ss.container, { backgroundColor: cls.background }]}>
@@ -1495,6 +1472,7 @@ export default function FeedScreen() {
         <Text style={ss.headerTitle}>FEED</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <NotifBell onPress={() => setNotifVisible(true)} />
+          <InboxBubble />
           {activeTab !== 'me' && (
             <TouchableOpacity style={ss.newPostBtn} onPress={() => setComposeVisible(true)}>
               <Ionicons name="add" size={16} color={colors.primary} />
@@ -1503,9 +1481,6 @@ export default function FeedScreen() {
           )}
         </View>
       </View>
-
-      {/* Live ticker */}
-      <LiveTicker />
 
       {/* Tab bar */}
       <View style={ss.tabBarOuter}>
@@ -1559,8 +1534,6 @@ export default function FeedScreen() {
           onDeletePost={(id) => setMyPosts(prev => prev.filter(p => p.id !== id))}
           bottomInset={insets.bottom}
         />
-      ) : activeTab === 'achievements' ? (
-        <AchievementSection bottomInset={insets.bottom} />
       ) : activeTab === 'leaderboard' ? (
         <LeaderboardSection bottomInset={insets.bottom} />
       ) : activeTab === 'search' ? (
@@ -1570,9 +1543,21 @@ export default function FeedScreen() {
           data={filteredPosts()}
           keyExtractor={item => item.id}
           renderItem={({ item }) => <PostCard post={item} />}
-          ListHeaderComponent={activeTab === 'trending' ? <AIPostsStrip posts={aiPosts.slice(0, 6)} /> : null}
+          ListHeaderComponent={
+            (activeTab === 'all' || activeTab === 'trending')
+              ? <AIPostsStrip posts={aiPosts.slice(0, 6)} />
+              : null
+          }
           contentContainerStyle={{ paddingTop: 4, paddingBottom: insets.bottom + 90, gap: 12 }}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
         />
       )}
 

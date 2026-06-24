@@ -117,6 +117,27 @@ export async function getUnreadCount(playerId: string): Promise<number> {
   return d.unread;
 }
 
+// ── Player profile (public) ───────────────────────────────────────────────────
+
+export interface PlayerProfile {
+  playerId: string;
+  username: string;
+  level: number;
+  chips: number;
+  avatarIndex: number;
+  rank: string;
+  winRate: number;
+  handsPlayed: number;
+  status: string;
+}
+
+export async function getPlayerProfile(targetId: string): Promise<PlayerProfile | null> {
+  const r = await fetch(`${getBase()}/social/players/${targetId}`);
+  if (!r.ok) return null;
+  const d = await r.json() as { player: PlayerProfile };
+  return d.player;
+}
+
 // ── Block ─────────────────────────────────────────────────────────────────────
 
 export async function blockPlayer(playerId: string, targetId: string) {

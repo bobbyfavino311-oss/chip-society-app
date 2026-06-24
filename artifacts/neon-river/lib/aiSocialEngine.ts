@@ -15,7 +15,7 @@ export interface AIPersonality {
   catchphrase: string;
 }
 
-export type AIPostType = 'BIG_WIN' | 'BAD_BEAT' | 'BLUFF' | 'TOURNAMENT' | 'TILT' | 'FUNNY' | 'SHORT_DECK';
+export type AIPostType = 'BIG_WIN' | 'BAD_BEAT' | 'BLUFF' | 'JACKPOT_WIN' | 'TILT' | 'FUNNY' | 'SHORT_DECK';
 
 export interface AIPost {
   id: string;
@@ -151,10 +151,12 @@ const TILT_TEMPLATES = [
   () => `Lost four buy-ins to the same player. They just call everything and somehow win. Is this legal?`,
 ];
 
-const TOURNAMENT_TEMPLATES = [
-  (pos: string, players: string) => `Finished ${pos} out of ${players} in the tournament. ${pick(['Variance is real.', 'Next time.', 'The grind never stops.', 'Almost.'])}`,
-  (pos: string, players: string) => `Busted ${pos}/${players}. Had the chip lead going into the final table. Poker.`,
-  (pos: string, players: string) => `${pos} place out of ${players}. Survived 3 all-ins against the odds. Worth it.`,
+const JACKPOT_WIN_TEMPLATES = [
+  (pot: string) => `Daily spin just hit ${pot}. Did not even see it coming. The neon gods smiled today.`,
+  (pot: string) => `Fortune cookie cracked for ${pot} chips. Luck or skill? At this point, both.`,
+  (pot: string) => `Jackpot wheel landed on ${pot}. ${pick(['Screen shook.', 'Chat went wild.', 'Lobby exploded.', 'Still shaking.'])}`,
+  (pot: string) => `Scratched the ${pot} prize on the bonus wheel. This game is giving tonight.`,
+  (pot: string) => `Hit the ${pot} jackpot after a 4-hour grind. Variance paid the bills today.`,
 ];
 
 const SHORT_DECK_TEMPLATES = [
@@ -197,13 +199,13 @@ export function formatTimeAgo(ms: number): string { return timeAgo(ms); }
 const HAND_RANKS = ['Pocket Aces', 'Pocket Kings', 'Royal Flush', 'Straight Flush', 'Quads', 'Full House', 'Flush', 'Set of Nines', 'Nut Straight', 'Pocket Queens', 'A-K Suited'];
 
 const TAG_MAP: Record<AIPostType, { tag: string; color: string }> = {
-  BIG_WIN:    { tag: 'WIN',       color: '#00ff88' },
-  BAD_BEAT:   { tag: 'BAD BEAT',  color: '#ff3355' },
-  BLUFF:      { tag: 'BLUFF',     color: '#ffd700' },
-  TOURNAMENT: { tag: 'TOURNAMENT',color: '#bf5fff' },
-  TILT:       { tag: 'ALL-IN',    color: '#ff6600' },
-  FUNNY:      { tag: 'JACKPOT',   color: '#00d4ff' },
-  SHORT_DECK: { tag: 'WIN',       color: '#00ff88' },
+  BIG_WIN:     { tag: 'WIN',      color: '#00ff88' },
+  BAD_BEAT:    { tag: 'BAD BEAT', color: '#ff3355' },
+  BLUFF:       { tag: 'BLUFF',    color: '#ffd700' },
+  JACKPOT_WIN: { tag: 'JACKPOT',  color: '#bf5fff' },
+  TILT:        { tag: 'ALL-IN',   color: '#ff6600' },
+  FUNNY:       { tag: 'JACKPOT',  color: '#00d4ff' },
+  SHORT_DECK:  { tag: 'WIN',      color: '#00ff88' },
 };
 
 export function seedAIPosts(count = 8): AIPost[] {
@@ -212,7 +214,7 @@ export function seedAIPosts(count = 8): AIPost[] {
 
 export function generateAIPost(idSuffix = String(Date.now())): AIPost {
   const personality = pick(AI_PERSONALITIES);
-  const type = pick<AIPostType>(['BIG_WIN', 'BAD_BEAT', 'BLUFF', 'TOURNAMENT', 'TILT', 'FUNNY', 'SHORT_DECK']);
+  const type = pick<AIPostType>(['BIG_WIN', 'BAD_BEAT', 'BLUFF', 'JACKPOT_WIN', 'TILT', 'FUNNY', 'SHORT_DECK']);
   const hand = pick(HAND_RANKS);
   const pot  = randomPot();
   const { tag, color: tagColor } = TAG_MAP[type];
@@ -224,13 +226,8 @@ export function generateAIPost(idSuffix = String(Date.now())): AIPost {
     case 'BLUFF':      content = pick(BLUFF_TEMPLATES)(pot);           break;
     case 'FUNNY':      content = pick(FUNNY_TEMPLATES)();              break;
     case 'TILT':       content = pick(TILT_TEMPLATES)();               break;
-    case 'SHORT_DECK': content = pick(SHORT_DECK_TEMPLATES)(hand);     break;
-    case 'TOURNAMENT': {
-      const pos     = pick(['1st', '2nd', '3rd', '4th', '5th', 'Final Table']);
-      const players = pick(['48', '64', '96', '128', '256']);
-      content = pick(TOURNAMENT_TEMPLATES)(pos, players);
-      break;
-    }
+    case 'SHORT_DECK':  content = pick(SHORT_DECK_TEMPLATES)(hand);          break;
+    case 'JACKPOT_WIN': content = pick(JACKPOT_WIN_TEMPLATES)(randomPot());  break;
     default: content = '';
   }
 

@@ -1,0 +1,433 @@
+CHIP SOCIETY SOCIAL FEED + PLAYER PROFILE FIXES
+
+Fix and redesign the Social Feed system based on the following requirements.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+1. PLAYER PROFILE SEARCH BUG
+
+Current issue:
+
+A player appears correctly in search results, but when tapping their profile, the app shows:
+
+Player Profile Not Found
+
+This is a critical routing/data bug.
+
+Required fix:
+
+When a player appears in search results, the result card must include the correct permanent playerId.
+
+When tapping the player:
+
+• Open profile by playerId
+• Load profile from server
+• Display username, avatar, level, stats, posts, followers, following
+• Do not search again by display name
+• Do not use local-only IDs
+• Do not use stale cached IDs
+
+If the profile exists in search results, it must open successfully.
+
+Acceptance test:
+
+1. Search username: realbobbyf
+2. Result appears
+3. Tap profile
+4. Profile opens correctly
+5. No “Player Not Found” error
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+2. SOCIAL FEED PULL-TO-REFRESH
+
+Add pull-down-to-refresh on the Social Feed.
+
+When player pulls down:
+
+• Refresh feed data
+• Load newest posts
+• Place newest posts at top
+• Include the player’s own new posts
+• Add fresh AI-generated posts if real activity is low
+• Update unread counts
+• Update leaderboard data
+• Update inbox badge
+
+Show a smooth refresh animation.
+
+Do not require app restart.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+3. FEED PILLS / TABS REDESIGN
+
+Only use these pills:
+
+• ALL
+• TRENDING
+• LEADERBOARD
+• SEARCH
+• ME
+
+Remove all others.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ALL TAB
+
+ALL shows:
+
+• All newest posts
+• Real player posts
+• Player’s own posts
+• AI-generated filler posts if needed
+
+Newest posts always appear at the top after refresh.
+
+When player creates a post:
+
+Their post immediately appears at the top of ALL.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TRENDING TAB
+
+TRENDING shows:
+
+• Posts with high engagement
+• Big wins
+• Rare hands
+• Fortune Cookie wins
+• High-value pots
+• Popular AI posts if real content is low
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LEADERBOARD TAB
+
+LEADERBOARD shows players with the highest chip balances across the entire platform.
+
+Must update in real time.
+
+Display:
+
+• Rank number
+• Avatar
+• Username
+• Chip balance
+• Level
+
+Chip balances must use compact formatting:
+
+1M
+500K
+1.3B
+
+Do not display values like:
+
+1313.4M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SEARCH TAB
+
+SEARCH allows players to search accounts by username.
+
+Search must return:
+
+• Exact matches
+• Partial matches
+• Case-insensitive matches
+
+Each result should show:
+
+• Avatar
+• Username
+• Level
+• Chip bracket
+• View Profile button
+• Follow button
+• Message button
+
+Tapping View Profile must open the correct profile.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ME TAB
+
+ME shows the current player’s own social activity.
+
+Display:
+
+• My posts
+• My followers
+• My following
+• My profile shortcut
+• My inbox shortcut
+• My social stats
+
+Newest own posts appear first.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+4. INBOX BUBBLE PLACEMENT
+
+Add an inbox bubble/icon to the Social Feed header.
+
+Placement:
+
+To the right of the notification bell.
+
+To the left of the Post button.
+
+Header layout:
+
+Notification Bell | Inbox Bubble | Post Button
+
+Inbox bubble should show unread count.
+
+Example:
+
+Inbox icon with badge:
+
+3
+
+Tapping inbox opens player messages.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+5. REMOVE LIVE FEATURE ENTIRELY
+
+Remove:
+
+• LIVE label
+• LIVE badge
+• LIVE feed indicator
+• LIVE ticker
+• LIVE activity section
+• LIVE status displays at top of feed
+
+Completely remove the LIVE feature from the Social Feed for now.
+
+Do not replace it with:
+
+• Latest From The Tables
+• Community Highlights
+• Activity Feed Banner
+• Any placeholder replacement
+
+Leave this area clean and empty.
+
+The LIVE system can be revisited in a future update once there is enough real player activity to justify it.
+
+For now, remove it completely.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+6. REAL-TIME SOCIAL UPDATES
+
+The Social Feed should update constantly and feel alive.
+
+Use:
+
+• Real-time post listener
+• Pull-to-refresh
+• AI-generated feed filler
+• Real user posts when available
+
+When new posts are created:
+
+• Add to ALL immediately
+• Update TRENDING if eligible
+• Update user profile posts
+• Update ME tab if current user created it
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+7. AI POST GENERATION ON REFRESH
+
+Until the game has enough real players, generate AI posts whenever the feed refreshes.
+
+Rules:
+
+• AI posts should feel poker/casino related
+• Do not claim fake tournaments
+• Do not claim unavailable features
+• Do not show impossible achievements
+• Do not show fake live player counts
+• Do not imply real users are online
+
+Allowed AI post topics:
+
+• Big poker hands
+• Bad beats
+• Blackjack wins
+• Three Card Poker wins
+• Fortune Cookie rewards
+• Daily Spin rewards
+• Avatar collection
+• Chip milestones
+• Funny poker comments
+
+Examples:
+
+“River card saved me. I was already emotionally folding.”
+
+“Hit a full house and somehow still thought I was behind.”
+
+“Opened a 🥠 and pulled 50K chips. I’ll take it.”
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+8. AI BOT PROFILE STAT FIXES
+
+Current issue:
+
+AI bot profiles display impossible or misleading stats.
+
+Examples:
+
+• More achievements than actually exist in the game
+• Tournament wins even though tournaments are not available
+
+Fix all AI profiles.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TOURNAMENT STATS RULE
+
+Until tournaments are officially released:
+
+All players must show:
+
+Tournament Wins: 0
+Tournament Earnings: 0
+Tournament Entries: 0
+
+This applies to:
+
+• Real players
+• AI players
+• Feed bots
+• Leaderboard bots
+• Profile previews
+
+Do not generate fake tournament wins.
+
+Do not generate fake tournament earnings.
+
+Do not generate fake tournament placements.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACHIEVEMENT COUNT RULE
+
+AI bot achievement counts must never exceed the actual number of achievements available in the game.
+
+If the game currently has 26 achievements:
+
+Valid AI achievement examples:
+
+0 / 26
+3 / 26
+8 / 26
+15 / 26
+22 / 26
+
+Invalid:
+
+31 achievements
+50 achievements
+100 achievements
+
+Achievement displays must reflect an actual possible number.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+9. PROFILE DATA CONSISTENCY
+
+Every player profile should display only real supported stats.
+
+Until features launch, lock or hide unavailable stats.
+
+Tournament section should say:
+
+TOURNAMENTS COMING SOON
+
+Tournament statistics will become available when tournaments launch.
+
+Do not show fake tournament numbers anywhere.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+10. ACCEPTANCE TEST
+
+Player Search:
+
+1. Open Feed
+2. Tap SEARCH
+3. Search existing username
+4. Result appears
+5. Tap player profile
+6. Profile opens successfully
+
+Pull-to-refresh:
+
+1. Open ALL tab
+2. Pull down to refresh
+3. Newest posts load at top
+4. AI filler posts appear if needed
+5. Own posts remain visible
+
+Feed pills:
+
+Verify only these exist:
+
+ALL
+TRENDING
+LEADERBOARD
+SEARCH
+ME
+
+Inbox:
+
+1. Confirm inbox icon appears between bell and Post
+2. Confirm unread badge works
+3. Tap inbox
+4. Inbox opens
+
+Leaderboard:
+
+1. Open LEADERBOARD
+2. Confirm highest chip players appear
+3. Confirm chip formatting uses K/M/B
+4. Confirm leaderboard updates in real time
+
+AI profiles:
+
+1. Open AI profile
+2. Tournament wins show 0
+3. Achievements do not exceed actual achievement count
+4. No impossible stats shown
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+The Social Feed should feel active, organized, and trustworthy.
+
+Players should be able to:
+
+• Search for other players
+• Open profiles successfully
+• Follow players
+• Message players
+• Refresh the feed
+• View leaderboards
+• See their own posts
+• Receive inbox messages
+• See AI filler content without fake tournament stats
+• Trust that profiles only show possible, supported stats
+
+The LIVE feature should be completely removed until there is enough genuine player activity to support it.
