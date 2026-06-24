@@ -82,6 +82,19 @@ async function runMigrations() {
         ADD COLUMN IF NOT EXISTS suspension_expires_at TIMESTAMPTZ,
         ADD COLUMN IF NOT EXISTS ban_reason TEXT;
     `);
+    // Backfill columns added after initial table creation
+    await client.query(`
+      ALTER TABLE player_notifications
+        ADD COLUMN IF NOT EXISTS reason TEXT NOT NULL DEFAULT '';
+    `);
+    await client.query(`
+      ALTER TABLE player_notifications
+        ADD COLUMN IF NOT EXISTS message TEXT;
+    `);
+    await client.query(`
+      ALTER TABLE player_notifications
+        ADD COLUMN IF NOT EXISTS amount INTEGER NOT NULL DEFAULT 0;
+    `);
     await client.query(`
       CREATE TABLE IF NOT EXISTS follows (
         follower_id   TEXT NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
