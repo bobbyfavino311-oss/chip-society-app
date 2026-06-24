@@ -97,7 +97,23 @@ export default function SignInScreen() {
     if (result.success) {
       router.replace('/(tabs)');
     } else {
-      setError(result.error ?? 'Sign in failed.');
+      const raw = result.error ?? 'Sign in failed.';
+      if (raw.startsWith('ACCOUNT_BANNED::')) {
+        const reason = raw.slice('ACCOUNT_BANNED::'.length);
+        setError(`Account banned: ${reason}`);
+      } else if (raw.startsWith('ACCOUNT_SUSPENDED::')) {
+        const parts = raw.slice('ACCOUNT_SUSPENDED::'.length).split('::');
+        const reason = parts[0] ?? 'Policy violation';
+        const expiresAt = parts[1];
+        if (expiresAt) {
+          const exp = new Date(expiresAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          setError(`Account suspended until ${exp}. Reason: ${reason}`);
+        } else {
+          setError(`Account suspended: ${reason}`);
+        }
+      } else {
+        setError(raw);
+      }
       doShake();
       setPin('');
     }

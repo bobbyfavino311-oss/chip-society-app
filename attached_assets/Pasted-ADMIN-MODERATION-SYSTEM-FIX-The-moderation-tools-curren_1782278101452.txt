@@ -1,0 +1,309 @@
+ADMIN MODERATION SYSTEM FIX
+
+The moderation tools currently do not function properly.
+
+When an admin issues a warning, suspension, or ban from the admin panel, the player either receives no notification or nothing actually happens to the account.
+
+These moderation actions must have real consequences and real-time visibility.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT PROBLEM
+
+The following admin actions exist:
+
+• Warn Player
+• Suspend Player
+• Ban Player
+
+However:
+
+• No notification is delivered.
+• No live action occurs.
+• The player may continue using the app.
+• The moderation system has no visible effect.
+
+This defeats the purpose of moderation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+WARNING SYSTEM
+
+When an admin issues a warning:
+
+Required fields:
+
+• Player
+• Reason
+• Optional message
+
+Example:
+
+Reason:
+Inappropriate Content
+
+Message:
+Please keep posts respectful and follow community guidelines.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER EXPERIENCE — WARNING
+
+If player is online:
+
+Immediately display:
+
+WARNING RECEIVED
+
+Reason:
+Inappropriate Content
+
+Message:
+Please keep posts respectful and follow community guidelines.
+
+Button:
+
+UNDERSTOOD
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NOTIFICATION CENTER
+
+Store warning permanently in notifications.
+
+Display:
+
+⚠️ Warning Received
+
+Unread until opened.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCOUNT RECORD
+
+Save:
+
+warningId
+playerId
+reason
+message
+adminId
+timestamp
+
+Warnings should remain attached to the account.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SUSPENSION SYSTEM
+
+When admin suspends a player:
+
+Required:
+
+• Duration
+• Reason
+• Optional message
+
+Examples:
+
+1 hour
+24 hours
+7 days
+30 days
+Custom
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER EXPERIENCE — SUSPENSION
+
+If player is online:
+
+Immediately disconnect session.
+
+Show:
+
+ACCOUNT SUSPENDED
+
+Reason:
+Abusive Behavior
+
+Suspension Ends:
+<Date/Time>
+
+Message:
+Please review community guidelines before returning.
+
+Button:
+
+OK
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LOGIN BLOCK
+
+Suspended players cannot:
+
+• Join games
+• Post
+• Comment
+• Follow
+• Create tables
+• Use multiplayer
+
+Login should show:
+
+ACCOUNT SUSPENDED
+
+Reason:
+Abusive Behavior
+
+Remaining Time:
+5 Days 12 Hours
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SUSPENSION EXPIRATION
+
+When suspension expires:
+
+Restore account automatically.
+
+No admin action required.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BAN SYSTEM
+
+Ban must be treated differently from suspension.
+
+Ban = account disabled.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER EXPERIENCE — BAN
+
+If player is online:
+
+Immediately disconnect.
+
+Show:
+
+ACCOUNT BANNED
+
+Reason:
+Severe Community Violation
+
+Message:
+This account has been permanently banned.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LOGIN BLOCK
+
+Banned accounts cannot log in.
+
+Do not allow:
+
+• Multiplayer
+• Casino Games
+• Social Feed
+• Account Creation Using Same Account
+
+The account should be completely disabled.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REAL-TIME REQUIREMENT
+
+Warnings, suspensions, and bans must use the same real-time event system as casino bonus notifications.
+
+Server should emit:
+
+player_warning
+
+player_suspension
+
+player_ban
+
+to the affected player.
+
+Do not require:
+
+• Refresh
+• Logout
+• App Restart
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ADMIN LOGGING
+
+Every moderation action must create a permanent log.
+
+Store:
+
+• Action Type
+• Player
+• Admin
+• Reason
+• Message
+• Timestamp
+
+Example:
+
+WARNING
+realbobbyf
+Spam Posting
+Issued by Admin
+6/24/2026
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ADMIN DASHBOARD STATUS
+
+Display moderation history:
+
+Warnings: 2
+Suspensions: 1
+Bans: 0
+
+Allow admin review.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCEPTANCE TEST
+
+WARNING
+
+1. Admin warns player.
+2. Player receives popup instantly.
+3. Notification saved.
+4. Warning appears in moderation history.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SUSPENSION
+
+1. Admin suspends player for 24 hours.
+2. Player instantly receives suspension notice.
+3. Session ends.
+4. Player cannot log back in.
+5. Suspension timer counts down.
+6. Access restored automatically after expiration.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BAN
+
+1. Admin bans player.
+2. Player instantly receives ban notice.
+3. Session ends immediately.
+4. Account cannot log in.
+5. Ban appears in moderation history.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+Admin moderation actions must have immediate, visible, enforceable consequences.
+
+If an admin warns, suspends, or bans a player, the player should know instantly and the system should actively enforce the action instead of simply storing it in the database.

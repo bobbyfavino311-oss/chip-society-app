@@ -33,6 +33,7 @@ import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import TutorialOverlay from '@/components/TutorialOverlay';
 import BonusNotificationModal from '@/components/BonusNotificationModal';
+import ModerationModal from '@/components/ModerationModal';
 import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 
@@ -104,6 +105,19 @@ function BonusNotificationRenderer() {
   );
 }
 
+// ─── Moderation notification renderer ─────────────────────────────────────────
+
+function ModerationModalRenderer() {
+  const { pendingModeration, dismissModeration, signOut } = useUser();
+  return (
+    <ModerationModal
+      event={pendingModeration}
+      onDismiss={dismissModeration}
+      onForceSignOut={() => { void signOut(); }}
+    />
+  );
+}
+
 // ─── Notification bridge — connects UserContext → NotificationProvider ────────
 
 function NotificationBridge({ children }: { children: React.ReactNode }) {
@@ -132,6 +146,7 @@ function RootLayoutNav() {
       <GateController />
       <AchievementPopupRenderer />
       <BonusNotificationRenderer />
+      <ModerationModalRenderer />
       <TutorialOverlay />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="entry"         options={{ headerShown: false, animation: 'fade' }} />

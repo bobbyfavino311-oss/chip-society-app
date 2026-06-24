@@ -109,6 +109,32 @@ router.post('/auth/login', async (req, res) => {
       return;
     }
 
+    // Check if banned
+    if (player.status === 'banned') {
+      res.status(403).json({
+        error: 'ACCOUNT_BANNED',
+        reason: player.banReason ?? 'Community violation',
+      });
+      return;
+    }
+
+    // Check if suspended — auto-restore if expired
+    if (player.status === 'suspended') {
+      const expiresAt = player.suspensionExpiresAt;
+      if (expiresAt && new Date() < new Date(expiresAt)) {
+        res.status(403).json({
+          error: 'ACCOUNT_SUSPENDED',
+          reason: player.banReason ?? 'Policy violation',
+          expiresAt: expiresAt.toISOString(),
+        });
+        return;
+      }
+      // Suspension expired — auto-restore
+      await db.update(playersTable)
+        .set({ status: 'active', banReason: null, suspensionExpiresAt: null, updatedAt: new Date() })
+        .where(eq(playersTable.playerId, player.playerId));
+    }
+
     req.log.info({ playerId: player.playerId, username }, 'Player signed in');
     res.json({ success: true, playerId: player.playerId, profile: player.profileJson });
   } catch (e) {

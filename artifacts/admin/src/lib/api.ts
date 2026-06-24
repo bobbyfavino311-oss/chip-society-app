@@ -19,12 +19,17 @@ async function req<T>(method: string, path: string, body?: unknown): Promise<T> 
 }
 
 export const api = {
-  stats:          ()                            => req<any>('GET',  '/admin/stats'),
-  players:        (q?: string, status?: string) => req<any>('GET',  `/admin/players?q=${q??''}&status=${status??'all'}`),
-  player:         (id: string)                  => req<any>('GET',  `/admin/players/${id}`),
-  adjustChips:    (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/chips`, b),
-  giveBonus:      (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/bonus`, b),
-  setStatus:      (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/status`, b),
-  reports:        (status?: string)             => req<any>('GET',  `/admin/reports?status=${status??'open'}`),
-  resolveReport:  (id: string, b: any)          => req<any>('PUT',  `/admin/reports/${id}`, b),
+  stats:             ()                            => req<any>('GET',  '/admin/stats'),
+  players:           (q?: string, status?: string) => req<any>('GET',  `/admin/players?q=${q??''}&status=${status??'all'}`),
+  player:            (id: string)                  => req<any>('GET',  `/admin/players/${id}`),
+  adjustChips:       (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/chips`, b),
+  giveBonus:         (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/bonus`, b),
+  setStatus:         (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/status`, b),
+  warn:              (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/warn`, b),
+  suspend:           (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/suspend`, b),
+  ban:               (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/ban`, b),
+  unban:             (id: string)                  => req<any>('POST', `/admin/players/${id}/unban`, {}),
+  moderationHistory: ()                            => req<any>('GET',  '/admin/moderation'),
+  reports:           (status?: string)             => req<any>('GET',  `/admin/reports?status=${status??'open'}`),
+  resolveReport:     (id: string, b: any)          => req<any>('PUT',  `/admin/reports/${id}`, b),
 };

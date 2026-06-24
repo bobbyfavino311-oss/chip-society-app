@@ -271,6 +271,8 @@ interface UserContextValue {
   claimFreeCookie: () => Promise<CookieTier | false>;
   pendingBonuses: PendingBonus[];
   dismissBonus: (notificationId: string) => void;
+  pendingModeration: PendingModeration | null;
+  dismissModeration: () => void;
 }
 
 export interface PendingBonus {
@@ -279,6 +281,14 @@ export interface PendingBonus {
   reason: string;
   message?: string | null;
   createdAt: string;
+}
+
+export interface PendingModeration {
+  type: 'warning' | 'suspension' | 'ban';
+  reason: string;
+  message?: string | null;
+  expiresAt?: string | null;
+  actionId: string;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -337,14 +347,20 @@ async function serverRegister(
 
 async function serverLogin(
   username: string, pin: string,
-): Promise<{ success: boolean; profile?: UserProfile; error?: string; isNetworkError?: boolean }> {
+): Promise<{ success: boolean; profile?: UserProfile; error?: string; isNetworkError?: boolean; isBanned?: boolean; isSuspended?: boolean; banReason?: string; suspensionExpiresAt?: string }> {
   try {
     const r = await fetch(`${getApiBase()}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, pin }),
     });
-    const d = await r.json() as { success?: boolean; profile?: UserProfile; error?: string };
+    const d = await r.json() as { success?: boolean; profile?: UserProfile; error?: string; reason?: string; expiresAt?: string };
+    if (r.status === 403 && d.error === 'ACCOUNT_BANNED') {
+      return { success: false, error: 'ACCOUNT_BANNED', isBanned: true, banReason: d.reason };
+    }
+    if (r.status === 403 && d.error === 'ACCOUNT_SUSPENDED') {
+      return { success: false, error: 'ACCOUNT_SUSPENDED', isSuspended: true, banReason: d.reason, suspensionExpiresAt: d.expiresAt };
+    }
     if (!r.ok) return { success: false, error: d.error ?? 'Login failed.' };
     return { success: true, profile: d.profile };
   } catch {
@@ -442,6 +458,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [now, setNow] = useState(Date.now());
   const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [pendingBonuses, setPendingBonuses] = useState<PendingBonus[]>([]);
+  const [pendingModeration, setPendingModeration] = useState<PendingModeration | null>(null);
   const checkedBonusIds = React.useRef<Set<string>>(new Set());
   const notifSocketRef = useRef<Socket | null>(null);
 
@@ -739,6 +756,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const signIn = useCallback(async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
     const res = await serverLogin(username, pin);
     if (!res.success) {
+      if (res.isBanned) {
+        return { success: false, error: `ACCOUNT_BANNED::${res.banReason ?? 'Community violation'}` };
+      }
+      if (res.isSuspended) {
+        const exp = res.suspensionExpiresAt ? `::${res.suspensionExpiresAt}` : '';
+        return { success: false, error: `ACCOUNT_SUSPENDED::${res.banReason ?? 'Policy violation'}${exp}` };
+      }
       if (res.isNetworkError) {
         // Server offline — verify against locally stored credentials.
         try {
@@ -939,6 +963,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }]);
     });
 
+    socket.on('player_warning', (data: { actionId: string; reason: string; message?: string | null; timestamp: string }) => {
+      console.log('[BonusSocket] player_warning', data);
+      setPendingModeration({ type: 'warning', reason: data.reason, message: data.message ?? null, actionId: data.actionId });
+    });
+
+    socket.on('player_suspension', (data: { actionId: string; reason: string; message?: string | null; expiresAt: string; timestamp: string }) => {
+      console.log('[BonusSocket] player_suspension', data);
+      setPendingModeration({ type: 'suspension', reason: data.reason, message: data.message ?? null, expiresAt: data.expiresAt, actionId: data.actionId });
+    });
+
+    socket.on('player_ban', (data: { actionId: string; reason: string; message?: string | null; timestamp: string }) => {
+      console.log('[BonusSocket] player_ban', data);
+      setPendingModeration({ type: 'ban', reason: data.reason, message: data.message ?? null, actionId: data.actionId });
+    });
+
     notifSocketRef.current = socket;
 
     return () => {
@@ -1013,6 +1052,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setPendingBonuses(prev => prev.filter(b => b.notificationId !== notificationId));
   }, []);
 
+  const dismissModeration = useCallback(() => {
+    setPendingModeration(null);
+  }, []);
+
   // ── Derived ───────────────────────────────────────────────────────────────────
 
   const today = new Date().toDateString();
@@ -1077,6 +1120,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       canClaimFreeCookie, nextCookieIn,
       addXP, consumeFortuneCookie, addFortuneCookies, claimFreeCookie,
       pendingBonuses, dismissBonus,
+      pendingModeration, dismissModeration,
     }}>
       {children}
     </UserContext.Provider>
