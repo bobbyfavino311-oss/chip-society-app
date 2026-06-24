@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { formatChips } from '@/lib/multiplayerTypes';
 import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
@@ -120,7 +121,7 @@ function AchCard({ ach, unlocked, claimed, progress, progressLabel, onClaim, cla
         <View style={styles.rewardRow}>
           <Ionicons name="cash-outline" size={10} color={unlocked ? '#ffd700' : 'rgba(255,215,0,0.25)'} />
           <Text style={[styles.rewardText, !unlocked && { opacity: 0.35 }]}>
-            {ach.chipReward.toLocaleString()} chips · {ach.xpReward} XP
+            {formatChips(ach.chipReward)} chips · {ach.xpReward} XP
           </Text>
         </View>
 

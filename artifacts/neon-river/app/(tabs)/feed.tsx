@@ -908,7 +908,7 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                   </Text>
                 </View>
                 <Text style={srch.handle}>{p.handle} · {p.rank}</Text>
-                <Text style={srch.chips}>{(p.chips / 1000).toFixed(0)}K chips · Lv.{p.level}</Text>
+                <Text style={srch.chips}>{(() => { const n = p.chips; const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1); return n >= 1_000_000_000 ? v(n/1_000_000_000)+'B' : n >= 1_000_000 ? v(n/1_000_000)+'M' : v(n/1_000)+'K'; })()} chips · Lv.{p.level}</Text>
               </View>
               <TouchableOpacity
                 style={[srch.followBtn, following && srch.followBtnActive]}

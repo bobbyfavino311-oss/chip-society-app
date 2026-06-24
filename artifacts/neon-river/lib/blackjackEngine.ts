@@ -95,8 +95,12 @@ export function canSplit(cards: Card[]): boolean {
 
 // ─── Display helpers ──────────────────────────────────────────────────────────
 
+function _fmtVal(v: number): string {
+  return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1);
+}
 export function fmt(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
+  if (n >= 1_000_000_000) return `${_fmtVal(n / 1_000_000_000)}B`;
+  if (n >= 1_000_000)     return `${_fmtVal(n / 1_000_000)}M`;
+  if (n >= 1_000)         return `${_fmtVal(n / 1_000)}K`;
   return String(n);
 }

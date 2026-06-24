@@ -36,8 +36,12 @@ export const STAKE_TIERS: StakeTier[] = [
   },
 ];
 
+function _fmtVal(v: number): string {
+  return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1);
+}
 export function fmtBankroll(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
+  if (n >= 1_000_000_000) return `${_fmtVal(n / 1_000_000_000)}B`;
+  if (n >= 1_000_000)     return `${_fmtVal(n / 1_000_000)}M`;
+  if (n >= 1_000)         return `${_fmtVal(n / 1_000)}K`;
   return String(n);
 }

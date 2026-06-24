@@ -590,9 +590,11 @@ export default function HomeScreen() {
 
   // ─── Derived values (must be before effects that reference them) ──────────
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
-  const formatChips = (n: number) => {
-    if (n >= 1_000_000) return `${parseFloat((n / 1_000_000).toFixed(1))}M`;
-    if (n >= 1_000)     return `${parseFloat((n / 1_000).toFixed(1))}K`;
+  const formatChips = (n: number): string => {
+    const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
+    if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
+    if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
+    if (n >= 1_000)         return `${v(n / 1_000)}K`;
     return String(n);
   };
 

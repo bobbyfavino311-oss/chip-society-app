@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SoundEngine } from '@/lib/soundEngine';
+import { formatChips } from '@/lib/multiplayerTypes';
 
 export interface BonusNotification {
   notificationId: string;
@@ -137,7 +138,7 @@ export default function BonusNotificationModal({ notification, onDismiss }: Prop
             {/* Chip count */}
             <View style={styles.amountRow}>
               <Text style={styles.plusSign}>+</Text>
-              <Text style={styles.amount}>{countDisplay.toLocaleString()}</Text>
+              <Text style={styles.amount}>{formatChips(countDisplay)}</Text>
             </View>
             <Text style={styles.chipsLabel}>CHIPS</Text>
 

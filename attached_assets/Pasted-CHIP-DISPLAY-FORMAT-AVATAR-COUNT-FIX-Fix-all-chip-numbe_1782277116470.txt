@@ -1,0 +1,157 @@
+CHIP DISPLAY FORMAT + AVATAR COUNT FIX
+
+Fix all chip number formatting and avatar count text.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CHIP NUMBER DISPLAY FORMAT
+
+The current chip display is too long and does not fit cleanly in the UI.
+
+Example problem:
+
+1,000,000
+
+takes too much space.
+
+Replace long chip numbers with compact formatting everywhere.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED FORMAT
+
+Use:
+
+1,000 = 1K
+10,000 = 10K
+100,000 = 100K
+500,000 = 500K
+1,000,000 = 1M
+1,300,000 = 1.3M
+10,000,000 = 10M
+100,000,000 = 100M
+1,000,000,000 = 1B
+1,300,000,000 = 1.3B
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BILLION FORMAT BUG
+
+Current bug:
+
+Over 1 billion chips displays incorrectly as:
+
+1313.4M
+
+This is wrong.
+
+Fix:
+
+Anything over 1,000,000,000 must display as:
+
+B
+
+Examples:
+
+1,313,400,000 = 1.3B
+2,500,000,000 = 2.5B
+10,000,000,000 = 10B
+
+Do not display billion values as large M values.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+APPLY COMPACT FORMAT EVERYWHERE
+
+Apply compact chip formatting to:
+
+• Home Screen
+• Player Profile
+• Casino Bonus Popup
+• Admin Bonus Popup
+• Table Screens
+• Poker Results
+• Blackjack Results
+• Three Card Poker Results
+• Daily Spin
+• Store
+• Social Feed
+• Leaderboards
+• Tournament Preview
+• Quick Play
+• Player Stats
+• Notifications
+
+Any chip number shown to the player must use compact format.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CASINO BONUS POPUP
+
+Current:
+
++1,000,000
+
+Change to:
+
++1M
+
+Current:
+
++500,000
+
+Change to:
+
++500K
+
+Current:
+
++1,300,000,000
+
+Change to:
+
++1.3B
+
+This will prevent layout overflow.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AVATAR PAGE TEXT FIX
+
+Current text says:
+
+45 collectible avatars • all unlocked
+
+This is incorrect.
+
+Replace with:
+
+Choose from 63 unique avatars
+
+Exact line:
+
+“Choose from 63 unique avatars”
+
+Do not say 45 anymore.
+
+Do not say collectible avatars.
+
+Do not say all unlocked on this line.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VALIDATION
+
+Before completion verify:
+
+✅ 1,000 displays as 1K
+✅ 500,000 displays as 500K
+✅ 1,000,000 displays as 1M
+✅ 1,300,000 displays as 1.3M
+✅ 1,000,000,000 displays as 1B
+✅ 1,300,000,000 displays as 1.3B
+✅ No billion value displays as 1000M+
+✅ Casino bonus popup fits correctly
+✅ All chip values fit on mobile
+✅ Avatar page says: Choose from 63 unique avatars
+✅ No screen still says 45 avatars

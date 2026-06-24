@@ -27,10 +27,12 @@ const HAND_COLORS: Record<string, string> = {
   'Three of a Kind': '#ffd700', 'Two Pair': '#ffd700', 'One Pair': '#aaaacc', 'High Card': '#666688',
 };
 
-function formatChips(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return `${n}`;
+function formatChips(n: number): string {
+  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
+  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
+  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
+  if (n >= 1_000)         return `${v(n / 1_000)}K`;
+  return String(n);
 }
 
 // ─── Community cards ──────────────────────────────────────────────────────────

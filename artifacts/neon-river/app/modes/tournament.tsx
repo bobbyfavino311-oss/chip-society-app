@@ -22,10 +22,12 @@ import {
 
 const TYPE_ORDER: TournamentType[] = ['beginner', 'sitandgo', 'turbo', 'highroller'];
 
-function formatChips(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return n.toLocaleString();
+function formatChips(n: number): string {
+  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
+  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
+  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
+  if (n >= 1_000)         return `${v(n / 1_000)}K`;
+  return String(n);
 }
 
 function TournamentCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {

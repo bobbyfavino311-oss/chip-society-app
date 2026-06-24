@@ -87,8 +87,10 @@ function getDiffDesc(d: AIDifficulty): string {
 }
 
 function formatChips(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
+  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
+  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
+  if (n >= 1_000)         return `${v(n / 1_000)}K`;
   return String(n);
 }
 
