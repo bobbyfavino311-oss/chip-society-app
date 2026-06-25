@@ -13,6 +13,7 @@ export default function CasinoLayout() {
         <Stack.Screen name="casino-war"            options={{ animation: 'slide_from_bottom', presentation: 'fullScreenModal' }} />
         <Stack.Screen name="let-it-ride"           options={{ animation: 'slide_from_bottom', presentation: 'fullScreenModal' }} />
         <Stack.Screen name="high-card-flush"       options={{ animation: 'slide_from_bottom', presentation: 'fullScreenModal' }} />
+        <Stack.Screen name="mississippi-stud"      options={{ animation: 'slide_from_bottom', presentation: 'fullScreenModal' }} />
       </Stack>
     </CasinoProvider>
   );

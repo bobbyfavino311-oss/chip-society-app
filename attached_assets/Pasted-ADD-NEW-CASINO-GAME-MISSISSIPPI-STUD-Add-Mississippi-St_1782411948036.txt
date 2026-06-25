@@ -1,0 +1,464 @@
+ADD NEW CASINO GAME — MISSISSIPPI STUD
+
+Add Mississippi Stud as a permanent game under the Casino Games section.
+
+Casino Games should now include:
+
+• Three Card Poker
+• Blackjack
+• Ultimate Texas Hold’em
+• Casino War
+• Let It Ride
+• High Card Flush
+• Mississippi Stud
+• More Games Coming Soon
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME CONCEPT
+
+Mississippi Stud is a community-card poker game where the player is not playing against the dealer.
+
+Instead, the player is trying to make the strongest possible five-card poker hand using:
+
+• 2 Hole Cards
+• 3 Community Cards
+
+The player wins by making Pair of Jacks or Better according to the Mississippi Stud pay table.
+
+There is no dealer qualification.
+
+The dealer simply deals the cards and resolves the wagers.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE LAYOUT
+
+Use the attached table layout as the gameplay reference, but redesign it entirely in the Chip Society visual style.
+
+The betting circles should be arranged exactly like this:
+
+         ANTE
+
+3RD STREET    4TH STREET    5TH STREET
+
+The betting spots should glow with Chip Society neon styling.
+
+Do NOT permanently display payout tables on the table.
+
+Instead, move all payout information into the Info button.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL STYLE
+
+Maintain the premium Chip Society casino identity.
+
+• Dark teal felt background (Vercetti theme)
+• Minimal geometric pattern (same pattern used across all casino games)
+• Cyan UI accents
+• Pink neon highlights
+• Gold payout animations
+• Orbitron typography
+• Thin glowing betting circles
+• Premium dealing animations
+
+The table should feel consistent with:
+
+• Three Card Poker
+• Ultimate Texas Hold’em
+• Casino War
+• Let It Ride
+• High Card Flush
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+START OF HAND
+
+Player places:
+
+• Ante wager
+
+(Optional future additions can be added later.)
+
+Dealer deals:
+
+• 2 player cards face up
+• 3 community cards face down
+
+Player immediately views both hole cards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FIRST DECISION
+
+After viewing the two hole cards, the player chooses:
+
+FOLD
+
+or
+
+BET 3RD STREET
+
+The player may wager:
+
+1× Ante
+
+2× Ante
+
+3× Ante
+
+If the player folds:
+
+The Ante is forfeited.
+
+The hand immediately ends.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FIRST COMMUNITY CARD
+
+Dealer reveals:
+
+Community Card #1
+
+Player now has:
+
+• 2 Hole Cards
+• 1 Community Card
+
+Player chooses:
+
+FOLD
+
+or
+
+BET 4TH STREET
+
+Available wagers:
+
+1×
+
+2×
+
+3×
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SECOND COMMUNITY CARD
+
+Dealer reveals:
+
+Community Card #2
+
+Player now has:
+
+• 2 Hole Cards
+• 2 Community Cards
+
+Player chooses:
+
+FOLD
+
+or
+
+BET 5TH STREET
+
+Available wagers:
+
+1×
+
+2×
+
+3×
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL COMMUNITY CARD
+
+Dealer reveals:
+
+Community Card #3
+
+The player’s final poker hand is evaluated.
+
+No further decisions.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+WINNING HANDS
+
+Minimum winning hand:
+
+Pair of Jacks or Better
+
+Pairs of:
+
+6s through 10s
+
+are a Push.
+
+Everything below Pair of 6s loses.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PAYOUT TABLE
+
+Royal Flush
+
+500 : 1
+
+Straight Flush
+
+100 : 1
+
+Four of a Kind
+
+40 : 1
+
+Full House
+
+10 : 1
+
+Flush
+
+6 : 1
+
+Straight
+
+4 : 1
+
+Three of a Kind
+
+3 : 1
+
+Two Pair
+
+2 : 1
+
+Pair of Jacks or Better
+
+1 : 1
+
+Pair of 6s through 10s
+
+Push
+
+Lower than Pair of 6s
+
+Lose
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OPTIONAL THREE CARD BONUS
+
+Include the optional Three Card Bonus wager.
+
+This wager is completely independent of the Ante and Street wagers.
+
+It is evaluated using only the three community cards, regardless of the player’s hole cards.
+
+It remains active even if the player folds.
+
+Three Card Bonus Pay Table:
+
+Straight Flush
+
+40 : 1
+
+Three of a Kind
+
+30 : 1
+
+Straight
+
+6 : 1
+
+Flush
+
+3 : 1
+
+Pair
+
+1 : 1
+
+Anything less loses.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BET FLOW
+
+Start:
+
+Ante
+
+↓
+
+Player receives 2 cards
+
+↓
+
+Fold
+
+OR
+
+Bet 3rd Street (1× / 2× / 3×)
+
+↓
+
+Reveal Community Card #1
+
+↓
+
+Fold
+
+OR
+
+Bet 4th Street (1× / 2× / 3×)
+
+↓
+
+Reveal Community Card #2
+
+↓
+
+Fold
+
+OR
+
+Bet 5th Street (1× / 2× / 3×)
+
+↓
+
+Reveal Final Community Card
+
+↓
+
+Evaluate hand
+
+↓
+
+Resolve payouts
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RESULT SCREEN
+
+Display each wager individually.
+
+Example:
+
+ANTE
+
++250K
+
+3RD STREET
+
++750K
+
+4TH STREET
+
++250K
+
+5TH STREET
+
++500K
+
+THREE CARD BONUS
+
++1.5M
+
+TOTAL WIN
+
+3.25M
+
+Use compact chip formatting throughout:
+
+250K
+
+1.2M
+
+3.4B
+
+Never display long comma-separated values.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+INFO BUTTON
+
+Replace permanent payout graphics with an Info button in the upper-right corner.
+
+The Info screen should include:
+
+• Game overview
+• How Mississippi Stud works
+• Betting sequence
+• Fold rules
+• Street wager explanation
+• Main payout table
+• Three Card Bonus payout table
+• Hand rankings
+• Example winning hands
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ANIMATIONS
+
+Dealer deals both hole cards with premium card-slide animations.
+
+Community cards reveal one at a time with smooth flip animations.
+
+Winning hands receive:
+
+• Gold glow
+• Neon outline
+• Floating payout text
+• Particle effects
+
+Royal Flush should trigger the game’s largest celebration animation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SOUND DESIGN
+
+Card Deal
+
+Premium casino card flick.
+
+Card Reveal
+
+Sharp card flip.
+
+Winning Hand
+
+Bright casino win chime.
+
+Three Card Bonus Win
+
+Unique celebratory bonus sound.
+
+Royal Flush
+
+Exclusive jackpot celebration with layered audio and particle effects.
+
+Fold
+
+Soft chip collection sound.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+Mississippi Stud should feel like one of Chip Society’s premium flagship casino games.
+
+The player should immediately understand:
+
+• They are not playing against the dealer.
+• They are building the strongest five-card poker hand.
+• They make strategic betting decisions after each reveal.
+• Folding ends the hand immediately.
+• Pair of Jacks or Better wins.
+• Pairs of 6s through 10s push.
+• Every street decision matters.
+
+Build this game to the same premium quality as Ultimate Texas Hold’em, Let It Ride, High Card Flush, Casino War, Blackjack, and Three Card Poker, with polished animations, smooth gameplay, and a cohesive Chip Society visual identity.

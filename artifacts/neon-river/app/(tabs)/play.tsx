@@ -81,6 +81,22 @@ function CasinoWarIcon({ size = 15, color = '#ffd700' }: { size?: number; color?
   );
 }
 
+function MississippiStudIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* 3 community cards top row */}
+      <Rect x="2"  y="2" width="5.5" height="8" rx="1.2" fill={`${color}12`} stroke={color} strokeWidth="1.0" />
+      <Rect x="9.2" y="2" width="5.5" height="8" rx="1.2" fill={`${color}12`} stroke={color} strokeWidth="1.0" />
+      <Rect x="16.5" y="2" width="5.5" height="8" rx="1.2" fill={`${color}12`} stroke={color} strokeWidth="1.0" />
+      {/* 2 hole cards bottom, centered */}
+      <Rect x="4"  y="13" width="6.5" height="9" rx="1.4" fill="#050010" stroke={color} strokeWidth="1.3" />
+      <SvgText x="5" y="19.5" fontSize="5" fontWeight="bold" fill={color}>A</SvgText>
+      <Rect x="13.5" y="13" width="6.5" height="9" rx="1.4" fill="#050010" stroke={color} strokeWidth="1.3" />
+      <SvgText x="14.5" y="19.5" fontSize="5" fontWeight="bold" fill={color}>K</SvgText>
+    </Svg>
+  );
+}
+
 function HighCardFlushIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
@@ -891,6 +907,13 @@ export default function PlayScreen() {
               iconNode: <LetItRideIcon size={15} color="#ffd700" />,
               sub:      'Three bets · Pull back two · Pair of 10s to win',
               onPress:  () => router.push('/casino/let-it-ride' as any),
+            },
+            {
+              label:    'MISSISSIPPI STUD',
+              icon:     'layers-outline',
+              iconNode: <MississippiStudIcon size={15} color="#ffd700" />,
+              sub:      '2 hole cards + 3 community · 3 street bets · Jacks or better wins',
+              onPress:  () => router.push('/casino/mississippi-stud' as any),
             },
             {
               label:  'MORE GAMES COMING SOON',
