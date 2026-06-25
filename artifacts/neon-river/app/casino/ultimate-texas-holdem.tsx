@@ -287,7 +287,7 @@ const ab = StyleSheet.create({
 export default function UltimateTexasHoldemScreen() {
   const insets   = useSafeAreaInsets();
   const { profile, addChips, removeChips } = useUser();
-  const { isMusicMuted } = useSoundSettings();
+  const { isMusicMuted, toggleMusicMute } = useSoundSettings();
   const { theme } = useTableTheme();
 
   const accent  = theme.accentPrimary   || '#00d4ff';
@@ -543,29 +543,13 @@ export default function UltimateTexasHoldemScreen() {
         </View>
 
         <View style={s.headerRight}>
-          <TouchableOpacity onPress={() => setShowPT(true)} style={s.iconBtn} hitSlop={10}>
-            <Ionicons name="list-outline" size={19} color="rgba(255,255,255,0.55)" />
+          <TouchableOpacity onPress={() => setShowPT(true)} style={[s.iconBtn, { borderColor: `${accent}50`, borderWidth: 1 }]} hitSlop={10}>
+            <Ionicons name="information-circle-outline" size={20} color={`${accent}dd`} />
           </TouchableOpacity>
-          {selectedTier && (
-            <TouchableOpacity
-              onPress={() => { setPhase('stake'); setSelectedTier(null); handleNewHand(); }}
-              style={s.iconBtn} hitSlop={10}
-            >
-              <Ionicons name="swap-horizontal-outline" size={19} color="rgba(255,255,255,0.45)" />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={toggleMusicMute} style={[s.iconBtn, isMusicMuted && s.iconBtnMuted]} hitSlop={10}>
+            <Ionicons name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'} size={18} color={isMusicMuted ? 'rgba(255,255,255,0.28)' : `${accent}dd`} />
+          </TouchableOpacity>
         </View>
-      </View>
-
-      {/* Chips balance */}
-      <View style={s.chipBar}>
-        <Ionicons name="logo-bitcoin" size={13} color={accent} />
-        <Text style={[s.chipBalance, { fontFamily: 'Inter_700Bold' }]}>{fmt(profile.chips)}</Text>
-        {handHistogram.handsPlayed > 0 && (
-          <Text style={s.sessionStat}>
-            {handHistogram.handsPlayed} hands · {handHistogram.wins}W
-          </Text>
-        )}
       </View>
 
       {/* ── TABLE ──────────────────────────────────────────────────────────────── */}
@@ -600,12 +584,6 @@ export default function UltimateTexasHoldemScreen() {
                 : <CardSlot key={i} size="md" />
             ))}
           </View>
-          {/* Live hand analyzer */}
-          {phase !== 'betting' && phase !== 'stake' && (
-            <View style={s.handAnalyzer}>
-              <LiveHandBadge handName={liveHandName} />
-            </View>
-          )}
         </View>
 
         {/* Player cards */}
@@ -617,11 +595,25 @@ export default function UltimateTexasHoldemScreen() {
                 : <CardSlot key={i} size="lg" />
             ))}
           </View>
-          {result && phase === 'result' && (
+
+          {/* Chip balance — player station */}
+          <View style={s.playerChipRow}>
+            <View style={s.chipDot} />
+            <Text style={[s.playerChipAmt, { fontFamily: 'Inter_700Bold' }]}>{fmt(profile.chips)}</Text>
+            {handHistogram.handsPlayed > 0 && (
+              <Text style={s.sessionStat}>{handHistogram.handsPlayed}H · {handHistogram.wins}W</Text>
+            )}
+          </View>
+
+          {/* Hand evaluation — live while in game, final hand at result */}
+          {phase !== 'betting' && phase !== 'stake' && liveHandName ? (
+            <LiveHandBadge handName={liveHandName} />
+          ) : (result && phase === 'result') ? (
             <Text style={[s.handLabel, { color: result.comparison === 'player' ? '#00ff88' : result.comparison === 'dealer' ? '#ff4444' : '#00d4ff' }]}>
               {result.playerHand.name.toUpperCase()}
             </Text>
-          )}
+          ) : null}
+
           <Text style={s.areaLabel}>YOU</Text>
         </View>
 
@@ -833,16 +825,19 @@ const s = StyleSheet.create({
   headerSub:    { fontSize: 9, color: 'rgba(255,255,255,0.35)', marginTop: 1, letterSpacing: 0.5 },
   headerRight:  { flexDirection: 'row', gap: 6 },
   iconBtn:      { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.05)' },
+  iconBtnMuted: { backgroundColor: 'rgba(255,255,255,0.03)' },
 
-  chipBar:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 4 },
-  chipBalance:  { fontSize: 15, color: '#fff', letterSpacing: 0.5 },
   sessionStat:  { fontSize: 9, color: 'rgba(255,255,255,0.3)', letterSpacing: 0.5 },
 
-  table:        { flex: 1, paddingHorizontal: 14, paddingVertical: 4, gap: 6, justifyContent: 'space-between' },
+  table:        { flex: 1, paddingHorizontal: 14, paddingVertical: 2, gap: 4, justifyContent: 'space-between' },
 
   dealerArea:   { alignItems: 'center', gap: 4 },
   playerArea:   { alignItems: 'center', gap: 4 },
   communityArea:{ alignItems: 'center', gap: 4 },
+
+  playerChipRow:{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 3 },
+  chipDot:      { width: 10, height: 10, borderRadius: 5, backgroundColor: '#ffd700', borderWidth: 2, borderColor: 'rgba(255,215,0,0.4)' },
+  playerChipAmt:{ fontSize: 14, color: '#ffd700', letterSpacing: 0.5 },
   areaLabel:    { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 2, color: 'rgba(255,255,255,0.25)' },
   cardRow:      { flexDirection: 'row', gap: 8, alignItems: 'center' },
   communityRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
