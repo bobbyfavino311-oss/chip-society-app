@@ -332,17 +332,17 @@ export const CRIMSON_NOIR: TableTheme = {
 export const VERCETTI: TableTheme = {
   id: 'vercetti',
   name: 'VERCETTI',
-  tagline: 'A luxury Miami beachfront casino. Tropical nights, neon pink, and turquoise palms.',
+  tagline: 'South Beach luxury. A premium minimalist teal felt with neon-pink accents and Miami Vice atmosphere.',
   rarity: 'LEGENDARY',
 
-  bgGradient: ['#003844', '#002030', '#001820', '#002030', '#003844'],
+  bgGradient: ['#003540', '#002830', '#001E2A', '#002830', '#003540'],
 
-  glowA: 'rgba(255,110,160,0.14)',
-  glowB: 'rgba(0,200,200,0.10)',
-  glowCenter: 'rgba(0,80,90,0.10)',
+  glowA: 'rgba(255,110,160,0.12)',
+  glowB: 'rgba(0,200,192,0.08)',
+  glowCenter: 'rgba(0,80,90,0.06)',
 
   tableSurfaceBg: 'transparent',
-  tableSurfaceBorder: 'rgba(255,110,160,0.42)',
+  tableSurfaceBorder: 'rgba(255,110,160,0.35)',
   tableSurfaceShadow: '#FF6EA0',
   tableCenterGlow: 'transparent',
 
@@ -351,29 +351,29 @@ export const VERCETTI: TableTheme = {
   cardBackPattern: 'tropical_palm',
   cardHighlightColor: '#FF6EA0',
 
-  chipTokenColor: '#00D4C8',
+  chipTokenColor: '#00C8C0',
   chipWinTokenColor: '#FFB8D0',
 
-  potBg: 'rgba(0,25,35,0.78)',
-  potBorder: 'rgba(255,110,160,0.45)',
+  potBg: 'rgba(0,22,30,0.72)',
+  potBorder: 'rgba(255,110,160,0.38)',
   potShadow: '#FF6EA0',
-  potLabelColor: 'rgba(255,110,160,0.55)',
+  potLabelColor: 'rgba(255,110,160,0.50)',
   potAmountColor: '#FFB8D0',
 
-  foldAccent: '#A04060',
-  checkAccent: '#00C8B8',
-  callAccent: '#00A898',
+  foldAccent: '#8A3055',
+  checkAccent: '#00C0B8',
+  callAccent: '#00A8A0',
   raiseAccent: '#FF6EA0',
   allInAccent: '#FFB8D0',
 
   accentPrimary: '#FF6EA0',
-  accentSecondary: '#00D4C8',
+  accentSecondary: '#00C8C0',
   textColor: '#FFE8F0',
 
   winEffectStyle: 'gold_shimmer',
   winGoldColor: '#FFB8D0',
 
-  previewColors: ['#003040', '#FF6EA0', '#00D4C8'],
+  previewColors: ['#002830', '#FF6EA0', '#00C8C0'],
 };
 
 export const ALL_TABLE_THEMES: TableTheme[] = [

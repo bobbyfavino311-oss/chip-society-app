@@ -1,0 +1,253 @@
+I actually like this direction much better than the palm tree wallpaper.
+
+The previous Vercetti theme looked like a wallpaper placed behind the table. This new direction feels much more like a professional casino felt, and because it’s minimal it won’t distract from the cards.
+
+I would completely redesign Vercetti around this aesthetic.
+
+⸻
+
+VERCETTI THEME REDESIGN
+
+Use the attached reference image only as inspiration for the color palette and minimalist style.
+
+The previous tropical wallpaper should be completely removed.
+
+Instead, redesign the Vercetti theme into a premium minimalist casino felt.
+
+⸻
+
+Overall Style
+
+Inspired by:
+
+• Luxury poker table felt
+
+• Miami Vice
+
+• 1980s South Beach
+
+• Ocean Drive
+
+• Neon reflections
+
+• Minimal graphic design
+
+The table should feel clean and expensive rather than decorative.
+
+⸻
+
+Background
+
+Replace the existing palm tree wallpaper with a very subtle layered abstract pattern.
+
+The pattern should be barely visible.
+
+Use:
+
+• soft curved shapes
+
+• gentle overlapping arcs
+
+• faint geometric waves
+
+• minimal palm-frond inspired silhouettes
+
+• subtle tonal gradients
+
+The background should never compete with the cards.
+
+It should simply create atmosphere.
+
+⸻
+
+Color Palette
+
+Primary Felt
+
+Deep teal
+
+Dark turquoise
+
+Blue-green
+
+Secondary
+
+Soft cyan
+
+Muted aqua
+
+Cool seafoam
+
+Accent
+
+Hot pink
+
+Magenta
+
+Purple glow
+
+Gold highlights for jackpots only
+
+⸻
+
+Lighting
+
+Instead of illustrations,
+
+use lighting.
+
+Soft radial glows
+
+Very faint bloom
+
+Subtle neon reflections
+
+Gentle edge lighting
+
+Soft gradients
+
+The lighting should make the table feel alive without becoming distracting.
+
+⸻
+
+Community Card Border
+
+Replace the existing border with:
+
+Thin neon pink border
+
+Rounded corners
+
+Double-line design
+
+Very soft glow
+
+Tiny cyan corner accents
+
+Minimal Art Deco styling
+
+No thick outlines.
+
+⸻
+
+Player Area
+
+Pot display
+
+Dark glass
+
+Pink text
+
+Thin cyan border
+
+Soft glow
+
+Betting circles
+
+Trips
+
+Purple outline
+
+Ante
+
+Gold
+
+Blind
+
+Gold
+
+Play
+
+Pink
+
+All circles should softly pulse when active.
+
+⸻
+
+Cards
+
+Cards should remain bright white.
+
+No texture.
+
+Premium casino quality.
+
+Strong contrast against the teal felt.
+
+⸻
+
+Buttons
+
+Glass panels
+
+Thin cyan outlines
+
+Pink hover glow
+
+Very soft animations
+
+No chunky borders.
+
+⸻
+
+Background Pattern
+
+Create a seamless vector-style pattern using only shapes.
+
+Examples:
+
+Large soft arcs
+
+Diagonal flowing curves
+
+Very faint tropical silhouettes
+
+Minimal geometric circles
+
+Layered gradients
+
+No photographs.
+
+No detailed palm trees.
+
+No wallpaper effect.
+
+It should resemble a premium casino felt.
+
+⸻
+
+Remove Across Every Theme
+
+Remove the semi-transparent black rectangles that currently appear:
+
+• behind the community cards
+
+• behind the player cards
+
+• behind the betting controls
+
+• along the bottom action area
+
+These overlays flatten the artwork and hide the table themes.
+
+Instead, allow every theme background to extend naturally across the entire table.
+
+Buttons, cards, betting controls, sliders, and HUD elements should float directly over the theme using glassmorphism panels only where readability is required.
+
+⸻
+
+Performance
+
+The background should be generated as a lightweight seamless texture.
+
+Preload it before entering the table.
+
+It should appear instantly with no fade-in, stretching, or visible loading.
+
+Scale properly to every device so the artwork always fills the table naturally without zooming or distortion.
+
+⸻
+
+Final Goal
+
+The redesigned Vercetti theme should feel like the signature Chip Society table—a luxurious minimalist teal casino felt with subtle Miami-inspired geometry, neon pink accents, and premium lighting. It should look sophisticated enough that players can focus on the gameplay while still immediately recognizing the distinctive Chip Society aesthetic.
