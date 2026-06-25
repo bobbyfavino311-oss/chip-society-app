@@ -35,6 +35,28 @@ function ThreeCardPokerIcon({ size = 15, color = '#ffd700' }: { size?: number; c
   );
 }
 
+function UltimateHoldemIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* Table oval */}
+      <Rect x="2" y="7" width="20" height="12" rx="6"
+        fill={`${color}14`} stroke={color} strokeWidth="1.4" />
+      {/* 5 community card pips in a row */}
+      {[5, 8, 12, 16, 19].map((cx, i) => (
+        <Rect key={i} x={cx - 1.2} y="11" width="2.4" height="3.5" rx="0.6"
+          fill={color} fillOpacity={i === 2 ? 1 : 0.55} />
+      ))}
+      {/* Two hole cards at bottom */}
+      <Rect x="7" y="17" width="4.5" height="5.5" rx="1"
+        fill="#050010" stroke={color} strokeWidth="1.3" />
+      <Rect x="12.5" y="17" width="4.5" height="5.5" rx="1"
+        fill="#050010" stroke={color} strokeWidth="1.3" />
+      <SvgText x="8.3" y="21.5" fontSize="4" fontWeight="bold" fill={color}>A</SvgText>
+      <SvgText x="13.8" y="21.5" fontSize="4" fontWeight="bold" fill={color}>K</SvgText>
+    </Svg>
+  );
+}
+
 function BlackjackIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
@@ -775,6 +797,13 @@ export default function PlayScreen() {
               iconNode: <BlackjackIcon size={15} color="#ffd700" />,
               sub:      'Six Deck · Beat the dealer',
               onPress:  () => router.push('/casino/blackjack' as any),
+            },
+            {
+              label:    'ULTIMATE TEXAS HOLD\'EM',
+              icon:     'card-outline',
+              iconNode: <UltimateHoldemIcon size={15} color="#ffd700" />,
+              sub:      'Ante · Blind · Trips Bonus · Play up to 4×',
+              onPress:  () => router.push('/casino/ultimate-texas-holdem' as any),
             },
             {
               label:  'MORE GAMES COMING SOON',

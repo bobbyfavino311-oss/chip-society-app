@@ -1,0 +1,647 @@
+CHIP SOCIETY — IMPLEMENT ULTIMATE TEXAS HOLD’EM™
+
+MASTER DEVELOPMENT PROMPT
+
+Create Ultimate Texas Hold’em as the newest permanent game under the Casino Games section.
+
+This game must become one of the flagship casino games of Chip Society and match (or exceed) the quality of Blackjack and Three Card Poker.
+
+The attached reference images are to be used as the layout reference only. Recreate the game entirely using Chip Society’s premium neon Miami aesthetic and UI language. Do not copy the graphics or styling—only use the references for placement of betting circles, cards, and gameplay flow.
+
+⸻
+
+OVERALL DESIGN
+
+Visual Style
+
+• Premium casino quality
+
+• Miami Vice neon aesthetic
+
+• Cyan
+
+• Pink
+
+• Purple
+
+• Gold accents
+
+• Dark luxury background
+
+• Glassmorphism UI
+
+• Animated neon borders
+
+• Premium particle effects
+
+• Consistent with every other Chip Society game
+
+The table should immediately look like part of the Chip Society universe.
+
+⸻
+
+TABLE LAYOUT
+
+Use the supplied reference screenshots for positioning.
+
+Top
+
+Dealer cards
+
+(two face-down hole cards)
+
+Center
+
+Five community cards
+
+Middle
+
+Dealer qualification text
+
+“Ante pushes if Dealer has less than a Pair”
+
+Bottom
+
+Player cards
+
+Bottom betting circles
+
+Trips
+
+Ante
+
+=
+
+Blind
+
+Play
+
+Exactly like the official game.
+
+⸻
+
+TABLE THEMES
+
+Ultimate Texas Hold’em automatically supports every Chip Society table theme.
+
+Vice Nights
+
+Vercetti
+
+Frozen Neon
+
+Dragon Fortune
+
+Sakura Garden
+
+Crimson Noir
+
+Purple Masquerade
+
+etc.
+
+Every theme should work automatically.
+
+⸻
+
+TABLE STAKES
+
+Before entering a table:
+
+Player selects stake level.
+
+Examples
+
+5K / 10K
+
+10K / 20K
+
+25K / 50K
+
+50K / 100K
+
+100K / 200K
+
+250K / 500K
+
+500K / 1M
+
+1M / 2M
+
+Only show tables the player can afford.
+
+⸻
+
+BETTING
+
+Player must place
+
+ANTE
+
+BLIND
+
+These wagers must always remain equal.
+
+Player may also place
+
+TRIPS BONUS
+
+independently.
+
+⸻
+
+DEAL
+
+Dealer
+
+Receives
+
+2 face-down cards.
+
+Player
+
+Receives
+
+2 face-up cards.
+
+Use the existing premium dealing animation.
+
+⸻
+
+PRE-FLOP
+
+Player chooses:
+
+CHECK
+
+PLAY 3×
+
+PLAY 4×
+
+Use large premium neon decision buttons.
+
+Once Play is selected
+
+disable further Play decisions.
+
+⸻
+
+FLOP
+
+Reveal
+
+3 community cards
+
+Player who checked may
+
+CHECK
+
+or
+
+PLAY 2×
+
+⸻
+
+TURN
+
+Reveal Turn card.
+
+⸻
+
+RIVER
+
+Reveal River card.
+
+If player still hasn’t played
+
+allow
+
+PLAY 1×
+
+or
+
+FOLD
+
+⸻
+
+SHOWDOWN
+
+Reveal dealer cards.
+
+Determine best five-card poker hand.
+
+Standard Hold’em rankings.
+
+⸻
+
+DEALER QUALIFICATION
+
+Dealer must have
+
+Pair or better.
+
+If Dealer has less than Pair
+
+Ante Pushes
+
+Play still resolves
+
+Blind resolves normally
+
+⸻
+
+PAY TABLES
+
+PLAY
+
+Player wins
+
+1:1
+
+Dealer wins
+
+Lose
+
+Tie
+
+Push
+
+⸻
+
+ANTE
+
+Dealer qualifies
+
+Player wins
+
+1:1
+
+Dealer wins
+
+Lose
+
+Tie
+
+Push
+
+Dealer not qualified
+
+Ante Pushes
+
+⸻
+
+BLIND
+
+Only pays when
+
+Player beats Dealer
+
+AND
+
+Player has Straight or better.
+
+Royal Flush
+
+500:1
+
+Straight Flush
+
+50:1
+
+Four of a Kind
+
+10:1
+
+Full House
+
+3:1
+
+Flush
+
+3:2
+
+Straight
+
+1:1
+
+Anything below Straight
+
+Push
+
+⸻
+
+TRIPS BONUS
+
+Independent of dealer.
+
+Royal Flush
+
+50:1
+
+Straight Flush
+
+40:1
+
+Quads
+
+30:1
+
+Full House
+
+8:1
+
+Flush
+
+6:1
+
+Straight
+
+5:1
+
+Trips
+
+3:1
+
+Anything lower
+
+Lose
+
+⸻
+
+IMPORTANT
+
+Do NOT implement the real casino
+
+$50,000 payout cap.
+
+Chip Society uses virtual chips.
+
+Allow unlimited payouts according to table stakes.
+
+⸻
+
+LIVE HAND ANALYZER
+
+As community cards appear
+
+display
+
+HIGH CARD
+
+PAIR
+
+TWO PAIR
+
+TRIPS
+
+STRAIGHT
+
+FLUSH
+
+FULL HOUSE
+
+QUADS
+
+STRAIGHT FLUSH
+
+ROYAL FLUSH
+
+Update instantly after every card.
+
+⸻
+
+DECISION TIMER
+
+Online multiplayer
+
+15-second neon countdown ring.
+
+Offline
+
+No timer.
+
+⸻
+
+PREMIUM ANIMATIONS
+
+Chip movement
+
+Card dealing
+
+Card flip
+
+Flop reveal
+
+Turn reveal
+
+River reveal
+
+Winning hand glow
+
+Winning cards pulse
+
+Dealer reveal
+
+Bet movement
+
+Blind payout
+
+Trips payout
+
+Royal Flush celebration
+
+Confetti
+
+Gold particles
+
+Camera shake
+
+Premium lighting
+
+⸻
+
+AUDIO
+
+New sound effects
+
+Dealer deal
+
+Chip placement
+
+Card flip
+
+Flop
+
+Turn
+
+River
+
+Check
+
+Bet
+
+Fold
+
+Push
+
+Win
+
+Lose
+
+Trips Bonus
+
+Blind Bonus
+
+Royal Flush celebration
+
+Premium casino ambience
+
+⸻
+
+HELP BUTTON
+
+Include
+
+How to Play
+
+Rules
+
+Dealer Qualification
+
+Blind Pay Table
+
+Trips Pay Table
+
+Poker Rankings
+
+Interactive tutorial
+
+⸻
+
+RESULTS SCREEN
+
+After showdown
+
+animate each wager individually.
+
+Example
+
+✔ PLAY
+
++500K
+
+✔ ANTE
+
++500K
+
+✔ BLIND
+
++1.5M
+
+✔ TRIPS
+
++8M
+
+TOTAL WIN
+
+10.5M
+
+Each payout should animate separately before displaying the total.
+
+⸻
+
+PLAYER STATISTICS
+
+Track Ultimate Texas Hold’em independently.
+
+Hands Played
+
+Wins
+
+Losses
+
+Net Profit
+
+Largest Win
+
+Largest Blind Bonus
+
+Largest Trips Bonus
+
+Highest Winning Hand
+
+Biggest Pot
+
+Win %
+
+⸻
+
+ACHIEVEMENTS
+
+First Win
+
+100 Hands
+
+500 Hands
+
+1,000 Hands
+
+First Straight
+
+First Flush
+
+First Full House
+
+First Quads
+
+First Straight Flush
+
+First Royal Flush
+
+Blind Master
+
+Trips Collector
+
+High Roller
+
+Million Chip Winner
+
+⸻
+
+AI DEALER
+
+Use the same dealer logic as Blackjack.
+
+Natural pauses
+
+Realistic dealing
+
+Consistent pacing
+
+Never feel robotic.
+
+⸻
+
+PERFORMANCE
+
+Preload all assets before entering the table.
+
+No blank card placeholders.
+
+No frame drops.
+
+Maintain a constant 60 FPS on mobile.
+
+Instant transitions between betting rounds.
+
+⸻
+
+CHIP SOCIETY POLISH
+
+Everything should feel premium.
+
+Nothing should resemble a web casino or a generic HTML game.
+
+Every animation, glow, chip movement, button press, and card flip should match the visual quality of the rest of Chip Society.
+
+The end result should feel like an official casino-quality Ultimate Texas Hold’em experience that fits seamlessly into the Chip Society universe and becomes one of the game’s flagship attractions.

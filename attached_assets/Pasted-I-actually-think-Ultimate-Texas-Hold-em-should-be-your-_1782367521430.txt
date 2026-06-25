@@ -1,0 +1,460 @@
+I actually think Ultimate Texas Hold’em should be your flagship casino game. It is arguably the most popular proprietary table game in casinos after blackjack, and it fits Chip Society perfectly because it feels like Hold’em while still being a house game.
+
+The one thing I would change is don’t just copy casino rules—make it feel like a Chip Society game with the same premium UI and polish you’ve been building.
+
+Here’s the complete implementation prompt I’d give your AI:
+
+ADD NEW CASINO GAME — ULTIMATE TEXAS HOLD’EM™
+
+Ultimate Texas Hold’em will become the flagship game under the Casino Games section.
+
+This game must feel like a premium AAA mobile casino experience that matches the existing Chip Society design language.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME LIST
+
+Casino Games should become:
+
+• Three Card Poker
+• Blackjack
+• Ultimate Texas Hold’em (NEW)
+• More Games Coming Soon
+
+Use a premium Hold’em-themed icon for Ultimate Texas Hold’em.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+THE TABLE
+
+Create a dedicated Ultimate Texas Hold’em table.
+
+Layout should include betting circles for:
+
+• ANTE
+• BLIND
+• PLAY
+• TRIPS BONUS (optional)
+
+Dealer sits at the top.
+
+Player sits at the bottom.
+
+Five community cards appear across the center exactly like traditional Hold’em.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BETTING FLOW
+
+STEP 1
+
+Player selects table stakes.
+
+Player places:
+
+• Ante
+• Blind
+
+Both bets must always be equal.
+
+Optional:
+
+Trips Bonus
+
+Player may increase or decrease the Trips wager independently.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 2
+
+Deal
+
+Dealer receives:
+
+2 hole cards face down.
+
+Player receives:
+
+2 hole cards face up.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 3
+
+PRE-FLOP DECISION
+
+Player may:
+
+CHECK
+
+or
+
+BET
+
+3x Ante
+
+or
+
+BET
+
+4x Ante
+
+Once a Play bet is made:
+
+Skip remaining betting decisions.
+
+Proceed directly to showdown.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 4
+
+THE FLOP
+
+Reveal:
+
+3 community cards.
+
+If player previously checked:
+
+Player may
+
+CHECK
+
+or
+
+BET 2x Ante.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 5
+
+TURN + RIVER
+
+Reveal final two community cards.
+
+If player has not made a Play bet:
+
+Player may
+
+FOLD
+
+or
+
+BET 1x Ante.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FOLD
+
+If player folds:
+
+Lose
+
+Ante
+
+Blind
+
+Trips Bonus
+
+Hand ends immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SHOWDOWN
+
+Reveal dealer cards.
+
+Determine best five-card Hold’em hand.
+
+Standard poker rankings apply.
+
+Dealer does not need to qualify.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PAYOUTS
+
+If Player wins:
+
+PLAY pays 1:1
+
+ANTE pays 1:1
+
+BLIND pays according to Blind pay table.
+
+Trips Bonus pays independently.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PUSHES
+
+Equal hands:
+
+Ante Push
+
+Blind Push
+
+Play Push
+
+Trips Bonus evaluated independently.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BLIND BONUS
+
+Blind bonus pays on strong hands.
+
+Suggested table:
+
+Straight ………… 1:1
+
+Flush …………….. 3:2
+
+Full House ……… 3:1
+
+Four of a Kind …10:1
+
+Straight Flush ….50:1
+
+Royal Flush ……500:1
+
+Blind loses if dealer wins.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TRIPS BONUS
+
+Trips Bonus ignores dealer hand.
+
+Pays based only on player’s final five-card hand.
+
+Suggested table:
+
+Three of a Kind ……..3:1
+
+Straight …………………4:1
+
+Flush ……………………..7:1
+
+Full House ……………..8:1
+
+Four of a Kind ………30:1
+
+Straight Flush ……..40:1
+
+Royal Flush …………50:1
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CHIP SOCIETY PRESENTATION
+
+Every stage should animate beautifully.
+
+PRE-FLOP
+
+↓
+
+FLOP
+
+↓
+
+TURN
+
+↓
+
+RIVER
+
+Each street appears with:
+
+• Card flip animation
+• Soft neon glow
+• Premium sound
+• Smooth transitions
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HAND LABELS
+
+Display current best hand live.
+
+Examples:
+
+HIGH CARD
+
+PAIR
+
+TWO PAIR
+
+TRIPS
+
+STRAIGHT
+
+FLUSH
+
+FULL HOUSE
+
+FOUR OF A KIND
+
+STRAIGHT FLUSH
+
+ROYAL FLUSH
+
+Update immediately as community cards appear.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+WIN SCREEN
+
+Instead of a plain payout:
+
+Animate each wager separately.
+
+Example:
+
+✔ PLAY +100K
+
+✔ ANTE +100K
+
+✔ BLIND +300K
+
+✔ TRIPS +700K
+
+TOTAL WIN
+
+1.2M
+
+Gold chip burst.
+
+Casino celebration.
+
+Premium sound effects.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE STAKES
+
+Like every other game:
+
+Player selects stakes before entering.
+
+Example tables:
+
+5K / 10K
+
+10K / 20K
+
+25K / 50K
+
+50K / 100K
+
+100K / 200K
+
+250K / 500K
+
+500K / 1M
+
+Only show tables the player can afford.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HELP SCREEN
+
+Add a Rules button.
+
+Explain:
+
+• Ante
+• Blind
+• Trips Bonus
+• Betting rounds
+• Blind payouts
+• Trips payouts
+
+Show everything with premium graphics instead of walls of text.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STAT TRACKING
+
+Track separately:
+
+Hands Played
+
+Hands Won
+
+Net Profit
+
+Largest Win
+
+Largest Blind Bonus
+
+Largest Trips Bonus
+
+Biggest Royal Flush
+
+Current Win Streak
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACHIEVEMENTS
+
+Add Ultimate Texas Hold’em achievements.
+
+Examples:
+
+First Victory
+
+100 Hands
+
+500 Hands
+
+1000 Hands
+
+Straight Flush
+
+Royal Flush
+
+Trips Collector
+
+Blind Master
+
+Big Winner
+
+High Roller
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AUDIO
+
+Every stage receives unique sounds.
+
+Deal
+
+Card flips
+
+Bet chips
+
+Flop reveal
+
+Turn reveal
+
+River reveal
+
+Win
+
+Loss
+
+Blind bonus
+
+Trips bonus
+
+Royal Flush celebration
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+Ultimate Texas Hold’em should become the highest-quality casino game in Chip Society.
+
+The experience should feel polished enough that players could mistake it for a dedicated standalone casino app. It should match the premium look and smooth animations of the existing Hold’em modes while remaining true to authentic Ultimate Texas Hold’em gameplay.
