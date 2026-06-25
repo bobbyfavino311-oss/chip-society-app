@@ -435,6 +435,40 @@ function CrimsonSilkBack({ w, h, r }: { w: number; h: number; r: number }) {
   );
 }
 
+// ─── Joker card face ──────────────────────────────────────────────────────────
+function JokerFace({ w, h }: { w: number; h: number }) {
+  const fs = Math.max(4, Math.round(h * 0.062));
+  const lh = fs * 1.28;
+  const pad = Math.max(2, Math.round(w * 0.1));
+  return (
+    <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'space-between', paddingVertical: h * 0.06 }]}>
+      {/* Top-left JOKER letters */}
+      <View style={{ alignSelf: 'flex-start', paddingLeft: pad }}>
+        {['J','O','K','E','R'].map((ch, i) => (
+          <Text key={i} style={{ fontSize: fs, fontWeight: '900', color: '#111', lineHeight: lh, includeFontPadding: false }}>{ch}</Text>
+        ))}
+      </View>
+      {/* Jester hat silhouette */}
+      <Svg width={w * 0.68} height={h * 0.40} viewBox="0 0 100 120">
+        <Ellipse cx={22} cy={44} rx={15} ry={24} fill="#1a1a1a" />
+        <Ellipse cx={50} cy={34} rx={16} ry={32} fill="#1a1a1a" />
+        <Ellipse cx={78} cy={44} rx={15} ry={24} fill="#1a1a1a" />
+        <Rect x={9} y={58} width={82} height={14} fill="#1a1a1a" />
+        <Rect x={2} y={70} width={96} height={12} rx={5} fill="#1a1a1a" />
+        <Circle cx={22} cy={20} r={6} fill="white" />
+        <Circle cx={50} cy={2} r={6} fill="white" />
+        <Circle cx={78} cy={20} r={6} fill="white" />
+      </Svg>
+      {/* Bottom-right JOKER letters (rotated 180°) */}
+      <View style={{ alignSelf: 'flex-end', paddingRight: pad, transform: [{ rotate: '180deg' }] }}>
+        {['J','O','K','E','R'].map((ch, i) => (
+          <Text key={i} style={{ fontSize: fs, fontWeight: '900', color: '#111', lineHeight: lh, includeFontPadding: false }}>{ch}</Text>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 function CardBack({ w, h, r }: { w: number; h: number; r: number }) {
   const { theme } = useTableTheme();
   if (theme.cardBackPattern === 'dragon_scale')    return <DragonScaleBack    w={w} h={h} r={r} />;
@@ -504,10 +538,11 @@ export default function PlayingCard({
   });
 
   // ── Card face values ─────────────────────────────────────────────────────
-  const isRed = card ? isRedSuit(card.suit) : false;
+  const isJokerCard = !!card && card.value === 0;
+  const isRed = card && !isJokerCard ? isRedSuit(card.suit) : false;
   const textColor = isRed ? '#e0132a' : '#111111';
-  const val = card ? valueLabel(card.value) : '';
-  const suit = card ? suitSymbol(card.suit) : '';
+  const val = card && !isJokerCard ? valueLabel(card.value) : '';
+  const suit = card && !isJokerCard ? suitSymbol(card.suit) : '';
 
   const cardBase = { width: dim.w, height: dim.h, borderRadius: dim.radius };
 
@@ -550,18 +585,25 @@ export default function PlayingCard({
               style={[
                 cardBase,
                 styles.cardFront,
+                isJokerCard && styles.jokerGlow,
                 highlighted && styles.highlightInner,
                 StyleSheet.absoluteFillObject,
               ]}
             >
-              {/* Large centered value */}
-              <Text style={[styles.cardValue, { fontSize: dim.valFont, color: textColor }]}>
-                {val}
-              </Text>
-              {/* Suit symbol below */}
-              <Text style={[styles.cardSuit, { fontSize: dim.suitFont, color: textColor }]}>
-                {suit}
-              </Text>
+              {isJokerCard ? (
+                <JokerFace w={dim.w} h={dim.h} />
+              ) : (
+                <>
+                  {/* Large centered value */}
+                  <Text style={[styles.cardValue, { fontSize: dim.valFont, color: textColor }]}>
+                    {val}
+                  </Text>
+                  {/* Suit symbol below */}
+                  <Text style={[styles.cardSuit, { fontSize: dim.suitFont, color: textColor }]}>
+                    {suit}
+                  </Text>
+                </>
+              )}
             </View>
           </Animated.View>
         </View>
@@ -602,6 +644,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     borderWidth: 2,
     borderColor: '#00d4ff',
+  },
+  jokerGlow: {
+    shadowColor: '#bf5fff',
+    shadowOpacity: 0.9,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 0 },
+    borderColor: 'rgba(191,95,255,0.50)',
   },
   cardValue: {
     fontWeight: '800',

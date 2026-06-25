@@ -49,6 +49,17 @@ export function shuffleDeck(deck: Card[]): Card[] {
   return d;
 }
 
+/** Returns true if a card is a Joker (value === 0) */
+export function isJoker(card: Card): boolean { return card.value === 0; }
+
+/** 54-card deck: standard 52 + 2 Jokers (value=0, suits S & H as sentinels) */
+export function createJokerDeck(): Card[] {
+  const deck = createDeck();
+  deck.push({ suit: 'S', value: 0 });
+  deck.push({ suit: 'H', value: 0 });
+  return deck;
+}
+
 export function evaluate5Cards(hand: Card[]): HandResult {
   const vals = hand.map(c => c.value).sort((a, b) => b - a);
   const suits = hand.map(c => c.suit);
@@ -189,6 +200,7 @@ export function describeHand(result: HandResult): string {
   // Dispatch on name — NOT rank. Short Deck swaps ranks 5 & 6 (Flush > Full House),
   // so rank-based dispatch returns the wrong label for Short Deck hands.
   switch (result.name) {
+    case 'Five of a Kind':   return `Five of a Kind — ${plural(result.values[0])}`;
     case 'Royal Flush':      return 'Royal Flush';
     case 'Straight Flush':   return `Straight Flush, ${vl(result.values[0])} high`;
     case 'Four of a Kind':   return `Four of a Kind — ${plural(result.values[0])}`;
@@ -220,7 +232,7 @@ export function determineWinners(
 
 // ─── Short Deck Hold'em variant ──────────────────────────────────────────────
 
-export type GameVariant = 'texas_holdem' | 'short_deck_holdem';
+export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem';
 
 /** 36-card deck: values 6–14, all 4 suits */
 export function createShortDeck(): Card[] {
@@ -308,6 +320,7 @@ export function getBestHandVariant(
   const all = [...holeCards, ...communityCards];
   const n = all.length;
   let best: HandResult | null = null;
+  if (variant === 'joker_holdem') return getBestHandJoker(holeCards, communityCards);
   const eval5 = variant === 'short_deck_holdem' ? evaluate5CardsShortDeck : evaluate5Cards;
 
   for (let i = 0; i < n - 4; i++) {
@@ -351,6 +364,16 @@ export function getPostflopStrengthVariant(
   communityCards: Card[],
   variant: GameVariant = 'texas_holdem'
 ): number {
+  if (variant === 'joker_holdem') {
+    if (communityCards.length === 0) {
+      if (holeCards.some(isJoker)) return 0.90;
+      return getPreflopStrength(holeCards);
+    }
+    const jr = getBestHandJoker(holeCards, communityCards);
+    const jStrength = jr.rank / 10;
+    const jTop = (jr.values[0] ?? 7) / 14;
+    return Math.min(1, jStrength * 0.85 + jTop * 0.15);
+  }
   if (communityCards.length === 0) return getPreflopStrength(holeCards);
   const result = getBestHandVariant(holeCards, communityCards, variant);
   const rankStrength = result.rank / 9;
@@ -360,5 +383,77 @@ export function getPostflopStrengthVariant(
 
 /** Create the right deck for the given variant */
 export function createVariantDeck(variant: GameVariant = 'texas_holdem'): Card[] {
-  return variant === 'short_deck_holdem' ? createShortDeck() : createDeck();
+  if (variant === 'short_deck_holdem') return createShortDeck();
+  if (variant === 'joker_holdem')      return createJokerDeck();
+  return createDeck();
+}
+
+// ─── Joker Hold'em evaluator ─────────────────────────────────────────────────
+
+/**
+ * Like evaluate5Cards but also recognises Five of a Kind (rank 10).
+ * Call this after joker substitution — hand must contain no actual Joker cards.
+ */
+export function evaluate5CardsWild(hand: Card[]): HandResult {
+  const allVals = hand.map(c => c.value);
+  if (new Set(allVals).size === 1) {
+    return { rank: 10, values: [allVals[0]], name: 'Five of a Kind' };
+  }
+  return evaluate5Cards(hand);
+}
+
+/** Pick the best 5-card HandResult from an arbitrary-length set of cards */
+function getBestFrom(cards: Card[], evalFn: (h: Card[]) => HandResult): HandResult {
+  const n = cards.length;
+  let best: HandResult | null = null;
+  for (let a = 0; a < n - 4; a++)
+    for (let b = a + 1; b < n - 3; b++)
+      for (let c = b + 1; c < n - 2; c++)
+        for (let d = c + 1; d < n - 1; d++)
+          for (let e = d + 1; e < n; e++) {
+            const r = evalFn([cards[a], cards[b], cards[c], cards[d], cards[e]]);
+            if (!best || compareHands(r, best) > 0) best = r;
+          }
+  return best ?? { rank: 0, values: [], name: 'High Card' };
+}
+
+/**
+ * Best hand evaluator for Joker Hold'em.
+ * Brute-forces every valid joker substitution, picks the highest-ranked result.
+ * Supports 0, 1, or 2 jokers. Five of a Kind is rank 10 (beats Royal Flush).
+ */
+export function getBestHandJoker(holeCards: Card[], communityCards: Card[]): HandResult {
+  const all = [...holeCards, ...communityCards];
+  const jokerCount = all.filter(isJoker).length;
+  const natural = all.filter(c => !isJoker(c));
+
+  if (jokerCount === 0) return getBestHand(holeCards, communityCards);
+  if (all.length < 5)   return { rank: 0, values: [], name: 'High Card' };
+
+  const SUITS: Suit[] = ['S', 'H', 'D', 'C'];
+  const inHand = new Set(natural.map(c => `${c.suit}${c.value}`));
+  const reps: Card[] = [];
+  for (const suit of SUITS) {
+    for (let v = 2; v <= 14; v++) {
+      if (!inHand.has(`${suit}${v}`)) reps.push({ suit, value: v });
+    }
+  }
+
+  let best: HandResult | null = null;
+  const updateBest = (r: HandResult) => { if (!best || compareHands(r, best) > 0) best = r; };
+  const evalCards = (cards: Card[]) =>
+    cards.length === 5 ? evaluate5CardsWild(cards) : getBestFrom(cards, evaluate5CardsWild);
+
+  if (jokerCount === 1) {
+    for (const r1 of reps) updateBest(evalCards([...natural, r1]));
+  } else {
+    // 2 jokers — iterate all unique pairs of substitutions
+    for (let i = 0; i < reps.length; i++) {
+      for (let j = i + 1; j < reps.length; j++) {
+        updateBest(evalCards([...natural, reps[i], reps[j]]));
+      }
+    }
+  }
+
+  return best ?? { rank: 0, values: [], name: 'High Card' };
 }

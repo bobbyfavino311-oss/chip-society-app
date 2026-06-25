@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { G, Path, Rect, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Ellipse, G, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { useUser } from '@/context/UserContext';
 import StakeSelectModal from '@/components/StakeSelectModal';
 
@@ -77,6 +77,21 @@ function CasinoWarIcon({ size = 15, color = '#ffd700' }: { size?: number; color?
         d="M13.5 6 L10.5 12 L13 12 L10.5 18 L14.5 11 L12 11 Z"
         fill={color} fillOpacity={0.9}
       />
+    </Svg>
+  );
+}
+
+function JokerHoldemIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* Three jester hat prongs */}
+      <Ellipse cx="6.5" cy="10.5" rx="4" ry="6.5" fill={color} />
+      <Ellipse cx="12" cy="7.5" rx="4.5" ry="8.5" fill={color} />
+      <Ellipse cx="17.5" cy="10.5" rx="4" ry="6.5" fill={color} />
+      {/* Hat body */}
+      <Rect x="4" y="14.5" width="16" height="4" fill={color} />
+      {/* Brim */}
+      <Rect x="1.5" y="17.5" width="21" height="4" rx="1.8" fill={color} />
     </Svg>
   );
 }
@@ -854,6 +869,42 @@ export default function PlayScreen() {
               icon:    'flash-outline',
               sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'} · ${autoStake?.blinds ?? ''}`,
               onPress: () => openQuickPlay('short_deck_holdem'),
+            },
+          ]}
+        />
+
+        {/* ── JOKER HOLD'EM ───────────────────────────────────────────── */}
+        <SectionCard
+          section="JOKER HOLD'EM"
+          accent="#ffd700"
+          icon="sparkles-outline"
+          title="JOKER HOLD'EM"
+          lines={["54-card deck · Two Wild Jokers", "Five of a Kind beats Royal Flush"]}
+          options={[
+            {
+              label:    'AI PRACTICE',
+              icon:     'game-controller-outline',
+              iconNode: <JokerHoldemIcon size={15} color="#ffd700" />,
+              sub:      'Wild Jokers · vs AI bots · fully offline',
+              onPress:  () => setAnteVariant('joker_holdem'),
+            },
+            {
+              label:   'QUICK PLAY',
+              icon:    'flash-outline',
+              sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'}`,
+              onPress: () => openQuickPlay('joker_holdem'),
+            },
+            {
+              label:   'RANKED',
+              icon:    'trophy-outline',
+              sub:     'Coming soon',
+              locked:  true,
+            },
+            {
+              label:   'TOURNAMENT',
+              icon:    'ribbon-outline',
+              sub:     'Coming soon',
+              locked:  true,
             },
           ]}
         />

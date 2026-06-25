@@ -1,4 +1,4 @@
-export type GameVariant = 'texas_holdem' | 'short_deck_holdem';
+export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem';
 
 export interface VariantConfig {
   variant: GameVariant;
@@ -52,5 +52,25 @@ export const VARIANT_CONFIGS: Record<GameVariant, VariantConfig> = {
     color: '#ff0090',
     accentColor: '#bf5fff',
     dimColor: '#ff009022',
+  },
+  joker_holdem: {
+    variant: 'joker_holdem',
+    label: "Joker Hold'em",
+    shortLabel: "Joker Hold'em",
+    deckLabel: '54-card deck · Two Wild Jokers',
+    description: "Texas Hold'em with two wild Jokers added. Jokers take any value — Five of a Kind is possible.",
+    rankingNote: 'Five of a Kind beats Royal Flush',
+    rulesPoints: [
+      'Full 52-card deck PLUS two wild Jokers — 54 cards',
+      'Jokers are always wild — automatically take best value',
+      'Five of a Kind is the highest possible hand',
+      'Hand ranking: Five of a Kind > Royal Flush > Straight Flush …',
+      'Each player gets 2 hole cards (may include Joker)',
+      'Five community cards shared by all (may include Joker)',
+      'Standard No Limit betting structure',
+    ],
+    color: '#ffd700',
+    accentColor: '#bf5fff',
+    dimColor: '#ffd70022',
   },
 };

@@ -1,0 +1,427 @@
+ADD NEW HOLD’EM VARIANT — JOKER HOLD’EM
+
+Add a brand-new Hold’em variant called Joker Hold’em.
+
+This game belongs with the other Hold’em variants and is NOT a Casino Game.
+
+The Hold’em section should now include:
+
+• No Limit Hold’em
+• Short Deck Hold’em
+• Joker Hold’em
+
+Joker Hold’em should have its own dedicated game card on both the Home Screen Quick Play section and the Play page.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME ICON
+
+The game icon should be simple.
+
+Use a black jester hat silhouette (similar to the attached reference) as the icon.
+
+Do not generate a detailed joker face.
+
+Do not use a clown.
+
+Do not use a full jester character.
+
+The icon should simply be:
+
+• Black jester hat
+• Clean silhouette
+• Minimal
+• Easily recognizable at small sizes
+• Styled to match the other Hold’em mode icons
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME TITLE
+
+JOKER HOLD’EM
+
+Subtitle:
+
+54-card deck • Two Wild Jokers
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME RULES
+
+Joker Hold’em plays exactly like Texas Hold’em.
+
+Everything remains identical except:
+
+The deck now contains:
+
+52 standard playing cards
+
+PLUS
+
+2 Jokers
+
+Total Deck:
+
+54 cards
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JOKER RULE
+
+The Joker is always wild.
+
+Players never choose its value.
+
+The game engine automatically assigns the Joker the value and suit that produces the strongest possible hand.
+
+Examples:
+
+Player:
+
+A♠
+
+A♦
+
+Board:
+
+A♥
+
+A♣
+
+Joker
+
+Result:
+
+★★★★★
+
+Five of a Kind (Aces)
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Player:
+
+10♠
+
+Joker
+
+Board:
+
+J♠
+
+Q♠
+
+K♠
+
+A♠
+
+Result:
+
+Royal Flush
+
+The Joker automatically becomes the missing card.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Player:
+
+7♥
+
+8♥
+
+Board:
+
+9♥
+
+10♥
+
+Joker
+
+Result:
+
+Straight Flush
+
+The Joker automatically completes the strongest possible hand.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NEW HAND RANKING
+
+Only ONE new poker hand is added.
+
+★★★★★
+
+Five of a Kind
+
+Five of the same rank created using a Joker.
+
+Example:
+
+K♠
+
+K♥
+
+K♦
+
+K♣
+
+Joker
+
+Five Kings
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HAND RANKING ORDER
+
+Highest
+
+Five of a Kind
+
+Royal Flush
+
+Straight Flush
+
+Four of a Kind
+
+Full House
+
+Flush
+
+Straight
+
+Three of a Kind
+
+Two Pair
+
+Pair
+
+High Card
+
+No other hand rankings change.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MULTIPLE JOKERS
+
+Because there are two Jokers in the deck:
+
+It is possible for a player to receive:
+
+0 Jokers
+
+1 Joker
+
+2 Jokers
+
+The engine must always calculate the mathematically strongest possible hand.
+
+If two Jokers are present:
+
+Evaluate every legal hand combination.
+
+Automatically choose the highest-ranked hand.
+
+The player should never manually assign Joker values.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HAND EVALUATION
+
+Update the hand evaluator to fully support:
+
+One Wild Joker
+
+Two Wild Jokers
+
+Five of a Kind
+
+Royal Flush using Joker
+
+Straight Flush using Joker
+
+Flush completion
+
+Straight completion
+
+Full House completion
+
+Four of a Kind completion
+
+Any other optimal combination.
+
+Always return the highest possible legal poker hand.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAMEPLAY
+
+Everything else remains identical to Texas Hold’em.
+
+Dealer button
+
+Blinds
+
+Betting rounds
+
+Pre-Flop
+
+Flop
+
+Turn
+
+River
+
+Showdown
+
+Side pots
+
+Split pots
+
+All function exactly the same.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK PLAY
+
+Quick Play should support:
+
+AI Practice
+
+Live Players
+
+Chip-bracket matchmaking
+
+Private Tables
+
+Exactly like the other Hold’em variants.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE DESIGN
+
+Use the existing Chip Society Hold’em table.
+
+No layout changes.
+
+The only visual difference should be:
+
+The deck contains Jokers.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD DESIGN
+
+Design a new Joker card.
+
+Requirements:
+
+• White playing card
+• Thin black border
+• Black “JOKER” text vertically in opposite corners
+• Simple black jester hat in the center
+• No face
+• No clown
+• No colors
+• No unnecessary artwork
+• Clean minimalist playing-card design
+• Matches the standard Chip Society card deck
+
+This should become the official Joker used throughout the app.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ANIMATIONS
+
+When a Joker is dealt:
+
+Add a subtle purple neon glow behind the card.
+
+At showdown:
+
+When the Joker transforms into its optimal value:
+
+Play a brief magical shimmer animation.
+
+Do not visibly morph the artwork.
+
+The card remains visually a Joker while the UI displays what it is representing.
+
+Example:
+
+Joker
+
+→ Acting as Ace of Hearts
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HAND DISPLAY
+
+If a Joker creates the final hand:
+
+Display:
+
+Joker Used
+
+underneath the winning hand.
+
+Example:
+
+★★★★★
+
+Five of a Kind
+
+(Joker Used)
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SOUND DESIGN
+
+When dealing a Joker:
+
+Play a unique magical casino sound.
+
+At showdown:
+
+If the Joker upgrades a hand:
+
+Play a premium shimmering audio cue before the normal hand-win sound.
+
+Five of a Kind should receive its own celebration sound that is even more dramatic than a Royal Flush.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACHIEVEMENTS
+
+Add new achievements:
+
+• First Joker Hand
+• Five of a Kind
+• Royal Flush with a Joker
+• Win Using Two Jokers
+• Joker Master (100 Joker hands played)
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STATISTICS
+
+Track:
+
+• Joker Hands Played
+• Joker Wins
+• Five of a Kind Count
+• Highest Joker Hand
+• Joker Royal Flushes
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+Joker Hold’em should feel like a premium, exciting variation of Texas Hold’em while remaining instantly familiar to existing players.
+
+The only gameplay differences should be:
+
+• Two Jokers are added to the deck.
+• Jokers are always wild.
+• The engine automatically selects the strongest possible hand.
+• Five of a Kind becomes the highest-ranking hand in the game.
+
+Everything else—including betting, gameplay flow, matchmaking, UI, and controls—should remain identical to standard Texas Hold’em, ensuring players can jump in immediately without learning a completely new game.
