@@ -250,6 +250,12 @@ export default function LetItRideScreen() {
   const [showInfo,      setShowInfo]      = useState(false);
   const [busy,          setBusy]          = useState(false);
 
+  // ── Refs for values read inside async closures (avoids stale state) ────────
+  const playerCardsRef = useRef<LIRCard[]>([]);
+  const communityRef   = useRef<LIRCard[]>([]);
+  const bet1ActiveRef  = useRef(true);
+  const bet2ActiveRef  = useRef(true);
+
   // ── Animations ─────────────────────────────────────────────────────────────
   const card0Anim  = useRef(new Animated.Value(0)).current;
   const card1Anim  = useRef(new Animated.Value(0)).current;
@@ -296,10 +302,10 @@ export default function LetItRideScreen() {
     setAnte(tier.ante);
     setBonusMult(0);
     setTotalWagered(0);
-    setBet1Active(true);
-    setBet2Active(true);
-    setPlayerCards([]);
-    setCommunity([]);
+    setBet1Active(true);      bet1ActiveRef.current = true;
+    setBet2Active(true);      bet2ActiveRef.current = true;
+    setPlayerCards([]);       playerCardsRef.current = [];
+    setCommunity([]);         communityRef.current = [];
     setCommunityReveal(0);
     setResult(null);
     resetAnims();
@@ -325,6 +331,8 @@ export default function LetItRideScreen() {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     const { playerCards: pc, communityCards: cc } = dealLetItRide();
+    playerCardsRef.current = [...pc];
+    communityRef.current   = [...cc];
     setPlayerCards([...pc]);
     setCommunity([...cc]);
 
@@ -346,6 +354,7 @@ export default function LetItRideScreen() {
     setBusy(true);
     addChips(ante);
     setTotalWagered(w => w - ante);
+    bet1ActiveRef.current = false;
     setBet1Active(false);
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await sleep(120);
@@ -373,6 +382,7 @@ export default function LetItRideScreen() {
     setBusy(true);
     addChips(ante);
     setTotalWagered(w => w - ante);
+    bet2ActiveRef.current = false;
     setBet2Active(false);
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await sleep(120);
@@ -397,12 +407,16 @@ export default function LetItRideScreen() {
 
   // ── Showdown ───────────────────────────────────────────────────────────────
   async function resolveHand() {
-    if (playerCards.length < 3 || community.length < 2) return;
+    const pc  = playerCardsRef.current;
+    const cc  = communityRef.current;
+    const b1  = bet1ActiveRef.current;
+    const b2  = bet2ActiveRef.current;
+    if (pc.length < 3 || cc.length < 2) return;
     const hand = evaluateLetItRide(
-      [playerCards[0], playerCards[1], playerCards[2]],
-      [community[0], community[1]],
+      [pc[0], pc[1], pc[2]],
+      [cc[0], cc[1]],
     );
-    const activeBets = 1 + (bet1Active ? 1 : 0) + (bet2Active ? 1 : 0);
+    const activeBets = 1 + (b1 ? 1 : 0) + (b2 ? 1 : 0);
     const bonusBet   = bonusMult * ante;
     const res = resolveLetItRide({ hand, activeBets, ante, bonusBet });
     setResult(res);
@@ -430,14 +444,14 @@ export default function LetItRideScreen() {
   function handleNextHand() {
     resetAnims();
     setTotalWagered(0);
-    setBet1Active(true);
-    setBet2Active(true);
-    setPlayerCards([]);
-    setCommunity([]);
+    setBet1Active(true);      bet1ActiveRef.current = true;
+    setBet2Active(true);      bet2ActiveRef.current = true;
+    setPlayerCards([]);       playerCardsRef.current = [];
+    setCommunity([]);         communityRef.current = [];
     setCommunityReveal(0);
     setResult(null);
     setBusy(false);
-    setPhase('decision1');
+    setPhase('betting');
   }
 
   // ── Derived ────────────────────────────────────────────────────────────────
