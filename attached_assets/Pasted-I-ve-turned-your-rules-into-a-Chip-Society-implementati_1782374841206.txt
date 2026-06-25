@@ -1,0 +1,497 @@
+I’ve turned your rules into a Chip Society implementation prompt that matches the style of the other casino games you’ve been adding.
+
+ADD NEW CASINO GAME — HIGH CARD FLUSH
+
+Add High Card Flush as a permanent game under the Casino Games section.
+
+Casino Games should now include:
+
+• Three Card Poker
+• Blackjack
+• Ultimate Texas Hold’em
+• Casino War
+• Let It Ride
+• High Card Flush
+• More Games Coming Soon
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME CONCEPT
+
+High Card Flush is a heads-up casino poker game where the player competes against the dealer.
+
+Unlike traditional poker, hands are ranked by the number of suited cards (flush cards), not by standard poker hands.
+
+The objective is to finish with a stronger flush than the dealer.
+
+The player receives:
+
+• 7 cards
+
+Dealer receives:
+
+• 7 cards
+
+The player attempts to have:
+
+• More cards of one suit than the dealer
+
+If both have the same number of suited cards, compare:
+
+Highest flush card
+
+If tied:
+
+Second highest
+
+Then third
+
+Continue until a winner is determined.
+
+If every flush card matches exactly:
+
+The hand is a Push.
+
+Straight Flushes have NO special value when comparing the player’s hand against the dealer.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE LAYOUT
+
+The betting circles should appear exactly like this:
+
+FLUSH BONUS
+
+ANTE
+
+RAISE
+
+STRAIGHT FLUSH BONUS
+
+Only Ante is required.
+
+Raise begins empty.
+
+Bonus wagers are optional.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+START OF HAND
+
+Player places:
+
+Ante
+
+Optional Flush Bonus
+
+Optional Straight Flush Bonus
+
+Dealer deals:
+
+7 player cards
+
+7 dealer cards face down
+
+Player may inspect all seven cards.
+
+Dealer cards remain hidden.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER DECISION
+
+After viewing all seven cards:
+
+Player chooses:
+
+FOLD
+
+or
+
+RAISE
+
+The maximum Raise depends on how many suited cards the player has.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RAISE RULES
+
+Two suited cards
+
+Raise = 1x Ante
+
+Three suited cards
+
+Raise = 1x Ante
+
+Four suited cards
+
+Raise = 1x Ante
+
+Five suited cards
+
+Raise = 2x Ante
+
+Six suited cards
+
+Raise = 3x Ante
+
+Seven suited cards
+
+Raise = 3x Ante
+
+The UI should automatically enable only the valid raise multiplier.
+
+Example:
+
+Player has six hearts.
+
+Available button:
+
+RAISE ×3
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FOLD
+
+If player folds:
+
+Ante loses immediately.
+
+Raise is never placed.
+
+However—
+
+Bonus wagers remain active.
+
+This is extremely important.
+
+Players may still receive:
+
+Flush Bonus
+
+Straight Flush Bonus
+
+even after folding.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DEALER QUALIFICATION
+
+Dealer must qualify with:
+
+Nine-high Three Card Flush
+
+or better.
+
+If dealer does NOT qualify:
+
+Ante pays even money.
+
+Raise pushes.
+
+Bonus wagers resolve normally.
+
+If dealer DOES qualify:
+
+Compare player flush against dealer flush.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HAND COMPARISON
+
+Winner determined by:
+
+Largest number of suited cards.
+
+Example:
+
+Player
+
+6-card Flush
+
+Dealer
+
+5-card Flush
+
+Player wins.
+
+If same number:
+
+Compare highest flush card.
+
+If tied:
+
+Compare second highest.
+
+Continue until winner.
+
+If identical:
+
+Push.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ANTE / RAISE PAYOUTS
+
+Dealer Qualifies
+
+Player Wins
+
+Ante pays 1:1
+
+Raise pays 1:1
+
+Dealer Wins
+
+Ante loses
+
+Raise loses
+
+Tie
+
+Ante Push
+
+Raise Push
+
+Dealer Does Not Qualify
+
+Ante wins 1:1
+
+Raise Push
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FLUSH BONUS
+
+Flush Bonus is resolved independently.
+
+It pays even if:
+
+Player folds
+
+Player loses to dealer
+
+Dealer qualifies
+
+Dealer does not qualify
+
+Only the player’s cards matter.
+
+Flush Bonus Pay Table
+
+7 Card Flush
+
+300 : 1
+
+6 Card Flush
+
+100 : 1
+
+5 Card Flush
+
+10 : 1
+
+4 Card Flush
+
+1 : 1
+
+Only the highest qualifying hand is paid.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STRAIGHT FLUSH BONUS
+
+Straight Flush Bonus is also independent.
+
+Only the player’s hand matters.
+
+An Ace may count as either:
+
+High
+
+or
+
+Low
+
+Only the highest qualifying straight flush is paid.
+
+Straight Flush Bonus Pay Table
+
+7 Card Straight Flush
+
+8000 : 1
+
+6 Card Straight Flush
+
+1000 : 1
+
+5 Card Straight Flush
+
+100 : 1
+
+4 Card Straight Flush
+
+60 : 1
+
+3 Card Straight Flush
+
+7 : 1
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RESULT SCREEN
+
+Show results separately.
+
+Example:
+
+ANTE
+
++250K
+
+RAISE
+
++500K
+
+FLUSH BONUS
+
++2.5M
+
+STRAIGHT FLUSH BONUS
+
+—
+
+NET WIN
+
+3.25M
+
+Use compact chip formatting:
+
+250K
+
+3.2M
+
+1.4B
+
+Never display long comma-separated numbers.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+INFO BUTTON
+
+Replace permanent paytables with an Info icon in the upper-right corner.
+
+The Info screen should include:
+
+• How High Card Flush works
+
+• Dealer qualification rule
+
+• Flush ranking explanation
+
+• Raise multiplier chart
+
+• Flush Bonus pay table
+
+• Straight Flush Bonus pay table
+
+• Hand comparison examples
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ANIMATIONS
+
+Use premium Chip Society animations.
+
+Dealer cards fan open smoothly.
+
+Winning flush cards glow.
+
+Winning suit receives a neon outline.
+
+Bonus wins explode with gold particles.
+
+Straight Flush Bonus uses:
+
+Purple
+
+Gold
+
+Electric cyan
+
+with premium celebration effects.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SOUND DESIGN
+
+Card Deal
+
+Soft casino card flick.
+
+Card Reveal
+
+Sharp card flip.
+
+Flush Made
+
+Elegant neon shimmer.
+
+Flush Bonus Win
+
+Gold casino chime.
+
+Straight Flush Bonus
+
+Large cinematic jackpot sound.
+
+Dealer Qualification
+
+Short confirmation sound.
+
+Winning Hand
+
+Bright premium casino celebration.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL STYLE
+
+Maintain the Chip Society identity.
+
+• Dark teal felt
+
+• Cyan UI
+
+• Pink highlights
+
+• Gold payout accents
+
+• Orbitron typography
+
+• Minimal premium layout
+
+• Consistent with Ultimate Texas Hold’em, Casino War, Let It Ride, and Three Card Poker
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+High Card Flush should feel like one of Chip Society’s flagship casino games.
+
+It should be extremely easy to understand while feeling luxurious, modern, and polished.
+
+The player should immediately understand:
+
+• They’re competing against the dealer.
+
+• Flush length is more important than poker hand rankings.
+
+• Bonus wagers are always live, even if they fold.
+
+• Dealer qualification matters.
+
+• Raise size is determined automatically by the strength of their flush.
+
+Build this as a premium casino experience fully consistent with the rest of Chip Society.
