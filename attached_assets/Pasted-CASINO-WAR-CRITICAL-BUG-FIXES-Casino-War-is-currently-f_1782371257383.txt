@@ -1,0 +1,401 @@
+CASINO WAR — CRITICAL BUG FIXES
+
+Casino War is currently facing major gameplay and UI bugs. Fix these before adding any new Casino War polish.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT BUGS
+
+The current Casino War screen has the following issues:
+
+• Cards are displaying broken text like “defin” instead of actual card faces
+• Dealer card is not rendering correctly
+• Player card is not rendering correctly
+• Card asset/value is undefined
+• Result says “LOST 1M” even though the displayed wagers do not clearly equal 1M
+• Net result display appears mathematically confusing
+• Balance is placed too high on the screen
+• Title is cut off by the Dynamic Island
+• Game spacing feels too empty
+• Results panel is oversized and unclear
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD RENDERING FIX
+
+The card renderer is broken.
+
+Fix immediately.
+
+Cards must always display:
+
+• Rank
+• Suit
+• Correct color
+• Correct face
+• Correct back when hidden
+
+Never display:
+
+• undefined
+• null
+• NaN
+• placeholder text
+• broken text
+• “defin”
+• empty white cards
+
+If card data fails, stop the hand and show a safe error instead of rendering broken cards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED CARD OBJECT
+
+Every card must contain:
+
+• rank
+• suit
+• value
+• displayRank
+• displaySuit
+• color
+
+Example:
+
+{
+rank: “A”,
+suit: “spades”,
+value: 14,
+displayRank: “A”,
+displaySuit: “♠”,
+color: “black”
+}
+
+Casino War must compare card value only.
+
+Ace = 14.
+
+King = 13.
+
+Queen = 12.
+
+Jack = 11.
+
+2 = 2.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DEAL LOGIC
+
+When player taps DEAL:
+
+1. Deduct Ante.
+2. Deduct optional Tie Bet if placed.
+3. Deal one face-up card to dealer.
+4. Deal one face-up card to player.
+5. Compare values.
+6. Resolve outcome.
+
+Dealer and player cards must appear immediately with correct rank and suit.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BASIC RESULT RULES
+
+If player card is higher:
+
+Ante wins 1:1.
+
+Tie Bet loses unless first cards match.
+
+If dealer card is higher:
+
+Ante loses.
+
+Tie Bet loses unless first cards match.
+
+If cards match:
+
+Trigger WAR decision:
+
+• Surrender
+• Go To War
+
+Do not immediately mark win or loss on first-card tie.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TIE BET RULE
+
+Tie Bet only wins if the first dealer card and first player card match in rank.
+
+Tie Bet pays:
+
+10:1
+
+If first cards do not match:
+
+Tie Bet loses.
+
+The UI must clearly show:
+
+Tie Bet -150K
+
+or
+
+Tie Bet +1.5M
+
+depending on outcome.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RESULT MATH FIX
+
+The result panel must show exact wager results.
+
+Example:
+
+Ante: 250K
+Tie Bet: 150K
+
+If player loses and no tie:
+
+ANTE -250K
+TIE BET -150K
+NET -400K
+
+Do not display:
+
+LOST 1M
+
+unless the actual net loss equals 1M.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NET RESULT FORMATTING
+
+Use compact format:
+
+250K
+400K
+1M
+1.5M
+325.8M
+1.3B
+
+Never display:
+
+1000K
+1313.4M
+Long comma-heavy values on mobile
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BALANCE PLACEMENT
+
+Move balance away from the top header.
+
+Place player balance near the player side of the table, below the player card and above betting circles.
+
+Use Chip Society gold chip icon.
+
+Do not use Bitcoin-style symbol.
+
+Do not place balance near the title.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HEADER SAFE AREA FIX
+
+The title is being cut off by the iPhone Dynamic Island.
+
+Move the title and subtitle downward enough to clear the notch safely.
+
+Use safe-area padding.
+
+Header should show:
+
+CASINO WAR
+ELITE • 250K ANTE
+
+Do not let the title be hidden behind the Dynamic Island.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TOP BUTTONS
+
+Top-left:
+
+Back button.
+
+Top-right:
+
+Info button.
+Music button.
+
+Use same controls as other casino games.
+
+Do not use placeholder icons.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE LAYOUT IMPROVEMENT
+
+Casino War should feel compact and fast.
+
+Reduce excessive empty vertical space.
+
+Recommended flow:
+
+Header
+Dealer Card
+VS / Result Banner
+Player Card
+Player Balance
+Tie Bet + Ante Circles
+Deal Button / War Options
+Result Panel
+
+Everything should fit cleanly on mobile.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RESULT PANEL FIX
+
+Result panel should only appear after the hand resolves.
+
+It should clearly show:
+
+• Ante result
+• Tie Bet result
+• War result if applicable
+• Net result
+
+Example:
+
+ANTE -250K
+TIE BET -150K
+
+NET -400K
+
+Button:
+
+NEXT HAND
+
+Do not show confusing or incorrect totals.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+WAR FLOW VALIDATION
+
+If first cards tie:
+
+Show:
+
+WAR!
+
+Options:
+
+SURRENDER
+GO TO WAR
+
+Surrender:
+
+Player loses half Ante only.
+
+Go To War:
+
+Player adds another Ante.
+
+Dealer matches.
+
+Deal second card to both.
+
+Resolve:
+
+Player higher = win war.
+
+Dealer higher = lose war.
+
+Tie again = player wins extra unit.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCEPTANCE TEST
+
+Test these exact cases:
+
+Case 1:
+
+Player A♠
+Dealer K♦
+
+Expected:
+
+Ante wins 1:1
+Tie Bet loses
+Net result correct
+
+Case 2:
+
+Player 7♠
+Dealer Q♥
+
+Expected:
+
+Ante loses
+Tie Bet loses
+Net result correct
+
+Case 3:
+
+Player 9♣
+Dealer 9♦
+
+Expected:
+
+Tie Bet pays 10:1
+WAR decision appears
+No immediate win/loss
+
+Case 4:
+
+Player loses with:
+
+Ante 250K
+Tie Bet 150K
+
+Expected:
+
+ANTE -250K
+TIE BET -150K
+NET -400K
+
+Not:
+
+LOST 1M
+
+Case 5:
+
+No card should ever display:
+
+undefined
+defin
+null
+NaN
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+Casino War should be fast, simple, clean, and mathematically accurate.
+
+The player should instantly understand:
+
+• What they bet
+• What card they got
+• What card dealer got
+• Why they won or lost
+• Exactly how much they won or lost
+
+No broken card rendering, no placeholder text, no incorrect totals, and no confusing results.

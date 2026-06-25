@@ -16,6 +16,7 @@ import PlayingCard from '@/components/PlayingCard';
 import StakeSelectModal from '@/components/StakeSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
+import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import { STAKE_TIERS, type StakeTier } from '@/lib/stakeConfig';
 import {
@@ -35,25 +36,23 @@ type Phase =
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function fmt(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000 % 1 === 0 ? (n / 1_000_000).toFixed(0) : (n / 1_000_000).toFixed(1))}M`;
-  if (n >= 1_000)     return `${(n / 1_000 % 1 === 0 ? (n / 1_000).toFixed(0) : (n / 1_000).toFixed(1))}K`;
-  return String(n);
-}
-function fmtNet(n: number): string {
-  if (n === 0) return 'PUSH';
-  return (n > 0 ? '+' : '') + fmt(Math.abs(n)) + (n < 0 ? '' : '');
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000_000) return `${(abs / 1_000_000_000 % 1 === 0 ? (abs / 1_000_000_000).toFixed(0) : (abs / 1_000_000_000).toFixed(1))}B`;
+  if (abs >= 1_000_000)     return `${(abs / 1_000_000 % 1 === 0 ? (abs / 1_000_000).toFixed(0) : (abs / 1_000_000).toFixed(1))}M`;
+  if (abs >= 1_000)         return `${(abs / 1_000 % 1 === 0 ? (abs / 1_000).toFixed(0) : (abs / 1_000).toFixed(1))}K`;
+  return String(abs);
 }
 function sleep(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
 
 // ─── Paytable modal ────────────────────────────────────────────────────────────
-function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+function PaytableModal({ visible, onClose, accent }: { visible: boolean; onClose: () => void; accent: string }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity style={pm.overlay} activeOpacity={1} onPress={onClose}>
         <View style={pm.sheet}>
           <LinearGradient colors={['#0e002a', '#050010']} style={StyleSheet.absoluteFill} />
           <View style={pm.header}>
-            <Text style={pm.title}>HOW TO PLAY</Text>
+            <Text style={[pm.title, { color: accent }]}>HOW TO PLAY</Text>
             <TouchableOpacity onPress={onClose} style={pm.closeBtn}>
               <Ionicons name="close" size={20} color="rgba(255,255,255,0.6)" />
             </TouchableOpacity>
@@ -63,12 +62,12 @@ function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => 
             { h: 'DEALER WINS',  d: "Dealer's card beats yours — Ante loses" },
             { h: 'TIE — WAR',    d: 'Matching ranks — choose SURRENDER or GO TO WAR' },
             { h: 'SURRENDER',    d: 'Lose only half your Ante. Round ends.' },
-            { h: 'GO TO WAR',    d: "Place equal raise. One more card each:\n\u2022 You win — raise pays 1:1, original Ante pushes\n\u2022 Dealer wins — lose both bets\n\u2022 Tie again — raise pays 2:1 BONUS, Ante pushes" },
+            { h: 'GO TO WAR',    d: "Place equal raise. One more card each:\n• You win — raise pays 1:1, original Ante pushes\n• Dealer wins — lose both bets\n• Tie again — raise pays 2:1 BONUS, Ante pushes" },
             { h: 'TIE BET',      d: 'Optional bet — pays 10:1 if initial cards tie.\nIndependent of war outcome.' },
-            { h: 'CARD RANKING', d: "Ace is highest. 2 is lowest. Suits don't matter." },
+            { h: 'CARD RANKING', d: "Ace is highest (14). 2 is lowest. Suits don't matter." },
           ].map(r => (
             <View key={r.h} style={pm.row}>
-              <Text style={pm.hand}>{r.h}</Text>
+              <Text style={[pm.hand, { color: accent }]}>{r.h}</Text>
               <Text style={pm.desc}>{r.d}</Text>
             </View>
           ))}
@@ -81,16 +80,16 @@ const pm = StyleSheet.create({
   overlay:  { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)', justifyContent: 'flex-end' },
   sheet:    { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', padding: 20, gap: 10 },
   header:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
-  title:    { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: '#FF6EA0', letterSpacing: 3 },
+  title:    { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
   closeBtn: { padding: 4 },
   row:      { borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', paddingVertical: 8, gap: 3 },
-  hand:     { fontSize: 9, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5, color: '#00D4C8' },
+  hand:     { fontSize: 9, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5 },
   desc:     { fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 16 },
 });
 
 // ─── Bet circle ────────────────────────────────────────────────────────────────
-function BetCircle({ label, amount, active, accent = '#ffd700', onPress }: {
-  label: string; amount: number; active: boolean; accent?: string; onPress?: () => void;
+function BetCircle({ label, amount, active, accent = '#ffd700', onPress, sub }: {
+  label: string; amount: number; active: boolean; accent?: string; onPress?: () => void; sub?: string;
 }) {
   const Wrap = onPress ? TouchableOpacity : View;
   return (
@@ -101,16 +100,18 @@ function BetCircle({ label, amount, active, accent = '#ffd700', onPress }: {
     >
       {active && <LinearGradient colors={[`${accent}28`, 'transparent']} style={StyleSheet.absoluteFill} />}
       <Text style={[bc.lbl, { color: active ? `${accent}cc` : `${accent}55` }]}>{label}</Text>
-      <Text style={[bc.amt, { color: active ? accent : `${accent}44` }]}>
+      <Text style={[bc.amt, { color: active ? accent : `${accent}44`, fontFamily: 'Inter_700Bold' }]}>
         {amount > 0 ? fmt(amount) : '—'}
       </Text>
+      {sub ? <Text style={[bc.sub, { color: active ? `${accent}88` : `${accent}33` }]}>{sub}</Text> : null}
     </Wrap>
   );
 }
 const bc = StyleSheet.create({
-  wrap: { width: 76, height: 76, borderRadius: 38, borderWidth: 2, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', gap: 2 },
+  wrap: { width: 80, height: 80, borderRadius: 40, borderWidth: 2, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', gap: 1 },
   lbl:  { fontSize: 7, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5, textAlign: 'center' },
-  amt:  { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  amt:  { fontSize: 13, fontWeight: '900' },
+  sub:  { fontSize: 6.5, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5 },
 });
 
 // ─── Action button ─────────────────────────────────────────────────────────────
@@ -122,6 +123,7 @@ function ActionBtn({ label, sub, onPress, disabled, accent = '#00D4C8', fill }: 
       style={[ab.btn, { borderColor: `${accent}70`, opacity: disabled ? 0.35 : 1 }, fill && { backgroundColor: `${accent}1a` }]}
       onPress={onPress} disabled={disabled} activeOpacity={0.75}
     >
+      {fill && <LinearGradient colors={[`${accent}18`, 'transparent']} style={StyleSheet.absoluteFill} />}
       <Text style={[ab.label, { color: accent }]}>{label}</Text>
       {sub ? <Text style={ab.sub}>{sub}</Text> : null}
     </TouchableOpacity>
@@ -137,28 +139,27 @@ const ab = StyleSheet.create({
 type RowOutcome = 'win' | 'loss' | 'push' | 'none';
 function ResultRow({ label, outcome, amount, sub }: { label: string; outcome: RowOutcome; amount?: number; sub?: string }) {
   const color = outcome === 'win' ? '#00ff88' : outcome === 'loss' ? '#ff4444' : outcome === 'push' ? '#00d4ff' : 'rgba(255,255,255,0.2)';
-  const text  = outcome === 'win' ? `+${fmt(amount ?? 0)}`
-              : outcome === 'loss' ? (amount !== undefined ? `-${fmt(Math.abs(amount))}` : 'LOSS')
-              : outcome === 'push' ? 'PUSH' : 'NO BET';
+  const sign  = outcome === 'win' ? '+' : outcome === 'loss' ? '-' : '';
+  const text  = outcome === 'push' ? 'PUSH' : outcome === 'none' ? 'NO BET' : `${sign}${fmt(amount ?? 0)}`;
   return (
     <View style={rr.row}>
       <View style={{ flex: 1 }}>
         <Text style={rr.label}>{label}</Text>
         {sub ? <Text style={rr.sub}>{sub}</Text> : null}
       </View>
-      <Text style={[rr.value, { color }]}>{text}</Text>
+      <Text style={[rr.value, { color, fontFamily: 'Inter_700Bold' }]}>{text}</Text>
     </View>
   );
 }
 const rr = StyleSheet.create({
-  row:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
+  row:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5 },
   label: { fontSize: 9, fontFamily: 'Orbitron_400Regular', letterSpacing: 1, color: 'rgba(255,255,255,0.4)' },
   sub:   { fontSize: 8, color: 'rgba(255,255,255,0.22)', marginTop: 1 },
-  value: { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  value: { fontSize: 14, fontWeight: '900' },
 });
 
-// ─── Card area ─────────────────────────────────────────────────────────────────
-function CardArea({ card, warCard, slideAnim, warSlideAnim, winner, label }: {
+// ─── Card station ──────────────────────────────────────────────────────────────
+function CardStation({ card, warCard, slideAnim, warSlideAnim, winner, label }: {
   card: CWCard | null;
   warCard?: CWCard | null;
   slideAnim: Animated.Value;
@@ -167,40 +168,37 @@ function CardArea({ card, warCard, slideAnim, warSlideAnim, winner, label }: {
   label: string;
 }) {
   return (
-    <View style={ca.wrap}>
-      <Text style={ca.label}>{label}</Text>
-      <View style={ca.cardsRow}>
+    <View style={cs.wrap}>
+      <Text style={cs.label}>{label}</Text>
+      <View style={cs.cardsRow}>
         {warCard && warSlideAnim ? (
-          <Animated.View style={{ transform: [{ translateY: warSlideAnim }], opacity: warSlideAnim.interpolate({ inputRange: [-60, 0], outputRange: [0, 1] }) }}>
-            <PlayingCard
-              card={{ rank: warCard.rank, suit: warCard.suit } as any}
-              faceDown={false} size="lg"
-            />
+          <Animated.View style={{
+            transform: [{ translateY: warSlideAnim }],
+            opacity: warSlideAnim.interpolate({ inputRange: [-60, 0], outputRange: [0, 1] }),
+          }}>
+            <PlayingCard card={{ suit: warCard.suit, value: warCard.value }} faceDown={false} size="lg" />
           </Animated.View>
         ) : null}
         <Animated.View style={[
           { transform: [{ translateY: slideAnim }] },
-          winner && ca.winnerGlow,
+          winner && cs.winnerGlow,
         ]}>
           {card ? (
-            <PlayingCard
-              card={{ rank: card.rank, suit: card.suit } as any}
-              faceDown={false} size="lg"
-            />
+            <PlayingCard card={{ suit: card.suit, value: card.value }} faceDown={false} size="lg" />
           ) : (
-            <View style={ca.placeholder} />
+            <View style={cs.placeholder} />
           )}
         </Animated.View>
       </View>
     </View>
   );
 }
-const ca = StyleSheet.create({
+const cs = StyleSheet.create({
   wrap:        { alignItems: 'center', gap: 6 },
   label:       { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 2, color: 'rgba(255,255,255,0.35)' },
   cardsRow:    { flexDirection: 'row', gap: 8, alignItems: 'center' },
-  placeholder: { width: 60, height: 84, borderRadius: 8, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', borderStyle: 'dashed', backgroundColor: 'rgba(255,255,255,0.03)' },
-  winnerGlow:  { shadowColor: '#ffd700', shadowOpacity: 0.8, shadowRadius: 12, shadowOffset: { width: 0, height: 0 } },
+  placeholder: { width: 60, height: 84, borderRadius: 10, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', borderStyle: 'dashed', backgroundColor: 'rgba(255,255,255,0.03)' },
+  winnerGlow:  { shadowColor: '#ffd700', shadowOpacity: 0.8, shadowRadius: 14, shadowOffset: { width: 0, height: 0 } },
 });
 
 // ─── Main screen ───────────────────────────────────────────────────────────────
@@ -208,22 +206,27 @@ export default function CasinoWarScreen() {
   const insets = useSafeAreaInsets();
   const { profile, addChips, removeChips } = useUser();
   const { theme } = useTableTheme();
+  const { isMusicMuted, toggleMusicMute } = useSoundSettings();
 
-  // ── Phase state ──────────────────────────────────────────────────────────────
-  const [phase,        setPhase]        = useState<Phase>('stake');
-  const [stake,        setStake]        = useState<StakeTier | null>(null);
-  const [ante,         setAnte]         = useState(0);
-  const [tieBetMult,   setTieBetMult]   = useState(0);   // 0, 1, 2, 3 × ante
-  const [deck,         setDeck]         = useState<CWCard[]>([]);
-  const [playerCard,   setPlayerCard]   = useState<CWCard | null>(null);
-  const [dealerCard,   setDealerCard]   = useState<CWCard | null>(null);
-  const [warPlayerCard,setWarPlayerCard] = useState<CWCard | null>(null);
-  const [warDealerCard,setWarDealerCard] = useState<CWCard | null>(null);
-  const [outcome,      setOutcome]      = useState<CWOutcome | null>(null);
-  const [warOutcome,   setWarOutcome]   = useState<CWWarOutcome | null>(null);
-  const [result,       setResult]       = useState<CWResult | null>(null);
-  const [paytable,     setPaytable]     = useState(false);
-  const [winner,       setWinner]       = useState<'player' | 'dealer' | null>(null);
+  const accent  = theme.accentPrimary   || '#FF6EA0';
+  const accent2 = theme.accentSecondary || '#bf5fff';
+
+  // ── Phase / game state ───────────────────────────────────────────────────────
+  const [phase,         setPhase]         = useState<Phase>('stake');
+  const [stake,         setStake]         = useState<StakeTier | null>(null);
+  const [ante,          setAnte]          = useState(0);
+  const [tieBetMult,    setTieBetMult]    = useState<0|1|2|3>(0);
+  const [deck,          setDeck]          = useState<CWCard[]>([]);
+  const [playerCard,    setPlayerCard]    = useState<CWCard | null>(null);
+  const [dealerCard,    setDealerCard]    = useState<CWCard | null>(null);
+  const [warPlayerCard, setWarPlayerCard] = useState<CWCard | null>(null);
+  const [warDealerCard, setWarDealerCard] = useState<CWCard | null>(null);
+  const [outcome,       setOutcome]       = useState<CWOutcome | null>(null);
+  const [result,        setResult]        = useState<CWResult | null>(null);
+  const [winner,        setWinner]        = useState<'player' | 'dealer' | null>(null);
+  const [paytable,      setPaytable]      = useState(false);
+  /** Tracks total chips removed from balance this round — used for clean chip settlement */
+  const [totalWagered,  setTotalWagered]  = useState(0);
 
   // ── Animations ──────────────────────────────────────────────────────────────
   const dealerSlide    = useRef(new Animated.Value(-80)).current;
@@ -233,7 +236,7 @@ export default function CasinoWarScreen() {
   const bannerScale    = useRef(new Animated.Value(0)).current;
   const bannerOpacity  = useRef(new Animated.Value(0)).current;
   const warScale       = useRef(new Animated.Value(0)).current;
-  const resultSlide    = useRef(new Animated.Value(40)).current;
+  const resultSlide    = useRef(new Animated.Value(30)).current;
   const resultOpacity  = useRef(new Animated.Value(0)).current;
 
   function resetAnims() {
@@ -244,7 +247,7 @@ export default function CasinoWarScreen() {
     bannerScale.setValue(0);
     bannerOpacity.setValue(0);
     warScale.setValue(0);
-    resultSlide.setValue(40);
+    resultSlide.setValue(30);
     resultOpacity.setValue(0);
   }
 
@@ -286,8 +289,8 @@ export default function CasinoWarScreen() {
 
   function animateResult() {
     Animated.parallel([
-      Animated.timing(resultSlide,   { toValue: 0,  duration: 280, useNativeDriver: true }),
-      Animated.timing(resultOpacity, { toValue: 1,  duration: 280, useNativeDriver: true }),
+      Animated.timing(resultSlide,   { toValue: 0, duration: 280, useNativeDriver: true }),
+      Animated.timing(resultOpacity, { toValue: 1, duration: 280, useNativeDriver: true }),
     ]).start();
   }
 
@@ -296,30 +299,33 @@ export default function CasinoWarScreen() {
     setStake(tier);
     setAnte(tier.ante);
     setTieBetMult(0);
+    setTotalWagered(0);
     setPhase('betting');
     resetAnims();
     setPlayerCard(null); setDealerCard(null);
     setWarPlayerCard(null); setWarDealerCard(null);
-    setOutcome(null); setWarOutcome(null); setResult(null); setWinner(null);
+    setOutcome(null); setResult(null); setWinner(null);
   }
 
   // ── Deal ─────────────────────────────────────────────────────────────────────
   const handleDeal = useCallback(async () => {
     if (!stake) return;
-    const totalBet = ante + (tieBetMult * ante);
+    const tieBet   = tieBetMult * ante;
+    const totalBet = ante + tieBet;
     if (profile.chips < totalBet) return;
 
     setPhase('dealing');
     resetAnims();
-    setWarPlayerCard(null); setWarDealerCard(null); setWarOutcome(null);
+    setWarPlayerCard(null); setWarDealerCard(null); setResult(null);
 
     removeChips(totalBet);
+    setTotalWagered(totalBet);
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    const { deck: newDeck, playerCard: pc, dealerCard: dc, outcome: oc } = dealCasinoWar();
+    const { deck: remaining, playerCard: pc, dealerCard: dc, outcome: oc } = dealCasinoWar();
     setPlayerCard(pc);
     setDealerCard(dc);
-    setDeck(newDeck);
+    setDeck(remaining);
     setOutcome(oc);
 
     await animateCards();
@@ -330,45 +336,44 @@ export default function CasinoWarScreen() {
       setPhase('war_choice');
       if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     } else {
-      const res = resolveCasinoWar({ outcome: oc, ante, tieBet: tieBetMult * ante });
+      const res = resolveCasinoWar({ outcome: oc, ante, tieBet });
       setResult(res);
       setWinner(oc === 'player_wins' ? 'player' : 'dealer');
-      if (res.netChips >= 0) addChips(ante + (tieBetMult * ante) + res.netChips);
-      else if (res.netChips < 0) {} // already removed
-      // Actually: we removed totalBet upfront. Now add back what player receives:
-      // player_wins: receive back ante*2 (original+win) → net+ante after tieBet deduction
-      // We need to add back the received amount only:
-      const tieBet = tieBetMult * ante;
-      if (oc === 'player_wins') {
-        addChips(ante * 2 + (tieBet > 0 ? 0 : 0)); // win ante + return ante; tie bet already deducted
-      }
-      // tieBet always loses on non-tie, already taken
+      // Return total wagered + net profit (handles win, loss, push cleanly)
+      addChips(totalBet + res.netChips);
       setPhase('result');
       animateResult();
+      if (Platform.OS !== 'web') {
+        if (res.netChips > 0) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stake, ante, tieBetMult, profile.chips]);
 
-  // ── War choice ───────────────────────────────────────────────────────────────
+  // ── War: Surrender ────────────────────────────────────────────────────────────
   const handleSurrender = useCallback(() => {
     if (!outcome) return;
     const tieBet = tieBetMult * ante;
     const res = resolveCasinoWar({ outcome, isSurrender: true, ante, tieBet });
     setResult(res);
     setWinner(null);
-    // Already removed (ante + tieBet) upfront. Return tie bet win + half ante back:
-    const tieBetReturn = tieBet > 0 ? tieBet * 11 : 0; // keep original + 10:1 win
-    const anteReturn   = ante - Math.floor(ante / 2);   // half returned
-    addChips(tieBetReturn + anteReturn);
+    // Return: totalWagered + netChips
+    // (netChips = -floor(ante/2) + tieBetNet, so player gets back half ante + tieBet win if any)
+    addChips(totalWagered + res.netChips);
     setPhase('result');
     animateResult();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outcome, ante, tieBetMult]);
+  }, [outcome, ante, tieBetMult, totalWagered]);
 
+  // ── War: Go to War ────────────────────────────────────────────────────────────
   const handleGoToWar = useCallback(async () => {
-    if (!outcome || !deck) return;
-    // Remove war raise from chips
+    if (!outcome || !deck.length) return;
+    // War raise = another ante
+    if (profile.chips < ante) return;
     removeChips(ante);
+    const newTotalWagered = totalWagered + ante;
+    setTotalWagered(newTotalWagered);
     setPhase('war_dealing');
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
@@ -377,7 +382,6 @@ export default function CasinoWarScreen() {
     const { warDealerCard: wdc, warPlayerCard: wpc, warOutcome: wo } = dealWarCards(deck);
     setWarDealerCard(wdc);
     setWarPlayerCard(wpc);
-    setWarOutcome(wo);
 
     await animateWarCards();
     await sleep(400);
@@ -385,43 +389,38 @@ export default function CasinoWarScreen() {
     const tieBet = tieBetMult * ante;
     const res = resolveCasinoWar({ outcome, warOutcome: wo, ante, tieBet });
     setResult(res);
-
-    // Resolve chip payback:
-    // We have removed: (ante + tieBet) initially, then +ante for war raise
-    // Total removed: ante*2 + tieBet
-    // Now return what player receives:
-    const tieBetReturn = tieBet > 0 ? tieBet * 11 : 0; // tie bet wins 10:1 on initial tie
-    let warReturn = 0;
-    if (wo === 'player_wins') {
-      // original ante push (return ante) + war raise pays 1:1 (return ante*2)
-      warReturn = ante + ante * 2;
-    } else if (wo === 'dealer_wins') {
-      warReturn = 0;
-    } else {
-      // war_tie bonus: original ante push (return ante) + war raise pays 2:1 (return ante*3)
-      warReturn = ante + ante * 3;
-    }
-    addChips(tieBetReturn + warReturn);
-
+    // Return: newTotalWagered + netChips (settles all bets cleanly)
+    addChips(newTotalWagered + res.netChips);
     setWinner(wo === 'player_wins' || wo === 'war_tie' ? 'player' : 'dealer');
     setPhase('war_result');
     animateResult();
+    if (Platform.OS !== 'web') {
+      if (res.netChips > 0) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outcome, deck, ante, tieBetMult]);
+  }, [outcome, deck, ante, tieBetMult, totalWagered, profile.chips]);
 
   // ── Next hand ─────────────────────────────────────────────────────────────────
   function handleNextHand() {
     resetAnims();
+    setTotalWagered(0);
     setPlayerCard(null); setDealerCard(null);
     setWarPlayerCard(null); setWarDealerCard(null);
-    setOutcome(null); setWarOutcome(null); setResult(null); setWinner(null);
+    setOutcome(null); setResult(null); setWinner(null);
     setPhase('betting');
   }
 
   useEffect(() => {
+    MusicEngine.configure({ muted: isMusicMuted });
     MusicEngine.play();
     return () => MusicEngine.stop();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    MusicEngine.configure({ muted: isMusicMuted });
+  }, [isMusicMuted]);
 
   // ─── Derived ──────────────────────────────────────────────────────────────────
   const tieBet      = tieBetMult * ante;
@@ -452,34 +451,49 @@ export default function CasinoWarScreen() {
       />
 
       {/* Paytable */}
-      <PaytableModal visible={paytable} onClose={() => setPaytable(false)} />
+      <PaytableModal visible={paytable} onClose={() => setPaytable(false)} accent={accent} />
 
-      {/* ── Top bar ─────────────────────────────────────────────────────── */}
-      <View style={[s.topBar, { paddingTop: insets.top + 8 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Ionicons name="chevron-back" size={20} color="rgba(255,255,255,0.7)" />
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <View style={[s.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 16 : 10) }]}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={12}>
+          <Ionicons name="chevron-back" size={22} color="rgba(255,255,255,0.7)" />
         </TouchableOpacity>
-        <View style={s.titleBlock}>
-          <Text style={s.titleText}>CASINO WAR</Text>
-          {stake && <Text style={s.stakeLabel}>{stake.label} · {fmt(stake.ante)} ANTE</Text>}
+
+        <View style={s.headerCenter}>
+          <Text style={[s.headerTitle, { color: accent }]}>CASINO WAR</Text>
+          {stake && (
+            <Text style={s.headerSub}>{stake.label} · ANTE {fmt(stake.ante)}</Text>
+          )}
         </View>
-        <TouchableOpacity onPress={() => setPaytable(true)} style={s.helpBtn}>
-          <Ionicons name="help-circle-outline" size={22} color="rgba(255,255,255,0.45)" />
-        </TouchableOpacity>
-      </View>
 
-      {/* ── Balance bar ─────────────────────────────────────────────────── */}
-      <View style={s.balanceBar}>
-        <Text style={s.balLabel}>BALANCE</Text>
-        <Text style={s.balAmt}>{fmt(profile.chips)}</Text>
+        <View style={s.headerRight}>
+          <TouchableOpacity
+            onPress={() => setPaytable(true)}
+            style={[s.iconBtn, { borderColor: `${accent}50`, borderWidth: 1 }]}
+            hitSlop={10}
+          >
+            <Ionicons name="information-circle-outline" size={20} color={`${accent}dd`} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={toggleMusicMute}
+            style={[s.iconBtn, isMusicMuted && s.iconBtnMuted]}
+            hitSlop={10}
+          >
+            <Ionicons
+              name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
+              size={18}
+              color={isMusicMuted ? 'rgba(255,255,255,0.28)' : `${accent}dd`}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* ── Table ───────────────────────────────────────────────────────── */}
       <View style={s.table}>
 
-        {/* Dealer area */}
-        <View style={s.cardSection}>
-          <CardArea
+        {/* Dealer card */}
+        <View style={s.stationWrap}>
+          <CardStation
             label="DEALER"
             card={dealerCard}
             warCard={warDealerCard}
@@ -489,32 +503,44 @@ export default function CasinoWarScreen() {
           />
         </View>
 
-        {/* Center — result / war banner */}
+        {/* Center — VS / WAR banner / outcome */}
         <View style={s.centerZone}>
           {/* TIE / WAR banner */}
           {(isWarChoice || phase === 'war_dealing' || phase === 'war_result') && (
-            <Animated.View style={[s.warBanner, { transform: [{ scale: isWarChoice ? bannerScale : warScale }], opacity: bannerOpacity }]}>
+            <Animated.View style={[s.warBanner, {
+              transform: [{ scale: isWarChoice ? bannerScale : warScale }],
+              opacity: bannerOpacity,
+            }]}>
               <LinearGradient colors={['#6600CC', '#FF0090']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
               <Text style={s.warText}>⚡ WAR ⚡</Text>
             </Animated.View>
           )}
 
-          {/* Outcome banner (non-war) */}
-          {isResult && result && !isWarChoice && (
-            <Animated.View style={[
-              s.outcomeBanner,
-              { transform: [{ translateY: resultSlide }], opacity: resultOpacity },
-            ]}>
+          {/* Outcome banner (non-war hands only) */}
+          {phase === 'result' && result && (
+            <Animated.View style={[s.outcomeBanner, { transform: [{ translateY: resultSlide }], opacity: resultOpacity }]}>
               {result.netChips > 0
-                ? <Text style={[s.outcomeText, { color: '#00ff88' }]}>WIN  {fmtNet(result.netChips)}</Text>
+                ? <Text style={[s.outcomeText, { color: '#00ff88' }]}>YOU WIN  +{fmt(result.netChips)}</Text>
                 : result.netChips < 0
-                ? <Text style={[s.outcomeText, { color: '#ff4444' }]}>LOST  {fmtNet(result.netChips)}</Text>
+                ? <Text style={[s.outcomeText, { color: '#ff4444' }]}>YOU LOSE  -{fmt(Math.abs(result.netChips))}</Text>
                 : <Text style={[s.outcomeText, { color: '#00d4ff' }]}>PUSH</Text>
               }
             </Animated.View>
           )}
 
-          {/* VS divider (during dealing / betting) */}
+          {/* War result banner */}
+          {phase === 'war_result' && result && (
+            <Animated.View style={[s.outcomeBanner, { transform: [{ translateY: resultSlide }], opacity: resultOpacity }]}>
+              {result.netChips > 0
+                ? <Text style={[s.outcomeText, { color: '#00ff88' }]}>WAR WON  +{fmt(result.netChips)}</Text>
+                : result.netChips < 0
+                ? <Text style={[s.outcomeText, { color: '#ff4444' }]}>WAR LOST  -{fmt(Math.abs(result.netChips))}</Text>
+                : <Text style={[s.outcomeText, { color: '#00d4ff' }]}>PUSH</Text>
+              }
+            </Animated.View>
+          )}
+
+          {/* VS divider */}
           {(phase === 'betting' || phase === 'dealing') && (
             <View style={s.vsDivider}>
               <View style={s.vsLine} />
@@ -524,9 +550,9 @@ export default function CasinoWarScreen() {
           )}
         </View>
 
-        {/* Player area */}
-        <View style={s.cardSection}>
-          <CardArea
+        {/* Player card + balance */}
+        <View style={s.playerStation}>
+          <CardStation
             label="YOU"
             card={playerCard}
             warCard={warPlayerCard}
@@ -534,21 +560,27 @@ export default function CasinoWarScreen() {
             warSlideAnim={warPlayerSlide}
             winner={winner === 'player'}
           />
+          {/* Chip balance — player station */}
+          <View style={s.playerChipRow}>
+            <View style={s.chipDot} />
+            <Text style={[s.playerChipAmt, { fontFamily: 'Inter_700Bold' }]}>{fmt(profile.chips)}</Text>
+          </View>
         </View>
       </View>
 
-      {/* ── Bottom controls ─────────────────────────────────────────────── */}
-      <View style={[s.bottom, { paddingBottom: insets.bottom + 16 }]}>
+      {/* ── Bottom controls ──────────────────────────────────────────────── */}
+      <View style={[s.bottom, { paddingBottom: insets.bottom + 10 }]}>
 
-        {/* Bet circles */}
-        {(phase === 'betting' || isDealing || isResult || isWarChoice) && (
+        {/* Bet circles — always visible when in game (except dealing) */}
+        {phase !== 'stake' && !isDealing && (
           <View style={s.circles}>
             <BetCircle
               label="TIE BET"
               amount={tieBet}
               active={tieBetMult > 0}
-              accent="#bf5fff"
-              onPress={phase === 'betting' ? () => setTieBetMult(m => (m + 1) % 4 as 0 | 1 | 2 | 3) : undefined}
+              accent={accent2}
+              sub={phase === 'betting' ? 'TAP TO SET' : undefined}
+              onPress={phase === 'betting' ? () => setTieBetMult(m => ((m + 1) % 4) as 0|1|2|3) : undefined}
             />
             <BetCircle
               label="ANTE"
@@ -562,39 +594,42 @@ export default function CasinoWarScreen() {
         {/* Result breakdown */}
         {isResult && result && (
           <Animated.View style={[s.resultPanel, { transform: [{ translateY: resultSlide }], opacity: resultOpacity }]}>
-            <LinearGradient colors={['rgba(0,0,0,0.65)', 'rgba(0,0,0,0.45)']} style={StyleSheet.absoluteFill} />
-            {result.ante > 0 && (
-              <ResultRow
-                label="ANTE"
-                outcome={result.anteNet > 0 ? 'win' : result.anteNet < 0 ? 'loss' : 'push'}
-                amount={Math.abs(result.anteNet)}
-              />
-            )}
+            <LinearGradient colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.35)']} style={StyleSheet.absoluteFill} />
+            <ResultRow
+              label="ANTE"
+              outcome={result.anteNet > 0 ? 'win' : result.anteNet < 0 ? 'loss' : 'push'}
+              amount={Math.abs(result.anteNet)}
+              sub={result.isSurrender ? 'Surrender — lose half' : undefined}
+            />
             {result.tieBet > 0 && (
               <ResultRow
-                label="TIE BET (10:1)"
+                label="TIE BET"
                 outcome={result.tieBetNet > 0 ? 'win' : result.tieBetNet < 0 ? 'loss' : 'push'}
                 amount={Math.abs(result.tieBetNet)}
+                sub={result.tieBetNet > 0 ? '10:1 payout' : 'No matching ranks'}
               />
             )}
             {result.warNet !== 0 && (
               <ResultRow
-                label={result.warOutcome === 'war_tie' ? 'WAR RAISE (2:1 BONUS)' : 'WAR RAISE'}
-                outcome={result.warNet > 0 ? 'win' : result.warNet < 0 ? 'loss' : 'push'}
+                label={result.warOutcome === 'war_tie' ? 'WAR RAISE (2:1)' : 'WAR RAISE'}
+                outcome={result.warNet > 0 ? 'win' : 'loss'}
                 amount={Math.abs(result.warNet)}
               />
             )}
             <View style={s.netDivider} />
             <View style={s.netRow}>
               <Text style={s.netLabel}>NET</Text>
-              <Text style={[s.netAmt, { color: result.netChips > 0 ? '#00ff88' : result.netChips < 0 ? '#ff4444' : '#00d4ff' }]}>
-                {fmtNet(result.netChips)}
+              <Text style={[s.netAmt, {
+                fontFamily: 'Inter_700Bold',
+                color: result.netChips > 0 ? '#00ff88' : result.netChips < 0 ? '#ff4444' : '#00d4ff',
+              }]}>
+                {result.netChips > 0 ? `+${fmt(result.netChips)}` : result.netChips < 0 ? `-${fmt(Math.abs(result.netChips))}` : 'PUSH'}
               </Text>
             </View>
           </Animated.View>
         )}
 
-        {/* Action buttons */}
+        {/* Deal button */}
         {phase === 'betting' && (
           <View style={s.btnRow}>
             <ActionBtn
@@ -602,45 +637,48 @@ export default function CasinoWarScreen() {
               sub={canAfford ? `Bet ${fmt(totalBet)}` : 'Insufficient chips'}
               onPress={handleDeal}
               disabled={!canAfford || isBusted}
-              accent="#FF6EA0"
+              accent={accent}
               fill
             />
           </View>
         )}
 
-        {phase === 'war_choice' && (
+        {/* War options */}
+        {isWarChoice && (
           <View style={s.btnRow}>
             <ActionBtn
               label="SURRENDER"
               sub={`Lose ${fmt(Math.floor(ante / 2))}`}
               onPress={handleSurrender}
-              accent="rgba(255,255,255,0.5)"
+              accent="rgba(255,255,255,0.55)"
             />
             <ActionBtn
               label="GO TO WAR"
               sub={`+${fmt(ante)} raise`}
               onPress={handleGoToWar}
               disabled={profile.chips < ante}
-              accent="#FF6EA0"
+              accent={accent}
               fill
             />
           </View>
         )}
 
+        {/* Dealing spinner text */}
+        {isDealing && (
+          <View style={s.dealingRow}>
+            <Text style={[s.dealingText, { color: `${accent}66` }]}>DEALING...</Text>
+          </View>
+        )}
+
+        {/* Next hand */}
         {isResult && (
           <View style={s.btnRow}>
             <ActionBtn
               label={isBusted ? 'CHANGE STAKES' : 'NEXT HAND'}
               onPress={isBusted ? () => setPhase('stake') : handleNextHand}
-              accent="#00D4C8"
+              accent={accent}
               fill
             />
-          </View>
-        )}
-
-        {isDealing && (
-          <View style={s.dealingRow}>
-            <Text style={s.dealingText}>DEALING...</Text>
           </View>
         )}
       </View>
@@ -652,22 +690,25 @@ export default function CasinoWarScreen() {
 const s = StyleSheet.create({
   root:         { flex: 1 },
 
-  topBar:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 8, gap: 8 },
-  backBtn:      { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  titleBlock:   { flex: 1, alignItems: 'center' },
-  titleText:    { fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: '#FF6EA0', letterSpacing: 3 },
-  stakeLabel:   { fontSize: 9, color: 'rgba(255,255,255,0.35)', letterSpacing: 1, marginTop: 2 },
-  helpBtn:      { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+  header:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingBottom: 8, gap: 8 },
+  backBtn:      { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.06)' },
+  headerCenter: { flex: 1, alignItems: 'center' },
+  headerTitle:  { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
+  headerSub:    { fontSize: 9, color: 'rgba(255,255,255,0.35)', letterSpacing: 1, marginTop: 2 },
+  headerRight:  { flexDirection: 'row', gap: 6 },
+  iconBtn:      { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.05)' },
+  iconBtnMuted: { backgroundColor: 'rgba(255,255,255,0.03)' },
 
-  balanceBar:   { alignItems: 'center', marginBottom: 4 },
-  balLabel:     { fontSize: 7, fontFamily: 'Orbitron_400Regular', letterSpacing: 2, color: 'rgba(255,255,255,0.28)' },
-  balAmt:       { fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: '#ffd700' },
+  table:        { flex: 1, justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 4 },
 
-  table:        { flex: 1, justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: 20 },
+  stationWrap:  { alignItems: 'center' },
 
-  cardSection:  { alignItems: 'center' },
+  playerStation:{ alignItems: 'center', gap: 8 },
+  playerChipRow:{ flexDirection: 'row', alignItems: 'center', gap: 5 },
+  chipDot:      { width: 10, height: 10, borderRadius: 5, backgroundColor: '#ffd700', borderWidth: 2, borderColor: 'rgba(255,215,0,0.4)' },
+  playerChipAmt:{ fontSize: 14, color: '#ffd700', letterSpacing: 0.5 },
 
-  centerZone:   { width: '100%', alignItems: 'center', minHeight: 60, justifyContent: 'center' },
+  centerZone:   { width: '100%', alignItems: 'center', minHeight: 56, justifyContent: 'center' },
   vsDivider:    { flexDirection: 'row', alignItems: 'center', gap: 10, width: '60%' },
   vsLine:       { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.10)' },
   vsText:       { fontSize: 10, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: 'rgba(255,255,255,0.18)', letterSpacing: 2 },
@@ -676,19 +717,19 @@ const s = StyleSheet.create({
   warText:      { fontSize: 22, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 4 },
 
   outcomeBanner:{ alignItems: 'center' },
-  outcomeText:  { fontSize: 20, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
+  outcomeText:  { fontSize: 18, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
 
   bottom:       { paddingHorizontal: 16, gap: 10 },
 
-  circles:      { flexDirection: 'row', justifyContent: 'center', gap: 20, paddingVertical: 6 },
+  circles:      { flexDirection: 'row', justifyContent: 'center', gap: 20, paddingTop: 4 },
 
   resultPanel:  { borderRadius: 14, overflow: 'hidden', paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  netDivider:   { height: 1, backgroundColor: 'rgba(255,255,255,0.09)', marginVertical: 6 },
+  netDivider:   { height: 1, backgroundColor: 'rgba(255,255,255,0.09)', marginVertical: 5 },
   netRow:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   netLabel:     { fontSize: 9, fontFamily: 'Orbitron_700Bold', letterSpacing: 2, color: 'rgba(255,255,255,0.45)' },
-  netAmt:       { fontSize: 22, fontWeight: '900', fontFamily: 'Orbitron_900Black' },
+  netAmt:       { fontSize: 20, fontWeight: '900' },
 
   btnRow:       { flexDirection: 'row', gap: 10 },
-  dealingRow:   { alignItems: 'center', paddingVertical: 14 },
-  dealingText:  { fontSize: 10, fontFamily: 'Orbitron_400Regular', letterSpacing: 3, color: 'rgba(255,255,255,0.28)' },
+  dealingRow:   { alignItems: 'center', paddingVertical: 12 },
+  dealingText:  { fontSize: 10, fontFamily: 'Orbitron_400Regular', letterSpacing: 3 },
 });

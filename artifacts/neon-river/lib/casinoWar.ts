@@ -4,11 +4,13 @@
  * Tie Bet pays 10:1. War tie bonus pays 2:1 on war raise.
  */
 
+import type { Suit } from './pokerEngine';
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface CWCard {
   rank: string;
-  suit: string;
+  suit: Suit;      // 'S' | 'H' | 'D' | 'C'  — compatible with PlayingCard
   value: number;   // 2–14 (Ace = 14)
   color: 'red' | 'black';
 }
@@ -35,8 +37,8 @@ export interface CWResult {
 // ─── Deck helpers ─────────────────────────────────────────────────────────────
 
 const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'] as const;
-const SUITS = ['♠','♥','♦','♣'] as const;
-const RED_SUITS = new Set(['♥','♦']);
+const SUITS: Suit[] = ['S', 'H', 'D', 'C'];
+const RED_SUITS = new Set<Suit>(['H', 'D']);
 
 function buildDeck(): CWCard[] {
   const deck: CWCard[] = [];
