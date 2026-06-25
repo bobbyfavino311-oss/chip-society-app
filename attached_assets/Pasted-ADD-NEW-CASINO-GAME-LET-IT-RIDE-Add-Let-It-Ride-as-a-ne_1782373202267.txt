@@ -1,0 +1,316 @@
+ADD NEW CASINO GAME — LET IT RIDE
+
+Add Let It Ride as a new permanent game under the Casino Games section.
+
+Casino Games should now include:
+
+• Three Card Poker
+• Blackjack
+• Ultimate Texas Hold’em
+• Casino War
+• Let It Ride
+• More Games Coming Soon
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME CONCEPT
+
+Let It Ride is a poker-based casino game where the player is not playing against the dealer or other players.
+
+The player is simply trying to make the best five-card poker hand using:
+
+• 3 player cards
+• 2 community cards
+
+Winning hands are paid according to the payout schedule.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE LAYOUT
+
+Use the attached payout/table reference for structure only.
+
+The betting layout must show three betting circles:
+
+$
+2
+1
+
+These represent the three required equal bets.
+
+Visual order should match the table:
+
+$   2   1
+
+The player places three equal wagers before the hand begins.
+
+Example:
+
+If table stake is 100K:
+
+$ = 100K
+2 = 100K
+1 = 100K
+
+Total starting wager:
+
+300K
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BONUS BET
+
+Add optional Bonus Bet.
+
+After placing the three equal wagers, the player may optionally activate the bonus spot.
+
+Bonus Bet should be separate from the main three wagers.
+
+Bonus pays only on stronger hands, such as Three of a Kind or better.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DEAL
+
+Dealer deals:
+
+• 3 cards to the player
+• 2 community cards face down
+
+Player cards are shown to the player.
+
+Community cards remain face down until revealed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FIRST DECISION
+
+After seeing their first 3 cards, the player chooses:
+
+TAKE BACK BET 1
+
+or
+
+LET IT RIDE
+
+If player takes back Bet 1:
+
+Return the first wager to the player.
+
+If player lets it ride:
+
+Bet 1 stays active.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FIRST COMMUNITY CARD
+
+Dealer burns the bottom card.
+
+Dealer reveals the first community card.
+
+Player now sees:
+
+• 3 player cards
+• 1 community card
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SECOND DECISION
+
+Player chooses:
+
+TAKE BACK BET 2
+
+or
+
+LET IT RIDE
+
+If player takes back Bet 2:
+
+Return the second wager to the player.
+
+If player lets it ride:
+
+Bet 2 stays active.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+THIRD BET RULE
+
+The third bet can never be taken back.
+
+Regardless of earlier choices:
+
+The final bet must always stay active.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SECOND COMMUNITY CARD
+
+Dealer reveals the second community card.
+
+Player’s final five-card hand is evaluated using:
+
+• 3 player cards
+• 2 community cards
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PAYOUT REQUIREMENT
+
+Only winning hands are paid.
+
+Minimum winning hand:
+
+Pair of Tens or Better
+
+Anything below Pair of Tens:
+
+Lose all remaining active wagers.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MAIN PAYOUT TABLE
+
+Use this payout schedule:
+
+Royal Flush — 1000 : 1
+Straight Flush — 200 : 1
+Four of a Kind — 50 : 1
+Full House — 11 : 1
+Flush — 8 : 1
+Straight — 5 : 1
+Three of a Kind — 3 : 1
+Two Pair — 2 : 1
+Pair of 10s or Better — 1 : 1
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PAYOUT EXAMPLE
+
+Player starts with:
+
+Bet $ = 100K
+Bet 2 = 100K
+Bet 1 = 100K
+
+Player takes back Bet 1.
+
+Player lets Bet 2 ride.
+
+Final active bets:
+
+Bet $ = 100K
+Bet 2 = 100K
+
+Player gets Flush.
+
+Flush pays 8:1.
+
+Payout:
+
+Bet $ +800K
+Bet 2 +800K
+
+Total win:
+
+1.6M
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+INFO BUTTON
+
+Do not show the full payout table permanently on the table.
+
+Add an Info button in the corner.
+
+Info panel should include:
+
+• How to Play
+• What “Let It Ride” means
+• Bet $ / 2 / 1 explanation
+• Bonus Bet explanation
+• Main payout table
+• Bonus payout table
+• Poker hand rankings
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE DESIGN
+
+Use Chip Society style, not the reference image style.
+
+Visual style:
+
+• Dark teal felt
+• Cyan accents
+• Pink highlights
+• Gold payout effects
+• Orbitron font
+• Clean neon casino UI
+• Premium card animations
+
+The table should feel consistent with Blackjack, Three Card Poker, Ultimate Texas Hold’em, and Casino War.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACTION BUTTONS
+
+Before first community card:
+
+LET IT RIDE
+TAKE BACK BET 1
+
+After first community card:
+
+LET IT RIDE
+TAKE BACK BET 2
+
+After second community card:
+
+SHOW RESULT / NEXT HAND
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RESULT SCREEN
+
+Display each wager separately.
+
+Example:
+
+BET $ +800K
+BET 2 +800K
+BET 1 RETURNED
+
+HAND:
+
+FLUSH
+
+TOTAL WIN:
+
+1.6M
+
+Use compact chip formatting:
+
+100K
+1M
+1.5M
+1.3B
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+Let It Ride should feel fast, simple, and premium.
+
+The player should clearly understand:
+
+• They are not playing against the dealer.
+• They are trying to make the best poker hand.
+• They can pull back Bet 1 and Bet 2.
+• The third bet always stays.
+• Pair of 10s or better is the minimum winning hand.
+• Payouts are based on the final five-card hand.
+
+Build this as a polished Chip Society casino game, not a generic web casino layout.

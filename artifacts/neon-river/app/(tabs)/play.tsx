@@ -81,6 +81,24 @@ function CasinoWarIcon({ size = 15, color = '#ffd700' }: { size?: number; color?
   );
 }
 
+function LetItRideIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* Three stacked cards — fan out left to right */}
+      <G transform="rotate(-18, 12, 13)">
+        <Rect x="5" y="4" width="9" height="13" rx="1.8" fill={`${color}15`} stroke={color} strokeWidth="1.1" />
+        <SvgText x="6.2" y="13" fontSize="5.5" fontWeight="bold" fill={color}>3</SvgText>
+      </G>
+      <Rect x="7.5" y="5" width="9" height="13" rx="1.8" fill="#050010" stroke={color} strokeWidth="1.2" />
+      <SvgText x="9" y="14" fontSize="5.5" fontWeight="bold" fill={color}>2</SvgText>
+      <G transform="rotate(18, 12, 13)">
+        <Rect x="10" y="4" width="9" height="13" rx="1.8" fill={`${color}12`} stroke={color} strokeWidth="1.1" />
+        <SvgText x="11.2" y="13" fontSize="5.5" fontWeight="bold" fill={color}>1</SvgText>
+      </G>
+    </Svg>
+  );
+}
+
 function BlackjackIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
@@ -835,6 +853,13 @@ export default function PlayScreen() {
               iconNode: <CasinoWarIcon size={15} color="#ffd700" />,
               sub:      'Instant action · Tie pays 10:1 · Go to War',
               onPress:  () => router.push('/casino/casino-war' as any),
+            },
+            {
+              label:    'LET IT RIDE',
+              icon:     'card-outline',
+              iconNode: <LetItRideIcon size={15} color="#ffd700" />,
+              sub:      'Three bets · Pull back two · Pair of 10s to win',
+              onPress:  () => router.push('/casino/let-it-ride' as any),
             },
             {
               label:  'MORE GAMES COMING SOON',
