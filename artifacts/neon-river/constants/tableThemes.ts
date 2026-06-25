@@ -1,4 +1,4 @@
-export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'sakura_garden' | 'frozen_neon' | 'crimson_noir';
+export type ThemeId = 'neon_default' | 'dragon_fortune' | 'royal_masquerade' | 'sakura_garden' | 'frozen_neon' | 'crimson_noir' | 'vercetti';
 
 export interface TableTheme {
   id: ThemeId;
@@ -19,7 +19,7 @@ export interface TableTheme {
 
   cardBackBg: string;
   cardBackAccent: string;
-  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'sakura_blossom' | 'frozen_glass' | 'crimson_silk';
+  cardBackPattern: 'mandala' | 'dragon_scale' | 'masquerade_veil' | 'sakura_blossom' | 'frozen_glass' | 'crimson_silk' | 'tropical_palm';
   cardHighlightColor: string;
 
   chipTokenColor: string;
@@ -329,6 +329,53 @@ export const CRIMSON_NOIR: TableTheme = {
   previewColors: ['#050505', '#A0001C', '#D4002A'],
 };
 
+export const VERCETTI: TableTheme = {
+  id: 'vercetti',
+  name: 'VERCETTI',
+  tagline: 'A luxury Miami beachfront casino. Tropical nights, neon pink, and turquoise palms.',
+  rarity: 'LEGENDARY',
+
+  bgGradient: ['#003844', '#002030', '#001820', '#002030', '#003844'],
+
+  glowA: 'rgba(255,110,160,0.14)',
+  glowB: 'rgba(0,200,200,0.10)',
+  glowCenter: 'rgba(0,80,90,0.10)',
+
+  tableSurfaceBg: 'transparent',
+  tableSurfaceBorder: 'rgba(255,110,160,0.42)',
+  tableSurfaceShadow: '#FF6EA0',
+  tableCenterGlow: 'transparent',
+
+  cardBackBg: '#004455',
+  cardBackAccent: '#FF6EA0',
+  cardBackPattern: 'tropical_palm',
+  cardHighlightColor: '#FF6EA0',
+
+  chipTokenColor: '#00D4C8',
+  chipWinTokenColor: '#FFB8D0',
+
+  potBg: 'rgba(0,25,35,0.78)',
+  potBorder: 'rgba(255,110,160,0.45)',
+  potShadow: '#FF6EA0',
+  potLabelColor: 'rgba(255,110,160,0.55)',
+  potAmountColor: '#FFB8D0',
+
+  foldAccent: '#A04060',
+  checkAccent: '#00C8B8',
+  callAccent: '#00A898',
+  raiseAccent: '#FF6EA0',
+  allInAccent: '#FFB8D0',
+
+  accentPrimary: '#FF6EA0',
+  accentSecondary: '#00D4C8',
+  textColor: '#FFE8F0',
+
+  winEffectStyle: 'gold_shimmer',
+  winGoldColor: '#FFB8D0',
+
+  previewColors: ['#003040', '#FF6EA0', '#00D4C8'],
+};
+
 export const ALL_TABLE_THEMES: TableTheme[] = [
   NEON_DEFAULT,
   DRAGON_FORTUNE,
@@ -336,4 +383,5 @@ export const ALL_TABLE_THEMES: TableTheme[] = [
   SAKURA_GARDEN,
   FROZEN_NEON,
   CRIMSON_NOIR,
+  VERCETTI,
 ];

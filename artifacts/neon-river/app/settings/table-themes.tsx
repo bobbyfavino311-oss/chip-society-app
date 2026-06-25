@@ -118,6 +118,34 @@ function SakuraGardenPreview({ size = 40 }: { size?: number }) {
   );
 }
 
+// ─── Vercetti tropical palm mini-preview ───────────────────────────────────────
+function VercettiPreview({ size = 40 }: { size?: number }) {
+  const s = size;
+  const pink = '#FF6EA0';
+  const cyan = '#00D4C8';
+  const teal = '#004455';
+  return (
+    <Svg width={s} height={s} viewBox="0 0 40 40">
+      {/* Sky background */}
+      <Rect x={0} y={0} width={40} height={40} fill={teal} fillOpacity={0.6} rx={4} />
+      {/* Palm trunk */}
+      <Path d="M 20 38 Q 19 30, 20 22 Q 21 16, 20 10"
+        fill="none" stroke="#005566" strokeWidth={2.5} strokeLinecap="round" />
+      {/* Palm fronds */}
+      <Path d="M 20 10 Q 10 6, 4 10" fill="none" stroke={cyan} strokeWidth={1.4} strokeLinecap="round" strokeOpacity={0.85} />
+      <Path d="M 20 10 Q 30 6, 36 10" fill="none" stroke={cyan} strokeWidth={1.4} strokeLinecap="round" strokeOpacity={0.85} />
+      <Path d="M 20 10 Q 16 4, 14 0" fill="none" stroke={cyan} strokeWidth={1.2} strokeLinecap="round" strokeOpacity={0.70} />
+      <Path d="M 20 10 Q 24 4, 26 0" fill="none" stroke={cyan} strokeWidth={1.2} strokeLinecap="round" strokeOpacity={0.70} />
+      <Path d="M 20 10 Q 8 12, 2 18" fill="none" stroke={cyan} strokeWidth={1.0} strokeLinecap="round" strokeOpacity={0.55} />
+      <Path d="M 20 10 Q 32 12, 38 18" fill="none" stroke={cyan} strokeWidth={1.0} strokeLinecap="round" strokeOpacity={0.55} />
+      {/* Neon pink glow dot at crown */}
+      <Circle cx={20} cy={10} r={2} fill={pink} fillOpacity={0.80} />
+      {/* Horizon pink line */}
+      <Line x1={2} y1={30} x2={38} y2={30} stroke={pink} strokeWidth={0.8} strokeOpacity={0.40} />
+    </Svg>
+  );
+}
+
 // ─── Theme card ───────────────────────────────────────────────────────────────
 function ThemeCard({
   theme,
@@ -132,6 +160,7 @@ function ThemeCard({
   const isDragon      = theme.id === 'dragon_fortune';
   const isMasquerade  = theme.id === 'royal_masquerade';
   const isSakura      = theme.id === 'sakura_garden';
+  const isVercetti    = theme.id === 'vercetti';
 
   // Derive accent colors from the theme itself
   const primary   = theme.accentPrimary;
@@ -155,12 +184,15 @@ function ThemeCard({
     ? ['#140026', '#0C0018', '#080010']
     : isSakura
     ? ['#200814', '#160510', '#0E030C']
+    : isVercetti
+    ? ['#003040', '#001E28', '#001018']
     : ['#0e0028', '#08001a', '#050010'];
 
   function Preview() {
     if (isDragon)     return <DragonScalePreview  size={42} />;
     if (isMasquerade) return <MasqueradePreview   size={42} />;
     if (isSakura)     return <SakuraGardenPreview  size={42} />;
+    if (isVercetti)   return <VercettiPreview      size={42} />;
     return <NeonMandalaPreview size={42} />;
   }
 

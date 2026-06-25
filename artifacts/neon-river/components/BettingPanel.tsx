@@ -85,6 +85,7 @@ export default function BettingPanel({
   const isDragon     = theme.id === 'dragon_fortune';
   const isMasquerade = theme.id === 'royal_masquerade';
   const isSakura     = theme.id === 'sakura_garden';
+  const isVercetti   = theme.id === 'vercetti';
 
   const maxRaise = myChips;
   const canRaise = myChips > callAmount && myChips >= minRaise;
@@ -128,6 +129,8 @@ export default function BettingPanel({
     ? { backgroundColor: 'rgba(8,0,20,0.97)',  borderTopColor: 'rgba(180,140,40,0.28)'  }
     : isSakura
     ? { backgroundColor: 'rgba(12,4,10,0.97)', borderTopColor: 'rgba(232,98,122,0.28)'  }
+    : isVercetti
+    ? { backgroundColor: 'rgba(0,20,28,0.94)', borderTopColor: 'rgba(255,110,160,0.35)' }
     : {};
 
   return (
@@ -142,9 +145,10 @@ export default function BettingPanel({
                   key={b.label}
                   style={[
                     styles.quickBtn,
-                    isDragon     && { backgroundColor: 'rgba(20,0,0,0.6)',  borderWidth: 1, borderColor: 'rgba(139,0,0,0.30)'    },
-                    isMasquerade && { backgroundColor: 'rgba(16,0,36,0.6)', borderWidth: 1, borderColor: 'rgba(155,48,255,0.22)' },
-                    isSakura     && { backgroundColor: 'rgba(20,8,16,0.6)',  borderWidth: 1, borderColor: 'rgba(232,98,122,0.20)'  },
+                    isDragon     && { backgroundColor: 'rgba(20,0,0,0.6)',   borderWidth: 1, borderColor: 'rgba(139,0,0,0.30)'     },
+                    isMasquerade && { backgroundColor: 'rgba(16,0,36,0.6)', borderWidth: 1, borderColor: 'rgba(155,48,255,0.22)'  },
+                    isSakura     && { backgroundColor: 'rgba(20,8,16,0.6)', borderWidth: 1, borderColor: 'rgba(232,98,122,0.20)'   },
+                    isVercetti   && { backgroundColor: 'rgba(0,30,40,0.6)', borderWidth: 1, borderColor: 'rgba(255,110,160,0.22)' },
                   ]}
                   onPress={() => setRaiseAmount(clampRaise(b.amount))}
                   disabled={disabled}
@@ -152,9 +156,10 @@ export default function BettingPanel({
                 >
                   <Text style={[
                     styles.quickLabel,
-                    isDragon     && { color: 'rgba(200,155,60,0.55)'  },
-                    isMasquerade && { color: 'rgba(212,175,55,0.50)'  },
-                    isSakura     && { color: 'rgba(244,168,192,0.48)' },
+                    isDragon     && { color: 'rgba(200,155,60,0.55)'   },
+                    isMasquerade && { color: 'rgba(212,175,55,0.50)'   },
+                    isSakura     && { color: 'rgba(244,168,192,0.48)'  },
+                    isVercetti   && { color: 'rgba(255,184,208,0.55)'  },
                   ]}>
                     {b.label}
                   </Text>
@@ -163,6 +168,7 @@ export default function BettingPanel({
                     isDragon     && { color: '#EAE3D2' },
                     isMasquerade && { color: '#F0E8FF' },
                     isSakura     && { color: '#FFE8F0' },
+                    isVercetti   && { color: '#FFB8D0' },
                   ]}>
                     {fmt(b.amount)}
                   </Text>
@@ -171,9 +177,10 @@ export default function BettingPanel({
               <TouchableOpacity
                 style={[
                   styles.quickBtn,
-                  isDragon     ? { backgroundColor: 'rgba(50,0,0,0.5)',  borderWidth: 1, borderColor: 'rgba(139,0,0,0.45)'    }
-                  : isMasquerade ? { backgroundColor: 'rgba(30,0,60,0.5)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.40)' }
-                  : isSakura     ? { backgroundColor: 'rgba(32,10,24,0.5)', borderWidth: 1, borderColor: 'rgba(232,98,122,0.42)'  }
+                  isDragon     ? { backgroundColor: 'rgba(50,0,0,0.5)',   borderWidth: 1, borderColor: 'rgba(139,0,0,0.45)'     }
+                  : isMasquerade ? { backgroundColor: 'rgba(30,0,60,0.5)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.40)'  }
+                  : isSakura     ? { backgroundColor: 'rgba(32,10,24,0.5)', borderWidth: 1, borderColor: 'rgba(232,98,122,0.42)' }
+                  : isVercetti   ? { backgroundColor: 'rgba(0,40,50,0.5)', borderWidth: 1, borderColor: 'rgba(255,110,160,0.45)' }
                   : styles.quickAllIn,
                 ]}
                 onPress={() => setRaiseAmount(maxRaise)}
@@ -185,6 +192,7 @@ export default function BettingPanel({
                   isDragon     ? { color: '#8B0000'  }
                   : isMasquerade ? { color: '#9B30FF'  }
                   : isSakura     ? { color: '#C4407C'  }
+                  : isVercetti   ? { color: '#FF6EA0'  }
                   : { color: colors.secondary },
                 ]}>
                   ALL IN
@@ -194,6 +202,7 @@ export default function BettingPanel({
                   isDragon     ? { color: '#C89B3C' }
                   : isMasquerade ? { color: '#D4AF37' }
                   : isSakura     ? { color: '#F4A8C0' }
+                  : isVercetti   ? { color: '#FFB8D0' }
                   : { color: colors.secondary },
                 ]}>
                   {fmt(maxRaise)}

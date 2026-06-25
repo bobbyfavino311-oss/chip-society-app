@@ -40,6 +40,8 @@ import FrozenNeonBackground from '@/components/FrozenNeonBackground';
 import FrozenNeonCardFrame from '@/components/FrozenNeonCardFrame';
 import CrimsonNoirBackground from '@/components/CrimsonNoirBackground';
 import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
+import VercettiBackground from '@/components/VercettiBackground';
+import VercettiCardFrame from '@/components/VercettiCardFrame';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -414,7 +416,8 @@ export default function PracticeScreen() {
   const isSakura      = theme.id === 'sakura_garden';
   const isFrozenNeon  = theme.id === 'frozen_neon';
   const isCrimsonNoir = theme.id === 'crimson_noir';
-  const needsFrame    = isDragon || isMasquerade || isSakura || isFrozenNeon || isCrimsonNoir;
+  const isVercetti    = theme.id === 'vercetti';
+  const needsFrame    = isDragon || isMasquerade || isSakura || isFrozenNeon || isCrimsonNoir || isVercetti;
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // ── Chip-fly animation refs — must be declared before any early return ─────
@@ -651,7 +654,7 @@ export default function PracticeScreen() {
         start={{ x: 0.3, y: 0 }} end={{ x: 0.7, y: 1 }}
       />
       {/* Ambient glow blobs — only for the default neon theme */}
-      {!isDragon && !isMasquerade && !isSakura && !isFrozenNeon && !isCrimsonNoir && (
+      {!isDragon && !isMasquerade && !isSakura && !isFrozenNeon && !isCrimsonNoir && !isVercetti && (
         <>
           <View style={[styles.glowPurple, { backgroundColor: theme.glowA }]} />
           <View style={[styles.glowCyan,   { backgroundColor: theme.glowB }]} />
@@ -660,11 +663,12 @@ export default function PracticeScreen() {
       )}
 
       {/* Theme atmospheric backgrounds */}
-      {isDragon     && <DragonBackground />}
-      {isMasquerade && <MasqueradeBackground />}
-      {isSakura     && <SakuraBackground />}
-      {isFrozenNeon && <FrozenNeonBackground />}
+      {isDragon      && <DragonBackground />}
+      {isMasquerade  && <MasqueradeBackground />}
+      {isSakura      && <SakuraBackground />}
+      {isFrozenNeon  && <FrozenNeonBackground />}
       {isCrimsonNoir && <CrimsonNoirBackground />}
+      {isVercetti    && <VercettiBackground />}
 
       {/* Exit modal */}
       <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
@@ -770,6 +774,9 @@ export default function PracticeScreen() {
           )}
           {isCrimsonNoir && tableLayout.w > 0 && (
             <CrimsonNoirCardFrame width={tableLayout.w} height={tableLayout.h} />
+          )}
+          {isVercetti && tableLayout.w > 0 && (
+            <VercettiCardFrame width={tableLayout.w} height={tableLayout.h} />
           )}
         <View style={[styles.tableSurface, {
           borderColor: theme.tableSurfaceBorder,

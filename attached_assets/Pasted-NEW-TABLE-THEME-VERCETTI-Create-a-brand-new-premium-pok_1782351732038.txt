@@ -1,0 +1,154 @@
+NEW TABLE THEME — VERCETTI
+
+Create a brand-new premium poker table theme named Vercetti, using the exact uploaded tropical background image as the table surface. Do not recreate, reinterpret, or generate a similar pattern—the uploaded image itself should be used as the base artwork for this theme.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+THEME NAME
+
+Vercetti
+
+Inspired by 1980s Miami, luxury beachfront estates, tropical nights, and neon casino culture.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BACKGROUND
+
+Use the exact uploaded image as the table background.
+
+Requirements:
+
+• Use the full-resolution uploaded artwork.
+• Do not crop away the palm trees unnecessarily.
+• Preserve the turquoise gradient and tropical pattern exactly as shown.
+• Scale the artwork proportionally so it fills the entire table surface cleanly.
+• Do not blur, repaint, or AI-regenerate the background.
+
+The uploaded image is the theme.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMMUNITY CARD BORDER
+
+Replace the standard community card border with a premium Miami pink design.
+
+Style:
+
+• Soft neon pink outline
+• Thin metallic rose-gold accent
+• Subtle inner glow
+• Rounded corners
+• Elegant—not oversized
+• Match the Vice/Miami aesthetic
+
+Do not use bright red.
+
+Do not use thick glowing borders.
+
+The border should feel luxurious and understated.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE RAIL
+
+Use a clean premium trim.
+
+Suggested colors:
+
+• Satin black
+• Rose gold accents
+• Cyan highlights
+
+The trim should frame the tropical artwork without overpowering it.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REMOVE DARK OVERLAYS
+
+There are still semi-transparent black rectangles appearing on the gameplay themes.
+
+These must be completely removed.
+
+Current problems:
+
+• Transparent black rectangle behind the table
+• Transparent black rectangle at the bottom of the screen
+• Dark overlays reducing visibility of the artwork
+
+These exist across multiple themes.
+
+Remove them entirely.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REPLACE WITH CLEAN LAYOUT
+
+Instead of dark overlays:
+
+Allow the theme artwork to extend naturally across the screen.
+
+UI elements should float directly over the background with proper spacing.
+
+Cards, chips, buttons, and betting controls should remain readable through:
+
+• Subtle glows
+• Thin borders
+• Soft shadows
+
+Do not rely on giant translucent black boxes.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UI COLOR PALETTE
+
+Use:
+
+• Miami Cyan
+• Neon Pink
+• Deep Aqua
+• Satin Black
+• Rose Gold
+
+Avoid introducing unrelated colors.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BUTTONS
+
+Buttons should complement the theme:
+
+• Cyan outlines
+• Pink highlights
+• Soft glow on interaction
+• Matte dark interiors
+
+Premium casino styling.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CHIP SOCIETY DESIGN LANGUAGE
+
+Maintain the Chip Society aesthetic:
+
+• Minimal
+• Premium
+• Neon Miami
+• High-end casino
+• Clean typography
+• No visual clutter
+
+The tropical artwork should be the centerpiece of the theme.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL QUALITY CHECK
+
+Before completion verify:
+
+✅ The exact uploaded image is used as the table background.
+✅ The artwork fills the table correctly without distortion.
+✅ Community cards have elegant pink Miami-inspired borders.
+✅ All semi-transparent black rectangles have been removed from every table theme.
+✅ The background remains fully visible behind the gameplay.
+✅ Buttons and UI complement the tropical artwork without covering it.
+✅ The theme feels like a luxury Miami casino table inspired by the Vercetti era.
