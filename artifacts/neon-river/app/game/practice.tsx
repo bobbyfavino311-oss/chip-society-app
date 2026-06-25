@@ -367,7 +367,8 @@ export default function PracticeScreen() {
   const { profile, recordWin, recordLoss, addChips, removeChips } = useUser();
   const { tier, variant: variantParam, players: playersParam } = useLocalSearchParams<{ tier?: string; variant?: string; players?: string }>();
   const tableConfig = STAKE_CONFIGS[tier ?? ''] ?? STAKE_CONFIGS.casual;
-  const gameVariant = (variantParam === 'short_deck_holdem' ? 'short_deck_holdem' : 'texas_holdem') as import('@/constants/gameVariants').GameVariant;
+  const VALID_VARIANTS = new Set(['texas_holdem', 'short_deck_holdem', 'joker_holdem']);
+  const gameVariant = (VALID_VARIANTS.has(variantParam ?? '') ? variantParam : 'texas_holdem') as import('@/constants/gameVariants').GameVariant;
   const initialPlayers = playersParam ? Math.max(4, Math.min(5, parseInt(playersParam, 10))) : 5;
   const autoStart = !!playersParam;
 
