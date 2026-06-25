@@ -1,0 +1,134 @@
+I would actually make a few additional improvements while you’re changing this screen. Here’s the prompt I’d give the AI:
+
+⸻
+
+ULTIMATE TEXAS HOLD’EM UI REFINEMENT
+
+The Ultimate Texas Hold’em screen is close, but several UI elements need to be updated to better match the overall Chip Society design language. These changes should make the interface cleaner, more intuitive, and consistent with the rest of the game.
+
+⸻
+
+1. REMOVE THE BITCOIN ICON
+
+The chip balance at the top currently uses a Bitcoin-style currency symbol.
+
+This should never be used anywhere in Chip Society.
+
+Replace it with the official Chip Society chip icon (the same gold casino chip icon used throughout the app for chip balances, rewards, and payouts).
+
+Maintain the current abbreviated number formatting (e.g. 322.5M, 1.3B, etc.), but use the Chip Society currency icon instead.
+
+⸻
+
+2. MOVE PLAYER CHIP BALANCE
+
+The player’s chip balance should not appear at the top of the screen.
+
+Move the chip balance to the player’s side of the table.
+
+Place it directly above the betting circles and below the player’s two hole cards, so it is visually associated with the player rather than the table header.
+
+The top area should remain focused on the game, while the player’s financial information belongs near their betting area.
+
+⸻
+
+3. REPLACE THE TOP-RIGHT BUTTONS
+
+The current icons are placeholders and don’t fit the rest of the app.
+
+Remove:
+
+* Hamburger/List button
+* Swap/Arrow button
+
+Replace with:
+
+Left Button (Top Right Group):
+
+ℹ️ Information
+
+* Opens:
+    * Game Rules
+    * Blind Pay Table
+    * Trips Pay Table
+    * Dealer Qualification
+    * Hand Rankings
+    * Interactive Tutorial
+
+Use the same glowing cyan circular button style used elsewhere in Chip Society.
+
+⸻
+
+Right Button (Top Right Group):
+
+🎵 Music Toggle
+
+Replace the arrows with the music toggle used throughout the rest of the app.
+
+Behavior:
+
+* Music On
+* Music Off
+* Remember the player’s preference across all casino games.
+* Use the same icon, animations, and settings behavior as every other game mode.
+
+⸻
+
+4. REVERSE THEIR POSITIONS
+
+The order should be:
+
+Top Right
+
+ℹ️ Info
+
+🎵 Music
+
+The Information button should sit closer to the center of the screen.
+
+The Music button should be on the far right, matching the layout used elsewhere in the app.
+
+⸻
+
+5. CLEAN UP THE HEADER
+
+The top of the screen should contain only:
+
+* Back Button
+* Game Title
+* Table Stakes (ELITE • ANTE 250K)
+* Info Button
+* Music Button
+
+Remove any unnecessary icons or UI clutter.
+
+Keep the header clean and premium.
+
+⸻
+
+6. IMPROVE PLAYER SIDE
+
+The player’s section should feel like their “station.”
+
+From top to bottom:
+
+* Player Hole Cards
+* Player Chip Balance (with Chip Society chip icon)
+* Current Hand Evaluation (e.g., Pair, Flush Draw, Straight, etc., when applicable)
+* Betting Circles
+* Action Buttons
+
+Everything related to the player should stay visually grouped together.
+
+⸻
+
+7. VISUAL POLISH
+
+While making these changes:
+
+* Remove any unnecessary empty space.
+* Improve spacing between UI elements.
+* Keep all typography consistent with the Orbitron font used throughout Chip Society.
+* Maintain the minimalist premium casino aesthetic established by the redesigned Vercetti theme.
+
+The final result should feel like a polished, high-end casino table where the interface disappears into the background and the focus stays on the cards, bets, and gameplay.

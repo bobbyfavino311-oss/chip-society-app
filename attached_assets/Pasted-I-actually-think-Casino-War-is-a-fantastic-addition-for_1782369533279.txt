@@ -1,0 +1,451 @@
+I actually think Casino War is a fantastic addition for Chip Society.
+
+One thing I would change is to make it feel less like a “cheap casino filler” and more like a high-energy, 30-second adrenaline game. It should become the game’s quickest casino experience—perfect for players waiting in tournament lobbies or taking a break from poker.
+
+I’d build it like this:
+
+⸻
+
+CHIP SOCIETY — IMPLEMENT CASINO WAR
+
+MASTER DEVELOPMENT PROMPT
+
+Add Casino War as a permanent game under the Casino Games section.
+
+This should be the fastest game in Chip Society while maintaining the same premium neon Miami presentation used throughout the app.
+
+Use the attached reference image only for the layout (dealer card, player card, Ante circle, Tie Bet circle, etc.). Do not copy its graphics or styling. Redesign everything using Chip Society’s premium visual language.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME LIST
+
+Update Casino Games to include:
+
+• Three Card Poker
+
+• Blackjack
+
+• Ultimate Texas Hold’em
+
+• Casino War (NEW)
+
+• More Games Coming Soon
+
+Use a premium crossed-card icon with subtle lightning accents to emphasize quick gameplay.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DESIGN GOAL
+
+Casino War should feel like the “instant action” casino game.
+
+Average round length:
+
+10–20 seconds.
+
+Fast animations.
+
+Fast payouts.
+
+Minimal decisions.
+
+Extremely satisfying.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE DESIGN
+
+Dealer card
+
+(top center)
+
+Player card
+
+(bottom center)
+
+Betting circles:
+
+TIE BET
+
+ANTE
+
+Simple clean layout.
+
+Dark teal premium felt.
+
+Pink neon accents.
+
+Cyan lighting.
+
+Gold highlights for wins.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE STAKES
+
+Choose stake before entering.
+
+5K
+
+10K
+
+25K
+
+50K
+
+100K
+
+250K
+
+500K
+
+1M
+
+2M
+
+Only show stakes the player can afford.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BETTING
+
+Player places:
+
+ANTE
+
+Optional:
+
+TIE BET
+
+Tie Bet may be adjusted independently.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DEAL
+
+Dealer receives:
+
+One face-up card.
+
+Player receives:
+
+One face-up card.
+
+Dealer and player cards should slide simultaneously with premium animations.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD RANKING
+
+Ace High.
+
+2 lowest.
+
+Standard ranking.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER WINS
+
+If player’s card is higher:
+
+ANTE pays
+
+1:1
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER LOSES
+
+If dealer’s card is higher:
+
+Ante loses.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TIE
+
+If ranks match
+
+Pause dramatically.
+
+Neon pulse.
+
+Play dramatic sound effect.
+
+Display
+
+⚡ WAR! ⚡
+
+Player chooses
+
+SURRENDER
+
+or
+
+GO TO WAR
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SURRENDER
+
+Lose only half of Ante.
+
+Round ends.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GO TO WAR
+
+Automatically place
+
+one additional Ante.
+
+Dealer also matches.
+
+Both original wagers remain on the table.
+
+Deal one additional face-up card to player and dealer.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+WAR RESULTS
+
+Player wins
+
+Wins all three wagers.
+
+Dealer wins
+
+Lose all wagers.
+
+Tie
+
+Player automatically wins
+
+plus
+
+one extra Ante
+
+according to official Casino War rules.
+
+Celebrate with unique animation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+TIE BET
+
+Optional wager.
+
+If first cards tie
+
+Tie Bet pays
+
+10:1
+
+Dealer outcome does not matter.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ANIMATIONS
+
+Dealer card slide.
+
+Player card slide.
+
+Card flip.
+
+War splash screen.
+
+Extra cards slide in.
+
+Winning cards glow.
+
+Gold chip explosion.
+
+Neon particles.
+
+Slow-motion reveal for Aces.
+
+Camera shake on War.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AUDIO
+
+New sound effects.
+
+Card deal.
+
+Card flip.
+
+Winning ding.
+
+Losing sound.
+
+WAR announcement.
+
+Chip payout.
+
+Gold jackpot sound.
+
+Tie alarm.
+
+Button clicks.
+
+Premium casino ambience.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UI
+
+Top
+
+Balance
+
+Current stake
+
+Hands played
+
+Center
+
+Dealer card
+
+Middle
+
+Animated result banner
+
+Bottom
+
+Player card
+
+Bet circles
+
+ANTE
+
+TIE BET
+
+Large DEAL button
+
+During ties:
+
+Replace DEAL button with
+
+SURRENDER
+
+GO TO WAR
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+LIVE ODDS PANEL
+
+Optional Help button.
+
+Displays:
+
+Player Wins
+
+Dealer Wins
+
+Tie
+
+Tie Bet
+
+War Rules
+
+Ace High
+
+Simple visual explanation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+RESULTS SCREEN
+
+Display
+
+Dealer Card
+
+Player Card
+
+Outcome
+
+Payout
+
+Animated chip movement.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAYER STATISTICS
+
+Track separately.
+
+Hands Played
+
+Wins
+
+Losses
+
+War Wins
+
+War Losses
+
+Tie Bets Won
+
+Biggest Win
+
+Longest Win Streak
+
+Total Profit
+
+Win %
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACHIEVEMENTS
+
+First Victory
+
+100 Hands
+
+500 Hands
+
+1,000 Hands
+
+First War
+
+War Veteran
+
+War Champion
+
+Tie Collector
+
+Ace Slayer
+
+Lucky Seven
+
+Million Chip Winner
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PERFORMANCE
+
+Instant dealing.
+
+60 FPS.
+
+No delays.
+
+Preload every animation.
+
+Rounds should feel almost instant.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CHIP SOCIETY POLISH
+
+Casino War should become Chip Society’s fastest casino experience.
+
+It should have almost no downtime between rounds, making it ideal for players who want quick action or want to play while waiting for poker tables.
+
+The overall presentation should be sleek, modern, and unmistakably part of the Chip Society universe, with premium neon visuals, polished animations, cinematic sound design, and satisfying chip payout effects. It should feel like a first-class casino game rather than a simple high-card game.

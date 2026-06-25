@@ -57,6 +57,30 @@ function UltimateHoldemIcon({ size = 15, color = '#ffd700' }: { size?: number; c
   );
 }
 
+function CasinoWarIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      {/* Left card — rotated */}
+      <G transform="rotate(-30, 12, 14)">
+        <Rect x="7" y="4" width="10" height="14" rx="2"
+          fill={`${color}18`} stroke={color} strokeWidth="1.2" />
+        <SvgText x="8.5" y="14.5" fontSize="7" fontWeight="bold" fill={color}>A</SvgText>
+      </G>
+      {/* Right card — rotated opposite */}
+      <G transform="rotate(30, 12, 14)">
+        <Rect x="7" y="4" width="10" height="14" rx="2"
+          fill="#050010" stroke={color} strokeWidth="1.4" />
+        <SvgText x="8.5" y="14.5" fontSize="7" fontWeight="bold" fill={color}>K</SvgText>
+      </G>
+      {/* Lightning bolt — center overlay */}
+      <Path
+        d="M13.5 6 L10.5 12 L13 12 L10.5 18 L14.5 11 L12 11 Z"
+        fill={color} fillOpacity={0.9}
+      />
+    </Svg>
+  );
+}
+
 function BlackjackIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
@@ -804,6 +828,13 @@ export default function PlayScreen() {
               iconNode: <UltimateHoldemIcon size={15} color="#ffd700" />,
               sub:      'Ante · Blind · Trips Bonus · Play up to 4×',
               onPress:  () => router.push('/casino/ultimate-texas-holdem' as any),
+            },
+            {
+              label:    'CASINO WAR',
+              icon:     'flash-outline',
+              iconNode: <CasinoWarIcon size={15} color="#ffd700" />,
+              sub:      'Instant action · Tie pays 10:1 · Go to War',
+              onPress:  () => router.push('/casino/casino-war' as any),
             },
             {
               label:  'MORE GAMES COMING SOON',
