@@ -822,7 +822,7 @@ export default function PlayScreen() {
         {/* ── SHORT DECK HOLD'EM ──────────────────────────────────────── */}
         <SectionCard
           section="SHORT DECK HOLD'EM"
-          accent="#bf5fff"
+          accent="#ff0090"
           icon="layers-outline"
           title="SHORT DECK HOLD'EM"
           lines={['36-card deck · 6 through Ace only', 'Flush beats Full House']}
@@ -845,7 +845,7 @@ export default function PlayScreen() {
         {/* ── CASINO ──────────────────────────────────────────────────── */}
         <SectionCard
           section="CASINO"
-          accent="#ffd700"
+          accent="#bf5fff"
           icon="diamond-outline"
           title="CASINO GAMES"
           lines={['House games · Win chips against the dealer']}
