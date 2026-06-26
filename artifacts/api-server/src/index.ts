@@ -134,6 +134,22 @@ async function runMigrations() {
         PRIMARY KEY (blocker_id, blocked_id)
       );
     `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS bug_reports (
+        id          TEXT PRIMARY KEY,
+        player_id   TEXT,
+        username    TEXT NOT NULL DEFAULT 'Anonymous',
+        category    TEXT NOT NULL DEFAULT 'other',
+        title       TEXT NOT NULL,
+        description TEXT NOT NULL,
+        device_info JSONB NOT NULL DEFAULT '{}',
+        status      TEXT NOT NULL DEFAULT 'open',
+        priority    TEXT NOT NULL DEFAULT 'medium',
+        admin_notes TEXT,
+        created_at  TIMESTAMPTZ DEFAULT NOW(),
+        updated_at  TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
     logger.info('Startup migrations complete');
   } catch (err) {
     logger.error({ err }, 'Startup migration failed — continuing anyway');

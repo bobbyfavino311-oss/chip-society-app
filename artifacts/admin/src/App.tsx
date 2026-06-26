@@ -5,6 +5,7 @@ import Dashboard from "@/pages/Dashboard";
 import Players from "@/pages/Players";
 import PlayerDetail from "@/pages/PlayerDetail";
 import Reports from "@/pages/Reports";
+import BugReports from "@/pages/BugReports";
 import Sidebar from "@/components/Sidebar";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
@@ -37,6 +38,7 @@ function AuthGate() {
         <Route path="/players" component={Players} />
         <Route path="/players/:id" component={PlayerDetail} />
         <Route path="/reports" component={Reports} />
+        <Route path="/bugs" component={BugReports} />
         <Route>
           <div className="p-8 text-muted-foreground">Page not found.</div>
         </Route>

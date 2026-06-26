@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, Flag, LogOut, Spade } from "lucide-react";
+import { LayoutDashboard, Users, Flag, Bug, LogOut, Spade } from "lucide-react";
 
 const nav = [
-  { href: "/",        label: "Dashboard", icon: LayoutDashboard },
-  { href: "/players", label: "Players",   icon: Users },
-  { href: "/reports", label: "Reports",   icon: Flag },
+  { href: "/",        label: "Dashboard",   icon: LayoutDashboard },
+  { href: "/players", label: "Players",     icon: Users },
+  { href: "/reports", label: "Reports",     icon: Flag },
+  { href: "/bugs",    label: "Bug Reports", icon: Bug },
 ];
 
 export default function Sidebar() {

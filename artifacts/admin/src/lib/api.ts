@@ -32,4 +32,6 @@ export const api = {
   moderationHistory: ()                            => req<any>('GET',  '/admin/moderation'),
   reports:           (status?: string)             => req<any>('GET',  `/admin/reports?status=${status??'open'}`),
   resolveReport:     (id: string, b: any)          => req<any>('PUT',  `/admin/reports/${id}`, b),
+  bugReports:        (status?: string, category?: string) => req<any>('GET', `/admin/bug-reports?status=${status??'all'}&category=${category??'all'}`),
+  updateBugReport:   (id: string, b: any)          => req<any>('PATCH', `/admin/bug-reports/${id}`, b),
 };

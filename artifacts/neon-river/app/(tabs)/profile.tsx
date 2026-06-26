@@ -23,6 +23,7 @@ import colors from '@/constants/colors';
 import { useUser, getXPForLevel } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
 import NeonAvatar from '@/components/NeonAvatar';
+import BugReportModal from '@/components/BugReportModal';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
 import { useSocial } from '@/context/SocialContext';
@@ -256,6 +257,7 @@ export default function ProfileScreen() {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.username);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showBugReport, setShowBugReport] = useState(false);
   const [showTournamentInfo, setShowTournamentInfo] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminPin, setAdminPin] = useState('');
@@ -628,6 +630,27 @@ export default function ProfileScreen() {
           <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.7)" />
         </TouchableOpacity>
 
+        {/* Report a Bug */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={() => setShowBugReport(true)}
+        >
+          <LinearGradient
+            colors={['rgba(255,100,50,0.10)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={[achStyles.iconWrap, { backgroundColor: 'rgba(255,100,50,0.10)' }]}>
+            <Ionicons name="bug-outline" size={20} color="rgba(255,120,60,0.85)" />
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>REPORT A BUG</Text>
+            <Text style={achStyles.achSub}>Help us squash issues · goes to dev team</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(255,120,60,0.5)" />
+        </TouchableOpacity>
+
         <NeonSectionTitle label="STREAK" color="rgba(255,150,50,0.8)" />
         <View style={styles.card}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -659,6 +682,8 @@ export default function ProfileScreen() {
           <Text style={adminStyles.adminEntryText}>ADMIN</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <BugReportModal visible={showBugReport} onClose={() => setShowBugReport(false)} />
 
       {/* Tournament info modal */}
       <Modal

@@ -95,6 +95,23 @@ export const blocksTable = pgTable('blocks', {
   createdAt:  timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (t) => [primaryKey({ columns: [t.blockerId, t.blockedId] })]);
 
+// ── Bug reports ───────────────────────────────────────────────────────────────
+
+export const bugReportsTable = pgTable('bug_reports', {
+  id:          text('id').primaryKey(),
+  playerId:    text('player_id'),
+  username:    text('username').notNull().default('Anonymous'),
+  category:    text('category').notNull().default('other'),
+  title:       text('title').notNull(),
+  description: text('description').notNull(),
+  deviceInfo:  jsonb('device_info').$type<Record<string, unknown>>().notNull().default({}),
+  status:      text('status').notNull().default('open'),
+  priority:    text('priority').notNull().default('medium'),
+  adminNotes:  text('admin_notes'),
+  createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt:   timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export type Player                = typeof playersTable.$inferSelect;
@@ -107,3 +124,4 @@ export type Follow                = typeof followsTable.$inferSelect;
 export type Conversation          = typeof conversationsTable.$inferSelect;
 export type DirectMessage         = typeof directMessagesTable.$inferSelect;
 export type Block                 = typeof blocksTable.$inferSelect;
+export type BugReport             = typeof bugReportsTable.$inferSelect;
