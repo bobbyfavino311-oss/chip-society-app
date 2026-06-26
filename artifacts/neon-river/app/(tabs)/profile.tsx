@@ -567,7 +567,7 @@ export default function ProfileScreen() {
         <TouchableOpacity
           style={[devStyles.addChipsBtn, { borderColor: '#D4A01760', marginTop: 6 }]}
           activeOpacity={0.8}
-          onPress={() => addFortuneCookies(2, 2, 2, 2, 2, 2)}
+          onPress={() => addFortuneCookies(2, 2, 2, 2, 2)}
         >
           <Text style={{ fontSize: 14 }}>🥠</Text>
           <Text style={[devStyles.addChipsTxt, { color: '#D4A017' }]}>+ TEST COOKIES  (2×all 6 tiers)</Text>

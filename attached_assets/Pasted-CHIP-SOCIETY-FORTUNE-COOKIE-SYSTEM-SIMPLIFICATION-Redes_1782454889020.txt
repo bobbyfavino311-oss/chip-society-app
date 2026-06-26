@@ -1,0 +1,190 @@
+CHIP SOCIETY – FORTUNE COOKIE SYSTEM SIMPLIFICATION
+
+Redesign the Fortune Cookie system to remove unnecessary rarity tiers and make the progression cleaner and easier to understand.
+
+The cookie system should now contain only four rarities:
+
+* Common
+* Rare
+* Epic
+* Legendary
+
+The Uncommon cookie has been removed entirely.
+
+The Mythic Cookie remains exclusive to the Daily Wheel and should not appear in the standard Fortune Cookie collection.
+
+⸻
+
+Cookie Collection
+
+Update the collection to display only:
+
+🥠 Common
+
+🥠 Rare
+
+🥠 Epic
+
+🥠 Legendary
+
+Remove every reference to Uncommon cookies throughout the app.
+
+This includes:
+
+* Cookie inventory
+* Cookie opening screen
+* Cookie counters
+* Cookie rewards
+* Cookie descriptions
+* Achievement rewards
+* Drop tables
+* Admin tools
+* Statistics
+
+Any existing Uncommon Cookies owned by players should automatically convert into Common Fortune Cookies.
+
+⸻
+
+Updated Reward Values
+
+These values should align with the newly balanced game economy and Daily Wheel.
+
+🥠 Common Cookie
+
+Rewards:
+
+• 5,000–25,000 Chips
+
+• Small XP rewards
+
+Description:
+
+“A simple fortune containing small chip rewards and a little extra experience.”
+
+⸻
+
+🥠 Rare Cookie
+
+Rewards:
+
+• 25,000–150,000 Chips
+
+• Medium XP
+
+• Small Ticket rewards (rare)
+
+Description:
+
+“A rarer fortune offering better chip rewards and occasional premium items.”
+
+⸻
+
+🥠 Epic Cookie
+
+Rewards:
+
+• 150,000–750,000 Chips
+
+• Large XP
+
+• Tickets
+
+Description:
+
+“Epic fortunes contain premium rewards for experienced players.”
+
+⸻
+
+🥠 Legendary Cookie
+
+Rewards:
+
+• 750,000–2,000,000 Chips
+
+• 5–25 Tickets
+
+Description:
+
+“Legendary fortunes are exceptionally rare and contain Chip Society’s most valuable standard rewards.”
+
+⸻
+
+Mythic Cookie
+
+Do not display Mythic alongside the standard cookie collection.
+
+Instead, show a small premium badge that reads:
+
+⭐ Daily Wheel Exclusive
+
+Description:
+
+“The Mythic Fortune Cookie can only be won from the Daily Wheel jackpot.”
+
+It should never appear in the normal cookie inventory progression.
+
+⸻
+
+Cookie Information Cards
+
+Redesign the four information cards beneath the cookie section.
+
+Replace the current values with:
+
+Common
+
+5K–25K Chips
+
+⸻
+
+Rare
+
+25K–150K Chips
+
+⸻
+
+Epic
+
+150K–750K Chips
+
+⸻
+
+Legendary
+
+750K–2M Chips
+
+These cards should simply communicate the expected chip reward range. Ticket rewards and XP remain hidden bonuses that players discover naturally.
+
+⸻
+
+UI Updates
+
+Update the cookie inventory to display:
+
+🥠 Common ×49
+
+🥠 Rare ×10
+
+🥠 Epic ×5
+
+🥠 Legendary ×5
+
+Remove every visual reference to the Uncommon rarity.
+
+⸻
+
+Progression
+
+Players unlock cookies as follows:
+
+* Common — Available immediately.
+* Rare — Unlocks at Level 25.
+* Epic — Unlocks at Level 50.
+* Legendary — Unlocks at Level 100.
+* Mythic — Daily Wheel exclusive only.
+
+⸻
+
+Design Goal
+
+The Fortune Cookie system should now feel cleaner, easier to understand, and consistent with the rebalanced game economy. Players progress naturally from Common to Legendary while the Mythic Cookie remains a true jackpot that can only be obtained from the Daily Wheel.

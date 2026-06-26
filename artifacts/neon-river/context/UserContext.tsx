@@ -22,11 +22,10 @@ export type Rank =
 
 export type AccountType = 'registered';
 
-export type CookieTier = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+export type CookieTier = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
 const COOKIE_INV_FIELD: Record<CookieTier, keyof UserProfile> = {
   common:    'commonCookies',
-  uncommon:  'uncommonCookies',
   rare:      'rareCookies',
   epic:      'epicCookies',
   legendary: 'legendaryCookies',
@@ -34,7 +33,6 @@ const COOKIE_INV_FIELD: Record<CookieTier, keyof UserProfile> = {
 };
 const COOKIE_STAT_FIELD: Record<CookieTier, keyof UserProfile> = {
   common:    'commonCookiesOpened',
-  uncommon:  'uncommonCookiesOpened',
   rare:      'rareCookiesOpened',
   epic:      'epicCookiesOpened',
   legendary: 'legendaryCookiesOpened',
@@ -157,9 +155,8 @@ export interface UserProfile {
   createdAt: string;
   tutorialCompleted: boolean;
   isFounder?: boolean;
-  // Fortune Cookie inventory — 6 tiers
+  // Fortune Cookie inventory — 5 tiers (Uncommon removed)
   commonCookies: number;
-  uncommonCookies: number;
   rareCookies: number;
   epicCookies: number;
   legendaryCookies: number;
@@ -168,7 +165,6 @@ export interface UserProfile {
   cookiesOpened: number;
   // Per-tier opened stats
   commonCookiesOpened: number;
-  uncommonCookiesOpened: number;
   rareCookiesOpened: number;
   epicCookiesOpened: number;
   legendaryCookiesOpened: number;
@@ -213,7 +209,6 @@ const DEFAULT_PROFILE: UserProfile = {
   createdAt: new Date().toISOString(),
   tutorialCompleted: false,
   commonCookies: 3,
-  uncommonCookies: 0,
   rareCookies: 0,
   epicCookies: 0,
   legendaryCookies: 0,
@@ -221,7 +216,6 @@ const DEFAULT_PROFILE: UserProfile = {
   lastFreeCookie: null,
   cookiesOpened: 0,
   commonCookiesOpened: 0,
-  uncommonCookiesOpened: 0,
   rareCookiesOpened: 0,
   epicCookiesOpened: 0,
   legendaryCookiesOpened: 0,
@@ -276,7 +270,7 @@ interface UserContextValue {
   nextCookieIn: number;
   addXP: (amount: number) => Promise<void>;
   consumeFortuneCookie: (tier: CookieTier) => Promise<boolean>;
-  addFortuneCookies: (common?: number, uncommon?: number, rare?: number, epic?: number, legendary?: number, mythic?: number) => Promise<void>;
+  addFortuneCookies: (common?: number, rare?: number, epic?: number, legendary?: number, mythic?: number) => Promise<void>;
   claimFreeCookie: () => Promise<CookieTier | false>;
   pendingBonuses: PendingBonus[];
   dismissBonus: (notificationId: string) => void;
@@ -445,14 +439,13 @@ function backfillProfile(base: UserProfile, saved: Partial<UserProfile>): UserPr
     tournamentLosses: saved.tournamentLosses ?? 0,
     bestTournamentFinish: saved.bestTournamentFinish ?? 0,
     biggestTournamentPrize: saved.biggestTournamentPrize ?? 0,
-    commonCookies:    saved.commonCookies    ?? (saved as any).fortuneCookies ?? 0,
-    uncommonCookies:  saved.uncommonCookies  ?? (saved as any).goldenCookies  ?? 0,
+    // Uncommon cookies removed — migrate any existing to common
+    commonCookies:    (saved.commonCookies ?? (saved as any).fortuneCookies ?? 0) + ((saved as any).uncommonCookies ?? (saved as any).goldenCookies ?? 0),
     rareCookies:      saved.rareCookies      ?? (saved as any).dragonCookies  ?? 0,
     epicCookies:      saved.epicCookies      ?? 0,
     legendaryCookies: saved.legendaryCookies ?? 0,
     mythicCookies:    saved.mythicCookies    ?? 0,
-    commonCookiesOpened:    saved.commonCookiesOpened    ?? 0,
-    uncommonCookiesOpened:  saved.uncommonCookiesOpened  ?? 0,
+    commonCookiesOpened:    (saved.commonCookiesOpened ?? 0) + ((saved as any).uncommonCookiesOpened ?? 0),
     rareCookiesOpened:      saved.rareCookiesOpened      ?? 0,
     epicCookiesOpened:      saved.epicCookiesOpened      ?? 0,
     legendaryCookiesOpened: saved.legendaryCookiesOpened ?? 0,
@@ -676,11 +669,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [profile, updateProfile]);
 
   const addFortuneCookies = useCallback(async (
-    common = 0, uncommon = 0, rare = 0, epic = 0, legendary = 0, mythic = 0,
+    common = 0, rare = 0, epic = 0, legendary = 0, mythic = 0,
   ) => {
     await updateProfile({
       commonCookies:    profile.commonCookies    + common,
-      uncommonCookies:  profile.uncommonCookies  + uncommon,
       rareCookies:      profile.rareCookies      + rare,
       epicCookies:      profile.epicCookies      + epic,
       legendaryCookies: profile.legendaryCookies + legendary,
@@ -693,14 +685,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       ? new Date(profile.lastFreeCookie).toDateString()
       : null;
     if (lastClaim === new Date().toDateString()) return false;
-    // Daily cookie: weighted random by drop rate (60/25/10/4/0.9/0.1)
+    // Daily cookie: weighted random by drop rate (75/15/7/2.5/0.5)
     const r = Math.random();
     const tier: CookieTier =
-      r < 0.600 ? 'common' :
-      r < 0.850 ? 'uncommon' :
-      r < 0.950 ? 'rare' :
-      r < 0.990 ? 'epic' :
-      r < 0.999 ? 'legendary' :
+      r < 0.750 ? 'common' :
+      r < 0.900 ? 'rare' :
+      r < 0.970 ? 'epic' :
+      r < 0.995 ? 'legendary' :
       'mythic';
     const invKey = COOKIE_INV_FIELD[tier];
     await updateProfile({

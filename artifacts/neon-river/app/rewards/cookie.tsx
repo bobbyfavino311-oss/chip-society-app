@@ -1,13 +1,13 @@
 /**
- * Fortune Cookie — 6-tier reward system
+ * Fortune Cookie — 5-tier reward system
  *
  * Architecture: Each tier has a SEPARATE reward pool with hard caps.
  * No cross-tier fallback. No shared reward table. pickReward() reads
  * only from the tier it receives. Hard caps enforce limits even if
  * config is somehow wrong.
  *
- * Tier hierarchy: COMMON → UNCOMMON → RARE → EPIC → LEGENDARY → MYTHIC
- * Drop rates:      60%       25%      10%    4%      0.9%        0.1%
+ * Tier hierarchy: COMMON → RARE → EPIC → LEGENDARY → MYTHIC (Wheel-only)
+ * Drop rates:      75%      15%   7%      2.5%        0.5%
  */
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -77,26 +77,19 @@ const TIER_CFG: Record<CookieTier, TierCfg> = {
     xpRange:     [100,         500],
     maxChips: 25_000, maxTickets: 0,
   },
-  uncommon: {
-    color: '#22C55E', label: 'UNCOMMON', dropRate: 'Common',
-    chipRange:   [25_000,      75_000],
-    ticketRange: [0,           1],
-    xpRange:     [500,         2_000],
-    maxChips: 75_000, maxTickets: 1,
-  },
   rare: {
     color: '#60A5FA', label: 'RARE', dropRate: 'Uncommon',
-    chipRange:   [75_000,      250_000],
-    ticketRange: [1,           3],
+    chipRange:   [25_000,      150_000],
+    ticketRange: [0,           1],
     xpRange:     [1_000,       5_000],
-    maxChips: 250_000, maxTickets: 3,
+    maxChips: 150_000, maxTickets: 1,
   },
   epic: {
     color: '#A855F7', label: 'EPIC', dropRate: 'Rare',
-    chipRange:   [250_000,     750_000],
-    ticketRange: [3,           10],
+    chipRange:   [150_000,     750_000],
+    ticketRange: [1,           5],
     xpRange:     [5_000,       25_000],
-    maxChips: 750_000, maxTickets: 10,
+    maxChips: 750_000, maxTickets: 5,
   },
   legendary: {
     color: '#F59E0B', label: 'LEGENDARY', dropRate: 'Very Rare',
@@ -115,12 +108,11 @@ const TIER_CFG: Record<CookieTier, TierCfg> = {
 };
 
 // Ordered from highest to lowest for "best available" auto-select
-const TIER_ORDER: CookieTier[] = ['mythic', 'legendary', 'epic', 'rare', 'uncommon', 'common'];
+const TIER_ORDER: CookieTier[] = ['mythic', 'legendary', 'epic', 'rare', 'common'];
 
 // Level required to unlock each cookie tier (null = Daily Wheel exclusive, not level-gated)
 const TIER_UNLOCK_LEVEL: Record<CookieTier, number | null> = {
   common:    0,
-  uncommon:  10,
   rare:      25,
   epic:      50,
   legendary: 100,
@@ -128,16 +120,15 @@ const TIER_UNLOCK_LEVEL: Record<CookieTier, number | null> = {
 };
 
 const TIER_DESCRIPTIONS: Record<CookieTier, string> = {
-  common:    '5K–25K chips',
-  uncommon:  '25K–75K chips',
-  rare:      '75K–250K chips',
-  epic:      '250K–750K chips',
-  legendary: '750K–2M chips',
-  mythic:    'The rarest Fortune Cookie in Chip Society. Only obtainable by landing on the Mythic Cookie slice of the Daily Wheel.',
+  common:    'A simple fortune containing small chip rewards and a little extra experience.',
+  rare:      'A rarer fortune offering better chip rewards and occasional premium items.',
+  epic:      'Epic fortunes contain premium rewards for experienced players.',
+  legendary: "Legendary fortunes are exceptionally rare and contain Chip Society's most valuable standard rewards.",
+  mythic:    'The Mythic Fortune Cookie can only be won from the Daily Wheel jackpot.',
 };
 
-// Chart shows all 5 standard tiers (Mythic is wheel-only, kept separate)
-const CHART_TIERS: CookieTier[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+// Info cards show 4 standard tiers (Mythic is wheel-only, shown separately)
+const CHART_TIERS: CookieTier[] = ['common', 'rare', 'epic', 'legendary'];
 
 const UNLOCK_SEEN_KEY = '@cs_cookie_unlock_seen_v1';
 
@@ -199,7 +190,6 @@ const MYTHIC_MESSAGES = [
 
 const COOKIE_PAL: Record<CookieTier, { body: string; dark: string; light: string; rim: string }> = {
   common:    { body: '#C4813A', dark: '#7A4E1E', light: '#E8A458', rim: '#D4A017' },
-  uncommon:  { body: '#166534', dark: '#052e16', light: '#22C55E', rim: '#4ADE80' },
   rare:      { body: '#1E40AF', dark: '#1e3a8a', light: '#60A5FA', rim: '#93C5FD' },
   epic:      { body: '#6B21A8', dark: '#3b0764', light: '#A855F7', rim: '#C084FC' },
   legendary: { body: '#D4A017', dark: '#8A6808', light: '#FFE06A', rim: '#FFF08A' },
@@ -210,7 +200,6 @@ const COOKIE_PAL: Record<CookieTier, { body: string; dark: string; light: string
 
 const PARTICLE_COLORS: Record<CookieTier, string[]> = {
   common:    ['#D4A017','#E8A458','#FFD700','#C4813A','#F0B020'],
-  uncommon:  ['#22C55E','#4ADE80','#16A34A','#86EFAC','#BBF7D0'],
   rare:      ['#60A5FA','#93C5FD','#3B82F6','#BFDBFE','#2563EB'],
   epic:      ['#A855F7','#C084FC','#7C3AED','#DDD6FE','#8B5CF6'],
   legendary: ['#FFD700','#FFF08A','#F59E0B','#FBBF24','#FDE68A'],
@@ -273,13 +262,6 @@ function CookieSvg({ tier, viewBoxX = 0, viewBoxW = 120, width = 180, height = 1
           <Ellipse cx={60} cy={26} rx={4} ry={2.5} fill="#BFDBFE" fillOpacity="0.50" />
         </G>
       )}
-      {tier === 'uncommon' && (
-        <G>
-          <Ellipse cx={60} cy={28} rx={4} ry={2.5} fill="#86EFAC" fillOpacity="0.55" />
-          <Circle cx={46} cy={46} r={2} fill="#4ADE80" fillOpacity="0.45" />
-          <Circle cx={74} cy={46} r={2} fill="#4ADE80" fillOpacity="0.45" />
-        </G>
-      )}
     </Svg>
   );
 }
@@ -288,7 +270,6 @@ function CookieSvg({ tier, viewBoxX = 0, viewBoxW = 120, width = 180, height = 1
 
 const TIER_BG: Record<CookieTier, readonly [string, string, string]> = {
   common:    ['#1A0600', '#0D0400', '#060200'],
-  uncommon:  ['#021A0A', '#010D05', '#000602'],
   rare:      ['#00061A', '#00030D', '#000206'],
   epic:      ['#0D001A', '#06000D', '#030006'],
   legendary: ['#1A0E00', '#0D0800', '#050300'],
@@ -307,7 +288,6 @@ export default function FortuneCookieScreen() {
   // ── Cookie inventory totals ────────────────────────────────────────────────
   const inv: Record<CookieTier, number> = {
     common:    profile.commonCookies    ?? 0,
-    uncommon:  profile.uncommonCookies  ?? 0,
     rare:      profile.rareCookies      ?? 0,
     epic:      profile.epicCookies      ?? 0,
     legendary: profile.legendaryCookies ?? 0,
@@ -329,7 +309,7 @@ export default function FortuneCookieScreen() {
   useEffect(() => {
     AsyncStorage.getItem(UNLOCK_SEEN_KEY).then(raw => {
       const seen = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
-      const toShow = (['uncommon', 'rare', 'epic', 'legendary'] as CookieTier[]).find(t => {
+      const toShow = (['rare', 'epic', 'legendary'] as CookieTier[]).find(t => {
         const lv = TIER_UNLOCK_LEVEL[t];
         return lv !== null && profile.level >= lv && !seen.has(t);
       });
@@ -354,7 +334,7 @@ export default function FortuneCookieScreen() {
       }) ?? 'common';
       setCookieTier(next);
     }
-  }, [inv.common, inv.uncommon, inv.rare, inv.epic, inv.legendary, inv.mythic, phase, cookieTier, profile.level]);
+  }, [inv.common, inv.rare, inv.epic, inv.legendary, inv.mythic, phase, cookieTier, profile.level]);
 
   // ── Animations ──────────────────────────────────────────────────────────────
   const shakeX       = useRef(new Animated.Value(0)).current;
@@ -647,6 +627,36 @@ export default function FortuneCookieScreen() {
                 <Text style={styles.emptySub}>Spin the wheel or come back tomorrow for your free daily cookie.</Text>
               </View>
             )}
+
+            {/* ── Tier info cards ─────────────────────────────────────────── */}
+            <Text style={styles.infoLabel}>FORTUNE COOKIE REWARDS</Text>
+            <View style={styles.infoGrid}>
+              {CHART_TIERS.map(t => {
+                const c = TIER_CFG[t];
+                const ranges: Record<CookieTier, string> = {
+                  common:    '5K–25K Chips',
+                  rare:      '25K–150K Chips',
+                  epic:      '150K–750K Chips',
+                  legendary: '750K–2M Chips',
+                  mythic:    '',
+                };
+                return (
+                  <View key={t} style={[styles.infoCard, { borderColor: `${c.color}30`, backgroundColor: `${c.color}0a` }]}>
+                    <View style={[styles.infoCardDot, { backgroundColor: c.color }]} />
+                    <Text style={[styles.infoCardTier, { color: c.color }]}>{c.label}</Text>
+                    <Text style={styles.infoCardRange}>{ranges[t]}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            {/* Mythic — wheel-only badge */}
+            <View style={styles.mythicBadge}>
+              <Text style={styles.mythicBadgeStar}>⭐</Text>
+              <View>
+                <Text style={styles.mythicBadgeTitle}>DAILY WHEEL EXCLUSIVE</Text>
+                <Text style={styles.mythicBadgeSub}>The Mythic Fortune Cookie can only be won from the Daily Wheel jackpot.</Text>
+              </View>
+            </View>
           </View>
         )}
 
@@ -828,6 +838,41 @@ const styles = StyleSheet.create({
   emptyIcon:  { fontSize: 48 },
   emptyTitle: { color: '#555', fontSize: 16, fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
   emptySub:   { color: '#333', fontSize: 12, fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 18 },
+
+  infoLabel: {
+    color: 'rgba(255,255,255,0.25)', fontSize: 9,
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 2, marginTop: 4,
+  },
+  infoGrid: { flexDirection: 'row', gap: 6 },
+  infoCard: {
+    flex: 1, borderRadius: 10, borderWidth: 1,
+    paddingVertical: 10, paddingHorizontal: 8,
+    alignItems: 'center', gap: 4,
+  },
+  infoCardDot: { width: 6, height: 6, borderRadius: 3 },
+  infoCardTier: {
+    fontSize: 8, fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 0.5, textAlign: 'center',
+  },
+  infoCardRange: {
+    color: 'rgba(255,255,255,0.50)', fontSize: 9,
+    fontFamily: 'Inter_700Bold', textAlign: 'center',
+  },
+  mythicBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    borderRadius: 10, borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.25)', backgroundColor: 'rgba(255,215,0,0.06)',
+    paddingVertical: 9, paddingHorizontal: 12,
+  },
+  mythicBadgeStar: { fontSize: 18 },
+  mythicBadgeTitle: {
+    color: '#FFD700', fontSize: 9,
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5, marginBottom: 2,
+  },
+  mythicBadgeSub: {
+    color: 'rgba(255,255,255,0.45)', fontSize: 10,
+    fontFamily: 'Orbitron_400Regular', lineHeight: 14,
+  },
 
   rewardCard: {
     borderRadius: 20, borderWidth: 1.5,

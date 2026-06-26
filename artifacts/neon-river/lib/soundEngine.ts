@@ -350,7 +350,7 @@ export const SoundEngine = {
    * cookieCrack — called when the cookie splits apart.
    * Each tier has its own dedicated WAV file on every platform.
    */
-  cookieCrack(tier: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'standard' | 'golden' | 'dragon' = 'common') {
+  cookieCrack(tier: 'common' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'standard' | 'golden' | 'dragon' = 'common') {
     haptic(Haptics.ImpactFeedbackStyle.Heavy);
     if (_muted || !_fxEnabled) return;
     // Map legacy tier names
@@ -376,7 +376,7 @@ export const SoundEngine = {
    * fortuneReward — called when the reward card appears.
    * Routes to the tier-specific dedicated reveal WAV.
    */
-  fortuneReward(tier: 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC') {
+  fortuneReward(tier: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC') {
     hapticNotif(Haptics.NotificationFeedbackType.Success);
     if (_muted || !_fxEnabled) return;
     const mapped = tier.toLowerCase() as 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
@@ -386,7 +386,6 @@ export const SoundEngine = {
 
   // Keep these for backward-compat (used nowhere new, but may be referenced)
   _rewardCommon()    { SoundEngine.fortuneReward('COMMON'); },
-  _rewardUncommon()  { SoundEngine.fortuneReward('UNCOMMON'); },
   _rewardRare()      { SoundEngine.fortuneReward('RARE'); },
   _rewardEpic()      { SoundEngine.fortuneReward('EPIC'); },
   _rewardLegendary() { SoundEngine.fortuneReward('LEGENDARY'); },

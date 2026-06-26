@@ -115,7 +115,7 @@ function FortuneCookieSection() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [claiming, setClaiming] = useState(false);
 
-  const total = (profile.commonCookies ?? 0) + (profile.uncommonCookies ?? 0) + (profile.rareCookies ?? 0) + (profile.epicCookies ?? 0) + (profile.legendaryCookies ?? 0) + (profile.mythicCookies ?? 0);
+  const total = (profile.commonCookies ?? 0) + (profile.rareCookies ?? 0) + (profile.epicCookies ?? 0) + (profile.legendaryCookies ?? 0) + (profile.mythicCookies ?? 0);
   const hasAny = total > 0;
   const canOpen = hasAny || canClaimFreeCookie;
 
@@ -175,7 +175,6 @@ function FortuneCookieSection() {
             {hasAny && (
               <View style={fc.typeRow}>
                 {(profile.commonCookies    ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#9CA3AF' }]}>🥠 Common ×{profile.commonCookies}</Text>}
-                {(profile.uncommonCookies  ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#22C55E' }]}>🥠 Uncommon ×{profile.uncommonCookies}</Text>}
                 {(profile.rareCookies      ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#60A5FA' }]}>🥠 Rare ×{profile.rareCookies}</Text>}
                 {(profile.epicCookies      ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#A855F7' }]}>🥠 Epic ×{profile.epicCookies}</Text>}
                 {(profile.legendaryCookies ?? 0) > 0 && <Text style={[fc.typeTag, { color: '#F59E0B' }]}>🥠 Legendary ×{profile.legendaryCookies}</Text>}
