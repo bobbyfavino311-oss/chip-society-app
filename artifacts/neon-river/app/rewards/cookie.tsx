@@ -628,57 +628,6 @@ export default function FortuneCookieScreen() {
         {phase === 'idle' && (
           <View style={styles.idleSection}>
 
-            {/* Tier progression chart — Common / Rare / Epic / Legendary */}
-            <View style={styles.cookieInventory}>
-              {CHART_TIERS.map(t => {
-                const tc = TIER_CFG[t];
-                const unlockLv = TIER_UNLOCK_LEVEL[t];
-                const isLocked = unlockLv !== null && unlockLv > 0 && profile.level < unlockLv;
-                const count = inv[t];
-                const isActive = cookieTier === t && !isLocked;
-                return (
-                  <TouchableOpacity
-                    key={t}
-                    style={[
-                      styles.tierCard,
-                      isActive && { borderColor: tc.color, backgroundColor: tc.color + '12' },
-                      isLocked && styles.tierCardLocked,
-                      !isActive && !isLocked && { borderColor: tc.color + '35' },
-                    ]}
-                    onPress={() => { if (!isLocked) setCookieTier(t); }}
-                    activeOpacity={isLocked ? 1 : 0.75}
-                  >
-                    {/* Dot indicator */}
-                    <View style={[styles.tierDot, { backgroundColor: isLocked ? '#2a2a2a' : tc.color }]} />
-
-                    {/* Tier name */}
-                    <Text style={[styles.tierCardName,
-                      { color: isLocked ? '#333' : isActive ? tc.color : tc.color + 'bb' }
-                    ]}>{tc.label}</Text>
-
-                    {/* Range or lock */}
-                    {isLocked ? (
-                      <View style={styles.tierLockRow}>
-                        <Ionicons name="lock-closed" size={10} color="#333" />
-                        <Text style={styles.tierCardUnlock}>Lv {unlockLv}</Text>
-                      </View>
-                    ) : (
-                      <Text style={[styles.tierCardRange, { color: isActive ? '#ccc' : '#666' }]}>
-                        {TIER_DESCRIPTIONS[t]}
-                      </Text>
-                    )}
-
-                    {/* Owned qty badge */}
-                    {!isLocked && count > 0 && (
-                      <View style={[styles.tierQtyBadge, { backgroundColor: tc.color + '22', borderColor: tc.color + '55' }]}>
-                        <Text style={[styles.tierQtyText, { color: tc.color }]}>{count}</Text>
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
             {(hasCookies || canClaimFreeCookie) ? (
               <TouchableOpacity style={[styles.openBtn, { overflow: 'hidden' }]} onPress={handleOpen} activeOpacity={0.82}>
                 <LinearGradient
@@ -869,38 +818,6 @@ const styles = StyleSheet.create({
   bottom: { paddingHorizontal: 20 },
 
   idleSection: { gap: 12 },
-  cookieInventory: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between',
-  },
-
-  // 4-tier card grid
-  tierCard: {
-    flex: 1, minWidth: '45%',
-    borderRadius: 14, borderWidth: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    paddingHorizontal: 14, paddingVertical: 12,
-    alignItems: 'flex-start', gap: 4,
-    position: 'relative',
-  },
-  tierCardLocked: { opacity: 0.45 },
-  tierDot: { width: 8, height: 8, borderRadius: 4, marginBottom: 2 },
-  tierCardName: {
-    fontSize: 9, fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
-  },
-  tierCardRange: {
-    fontSize: 11, fontFamily: 'Inter_700Bold', letterSpacing: -0.3, lineHeight: 15,
-  },
-  tierLockRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  tierCardUnlock: {
-    fontSize: 9, color: '#333', fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5,
-  },
-  tierQtyBadge: {
-    position: 'absolute', top: 8, right: 10,
-    borderRadius: 10, borderWidth: 1,
-    paddingHorizontal: 7, paddingVertical: 2,
-  },
-  tierQtyText: { fontSize: 11, fontFamily: 'Inter_700Bold' },
-
   openBtn: {
     borderRadius: 14, height: 52,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
