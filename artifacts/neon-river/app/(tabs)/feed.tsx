@@ -820,8 +820,8 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
   const [searching, setSearching] = useState(false);
   const [searchErr, setSearchErr] = useState('');
   const [messagingId, setMessagingId] = useState<string | null>(null);
-  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
   const { profile } = useUser();
+  const { follow: socialFollow, isFollowing } = useSocial();
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const formatChips = (n: number) => {
@@ -845,12 +845,30 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       setSearchErr('');
+
+      // Always search MOCK_PLAYERS locally — instant, never fails
+      const lq = q.toLowerCase();
+      const mockMatches: SearchPlayer[] = MOCK_PLAYERS
+        .filter(p => p.username.toLowerCase().includes(lq) || p.handle.toLowerCase().includes(lq))
+        .map(p => ({
+          playerId: p.id,
+          username: p.username,
+          level: p.level,
+          chips: p.chips,
+          avatarIndex: p.avatarId ?? 1,
+          rank: p.rank,
+          status: p.status,
+        }));
+
       try {
-        const data = await searchPlayers(q);
-        setResults(data);
+        const apiData = await searchPlayers(q);
+        // Merge: API results first, then mock players not already in API results
+        const apiIds = new Set(apiData.map(d => d.playerId));
+        setResults([...apiData, ...mockMatches.filter(m => !apiIds.has(m.playerId))]);
       } catch {
-        setSearchErr('Search failed. Try again.');
-        setResults([]);
+        // API unavailable — show local mock results so search is never completely broken
+        setResults(mockMatches);
+        if (mockMatches.length === 0) setSearchErr('Search unavailable. Try again.');
       } finally {
         setSearching(false);
       }
@@ -858,12 +876,13 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query]);
 
-  const handleFollow = async (targetId: string) => {
-    if (!profile.playerId) return;
-    try {
-      await followPlayer(profile.playerId, targetId);
-      setFollowingIds(prev => new Set([...prev, targetId]));
-    } catch { /* silent */ }
+  const handleFollow = (targetId: string, username: string) => {
+    // Update SocialContext (persists across app via AsyncStorage)
+    socialFollow(targetId, username);
+    // Best-effort API sync — non-blocking, silent on failure
+    if (profile.playerId) {
+      followPlayer(profile.playerId, targetId).catch(() => {});
+    }
   };
 
   const handleMessage = async (targetId: string) => {
@@ -919,7 +938,7 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
             : null
         }
         renderItem={({ item: p }) => {
-          const isFollowed = followingIds.has(p.playerId);
+          const isFollowed = isFollowing(p.playerId);
           return (
             <TouchableOpacity
               style={srch.card}
@@ -942,11 +961,14 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                 <Text style={srch.handle}>{p.rank} · {formatChips(p.chips)} chips · Lv.{p.level}</Text>
               </View>
               <View style={{ flexDirection: 'row', gap: 6 }}>
-                {!isFollowed && (
-                  <TouchableOpacity style={srch.followBtn} onPress={() => handleFollow(p.playerId)}>
-                    <Text style={srch.followText}>+ Follow</Text>
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  style={[srch.followBtn, isFollowed && { backgroundColor: `${colors.primary}15`, borderColor: `${colors.primary}40` }]}
+                  onPress={() => !isFollowed && handleFollow(p.playerId, p.username)}
+                >
+                  <Text style={[srch.followText, isFollowed && { color: `${colors.primary}70` }]}>
+                    {isFollowed ? '✓ Following' : '+ Follow'}
+                  </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={srch.msgBtn}
                   onPress={() => handleMessage(p.playerId)}

@@ -57,28 +57,7 @@ const KEY_NOTIFICATIONS = '@chipsociety_social_notifications_v1';
 
 // ── Seeded notifications (simulated social activity) ─────────────────────────
 
-const SEED_NOTIFICATIONS: SocialNotification[] = [
-  {
-    id: 'sn1', type: 'follow', fromUser: 'NightShark99',
-    message: 'NightShark99 started following you', timestamp: Date.now() - 12 * 60 * 1000, read: false,
-  },
-  {
-    id: 'sn2', type: 'like', fromUser: 'VegasMirage',
-    message: 'VegasMirage liked your post', timestamp: Date.now() - 45 * 60 * 1000, read: false,
-  },
-  {
-    id: 'sn3', type: 'comment', fromUser: 'NeonWitch',
-    message: 'NeonWitch commented: "Incredible hand! 🔥"', timestamp: Date.now() - 2 * 60 * 60 * 1000, read: false,
-  },
-  {
-    id: 'sn4', type: 'reaction', fromUser: 'ShadowKing',
-    message: 'ShadowKing reacted 👑 to your post', timestamp: Date.now() - 3 * 60 * 60 * 1000, read: true,
-  },
-  {
-    id: 'sn5', type: 'follow', fromUser: 'PokerPhantom',
-    message: 'PokerPhantom started following you', timestamp: Date.now() - 6 * 60 * 60 * 1000, read: true,
-  },
-];
+const SEED_NOTIFICATIONS: SocialNotification[] = [];
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
