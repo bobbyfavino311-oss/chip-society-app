@@ -72,37 +72,37 @@ interface TierCfg {
 const TIER_CFG: Record<CookieTier, TierCfg> = {
   common: {
     color: '#9CA3AF', label: 'COMMON', dropRate: 'Very Common',
-    chipRange:   [5_000,       10_000],
+    chipRange:   [5_000,       25_000],
     ticketRange: [0,           0],
     xpRange:     [100,         500],
-    maxChips: 10_000, maxTickets: 0,
+    maxChips: 25_000, maxTickets: 0,
   },
   uncommon: {
     color: '#22C55E', label: 'UNCOMMON', dropRate: 'Common',
-    chipRange:   [10_000,      25_000],
+    chipRange:   [25_000,      75_000],
     ticketRange: [0,           1],
-    xpRange:     [250,         1_000],
-    maxChips: 25_000, maxTickets: 1,
+    xpRange:     [500,         2_000],
+    maxChips: 75_000, maxTickets: 1,
   },
   rare: {
     color: '#60A5FA', label: 'RARE', dropRate: 'Uncommon',
-    chipRange:   [25_000,      50_000],
-    ticketRange: [0,           1],
-    xpRange:     [500,         2_000],
-    maxChips: 50_000, maxTickets: 1,
+    chipRange:   [75_000,      250_000],
+    ticketRange: [1,           3],
+    xpRange:     [1_000,       5_000],
+    maxChips: 250_000, maxTickets: 3,
   },
   epic: {
     color: '#A855F7', label: 'EPIC', dropRate: 'Rare',
-    chipRange:   [100_000,     250_000],
-    ticketRange: [1,           3],
-    xpRange:     [2_000,       10_000],
-    maxChips: 250_000, maxTickets: 3,
+    chipRange:   [250_000,     750_000],
+    ticketRange: [3,           10],
+    xpRange:     [5_000,       25_000],
+    maxChips: 750_000, maxTickets: 10,
   },
   legendary: {
     color: '#F59E0B', label: 'LEGENDARY', dropRate: 'Very Rare',
-    chipRange:   [500_000,     2_000_000],
+    chipRange:   [750_000,     2_000_000],
     ticketRange: [5,           25],
-    xpRange:     [10_000,      50_000],
+    xpRange:     [25_000,      100_000],
     maxChips: 2_000_000, maxTickets: 25,
   },
   mythic: {
@@ -128,16 +128,16 @@ const TIER_UNLOCK_LEVEL: Record<CookieTier, number | null> = {
 };
 
 const TIER_DESCRIPTIONS: Record<CookieTier, string> = {
-  common:    '5K–10K chips',
-  uncommon:  '10K–25K chips',
-  rare:      '25K–50K chips',
-  epic:      '100K–250K chips',
-  legendary: '500K+ or token',
+  common:    '5K–25K chips',
+  uncommon:  '25K–75K chips',
+  rare:      '75K–250K chips',
+  epic:      '250K–750K chips',
+  legendary: '750K–2M chips',
   mythic:    'The rarest Fortune Cookie in Chip Society. Only obtainable by landing on the Mythic Cookie slice of the Daily Wheel.',
 };
 
-// Chart shows 4 tiers: Common / Rare / Epic / Legendary (Uncommon & Mythic excluded)
-const CHART_TIERS: CookieTier[] = ['common', 'rare', 'epic', 'legendary'];
+// Chart shows all 5 standard tiers (Mythic is wheel-only, kept separate)
+const CHART_TIERS: CookieTier[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 const UNLOCK_SEEN_KEY = '@cs_cookie_unlock_seen_v1';
 
