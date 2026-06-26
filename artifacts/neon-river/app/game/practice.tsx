@@ -591,6 +591,7 @@ export default function PracticeScreen() {
 
     if (didWin) {
       await recordWin(0);
+      if (!isMountedRef.current) return;
       const human = state.players.find(p => p.isHuman);
       let handDesc = state.winnerHand ?? '';
       if (!handDesc && human && human.holeCards.length >= 2) {
@@ -602,6 +603,7 @@ export default function PracticeScreen() {
       onChipBalance(finalHumanChips);
     } else {
       await recordLoss();
+      if (!isMountedRef.current) return;
       recordGameLoss();
     }
 
@@ -610,6 +612,7 @@ export default function PracticeScreen() {
     } else if (humanDelta < 0) {
       await removeChips(-humanDelta);
     }
+    if (!isMountedRef.current) return;
 
     setHandCount(h => h + 1);
     continueAfterHand();
