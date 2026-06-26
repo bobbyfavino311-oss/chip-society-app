@@ -1,0 +1,472 @@
+I’ve consolidated everything into one implementation document so your AI builder can work through every issue systematically without overlooking any item.
+
+CHIP SOCIETY – MASTER BUG FIX & SYSTEM OVERHAUL PROMPT
+
+This update is focused entirely on bug fixes, backend corrections, UI polish, and social system reliability. Every issue below must be addressed completely before moving on to new features. Do not skip any item.
+
+⸻
+
+1. THREE CARD POKER – SIDE BET BUG
+
+Current Issue:
+
+If a player folds their Ante, all side bets are incorrectly forfeited.
+
+Correct Behavior:
+
+Only the Ante/Play portion of the hand should fold.
+
+Any active side bets must remain live and always resolve independently.
+
+This includes every side wager available in Three Card Poker.
+
+Examples:
+
+• Pair Plus
+• Six Card Bonus
+• Any future independent bonus wagers
+
+If the player folds but qualifies for a winning side bet:
+
+• The side bet must remain active.
+• The winning animation must play.
+• The player must be paid correctly.
+• Folding the Ante must never cancel an independent wager.
+
+This must follow standard casino rules.
+
+⸻
+
+2. ULTIMATE TEXAS HOLD’EM INFO SCREEN
+
+Current Issue:
+
+The rules are cut off.
+
+The information panel cannot be fully read.
+
+Fix:
+
+Allow vertical scrolling inside the information panel.
+
+The player must be able to read:
+
+• Rules
+• Betting sequence
+• Blind payouts
+• Trips payouts
+• Dealer qualification
+• All gameplay instructions
+
+No text should ever be clipped.
+
+⸻
+
+3. CASINO WAR INFO SCREEN
+
+Current Issue:
+
+Rules are cut off.
+
+Fix:
+
+Make the rules panel fully scrollable.
+
+Every rule and payout must be visible.
+
+⸻
+
+4. BLACKJACK UPDATE
+
+Rename:
+
+Blackjack
+
+to
+
+Five Deck Blackjack
+
+The game must now explicitly state it uses a five-deck shoe.
+
+Update:
+
+• Rules
+• Information screen
+• Description
+• Game title
+
+⸻
+
+5. SOCIAL SEARCH SYSTEM
+
+Current Issue:
+
+Searching players works inconsistently.
+
+Sometimes users appear.
+
+Sometimes interactions fail.
+
+Required Fix:
+
+Searching by username must always return:
+
+• Correct player
+• AI players
+• Real players
+
+Search should feel instant.
+
+⸻
+
+6. FOLLOW BUTTON
+
+Current Issue:
+
+The Follow button doesn’t actually follow players.
+
+Required Fix:
+
+Pressing Follow must immediately:
+
+• Save follow relationship
+• Update backend
+• Change button to Following
+• Update profile counts
+• Persist after app restart
+
+⸻
+
+7. PLAYER PROFILE BUG
+
+Current Issue:
+
+After selecting a player from search:
+
+“Profile Not Found”
+
+appears.
+
+Fix:
+
+Selecting any valid player should always open their profile.
+
+Never show Profile Not Found for existing accounts.
+
+⸻
+
+8. FOLLOWER SYSTEM
+
+Completely implement follower tracking.
+
+Every profile must include:
+
+Followers
+
+Following
+
+Posts
+
+Likes
+
+Member Since
+
+Current Chips
+
+Level
+
+Wins
+
+Achievements
+
+The follower count must update instantly.
+
+The following count must update instantly.
+
+Both must persist after restart.
+
+⸻
+
+9. CHIP STORE
+
+Current Issue:
+
+Daily Bonus appears twice.
+
+Remove:
+
+The duplicate Daily Bonus banner from the Chip Store.
+
+The Daily Streak on the Home screen is already the official claim location.
+
+Only one Daily Bonus entry should exist.
+
+⸻
+
+10. REMOVE FAKE TOURNAMENT NOTIFICATIONS
+
+Notifications currently claim:
+
+“Tournaments are available.”
+
+This is incorrect.
+
+Tournament mode does not exist yet.
+
+Remove every fake tournament notification.
+
+Never generate tournament notifications until tournaments are actually implemented.
+
+⸻
+
+11. REMOVE FAKE AI NOTIFICATIONS
+
+Current Issue:
+
+Every login creates fake AI notifications.
+
+Stop generating fake notification spam.
+
+Notifications should only exist when an actual event occurs:
+
+• Friend follows
+• Likes
+• Comments
+• Replies
+• Casino bonus
+• Admin warning
+• Suspension
+• Ban
+• Future tournament events
+
+No fabricated notifications.
+
+⸻
+
+12. ALL FEED
+
+Every refresh should generate fresh AI content.
+
+Newest posts always appear first.
+
+Feed order:
+
+Newest
+
+↓
+
+Older
+
+↓
+
+Oldest
+
+Never sort randomly.
+
+⸻
+
+13. TRENDING FEED
+
+Current Issue:
+
+Trending behaves like All.
+
+Correct Behavior:
+
+Trending should rank posts by engagement.
+
+Ranking factors:
+
+Likes
+
+Comments
+
+Shares (future)
+
+Engagement score
+
+Trending should NOT simply show newest posts.
+
+⸻
+
+14. LEADERBOARD BUG
+
+Current Issue:
+
+Leaderboard displays incorrect rankings.
+
+Players with fewer chips appear above richer players.
+
+Required Fix:
+
+Scan every player account.
+
+Sort players by:
+
+Total Chip Balance
+
+Highest → Lowest
+
+Rank #1 must always have the most chips.
+
+Rank #2 second most.
+
+Continue descending.
+
+Leaderboard updates automatically whenever balances change.
+
+Real-time.
+
+⸻
+
+15. EMPTY INBOX
+
+Current Issue:
+
+Empty Inbox tells players:
+
+“Find Players”
+
+Nothing happens.
+
+Required Fix:
+
+Pressing Find Players should immediately navigate to:
+
+Social
+
+↓
+
+Search Players
+
+The player should begin discovering accounts instantly.
+
+⸻
+
+16. PROFILE COUNTS
+
+Verify every profile statistic updates correctly.
+
+Including:
+
+Followers
+
+Following
+
+Posts
+
+Likes
+
+Wins
+
+Hands Played
+
+Achievements
+
+Current Chips
+
+Level
+
+Everything must stay synchronized with backend data.
+
+No placeholder values.
+
+⸻
+
+17. REAL-TIME SOCIAL SYSTEM
+
+All social actions should update immediately.
+
+Examples:
+
+Follow
+
+Like
+
+Comment
+
+Delete Post
+
+New Post
+
+Profile Update
+
+Chip Balance
+
+Leaderboard
+
+Notifications
+
+No manual refresh should be required.
+
+⸻
+
+18. REMOVE ALL PLACEHOLDER DATA
+
+Scan the entire application.
+
+Remove every placeholder:
+
+Fake notifications
+
+Fake tournaments
+
+Incorrect achievements
+
+Placeholder rankings
+
+Placeholder followers
+
+Placeholder following
+
+Fake leaderboard entries
+
+Everything displayed should come from real backend data or legitimate AI-generated social posts.
+
+⸻
+
+19. BACKEND DATA VALIDATION
+
+Perform a full validation of every backend system.
+
+Verify:
+
+Social profiles
+
+Follower relationships
+
+Notifications
+
+Leaderboard
+
+Chip balances
+
+Casino payouts
+
+Achievements
+
+Statistics
+
+Search indexing
+
+Profile loading
+
+No orphaned data.
+
+No invalid references.
+
+No broken player IDs.
+
+⸻
+
+FINAL OBJECTIVE
+
+This update is entirely focused on stability, polish, and accuracy.
+
+Every system should behave exactly like a production-ready social casino platform.
+
+Nothing should rely on placeholder values, fake notifications, fake rankings, or incomplete backend logic.
+
+Every social interaction, notification, profile, search result, leaderboard position, and casino payout must reflect real data in real time.
+
+Once these issues are resolved, the social platform and casino systems should feel complete, reliable, and ready for large-scale player testing.

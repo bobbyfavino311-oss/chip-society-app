@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Animated, Modal, Platform, StyleSheet,
+  Animated, Modal, Platform, ScrollView, StyleSheet,
   Text, TouchableOpacity, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -57,20 +57,23 @@ function PaytableModal({ visible, onClose, accent }: { visible: boolean; onClose
               <Ionicons name="close" size={20} color="rgba(255,255,255,0.6)" />
             </TouchableOpacity>
           </View>
-          {[
-            { h: 'PLAYER WINS',  d: "Your card beats Dealer's card — Ante pays 1:1" },
-            { h: 'DEALER WINS',  d: "Dealer's card beats yours — Ante loses" },
-            { h: 'TIE — WAR',    d: 'Matching ranks — choose SURRENDER or GO TO WAR' },
-            { h: 'SURRENDER',    d: 'Lose only half your Ante. Round ends.' },
-            { h: 'GO TO WAR',    d: "Place equal raise. One more card each:\n• You win — raise pays 1:1, original Ante pushes\n• Dealer wins — lose both bets\n• Tie again — raise pays 2:1 BONUS, Ante pushes" },
-            { h: 'TIE BET',      d: 'Optional bet — pays 10:1 if initial cards tie.\nIndependent of war outcome.' },
-            { h: 'CARD RANKING', d: "Ace is highest (14). 2 is lowest. Suits don't matter." },
-          ].map(r => (
-            <View key={r.h} style={pm.row}>
-              <Text style={[pm.hand, { color: accent }]}>{r.h}</Text>
-              <Text style={pm.desc}>{r.d}</Text>
-            </View>
-          ))}
+          <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0 }}>
+            {[
+              { h: 'PLAYER WINS',  d: "Your card beats Dealer's card — Ante pays 1:1" },
+              { h: 'DEALER WINS',  d: "Dealer's card beats yours — Ante loses" },
+              { h: 'TIE — WAR',    d: 'Matching ranks — choose SURRENDER or GO TO WAR' },
+              { h: 'SURRENDER',    d: 'Lose only half your Ante. Round ends.' },
+              { h: 'GO TO WAR',    d: "Place equal raise. One more card each:\n• You win — raise pays 1:1, original Ante pushes\n• Dealer wins — lose both bets\n• Tie again — raise pays 2:1 BONUS, Ante pushes" },
+              { h: 'TIE BET',      d: 'Optional bet — pays 10:1 if initial cards tie.\nIndependent of war outcome.' },
+              { h: 'CARD RANKING', d: "Ace is highest (14). 2 is lowest. Suits don't matter." },
+            ].map(r => (
+              <View key={r.h} style={pm.row}>
+                <Text style={[pm.hand, { color: accent }]}>{r.h}</Text>
+                <Text style={pm.desc}>{r.d}</Text>
+              </View>
+            ))}
+            <View style={{ height: 16 }} />
+          </ScrollView>
         </View>
       </TouchableOpacity>
     </Modal>
@@ -78,7 +81,7 @@ function PaytableModal({ visible, onClose, accent }: { visible: boolean; onClose
 }
 const pm = StyleSheet.create({
   overlay:  { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)', justifyContent: 'flex-end' },
-  sheet:    { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', padding: 20, gap: 10 },
+  sheet:    { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', maxHeight: '85%', padding: 20, gap: 10 },
   header:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
   title:    { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
   closeBtn: { padding: 4 },

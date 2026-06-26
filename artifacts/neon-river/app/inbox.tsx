@@ -78,7 +78,7 @@ export default function InboxScreen() {
           <Ionicons name="chatbubbles-outline" size={48} color={colors.textDim} />
           <Text style={s.emptyText}>No messages yet</Text>
           <Text style={s.emptySubtext}>Search for players to start a conversation</Text>
-          <TouchableOpacity style={s.searchBtn} onPress={() => router.back()}>
+          <TouchableOpacity style={s.searchBtn} onPress={() => router.push('/(tabs)/feed')}>
             <Text style={s.searchBtnText}>Find Players</Text>
           </TouchableOpacity>
         </View>

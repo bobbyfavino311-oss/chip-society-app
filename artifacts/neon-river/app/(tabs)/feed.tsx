@@ -1453,7 +1453,26 @@ export default function FeedScreen() {
     const base = (activeTab === 'all' || activeTab === 'trending')
       ? SOCIAL_POSTS
       : SOCIAL_POSTS.filter(p => p.tab === activeTab);
-    return base.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
+    const filtered = base.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
+
+    if (activeTab === 'trending') {
+      return [...filtered].sort((a, b) => {
+        const scoreA = a.likes + a.comments * 2;
+        const scoreB = b.likes + b.comments * 2;
+        return scoreB - scoreA;
+      });
+    }
+
+    // All / tab-filtered: newest first (parse timeAgo strings)
+    const toMs = (t: string): number => {
+      const n = parseInt(t, 10) || 0;
+      if (t.includes('m')) return n * 60_000;
+      if (t.includes('h')) return n * 3_600_000;
+      if (t.includes('d')) return n * 86_400_000;
+      if (t.includes('w')) return n * 604_800_000;
+      return 0;
+    };
+    return [...filtered].sort((a, b) => toMs(a.timeAgo) - toMs(b.timeAgo));
   }, [activeTab, isMuted, isBlocked]);
 
   const handleRefresh = useCallback(async () => {

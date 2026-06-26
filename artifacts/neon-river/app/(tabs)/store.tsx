@@ -439,7 +439,6 @@ export default function StoreScreen() {
           </View>
         </View>
 
-        <DailyBonusCard />
         <FortuneCookieSection />
         <ScratchSection />
 

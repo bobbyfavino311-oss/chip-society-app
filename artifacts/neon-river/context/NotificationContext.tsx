@@ -99,32 +99,8 @@ function buildReturningNotifications(
     });
   }
 
-  if (away > 60 * 60 * 1000) {
-    // Away > 1 hour
-    notifs.push({
-      category: 'tournament',
-      priority: 'medium',
-      title: 'New Tournaments Available',
-      message: 'Fresh tournaments have opened while you were away. Check the lobby.',
-      actionRoute: '/tournaments',
-      actionLabel: 'VIEW',
-      icon: 'ribbon',
-      iconColor: '#bf5fff',
-    });
-  }
-
   if (away > 4 * 60 * 60 * 1000) {
     // Away > 4 hours
-    notifs.push({
-      category: 'social',
-      priority: 'medium',
-      title: 'Activity While You Were Away',
-      message: 'Players liked and commented on your posts. Check your feed.',
-      actionRoute: '/(tabs)/feed',
-      actionLabel: 'SEE FEED',
-      icon: 'heart',
-      iconColor: '#ff0090',
-    });
     notifs.push({
       category: 'gameplay',
       priority: 'medium',
@@ -161,16 +137,6 @@ const SEED_NOTIFICATIONS: Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'd
     actionRoute: '/rewards/wheel',
     actionLabel: 'SPIN NOW',
     icon: 'radio-button-on',
-    iconColor: '#bf5fff',
-  },
-  {
-    category: 'tournament',
-    priority: 'medium',
-    title: 'Neon Championship Open',
-    message: 'The Neon Championship is now registering. 500K chip prize pool — limited seats.',
-    actionRoute: '/(tabs)/tournaments',
-    actionLabel: 'VIEW',
-    icon: 'ribbon',
     iconColor: '#bf5fff',
   },
   {

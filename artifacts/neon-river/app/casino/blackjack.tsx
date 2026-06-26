@@ -24,7 +24,7 @@ import { type StakeTier } from '@/lib/stakeConfig';
 // ─── Testing mode ─────────────────────────────────────────────────────────────
 // Flip TESTING_MODE to false to restore six-deck production shoe.
 const TESTING_MODE    = true;
-const TEST_DECKS      = TESTING_MODE ? 1 : 6;
+const TEST_DECKS      = TESTING_MODE ? 1 : 5;
 const TEST_SHOE_TOTAL = TEST_DECKS * 52;          // 52 (testing) or 312
 const TEST_RESHUFFLE  = TEST_SHOE_TOTAL - 10;     // reshuffle when ≤10 remain
 
@@ -194,7 +194,7 @@ function ShufflingOverlay({ visible, shuffleKey, numDecks }: { visible: boolean;
 
   if (!visible) return null;
 
-  const deckLabel = numDecks === 1 ? 'Single deck · 52 cards' : `Six decks · ${numDecks * 52} cards`;
+  const deckLabel = numDecks === 1 ? 'Single deck · 52 cards' : numDecks === 5 ? 'Five decks · 260 cards' : `${numDecks} decks · ${numDecks * 52} cards`;
 
   return (
     <View style={[StyleSheet.absoluteFillObject, sovl.wrap]}>
@@ -674,8 +674,8 @@ export default function BlackjackScreen() {
 
         {/* Center title */}
         <View style={s.titleBlock}>
-          <Text style={s.titleText}>BLACKJACK</Text>
-          <Text style={s.subtitleText}>{TESTING_MODE ? 'SINGLE DECK · TEST MODE' : 'SIX DECK SHOE'}</Text>
+          <Text style={s.titleText}>FIVE DECK BLACKJACK</Text>
+          <Text style={s.subtitleText}>{TESTING_MODE ? 'SINGLE DECK · TEST MODE' : 'FIVE DECK SHOE'}</Text>
         </View>
 
         {/* Right: shoe indicator only */}
