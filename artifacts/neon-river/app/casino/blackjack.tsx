@@ -674,7 +674,7 @@ export default function BlackjackScreen() {
 
         {/* Center title */}
         <View style={s.titleBlock}>
-          <Text style={s.titleText}>FIVE DECK BLACKJACK</Text>
+          <Text style={s.titleText}>BLACKJACK</Text>
           <Text style={s.subtitleText}>{TESTING_MODE ? 'SINGLE DECK · TEST MODE' : 'FIVE DECK SHOE'}</Text>
         </View>
 

@@ -14,12 +14,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useSocial } from '@/context/SocialContext';
+import { useUser } from '@/context/UserContext';
 import NeonAvatar from '@/components/NeonAvatar';
 import {
   MOCK_PLAYERS, SOCIAL_POSTS, POST_TAG_COLORS, POKER_REACTIONS,
   type MockPlayer, type SocialPost,
 } from '@/lib/socialData';
-import { getPlayerProfile, type PlayerProfile } from '@/lib/socialApi';
+import { getPlayerProfile, followPlayer, unfollowPlayer, type PlayerProfile } from '@/lib/socialApi';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -162,6 +163,7 @@ export default function PlayerProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { isFollowing, follow, unfollow } = useSocial();
+  const { profile: myProfile } = useUser();
 
   const [player, setPlayer] = useState<DisplayPlayer | null>(() => {
     const mock = MOCK_PLAYERS.find(p => p.id === id);
@@ -169,6 +171,7 @@ export default function PlayerProfileScreen() {
   });
   const [loading, setLoading] = useState(!player);
   const [error, setError] = useState(false);
+  const [followerDelta, setFollowerDelta] = useState(0);
 
   useEffect(() => {
     if (player || !id) return;
@@ -187,8 +190,19 @@ export default function PlayerProfileScreen() {
 
   function handleFollow() {
     if (!player) return;
-    if (following) unfollow(player.id);
-    else follow(player.id, player.username);
+    if (following) {
+      unfollow(player.id);
+      setFollowerDelta(d => d - 1);
+      if (myProfile.playerId && !player.isMock) {
+        unfollowPlayer(myProfile.playerId, player.id).catch(() => {});
+      }
+    } else {
+      follow(player.id, player.username);
+      setFollowerDelta(d => d + 1);
+      if (myProfile.playerId && !player.isMock) {
+        followPlayer(myProfile.playerId, player.id).catch(() => {});
+      }
+    }
   }
 
   if (loading) {
@@ -279,7 +293,7 @@ export default function PlayerProfileScreen() {
         <View style={s.socialRow}>
           <View style={s.socialStat}>
             <Text style={s.socialVal}>
-              {player.followers >= 1000 ? `${(player.followers / 1000).toFixed(1)}K` : player.followers}
+              {(player.followers + followerDelta) >= 1000 ? `${((player.followers + followerDelta) / 1000).toFixed(1)}K` : (player.followers + followerDelta)}
             </Text>
             <Text style={s.socialLabel}>Followers</Text>
           </View>

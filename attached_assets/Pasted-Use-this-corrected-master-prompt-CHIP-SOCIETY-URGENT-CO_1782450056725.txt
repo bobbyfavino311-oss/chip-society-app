@@ -1,0 +1,244 @@
+Use this corrected master prompt:
+
+CHIP SOCIETY — URGENT CORRECTION PROMPT
+
+Almost none of the previous fixes were completed correctly. Stop adding new features and fix these exact issues first.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+1. BLACKJACK NAME + DECK COUNT FIX
+
+Do NOT rename Blackjack.
+
+The game name must remain:
+
+BLACKJACK
+
+Do not call it:
+
+Five Deck Blackjack
+5 Deck Blackjack
+Five Deck Shoe Blackjack
+
+Only the internal deck/shoe count changes.
+
+Required behavior:
+
+Blackjack must use a 5-deck shoe.
+
+That means:
+
+52 cards × 5 decks = 260 total cards
+
+The game must deal from a 260-card shoe, not a single 52-card deck.
+
+Update only the internal rules/info text to say:
+
+Uses a 5-deck shoe.
+
+The visible game title remains:
+
+BLACKJACK
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+2. SOCIAL MEDIA SYSTEM STILL BROKEN
+
+The social system still has not been fixed.
+
+Fix all of the following together.
+
+Player search must work.
+
+If a searched account appears in results, clicking that player must open the correct profile.
+
+Never show:
+
+Profile Not Found
+
+for a player that exists.
+
+The Follow button must actually work.
+
+When Follow is tapped:
+
+• Save the follow relationship to the server
+• Button changes to Following
+• Following count updates on current player profile
+• Follower count updates on target player profile
+• Counts persist after logout/login
+• Counts persist after app restart
+
+Player profiles must show:
+
+• Followers count
+• Following count
+• Posts count
+• Current chips
+• Level
+• Achievements
+
+The empty inbox “Find Players” button must navigate directly to Social Search.
+
+The leaderboard must sort players by real chip balance from highest to lowest.
+
+Rank #1 must be the player with the most chips.
+
+Do not use fake leaderboard rankings.
+
+Do not use placeholder data.
+
+Do not use random AI accounts above real players unless they actually have more chips in the database.
+
+Notifications must stop generating fake AI notifications on login.
+
+Only show notifications from real events:
+
+• Follow
+• Message
+• Like
+• Comment
+• Admin bonus
+• Warning
+• Suspension
+• Ban
+
+Remove all fake tournament notifications.
+
+Do not mention tournaments until tournaments actually exist.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+3. ALL FEED FIX
+
+The ALL feed must show newest posts first.
+
+When a player posts:
+
+Their post appears at the top immediately.
+
+When the player pulls down to refresh:
+
+• New posts appear at the top
+• The player’s own posts remain visible
+• AI filler posts may generate if needed
+• Posts must be sorted newest to oldest
+
+Do not randomize the ALL feed.
+
+Do not bury new posts.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+4. TRENDING FEED FIX
+
+Trending must only show posts based on engagement.
+
+Sort by:
+
+• Likes
+• Comments
+• Replies
+• Reactions
+
+Trending is NOT the same as All.
+
+Do not show posts in Trending just because they are new.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+5. WHEEL OF FORTUNE REVERT
+
+Revert the Daily Spin / Wheel of Fortune design back to its original state.
+
+Undo the recent redesign.
+
+Return to the original wheel structure, original overall layout, and original visual direction.
+
+Do not keep the newer pie-chart style redesign.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+6. WHEEL PRIZE TEXT FIX
+
+The prize names on the wheel must fit cleanly inside each slice.
+
+Current issue:
+
+Prize names are too small, cramped, or awkwardly placed.
+
+Required fix:
+
+Place prize text diagonally along each slice.
+
+Each label should follow the direction of its wedge so it fits naturally.
+
+Text must be:
+
+• Diagonal
+• Centered within each slice
+• Large enough to read
+• Not overlapping icons
+• Not spilling outside the slice
+• Not upside down unless the slice position requires rotation for readability
+
+Examples:
+
+2K
+5K
+10K
+25K
+50K
+100K
+TICKET
+XP
+COOKIE
+
+Each prize label should fit perfectly inside its slice.
+
+Use consistent rotation based on wedge angle.
+
+Icons may remain, but the text must be readable first.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+7. FINAL ACCEPTANCE TEST
+
+Before marking complete, verify:
+
+BLACKJACK
+
+• Title still says BLACKJACK
+• Internal shoe contains 260 cards
+• Info text says 5-deck shoe
+• No visible rename occurred
+
+SOCIAL
+
+• Search real player
+• Open profile successfully
+• Follow player
+• Following count updates
+• Follower count updates
+• Logout/login
+• Counts remain correct
+• Inbox Find Players opens Search
+• Leaderboard sorts by real chip balance
+• No fake notifications appear
+• No fake tournament notifications appear
+
+FEED
+
+• New posts appear at top of ALL
+• Pull-to-refresh works
+• Trending sorts by engagement only
+
+WHEEL
+
+• Original wheel design restored
+• Prize labels are diagonal on slices
+• Text is readable
+• Text fits inside slices
+• No new redesign remains
+
+Fix these exact items before doing anything else.

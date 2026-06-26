@@ -27,8 +27,7 @@ import ChipAmount from '@/components/ChipAmount';
 const { width: SCREEN_W } = Dimensions.get('window');
 const WHEEL_SIZE = Math.min(SCREEN_W - 32, 320);
 const CX = 150, CY = 150;
-const R_OUTER = 136, R_INNER = 42, R_TEXT = 94, R_ICON = 116;
-const R_BULB = R_OUTER + 7; // marquee ring radius
+const R_OUTER = 136, R_INNER = 42, R_TEXT = 96, R_ICON = 118;
 
 // ─── Segments ─────────────────────────────────────────────────────────────────
 // arc  = visual slice angle (degrees). All arcs must sum to 360.
@@ -43,16 +42,16 @@ const R_BULB = R_OUTER + 7; // marquee ring radius
 //   MYTHIC   → purple+cyan #bf5fff / #00d4ff
 
 const SEGMENTS = [
-  { label: '2K',    rarity: 'COMMON',   arc: 65,  prob: 0.250, chips: 2_000,   xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001a26', icon: '💰' },
-  { label: '5K',    rarity: 'COMMON',   arc: 55,  prob: 0.180, chips: 5_000,   xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001530', icon: '💰' },
-  { label: '+XP',   rarity: 'COMMON',   arc: 50,  prob: 0.140, chips: 0,       xp: 500, ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001022', icon: '⚡' },
-  { label: '10K',   rarity: 'COMMON',   arc: 45,  prob: 0.130, chips: 10_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001222', icon: '💎' },
+  { label: '2K',    rarity: 'COMMON',   arc: 36,  prob: 0.250, chips: 2_000,   xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001a26', icon: '💰' },
+  { label: '5K',    rarity: 'COMMON',   arc: 36,  prob: 0.180, chips: 5_000,   xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001530', icon: '💰' },
+  { label: '+XP',   rarity: 'COMMON',   arc: 36,  prob: 0.140, chips: 0,       xp: 500, ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001022', icon: '⚡' },
+  { label: '10K',   rarity: 'COMMON',   arc: 36,  prob: 0.130, chips: 10_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001222', icon: '💎' },
   { label: '25K',   rarity: 'UNCOMMON', arc: 36,  prob: 0.100, chips: 25_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001a0e', icon: '⭐' },
-  { label: 'TICKET',rarity: 'UNCOMMON', arc: 30,  prob: 0.080, chips: 0,       xp: 0,   ticket: 1, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001810', icon: '🎟' },
-  { label: '50K',   rarity: 'UNCOMMON', arc: 24,  prob: 0.055, chips: 50_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001208', icon: '🔥' },
-  { label: 'COOKIE',rarity: 'RARE',     arc: 17,  prob: 0.040, chips: 0,       xp: 0,   ticket: 0, cookie: 1, mythicCookie: 0, col: '#D4A017', dim: '#1a0e00', icon: '🥠' },
-  { label: '100K!', rarity: 'EPIC',     arc:  8,  prob: 0.020, chips: 100_000, xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#ffd700', dim: '#2a1a00', icon: '👑' },
-  { label: 'MYTHIC',rarity: 'MYTHIC',   arc: 30,  prob: 0.005, chips: 0,       xp: 0,   ticket: 0, cookie: 0, mythicCookie: 1, col: '#bf5fff', dim: '#1a0038', icon: '🥠' },
+  { label: 'TICKET',rarity: 'UNCOMMON', arc: 36,  prob: 0.080, chips: 0,       xp: 0,   ticket: 1, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001810', icon: '🎟' },
+  { label: '50K',   rarity: 'UNCOMMON', arc: 36,  prob: 0.055, chips: 50_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001208', icon: '🔥' },
+  { label: 'COOKIE',rarity: 'RARE',     arc: 36,  prob: 0.040, chips: 0,       xp: 0,   ticket: 0, cookie: 1, mythicCookie: 0, col: '#D4A017', dim: '#1a0e00', icon: '🥠' },
+  { label: '100K!', rarity: 'EPIC',     arc: 36,  prob: 0.020, chips: 100_000, xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#ffd700', dim: '#2a1a00', icon: '👑' },
+  { label: 'MYTHIC',rarity: 'MYTHIC',   arc: 36,  prob: 0.005, chips: 0,       xp: 0,   ticket: 0, cookie: 0, mythicCookie: 1, col: '#bf5fff', dim: '#1a0038', icon: '🥠' },
 ] as const;
 
 type Seg = (typeof SEGMENTS)[number];
@@ -105,12 +104,6 @@ function midPos(startDeg: number, arc: number) {
     rot: mid + 90,
   };
 }
-
-// Marquee bulb positions — 36 evenly-spaced
-const BULBS = Array.from({ length: 36 }, (_, i) => {
-  const a = -90 + i * 10;
-  return { x: CX + R_BULB * Math.cos(toRad(a)), y: CY + R_BULB * Math.sin(toRad(a)) };
-});
 
 // ─── Landing sounds ───────────────────────────────────────────────────────────
 
@@ -461,7 +454,7 @@ export default function WheelScreen() {
                       textAnchor="middle"
                       fill={isW ? '#fff' : isMy ? '#00d4ff' : sg.col}
                       fillOpacity={isW ? 1 : 0.9}
-                      fontSize={sg.arc >= 40 ? 11 : sg.arc >= 17 ? 9 : 7}
+                      fontSize={sg.arc >= 36 ? 11 : sg.arc >= 17 ? 9 : 7}
                       fontWeight="bold"
                       transform={`rotate(${p.rot.toFixed(1)}, ${p.x.toFixed(2)}, ${p.y.toFixed(2)})`}
                     >{sg.label}</SvgText>
@@ -470,42 +463,11 @@ export default function WheelScreen() {
               );
             })}
 
-            {/* Vegas marquee outer rim — gold ring */}
-            <Circle cx={CX} cy={CY} r={R_OUTER + 1} fill="none" stroke="#ffd700" strokeWidth={2.5} strokeOpacity={0.6} />
-            {/* Inner neon ring */}
-            <Circle cx={CX} cy={CY} r={R_OUTER} fill="none" stroke="rgba(191,95,255,0.5)" strokeWidth={1.5} />
-            {/* Outer neon accent */}
-            <Circle cx={CX} cy={CY} r={R_OUTER + 4} fill="none" stroke="rgba(0,212,255,0.18)" strokeWidth={1} />
+            {/* Outer border */}
+            <Circle cx={CX} cy={CY} r={R_OUTER + 1} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth={1.5} />
 
-            {/* Marquee bulbs */}
-            {BULBS.map((b, i) => (
-              <Circle
-                key={i}
-                cx={b.x.toFixed(2)} cy={b.y.toFixed(2)} r={2.2}
-                fill={i % 3 === 0 ? '#ffd700' : i % 3 === 1 ? '#00d4ff' : '#bf5fff'}
-                fillOpacity={0.75}
-              />
-            ))}
-
-            {/* Segment boundary dots */}
-            {START_ANGLES.map((startA, i) => {
-              const ang = -90 + startA;
-              const dx  = CX + (R_OUTER + 1) * Math.cos(toRad(ang));
-              const dy  = CY + (R_OUTER + 1) * Math.sin(toRad(ang));
-              return <Circle key={i} cx={dx.toFixed(2)} cy={dy.toFixed(2)} r={2.5} fill={SEGMENTS[i].col} fillOpacity={0.8} />;
-            })}
-
-            {/* ── Casino Chip Hub ── */}
-            {/* Gold outer trim */}
-            <Circle cx={CX} cy={CY} r={R_INNER + 6}  fill="#100020" stroke="#ffd700"     strokeWidth={3} />
-            {/* Black chip body */}
-            <Circle cx={CX} cy={CY} r={R_INNER + 3}  fill="#08001a" stroke="rgba(255,215,0,0.35)" strokeWidth={1} />
-            {/* Cyan inner ring */}
-            <Circle cx={CX} cy={CY} r={R_INNER - 2}  fill="none"   stroke="#00d4ff"     strokeWidth={2} strokeOpacity={0.8} />
-            {/* Pink inner ring */}
-            <Circle cx={CX} cy={CY} r={R_INNER - 8}  fill="none"   stroke="#ff0090"     strokeWidth={1} strokeOpacity={0.6} />
-            {/* Deep center */}
-            <Circle cx={CX} cy={CY} r={R_INNER - 12} fill="#05000f" />
+            {/* ── Center hub ── */}
+            <Circle cx={CX} cy={CY} r={R_INNER + 2} fill="#050010" stroke="rgba(255,255,255,0.18)" strokeWidth={1.5} />
             {/* ♠ spade */}
             <SvgText x={CX} y={CY + 8} textAnchor="middle" fill="#ffffff" fontSize={22} fontWeight="bold">♠</SvgText>
 

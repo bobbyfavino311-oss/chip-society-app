@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -714,7 +714,33 @@ const LB_CATS = [
 
 function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
   const [cat, setCat] = useState<typeof LB_CATS[number]['id']>('chips');
-  const entries = getLeaderboard(cat).slice(0, 10);
+  const { profile } = useUser();
+
+  const entries = useMemo(() => {
+    const base = getLeaderboard(cat);
+    const myWinRate = profile.handsPlayed > 0
+      ? Math.round((profile.wins / profile.handsPlayed) * 100) : 0;
+    let myValue = 0;
+    let myLabel = '';
+    if (cat === 'chips')   { myValue = profile.chips;  myLabel = profile.chips >= 1_000_000 ? `${(profile.chips / 1_000_000).toFixed(1)}M` : profile.chips >= 1_000 ? `${(profile.chips / 1_000).toFixed(0)}K` : String(profile.chips); }
+    if (cat === 'winrate') { myValue = myWinRate;       myLabel = `${myWinRate}%`; }
+    if (cat === 'pots')    { myValue = 0;               myLabel = '—'; }
+    if (cat === 'xp')      { myValue = profile.level;  myLabel = `Lv ${profile.level}`; }
+    const mePlayer = {
+      id: '__me__', username: profile.username || 'You',
+      rank: profile.rank as string,
+      level: profile.level, chips: profile.chips,
+      winRate: myWinRate, handsPlayed: profile.handsPlayed,
+      biggestPot: 0, tournamentWins: 0,
+      avatarId: profile.avatarIndex, status: 'online' as const,
+      posts: [], isMock: false,
+    };
+    const merged = [
+      ...base.filter(e => e.player.id !== '__me__'),
+      { player: mePlayer as Parameters<typeof getLeaderboard>[0] extends never ? never : any, value: myValue, label: myLabel },
+    ];
+    return merged.sort((a, b) => b.value - a.value).slice(0, 10);
+  }, [cat, profile]);
 
   const medalColors = ['#ffd700', '#a0a8c0', '#cd7f32'];
 
@@ -743,11 +769,12 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
         {/* Entries */}
         {entries.map((entry, i) => {
           const medal = i < 3 ? medalColors[i] : null;
+          const isMe = entry.player.id === '__me__';
           return (
             <TouchableOpacity
               key={entry.player.id}
-              style={lb.row}
-              onPress={() => router.push(`/social/player-profile?id=${entry.player.id}`)}
+              style={[lb.row, isMe && { borderColor: colors.primary + '55', backgroundColor: colors.primary + '10' }]}
+              onPress={() => !isMe && router.push(`/social/player-profile?id=${entry.player.id}`)}
             >
               <LinearGradient
                 colors={medal ? [`${medal}18`, 'transparent'] : ['transparent', 'transparent']}
@@ -1463,7 +1490,8 @@ const stripStyle = StyleSheet.create({
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
   const cls = useColors();
-  const [activeTab, setActiveTab] = useState('all');
+  const { tab: _initialTab } = useLocalSearchParams<{ tab?: string }>();
+  const [activeTab, setActiveTab] = useState(_initialTab ?? 'all');
   const [composeVisible, setComposeVisible] = useState(false);
   const [myPosts, setMyPosts] = useState<MePost[]>(INITIAL_MY_POSTS);
   const [notifVisible, setNotifVisible] = useState(false);
