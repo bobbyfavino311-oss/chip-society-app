@@ -72,44 +72,44 @@ interface TierCfg {
 const TIER_CFG: Record<CookieTier, TierCfg> = {
   common: {
     color: '#9CA3AF', label: 'COMMON', dropRate: 'Very Common',
-    chipRange:   [5_000,      25_000],
-    ticketRange: [1,          1],
-    xpRange:     [100,        500],
-    maxChips: 25_000, maxTickets: 1,
+    chipRange:   [5_000,       10_000],
+    ticketRange: [0,           0],
+    xpRange:     [100,         500],
+    maxChips: 10_000, maxTickets: 0,
   },
   uncommon: {
     color: '#22C55E', label: 'UNCOMMON', dropRate: 'Common',
-    chipRange:   [25_000,     75_000],
-    ticketRange: [1,          2],
-    xpRange:     [500,        2_500],
-    maxChips: 75_000, maxTickets: 2,
+    chipRange:   [10_000,      25_000],
+    ticketRange: [0,           1],
+    xpRange:     [250,         1_000],
+    maxChips: 25_000, maxTickets: 1,
   },
   rare: {
     color: '#60A5FA', label: 'RARE', dropRate: 'Uncommon',
-    chipRange:   [75_000,     250_000],
-    ticketRange: [1,          3],
-    xpRange:     [1_000,      5_000],
-    maxChips: 250_000, maxTickets: 3,
+    chipRange:   [25_000,      50_000],
+    ticketRange: [0,           1],
+    xpRange:     [500,         2_000],
+    maxChips: 50_000, maxTickets: 1,
   },
   epic: {
     color: '#A855F7', label: 'EPIC', dropRate: 'Rare',
-    chipRange:   [250_000,    750_000],
-    ticketRange: [3,          10],
-    xpRange:     [5_000,      25_000],
-    maxChips: 750_000, maxTickets: 10,
+    chipRange:   [100_000,     250_000],
+    ticketRange: [1,           3],
+    xpRange:     [2_000,       10_000],
+    maxChips: 250_000, maxTickets: 3,
   },
   legendary: {
     color: '#F59E0B', label: 'LEGENDARY', dropRate: 'Very Rare',
-    chipRange:   [750_000,    2_000_000],
-    ticketRange: [5,          25],
-    xpRange:     [25_000,     100_000],
+    chipRange:   [500_000,     2_000_000],
+    ticketRange: [5,           25],
+    xpRange:     [10_000,      50_000],
     maxChips: 2_000_000, maxTickets: 25,
   },
   mythic: {
     color: '#FF0090', label: 'MYTHIC', dropRate: 'Daily Wheel Only',
-    chipRange:   [500_000,    10_000_000],
-    ticketRange: [15,         50],
-    xpRange:     [100_000,    500_000],
+    chipRange:   [500_000,     10_000_000],
+    ticketRange: [15,          50],
+    xpRange:     [100_000,     500_000],
     maxChips: 10_000_000, maxTickets: 50,
   },
 };
@@ -128,13 +128,16 @@ const TIER_UNLOCK_LEVEL: Record<CookieTier, number | null> = {
 };
 
 const TIER_DESCRIPTIONS: Record<CookieTier, string> = {
-  common:    'The everyday fortune. A dependable reward containing small chip payouts and XP.',
-  uncommon:  'A luckier fortune containing larger chip rewards and increased experience.',
-  rare:      'Rare fortunes begin rewarding premium progression items alongside larger chip prizes.',
-  epic:      'An Epic Fortune contains premium rewards for dedicated players.',
-  legendary: 'Legendary fortunes are extremely uncommon and contain premium rewards worthy of elite players.',
+  common:    '5K–10K chips',
+  uncommon:  '10K–25K chips',
+  rare:      '25K–50K chips',
+  epic:      '100K–250K chips',
+  legendary: '500K+ chips or token',
   mythic:    'The rarest Fortune Cookie in Chip Society. Only obtainable by landing on the Mythic Cookie slice of the Daily Wheel.',
 };
+
+// Tiers shown in the collection chart (Uncommon is a backend tier, Mythic is wheel-only)
+const CHART_TIERS: CookieTier[] = ['common', 'rare', 'epic', 'legendary'];
 
 const UNLOCK_SEEN_KEY = '@cs_cookie_unlock_seen_v1';
 
@@ -154,11 +157,11 @@ function pickReward(tier: CookieTier): FortuneReward {
     const amount = Math.min(raw, cfg.maxChips); // hard cap
     return { type: 'chips', amount, label: `+${formatChips(amount)} Chips`, color, tier };
 
-  } else if (roll < 0.90) {
-    // ── Lottery tickets ────────────────────────────────────────────────────
+  } else if (roll < 0.90 && cfg.maxTickets > 0) {
+    // ── Lottery tickets (skip for tiers with no ticket range) ──────────────
     const [min, max] = cfg.ticketRange;
     const raw    = Math.floor(min + Math.random() * (max - min + 1));
-    const amount = Math.min(raw, cfg.maxTickets); // hard cap
+    const amount = Math.min(Math.max(raw, 1), cfg.maxTickets); // at least 1 if we're here
     return { type: 'tickets', amount, label: `+${amount} Lottery Ticket${amount !== 1 ? 's' : ''}`, color, tier };
 
   } else {
@@ -625,65 +628,55 @@ export default function FortuneCookieScreen() {
         {phase === 'idle' && (
           <View style={styles.idleSection}>
 
-            {/* Tier progression grid — all 6 tiers always visible */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cookieInventory}>
-              {(['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'] as CookieTier[]).map(t => {
+            {/* Tier progression chart — Common / Rare / Epic / Legendary */}
+            <View style={styles.cookieInventory}>
+              {CHART_TIERS.map(t => {
                 const tc = TIER_CFG[t];
                 const unlockLv = TIER_UNLOCK_LEVEL[t];
-                const isMythicTier = t === 'mythic';
-                const isLocked = !isMythicTier && unlockLv !== null && unlockLv > 0 && profile.level < unlockLv;
+                const isLocked = unlockLv !== null && unlockLv > 0 && profile.level < unlockLv;
                 const count = inv[t];
                 const isActive = cookieTier === t && !isLocked;
                 return (
                   <TouchableOpacity
                     key={t}
                     style={[
-                      styles.pill,
-                      isActive && styles.pillActive,
-                      isLocked && styles.pillLocked,
-                      { borderColor: isLocked ? '#2a2a2a' : isActive ? tc.color : tc.color + '44' },
+                      styles.tierCard,
+                      isActive && { borderColor: tc.color, backgroundColor: tc.color + '12' },
+                      isLocked && styles.tierCardLocked,
+                      !isActive && !isLocked && { borderColor: tc.color + '35' },
                     ]}
-                    onPress={() => {
-                      if (isLocked) return;
-                      setCookieTier(t);
-                    }}
-                    activeOpacity={isLocked ? 1 : 0.72}
+                    onPress={() => { if (!isLocked) setCookieTier(t); }}
+                    activeOpacity={isLocked ? 1 : 0.75}
                   >
+                    {/* Dot indicator */}
+                    <View style={[styles.tierDot, { backgroundColor: isLocked ? '#2a2a2a' : tc.color }]} />
+
+                    {/* Tier name */}
+                    <Text style={[styles.tierCardName,
+                      { color: isLocked ? '#333' : isActive ? tc.color : tc.color + 'bb' }
+                    ]}>{tc.label}</Text>
+
+                    {/* Range or lock */}
                     {isLocked ? (
-                      <Ionicons name="lock-closed" size={12} color="#3a3a3a" />
+                      <View style={styles.tierLockRow}>
+                        <Ionicons name="lock-closed" size={10} color="#333" />
+                        <Text style={styles.tierCardUnlock}>Lv {unlockLv}</Text>
+                      </View>
                     ) : (
-                      <Text style={[styles.pillNum, { color: (count > 0 || isMythicTier) ? tc.color : tc.color + '55' }]}>
-                        {isMythicTier && count === 0 ? '✦' : count}
+                      <Text style={[styles.tierCardRange, { color: isActive ? '#ccc' : '#666' }]}>
+                        {TIER_DESCRIPTIONS[t]}
                       </Text>
                     )}
-                    <View style={styles.pillLabels}>
-                      <Text style={[styles.pillLbl,
-                        isActive && { color: tc.color },
-                        isLocked && { color: '#3a3a3a' },
-                      ]}>{tc.label}</Text>
-                      {isLocked && unlockLv !== null && (
-                        <Text style={styles.pillUnlockLbl}>Lv {unlockLv}</Text>
-                      )}
-                      {isMythicTier && (
-                        <Text style={[styles.pillExclusiveLbl, { color: tc.color + '99' }]}>WHEEL</Text>
-                      )}
-                    </View>
+
+                    {/* Owned qty badge */}
+                    {!isLocked && count > 0 && (
+                      <View style={[styles.tierQtyBadge, { backgroundColor: tc.color + '22', borderColor: tc.color + '55' }]}>
+                        <Text style={[styles.tierQtyText, { color: tc.color }]}>{count}</Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
                 );
               })}
-            </ScrollView>
-
-            {/* Selected tier info + description */}
-            <View style={[styles.tierHint, { borderColor: cfg.color + '30', backgroundColor: cfg.color + '0C' }]}>
-              <Text style={[styles.tierHintDesc, { color: cfg.color + 'dd' }]}>
-                {TIER_DESCRIPTIONS[cookieTier]}
-              </Text>
-              <Text style={[styles.tierHintText, { color: cfg.color + '88' }]}>
-                {isMythicSelected
-                  ? `Exclusive Daily Wheel · ${formatChips(cfg.chipRange[0])}–${formatChips(cfg.chipRange[1])} chips · ${cfg.ticketRange[0]}–${cfg.ticketRange[1]} tickets`
-                  : `${cfg.dropRate} drop · ${formatChips(cfg.chipRange[0])}–${formatChips(cfg.chipRange[1])} chips`
-                }
-              </Text>
             </View>
 
             {(hasCookies || canClaimFreeCookie) ? (
@@ -876,40 +869,37 @@ const styles = StyleSheet.create({
   bottom: { paddingHorizontal: 20 },
 
   idleSection: { gap: 12 },
-  cookieInventory: { flexDirection: 'row', gap: 8, paddingVertical: 2 },
-
-  pill: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderRadius: 20, borderWidth: 1,
-    paddingHorizontal: 12, paddingVertical: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  pillActive: { backgroundColor: 'rgba(255,255,255,0.10)' },
-  pillLocked: { backgroundColor: 'rgba(255,255,255,0.01)', opacity: 0.55 },
-  pillNum:    { fontSize: 14, fontWeight: '900', fontFamily: 'Inter_700Bold' },
-  pillLabels: { alignItems: 'center', gap: 1 },
-  pillLbl:    { fontSize: 9,  color: '#888', fontFamily: 'Orbitron_400Regular', letterSpacing: 1 },
-  pillUnlockLbl: {
-    fontSize: 7, color: '#3a3a3a',
-    fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5,
-  },
-  pillExclusiveLbl: {
-    fontSize: 6, fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5,
+  cookieInventory: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between',
   },
 
-  tierHint: {
+  // 4-tier card grid
+  tierCard: {
+    flex: 1, minWidth: '45%',
+    borderRadius: 14, borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    paddingHorizontal: 14, paddingVertical: 12,
+    alignItems: 'flex-start', gap: 4,
+    position: 'relative',
+  },
+  tierCardLocked: { opacity: 0.45 },
+  tierDot: { width: 8, height: 8, borderRadius: 4, marginBottom: 2 },
+  tierCardName: {
+    fontSize: 9, fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
+  },
+  tierCardRange: {
+    fontSize: 11, fontFamily: 'Inter_700Bold', letterSpacing: -0.3, lineHeight: 15,
+  },
+  tierLockRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  tierCardUnlock: {
+    fontSize: 9, color: '#333', fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5,
+  },
+  tierQtyBadge: {
+    position: 'absolute', top: 8, right: 10,
     borderRadius: 10, borderWidth: 1,
-    paddingHorizontal: 14, paddingVertical: 10,
-    alignItems: 'center', gap: 4,
+    paddingHorizontal: 7, paddingVertical: 2,
   },
-  tierHintDesc: {
-    fontSize: 11, fontFamily: 'Orbitron_400Regular',
-    textAlign: 'center', lineHeight: 16,
-  },
-  tierHintText: {
-    fontSize: 9, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.8,
-    textAlign: 'center',
-  },
+  tierQtyText: { fontSize: 11, fontFamily: 'Inter_700Bold' },
 
   openBtn: {
     borderRadius: 14, height: 52,
