@@ -1,0 +1,116 @@
+FORTUNE COOKIE BUTTON STATE BUG FIX
+
+The Fortune Cookie selector is still broken.
+
+Current bug:
+
+When the player taps:
+
+LEGENDARY
+
+the screen immediately switches back to COMMON.
+
+Same issue happens with:
+
+EPIC
+RARE
+
+This means the selected cookie state is being overwritten after button press.
+
+Fix this immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ROOT ISSUE TO CHECK
+
+The selected cookie rarity must be controlled by ONE state value only.
+
+Example:
+
+selectedCookieRarity
+
+Do not allow inventory sorting, default rarity logic, animation state, or cookie count refresh to reset the selection back to Common.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED BEHAVIOR
+
+If player taps LEGENDARY:
+
+selectedCookieRarity = LEGENDARY
+
+The UI must stay on LEGENDARY.
+
+Open button must say:
+
+OPEN LEGENDARY
+
+Opening the cookie must deduct:
+
+Legendary -1
+
+It must NOT deduct Common.
+
+It must NOT switch to Common.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FIX ALL COOKIE TABS
+
+COMMON opens Common.
+
+RARE opens Rare.
+
+EPIC opens Epic.
+
+LEGENDARY opens Legendary.
+
+MYTHIC opens Mythic only if owned.
+
+No tab should auto-reset to another rarity unless the selected rarity reaches 0 after opening.
+
+Even then, only switch if that rarity count becomes 0, and choose the next available rarity intentionally.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OPEN FUNCTION REQUIREMENT
+
+The openCookie function must receive the selected rarity directly.
+
+Example:
+
+openCookie(selectedCookieRarity)
+
+Do NOT hardcode:
+
+openCookie("common")
+
+Do NOT default to common inside the open function.
+
+Do NOT re-read the first inventory item and open that instead.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL TEST
+
+Player owns:
+
+Common x74
+Rare x11
+Epic x9
+Legendary x9
+Mythic x2
+
+Test:
+
+Tap Rare → UI stays Rare → Open Rare → Rare becomes x10.
+
+Tap Epic → UI stays Epic → Open Epic → Epic becomes x8.
+
+Tap Legendary → UI stays Legendary → Open Legendary → Legendary becomes x8.
+
+Tap Common → UI stays Common → Open Common → Common becomes x73.
+
+Tap Mythic → UI stays Mythic → Open Mythic → Mythic becomes x1.
+
+If any rarity switches back to Common before opening, the bug is not fixed.

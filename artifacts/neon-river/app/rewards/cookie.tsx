@@ -321,21 +321,8 @@ export default function FortuneCookieScreen() {
     }).catch(() => {});
   }, [profile.level]);
 
-  // Auto-switch to best available unlocked tier when selected tier runs out
-  useEffect(() => {
-    if (phase !== 'idle') return;
-    const unlockLv = TIER_UNLOCK_LEVEL[cookieTier];
-    const tierLocked = unlockLv !== null && unlockLv > 0 && profile.level < unlockLv;
-    if (inv[cookieTier] <= 0 || tierLocked) {
-      // Auto-switch only within the 4 standard tiers — never force Mythic
-      const next = (['common', 'rare', 'epic', 'legendary'] as CookieTier[]).find(t => {
-        const lv = TIER_UNLOCK_LEVEL[t];
-        const unlocked = lv === null || profile.level >= lv;
-        return unlocked && inv[t] > 0;
-      }) ?? 'common';
-      setCookieTier(next);
-    }
-  }, [inv.common, inv.rare, inv.epic, inv.legendary, inv.mythic, phase, cookieTier, profile.level]);
+  // No auto-switch effect — tier selection is fully manual.
+  // Auto-switch only happens inside handleOpen after a tier is depleted.
 
   // ── Animations ──────────────────────────────────────────────────────────────
   const shakeX       = useRef(new Animated.Value(0)).current;
@@ -405,6 +392,15 @@ export default function FortuneCookieScreen() {
     // Consume one cookie of the selected tier
     const ok = await consumeFortuneCookie(tierToOpen);
     if (!ok) return;
+
+    // After consuming, if this tier is now empty switch to the next available tier
+    const remainingAfterOpen = inv[tierToOpen] - 1;
+    if (remainingAfterOpen <= 0) {
+      const allTiers: CookieTier[] = ['common', 'rare', 'epic', 'legendary', 'mythic'];
+      const next = allTiers.find(t => t !== tierToOpen && inv[t] > 0);
+      if (next) setCookieTier(next);
+      // else stay on current tier (shows "NO X COOKIES" disabled state)
+    }
 
     // Pick reward STRICTLY from this tier's pool
     const picked = pickReward(tierToOpen);
