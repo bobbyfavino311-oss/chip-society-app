@@ -530,7 +530,9 @@ export default function WheelScreen() {
             ) : (
               <View style={s.claimedRow}>
                 <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                <Text style={s.claimedText}>Added to your balance!</Text>
+                <Text style={s.claimedText}>
+                  {seg?.xp ? '⚡ KEEP LEVELING UP!' : 'Added to your balance!'}
+                </Text>
               </View>
             )}
           </Animated.View>

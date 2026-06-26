@@ -1,0 +1,273 @@
+I think this is a good opportunity to make Fortune Cookies into a real progression system instead of just random loot. Right now players collect them, but there isn’t a satisfying sense of “unlocking” higher tiers. Here’s a complete redesign prompt.
+
+⸻
+
+CHIP SOCIETY – FORTUNE COOKIE SYSTEM OVERHAUL
+
+Completely redesign the Fortune Cookie system so it feels like a collectible progression feature rather than simply random rewards.
+
+The UI should remain clean and minimal, but every cookie rarity should have a clear purpose and method of obtaining it.
+
+⸻
+
+Cookie Collection Screen
+
+Update every cookie description.
+
+Common Cookie
+
+Drop Rate: Very Common
+
+Rewards
+
+• 5,000–25,000 Chips
+
+• Small XP rewards
+
+Description:
+
+“The everyday fortune. A dependable reward containing small chip payouts and XP.”
+
+⸻
+
+Uncommon Cookie
+
+Drop Rate: Common
+
+Rewards
+
+• 25,000–75,000 Chips
+
+• Medium XP
+
+Description:
+
+“A luckier fortune containing larger chip rewards and increased experience.”
+
+⸻
+
+Rare Cookie
+
+Rewards
+
+• 75,000–250,000 Chips
+
+• Medium XP
+
+• Small Ticket rewards
+
+Description:
+
+“Rare fortunes begin rewarding premium progression items alongside larger chip prizes.”
+
+⸻
+
+Epic Cookie
+
+Rewards
+
+• 250,000–750,000 Chips
+
+• Large XP
+
+• Tickets
+
+Description:
+
+“An Epic Fortune contains premium rewards for dedicated players.”
+
+⸻
+
+Legendary Cookie
+
+Rewards
+
+• 750,000–2,000,000 Chips
+
+• 5–25 Tickets
+
+Description:
+
+“Legendary fortunes are extremely uncommon and contain premium rewards worthy of Chip Society’s elite.”
+
+⸻
+
+Mythic Cookie
+
+Not shown in the normal cookie progression.
+
+Instead display:
+
+Obtainable only from the Daily Wheel Jackpot.
+
+Rewards
+
+• 500,000–10,000,000 Chips
+
+• 15–50 Tickets
+
+Description:
+
+“The rarest Fortune Cookie in Chip Society. Only obtainable by landing on the Mythic Cookie slice of the Daily Wheel.”
+
+⸻
+
+Cookie Unlock Progression
+
+Currently there is no progression system.
+
+Implement one.
+
+Players should unlock cookie rarities naturally while playing.
+
+⸻
+
+Common
+
+Unlocked immediately.
+
+⸻
+
+Uncommon
+
+Unlock after reaching Level 10.
+
+⸻
+
+Rare
+
+Unlock after reaching Level 25.
+
+⸻
+
+Epic
+
+Unlock after reaching Level 50.
+
+⸻
+
+Legendary
+
+Unlock after reaching Level 100.
+
+⸻
+
+Mythic
+
+Never unlocks through leveling.
+
+The only way to obtain Mythic Cookies is by landing on the Mythic Cookie slice on the Daily Wheel.
+
+Do not sell Mythic Cookies.
+
+Do not award Mythic Cookies from achievements.
+
+Do not include Mythic Cookies in daily login rewards.
+
+Do not include Mythic Cookies in the Chip Store.
+
+The Daily Wheel is the exclusive source.
+
+⸻
+
+Unlock Experience
+
+When a player reaches the required level:
+
+Display a premium popup.
+
+Example:
+
+🎉 NEW COOKIE UNLOCKED
+
+Rare Fortune Cookie
+
+“You’ve unlocked a new Fortune Cookie rarity.”
+
+Add the cookie permanently to the player’s collection.
+
+⸻
+
+Cookie Sources
+
+Common
+
+* Daily login
+* Achievements
+* Beginner missions
+* Social rewards
+
+⸻
+
+Uncommon
+
+* Level milestones
+* Tournament rewards
+* Missions
+
+⸻
+
+Rare
+
+* High-level achievements
+* Weekly rewards
+* Event rewards
+
+⸻
+
+Epic
+
+* Major achievements
+* VIP progression
+* Seasonal events
+
+⸻
+
+Legendary
+
+* End-game achievements
+* Elite tournaments
+* Very rare event rewards
+
+⸻
+
+Mythic
+
+Daily Wheel only.
+
+No exceptions.
+
+⸻
+
+Daily Wheel XP Message
+
+Currently when XP is awarded it incorrectly says:
+
+“Added to your balance.”
+
+Replace this message everywhere with:
+
+⚡ KEEP LEVELING UP!
+
+The XP reward popup should feel different from chip rewards.
+
+Examples:
+
+⚡ +5,000 XP
+
+KEEP LEVELING UP!
+
+instead of
+
+“Added to your balance.”
+
+⸻
+
+Cookie Collection UI Improvements
+
+* Show a lock icon over cookie rarities that have not yet been unlocked.
+* Display the unlock requirement underneath each locked cookie (e.g., “Unlocks at Level 25”).
+* Once unlocked, replace the lock with the player’s owned quantity.
+* Keep Mythic visually separate with an “Exclusive” badge labeled Daily Wheel Only.
+
+This gives players a clear long-term progression path while preserving the Mythic Cookie as a true jackpot reward that remains exciting even for high-level players.
