@@ -1,0 +1,136 @@
+I think that’s a much healthier economy. The wheel should mostly reward XP and progression, with chips acting as a nice bonus rather than the main attraction.
+
+CHIP SOCIETY – FINAL DAILY WHEEL REBALANCE
+
+Completely rebalance the Wheel of Fortune.
+
+The wheel should have 12 slices and focus more heavily on XP progression while still offering occasional chip rewards. The goal is to make the daily spin rewarding without flooding the economy with free chips.
+
+⸻
+
+Wheel Layout (12 Slices)
+
+⚡ 2.5K XP
+
+💰 10K Chips
+
+⚡ 5K XP
+
+🥠 Common Fortune Cookie
+
+💰 50K Chips
+
+💎 10K XP
+
+⚡ 25K XP
+
+💰 100K Chips
+
+⚡ 50K XP
+
+💰 250K Chips
+
+🥠 Mythic Fortune Cookie
+
+💰 1M Chips
+
+⸻
+
+Prize Distribution
+
+XP Rewards (5 Slices)
+
+* ⚡ 2.5K XP
+* ⚡ 5K XP
+* 💎 10K XP
+* ⚡ 25K XP
+* ⚡ 50K XP
+
+XP should make up nearly half of all wheel rewards, encouraging long-term progression.
+
+⸻
+
+Chip Rewards (5 Slices)
+
+* 💰 10K
+* 💰 50K
+* 💰 100K
+* 💰 250K
+* 💰 1M
+
+10K is the minimum direct chip reward.
+
+1M is the absolute maximum direct chip reward.
+
+⸻
+
+Cookie Rewards (2 Slices)
+
+🥠 Common Fortune Cookie
+
+🥠 Mythic Fortune Cookie
+
+These remain the only cookie rewards available on the wheel.
+
+⸻
+
+Prize Odds
+
+Very Common
+
+* 2.5K XP
+* 5K XP
+* 10K Chips
+* 50K Chips
+
+Common
+
+* 10K XP
+* 25K XP
+* 100K Chips
+
+Uncommon
+
+* 50K XP
+* 250K Chips
+
+Rare
+
+* Common Fortune Cookie
+
+Ultra Rare
+
+* 1M Chips
+* Mythic Fortune Cookie
+
+The 1M chip slice and Mythic Cookie should have the two lowest probabilities on the wheel.
+
+⸻
+
+Cookie Values
+
+Common Fortune Cookie
+
+Random reward:
+
+* 25,000–150,000 chips
+
+Mythic Fortune Cookie
+
+Random reward:
+
+* 500,000–10,000,000 chips
+
+Mythic Cookies remain the only way to occasionally earn more than 1 million chips from the daily wheel.
+
+⸻
+
+Visual Rules
+
+* Prize names remain diagonal inside each slice.
+* 💰 represents all chip prizes.
+* ⚡ or 💎 represents XP only.
+* Cookie slices display only the cookie artwork.
+* Keep the wheel at 12 slices for maximum readability and cleaner spacing.
+
+This distribution makes the wheel feel rewarding every day while preserving the value of actually playing poker and casino games to build a bankroll.
