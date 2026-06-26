@@ -406,7 +406,7 @@ function ChipSocietyLogo() {
           Society
         </Animated.Text>
       </View>
-      <Text style={logo.sub} allowFontScaling={false}>TEXAS HOLD'EM POKER</Text>
+      <Text style={logo.sub} allowFontScaling={false}>SOCIAL POKER NETWORK</Text>
     </View>
   );
 }
