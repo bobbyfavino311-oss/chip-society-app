@@ -201,10 +201,10 @@ function FortuneCookieSection() {
       {/* Rarity guide */}
       <View style={fc.rarityRow}>
         {([
-          { label: 'COMMON',    color: '#9CA3AF', desc: '5K–10K chips' },
-          { label: 'RARE',      color: '#60A5FA', desc: '25K–50K chips' },
-          { label: 'EPIC',      color: '#A855F7', desc: '100K–250K' },
-          { label: 'LEGENDARY', color: '#F59E0B', desc: '500K+ or token' },
+          { label: 'COMMON',    color: '#9CA3AF', desc: '5K–25K chips' },
+          { label: 'RARE',      color: '#60A5FA', desc: '25K–150K chips' },
+          { label: 'EPIC',      color: '#A855F7', desc: '150K–750K chips' },
+          { label: 'LEGENDARY', color: '#F59E0B', desc: '750K–2M chips' },
         ] as const).map(r => (
           <View key={r.label} style={fc.rarityItem}>
             <View style={[fc.rarityDot, { backgroundColor: r.color }]} />
