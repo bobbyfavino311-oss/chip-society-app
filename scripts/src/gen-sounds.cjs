@@ -510,6 +510,190 @@ function gen_bet_placed() {
   return normalize(out);
 }
 
+// ── Gameplay interaction sounds (soft felt palette) ────────────────────────────
+
+function gen_check() {
+  // Soft digital tap: muted button press with slight pop, 65 ms
+  // Like a rubber-tipped button on felt — no ring, no metal
+  const dur = 0.065;
+  const out = zeros(dur);
+  // Damped felt-body thump (260 Hz — mid, warm)
+  const body = sine(0.055, 260, 0.50);
+  adsr(body, 0.001, 0.022, 0.0, 0.032);
+  mix(out, body, 0);
+  // Soft texture layer — bandpass noise, not highpass (avoids metallic ping)
+  const tex = noise(0.035, 0.20, 0.22);
+  adsr(tex, 0.001, 0.010, 0.0, 0.024);
+  mix(out, tex, 0);
+  // Sub warmth — keeps it from sounding tinny
+  const sub = sine(0.045, 108, 0.18);
+  adsr(sub, 0.001, 0.018, 0.0, 0.026);
+  mix(out, sub, 0);
+  return normalize(out, 0.72);
+}
+
+function gen_call() {
+  // Fuller tap-pop: same palette as check, more body, 90 ms
+  // Confident but understated — not a coin drop
+  const dur = 0.090;
+  const out = zeros(dur);
+  const body = sine(0.075, 220, 0.55);
+  adsr(body, 0.001, 0.028, 0.0, 0.046);
+  mix(out, body, 0);
+  const tex = noise(0.048, 0.22, 0.20);
+  adsr(tex, 0.001, 0.013, 0.0, 0.034);
+  mix(out, tex, 0);
+  const sub = sine(0.060, 94, 0.26);
+  adsr(sub, 0.001, 0.022, 0.0, 0.037);
+  mix(out, sub, 0);
+  return normalize(out, 0.75);
+}
+
+function gen_raise() {
+  // Soft chip sliding across felt + tiny confirmation pop at end, 185 ms
+  // Slide: bandpass noise (felt friction). Pop: soft thump. No metal clink.
+  const dur = 0.185;
+  const out = zeros(dur);
+  // Felt slide body
+  const slide = noise(0.120, 0.38, 0.17);
+  adsr(slide, 0.005, 0.040, 0.30, 0.070);
+  mix(out, slide, 0);
+  // Airy high-freq texture during slide (very restrained)
+  const hi = hpnoise(0.090, 0.14, 0.12);
+  adsr(hi, 0.004, 0.030, 0.10, 0.056);
+  mix(out, hi, 0.010);
+  // Confirmation pop: damped sine (not a ping — no ring)
+  const pop = sine(0.060, 330, 0.50);
+  adsr(pop, 0.001, 0.019, 0.0, 0.040);
+  mix(out, pop, 0.115);
+  const popTex = noise(0.035, 0.18, 0.24);
+  adsr(popTex, 0.001, 0.009, 0.0, 0.025);
+  mix(out, popTex, 0.115);
+  return normalize(out, 0.80);
+}
+
+function gen_fold() {
+  // Quick paper/card sweep — almost silent, 115 ms
+  // Cards gently pushed into the muck across felt
+  const dur = 0.115;
+  const out = zeros(dur);
+  // Card paper texture: thin hpnoise sweep, fast fade
+  const sweep = hpnoise(0.100, 0.42, 0.075);
+  adsr(sweep, 0.002, 0.028, 0.0, 0.070);
+  mix(out, sweep, 0);
+  // Felt landing: very soft low thump at end
+  const land = sine(0.048, 155, 0.20);
+  adsr(land, 0.001, 0.017, 0.0, 0.030);
+  mix(out, land, 0.058);
+  return normalize(out, 0.62); // intentionally quieter — "almost silent"
+}
+
+function gen_chip_click() {
+  // Soft digital pop: muted press after Deal/Raise/Call confirmation, 72 ms
+  // Think: ceramic chip on felt, not metal on metal
+  const dur = 0.072;
+  const out = zeros(dur);
+  const pop = sine(0.058, 370, 0.52);
+  adsr(pop, 0.001, 0.019, 0.0, 0.038);
+  mix(out, pop, 0);
+  const tex = noise(0.040, 0.18, 0.20);
+  adsr(tex, 0.001, 0.010, 0.0, 0.029);
+  mix(out, tex, 0);
+  const sub = sine(0.044, 122, 0.20);
+  adsr(sub, 0.001, 0.016, 0.0, 0.027);
+  mix(out, sub, 0);
+  return normalize(out, 0.73);
+}
+
+function gen_deal() {
+  // Smooth card flick across felt, 130 ms
+  // Three-part: fingertip flick → felt slide → soft landing pat
+  const dur = 0.130;
+  const out = zeros(dur);
+  // Flick: brief hpnoise burst — card leaving fingertips
+  const flick = hpnoise(0.038, 0.52, 0.095);
+  adsr(flick, 0.001, 0.010, 0.0, 0.027);
+  mix(out, flick, 0);
+  // Slide across felt: bandpass noise
+  const slide = noise(0.072, 0.26, 0.21);
+  adsr(slide, 0.002, 0.018, 0.16, 0.050);
+  mix(out, slide, 0.008);
+  // Soft landing: damped sine pat on felt
+  const land = sine(0.052, 205, 0.36);
+  adsr(land, 0.001, 0.018, 0.0, 0.033);
+  mix(out, land, 0.072);
+  const landTex = noise(0.028, 0.13, 0.23);
+  adsr(landTex, 0.001, 0.009, 0.0, 0.018);
+  mix(out, landTex, 0.072);
+  return normalize(out, 0.78);
+}
+
+function gen_card_flip() {
+  // Crisp snap — card reveal, 58 ms, very clean and short
+  // Each revealed card sounds identical, not fatiguing
+  const dur = 0.058;
+  const out = zeros(dur);
+  // Crisp snap transient: sharp hpnoise hit
+  const snap = hpnoise(0.030, 0.75, 0.058);
+  adsr(snap, 0.001, 0.008, 0.0, 0.021);
+  mix(out, snap, 0);
+  // Brief resonant body: card-flip character (not a metallic ping)
+  const body = sine(0.044, 510, 0.30);
+  adsr(body, 0.001, 0.011, 0.0, 0.032);
+  mix(out, body, 0.002);
+  // Midrange texture for warmth
+  const mid = noise(0.024, 0.16, 0.30);
+  adsr(mid, 0.001, 0.007, 0.0, 0.016);
+  mix(out, mid, 0.002);
+  return normalize(out, 0.80);
+}
+
+function gen_win() {
+  // Subtle soft whoosh — pre-win animation, 220 ms
+  // Cards sweeping to winner, silk on felt. NOT the win music (left untouched).
+  const dur = 0.220;
+  const out = zeros(dur);
+  // Main whoosh: bandpass noise — warm felt sweep
+  const whoosh = noise(0.190, 0.44, 0.10);
+  adsr(whoosh, 0.012, 0.055, 0.28, 0.110);
+  mix(out, whoosh, 0);
+  // Airy high shimmer on top — positive, light
+  const shimmer = hpnoise(0.155, 0.18, 0.038);
+  adsr(shimmer, 0.010, 0.058, 0.18, 0.078);
+  mix(out, shimmer, 0.010);
+  // Gentle rising tone — sense of elevation without being fanfare
+  const rise = sine(0.115, 650, 0.16);
+  adsr(rise, 0.008, 0.032, 0.12, 0.068);
+  mix(out, rise, 0.062);
+  return normalize(out, 0.78);
+}
+
+function gen_allin() {
+  // All chips in: extended felt slide + heavier landing thump, 210 ms
+  // More dramatic than raise, same felt palette — no metallic sound
+  const dur = 0.210;
+  const out = zeros(dur);
+  // Extended felt slide
+  const slide = noise(0.150, 0.44, 0.155);
+  adsr(slide, 0.006, 0.048, 0.28, 0.085);
+  mix(out, slide, 0);
+  const hi = hpnoise(0.110, 0.18, 0.095);
+  adsr(hi, 0.004, 0.038, 0.16, 0.062);
+  mix(out, hi, 0.010);
+  // Heavy landing thump — deeper than raise (170 Hz vs 330 Hz)
+  const thump = sine(0.078, 168, 0.64);
+  adsr(thump, 0.001, 0.024, 0.0, 0.053);
+  mix(out, thump, 0.118);
+  const thumpTex = noise(0.040, 0.20, 0.21);
+  adsr(thumpTex, 0.001, 0.011, 0.0, 0.028);
+  mix(out, thumpTex, 0.118);
+  // Sub resonance for physical weight
+  const sub = sine(0.068, 76, 0.28);
+  adsr(sub, 0.001, 0.023, 0.0, 0.044);
+  mix(out, sub, 0.122);
+  return normalize(out, 0.82);
+}
+
 // ── Run generator ──────────────────────────────────────────────────────────────
 
 const sounds = {
@@ -532,6 +716,16 @@ const sounds = {
   tournament_win:         gen_tournament_win,
   error:                  gen_error,
   bet_placed:             gen_bet_placed,
+  // ── Gameplay interaction sounds (soft felt palette) ────────────────────────
+  check:                  gen_check,
+  call:                   gen_call,
+  raise:                  gen_raise,
+  fold:                   gen_fold,
+  chip_click:             gen_chip_click,
+  deal:                   gen_deal,
+  card_flip:              gen_card_flip,
+  win:                    gen_win,
+  allin:                  gen_allin,
 };
 
 if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });

@@ -1,0 +1,147 @@
+I agree. I wouldn’t overhaul the entire soundscape—your reward collection, theme music, and bonus sounds already fit the game’s identity. The weak point is the core gameplay interaction sounds. Those are the sounds players hear thousands of times, so they need to be satisfying without becoming irritating.
+
+Here’s the prompt I’d give your AI:
+
+⸻
+
+Gameplay Interaction Sound Redesign
+
+The gameplay interaction sounds need to be completely redesigned. The current sounds are too harsh and resemble a ceramic poker chip tapping against a metal can. They sound cheap and repetitive after only a few hands.
+
+Do not change:
+
+* Reward collection sounds
+* Theme music
+* Level up sounds
+* Bonus sounds
+* Achievement sounds
+* Notification sounds
+
+Only redesign the sounds used during active gameplay.
+
+Design Goal
+
+Every action should feel:
+
+* Soft
+* Premium
+* Modern
+* Tactile
+* Satisfying
+* Quick
+* Easy to hear repeatedly without becoming annoying
+
+Avoid metallic ringing, loud coin clinks, casino slot-machine effects, or anything with a long echo.
+
+⸻
+
+Check
+
+Replace the current sound with a soft digital tap.
+
+Think of a muted button press with a slight pop rather than a chip hitting metal.
+
+Duration:
+50–80 ms.
+
+⸻
+
+Call
+
+Use a slightly fuller version of the Check sound.
+
+A soft “tap-pop” with a little more body.
+
+It should sound confident but understated.
+
+⸻
+
+Raise
+
+This should feel satisfying without sounding like a coin.
+
+Suggested sound:
+
+* Soft chip sliding across felt
+* Tiny confirmation pop at the end
+
+No metallic clink.
+
+⸻
+
+Fold
+
+Use a quick paper/card sweep.
+
+Almost silent.
+
+The sound should resemble cards being gently pushed into the muck.
+
+⸻
+
+Bet Confirmed
+
+After pressing Deal, Raise, or Call, play a short confirmation click.
+
+Think:
+
+Soft digital “pop”
+
+Not
+
+Metallic “clink”
+
+⸻
+
+Card Deal
+
+Replace the current card deal sound with a smoother card flick.
+
+Think:
+
+A professional dealer pitching a card across felt.
+
+Not:
+
+A loud slap.
+
+⸻
+
+Card Reveal
+
+A crisp snap.
+
+Very clean.
+
+Very short.
+
+Each revealed card should sound identical.
+
+⸻
+
+Winning Hand
+
+Keep the existing win music.
+
+Only replace the sound immediately before the win animation.
+
+Use a subtle soft whoosh instead of the current hard click.
+
+⸻
+
+Overall Audio Direction
+
+The gameplay should sound closer to a premium mobile strategy or card game than a traditional casino app.
+
+Imagine:
+
+* Ceramic chips sliding on felt
+* Cards flicking across a table
+* Soft UI taps
+* Minimal mechanical sounds
+
+The objective is for players to play hundreds of hands without the core interaction sounds becoming fatiguing or repetitive.
+
+⸻
+
+I would also recommend replacing the “chip tap” entirely with a felt-based sound palette. Since Chip Society is designed around poker tables rather than slot machines, interactions should sound like cards and chips moving across premium casino felt, not metal or plastic. That subtle change alone will make the gameplay feel significantly more polished.
