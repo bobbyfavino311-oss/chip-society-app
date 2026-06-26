@@ -1,4 +1,4 @@
-export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem';
+export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem' | 'omaha_holdem';
 
 export interface VariantConfig {
   variant: GameVariant;
@@ -14,6 +14,26 @@ export interface VariantConfig {
 }
 
 export const VARIANT_CONFIGS: Record<GameVariant, VariantConfig> = {
+  omaha_holdem: {
+    variant: 'omaha_holdem',
+    label: "Omaha Hold'em",
+    shortLabel: 'Omaha',
+    deckLabel: '52-card deck · 4 hole cards',
+    description: "Omaha Hold'em — each player receives 4 hole cards but must use exactly 2 of them plus exactly 3 community cards.",
+    rankingNote: 'Must use exactly 2 hole + 3 board cards',
+    rulesPoints: [
+      'Full 52-card deck — 2 through Ace',
+      'Each player receives 4 private hole cards',
+      'Five community cards shared by all',
+      'MUST use exactly 2 hole cards + exactly 3 board cards',
+      'Cannot use 0, 1, 3 or 4 hole cards — always exactly 2',
+      'Standard hand rankings (Full House beats Flush)',
+      'No Limit betting structure',
+    ],
+    color: '#00ff88',
+    accentColor: '#00aa55',
+    dimColor: '#00ff8822',
+  },
   texas_holdem: {
     variant: 'texas_holdem',
     label: "No Limit Hold'em",

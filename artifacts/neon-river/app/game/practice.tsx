@@ -367,7 +367,7 @@ export default function PracticeScreen() {
   const { profile, recordWin, recordLoss, addChips, removeChips } = useUser();
   const { tier, variant: variantParam, players: playersParam } = useLocalSearchParams<{ tier?: string; variant?: string; players?: string }>();
   const tableConfig = STAKE_CONFIGS[tier ?? ''] ?? STAKE_CONFIGS.casual;
-  const VALID_VARIANTS = new Set(['texas_holdem', 'short_deck_holdem', 'joker_holdem']);
+  const VALID_VARIANTS = new Set(['texas_holdem', 'short_deck_holdem', 'joker_holdem', 'omaha_holdem']);
   const gameVariant = (VALID_VARIANTS.has(variantParam ?? '') ? variantParam : 'texas_holdem') as import('@/constants/gameVariants').GameVariant;
   const initialPlayers = playersParam ? Math.max(4, Math.min(5, parseInt(playersParam, 10))) : 5;
   const autoStart = !!playersParam;
@@ -589,7 +589,7 @@ export default function PracticeScreen() {
       await recordWin(0);
       const human = state.players.find(p => p.isHuman);
       let handDesc = state.winnerHand ?? '';
-      if (!handDesc && human && human.holeCards.length === 2) {
+      if (!handDesc && human && human.holeCards.length >= 2) {
         const best = getBestHandVariant(human.holeCards, state.communityCards, state.variant);
         handDesc = describeHand(best);
       }
@@ -845,7 +845,7 @@ export default function PracticeScreen() {
           <View style={styles.humanCards}>
             {humanPlayer.holeCards.length > 0
               ? humanPlayer.holeCards.map((card, i) => (
-                  <PlayingCard key={i} card={card} faceDown={false} size="lg" />
+                  <PlayingCard key={i} card={card} faceDown={false} size={humanPlayer.holeCards.length > 2 ? 'md' : 'lg'} />
                 ))
               : <><PlayingCard faceDown size="lg" /><PlayingCard faceDown size="lg" /></>
             }
@@ -892,7 +892,7 @@ export default function PracticeScreen() {
             const humanCollected = humanNet + humanContrib; // total chips received from pots
 
             // Human's best hand at showdown
-            const humanHand = state.showCards && humanPlayer && humanPlayer.holeCards.length === 2 && state.communityCards.length >= 3
+            const humanHand = state.showCards && humanPlayer && humanPlayer.holeCards.length >= 2 && state.communityCards.length >= 3
               ? getBestHandVariant(humanPlayer.holeCards, state.communityCards, state.variant)
               : null;
             const humanHandName = humanHand?.name ?? '';

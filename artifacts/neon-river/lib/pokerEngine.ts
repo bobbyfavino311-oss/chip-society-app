@@ -232,7 +232,7 @@ export function determineWinners(
 
 // ─── Short Deck Hold'em variant ──────────────────────────────────────────────
 
-export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem';
+export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem' | 'omaha_holdem';
 
 /** 36-card deck: values 6–14, all 4 suits */
 export function createShortDeck(): Card[] {
@@ -321,6 +321,7 @@ export function getBestHandVariant(
   const n = all.length;
   let best: HandResult | null = null;
   if (variant === 'joker_holdem') return getBestHandJoker(holeCards, communityCards);
+  if (variant === 'omaha_holdem') return getBestHandOmaha(holeCards, communityCards);
   const eval5 = variant === 'short_deck_holdem' ? evaluate5CardsShortDeck : evaluate5Cards;
 
   for (let i = 0; i < n - 4; i++) {
@@ -338,6 +339,29 @@ export function getBestHandVariant(
   }
 
   return best ?? { rank: 0, values: [], name: 'High Card' };
+}
+
+/**
+ * Omaha Hold'em hand evaluator.
+ * Players MUST use exactly 2 hole cards + exactly 3 community cards.
+ * Enumerates all C(4,2) × C(5,3) = 60 combinations and returns the best legal hand.
+ */
+export function getBestHandOmaha(holeCards: Card[], communityCards: Card[]): HandResult {
+  let best: HandResult | null = null;
+  for (let hi = 0; hi < holeCards.length - 1; hi++) {
+    for (let hj = hi + 1; hj < holeCards.length; hj++) {
+      for (let ci = 0; ci < communityCards.length - 2; ci++) {
+        for (let cj = ci + 1; cj < communityCards.length - 1; cj++) {
+          for (let ck = cj + 1; ck < communityCards.length; ck++) {
+            const hand = [holeCards[hi], holeCards[hj], communityCards[ci], communityCards[cj], communityCards[ck]];
+            const result = evaluate5Cards(hand);
+            if (!best || compareHands(result, best) > 0) best = result;
+          }
+        }
+      }
+    }
+  }
+  return best ?? { rank: 0, values: [holeCards[0]?.value ?? 7], name: 'High Card' };
 }
 
 /** Variant-aware winner determination */

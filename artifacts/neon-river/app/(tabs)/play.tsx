@@ -96,6 +96,26 @@ function JokerHoldemIcon({ size = 15, color = '#ffd700' }: { size?: number; colo
   );
 }
 
+function OmahaIcon({ size = 15, color = '#00ff88' }: { size?: number; color?: string }) {
+  const cw = size * 0.52, ch = size * 0.72;
+  const offsets = [0, size * 0.17, size * 0.34, size * 0.51];
+  const totalW = cw + offsets[3];
+  return (
+    <Svg width={totalW + 2} height={ch + 2} viewBox={`0 0 ${totalW + 2} ${ch + 2}`}>
+      {offsets.map((ox, i) => (
+        <Rect key={i} x={ox + 1} y={1} width={cw - 1} height={ch - 1}
+          rx={size * 0.07} ry={size * 0.07}
+          fill="none" stroke={color} strokeWidth={1.2}
+          opacity={0.35 + i * 0.22}
+        />
+      ))}
+      <SvgText x={offsets[3] + cw / 2} y={ch * 0.67}
+        textAnchor="middle" fill={color} fontSize={size * 0.42} fontWeight="bold"
+      >4</SvgText>
+    </Svg>
+  );
+}
+
 function MississippiStudIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
@@ -893,6 +913,42 @@ export default function PlayScreen() {
               icon:    'flash-outline',
               sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'}`,
               onPress: () => openQuickPlay('joker_holdem'),
+            },
+            {
+              label:   'RANKED',
+              icon:    'trophy-outline',
+              sub:     'Coming soon',
+              locked:  true,
+            },
+            {
+              label:   'TOURNAMENT',
+              icon:    'ribbon-outline',
+              sub:     'Coming soon',
+              locked:  true,
+            },
+          ]}
+        />
+
+        {/* ── OMAHA HOLD'EM ───────────────────────────────────────────── */}
+        <SectionCard
+          section="OMAHA HOLD'EM"
+          accent="#00ff88"
+          icon="grid-outline"
+          title="OMAHA HOLD'EM"
+          lines={["52-card deck · 4 hole cards per player", "Must use exactly 2 hole + 3 board cards"]}
+          options={[
+            {
+              label:    'AI PRACTICE',
+              icon:     'game-controller-outline',
+              iconNode: <OmahaIcon size={15} color="#00ff88" />,
+              sub:      '4 hole cards · vs AI bots · fully offline',
+              onPress:  () => setAnteVariant('omaha_holdem'),
+            },
+            {
+              label:   'QUICK PLAY',
+              icon:    'flash-outline',
+              sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'} · ${autoStake?.blinds ?? ''}`,
+              onPress: () => openQuickPlay('omaha_holdem'),
             },
             {
               label:   'RANKED',

@@ -513,7 +513,8 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, sb: number 
   ps[dealerIdx].isDealer = true;
 
   let deckCursor = 0;
-  for (let round = 0; round < 2; round++) {
+  const numHoleCards = variant === 'omaha_holdem' ? 4 : 2;
+  for (let round = 0; round < numHoleCards; round++) {
     for (const p of ps) p.holeCards.push(deck[deckCursor++]);
   }
 

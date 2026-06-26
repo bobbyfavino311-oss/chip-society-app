@@ -47,7 +47,20 @@ const RANK_COLORS: Record<string, string> = {
 
 // ─── Tournament Preview Hub ────────────────────────────────────────────────────
 
-type TVariant = 'texas_holdem' | 'short_deck_holdem';
+type TVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem' | 'omaha_holdem';
+
+type QpVariantDef = {
+  key: TVariant; label: string; sub: string;
+  color: string; gradient: [string, string];
+  iconSet: 'ion' | 'mci'; iconName: string;
+};
+
+const QP_VARIANTS: QpVariantDef[] = [
+  { key: 'texas_holdem',      label: "TRADITIONAL\nHOLD'EM",  sub: 'Classic 52-card poker',              color: '#00d4ff', gradient: ['#00d4ff', '#0066cc'], iconSet: 'ion', iconName: 'card-outline' },
+  { key: 'short_deck_holdem', label: "SHORT\nDECK",           sub: '36-card · Flush beats Full House',   color: '#ff0090', gradient: ['#ff0090', '#cc0077'], iconSet: 'mci', iconName: 'cards' },
+  { key: 'joker_holdem',      label: "JOKER\nHOLD'EM",        sub: '54-card deck · 2 wild Jokers',       color: '#ffd700', gradient: ['#ffd700', '#cc8800'], iconSet: 'ion', iconName: 'sparkles-outline' },
+  { key: 'omaha_holdem',      label: "OMAHA\nHOLD'EM",        sub: '4 hole cards · Use exactly 2',      color: '#00ff88', gradient: ['#00ff88', '#00aa55'], iconSet: 'ion', iconName: 'grid-outline' },
+];
 
 interface TPreviewCard {
   id: string;
@@ -213,11 +226,9 @@ function QuickPlayCard() {
   const [seats, setSeats] = useState<4 | 5>(5);
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const isHoldem = variant === 'texas_holdem';
-  const accentColor = isHoldem ? colors.primary : colors.secondary;
-  const gradientColors: [string, string] = isHoldem
-    ? [colors.primary, '#0066cc']
-    : [colors.secondary, '#cc0077'];
+  const activeVariant   = QP_VARIANTS.find(v => v.key === variant) ?? QP_VARIANTS[0];
+  const accentColor     = activeVariant.color;
+  const gradientColors  = activeVariant.gradient;
 
   // Determine stake level from player's actual bankroll
   const tierKey    = getAutoTierKey(profile.chips);
@@ -253,44 +264,41 @@ function QuickPlayCard() {
         <Text style={[qp.title, { color: accentColor }]}>QUICK PLAY</Text>
       </View>
 
-      {/* Step 1 — Game Mode */}
-      <Text style={qp.stepLabel}>STEP 1 · SELECT GAME MODE</Text>
-      <View style={qp.modeRow}>
-        <TouchableOpacity
-          style={[qp.modeBtn, isHoldem && { borderColor: colors.primary, backgroundColor: `${colors.primary}15` }]}
-          onPress={() => setVariant('texas_holdem')}
-          activeOpacity={0.8}
-        >
-          {isHoldem && (
-            <LinearGradient colors={[`${colors.primary}18`, 'transparent']} style={StyleSheet.absoluteFill} />
-          )}
-          <View style={[qp.modeIconWrap, { borderColor: isHoldem ? `${colors.primary}60` : colors.border }]}>
-            <Ionicons name="card" size={20} color={isHoldem ? colors.primary : colors.textMuted} />
-          </View>
-          <Text style={[qp.modeName, { color: isHoldem ? colors.primary : colors.textMuted }]}>NO LIMIT{'\n'}HOLD'EM</Text>
-          <Text style={qp.modeSub}>Classic · 52 cards</Text>
-          {isHoldem && <Ionicons name="checkmark-circle" size={16} color={colors.primary} style={qp.modeCheck} />}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[qp.modeBtn, !isHoldem && { borderColor: colors.secondary, backgroundColor: `${colors.secondary}15` }]}
-          onPress={() => setVariant('short_deck_holdem')}
-          activeOpacity={0.8}
-        >
-          {!isHoldem && (
-            <LinearGradient colors={[`${colors.secondary}18`, 'transparent']} style={StyleSheet.absoluteFill} />
-          )}
-          <View style={[qp.modeIconWrap, { borderColor: !isHoldem ? `${colors.secondary}60` : colors.border }]}>
-            <MaterialCommunityIcons name="cards" size={20} color={!isHoldem ? colors.secondary : colors.textMuted} />
-          </View>
-          <Text style={[qp.modeName, { color: !isHoldem ? colors.secondary : colors.textMuted }]}>SHORT{'\n'}DECK</Text>
-          <Text style={qp.modeSub}>36 cards · Flush beats Full House</Text>
-          {!isHoldem && <Ionicons name="checkmark-circle" size={16} color={colors.secondary} style={qp.modeCheck} />}
-        </TouchableOpacity>
-      </View>
+      {/* Step 1 — Variant Carousel */}
+      <Text style={qp.stepLabel}>SELECT VARIANT</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={qp.carouselContent}
+        style={qp.carousel}
+        decelerationRate="fast"
+      >
+        {QP_VARIANTS.map(v => {
+          const isSel = variant === v.key;
+          const iconEl = v.iconSet === 'mci'
+            ? <MaterialCommunityIcons name={v.iconName as any} size={20} color={isSel ? v.color : colors.textMuted} />
+            : <Ionicons name={v.iconName as any} size={20} color={isSel ? v.color : colors.textMuted} />;
+          return (
+            <TouchableOpacity
+              key={v.key}
+              style={[qp.variantCard, isSel && { borderColor: v.color, backgroundColor: `${v.color}12` }]}
+              onPress={() => setVariant(v.key)}
+              activeOpacity={0.8}
+            >
+              {isSel && <LinearGradient colors={[`${v.color}18`, 'transparent']} style={StyleSheet.absoluteFill} />}
+              <View style={[qp.variantIconWrap, { borderColor: isSel ? `${v.color}55` : colors.border }]}>
+                {iconEl}
+              </View>
+              <Text style={[qp.variantName, { color: isSel ? v.color : colors.textMuted }]} numberOfLines={2}>{v.label}</Text>
+              <Text style={qp.variantSub} numberOfLines={2}>{v.sub}</Text>
+              {isSel && <Ionicons name="checkmark-circle" size={14} color={v.color} style={qp.variantCheck} />}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
 
       {/* Step 2 — Seat Count */}
-      <Text style={qp.stepLabel}>STEP 2 · SELECT TABLE SIZE</Text>
+      <Text style={qp.stepLabel}>TABLE SIZE</Text>
       <View style={qp.seatRow}>
         {([4, 5] as const).map(n => {
           const active = seats === n;
@@ -960,23 +968,24 @@ const qp = StyleSheet.create({
     fontSize: 8, fontWeight: '700', letterSpacing: 1.5,
     color: 'rgba(255,255,255,0.35)', fontFamily: 'Orbitron_400Regular',
   },
-  modeRow: { flexDirection: 'row', gap: 10 },
-  modeBtn: {
-    flex: 1, borderRadius: 12, borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    padding: 12, gap: 6, overflow: 'hidden', alignItems: 'flex-start',
+  carousel:       { marginHorizontal: -18, marginBottom: -4 },
+  carouselContent: { paddingHorizontal: 18, gap: 9, flexDirection: 'row' },
+  variantCard: {
+    width: 138, borderRadius: 12, borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.08)',
+    padding: 11, overflow: 'hidden', position: 'relative',
   },
-  modeIconWrap: {
-    width: 36, height: 36, borderRadius: 10, borderWidth: 1,
+  variantIconWrap: {
+    width: 36, height: 36, borderRadius: 9, borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.04)', marginBottom: 8,
   },
-  modeName: {
-    fontSize: 12, fontWeight: '800', letterSpacing: 0.4,
-    fontFamily: 'Orbitron_700Bold', lineHeight: 16,
+  variantName: {
+    fontSize: 9.5, fontWeight: '800', letterSpacing: 0.3,
+    fontFamily: 'Orbitron_700Bold', lineHeight: 13, marginBottom: 4,
   },
-  modeSub: { color: 'rgba(255,255,255,0.35)', fontSize: 9, lineHeight: 13 },
-  modeCheck: { position: 'absolute', top: 8, right: 8 },
+  variantSub:   { color: 'rgba(255,255,255,0.32)', fontSize: 8.5, lineHeight: 12 },
+  variantCheck: { position: 'absolute', top: 8, right: 8 },
   seatRow: { flexDirection: 'row', gap: 10 },
   seatBtn: {
     flex: 1, borderRadius: 12, borderWidth: 1,
