@@ -12,6 +12,7 @@ import {
   ACHIEVEMENT_MAP,
   ALL_ACHIEVEMENTS,
   HAND_TO_ACHIEVEMENT,
+  OMAHA_HAND_TO_ACHIEVEMENT,
 } from '@/lib/achievements';
 import { useUser } from '@/context/UserContext';
 import { SoundEngine } from '@/lib/soundEngine';
@@ -32,10 +33,12 @@ interface AchievementContextValue {
   claimedIds: Set<string>;
   pendingUnlock: Achievement | null;
   dismissPending: () => void;
-  /** Call after a human win in-game */
-  recordGameWin: (handDesc: string, wasAllIn: boolean, potSize: number) => void;
+  /** Call after a human win in-game. Pass variant for variant-specific achievements. */
+  recordGameWin: (handDesc: string, wasAllIn: boolean, potSize: number, variant?: string) => void;
   /** Call after a human loss in-game */
   recordGameLoss: () => void;
+  /** Call every Omaha hand (win or loss) for grinder/specialist progress */
+  recordOmahaHand: () => void;
   /** Call when chip balance changes */
   onChipBalance: (chips: number) => void;
   /** Call on login-streak check */
@@ -55,6 +58,7 @@ const AchievementContext = createContext<AchievementContextValue>({
   dismissPending: () => {},
   recordGameWin: () => {},
   recordGameLoss: () => {},
+  recordOmahaHand: () => {},
   onChipBalance: () => {},
   onLoginStreak: () => {},
   claim: async () => {},
@@ -163,7 +167,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
   }, [addChips, updateProfile, persist]);
 
   // ── recordGameWin ─────────────────────────────────────────────────────────
-  const recordGameWin = useCallback((handDesc: string, wasAllIn: boolean, potSize: number) => {
+  const recordGameWin = useCallback((handDesc: string, wasAllIn: boolean, potSize: number, variant?: string) => {
     // Update streak
     const newStreak = winStreakRef.current + 1;
     winStreakRef.current = newStreak;
@@ -207,6 +211,30 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     if (newStreak >= 5)    unlock('streak_5');
     if (newStreak >= 10)   unlock('streak_10');
 
+    // ── Omaha-specific win achievements ───────────────────────────────────
+    if (variant === 'omaha_holdem') {
+      const omahaWins = (handCountsRef.current['omaha_wins'] ?? 0) + 1;
+      const withWins = { ...handCountsRef.current, 'omaha_wins': omahaWins };
+      handCountsRef.current = withWins;
+      setHandCounts(withWins);
+      if (omahaWins === 1) unlock('omaha_first_win');
+      const omahaHandAchId = OMAHA_HAND_TO_ACHIEVEMENT[handDesc];
+      if (omahaHandAchId) unlock(omahaHandAchId);
+    }
+
+    persist();
+  }, [unlock, persist]);
+
+  // ── recordOmahaHand — call every Omaha hand (win OR loss) ────────────────
+  const recordOmahaHand = useCallback(() => {
+    const prev = handCountsRef.current['omaha_hands'] ?? 0;
+    const next = prev + 1;
+    const updated = { ...handCountsRef.current, 'omaha_hands': next };
+    handCountsRef.current = updated;
+    setHandCounts(updated);
+    if (next === 1)   unlock('omaha_first_hand');
+    if (next >= 100)  unlock('omaha_grinder');
+    if (next >= 500)  unlock('omaha_specialist');
     persist();
   }, [unlock, persist]);
 
@@ -251,6 +279,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
       dismissPending,
       recordGameWin,
       recordGameLoss,
+      recordOmahaHand,
       onChipBalance,
       onLoginStreak,
       claim,

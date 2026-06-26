@@ -178,6 +178,11 @@ export interface UserProfile {
   tournamentLosses: number;
   bestTournamentFinish: number;
   biggestTournamentPrize: number;
+  // Omaha stats
+  omahaHandsPlayed: number;
+  omahaWins: number;
+  omahaLosses: number;
+  omahaBiggestPot: number;
 }
 
 
@@ -225,6 +230,10 @@ const DEFAULT_PROFILE: UserProfile = {
   tournamentLosses: 0,
   bestTournamentFinish: 0,
   biggestTournamentPrize: 0,
+  omahaHandsPlayed: 0,
+  omahaWins: 0,
+  omahaLosses: 0,
+  omahaBiggestPot: 0,
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────

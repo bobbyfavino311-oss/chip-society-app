@@ -1,5 +1,5 @@
 export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary';
-export type AchievementCategory = 'hands' | 'milestone' | 'streak' | 'bankroll';
+export type AchievementCategory = 'hands' | 'milestone' | 'streak' | 'bankroll' | 'omaha';
 
 export interface Achievement {
   id: string;
@@ -218,6 +218,71 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
     rarity: 'legendary', icon: '🌌', chipReward: 25_000, xpReward: 3_000,
     category: 'bankroll', target: 10_000_000,
   },
+
+  // ── Omaha Hold'em ──────────────────────────────────────────────────────────
+  {
+    id: 'omaha_first_hand',
+    name: 'Omaha Initiate',
+    description: 'Play your first Omaha Hold\'em hand.',
+    rarity: 'common', icon: '🃏', chipReward: 500, xpReward: 50,
+    category: 'omaha',
+  },
+  {
+    id: 'omaha_first_win',
+    name: 'Omaha Opener',
+    description: 'Win your first Omaha Hold\'em hand.',
+    rarity: 'common', icon: '🏆', chipReward: 1_000, xpReward: 100,
+    category: 'omaha',
+  },
+  {
+    id: 'omaha_full_house',
+    name: 'Omaha House',
+    description: 'Win an Omaha hand with a Full House.',
+    rarity: 'common', icon: '🏠', chipReward: 2_000, xpReward: 200,
+    category: 'omaha',
+  },
+  {
+    id: 'omaha_flush',
+    name: 'Omaha Flush',
+    description: 'Win an Omaha hand with a Flush.',
+    rarity: 'rare', icon: '♠️', chipReward: 3_000, xpReward: 350,
+    category: 'omaha',
+  },
+  {
+    id: 'omaha_straight',
+    name: 'Omaha Straight',
+    description: 'Win an Omaha hand with a Straight.',
+    rarity: 'rare', icon: '➡️', chipReward: 3_000, xpReward: 350,
+    category: 'omaha',
+  },
+  {
+    id: 'omaha_quads',
+    name: 'Omaha Quads',
+    description: 'Win an Omaha hand with Four of a Kind.',
+    rarity: 'epic', icon: '💎', chipReward: 8_000, xpReward: 1_000,
+    category: 'omaha',
+  },
+  {
+    id: 'omaha_royal_flush',
+    name: 'Omaha Royalty',
+    description: 'Win an Omaha hand with a Royal Flush.',
+    rarity: 'legendary', icon: '👑', chipReward: 30_000, xpReward: 4_000,
+    category: 'omaha',
+  },
+  {
+    id: 'omaha_grinder',
+    name: 'Omaha Grinder',
+    description: 'Play 100 Omaha Hold\'em hands.',
+    rarity: 'rare', icon: '🔥', chipReward: 5_000, xpReward: 700,
+    category: 'omaha', target: 100,
+  },
+  {
+    id: 'omaha_specialist',
+    name: 'Omaha Specialist',
+    description: 'Play 500 Omaha Hold\'em hands.',
+    rarity: 'legendary', icon: '🌟', chipReward: 20_000, xpReward: 3_000,
+    category: 'omaha', target: 500,
+  },
 ];
 
 export const ACHIEVEMENT_MAP: Record<string, Achievement> =
@@ -233,4 +298,13 @@ export const HAND_TO_ACHIEVEMENT: Record<string, string> = {
   'Four of a Kind':  'hand_four_kind',
   'Straight Flush':  'hand_straight_flush',
   'Royal Flush':     'hand_royal_flush',
+};
+
+export const OMAHA_HAND_TO_ACHIEVEMENT: Record<string, string> = {
+  'Full House':      'omaha_full_house',
+  'Flush':           'omaha_flush',
+  'Straight':        'omaha_straight',
+  'Four of a Kind':  'omaha_quads',
+  'Straight Flush':  'omaha_royal_flush',
+  'Royal Flush':     'omaha_royal_flush',
 };

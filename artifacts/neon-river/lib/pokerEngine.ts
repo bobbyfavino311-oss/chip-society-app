@@ -9,6 +9,10 @@ export interface HandResult {
   rank: number; // 0=High Card .. 9=Royal Flush
   values: number[]; // tiebreaker values
   name: string;
+  /** Omaha only — the 2 hole cards that formed this hand */
+  usedHoleCards?: Card[];
+  /** Omaha only — the 3 board cards that formed this hand */
+  usedBoardCards?: Card[];
 }
 
 const SUIT_SYMBOLS: Record<Suit, string> = { S: '♠', H: '♥', D: '♦', C: '♣' };
@@ -355,7 +359,13 @@ export function getBestHandOmaha(holeCards: Card[], communityCards: Card[]): Han
           for (let ck = cj + 1; ck < communityCards.length; ck++) {
             const hand = [holeCards[hi], holeCards[hj], communityCards[ci], communityCards[cj], communityCards[ck]];
             const result = evaluate5Cards(hand);
-            if (!best || compareHands(result, best) > 0) best = result;
+            if (!best || compareHands(result, best) > 0) {
+              best = {
+                ...result,
+                usedHoleCards:  [holeCards[hi], holeCards[hj]],
+                usedBoardCards: [communityCards[ci], communityCards[cj], communityCards[ck]],
+              };
+            }
           }
         }
       }

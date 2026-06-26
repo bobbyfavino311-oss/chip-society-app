@@ -26,7 +26,7 @@ import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame, TableConfig } from '@/hooks/usePokerGame';
 import { SoundEngine } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
-import { getBestHandVariant, describeHand } from '@/lib/pokerEngine';
+import { getBestHandVariant, describeHand, isRedSuit, suitSymbol, valueLabel } from '@/lib/pokerEngine';
 import type { GameVariant } from '@/constants/gameVariants';
 import NeonAvatarSeat from '@/components/NeonAvatar';
 import { useTableTheme } from '@/context/TableThemeContext';
@@ -364,7 +364,7 @@ const g = StyleSheet.create({
 // ─── Main game screen ─────────────────────────────────────────────────────────
 
 export default function PracticeScreen() {
-  const { profile, recordWin, recordLoss, addChips, removeChips } = useUser();
+  const { profile, recordWin, recordLoss, addChips, removeChips, updateProfile } = useUser();
   const { tier, variant: variantParam, players: playersParam } = useLocalSearchParams<{ tier?: string; variant?: string; players?: string }>();
   const tableConfig = STAKE_CONFIGS[tier ?? ''] ?? STAKE_CONFIGS.casual;
   const VALID_VARIANTS = new Set(['texas_holdem', 'short_deck_holdem', 'joker_holdem', 'omaha_holdem']);
@@ -526,7 +526,7 @@ export default function PracticeScreen() {
   }, [state.phase, state.winnerIds]);
 
   // ── Achievement hooks (must be above every early return) ─────────────────
-  const { recordGameWin, recordGameLoss, onChipBalance } = useAchievements();
+  const { recordGameWin, recordGameLoss, recordOmahaHand, onChipBalance } = useAchievements();
 
   // ── Ambient music — start when game begins, stop when it ends ────────────
   React.useEffect(() => {
@@ -599,12 +599,27 @@ export default function PracticeScreen() {
         handDesc = describeHand(best);
       }
       const wasAllIn = human?.status === 'allIn' || isAllIn;
-      recordGameWin(handDesc, wasAllIn, state.pot);
+      recordGameWin(handDesc, wasAllIn, state.pot, gameVariant);
       onChipBalance(finalHumanChips);
     } else {
       await recordLoss();
       if (!isMountedRef.current) return;
       recordGameLoss();
+    }
+
+    // Omaha stat tracking — every hand regardless of outcome
+    if (gameVariant === 'omaha_holdem') {
+      recordOmahaHand();
+      const omahaUpdates: Parameters<typeof updateProfile>[0] = {
+        omahaHandsPlayed: (profile.omahaHandsPlayed ?? 0) + 1,
+      };
+      if (didWin) {
+        omahaUpdates.omahaWins = (profile.omahaWins ?? 0) + 1;
+        omahaUpdates.omahaBiggestPot = Math.max(profile.omahaBiggestPot ?? 0, state.pot);
+      } else {
+        omahaUpdates.omahaLosses = (profile.omahaLosses ?? 0) + 1;
+      }
+      await updateProfile(omahaUpdates);
     }
 
     if (humanDelta > 0) {
@@ -927,6 +942,25 @@ export default function PracticeScreen() {
                     {humanHandDesc !== humanHandName && (
                       <Text style={styles.hoHandDesc}>{humanHandDesc}</Text>
                     )}
+                    {/* Omaha "USED" breakdown — show which 2 hole + 3 board cards formed the hand */}
+                    {gameVariant === 'omaha_holdem' && humanHand.usedHoleCards && humanHand.usedBoardCards && (
+                      <View style={styles.omahaUsedRow}>
+                        <Text style={styles.omahaUsedLabel}>USED</Text>
+                        <View style={styles.omahaUsedCards}>
+                          {humanHand.usedHoleCards.map((c, i) => (
+                            <Text key={`uh${i}`} style={[styles.omahaUsedCard, { color: isRedSuit(c.suit) ? '#ff6666' : '#e8e8e8' }]}>
+                              {valueLabel(c.value)}{suitSymbol(c.suit)}
+                            </Text>
+                          ))}
+                          <Text style={styles.omahaUsedPlus}>+</Text>
+                          {humanHand.usedBoardCards.map((c, i) => (
+                            <Text key={`ub${i}`} style={[styles.omahaUsedCard, { color: isRedSuit(c.suit) ? '#ff6666' : '#e8e8e8' }]}>
+                              {valueLabel(c.value)}{suitSymbol(c.suit)}
+                            </Text>
+                          ))}
+                        </View>
+                      </View>
+                    )}
                   </View>
                 )}
 
@@ -1016,7 +1050,7 @@ export default function PracticeScreen() {
                     <Text style={styles.hoSectionTitle}>PLAYER RESULTS</Text>
                     {resultPlayers.map(p => {
                       const wonPots = state.potResults.filter(pr => !pr.isReturned && pr.winnerIds.includes(p.id));
-                      const hand = state.showCards && p.holeCards.length === 2 && state.communityCards.length >= 3
+                      const hand = state.showCards && p.holeCards.length >= 2 && state.communityCards.length >= 3
                         ? getBestHandVariant(p.holeCards, state.communityCards, state.variant)
                         : null;
                       const isFolded = p.status === 'folded';
@@ -1377,6 +1411,21 @@ const styles = StyleSheet.create({
   },
   hoHandDesc: {
     fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1,
+  },
+  omahaUsedRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6, justifyContent: 'center',
+  },
+  omahaUsedLabel: {
+    fontFamily: 'Orbitron_400Regular', fontSize: 8, color: 'rgba(255,255,255,0.3)', letterSpacing: 2,
+  },
+  omahaUsedCards: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+  },
+  omahaUsedCard: {
+    fontFamily: 'Inter_700Bold', fontSize: 13, letterSpacing: 0.5,
+  },
+  omahaUsedPlus: {
+    fontFamily: 'Inter_400Regular', fontSize: 11, color: 'rgba(255,255,255,0.3)', marginHorizontal: 4,
   },
 
   // Pot breakdown section

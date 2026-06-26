@@ -26,8 +26,9 @@ const CATEGORY_LABELS: Record<AchievementCategory, string> = {
   milestone: 'MILESTONES',
   streak:    'STREAKS',
   bankroll:  'BANKROLL',
+  omaha:     'OMAHA HOLD\'EM',
 };
-const CATEGORIES: AchievementCategory[] = ['hands', 'milestone', 'streak', 'bankroll'];
+const CATEGORIES: AchievementCategory[] = ['hands', 'milestone', 'streak', 'bankroll', 'omaha'];
 
 interface AchCardProps {
   ach: Achievement;
@@ -192,7 +193,7 @@ export default function AchievementsScreen() {
   };
 
   const byCategory = useMemo(() => {
-    const map: Record<AchievementCategory, Achievement[]> = { hands: [], milestone: [], streak: [], bankroll: [] };
+    const map: Record<AchievementCategory, Achievement[]> = { hands: [], milestone: [], streak: [], bankroll: [], omaha: [] };
     for (const ach of ALL_ACHIEVEMENTS) map[ach.category].push(ach);
     return map;
   }, []);

@@ -1,0 +1,429 @@
+ADD NEW HOLD’EM VARIANT — OMAHA TEXAS HOLD’EM
+
+Add Omaha Texas Hold’em as a new permanent poker variant.
+
+This is NOT a Casino Game.
+
+Omaha belongs in the Hold’em / Poker variants section alongside:
+
+• Traditional No Limit Hold’em
+• Short Deck Hold’em
+• Joker Hold’em
+• Omaha Texas Hold’em
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME NAME
+
+OMAHA TEXAS HOLD’EM
+
+Subtitle:
+
+4 hole cards • Use exactly 2
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CORE GAME RULES
+
+Omaha follows the same betting structure as Texas Hold’em.
+
+Betting rounds:
+
+• Pre-Flop
+• Flop
+• Turn
+• River
+• Showdown
+
+Community cards:
+
+• 5 total community cards
+
+Each player receives:
+
+• 4 private hole cards
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GOLDEN RULE
+
+This is the most important Omaha rule.
+
+Players must use:
+
+Exactly 2 cards from their 4 hole cards
+
+and
+
+Exactly 3 cards from the 5 community cards
+
+to make their final 5-card poker hand.
+
+Do NOT allow:
+
+• 0 hole cards
+• 1 hole card
+• 3 hole cards
+• 4 hole cards
+• 4 community cards
+• 5 community cards
+
+The hand evaluator must enforce this rule every time.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HAND RANKINGS
+
+Use standard poker hand rankings:
+
+• Royal Flush
+• Straight Flush
+• Four of a Kind
+• Full House
+• Flush
+• Straight
+• Three of a Kind
+• Two Pair
+• Pair
+• High Card
+
+No new hand rankings are added.
+
+Do not use Joker Hold’em rules.
+
+Do not use Short Deck rules.
+
+Omaha uses standard 52-card deck poker rankings.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DECK
+
+Use a standard 52-card deck.
+
+No Jokers.
+
+No removed cards.
+
+No Short Deck structure.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAMEPLAY FLOW
+
+Omaha should play exactly like the existing Hold’em engine except for the hole-card count and hand evaluation rule.
+
+Flow:
+
+1. Small blind posts.
+2. Big blind posts.
+3. Each player receives 4 hole cards.
+4. Pre-Flop betting.
+5. Flop reveals 3 community cards.
+6. Flop betting.
+7. Turn reveals 1 community card.
+8. Turn betting.
+9. River reveals 1 community card.
+10. River betting.
+11. Showdown.
+12. Best Omaha-legal hand wins.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SHOWDOWN LOGIC
+
+At showdown:
+
+Evaluate every valid combination using:
+
+• exactly 2 hole cards
+• exactly 3 community cards
+
+Return the strongest possible legal Omaha hand.
+
+Example:
+
+Player hole cards:
+
+A♠ A♦ 7♣ 2♥
+
+Board:
+
+A♥ K♠ K♦ 9♣ 3♠
+
+The player may only use two hole cards.
+
+Valid hand:
+
+A♠ A♦ + A♥ K♠ K♦
+
+Full House
+
+Do not accidentally use three hole cards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+IMPORTANT HAND EVALUATION WARNING
+
+Do not reuse standard Hold’em hand evaluation without modification.
+
+Texas Hold’em lets players use any combination of hole cards and board cards.
+
+Omaha does not.
+
+Omaha must use exactly 2 hole cards and exactly 3 board cards.
+
+This rule must be hardcoded into the Omaha evaluator.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK PLAY HOME SCREEN UPDATE
+
+Update the Home Screen Quick Play section.
+
+The game mode selection should become a horizontal carousel that scrolls left/right.
+
+This carousel appears above the player count / opponent type selection tabs.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK PLAY CAROUSEL OPTIONS
+
+Add these game cards to the Quick Play carousel:
+
+1. Traditional Hold’em
+    Subtitle: Classic 52-card poker
+2. Short Deck Hold’em
+    Subtitle: 36-card deck • Flush beats Full House
+3. Joker Hold’em
+    Subtitle: 54-card deck • 2 wild Jokers
+4. Omaha Texas Hold’em
+    Subtitle: 4 hole cards • Use exactly 2
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CAROUSEL BEHAVIOR
+
+Players can swipe left or right through available poker variants.
+
+Each card should display:
+
+• Game icon
+• Game name
+• Short rule subtitle
+• Selected state
+• Neon border when selected
+
+When a player taps a mode:
+
+That mode becomes selected.
+
+Then they continue to:
+
+• Choose AI or Live Players
+• Choose player count
+• Choose stake/blind level
+• Enter matchmaking
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HOME SCREEN QUICK PLAY FLOW
+
+New flow:
+
+Quick Play
+
+↓
+
+Select Poker Variant Carousel
+
+↓
+
+Choose Opponent Type
+
+• You + AI Players
+• You + Live Players
+
+↓
+
+Choose Player Count
+
+↓
+
+Choose Stakes / Blinds
+
+↓
+
+Start Matchmaking
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PLAY PAGE UPDATE
+
+Add Omaha Texas Hold’em as its own separate section/card on the Play page.
+
+It should not be inside Casino Games.
+
+It should sit with the other Hold’em variants.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OMAHA GAME ICON
+
+Create a clean Omaha icon.
+
+Recommended:
+
+• Four stacked playing cards
+• Cyan / pink neon outline
+• Small “4” marker
+• Matches the other poker variant icons
+
+Do not use casino-game-style icons.
+
+This is a poker variant.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+GAME MODES
+
+Omaha should support:
+
+• AI Practice
+• Quick Play
+• Live Players
+• Private Tables
+
+Same structure as Traditional Hold’em, Short Deck, and Joker Hold’em.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MATCHMAKING
+
+Use the existing chip-bracket matchmaking system.
+
+Players should be matched by:
+
+• Selected variant
+• Selected blind level
+• Chip bracket
+• Player count
+• Opponent type
+
+Do not mix Omaha players with Traditional Hold’em, Short Deck, or Joker Hold’em tables.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PRIVATE TABLES
+
+Private tables should support Omaha Texas Hold’em.
+
+When creating a private table, game type options should include:
+
+• Traditional Hold’em
+• Short Deck Hold’em
+• Joker Hold’em
+• Omaha Texas Hold’em
+
+Room code logic remains the same.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+UI CARD LAYOUT
+
+Because Omaha gives each player 4 hole cards:
+
+Update player card area.
+
+Requirements:
+
+• Display 4 hole cards cleanly
+• Cards must remain readable on mobile
+• Do not overlap too tightly
+• Scale slightly smaller than 2-card Hold’em only if needed
+• Keep selected theme background visible
+
+Community cards remain 5 cards like standard Hold’em.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+HAND RESULT DISPLAY
+
+At showdown, clearly display the legal Omaha hand.
+
+Example:
+
+YOU WIN
+
+Full House — Aces over Kings
+
+Used:
+
+A♠ A♦ + A♥ K♠ K♦
+
+Optional:
+
+Highlight the exact 2 hole cards and 3 community cards used.
+
+This is important because Omaha hands can be confusing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AI LOGIC
+
+Update AI decision-making for Omaha.
+
+AI must understand:
+
+• Four-card starting hands
+• Strong draws
+• Nut flush draws
+• Wrap straight draws
+• Paired boards
+• Omaha hand strength is different from Hold’em
+
+Basic AI can start simple, but it must not evaluate Omaha hands like standard Hold’em.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACHIEVEMENTS
+
+Add Omaha achievements:
+
+• First Omaha Hand
+• First Omaha Win
+• Omaha Full House
+• Omaha Flush
+• Omaha Straight
+• Omaha Quads
+• Omaha Royal Flush
+• Omaha Grinder — 100 hands
+• Omaha Specialist — 500 hands
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STAT TRACKING
+
+Track Omaha separately:
+
+• Omaha Hands Played
+• Omaha Wins
+• Omaha Losses
+• Omaha Win Rate
+• Omaha Biggest Pot
+• Omaha Biggest Hand
+• Omaha Net Profit
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+Omaha Texas Hold’em should feel like a true poker variant, not a casino side game.
+
+The key difference is simple:
+
+Players receive 4 hole cards, but must use exactly 2.
+
+Everything else should feel familiar to Texas Hold’em players.
+
+The Home Screen Quick Play system should now use a clean horizontal carousel so players can easily choose between Traditional Hold’em, Short Deck, Joker Hold’em, and Omaha before choosing opponent type, player count, and stakes.
