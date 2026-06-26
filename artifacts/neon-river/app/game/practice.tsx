@@ -656,7 +656,10 @@ export default function PracticeScreen() {
         if (next <= 0) {
           clearInterval(betweenIntervalRef.current!);
           betweenIntervalRef.current = null;
-          void onHandOverRef.current();
+          // Use setTimeout(0) to move the async call out of the state-updater
+          setTimeout(() => {
+            onHandOverRef.current().catch(() => {});
+          }, 0);
           return 0;
         }
         return next;
@@ -664,6 +667,7 @@ export default function PracticeScreen() {
     }, 1_000);
     return () => {
       if (betweenIntervalRef.current) { clearInterval(betweenIntervalRef.current); betweenIntervalRef.current = null; }
+      barAnim.stopAnimation();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHandOver]);
@@ -694,8 +698,8 @@ export default function PracticeScreen() {
       {isCrimsonNoir && <CrimsonNoirBackground />}
       {isVercetti    && <VercettiBackground />}
 
-      {/* Exit modal */}
-      <Modal transparent visible={exitConfirm} animationType="fade" onRequestClose={() => setExitConfirm(false)}>
+      {/* Exit modal — animationType="none" avoids native-animation/navigation race on iOS */}
+      <Modal transparent visible={exitConfirm} animationType="none" onRequestClose={() => setExitConfirm(false)}>
         <View style={styles.exitOverlay}>
           <View style={styles.exitCard}>
             <Text style={styles.exitTitle}>EXIT GAME?</Text>
@@ -703,7 +707,7 @@ export default function PracticeScreen() {
             <View style={styles.exitBtns}>
               <TouchableOpacity
                 style={[styles.exitChoiceBtn, styles.exitYes]}
-                onPress={() => { setExitConfirm(false); setGameStarted(false); router.back(); }}
+                onPress={() => router.back()}
                 activeOpacity={0.85}
               >
                 <Text style={styles.exitChoiceText}>YES</Text>
