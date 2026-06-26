@@ -42,16 +42,22 @@ const R_OUTER = 136, R_INNER = 42, R_TEXT = 96, R_ICON = 118;
 //   MYTHIC   → purple+cyan #bf5fff / #00d4ff
 
 const SEGMENTS = [
-  { label: '2K',    rarity: 'COMMON',   arc: 36,  prob: 0.250, chips: 2_000,   xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001a26', icon: '💰' },
-  { label: '5K',    rarity: 'COMMON',   arc: 36,  prob: 0.180, chips: 5_000,   xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001530', icon: '💰' },
-  { label: '+XP',   rarity: 'COMMON',   arc: 36,  prob: 0.140, chips: 0,       xp: 500, ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001022', icon: '⚡' },
-  { label: '10K',   rarity: 'COMMON',   arc: 36,  prob: 0.130, chips: 10_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001222', icon: '💎' },
-  { label: '25K',   rarity: 'UNCOMMON', arc: 36,  prob: 0.100, chips: 25_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001a0e', icon: '⭐' },
-  { label: 'TICKET',rarity: 'UNCOMMON', arc: 36,  prob: 0.080, chips: 0,       xp: 0,   ticket: 1, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001810', icon: '🎟' },
-  { label: '50K',   rarity: 'UNCOMMON', arc: 36,  prob: 0.055, chips: 50_000,  xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001208', icon: '🔥' },
-  { label: 'COOKIE',rarity: 'RARE',     arc: 36,  prob: 0.040, chips: 0,       xp: 0,   ticket: 0, cookie: 1, mythicCookie: 0, col: '#D4A017', dim: '#1a0e00', icon: '🥠' },
-  { label: '100K!', rarity: 'EPIC',     arc: 36,  prob: 0.020, chips: 100_000, xp: 0,   ticket: 0, cookie: 0, mythicCookie: 0, col: '#ffd700', dim: '#2a1a00', icon: '👑' },
-  { label: 'MYTHIC',rarity: 'MYTHIC',   arc: 36,  prob: 0.005, chips: 0,       xp: 0,   ticket: 0, cookie: 0, mythicCookie: 1, col: '#bf5fff', dim: '#1a0038', icon: '🥠' },
+  { label: '250K',   rarity: 'COMMON',   arc: 22.5, prob: 0.140, chips: 250_000,    xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001a26', icon: '💰' },
+  { label: '5K XP',  rarity: 'COMMON',   arc: 22.5, prob: 0.100, chips: 0,          xp: 5_000,  ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001022', icon: '⚡' },
+  { label: '500K',   rarity: 'COMMON',   arc: 22.5, prob: 0.120, chips: 500_000,    xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001530', icon: '💰' },
+  { label: 'COOKIE', rarity: 'UNCOMMON', arc: 22.5, prob: 0.070, chips: 0,          xp: 0,      ticket: 0, cookie: 1, mythicCookie: 0, col: '#00cc66', dim: '#001a0e', icon: '🥠' },
+  { label: '750K',   rarity: 'COMMON',   arc: 22.5, prob: 0.110, chips: 750_000,    xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001222', icon: '💰' },
+  { label: '10K XP', rarity: 'COMMON',   arc: 22.5, prob: 0.080, chips: 0,          xp: 10_000, ticket: 0, cookie: 0, mythicCookie: 0, col: '#00d4ff', dim: '#001022', icon: '💎' },
+  { label: '1M',     rarity: 'UNCOMMON', arc: 22.5, prob: 0.090, chips: 1_000_000,  xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001810', icon: '💰' },
+  { label: '2M',     rarity: 'UNCOMMON', arc: 22.5, prob: 0.070, chips: 2_000_000,  xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001208', icon: '💰' },
+  { label: '25K XP', rarity: 'UNCOMMON', arc: 22.5, prob: 0.050, chips: 0,          xp: 25_000, ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001a0e', icon: '⚡' },
+  { label: '3M',     rarity: 'UNCOMMON', arc: 22.5, prob: 0.060, chips: 3_000_000,  xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001810', icon: '💰' },
+  { label: '5M',     rarity: 'RARE',     arc: 22.5, prob: 0.030, chips: 5_000_000,  xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#D4A017', dim: '#1a0e00', icon: '💰' },
+  { label: '50K XP', rarity: 'RARE',     arc: 22.5, prob: 0.040, chips: 0,          xp: 50_000, ticket: 0, cookie: 0, mythicCookie: 0, col: '#D4A017', dim: '#1a0e00', icon: '💎' },
+  { label: '7.5M',   rarity: 'RARE',     arc: 22.5, prob: 0.020, chips: 7_500_000,  xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#D4A017', dim: '#1a0e00', icon: '💰' },
+  { label: '10M',    rarity: 'EPIC',     arc: 22.5, prob: 0.010, chips: 10_000_000, xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#ffd700', dim: '#2a1a00', icon: '💰' },
+  { label: 'MYTHIC', rarity: 'MYTHIC',   arc: 22.5, prob: 0.005, chips: 0,          xp: 0,      ticket: 0, cookie: 0, mythicCookie: 1, col: '#bf5fff', dim: '#1a0038', icon: '🥠' },
+  { label: '1M',     rarity: 'UNCOMMON', arc: 22.5, prob: 0.090, chips: 1_000_000,  xp: 0,      ticket: 0, cookie: 0, mythicCookie: 0, col: '#00cc66', dim: '#001810', icon: '💰' },
 ] as const;
 
 type Seg = (typeof SEGMENTS)[number];
@@ -512,7 +518,7 @@ export default function WheelScreen() {
             ) : seg.ticket ? (
               <Text style={[s.resultAmount, { color: seg.col }]}>+1 SCRATCH TICKET</Text>
             ) : seg.xp > 0 ? (
-              <Text style={[s.resultAmount, { color: seg.col }]}>+{seg.xp} XP</Text>
+              <Text style={[s.resultAmount, { color: seg.col }]}>+{seg.xp >= 1000 ? `${(seg.xp / 1000).toFixed(0)}K` : seg.xp} XP</Text>
             ) : seg.mythicCookie ? (
               <Text style={[s.resultAmount, s.mythicCookieText]}>MYTHIC FORTUNE{'\n'}COOKIE</Text>
             ) : (

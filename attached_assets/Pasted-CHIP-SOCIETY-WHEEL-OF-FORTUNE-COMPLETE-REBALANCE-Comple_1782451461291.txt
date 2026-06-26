@@ -1,0 +1,259 @@
+CHIP SOCIETY – WHEEL OF FORTUNE COMPLETE REBALANCE
+
+Completely redesign and rebalance the Wheel of Fortune rewards. The current wheel does not properly reflect the in-game economy, and too many cookie variants appear as prizes.
+
+Going forward, the wheel should only award two cookie types:
+
+* Common Fortune Cookie
+* Mythic Fortune Cookie
+
+No other cookie rarities should ever appear on the wheel.
+
+⸻
+
+Wheel Design
+
+Keep the original Wheel of Fortune layout.
+
+Revert the wheel back to its original visual style.
+
+Do not use the newer redesign.
+
+Prize labels should be placed diagonally inside each slice, following the angle of the wedge so every prize is easy to read.
+
+Text should always remain inside its slice.
+
+⸻
+
+Prize Icon Standards
+
+Use one consistent visual language.
+
+Chip Rewards
+
+Represent chip prizes only with:
+
+💰 Money Bag
+
+or
+
+A stack of cash icon.
+
+Never use poker chips to represent chip rewards.
+
+⸻
+
+XP Rewards
+
+Represent XP only with:
+
+💎 Diamond
+
+or
+
+⚡ Lightning Bolt
+
+No plain “XP” text by itself.
+
+⸻
+
+Cookie Rewards
+
+Display the actual cookie artwork.
+
+Only two cookie prizes are allowed:
+
+• Common Fortune Cookie
+
+• Mythic Fortune Cookie
+
+Do not include:
+
+* Rare Cookie
+* Epic Cookie
+* Legendary Cookie
+* Theme Cookie
+* Holiday Cookie
+* Any other cookie rarity
+
+The wheel should never contain more than one Common Cookie slice and one Mythic Cookie slice.
+
+⸻
+
+Cookie Value Rebalance
+
+Adjust the values of all cookies across the game to match the new economy.
+
+Common Fortune Cookie
+
+Very common.
+
+Reward range:
+
+25,000 – 150,000 Chips
+
+⸻
+
+Rare Fortune Cookie
+
+(Not available on the wheel.)
+
+Reward range:
+
+150,000 – 500,000 Chips
+
+⸻
+
+Epic Fortune Cookie
+
+(Not available on the wheel.)
+
+Reward range:
+
+500,000 – 2,000,000 Chips
+
+⸻
+
+Legendary Fortune Cookie
+
+(Not available on the wheel.)
+
+Reward range:
+
+2,000,000 – 5,000,000 Chips
+
+⸻
+
+Mythic Fortune Cookie
+
+The rarest cookie in the game.
+
+Reward range:
+
+500,000 – 10,000,000 Chips
+
+Never exceed 10,000,000 chips from a Mythic Cookie.
+
+When opened, the reward should be randomly generated within this range.
+
+⸻
+
+Wheel Prize Distribution
+
+Create a balanced 16-slice wheel.
+
+Example:
+
+💰 250K
+
+⚡ 5K XP
+
+💰 500K
+
+Common Fortune Cookie
+
+💰 750K
+
+💎 10K XP
+
+💰 1M
+
+💰 2M
+
+⚡ 25K XP
+
+💰 3M
+
+💰 5M
+
+💎 50K XP
+
+💰 7.5M
+
+💰 10M
+
+Mythic Fortune Cookie
+
+💰 1M
+
+This provides:
+
+* One Common Cookie
+* One Mythic Cookie
+* No other cookie prizes
+
+⸻
+
+Prize Probability
+
+Not every slice should have the same probability.
+
+Use weighted odds.
+
+Most Common
+
+250K
+
+500K
+
+750K
+
+1M
+
+Small XP
+
+⸻
+
+Uncommon
+
+2M
+
+3M
+
+25K XP
+
+50K XP
+
+⸻
+
+Rare
+
+5M
+
+7.5M
+
+10M
+
+⸻
+
+Ultra Rare
+
+Mythic Fortune Cookie
+
+This should be one of the hardest rewards to land on.
+
+The Common Fortune Cookie should be significantly more common than the Mythic Cookie.
+
+⸻
+
+Visual Improvements
+
+Every slice should display:
+
+* Prize icon
+* Prize value
+* Diagonal text
+* Proper spacing
+* No overlap
+* Consistent font size
+* High readability
+
+The text should follow the angle of the slice and remain centered within its wedge.
+
+⸻
+
+Final Design Goal
+
+The Wheel of Fortune should feel exciting every day while maintaining a healthy in-game economy.
+
+Players should regularly win meaningful chip amounts and XP, while the Common Fortune Cookie provides frequent surprise rewards and the Mythic Fortune Cookie remains an exceptionally rare jackpot prize. Removing all other cookie rarities from the wheel simplifies the reward system, makes the Mythic Cookie feel truly special, and keeps the wheel visually clean and easy to understand.
