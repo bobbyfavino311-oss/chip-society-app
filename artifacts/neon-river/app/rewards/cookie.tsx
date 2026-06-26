@@ -327,7 +327,8 @@ export default function FortuneCookieScreen() {
     const unlockLv = TIER_UNLOCK_LEVEL[cookieTier];
     const tierLocked = unlockLv !== null && unlockLv > 0 && profile.level < unlockLv;
     if (inv[cookieTier] <= 0 || tierLocked) {
-      const next = TIER_ORDER.find(t => {
+      // Auto-switch only within the 4 standard tiers — never force Mythic
+      const next = (['common', 'rare', 'epic', 'legendary'] as CookieTier[]).find(t => {
         const lv = TIER_UNLOCK_LEVEL[t];
         const unlocked = lv === null || profile.level >= lv;
         return unlocked && inv[t] > 0;
@@ -608,44 +609,67 @@ export default function FortuneCookieScreen() {
         {phase === 'idle' && (
           <View style={styles.idleSection}>
 
-            {/* ── Rarity selector tabs (COMMON / RARE / EPIC / LEGENDARY) ── */}
+            {/* ── Rarity selector tabs ── */}
             <View style={styles.tierTabRow}>
-              {CHART_TIERS.map(t => {
-                const c    = TIER_CFG[t];
-                const qty  = inv[t];
-                const isActive = cookieTier === t;
-                const isEmpty  = qty === 0 && !(t === 'common' && canClaimFreeCookie);
-                return (
-                  <TouchableOpacity
-                    key={t}
-                    style={[
-                      styles.tierTab,
-                      isActive
-                        ? { borderColor: c.color, backgroundColor: `${c.color}20` }
-                        : { borderColor: `${c.color}25`, backgroundColor: 'transparent' },
-                    ]}
-                    onPress={() => setCookieTier(t)}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[styles.tierTabLabel, { color: isActive ? c.color : `${c.color}60` }]}>
-                      {c.label}
-                    </Text>
-                    <Text style={[styles.tierTabCount, { color: isActive ? c.color : 'rgba(255,255,255,0.25)' }]}>
-                      {isEmpty ? '×0' : `×${qty}`}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+              {(CHART_TIERS as CookieTier[])
+                .concat(inv.mythic > 0 ? (['mythic'] as CookieTier[]) : [])
+                .map(t => {
+                  const c        = TIER_CFG[t];
+                  const qty      = inv[t];
+                  const isActive = cookieTier === t;
+                  const hasDaily = t === 'common' && canClaimFreeCookie;
+                  return (
+                    <TouchableOpacity
+                      key={t}
+                      style={[
+                        styles.tierTab,
+                        isActive
+                          ? { borderColor: c.color, backgroundColor: `${c.color}20` }
+                          : { borderColor: `${c.color}25`, backgroundColor: 'transparent' },
+                      ]}
+                      onPress={() => setCookieTier(t)}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.tierTabLabel, { color: isActive ? c.color : `${c.color}60` }]}>
+                        {c.label}
+                      </Text>
+                      <Text style={[styles.tierTabCount, { color: isActive ? c.color : 'rgba(255,255,255,0.25)' }]}>
+                        {hasDaily && qty === 0 ? '✦' : `×${qty}`}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
             </View>
 
-            {/* ── Open / empty / mythic ── */}
-            {(hasCookies || canClaimFreeCookie) ? (
-              <>
+            {/* ── Single open button — controlled by selected tab ── */}
+            {(() => {
+              const tierQty   = inv[cookieTier];
+              const isDailyOk = cookieTier === 'common' && canClaimFreeCookie;
+              const canOpenThis = tierQty > 0 || isDailyOk;
+
+              if (!hasCookies && !canClaimFreeCookie) {
+                return (
+                  <View style={styles.emptyState}>
+                    <Text style={styles.emptyIcon}>🥠</Text>
+                    <Text style={styles.emptyTitle}>No Cookies</Text>
+                    <Text style={styles.emptySub}>Spin the wheel or come back tomorrow for your free daily cookie.</Text>
+                  </View>
+                );
+              }
+
+              if (!canOpenThis) {
+                return (
+                  <View style={[styles.openBtn, styles.openBtnDisabled]}>
+                    <Text style={styles.openBtnDisabledText}>NO {cfg.label} COOKIES</Text>
+                  </View>
+                );
+              }
+
+              return (
                 <TouchableOpacity
-                  style={[styles.openBtn, { overflow: 'hidden', opacity: (inv[cookieTier] === 0 && !(cookieTier === 'common' && canClaimFreeCookie)) ? 0.4 : 1 }]}
+                  style={[styles.openBtn, { overflow: 'hidden' }]}
                   onPress={handleOpen}
                   activeOpacity={0.82}
-                  disabled={inv[cookieTier] === 0 && !(cookieTier === 'common' && canClaimFreeCookie) && !isMythicSelected}
                 >
                   <LinearGradient
                     colors={isMythicSelected ? ['#FF0090', '#FF69B4', '#FFD700'] : [cfg.color, cfg.color + 'cc']}
@@ -653,33 +677,12 @@ export default function FortuneCookieScreen() {
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                   />
                   <Text style={[styles.openBtnText, { color: isMythicSelected ? '#fff' : '#050010' }]}>
-                    {canClaimFreeCookie && !hasCookies
-                      ? `CLAIM & OPEN ${cfg.label}`
-                      : `OPEN ${cfg.label}`}
+                    {isDailyOk && tierQty === 0 ? `CLAIM & OPEN ${cfg.label}` : `OPEN ${cfg.label}`}
                   </Text>
                   <Ionicons name="chevron-forward" size={18} color={isMythicSelected ? '#fff' : '#050010'} />
                 </TouchableOpacity>
-
-                {/* Mythic owned — separate premium section */}
-                {inv.mythic > 0 && (
-                  <TouchableOpacity
-                    style={[styles.mythicOpenBtn, { overflow: 'hidden' }]}
-                    onPress={() => { setCookieTier('mythic'); setTimeout(handleOpen, 50); }}
-                    activeOpacity={0.82}
-                  >
-                    <LinearGradient colors={['#FF0090', '#FF69B4', '#FFD700']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-                    <Text style={styles.mythicOpenLabel}>MYTHIC COOKIE</Text>
-                    <Text style={styles.mythicOpenSub}>Daily Wheel Exclusive · ×{inv.mythic}</Text>
-                  </TouchableOpacity>
-                )}
-              </>
-            ) : (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyIcon}>🥠</Text>
-                <Text style={styles.emptyTitle}>No Cookies</Text>
-                <Text style={styles.emptySub}>Spin the wheel or come back tomorrow for your free daily cookie.</Text>
-              </View>
-            )}
+              );
+            })()}
 
             {/* ── Tier info cards ─────────────────────────────────────────── */}
             <Text style={styles.infoLabel}>FORTUNE COOKIE REWARDS</Text>
@@ -886,6 +889,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
   },
   openBtnText: { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
+  openBtnDisabled: {
+    borderRadius: 14, height: 52,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  openBtnDisabledText: {
+    fontSize: 11, fontFamily: 'Orbitron_700Bold',
+    color: 'rgba(255,255,255,0.25)', letterSpacing: 1.5,
+  },
 
   emptyState: { alignItems: 'center', gap: 8 },
   emptyIcon:  { fontSize: 48 },

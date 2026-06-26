@@ -1,0 +1,159 @@
+FORTUNE COOKIE MYTHIC SELECTION BUG FIX
+
+The Fortune Cookie screen has two major bugs:
+
+1. Mythic Cookie has a duplicate button.
+2. When the player owns a Mythic Cookie, the screen gets stuck on Mythic and will not allow the player to open Common, Rare, Epic, or Legendary cookies.
+
+Fix this immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REMOVE DUPLICATE MYTHIC BUTTON
+
+Current problem:
+
+The screen shows:
+
+OPEN MYTHIC
+
+and also a second large button/card:
+
+MYTHIC COOKIE
+Daily Wheel Exclusive
+
+This is redundant.
+
+There should only be ONE actionable Open button.
+
+Remove the duplicate Mythic Cookie button/card.
+
+The Mythic section can be informational, but it must not look like a second open button.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE SELECTOR MUST CONTROL OPEN BUTTON
+
+The selected cookie rarity must control the Open button.
+
+Tabs:
+
+COMMON
+RARE
+EPIC
+LEGENDARY
+MYTHIC only if owned
+
+When the player taps COMMON:
+
+Button says:
+OPEN COMMON
+
+When player taps RARE:
+
+Button says:
+OPEN RARE
+
+When player taps EPIC:
+
+Button says:
+OPEN EPIC
+
+When player taps LEGENDARY:
+
+Button says:
+OPEN LEGENDARY
+
+When player taps MYTHIC:
+
+Button says:
+OPEN MYTHIC
+
+Do not force Mythic to stay selected just because the player owns one.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+MYTHIC RULE
+
+Mythic Cookie is Daily Wheel exclusive.
+
+But if the player owns a Mythic Cookie, they must still be able to open it.
+
+Mythic should appear as a selectable tab only when owned.
+
+It should not block access to other cookie rarities.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COOKIE OPEN LOGIC
+
+The Open button must open the currently selected rarity only.
+
+Example:
+
+Player owns:
+
+Common x74
+Rare x11
+Epic x9
+Legendary x9
+Mythic x2
+
+Player taps Common:
+
+Open button opens Common.
+
+Player taps Rare:
+
+Open button opens Rare.
+
+Player taps Epic:
+
+Open button opens Epic.
+
+Player taps Legendary:
+
+Open button opens Legendary.
+
+Player taps Mythic:
+
+Open button opens Mythic.
+
+No rarity should override another rarity.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+EMPTY / ZERO STATE
+
+If player owns 0 of a selected rarity:
+
+Disable the Open button.
+
+Show:
+
+NO COMMON COOKIES
+
+or
+
+NO RARE COOKIES
+
+depending on selected tab.
+
+Do not automatically switch to Mythic.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL TEST
+
+Verify:
+
+• Only one Open button exists.
+• Mythic does not create a duplicate button.
+• Common cookies can be selected and opened.
+• Rare cookies can be selected and opened.
+• Epic cookies can be selected and opened.
+• Legendary cookies can be selected and opened.
+• Mythic can be selected and opened only if owned.
+• Owning Mythic does not block opening other cookies.
+• Cookie count decreases only for the selected rarity.
+• UI updates after each cookie is opened.
