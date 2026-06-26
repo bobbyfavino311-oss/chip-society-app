@@ -1,0 +1,74 @@
+Use this exact correction prompt:
+
+FORTUNE COOKIE SCREEN FIX
+The Fortune Cookie screen is still incomplete.
+Current issues:
+1. Player cannot choose which cookie rarity to open.
+2. If the player owns Common, Rare, Epic, or Legendary cookies, there is no proper way to switch between them.
+3. The screen only shows one active cookie type.
+4. The bottom Daily Wheel Exclusive text runs off the screen.
+5. The Mythic description is clipped and unreadable.
+Fix this screen immediately.
+REQUIRED COOKIE SELECTOR
+Add selectable cookie rarity tabs/buttons above the Open Cookie button or directly below the cookie image.
+Tabs:
+COMMON
+RARE
+EPIC
+LEGENDARY
+Only show tabs for cookie types the player owns OR show all tabs with locked/zero states.
+When tapped:
+• Cookie color changes
+• Cookie title updates
+• Drop rate text updates
+• Owned count updates
+• Reward range updates
+• Open button opens that selected rarity
+Example:
+Player owns:
+Common x49
+Rare x10
+Epic x5
+Legendary x5
+The player must be able to tap each rarity and open that exact cookie type.
+Do not force the player to only open the currently displayed cookie.
+COOKIE OPEN BUTTON
+Button should say:
+OPEN COMMON COOKIE
+OPEN RARE COOKIE
+OPEN EPIC COOKIE
+OPEN LEGENDARY COOKIE
+or shorter:
+OPEN COMMON
+OPEN RARE
+OPEN EPIC
+OPEN LEGENDARY
+depending on available space.
+BOTTOM TEXT FIX
+The Daily Wheel Exclusive box text must wrap properly.
+Current text runs off the screen.
+Fix it so it displays cleanly within the card:
+DAILY WHEEL EXCLUSIVE
+The Mythic Fortune Cookie can only be won from the Daily Wheel.
+No clipping.
+No horizontal overflow.
+No hidden text.
+MYTHIC RULE
+Mythic Cookie should remain Daily Wheel exclusive.
+Do not add Mythic to the normal cookie selector unless the player owns one.
+If player owns a Mythic Cookie, show it in a separate premium section labeled:
+MYTHIC COOKIE
+Daily Wheel Exclusive
+But do not include Mythic in the normal Common/Rare/Epic/Legendary progression row.
+FINAL TEST
+Verify:
+• Player can open Common cookies.
+• Player can open Rare cookies.
+• Player can open Epic cookies.
+• Player can open Legendary cookies.
+• Selected cookie rarity changes correctly.
+• Open button opens the selected rarity.
+• Cookie count decreases correctly.
+• Reward range matches selected rarity.
+• Bottom Mythic text wraps correctly.
+• No text runs off the screen.

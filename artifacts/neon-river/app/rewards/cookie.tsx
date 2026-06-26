@@ -608,18 +608,71 @@ export default function FortuneCookieScreen() {
         {phase === 'idle' && (
           <View style={styles.idleSection}>
 
+            {/* ── Rarity selector tabs (COMMON / RARE / EPIC / LEGENDARY) ── */}
+            <View style={styles.tierTabRow}>
+              {CHART_TIERS.map(t => {
+                const c    = TIER_CFG[t];
+                const qty  = inv[t];
+                const isActive = cookieTier === t;
+                const isEmpty  = qty === 0 && !(t === 'common' && canClaimFreeCookie);
+                return (
+                  <TouchableOpacity
+                    key={t}
+                    style={[
+                      styles.tierTab,
+                      isActive
+                        ? { borderColor: c.color, backgroundColor: `${c.color}20` }
+                        : { borderColor: `${c.color}25`, backgroundColor: 'transparent' },
+                    ]}
+                    onPress={() => setCookieTier(t)}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={[styles.tierTabLabel, { color: isActive ? c.color : `${c.color}60` }]}>
+                      {c.label}
+                    </Text>
+                    <Text style={[styles.tierTabCount, { color: isActive ? c.color : 'rgba(255,255,255,0.25)' }]}>
+                      {isEmpty ? '×0' : `×${qty}`}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* ── Open / empty / mythic ── */}
             {(hasCookies || canClaimFreeCookie) ? (
-              <TouchableOpacity style={[styles.openBtn, { overflow: 'hidden' }]} onPress={handleOpen} activeOpacity={0.82}>
-                <LinearGradient
-                  colors={isMythicSelected ? ['#FF0090', '#FF69B4', '#FFD700'] : [cfg.color, cfg.color + 'cc']}
-                  style={StyleSheet.absoluteFill}
-                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                />
-                <Text style={[styles.openBtnText, { color: isMythicSelected ? '#fff' : '#050010' }]}>
-                  {canClaimFreeCookie && !hasCookies ? 'CLAIM DAILY & OPEN' : 'OPEN COOKIE'}
-                </Text>
-                <Ionicons name="chevron-forward" size={18} color={isMythicSelected ? '#fff' : '#050010'} />
-              </TouchableOpacity>
+              <>
+                <TouchableOpacity
+                  style={[styles.openBtn, { overflow: 'hidden', opacity: (inv[cookieTier] === 0 && !(cookieTier === 'common' && canClaimFreeCookie)) ? 0.4 : 1 }]}
+                  onPress={handleOpen}
+                  activeOpacity={0.82}
+                  disabled={inv[cookieTier] === 0 && !(cookieTier === 'common' && canClaimFreeCookie) && !isMythicSelected}
+                >
+                  <LinearGradient
+                    colors={isMythicSelected ? ['#FF0090', '#FF69B4', '#FFD700'] : [cfg.color, cfg.color + 'cc']}
+                    style={StyleSheet.absoluteFill}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  />
+                  <Text style={[styles.openBtnText, { color: isMythicSelected ? '#fff' : '#050010' }]}>
+                    {canClaimFreeCookie && !hasCookies
+                      ? `CLAIM & OPEN ${cfg.label}`
+                      : `OPEN ${cfg.label}`}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={18} color={isMythicSelected ? '#fff' : '#050010'} />
+                </TouchableOpacity>
+
+                {/* Mythic owned — separate premium section */}
+                {inv.mythic > 0 && (
+                  <TouchableOpacity
+                    style={[styles.mythicOpenBtn, { overflow: 'hidden' }]}
+                    onPress={() => { setCookieTier('mythic'); setTimeout(handleOpen, 50); }}
+                    activeOpacity={0.82}
+                  >
+                    <LinearGradient colors={['#FF0090', '#FF69B4', '#FFD700']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+                    <Text style={styles.mythicOpenLabel}>MYTHIC COOKIE</Text>
+                    <Text style={styles.mythicOpenSub}>Daily Wheel Exclusive · ×{inv.mythic}</Text>
+                  </TouchableOpacity>
+                )}
+              </>
             ) : (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyIcon}>🥠</Text>
@@ -633,12 +686,11 @@ export default function FortuneCookieScreen() {
             <View style={styles.infoGrid}>
               {CHART_TIERS.map(t => {
                 const c = TIER_CFG[t];
-                const ranges: Record<CookieTier, string> = {
+                const ranges: Record<string, string> = {
                   common:    '5K–25K Chips',
                   rare:      '25K–150K Chips',
                   epic:      '150K–750K Chips',
                   legendary: '750K–2M Chips',
-                  mythic:    '',
                 };
                 return (
                   <View key={t} style={[styles.infoCard, { borderColor: `${c.color}30`, backgroundColor: `${c.color}0a` }]}>
@@ -649,12 +701,13 @@ export default function FortuneCookieScreen() {
                 );
               })}
             </View>
-            {/* Mythic — wheel-only badge */}
+
+            {/* Mythic — wheel-only badge (always shown at bottom) */}
             <View style={styles.mythicBadge}>
               <Text style={styles.mythicBadgeStar}>⭐</Text>
-              <View>
+              <View style={styles.mythicBadgeText}>
                 <Text style={styles.mythicBadgeTitle}>DAILY WHEEL EXCLUSIVE</Text>
-                <Text style={styles.mythicBadgeSub}>The Mythic Fortune Cookie can only be won from the Daily Wheel jackpot.</Text>
+                <Text style={styles.mythicBadgeSub}>The Mythic Fortune Cookie can only be won from the Daily Wheel.</Text>
               </View>
             </View>
           </View>
@@ -839,6 +892,35 @@ const styles = StyleSheet.create({
   emptyTitle: { color: '#555', fontSize: 16, fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
   emptySub:   { color: '#333', fontSize: 12, fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 18 },
 
+  // ── Tier selector tabs ──────────────────────────────────────────────────────
+  tierTabRow: { flexDirection: 'row', gap: 6 },
+  tierTab: {
+    flex: 1, borderRadius: 10, borderWidth: 1,
+    paddingVertical: 8, paddingHorizontal: 4,
+    alignItems: 'center', gap: 3,
+  },
+  tierTabLabel: {
+    fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5,
+  },
+  tierTabCount: {
+    fontSize: 11, fontFamily: 'Inter_700Bold',
+  },
+
+  // ── Mythic owned open button ─────────────────────────────────────────────
+  mythicOpenBtn: {
+    borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,0,144,0.50)',
+    paddingVertical: 10, paddingHorizontal: 16,
+    alignItems: 'center', gap: 2,
+  },
+  mythicOpenLabel: {
+    fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_900Black',
+    color: '#fff', letterSpacing: 1.5,
+  },
+  mythicOpenSub: {
+    fontSize: 9, fontFamily: 'Orbitron_400Regular',
+    color: 'rgba(255,255,255,0.70)', letterSpacing: 0.5,
+  },
+
   infoLabel: {
     color: 'rgba(255,255,255,0.25)', fontSize: 9,
     fontFamily: 'Orbitron_700Bold', letterSpacing: 2, marginTop: 4,
@@ -864,14 +946,15 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,215,0,0.25)', backgroundColor: 'rgba(255,215,0,0.06)',
     paddingVertical: 9, paddingHorizontal: 12,
   },
-  mythicBadgeStar: { fontSize: 18 },
+  mythicBadgeStar: { fontSize: 18, flexShrink: 0 },
+  mythicBadgeText: { flex: 1 },
   mythicBadgeTitle: {
     color: '#FFD700', fontSize: 9,
     fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5, marginBottom: 2,
   },
   mythicBadgeSub: {
     color: 'rgba(255,255,255,0.45)', fontSize: 10,
-    fontFamily: 'Orbitron_400Regular', lineHeight: 14,
+    fontFamily: 'Orbitron_400Regular', lineHeight: 14, flexWrap: 'wrap',
   },
 
   rewardCard: {
