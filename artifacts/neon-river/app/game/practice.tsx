@@ -377,7 +377,8 @@ export default function PracticeScreen() {
   const [exitConfirm, setExitConfirm] = useState(false);
   const [handCount, setHandCount] = useState(0);
   const [numPlayers, setNumPlayers] = useState(initialPlayers);
-  const [fxEnabled, setFxEnabled] = useState(true);
+  const [fxEnabled, setFxEnabled]           = useState(true);
+  const [showOmahaRules, setShowOmahaRules] = useState(false);
 
   // ── Mounted guard — prevents async setState after router.back() ──────────
   const isMountedRef = useRef(true);
@@ -719,6 +720,34 @@ export default function PracticeScreen() {
         </View>
       </Modal>
 
+      {/* Omaha rules modal */}
+      <Modal transparent visible={showOmahaRules} animationType="fade" onRequestClose={() => setShowOmahaRules(false)}>
+        <View style={styles.exitOverlay}>
+          <View style={[styles.exitCard, { maxWidth: 320, paddingHorizontal: 24, paddingVertical: 28 }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <Text style={[styles.exitTitle, { fontSize: 15, letterSpacing: 3 }]}>OMAHA HOLD'EM</Text>
+              <TouchableOpacity onPress={() => setShowOmahaRules(false)} hitSlop={12}>
+                <Ionicons name="close" size={20} color="rgba(255,255,255,0.5)" />
+              </TouchableOpacity>
+            </View>
+            {[
+              'Each player receives 4 private hole cards.',
+              'Five community cards are dealt face-up.',
+              'You must use exactly 2 of your hole cards.',
+              'You must use exactly 3 community cards.',
+              'Standard poker hand rankings apply.',
+              'Betting rounds: Pre-Flop · Flop · Turn · River.',
+              'Best legal 5-card hand wins.',
+            ].map((rule, i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: 9 }}>
+                <Text style={{ color: '#00ff88', fontFamily: 'Orbitron_400Regular', fontSize: 9, lineHeight: 16 }}>▸</Text>
+                <Text style={[styles.exitSub, { textAlign: 'left', fontSize: 12, lineHeight: 17, flex: 1 }]}>{rule}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </Modal>
+
       {/* Top controls */}
       <View style={[styles.topControls, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => setExitConfirm(true)} activeOpacity={0.8}>
@@ -732,17 +761,24 @@ export default function PracticeScreen() {
             </Text>
           )}
         </View>
-        <TouchableOpacity
-          style={[styles.iconBtn, fxEnabled && styles.iconBtnOn]}
-          onPress={toggleFx}
-          activeOpacity={0.75}
-        >
-          <Ionicons
-            name={fxEnabled ? 'musical-notes' : 'musical-notes-outline'}
-            size={16}
-            color={fxEnabled ? '#00d4ff' : 'rgba(255,255,255,0.3)'}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {gameVariant === 'omaha_holdem' && (
+            <TouchableOpacity style={styles.iconBtn} onPress={() => setShowOmahaRules(true)} activeOpacity={0.75}>
+              <Ionicons name="information-circle-outline" size={18} color="#00ff88cc" />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={[styles.iconBtn, fxEnabled && styles.iconBtnOn]}
+            onPress={toggleFx}
+            activeOpacity={0.75}
+          >
+            <Ionicons
+              name={fxEnabled ? 'musical-notes' : 'musical-notes-outline'}
+              size={16}
+              color={fxEnabled ? '#00d4ff' : 'rgba(255,255,255,0.3)'}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* AI players — minimal, close to top */}
@@ -754,7 +790,7 @@ export default function PracticeScreen() {
             isCurrentTurn={state.players[state.currentPlayerIndex]?.id === player.id}
             isWinner={state.winnerIds.includes(player.id)}
             timer={state.timer}
-            showCards={isHandOver && player.status !== 'folded'}
+            showCards={isHandOver && (gameVariant !== 'omaha_holdem' ? player.status !== 'folded' : state.winnerIds.includes(player.id))}
           />
         ))}
       </View>

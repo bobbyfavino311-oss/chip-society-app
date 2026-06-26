@@ -84,12 +84,20 @@ function CasinoWarIcon({ size = 15, color = '#ffd700' }: { size?: number; color?
 function JokerHoldemIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
-      {/* Three jester hat prongs */}
-      <Ellipse cx="6.5" cy="10.5" rx="4" ry="6.5" fill={color} />
-      <Ellipse cx="12" cy="7.5" rx="4.5" ry="8.5" fill={color} />
-      <Ellipse cx="17.5" cy="10.5" rx="4" ry="6.5" fill={color} />
+      {/* Left prong — droops left, soft fabric point */}
+      <Path d="M 5.5,14 C 4,11.5 1.5,10 2,8 C 2.5,10 5,12 8.5,14 Z" fill={color} />
+      {/* Center prong — rises straight up */}
+      <Path d="M 10,14 C 10,10 9.5,7 12,4 C 14.5,7 14,10 14,14 Z" fill={color} />
+      {/* Right prong — droops right, soft fabric point */}
+      <Path d="M 15.5,14 C 19,12 21.5,10 22,8 C 22.5,10 20.5,11.5 18.5,14 Z" fill={color} />
+      {/* Bell — left tip */}
+      <Circle cx="2" cy="7" r="2" fill={color} />
+      {/* Bell — center tip */}
+      <Circle cx="12" cy="3" r="2" fill={color} />
+      {/* Bell — right tip */}
+      <Circle cx="22" cy="7" r="2" fill={color} />
       {/* Hat body */}
-      <Rect x="4" y="14.5" width="16" height="4" fill={color} />
+      <Rect x="4.5" y="13" width="15" height="5.5" fill={color} />
       {/* Brim */}
       <Rect x="1.5" y="17.5" width="21" height="4" rx="1.8" fill={color} />
     </Svg>
@@ -914,18 +922,6 @@ export default function PlayScreen() {
               sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'}`,
               onPress: () => openQuickPlay('joker_holdem'),
             },
-            {
-              label:   'RANKED',
-              icon:    'trophy-outline',
-              sub:     'Coming soon',
-              locked:  true,
-            },
-            {
-              label:   'TOURNAMENT',
-              icon:    'ribbon-outline',
-              sub:     'Coming soon',
-              locked:  true,
-            },
           ]}
         />
 
@@ -949,18 +945,6 @@ export default function PlayScreen() {
               icon:    'flash-outline',
               sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'} · ${autoStake?.blinds ?? ''}`,
               onPress: () => openQuickPlay('omaha_holdem'),
-            },
-            {
-              label:   'RANKED',
-              icon:    'trophy-outline',
-              sub:     'Coming soon',
-              locked:  true,
-            },
-            {
-              label:   'TOURNAMENT',
-              icon:    'ribbon-outline',
-              sub:     'Coming soon',
-              locked:  true,
             },
           ]}
         />
@@ -1021,12 +1005,6 @@ export default function PlayScreen() {
               iconNode: <MississippiStudIcon size={15} color="#ffd700" />,
               sub:      '2 hole cards + 3 community · 3 street bets · Jacks or better wins',
               onPress:  () => router.push('/casino/mississippi-stud' as any),
-            },
-            {
-              label:  'MORE GAMES COMING SOON',
-              icon:   'dice-outline',
-              sub:    'New casino games are currently in development',
-              locked: true,
             },
           ]}
         />

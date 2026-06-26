@@ -505,7 +505,7 @@ export default function HighCardFlushScreen() {
                 cards={dealerCards}
                 anims={dAnims}
                 revealCount={dealerReveal}
-                size="casino"
+                size="md"
               />
               {phase === 'result' && result && (
                 <View style={[s.qualBadge, {
@@ -574,7 +574,7 @@ export default function HighCardFlushScreen() {
                 cards={playerCards}
                 anims={pAnims}
                 flushSuit={playerFlush?.suit}
-                size="casino"
+                size="md"
               />
               <Text style={[s.areaLabel, { marginTop: 6 }]}>
                 {phase === 'decision' && playerFlush

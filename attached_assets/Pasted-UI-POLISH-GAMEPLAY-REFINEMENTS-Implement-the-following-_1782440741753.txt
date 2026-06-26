@@ -1,0 +1,194 @@
+UI POLISH & GAMEPLAY REFINEMENTS
+
+Implement the following refinements across Chip Society.
+
+⸻
+
+1. HIGH CARD FLUSH — ENLARGE PLAYER & DEALER CARDS
+
+The current cards in High Card Flush are too small.
+
+Although the game functions correctly, players should be able to recognize suits and values instantly without straining.
+
+Increase the size of both:
+
+* Dealer’s 7 cards
+* Player’s 7 cards
+
+Increase each card approximately 10–15%.
+
+Requirements:
+
+* Keep spacing even.
+* No overlap.
+* Preserve the clean layout.
+* Maintain mobile readability.
+* Keep all animations and reveal effects.
+
+The goal is simply to improve readability while maintaining the premium minimalist aesthetic.
+
+⸻
+
+2. OMAHA HOLD’EM — SHOW ONLY THE WINNING HAND AT SHOWDOWN
+
+Currently, Omaha reveals every player’s four hole cards at showdown.
+
+This creates visual clutter because Omaha already has:
+
+* 4 hole cards per player
+* 5 community cards
+
+When multiple players reach showdown, the screen becomes crowded and the cards overlap, making them difficult to read.
+
+New Showdown Behavior
+
+Reveal:
+
+* Community cards
+* Winning player’s four hole cards only
+
+Do not reveal losing players’ hole cards.
+
+Instead, display:
+
+* Folded backs for players who muck
+* Or simply hide the losing hands after evaluation
+
+Below the winner, display:
+
+Winning Hand
+
+Example:
+
+Full House
+
+Aces over Kings
+
+or
+
+Nut Straight
+
+or
+
+Ace High Flush
+
+Optionally highlight:
+
+* The exact 2 hole cards used
+* The exact 3 community cards used
+
+This keeps Omaha much cleaner while still showing how the winning hand was made.
+
+⸻
+
+3. REMOVE UNUSED MODES FROM OMAHA & JOKER HOLD’EM
+
+Remove the following options from:
+
+* Omaha Hold’em
+* Joker Hold’em
+
+Remove:
+
+* Ranked
+* Tournament
+
+These modes currently serve no purpose and only create unnecessary visual clutter.
+
+Each variant should only display:
+
+* AI Practice
+* Quick Play
+
+Additional modes can be added later if needed.
+
+⸻
+
+4. ADD AN INFO BUTTON TO OMAHA HOLD’EM
+
+Omaha currently lacks an information button.
+
+Add the standard Chip Society Info (ⓘ) icon in the upper-right corner, matching every other casino and poker game.
+
+When tapped, display:
+
+Omaha Texas Hold’em Rules
+
+* Each player receives 4 private hole cards.
+* Five community cards are dealt.
+* You must use exactly 2 hole cards.
+* You must use exactly 3 community cards.
+* Standard poker hand rankings apply.
+* Betting rounds:
+    * Pre-Flop
+    * Flop
+    * Turn
+    * River
+* Best legal 5-card hand wins.
+
+This should match the clean informational popups used throughout the app.
+
+⸻
+
+5. REDESIGN THE JOKER CARD SYMBOL
+
+The current Joker icon resembles a crown.
+
+It should instead be an unmistakable traditional jester hat.
+
+New Joker Symbol Requirements
+
+Design a classic medieval court jester hat featuring:
+
+* Three soft fabric points (not rigid spikes)
+* One point leaning left
+* One centered point
+* One leaning right
+* A small round bell attached to the tip of each point
+* Slight curves in each point so they resemble hanging fabric
+* A simple black headband/base beneath the hat
+* Flat black silhouette
+* No gradients
+* No text
+* No letters
+* No numbers
+* No facial features
+* No clown elements
+* No decorative artwork
+
+The finished icon should instantly communicate “Jester” rather than “Crown.”
+
+This icon will be used:
+
+* On Joker playing cards
+* As the Joker Hold’em game icon
+* Anywhere the Joker variant is represented.
+
+Keep the design clean, bold, and recognizable even at small sizes.
+
+⸻
+
+6. REMOVE “MORE GAMES COMING SOON”
+
+Remove the “More Games Coming Soon” card from the Casino Games section.
+
+It no longer serves a purpose.
+
+The Casino Games section should now end naturally after the final implemented game.
+
+There should be no placeholder cards remaining.
+
+If additional casino games are added in the future, they can simply be inserted into the existing list without using a placeholder.
+
+⸻
+
+FINAL DESIGN GOAL
+
+These refinements are focused on improving readability, reducing unnecessary UI clutter, and giving the app a more polished, production-quality feel.
+
+* High Card Flush cards should be easier to read.
+* Omaha showdowns should be clean and readable by showing only the winning hand.
+* Omaha and Joker Hold’em should contain only the currently supported play modes.
+* Omaha should include the same helpful rules popup as every other game.
+* The Joker icon should clearly resemble a traditional three-point jester hat with bells rather than a crown.
+* The Casino Games list should end cleanly without placeholder content.
