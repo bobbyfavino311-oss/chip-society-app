@@ -73,29 +73,19 @@ interface TPreviewCard {
 
 const PREVIEW_CARDS: TPreviewCard[] = [
   {
-    id: '1', emoji: '🏆', name: 'CHIP SOCIETY CHAMPIONSHIP', color: colors.gold,
-    badge: 'COMING SOON',
-    features: ['Multi-table tournament', 'Championship events', 'Final table spotlight', 'Massive future prize pools'],
-  },
-  {
     id: '2', emoji: '⚡', name: 'TURBO SHOWDOWN', color: colors.primary,
-    badge: 'IN DEVELOPMENT',
-    features: ['Fast blind increases', 'Shorter tournament sessions', 'Faster action', 'Quick competitive play'],
-  },
-  {
-    id: '3', emoji: '🐉', name: 'FOUR DRAGONS EVENT', color: colors.secondary,
     badge: 'COMING SOON',
-    features: ['Four Dragons themed event', 'Limited-time format', 'Special rewards', 'Seasonal competition'],
+    features: ['Fast blind increases', 'Shorter tournament sessions', 'Rapid chip accumulation', 'Quick competitive play'],
   },
   {
-    id: '4', emoji: '💰', name: 'HIGH ROLLER SERIES', color: '#bf5fff',
-    badge: 'IN DEVELOPMENT',
-    features: ['Elite stakes', 'Premium competition', 'Exclusive events', 'Large future prize pools'],
-  },
-  {
-    id: '5', emoji: '🎭', name: 'SEASONAL EVENTS', color: '#00e887',
+    id: '3', emoji: '🎭', name: 'SEASONAL EVENTS', color: '#00e887',
     badge: 'COMING SOON',
-    features: ['Holiday events', 'Community competitions', 'Special game modes', 'Limited-time rewards'],
+    features: ['Halloween Event', 'Christmas Event', 'Summer Nights', 'Lucky Fortune Festival'],
+  },
+  {
+    id: '4', emoji: '🎯', name: 'MTT TOURNAMENTS', color: '#bf5fff',
+    badge: 'COMING SOON',
+    features: ['Large prize pools', 'Scheduled start times', 'Progressive blind levels', 'Final Table experience'],
   },
 ];
 
@@ -131,8 +121,8 @@ function TournamentPreviewCard({ card }: { card: TPreviewCard }) {
           ))}
         </View>
         <View style={[tc.comingSoonBar, { borderColor: `${card.color}30` }]}>
-          <Ionicons name="lock-closed-outline" size={10} color={`${card.color}60`} />
-          <Text style={[tc.comingSoonText, { color: `${card.color}70` }]}>ARRIVING IN A FUTURE UPDATE</Text>
+          <Ionicons name="time-outline" size={10} color={`${card.color}60`} />
+          <Text style={[tc.comingSoonText, { color: `${card.color}70` }]}>COMING SOON</Text>
         </View>
       </View>
     </View>
@@ -140,17 +130,6 @@ function TournamentPreviewCard({ card }: { card: TPreviewCard }) {
 }
 
 function TournamentPreviewHub() {
-  const [notified, setNotified] = useState(false);
-
-  useEffect(() => {
-    AsyncStorage.getItem('tournamentNotify').then(v => { if (v === '1') setNotified(true); });
-  }, []);
-
-  const handleNotify = async () => {
-    setNotified(true);
-    await AsyncStorage.setItem('tournamentNotify', '1');
-  };
-
   return (
     <View style={tour.wrap}>
       {/* Main feature card */}
@@ -168,21 +147,12 @@ function TournamentPreviewHub() {
           <Text style={tour.featEmoji}>🏆</Text>
           <Text style={tour.featTitle}>CHIP SOCIETY{'\n'}CHAMPIONSHIP</Text>
           <Text style={tour.featDesc}>
-            Compete against players worldwide in multi-table poker tournaments featuring championship prize pools, final table action, and competitive events.
+            The flagship tournament series of Chip Society. Battle for massive chip prizes, exclusive avatars, badges, and seasonal rewards.
           </Text>
-          {/* Notify button */}
-          {notified ? (
-            <View style={tour.notifiedRow}>
-              <Ionicons name="checkmark-circle" size={14} color={colors.success} />
-              <Text style={tour.notifiedText}>We'll notify you when tournaments launch.</Text>
-            </View>
-          ) : (
-            <TouchableOpacity style={tour.notifyBtn} onPress={handleNotify} activeOpacity={0.8}>
-              <LinearGradient colors={[`${colors.gold}25`, `${colors.gold}10`]} style={StyleSheet.absoluteFill} />
-              <Ionicons name="notifications-outline" size={14} color={colors.gold} />
-              <Text style={tour.notifyBtnText}>NOTIFY ME</Text>
-            </TouchableOpacity>
-          )}
+          <View style={[tour.featComingSoon, { borderColor: `${colors.gold}30` }]}>
+            <Ionicons name="time-outline" size={10} color={`${colors.gold}80`} />
+            <Text style={[tour.featComingSoonText, { color: `${colors.gold}80` }]}>COMING SOON</Text>
+          </View>
         </View>
       </View>
 
@@ -890,18 +860,16 @@ const tour = StyleSheet.create({
   },
   featDesc:  { color: 'rgba(255,255,255,0.42)', fontSize: 12, lineHeight: 18 },
 
-  notifyBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    borderRadius: 11, borderWidth: 1,
-    borderColor: `${colors.gold}50`, overflow: 'hidden',
-    paddingHorizontal: 14, paddingVertical: 10, alignSelf: 'flex-start',
+  featComingSoon: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderRadius: 8, borderWidth: 1,
+    paddingHorizontal: 10, paddingVertical: 6,
+    alignSelf: 'flex-start',
   },
-  notifyBtnText: {
-    fontFamily: 'Orbitron_700Bold', fontSize: 11,
-    color: colors.gold, letterSpacing: 1,
+  featComingSoonText: {
+    fontSize: 9, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
   },
-  notifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  notifiedText: { color: 'rgba(255,255,255,0.5)', fontSize: 11 },
 });
 
 const logo = StyleSheet.create({

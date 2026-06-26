@@ -1,0 +1,141 @@
+CHIP SOCIETY – HOME SCREEN FEATURED TOURNAMENT REDESIGN
+
+Redesign the Featured Tournaments section on the Home screen to feel cleaner, more intentional, and focused on upcoming content. Remove filler cards and replace them with features that players will actually anticipate.
+
+⸻
+
+Overall Goals
+
+* Reduce visual clutter.
+* Remove placeholder content that serves no gameplay purpose.
+* Keep only meaningful upcoming events.
+* Make every carousel card feel like an actual future feature.
+
+⸻
+
+1. CHIP SOCIETY CHAMPIONSHIP
+
+Keep the Chip Society Championship featured banner.
+
+However, remove the “Notify Me” / reminder button completely.
+
+Since tournaments are not live yet, reminder functionality has no purpose and adds unnecessary UI.
+
+Instead, replace the lower portion of the card with:
+
+COMING SOON
+
+“The flagship tournament series of Chip Society. Battle for massive chip prizes, exclusive avatars, badges, and seasonal rewards.”
+
+Display a premium “Coming Soon” badge only.
+
+No buttons.
+
+⸻
+
+2. TURBO SHOWDOWN
+
+Keep this featured card exactly as it is.
+
+This remains one of the upcoming featured tournament modes.
+
+No redesign necessary.
+
+⸻
+
+3. SEASONAL EVENTS
+
+Keep the Seasonal Events featured card.
+
+Update the description to emphasize rotating content.
+
+Example:
+
+“Limited-time themed tournaments featuring exclusive table themes, avatars, collectibles, and seasonal rewards.”
+
+Display:
+
+• Halloween Event
+
+• Christmas Event
+
+• Summer Nights
+
+• Lucky Fortune Festival
+
+as rotating examples.
+
+⸻
+
+4. ADD MTT TOURNAMENTS
+
+Replace one of the removed cards with:
+
+MTT TOURNAMENTS
+
+(Multi-Table Tournaments)
+
+Description:
+
+“Compete against hundreds of players across multiple tables until one champion remains.”
+
+Features:
+
+• Large prize pools
+
+• Scheduled start times
+
+• Progressive blind levels
+
+• Final Table experience
+
+Display:
+
+COMING SOON
+
+No reminder button.
+
+No lock icon.
+
+⸻
+
+5. REMOVE FOUR DRAGONS EVENT
+
+Remove the entire Four Dragons event card from the Featured Tournament carousel.
+
+This event no longer belongs in the upcoming tournament rotation.
+
+Do not leave an empty placeholder.
+
+Replace it with the new MTT Tournament card.
+
+⸻
+
+Final Featured Carousel Order
+
+1. Chip Society Championship
+2. Turbo Showdown
+3. Seasonal Events
+4. MTT Tournaments
+
+⸻
+
+Visual Design
+
+Every card should feature:
+
+• Premium artwork
+
+• Minimal neon accents
+
+• “COMING SOON” badge
+
+• No unnecessary buttons
+
+• Consistent spacing
+
+• Large, readable typography
+
+• Rich descriptions that build anticipation without cluttering the interface
+
+The Featured Tournament carousel should feel like a polished roadmap of future content rather than a collection of placeholders.
