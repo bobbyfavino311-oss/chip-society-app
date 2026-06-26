@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Animated,
   ScrollView,
@@ -11,273 +11,324 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Circle, Ellipse, Line, Path, Polygon, Rect } from 'react-native-svg';
+import Svg, { Circle, Ellipse, Line, Path, Rect } from 'react-native-svg';
 
 import { useTableTheme } from '@/context/TableThemeContext';
 import { ALL_TABLE_THEMES, TableTheme, ThemeId } from '@/constants/tableThemes';
 
-// ─── Dragon scale mini-preview ─────────────────────────────────────────────────
-function DragonScalePreview({ size = 40 }: { size?: number }) {
-  const s = size;
-  const gold = '#C89B3C';
-  const dark = '#0A0000';
-  return (
-    <Svg width={s} height={s} viewBox="0 0 40 40">
-      <Polygon points="20,2 38,20 20,38 2,20" fill={dark} stroke={gold} strokeWidth={1.2} />
-      <Polygon points="20,8 32,20 20,32 8,20" fill="none" stroke={gold} strokeWidth={0.7} strokeOpacity={0.5} />
-      <Circle cx={20} cy={20} r={4} fill={gold} opacity={0.85} />
-      <Line x1={20} y1={2} x2={20} y2={38} stroke={gold} strokeWidth={0.4} strokeOpacity={0.3} />
-      <Line x1={2} y1={20} x2={38} y2={20} stroke={gold} strokeWidth={0.4} strokeOpacity={0.3} />
-    </Svg>
-  );
-}
+// ─── Panoramic banner constants ────────────────────────────────────────────────
+// viewBox 360×120 — 3:1 ratio renders full-width at ~118 px tall on device
 
-// ─── Neon mandala mini-preview ─────────────────────────────────────────────────
-function NeonMandalaPreview({ size = 40 }: { size?: number }) {
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = size * 0.38;
-  return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <Circle cx={cx} cy={cy} r={r} stroke="#00d4ff" strokeWidth={1.2} fill="none" />
-      <Circle cx={cx} cy={cy} r={r * 0.6} stroke="#ff0090" strokeWidth={0.9} fill="none" />
-      <Circle cx={cx} cy={cy} r={r * 0.25} fill="#bf5fff" opacity={0.7} />
-      {[0, 45, 90, 135].map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        return (
-          <Line key={i}
-            x1={cx + Math.cos(rad) * r * 0.2} y1={cy + Math.sin(rad) * r * 0.2}
-            x2={cx + Math.cos(rad) * r * 0.85} y2={cy + Math.sin(rad) * r * 0.85}
-            stroke="#00d4ff" strokeWidth={0.7} strokeOpacity={0.6} />
-        );
-      })}
-    </Svg>
-  );
-}
+const BW = 360, BH = 120;
+const TX = 180, TY = 70;          // table ellipse center
+const TRX = 140, TRY = 46;        // outer rim radii
+const TFX = 133, TFY = 40;        // felt surface radii
+// Community card slots (5 cards centered on table)
+const CW = 18, CH = 26, CG = 5;   // card width, height, gap
+const TOTAL_CW = 5 * CW + 4 * CG; // 110
+const CSX = TX - TOTAL_CW / 2;    // start X = 125
+const CSY = TY - CH / 2;          // start Y = 57
 
-// ─── Masquerade mask mini-preview ──────────────────────────────────────────────
-function MasqueradePreview({ size = 40 }: { size?: number }) {
-  const s = size;
-  const cx = s / 2;
-  const cy = s / 2 + 2;
-  const gold = '#D4AF37';
+// ─── Shared table surface (oval + felt + card slots) ──────────────────────────
+function TableSurface({ feltFill, rimColor, slotBorder }: {
+  feltFill: string; rimColor: string; slotBorder: string;
+}) {
   return (
-    <Svg width={s} height={s} viewBox="0 0 40 40">
-      {/* Mask outline */}
-      <Path
-        d="M 5 22 C 5 13, 10 8, 16 8 L 24 8 C 30 8, 35 13, 35 22 C 35 27, 32 29, 29 28 C 27 30, 23 32, 20 32 C 17 32, 13 30, 11 28 C 8 29, 5 27, 5 22 Z"
-        fill="#1A0040" fillOpacity={0.8}
-        stroke={gold} strokeWidth={1.2} strokeOpacity={0.85}
-      />
-      {/* Left eye */}
-      <Ellipse cx={14} cy={19} rx={4.5} ry={3}
-        fill="#090018" stroke={gold} strokeWidth={0.8} strokeOpacity={0.65} />
-      {/* Right eye */}
-      <Ellipse cx={26} cy={19} rx={4.5} ry={3}
-        fill="#090018" stroke={gold} strokeWidth={0.8} strokeOpacity={0.65} />
-      {/* Crest top */}
-      <Circle cx={20} cy={6} r={1.5}
-        fill="none" stroke={gold} strokeWidth={0.8} strokeOpacity={0.60} />
-      <Line x1={20} y1={8} x2={20} y2={6}
-        stroke={gold} strokeWidth={0.8} strokeOpacity={0.55} />
-    </Svg>
-  );
-}
-
-// ─── Sakura Garden mini-preview ────────────────────────────────────────────────
-function SakuraGardenPreview({ size = 40 }: { size?: number }) {
-  const pink = '#F4A8C0';
-  const rose = '#E8627A';
-  const plum = '#C4407C';
-  const s = size;
-  return (
-    <Svg width={s} height={s} viewBox="0 0 40 40">
-      {/* Branch */}
-      <Path
-        d="M 2 2 Q 14 14, 20 20 Q 26 26, 38 38"
-        fill="none" stroke={plum} strokeWidth={1.5} strokeOpacity={0.55}
-        strokeLinecap="round"
-      />
-      {/* Blossom clusters on branch */}
-      {([[10, 10], [20, 20], [30, 30]] as [number,number][]).map(([cx, cy], i) => (
-        <React.Fragment key={i}>
-          <Circle cx={cx}     cy={cy}     r={3.0} fill={pink} fillOpacity={0.70} />
-          <Circle cx={cx - 3} cy={cy}     r={2.2} fill={pink} fillOpacity={0.50} />
-          <Circle cx={cx + 3} cy={cy}     r={2.2} fill={pink} fillOpacity={0.50} />
-          <Circle cx={cx}     cy={cy - 3} r={2.2} fill={pink} fillOpacity={0.50} />
-          <Circle cx={cx}     cy={cy + 3} r={2.2} fill={pink} fillOpacity={0.50} />
-          <Circle cx={cx}     cy={cy}     r={0.8} fill={rose} fillOpacity={0.80} />
-        </React.Fragment>
+    <>
+      <Ellipse cx={TX} cy={TY} rx={TRX} ry={TRY}
+        fill="none" stroke={rimColor} strokeWidth={1.5} strokeOpacity={0.65} />
+      <Ellipse cx={TX} cy={TY} rx={TFX} ry={TFY} fill={feltFill} />
+      <Ellipse cx={TX} cy={TY} rx={TFX * 0.58} ry={TFY * 0.52}
+        fill="none" stroke={rimColor} strokeWidth={0.5} strokeOpacity={0.18} />
+      {Array.from({ length: 5 }, (_, i) => (
+        <Rect key={i}
+          x={CSX + i * (CW + CG)} y={CSY}
+          width={CW} height={CH} rx={3}
+          fill="rgba(0,0,0,0.38)"
+          stroke={slotBorder} strokeWidth={0.8} strokeOpacity={0.65}
+        />
       ))}
-      {/* Scattered petals */}
-      <Ellipse cx={32} cy={8}  rx={3.5} ry={2} fill={pink} fillOpacity={0.35}
-        transform="rotate(40, 32, 8)" />
-      <Ellipse cx={8}  cy={30} rx={3}   ry={2} fill={pink} fillOpacity={0.30}
-        transform="rotate(-30, 8, 30)" />
+    </>
+  );
+}
+
+// ─── Per-theme panoramic banners ──────────────────────────────────────────────
+
+function NeonDefaultBanner() {
+  return (
+    <Svg width="100%" height={BH} viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMid slice">
+      <Rect x={0} y={0} width={BW} height={BH} fill="#060018" />
+      {[60, 120, 180, 240, 300].map(x => (
+        <Line key={`v${x}`} x1={x} y1={0} x2={x} y2={BH}
+          stroke="#00d4ff" strokeWidth={0.3} strokeOpacity={0.12} />
+      ))}
+      {[30, 60, 90].map(y => (
+        <Line key={`h${y}`} x1={0} y1={y} x2={BW} y2={y}
+          stroke="#bf5fff" strokeWidth={0.3} strokeOpacity={0.10} />
+      ))}
+      <Circle cx={0} cy={BH} r={65} fill="#bf5fff" fillOpacity={0.10} />
+      <Circle cx={BW} cy={0} r={55} fill="#00d4ff" fillOpacity={0.08} />
+      <TableSurface feltFill="rgba(0,18,8,0.72)" rimColor="#ff0090" slotBorder="#00d4ff" />
     </Svg>
   );
 }
 
-// ─── Vercetti tropical palm mini-preview ───────────────────────────────────────
-function VercettiPreview({ size = 40 }: { size?: number }) {
-  const s = size;
-  const pink = '#FF6EA0';
-  const cyan = '#00D4C8';
-  const teal = '#004455';
+function DragonFortuneBanner() {
+  const scales: React.ReactElement[] = [];
+  for (let row = 0; row < 6; row++) {
+    for (let col = 0; col < 13; col++) {
+      const x = col * 30 + (row % 2) * 15 - 15;
+      const y = row * 22 - 11;
+      scales.push(
+        <Path key={`${row}-${col}`}
+          d={`M ${x+15},${y} L ${x+30},${y+11} L ${x+15},${y+22} L ${x},${y+11} Z`}
+          fill="none" stroke="#C89B3C" strokeWidth={0.4} strokeOpacity={0.13}
+        />
+      );
+    }
+  }
   return (
-    <Svg width={s} height={s} viewBox="0 0 40 40">
-      {/* Sky background */}
-      <Rect x={0} y={0} width={40} height={40} fill={teal} fillOpacity={0.6} rx={4} />
-      {/* Palm trunk */}
-      <Path d="M 20 38 Q 19 30, 20 22 Q 21 16, 20 10"
-        fill="none" stroke="#005566" strokeWidth={2.5} strokeLinecap="round" />
-      {/* Palm fronds */}
-      <Path d="M 20 10 Q 10 6, 4 10" fill="none" stroke={cyan} strokeWidth={1.4} strokeLinecap="round" strokeOpacity={0.85} />
-      <Path d="M 20 10 Q 30 6, 36 10" fill="none" stroke={cyan} strokeWidth={1.4} strokeLinecap="round" strokeOpacity={0.85} />
-      <Path d="M 20 10 Q 16 4, 14 0" fill="none" stroke={cyan} strokeWidth={1.2} strokeLinecap="round" strokeOpacity={0.70} />
-      <Path d="M 20 10 Q 24 4, 26 0" fill="none" stroke={cyan} strokeWidth={1.2} strokeLinecap="round" strokeOpacity={0.70} />
-      <Path d="M 20 10 Q 8 12, 2 18" fill="none" stroke={cyan} strokeWidth={1.0} strokeLinecap="round" strokeOpacity={0.55} />
-      <Path d="M 20 10 Q 32 12, 38 18" fill="none" stroke={cyan} strokeWidth={1.0} strokeLinecap="round" strokeOpacity={0.55} />
-      {/* Neon pink glow dot at crown */}
-      <Circle cx={20} cy={10} r={2} fill={pink} fillOpacity={0.80} />
-      {/* Horizon pink line */}
-      <Line x1={2} y1={30} x2={38} y2={30} stroke={pink} strokeWidth={0.8} strokeOpacity={0.40} />
+    <Svg width="100%" height={BH} viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMid slice">
+      <Rect x={0} y={0} width={BW} height={BH} fill="#0A0000" />
+      {scales}
+      <Circle cx={0} cy={BH} r={72} fill="#CC0000" fillOpacity={0.09} />
+      <Circle cx={BW} cy={0} r={58} fill="#C89B3C" fillOpacity={0.07} />
+      <TableSurface feltFill="rgba(16,0,0,0.86)" rimColor="#C89B3C" slotBorder="#C89B3C" />
     </Svg>
   );
 }
+
+function RoyalMasqueradeBanner() {
+  const diag: React.ReactElement[] = [];
+  for (let i = -2; i < 15; i++) {
+    diag.push(
+      <Line key={`a${i}`} x1={i * 28} y1={0} x2={i * 28 - 120} y2={BH}
+        stroke="#D4AF37" strokeWidth={0.3} strokeOpacity={0.09} />,
+      <Line key={`b${i}`} x1={i * 28} y1={0} x2={i * 28 + 120} y2={BH}
+        stroke="#D4AF37" strokeWidth={0.3} strokeOpacity={0.09} />
+    );
+  }
+  return (
+    <Svg width="100%" height={BH} viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMid slice">
+      <Rect x={0} y={0} width={BW} height={BH} fill="#0C0018" />
+      {diag}
+      <Circle cx={0} cy={BH} r={68} fill="#9B30FF" fillOpacity={0.10} />
+      <Circle cx={BW} cy={0} r={58} fill="#D4AF37" fillOpacity={0.08} />
+      <TableSurface feltFill="rgba(14,0,30,0.85)" rimColor="#D4AF37" slotBorder="#D4AF37" />
+    </Svg>
+  );
+}
+
+function SakuraBanner() {
+  const petals: [number, number, number][] = [
+    [38, 14, 0.26], [88, 7, 0.20], [18, 46, 0.22], [302, 18, 0.24],
+    [328, 52, 0.20], [48, 88, 0.22], [312, 96, 0.20], [142, 9, 0.18],
+    [258, 108, 0.22], [78, 102, 0.18], [20, 72, 0.16], [344, 82, 0.18],
+  ];
+  return (
+    <Svg width="100%" height={BH} viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMid slice">
+      <Rect x={0} y={0} width={BW} height={BH} fill="#150410" />
+      <Path d="M 0 8 Q 55 28 85 40 Q 115 52 132 46"
+        fill="none" stroke="#C4407C" strokeWidth={1.3} strokeOpacity={0.32} strokeLinecap="round" />
+      <Path d="M 360 112 Q 305 90 275 80 Q 245 70 228 76"
+        fill="none" stroke="#C4407C" strokeWidth={1.3} strokeOpacity={0.28} strokeLinecap="round" />
+      {petals.map(([cx, cy, op], i) => (
+        <Circle key={i} cx={cx} cy={cy} r={4.5} fill="#F4A8C0" fillOpacity={op} />
+      ))}
+      <Circle cx={0} cy={0} r={62} fill="#E8627A" fillOpacity={0.08} />
+      <Circle cx={BW} cy={BH} r={58} fill="#C4407C" fillOpacity={0.08} />
+      <TableSurface feltFill="rgba(20,4,16,0.85)" rimColor="#E8627A" slotBorder="#F4A8C0" />
+    </Svg>
+  );
+}
+
+function FrozenNeonBanner() {
+  const diag: React.ReactElement[] = [];
+  for (let x = 0; x <= BW + 80; x += 55) {
+    diag.push(
+      <Line key={x} x1={x} y1={0} x2={x - 70} y2={BH}
+        stroke="#00D9FF" strokeWidth={0.35} strokeOpacity={0.14} />
+    );
+  }
+  const snowflake = (cx: number, cy: number, r: number, color: string, op: number) =>
+    [0, 30, 60, 90, 120, 150].map(deg => {
+      const rad = deg * Math.PI / 180;
+      return <Line key={deg}
+        x1={cx} y1={cy}
+        x2={cx + Math.cos(rad) * r} y2={cy + Math.sin(rad) * r}
+        stroke={color} strokeWidth={0.55} strokeOpacity={op} />;
+    });
+  return (
+    <Svg width="100%" height={BH} viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMid slice">
+      <Rect x={0} y={0} width={BW} height={BH} fill="#05101C" />
+      {diag}
+      {snowflake(28, 18, 22, '#00D9FF', 0.22)}
+      {snowflake(332, 102, 17, '#8FEFFF', 0.18)}
+      {snowflake(8, 95, 12, '#00D9FF', 0.14)}
+      <Circle cx={0} cy={0} r={68} fill="#00D9FF" fillOpacity={0.07} />
+      <Circle cx={BW} cy={BH} r={58} fill="#00D9FF" fillOpacity={0.07} />
+      <TableSurface feltFill="rgba(4,14,24,0.83)" rimColor="#00D9FF" slotBorder="#00D9FF" />
+    </Svg>
+  );
+}
+
+function CrimsonNoirBanner() {
+  const silk: React.ReactElement[] = [];
+  for (let x = -60; x <= BW + 60; x += 18) {
+    silk.push(
+      <Line key={x} x1={x} y1={0} x2={x - 120} y2={BH}
+        stroke="#D4002A" strokeWidth={0.25} strokeOpacity={0.09} />
+    );
+  }
+  return (
+    <Svg width="100%" height={BH} viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMid slice">
+      <Rect x={0} y={0} width={BW} height={BH} fill="#050003" />
+      {silk}
+      <Circle cx={0} cy={BH} r={72} fill="#D4002A" fillOpacity={0.08} />
+      <Circle cx={BW} cy={0} r={58} fill="#A0001C" fillOpacity={0.07} />
+      <TableSurface feltFill="rgba(8,2,6,0.90)" rimColor="#D4002A" slotBorder="#D4002A" />
+    </Svg>
+  );
+}
+
+function VercettiBanner() {
+  function Palm({ x, flip }: { x: number; flip?: boolean }) {
+    const s = flip ? -1 : 1;
+    return (
+      <>
+        <Path d={`M ${x} 120 Q ${x - s * 2} 92 ${x} 72 Q ${x + s * 1} 52 ${x} 38`}
+          fill="none" stroke="#003545" strokeWidth={3.5} strokeLinecap="round" />
+        <Path d={`M ${x} 38 Q ${x - s * 14} 32 ${x - s * 24} 36`}
+          fill="none" stroke="#00C8C0" strokeWidth={1.3} strokeLinecap="round" strokeOpacity={0.60} />
+        <Path d={`M ${x} 38 Q ${x + s * 14} 32 ${x + s * 24} 36`}
+          fill="none" stroke="#00C8C0" strokeWidth={1.3} strokeLinecap="round" strokeOpacity={0.60} />
+        <Path d={`M ${x} 38 Q ${x - s * 6} 28 ${x - s * 8} 20`}
+          fill="none" stroke="#00C8C0" strokeWidth={1.0} strokeLinecap="round" strokeOpacity={0.45} />
+        <Path d={`M ${x} 38 Q ${x + s * 6} 28 ${x + s * 8} 20`}
+          fill="none" stroke="#00C8C0" strokeWidth={1.0} strokeLinecap="round" strokeOpacity={0.45} />
+        <Path d={`M ${x} 38 Q ${x - s * 18} 40 ${x - s * 30} 50`}
+          fill="none" stroke="#00C8C0" strokeWidth={0.9} strokeLinecap="round" strokeOpacity={0.40} />
+      </>
+    );
+  }
+  return (
+    <Svg width="100%" height={BH} viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMid slice">
+      <Rect x={0} y={0} width={BW} height={BH} fill="#002530" />
+      <Rect x={0} y={78} width={BW} height={2} fill="#FF6EA0" fillOpacity={0.18} />
+      <Palm x={28} />
+      <Palm x={332} flip />
+      <Circle cx={0} cy={BH} r={58} fill="#FF6EA0" fillOpacity={0.07} />
+      <Circle cx={BW} cy={BH} r={58} fill="#FF6EA0" fillOpacity={0.06} />
+      <TableSurface feltFill="rgba(0,52,66,0.76)" rimColor="#FF6EA0" slotBorder="#FF6EA0" />
+    </Svg>
+  );
+}
+
+// ─── Short descriptions (one line each) ───────────────────────────────────────
+const SHORT_DESC: Record<string, string> = {
+  neon_default:     'Classic neon-synthwave table.',
+  dragon_fortune:   'Ancient crimson and gold VIP table.',
+  royal_masquerade: 'Elegant Venetian casino theme.',
+  sakura_garden:    'Minimal Japanese-inspired table.',
+  frozen_neon:      'Arctic luxury neon casino table.',
+  crimson_noir:     'Underground invitation-only noir room.',
+  vercetti:         'Minimal tropical retro table.',
+};
 
 // ─── Theme card ───────────────────────────────────────────────────────────────
-function ThemeCard({
-  theme,
-  isActive,
-  onEquip,
-}: {
+function ThemeCard({ theme, isActive, onEquip, index }: {
   theme: TableTheme;
   isActive: boolean;
   onEquip: () => void;
+  index: number;
 }) {
-  const pressAnim = useRef(new Animated.Value(1)).current;
-  const isDragon      = theme.id === 'dragon_fortune';
-  const isMasquerade  = theme.id === 'royal_masquerade';
-  const isSakura      = theme.id === 'sakura_garden';
-  const isVercetti    = theme.id === 'vercetti';
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(18)).current;
 
-  // Derive accent colors from the theme itself
-  const primary   = theme.accentPrimary;
-  const secondary = theme.accentSecondary;
-
-  function press() {
-    Animated.sequence([
-      Animated.timing(pressAnim, { toValue: 0.96, duration: 70, useNativeDriver: true }),
-      Animated.spring(pressAnim, { toValue: 1, friction: 5, useNativeDriver: true }),
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim,  { toValue: 1, duration: 380, delay: index * 60, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 380, delay: index * 60, useNativeDriver: true }),
     ]).start();
-    onEquip();
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const borderColor = isActive
-    ? primary
-    : `${primary}40`;
+  const primary = theme.accentPrimary;
+  const isLegendary = theme.rarity === 'LEGENDARY';
 
-  const bgColors: [string, string, string] = isDragon
-    ? ['#120000', '#0A0000', '#060000']
-    : isMasquerade
-    ? ['#140026', '#0C0018', '#080010']
-    : isSakura
-    ? ['#200814', '#160510', '#0E030C']
-    : isVercetti
-    ? ['#003040', '#001E28', '#001018']
-    : ['#0e0028', '#08001a', '#050010'];
-
-  function Preview() {
-    if (isDragon)     return <DragonScalePreview  size={42} />;
-    if (isMasquerade) return <MasqueradePreview   size={42} />;
-    if (isSakura)     return <SakuraGardenPreview  size={42} />;
-    if (isVercetti)   return <VercettiPreview      size={42} />;
-    return <NeonMandalaPreview size={42} />;
+  function Banner() {
+    switch (theme.id) {
+      case 'dragon_fortune':   return <DragonFortuneBanner />;
+      case 'royal_masquerade': return <RoyalMasqueradeBanner />;
+      case 'sakura_garden':    return <SakuraBanner />;
+      case 'frozen_neon':      return <FrozenNeonBanner />;
+      case 'crimson_noir':     return <CrimsonNoirBanner />;
+      case 'vercetti':         return <VercettiBanner />;
+      default:                 return <NeonDefaultBanner />;
+    }
   }
 
   return (
-    <Animated.View style={{ transform: [{ scale: pressAnim }] }}>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={press}
-        style={[
-          s.card,
-          { borderColor },
+    <Animated.View style={[s.cardOuter, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+      <View style={[s.card, { borderColor: isActive ? `${primary}55` : `${primary}20` }]}>
+
+        {/* Panoramic preview banner */}
+        <View style={[
+          s.bannerWrap,
           isActive && {
             shadowColor: primary,
-            shadowOpacity: 0.45,
+            shadowOpacity: 0.60,
             shadowRadius: 18,
             shadowOffset: { width: 0, height: 0 },
           },
-        ]}
-      >
-        <LinearGradient colors={bgColors} style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+        ]}>
+          <Banner />
+          {isActive && (
+            <View style={[StyleSheet.absoluteFill, s.bannerActiveRing, { borderColor: `${primary}70` }]} />
+          )}
+        </View>
 
-        <View style={[s.cardAccentLine, { backgroundColor: borderColor, opacity: isActive ? 0.8 : 0.3 }]} />
-
-        <View style={s.cardBody}>
-          {/* Left — icon + palette */}
-          <View style={s.cardLeft}>
-            <View style={[s.iconRing, { borderColor: `${primary}55` }]}>
-              <View style={[s.iconBg, { backgroundColor: theme.previewColors[0] }]}>
-                <Preview />
-              </View>
-            </View>
-            <View style={s.paletteRow}>
-              {theme.previewColors.map((c, i) => (
-                <View key={i} style={[s.paletteDot, { backgroundColor: c, borderColor: 'rgba(255,255,255,0.15)' }]} />
-              ))}
-            </View>
-          </View>
-
-          {/* Right — info */}
-          <View style={s.cardRight}>
-            <View style={s.nameRow}>
-              <Text style={[s.themeName, { color: theme.textColor }]}>
+        {/* Info section */}
+        <View style={s.cardInfo}>
+          <View style={s.infoTop}>
+            <View style={s.infoLeft}>
+              <Text style={[s.themeName, { color: theme.textColor }]} numberOfLines={1}>
                 {theme.name}
               </Text>
-              <View style={[s.rarityBadge, {
-                borderColor: `${primary}66`,
-                backgroundColor: `${primary}18`,
-              }]}>
-                <Text style={[s.rarityText, { color: primary }]}>
-                  {theme.rarity}
-                </Text>
-              </View>
+              <Text style={[s.rarityTag, { color: isLegendary ? primary : 'rgba(255,255,255,0.38)' }]}>
+                {isLegendary ? '◆  LEGENDARY' : 'FREE'}
+              </Text>
+              <Text style={s.description} numberOfLines={1}>
+                {SHORT_DESC[theme.id] ?? theme.tagline}
+              </Text>
             </View>
-
-            <Text style={s.themeTagline} numberOfLines={3}>
-              {theme.tagline}
-            </Text>
-
-            {isActive ? (
-              <View style={[s.equippedTag, { borderColor: primary }]}>
-                <Ionicons name="checkmark-circle" size={12} color={primary} />
-                <Text style={[s.equippedText, { color: primary }]}>EQUIPPED</Text>
-              </View>
-            ) : (
-              <TouchableOpacity onPress={press} style={[s.equipBtn, { borderColor: `${primary}99` }]}>
-                <LinearGradient
-                  colors={[`${primary}30`, `${primary}10`]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <Text style={[s.equipBtnText, { color: primary }]}>EQUIP</Text>
-              </TouchableOpacity>
-            )}
+            <View style={s.infoRight}>
+              {isActive ? (
+                <View style={[s.equippedBtn, {
+                  backgroundColor: `${primary}1A`,
+                  borderColor: `${primary}70`,
+                  shadowColor: primary,
+                  shadowOpacity: 0.35,
+                  shadowRadius: 8,
+                  shadowOffset: { width: 0, height: 0 },
+                }]}>
+                  <Ionicons name="checkmark" size={11} color={primary} />
+                  <Text style={[s.equippedBtnText, { color: primary }]}>EQUIPPED</Text>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={onEquip}
+                  style={[s.equipBtn, { borderColor: `${primary}50` }]}
+                  activeOpacity={0.75}
+                >
+                  <Text style={[s.equipBtnText, { color: primary }]}>EQUIP</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
 
-        {isActive && (
-          <LinearGradient
-            colors={['transparent', `${primary}0D`, 'transparent']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={StyleSheet.absoluteFill}
-            pointerEvents="none"
-          />
-        )}
-      </TouchableOpacity>
+      </View>
     </Animated.View>
   );
 }
@@ -290,49 +341,35 @@ export default function TableThemesScreen() {
   return (
     <View style={s.screen}>
       <LinearGradient
-        colors={['#0a0018', '#050010', '#030008']}
+        colors={['#09001E', '#050010', '#030008']}
         style={StyleSheet.absoluteFill}
       />
 
       {/* Header */}
-      <View style={[s.header, { paddingTop: insets.top + 12 }]}>
+      <View style={[s.header, { paddingTop: insets.top + 14 }]}>
         <TouchableOpacity style={s.backBtn} onPress={() => router.back()} activeOpacity={0.75}>
-          <Ionicons name="chevron-back" size={22} color="rgba(255,255,255,0.6)" />
+          <Ionicons name="chevron-back" size={21} color="rgba(255,255,255,0.55)" />
         </TouchableOpacity>
         <Text style={s.headerTitle}>TABLE THEMES</Text>
         <View style={{ width: 40 }} />
       </View>
 
-      <Text style={s.headerSub}>Select a table theme. Applies to all game modes.</Text>
+      <Text style={s.headerSub}>Applies to all game modes.</Text>
 
       <ScrollView
-        contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 32 }]}
+        contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 40 }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Active theme preview band */}
-        <View style={[s.activePreview, { borderColor: `${activeTheme.accentPrimary}44` }]}>
-          <LinearGradient
-            colors={[`${activeTheme.accentPrimary}18`, 'transparent']}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-          />
-          <Text style={s.activeLabel}>ACTIVE THEME</Text>
-          <Text style={[s.activeName, { color: activeTheme.accentPrimary }]}>
-            {activeTheme.name}
-          </Text>
-        </View>
-
-        {/* Theme cards */}
-        {ALL_TABLE_THEMES.map((t) => (
+        {ALL_TABLE_THEMES.map((t, i) => (
           <ThemeCard
             key={t.id}
             theme={t}
             isActive={t.id === activeTheme.id}
             onEquip={() => setTheme(t.id as ThemeId)}
+            index={i}
           />
         ))}
 
-        {/* Coming soon hint */}
         <View style={s.comingSoon}>
           <Text style={s.comingSoonLabel}>MORE THEMES COMING SOON</Text>
           <Text style={s.comingSoonSub}>Samurai Edge · Ice Palace · Golden Age</Text>
@@ -342,98 +379,133 @@ export default function TableThemesScreen() {
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#050010' },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingBottom: 6,
   },
   backBtn: {
-    width: 40, height: 40, borderRadius: 20,
+    width: 38, height: 38, borderRadius: 19,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
   headerTitle: {
-    color: '#e8e8ff',
-    fontSize: 14,
-    fontWeight: '800',
-    letterSpacing: 3,
+    color: '#e4e4ff',
+    fontSize: 13,
+    letterSpacing: 3.5,
     fontFamily: 'Orbitron_700Bold',
   },
   headerSub: {
-    color: 'rgba(255,255,255,0.35)',
+    color: 'rgba(255,255,255,0.28)',
     fontSize: 11,
     textAlign: 'center',
-    letterSpacing: 0.5,
-    marginBottom: 20,
+    letterSpacing: 0.4,
+    marginBottom: 22,
     marginTop: 2,
   },
-  list: { paddingHorizontal: 16, gap: 16 },
 
-  activePreview: {
+  list: { paddingHorizontal: 16, gap: 22 },
+
+  cardOuter: { borderRadius: 16, overflow: 'hidden' },
+  card: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+    backgroundColor: '#0A0018',
+  },
+
+  bannerWrap: {
+    width: '100%',
+    overflow: 'hidden',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+  },
+  bannerActiveRing: {
+    borderRadius: 0,
+    borderWidth: 1.5,
+    pointerEvents: 'none',
+  },
+
+  cardInfo: {
+    paddingHorizontal: 16,
+    paddingTop: 13,
+    paddingBottom: 14,
+  },
+  infoTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    overflow: 'hidden',
-    marginBottom: 4,
+    gap: 12,
   },
-  activeLabel: {
-    color: 'rgba(255,255,255,0.4)',
+  infoLeft: {
+    flex: 1,
+    gap: 4,
+  },
+  infoRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+
+  themeName: {
+    fontSize: 14,
+    letterSpacing: 1.8,
+    fontFamily: 'Orbitron_700Bold',
+  },
+  rarityTag: {
     fontSize: 9,
     letterSpacing: 2,
     fontFamily: 'Orbitron_400Regular',
+    marginTop: 1,
   },
-  activeName: {
-    fontSize: 13,
-    fontWeight: '800',
-    letterSpacing: 1.5,
+  description: {
+    color: 'rgba(255,255,255,0.38)',
+    fontSize: 11,
+    letterSpacing: 0.2,
+    marginTop: 3,
+  },
+
+  equippedBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    borderRadius: 50,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  equippedBtnText: {
+    fontSize: 9,
+    letterSpacing: 1.8,
     fontFamily: 'Orbitron_700Bold',
   },
 
-  card: {
-    borderRadius: 18,
-    borderWidth: 1.5,
-    overflow: 'hidden',
-    elevation: 8,
-  },
-  cardAccentLine: { height: 2, width: '100%' },
-  cardBody: { flexDirection: 'row', gap: 14, padding: 16 },
-  cardLeft: { alignItems: 'center', gap: 10 },
-  iconRing: {
-    width: 60, height: 60,
-    borderRadius: 12, borderWidth: 1.5,
-    alignItems: 'center', justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  iconBg: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
-  paletteRow: { flexDirection: 'row', gap: 5 },
-  paletteDot: { width: 10, height: 10, borderRadius: 5, borderWidth: 1 },
-  cardRight: { flex: 1, gap: 7 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  themeName: { fontSize: 14, fontWeight: '800', letterSpacing: 1.5, fontFamily: 'Orbitron_700Bold' },
-  rarityBadge: { borderRadius: 8, borderWidth: 1, paddingHorizontal: 7, paddingVertical: 2 },
-  rarityText: { fontSize: 8, fontWeight: '800', letterSpacing: 1.5, fontFamily: 'Orbitron_400Regular' },
-  themeTagline: { color: 'rgba(255,255,255,0.45)', fontSize: 11, lineHeight: 16, letterSpacing: 0.2 },
-  equippedTag: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    alignSelf: 'flex-start', borderWidth: 1, borderRadius: 8,
-    paddingHorizontal: 10, paddingVertical: 5,
-  },
-  equippedText: { fontSize: 10, fontWeight: '800', letterSpacing: 1.5, fontFamily: 'Orbitron_700Bold' },
   equipBtn: {
-    alignSelf: 'flex-start', borderWidth: 1, borderRadius: 8,
-    paddingHorizontal: 16, paddingVertical: 6, overflow: 'hidden',
+    borderRadius: 50,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
   },
-  equipBtnText: { fontSize: 10, fontWeight: '800', letterSpacing: 2, fontFamily: 'Orbitron_700Bold' },
+  equipBtnText: {
+    fontSize: 9,
+    letterSpacing: 2,
+    fontFamily: 'Orbitron_700Bold',
+  },
 
-  comingSoon: { alignItems: 'center', paddingVertical: 24, gap: 6 },
-  comingSoonLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 9, letterSpacing: 2.5, fontFamily: 'Orbitron_400Regular' },
-  comingSoonSub: { color: 'rgba(255,255,255,0.14)', fontSize: 10, letterSpacing: 0.5 },
+  comingSoon: { alignItems: 'center', paddingVertical: 28, gap: 6 },
+  comingSoonLabel: {
+    color: 'rgba(255,255,255,0.18)',
+    fontSize: 9,
+    letterSpacing: 2.5,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  comingSoonSub: {
+    color: 'rgba(255,255,255,0.11)',
+    fontSize: 10,
+    letterSpacing: 0.4,
+  },
 });

@@ -1,0 +1,354 @@
+Theme Selection Screen Redesign
+
+Completely redesign the Table Theme Selection screen. The current design feels too busy and outdated with the large icon boxes, thick borders, multiple color dots, oversized buttons, and long descriptions. I want this screen to feel like a premium game customization menu rather than a settings page.
+
+Do not redesign the overall navigation or functionality—only redesign the presentation of the theme cards.
+
+⸻
+
+Overall Design Direction
+
+Design inspiration:
+
+* Apple Wallet
+* Apple TV
+* PlayStation Store
+* Call of Duty Loadouts
+* Clash Royale cosmetics
+* Modern AAA game skin selectors
+
+The experience should feel:
+
+* Premium
+* Minimal
+* Elegant
+* Easy to browse
+* Luxury casino aesthetic
+
+There should be much more whitespace and less visual clutter.
+
+⸻
+
+Remove the Large Icon Box
+
+Completely remove the square icon box on the left.
+
+Instead, every theme card should begin with a wide panoramic preview banner (approximately 3:1 aspect ratio) that displays a miniature preview of the actual poker table.
+
+This preview should be generated from the real gameplay assets used by that theme.
+
+Do not use generic icons anymore.
+
+⸻
+
+Live Table Preview
+
+Each preview should display a simplified version of the actual table including:
+
+* Table felt/background
+* Community card area
+* Signature community card border
+* Table trim
+* Theme colors
+* Background artwork
+
+Do NOT display:
+
+* Player cards
+* Chips
+* Buttons
+* UI
+* Text overlays
+
+The preview should immediately tell the player exactly what the table looks like in-game.
+
+Examples:
+
+Vice Nights
+
+Neon cyan felt
+
+Pink community card border
+
+Palm silhouettes
+
+Subtle neon glow
+
+⸻
+
+Four Dragons
+
+Black felt
+
+Crimson dragon scales
+
+Gold trim
+
+Minimal dragon artwork
+
+⸻
+
+Royal Masquerade
+
+Deep purple velvet
+
+Gold accents
+
+Subtle masquerade patterns
+
+⸻
+
+Sakura Garden
+
+Soft pink
+
+Cherry blossom silhouettes
+
+Minimal floral artwork
+
+⸻
+
+Vercetti
+
+Minimal teal background
+
+Soft tropical line pattern
+
+Pink community card border
+
+No large illustrations
+
+⸻
+
+Card Layout
+
+Simplify every theme card.
+
+New layout:
+
+────────────────────────
+
+(Table Preview Banner)
+
+THEME NAME
+
+Rarity
+
+Short Description
+
+Equip / Equipped
+
+────────────────────────
+
+Nothing else.
+
+⸻
+
+Remove the Color Dots
+
+Remove the three palette circles underneath every icon.
+
+The preview banner already communicates the color palette.
+
+These dots are unnecessary.
+
+⸻
+
+Shorten Descriptions
+
+Current descriptions are too long.
+
+Descriptions should never exceed one line.
+
+Examples:
+
+Vice Nights
+
+Classic neon synthwave table.
+
+⸻
+
+Four Dragons
+
+Ancient crimson and gold VIP table.
+
+⸻
+
+Royal Masquerade
+
+Elegant Venetian casino theme.
+
+⸻
+
+Sakura Garden
+
+Minimal Japanese-inspired table.
+
+⸻
+
+Vercetti
+
+Minimal tropical retro table.
+
+⸻
+
+Rarity Badge
+
+Replace the large rarity pill.
+
+Instead use a small clean tag beneath the title.
+
+Examples:
+
+◆ Legendary
+
+◆ Epic
+
+◆ Rare
+
+FREE
+
+Very small.
+
+Very subtle.
+
+No oversized pills.
+
+⸻
+
+Equip Button
+
+Replace the current outlined buttons.
+
+New style:
+
+Rounded capsule button.
+
+Smaller.
+
+Cleaner.
+
+Less visual weight.
+
+Examples:
+
+Equip
+
+or
+
+✓ Equipped
+
+When equipped:
+
+* Filled button
+* Slight glow
+* Small checkmark
+
+Do not glow the entire card.
+
+⸻
+
+Equipped State
+
+When a theme is equipped:
+
+Glow only:
+
+* Preview banner
+* Equipped button
+
+Do NOT glow the entire border.
+
+The current glow is excessive.
+
+⸻
+
+Card Borders
+
+Reduce border thickness.
+
+Keep only a subtle outline using the theme accent color.
+
+No heavy glowing frames.
+
+No oversized borders.
+
+⸻
+
+Increase Spacing
+
+Increase the vertical spacing between cards.
+
+Cards should breathe.
+
+Scrolling should feel smooth and premium.
+
+⸻
+
+Background
+
+Keep the background extremely minimal.
+
+Dark purple/black.
+
+Very subtle grain texture.
+
+Soft vignette.
+
+No distracting artwork behind the cards.
+
+The focus should remain entirely on the theme previews.
+
+⸻
+
+Typography
+
+Maintain the Chip Society futuristic font.
+
+Increase hierarchy:
+
+Theme Name
+
+↓
+
+Rarity
+
+↓
+
+Description
+
+↓
+
+Button
+
+The theme name should remain the visual focus.
+
+⸻
+
+Animations
+
+When scrolling:
+
+Cards should gently fade upward into view.
+
+No dramatic animations.
+
+When equipping:
+
+Preview banner softly glows.
+
+Button transitions from “Equip” to “✓ Equipped.”
+
+Very smooth.
+
+Very premium.
+
+⸻
+
+Future Scalability
+
+Design this layout so it scales cleanly to dozens or even hundreds of themes without becoming cluttered.
+
+The new design should emphasize the actual table artwork instead of icons, making it easy for players to browse, compare, and collect themes at a glance.
+
+The final result should feel closer to browsing premium cosmetic skins in a modern AAA game than navigating a traditional settings menu.
