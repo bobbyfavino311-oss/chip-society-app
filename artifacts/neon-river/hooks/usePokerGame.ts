@@ -677,6 +677,14 @@ export function usePokerGame(
     // cancel the already-scheduled timeout. aiKeyRef prevents duplicates.
   }, [state.currentPlayerIndex, state.phase, state.numToAct, state.allInRunout]); // eslint-disable-line
 
+  // ── Unmount cleanup — kills both timers so setState never fires after nav-back
+  useEffect(() => {
+    return () => {
+      clearTimer();
+      clearAI();
+    };
+  }, []); // eslint-disable-line
+
   const startNewHand = useCallback((dealerIdx: number = 0, overrideNumAI?: number) => {
     clearTimer();
     clearAI();

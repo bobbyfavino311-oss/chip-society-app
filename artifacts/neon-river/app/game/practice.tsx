@@ -379,6 +379,10 @@ export default function PracticeScreen() {
   const [numPlayers, setNumPlayers] = useState(initialPlayers);
   const [fxEnabled, setFxEnabled] = useState(true);
 
+  // ── Mounted guard — prevents async setState after router.back() ──────────
+  const isMountedRef = useRef(true);
+  useEffect(() => { isMountedRef.current = true; return () => { isMountedRef.current = false; }; }, []);
+
   // ── Between-hand countdown ────────────────────────────────────────────────
   const [betweenSecs, setBetweenSecs]         = useState(10);
   const barAnim            = useRef(new Animated.Value(1)).current;
