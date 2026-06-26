@@ -207,8 +207,11 @@ export default function MississippiStudScreen() {
   // ── Game state ────────────────────────────────────────────────────────────
   const [phase,         setPhase]         = useState<MSPhase>('stake');
   const [stake,         setStake]         = useState<StakeTier | null>(null);
-  const [ante,          setAnte]          = useState(0);
-  const [threeCardBet,  setThreeCardBet]  = useState(0);
+  const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+  type BonusIdx = 0 | 1 | 2 | 3 | 4;
+  const [ante,           setAnte]          = useState(0);
+  const [threeCardIdx,   setThreeCardIdx]  = useState<BonusIdx>(0);
+  const [threeCardBet,   setThreeCardBet]  = useState(0);
   const [holeCards,     setHoleCards]     = useState<MSCard[]>([]);
   const [communityCards, setCommunityCards] = useState<MSCard[]>([]);
   const [commReveal,    setCommReveal]    = useState(0);   // 0-3 community cards face-up
@@ -276,7 +279,7 @@ export default function MississippiStudScreen() {
   function handleStakeSelect(tier: StakeTier) {
     setStake(tier);
     setAnte(tier.ante);              anteRef.current = tier.ante;
-    setThreeCardBet(0);              threeCardRef.current = 0;
+    setThreeCardIdx(0); setThreeCardBet(0);   threeCardRef.current = 0;
     setStreet3Bet(0);  setStreet4Bet(0);  setStreet5Bet(0);
     street3Ref.current = 0; street4Ref.current = 0; street5Ref.current = 0;
     setTotalWagered(0);              totalWageredRef.current = 0;
@@ -628,13 +631,14 @@ export default function MississippiStudScreen() {
           <>
             <TouchableOpacity
               onPress={() => {
-                const next = threeCardBet > 0 ? 0 : anteAmt;
-                setThreeCardBet(next); threeCardRef.current = next;
+                const nextIdx = ((threeCardIdx + 1) % 5) as BonusIdx;
+                const next = BONUS_STEPS[nextIdx];
+                setThreeCardIdx(nextIdx); setThreeCardBet(next); threeCardRef.current = next;
               }}
               style={[s.bonusToggle, threeCardBet > 0 && { borderColor: `${accent2}80`, backgroundColor: `${accent2}12` }]}
             >
               <Text style={[s.bonusToggleText, { color: threeCardBet > 0 ? accent2 : 'rgba(255,255,255,0.35)' }]}>
-                {threeCardBet > 0 ? `✓ THREE CARD BONUS  +${fmt(anteAmt)}` : 'ADD THREE CARD BONUS  (optional)'}
+                {threeCardBet > 0 ? `✓ THREE CARD BONUS  +${fmt(threeCardBet)}` : 'ADD THREE CARD BONUS  (optional)'}
               </Text>
             </TouchableOpacity>
             <View style={s.btnRow}>

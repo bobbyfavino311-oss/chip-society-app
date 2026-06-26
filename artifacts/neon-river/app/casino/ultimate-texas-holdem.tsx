@@ -26,7 +26,8 @@ import type { Card } from '@/lib/pokerEngine';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase = 'stake' | 'betting' | 'preflop' | 'flop' | 'turn_river' | 'showdown' | 'result';
-type TripsMult = 0 | 1 | 2 | 3;
+const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+type TripsMult = 0 | 1 | 2 | 3 | 4;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function fmt(n: number): string {
@@ -145,11 +146,10 @@ function BetCircle({ label, amount, active, accent = '#ffd700', small = false }:
   );
 }
 
-function TripsBetCircle({ mult, ante, onCycle, disabled }: {
-  mult: TripsMult; ante: number; onCycle: () => void; disabled: boolean;
+function TripsBetCircle({ mult, amount, onCycle, disabled }: {
+  mult: TripsMult; amount: number; onCycle: () => void; disabled: boolean;
 }) {
   const active = mult > 0;
-  const amount = ante * mult;
   const accent = '#bf5fff';
   return (
     <TouchableOpacity onPress={onCycle} disabled={disabled} activeOpacity={0.75}>
@@ -161,7 +161,6 @@ function TripsBetCircle({ mult, ante, onCycle, disabled }: {
         <Text style={[bc.amt, { color: active ? accent : `${accent}45`, fontSize: 11 }]}>
           {active ? fmt(amount) : '—'}
         </Text>
-        {active && <Text style={[bc.multBadge, { color: `${accent}99` }]}>{mult}×</Text>}
       </View>
     </TouchableOpacity>
   );
@@ -321,7 +320,7 @@ export default function UltimateTexasHoldemScreen() {
 
   // ── Derived values ──────────────────────────────────────────────────────────
   const ante       = selectedTier?.ante ?? 0;
-  const tripsBet   = ante * tripsMult;
+  const tripsBet   = BONUS_STEPS[tripsMult];
   const totalCost  = ante + ante + tripsBet; // ante + blind + trips upfront
   const canDeal    = ante > 0 && profile.chips >= totalCost && !busy;
   const liveCommunity = deal?.community.slice(0, communityCount) ?? [];
@@ -333,8 +332,8 @@ export default function UltimateTexasHoldemScreen() {
   const cycleTrips = useCallback(() => {
     if (phase !== 'betting' || busy) return;
     Haptics.selectionAsync();
-    const next = ((tripsMult + 1) % 4) as TripsMult;
-    const costIfNext = ante + ante + ante * next;
+    const next = ((tripsMult + 1) % 5) as TripsMult;
+    const costIfNext = ante + ante + BONUS_STEPS[next];
     setTripsMult(next > 0 && costIfNext > profile.chips ? 0 : next);
   }, [phase, busy, tripsMult, ante, profile.chips]);
 
@@ -621,7 +620,7 @@ export default function UltimateTexasHoldemScreen() {
         <View style={s.betCirclesRow}>
           <TripsBetCircle
             mult={tripsMult}
-            ante={ante}
+            amount={tripsBet}
             onCycle={cycleTrips}
             disabled={phase !== 'betting' || busy}
           />

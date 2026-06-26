@@ -26,7 +26,8 @@ import type { Card } from '@/lib/pokerEngine';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase   = 'betting' | 'action' | 'result';
-type Mult    = 0 | 1 | 2 | 3;
+const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+type BonusIdx = 0 | 1 | 2 | 3 | 4;
 
 interface TCPResult {
   playerEval:     ThreeCardEval;
@@ -137,19 +138,17 @@ function BetCircle({ label, amount, active }: { label: string; amount: number; a
   );
 }
 
-// ─── Side-bet circle (tappable, cycles 0→1x→2x→0) ───────────────────────────
+// ─── Side-bet circle (tappable, cycles 0→250K→500K→750K→1M→0) ───────────────
 function SideBetCircle({
-  label, mult, anteBet, onCycle, disabled,
-}: { label: string; mult: Mult; anteBet: number; onCycle: () => void; disabled: boolean }) {
-  const active = mult > 0;
-  const amount = anteBet * mult;
+  label, amount, onCycle, disabled,
+}: { label: string; amount: number; onCycle: () => void; disabled: boolean }) {
+  const active = amount > 0;
   return (
     <TouchableOpacity onPress={onCycle} disabled={disabled} activeOpacity={0.75}>
       <View style={[circ.wrap, active && circ.active, disabled && !active && { opacity: 0.5 }]}>
         {active && <LinearGradient colors={['rgba(255,215,0,0.2)', 'transparent']} style={StyleSheet.absoluteFill} />}
         <Text style={circ.lbl} numberOfLines={2} adjustsFontSizeToFit>{label}</Text>
         <Text style={[circ.amt, active && circ.amtActive]}>{active ? fmt(amount) : '—'}</Text>
-        {active && <Text style={circ.multBadge}>{mult}×</Text>}
       </View>
     </TouchableOpacity>
   );
@@ -264,15 +263,17 @@ export default function ThreeCardPokerScreen() {
   const [selectedTier,   setSelectedTier]   = useState<StakeTier | null>(null);
 
   const [phase,          setPhase]          = useState<Phase>('betting');
-  const [ppMult,         setPpMult]         = useState<Mult>(0);
-  const [scMult,         setScMult]         = useState<Mult>(0);
+  const [ppMult,         setPpMult]         = useState<BonusIdx>(0);
+  const [scMult,         setScMult]         = useState<BonusIdx>(0);
   const [playerCards,    setPlayerCards]    = useState<Card[]>([]);
   const [dealerCards,    setDealerCards]    = useState<Card[]>([]);
   const [dealerRevealed, setDealerRevealed] = useState(false);
   const [result,         setResult]         = useState<TCPResult | null>(null);
   const [lastAnte,       setLastAnte]       = useState(0);
-  const [lastPpMult,     setLastPpMult]     = useState<Mult>(0);
-  const [lastScMult,     setLastScMult]     = useState<Mult>(0);
+  const [lastPpMult,     setLastPpMult]     = useState<BonusIdx>(0);
+  const [lastScMult,     setLastScMult]     = useState<BonusIdx>(0);
+  const [lastPpBet,      setLastPpBet]      = useState(0);
+  const [lastScBet,      setLastScBet]      = useState(0);
   const [busy,           setBusy]           = useState(false);
   const [showPT,         setShowPT]         = useState(false);
   const [played,         setPlayed]         = useState(false);
@@ -280,8 +281,8 @@ export default function ThreeCardPokerScreen() {
   // Ante is always derived from the selected stake tier
   const anteBet = selectedTier?.ante ?? 0;
 
-  const ppBet         = anteBet * ppMult;
-  const scBet         = anteBet * scMult;
+  const ppBet         = BONUS_STEPS[ppMult];
+  const scBet         = BONUS_STEPS[scMult];
   const dealCost      = anteBet + ppBet + scBet;
   // Always reserve one extra anteBet for the Play wager so the player
   // is never forced to fold simply because side bets consumed all chips.
@@ -289,21 +290,20 @@ export default function ThreeCardPokerScreen() {
   const canDeal       = anteBet > 0 && profile.chips >= totalRequired && !busy;
   const canPlay       = !busy && profile.chips >= anteBet;
 
-  // ── Cycle side-bet multiplier (skip any amount that would eat the play reserve) ──
+  // ── Cycle side-bet (fixed steps: 0 → 250K → 500K → 750K → 1M → 0) ──────────
   const cyclePP = useCallback(() => {
     if (phase !== 'betting' || busy) return;
     Haptics.selectionAsync();
-    const next = ((ppMult + 1) % 4) as Mult;
-    // If increasing would leave < anteBet for play, wrap to 0 (off)
-    const costIfNext = anteBet + anteBet * next + scBet + anteBet;
+    const next = ((ppMult + 1) % 5) as BonusIdx;
+    const costIfNext = anteBet + BONUS_STEPS[next] + scBet + anteBet;
     setPpMult(next > 0 && costIfNext > profile.chips ? 0 : next);
   }, [phase, busy, ppMult, anteBet, scBet, profile.chips]);
 
   const cycleSC = useCallback(() => {
     if (phase !== 'betting' || busy) return;
     Haptics.selectionAsync();
-    const next = ((scMult + 1) % 4) as Mult;
-    const costIfNext = anteBet + ppBet + anteBet * next + anteBet;
+    const next = ((scMult + 1) % 5) as BonusIdx;
+    const costIfNext = anteBet + ppBet + BONUS_STEPS[next] + anteBet;
     setScMult(next > 0 && costIfNext > profile.chips ? 0 : next);
   }, [phase, busy, scMult, anteBet, ppBet, profile.chips]);
 
@@ -323,6 +323,8 @@ export default function ThreeCardPokerScreen() {
     setLastAnte(anteBet);
     setLastPpMult(ppMult);
     setLastScMult(scMult);
+    setLastPpBet(ppBet);
+    setLastScBet(scBet);
     setPhase('action');
     setBusy(false);
   }, [canDeal, dealCost, anteBet, ppMult, scMult, removeChips]);
@@ -563,8 +565,7 @@ export default function ThreeCardPokerScreen() {
           <View style={gs.circleRow}>
             <SideBetCircle
               label={'PAIR\nPLUS'}
-              mult={phase === 'betting' ? ppMult : lastPpMult}
-              anteBet={phase === 'betting' ? anteBet : lastAnte}
+              amount={phase === 'betting' ? ppBet : lastPpBet}
               onCycle={cyclePP}
               disabled={phase !== 'betting'}
             />
@@ -580,8 +581,7 @@ export default function ThreeCardPokerScreen() {
             />
             <SideBetCircle
               label={'6 CARD\nBONUS'}
-              mult={phase === 'betting' ? scMult : lastScMult}
-              anteBet={phase === 'betting' ? anteBet : lastAnte}
+              amount={phase === 'betting' ? scBet : lastScBet}
               onCycle={cycleSC}
               disabled={phase !== 'betting'}
             />
@@ -697,11 +697,11 @@ export default function ThreeCardPokerScreen() {
               />
 
               {/* PAIR PLUS — only if bet was placed */}
-              {lastPpMult > 0 && (
+              {lastPpBet > 0 && (
                 <ResultRow
                   label="PAIR PLUS"
                   outcome={result.pairPlusWin > 0 ? 'win' : 'loss'}
-                  amount={Math.abs(result.pairPlusWin) || lastAnte * lastPpMult}
+                  amount={Math.abs(result.pairPlusWin) || lastPpBet}
                   sub={result.playerEval.label}
                 />
               )}
@@ -718,7 +718,7 @@ export default function ThreeCardPokerScreen() {
               )}
 
               {/* 6 CARD BONUS — only if bet was placed */}
-              {lastScMult > 0 && (
+              {lastScBet > 0 && (
                 <ResultRow
                   label="6 CARD BONUS"
                   outcome={
@@ -728,8 +728,8 @@ export default function ThreeCardPokerScreen() {
                   }
                   amount={
                     result.comparison === 'fold'
-                      ? lastAnte * lastScMult
-                      : Math.abs(result.sixCardWin) || lastAnte * lastScMult
+                      ? lastScBet
+                      : Math.abs(result.sixCardWin) || lastScBet
                   }
                   sub={result.comparison !== 'fold' ? (result.sixCardEval?.label ?? undefined) : undefined}
                   accent={result.sixCardWin > 0 ? '#bf5fff' : undefined}
@@ -762,7 +762,7 @@ export default function ThreeCardPokerScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={[gs.tableTierName, { color: selectedTier.color }]}>{selectedTier.label} TABLE</Text>
                 <Text style={gs.tableAnteInfo}>
-                  ANTE {fmt(anteBet)} · PAIR+ up to {fmt(anteBet * 2)} · 6CB up to {fmt(anteBet * 2)}
+                  ANTE {fmt(anteBet)} · PAIR+ up to 1M · 6CB up to 1M
                 </Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedTier(null)} style={gs.changeTableBtn} activeOpacity={0.75}>
@@ -846,7 +846,7 @@ export default function ThreeCardPokerScreen() {
               <View style={{ alignItems: 'center', gap: 2 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Ionicons name="refresh" size={13} color="#000" />
-                  <Text style={gs.playBtnText}>REBET  {fmt(lastAnte + lastAnte * lastPpMult + lastAnte * lastScMult)}</Text>
+                  <Text style={gs.playBtnText}>REBET  {fmt(lastAnte + lastPpBet + lastScBet)}</Text>
                 </View>
                 <Text style={gs.playBtnSub}>Repeat last wager</Text>
               </View>

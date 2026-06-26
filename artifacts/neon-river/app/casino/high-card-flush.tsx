@@ -197,10 +197,10 @@ function CardFan({
   anims: Animated.Value[];
   flushSuit?: string;
   revealCount?: number;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'casino' | 'md';
 }) {
   const count = cards.length || 7;
-  const OVERLAP = size === 'sm' ? -10 : -14;
+  const OVERLAP = size === 'casino' ? -11 : size === 'sm' ? -10 : -14;
 
   return (
     <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
@@ -224,7 +224,7 @@ function CardFan({
               {card ? (
                 <PlayingCard card={card} faceDown={!revealed} size={size} />
               ) : (
-                <View style={{ width: size === 'sm' ? 32 : 46, height: size === 'sm' ? 46 : 64, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderStyle: 'dashed' }} />
+                <View style={{ width: size === 'casino' ? 37 : size === 'sm' ? 32 : 46, height: size === 'casino' ? 53 : size === 'sm' ? 46 : 64, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderStyle: 'dashed' }} />
               )}
             </View>
           </Animated.View>
@@ -244,9 +244,13 @@ export default function HighCardFlushScreen() {
   const accent2 = theme.accentSecondary || '#bf5fff';
 
   // ── Game state ────────────────────────────────────────────────────────────
+  const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+  type BonusIdx = 0 | 1 | 2 | 3 | 4;
   const [phase,           setPhase]           = useState<HCFPhase>('stake');
   const [stake,           setStake]           = useState<StakeTier | null>(null);
   const [ante,            setAnte]            = useState(0);
+  const [flushBonusIdx,   setFlushBonusIdx]   = useState<BonusIdx>(0);
+  const [sfBonusIdx,      setSfBonusIdx]      = useState<BonusIdx>(0);
   const [flushBonusBet,   setFlushBonusBet]   = useState(0);
   const [sfBonusBet,      setSfBonusBet]      = useState(0);
   const [playerCards,     setPlayerCards]     = useState<HCFCard[]>([]);
@@ -310,8 +314,8 @@ export default function HighCardFlushScreen() {
   function handleStakeSelect(tier: StakeTier) {
     setStake(tier);
     setAnte(tier.ante);            anteRef.current = tier.ante;
-    setFlushBonusBet(0);           flushBonusBetRef.current = 0;
-    setSfBonusBet(0);              sfBonusBetRef.current = 0;
+    setFlushBonusIdx(0); setFlushBonusBet(0); flushBonusBetRef.current = 0;
+    setSfBonusIdx(0);    setSfBonusBet(0);    sfBonusBetRef.current = 0;
     setTotalWagered(0);            totalWageredRef.current = 0;
     setRaiseMult(1);               raiseMultRef.current = 1;
     setFolded(false);              foldedRef.current = false;
@@ -434,8 +438,8 @@ export default function HighCardFlushScreen() {
     setFolded(false);       foldedRef.current = false;
     setResult(null);
     setBusy(false);
-    setFlushBonusBet(0);    flushBonusBetRef.current = 0;
-    setSfBonusBet(0);       sfBonusBetRef.current = 0;
+    setFlushBonusIdx(0); setFlushBonusBet(0);    flushBonusBetRef.current = 0;
+    setSfBonusIdx(0);    setSfBonusBet(0);       sfBonusBetRef.current = 0;
     setPhase('betting');
   }
 
@@ -501,6 +505,7 @@ export default function HighCardFlushScreen() {
                 cards={dealerCards}
                 anims={dAnims}
                 revealCount={dealerReveal}
+                size="casino"
               />
               {phase === 'result' && result && (
                 <View style={[s.qualBadge, {
@@ -523,7 +528,7 @@ export default function HighCardFlushScreen() {
           ) : (
             <View style={s.emptyRow}>
               {Array.from({ length: 7 }).map((_, i) => (
-                <View key={i} style={[s.cardSlot, { marginRight: i < 6 ? -10 : 0 }]} />
+                <View key={i} style={[s.cardSlot, { marginRight: i < 6 ? -11 : 0 }]} />
               ))}
             </View>
           )}
@@ -569,6 +574,7 @@ export default function HighCardFlushScreen() {
                 cards={playerCards}
                 anims={pAnims}
                 flushSuit={playerFlush?.suit}
+                size="casino"
               />
               <Text style={[s.areaLabel, { marginTop: 6 }]}>
                 {phase === 'decision' && playerFlush
@@ -580,7 +586,7 @@ export default function HighCardFlushScreen() {
             <>
               <View style={s.emptyRow}>
                 {Array.from({ length: 7 }).map((_, i) => (
-                  <View key={i} style={[s.cardSlot, { marginRight: i < 6 ? -10 : 0 }]} />
+                  <View key={i} style={[s.cardSlot, { marginRight: i < 6 ? -11 : 0 }]} />
                 ))}
               </View>
               <Text style={s.areaLabel}>YOUR HAND</Text>
@@ -639,24 +645,26 @@ export default function HighCardFlushScreen() {
             <View style={s.bonusToggles}>
               <TouchableOpacity
                 onPress={() => {
-                  const next = flushBonusBet > 0 ? 0 : anteAmt;
-                  setFlushBonusBet(next); flushBonusBetRef.current = next;
+                  const nextIdx = ((flushBonusIdx + 1) % 5) as BonusIdx;
+                  const next = BONUS_STEPS[nextIdx];
+                  setFlushBonusIdx(nextIdx); setFlushBonusBet(next); flushBonusBetRef.current = next;
                 }}
                 style={[s.bonusToggle, flushBonusBet > 0 && { borderColor: `${'#ffd700'}80`, backgroundColor: '#ffd70012' }]}
               >
                 <Text style={[s.bonusToggleText, { color: flushBonusBet > 0 ? '#ffd700' : 'rgba(255,255,255,0.35)' }]}>
-                  {flushBonusBet > 0 ? `✓ FLUSH BONUS  +${fmt(anteAmt)}` : 'ADD FLUSH BONUS  (optional)'}
+                  {flushBonusBet > 0 ? `✓ FLUSH BONUS  +${fmt(flushBonusBet)}` : 'ADD FLUSH BONUS  (optional)'}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  const next = sfBonusBet > 0 ? 0 : anteAmt;
-                  setSfBonusBet(next); sfBonusBetRef.current = next;
+                  const nextIdx = ((sfBonusIdx + 1) % 5) as BonusIdx;
+                  const next = BONUS_STEPS[nextIdx];
+                  setSfBonusIdx(nextIdx); setSfBonusBet(next); sfBonusBetRef.current = next;
                 }}
                 style={[s.bonusToggle, sfBonusBet > 0 && { borderColor: `${accent2}80`, backgroundColor: `${accent2}12` }]}
               >
                 <Text style={[s.bonusToggleText, { color: sfBonusBet > 0 ? accent2 : 'rgba(255,255,255,0.35)' }]}>
-                  {sfBonusBet > 0 ? `✓ SF BONUS  +${fmt(anteAmt)}` : 'ADD STRAIGHT FLUSH BONUS  (optional)'}
+                  {sfBonusBet > 0 ? `✓ SF BONUS  +${fmt(sfBonusBet)}` : 'ADD STRAIGHT FLUSH BONUS  (optional)'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -787,7 +795,7 @@ const s = StyleSheet.create({
   qualText:    { fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 1, textAlign: 'center', color: 'rgba(255,255,255,0.3)' },
 
   emptyRow:    { flexDirection: 'row', alignSelf: 'center' },
-  cardSlot:    { width: 32, height: 46, borderRadius: 5, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', borderStyle: 'dashed' },
+  cardSlot:    { width: 37, height: 53, borderRadius: 5, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', borderStyle: 'dashed' },
 
   centerBadge:     { alignItems: 'center', paddingVertical: 4 },
   centerBadgeText: { fontSize: 13, fontFamily: 'Orbitron_900Black', letterSpacing: 1.5 },

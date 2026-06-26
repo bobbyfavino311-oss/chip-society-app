@@ -1,0 +1,188 @@
+UI POLISH & BETTING SYSTEM UPDATE
+
+Implement the following refinements across the entire Chip Society platform.
+
+⸻
+
+1. REDESIGN THE JOKER CARD
+
+The current Joker card is not acceptable.
+
+Problems:
+
+* It contains the word “JOKER.”
+* The current icon does not resemble a real jester hat.
+* It looks inconsistent with the premium Chip Society card deck.
+
+New Design Requirements
+
+Use the attached reference as the inspiration.
+
+The new Joker card should feature:
+
+* White playing card.
+* Thin black border matching the standard deck.
+* Large black Jester Hat centered on the card.
+* No “JOKER” lettering anywhere on the card.
+* No letters in the corners.
+* No numbers.
+* No suit icons.
+* No extra artwork.
+* No gradients.
+* No clown face.
+* No decorative flourishes.
+
+The card should simply display the large black jester hat symbol centered on a clean white card.
+
+This minimalist design should become the official Joker card used throughout Joker Hold’em.
+
+⸻
+
+2. ENLARGE PLAYING CARDS IN HIGH CARD FLUSH
+
+The current cards are too small.
+
+Although the layout is clean, players need to recognize cards instantly while playing.
+
+Increase the size of both:
+
+* Dealer’s seven cards
+* Player’s seven cards
+
+Increase each card by approximately 10–15%.
+
+Requirements:
+
+* Keep the spacing between cards proportional.
+* Do not create overlap.
+* Maintain the same layout.
+* Preserve all animations.
+* Ensure every card remains fully visible.
+
+The goal is simply to improve readability while preserving the elegant, minimalist look of the table.
+
+⸻
+
+3. STANDARDIZE BET LIMITS ACROSS ALL CASINO GAMES
+
+Increase the betting limits across every Casino Game so they remain consistent throughout the app.
+
+⸻
+
+ANTE BET
+
+Current:
+
+Minimum: 250K
+
+Maximum: 250K
+
+Change to:
+
+Minimum: 250K
+
+Maximum: 500K
+
+Every game that includes an Ante wager should support:
+
+250K
+
+500K
+
+⸻
+
+BONUS WAGERS
+
+Current maximum bonus wagers are inconsistent.
+
+Standardize every optional bonus wager across all Casino Games.
+
+Examples include:
+
+* Trips
+* Tie Bet
+* Flush Bonus
+* Straight Flush Bonus
+* Blind Bonus
+* Pair Plus
+* 6 Card Bonus
+* Lucky Bonus
+* Any future optional side wager
+
+New limits:
+
+Minimum:
+
+250K
+
+Maximum:
+
+1M
+
+The betting controls should smoothly cycle through all supported values.
+
+Example progression:
+
+250K
+
+500K
+
+750K
+
+1M
+
+No bonus wager should exceed 1M.
+
+⸻
+
+4. KEEP ALL CASINO GAMES CONSISTENT
+
+Every Casino Game should now follow the same wagering rules unless that game’s mechanics explicitly require otherwise.
+
+Standard:
+
+Ante
+
+• Minimum: 250K
+• Maximum: 500K
+
+Bonus Bets
+
+• Minimum: 250K
+• Maximum: 1M
+
+This creates a consistent betting experience throughout the entire Casino Games section.
+
+⸻
+
+5. VERIFY ALL BETTING LOGIC
+
+After increasing the limits, verify that every system continues functioning correctly.
+
+Check:
+
+* Chip deduction
+* Bet placement
+* Bet validation
+* Maximum bet enforcement
+* Payout calculations
+* Side-bet payouts
+* AI betting logic
+* Multiplayer synchronization
+* Admin chip adjustments
+* Statistics tracking
+* Achievement tracking
+
+No game should contain hardcoded references to the previous 250K or 750K limits.
+
+Update all validation rules, UI displays, sliders, betting buttons, animations, and payout logic to support the new standardized limits.
+
+⸻
+
+DESIGN GOAL
+
+These changes are intended to make Chip Society feel more polished, consistent, and easier to read during gameplay.
+
+* The Joker card should become an instantly recognizable premium icon using only a clean black jester hat.
+* High Card Flush should have slightly larger cards for faster recognition without disrupting the layout.
+* Every Casino Game should share the same betting limits, creating a consistent experience across the entire casino section.

@@ -8,16 +8,17 @@ import { useTableTheme } from '../context/TableThemeContext';
 interface PlayingCardProps {
   card?: Card;
   faceDown?: boolean;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'casino' | 'md' | 'lg' | 'xl';
   highlighted?: boolean;
   animated?: boolean;
 }
 
 const SIZES = {
-  sm:  { w: 32,  h: 46,  valFont: 14, suitFont: 11, radius: 6  },
-  md:  { w: 46,  h: 64,  valFont: 20, suitFont: 15, radius: 8  },
-  lg:  { w: 60,  h: 84,  valFont: 26, suitFont: 20, radius: 10 },
-  xl:  { w: 76,  h: 106, valFont: 34, suitFont: 26, radius: 13 },
+  sm:     { w: 32,  h: 46,  valFont: 14, suitFont: 11, radius: 6  },
+  casino: { w: 37,  h: 53,  valFont: 16, suitFont: 13, radius: 7  },
+  md:     { w: 46,  h: 64,  valFont: 20, suitFont: 15, radius: 8  },
+  lg:     { w: 60,  h: 84,  valFont: 26, suitFont: 20, radius: 10 },
+  xl:     { w: 76,  h: 106, valFont: 34, suitFont: 26, radius: 13 },
 };
 
 // ─── Neon mandala card back ────────────────────────────────────────────────────
@@ -437,34 +438,26 @@ function CrimsonSilkBack({ w, h, r }: { w: number; h: number; r: number }) {
 
 // ─── Joker card face ──────────────────────────────────────────────────────────
 function JokerFace({ w, h }: { w: number; h: number }) {
-  const fs = Math.max(4, Math.round(h * 0.062));
-  const lh = fs * 1.28;
-  const pad = Math.max(2, Math.round(w * 0.1));
   return (
-    <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'space-between', paddingVertical: h * 0.06 }]}>
-      {/* Top-left JOKER letters */}
-      <View style={{ alignSelf: 'flex-start', paddingLeft: pad }}>
-        {['J','O','K','E','R'].map((ch, i) => (
-          <Text key={i} style={{ fontSize: fs, fontWeight: '900', color: '#111', lineHeight: lh, includeFontPadding: false }}>{ch}</Text>
-        ))}
-      </View>
-      {/* Jester hat silhouette */}
-      <Svg width={w * 0.68} height={h * 0.40} viewBox="0 0 100 120">
-        <Ellipse cx={22} cy={44} rx={15} ry={24} fill="#1a1a1a" />
-        <Ellipse cx={50} cy={34} rx={16} ry={32} fill="#1a1a1a" />
-        <Ellipse cx={78} cy={44} rx={15} ry={24} fill="#1a1a1a" />
-        <Rect x={9} y={58} width={82} height={14} fill="#1a1a1a" />
-        <Rect x={2} y={70} width={96} height={12} rx={5} fill="#1a1a1a" />
-        <Circle cx={22} cy={20} r={6} fill="white" />
-        <Circle cx={50} cy={2} r={6} fill="white" />
-        <Circle cx={78} cy={20} r={6} fill="white" />
+    <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+      <Svg width={w * 0.84} height={h * 0.74} viewBox="0 0 100 110">
+        {/* Left prong */}
+        <Ellipse cx={24} cy={47} rx={9} ry={24} fill="#111" transform="rotate(-28 24 47)" />
+        {/* Center prong */}
+        <Ellipse cx={50} cy={43} rx={9} ry={26} fill="#111" />
+        {/* Right prong */}
+        <Ellipse cx={76} cy={47} rx={9} ry={24} fill="#111" transform="rotate(28 76 47)" />
+        {/* Left bell */}
+        <Circle cx={13} cy={15} r={11} fill="#111" />
+        {/* Center bell */}
+        <Circle cx={50} cy={11} r={11} fill="#111" />
+        {/* Right bell */}
+        <Circle cx={87} cy={15} r={11} fill="#111" />
+        {/* Hat band */}
+        <Rect x={11} y={63} width={78} height={12} fill="#111" />
+        {/* Brim */}
+        <Rect x={2} y={73} width={96} height={15} rx={5} fill="#111" />
       </Svg>
-      {/* Bottom-right JOKER letters (rotated 180°) */}
-      <View style={{ alignSelf: 'flex-end', paddingRight: pad, transform: [{ rotate: '180deg' }] }}>
-        {['J','O','K','E','R'].map((ch, i) => (
-          <Text key={i} style={{ fontSize: fs, fontWeight: '900', color: '#111', lineHeight: lh, includeFontPadding: false }}>{ch}</Text>
-        ))}
-      </View>
     </View>
   );
 }

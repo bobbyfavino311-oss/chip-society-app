@@ -239,7 +239,9 @@ export default function LetItRideScreen() {
   const [phase,         setPhase]         = useState<LIRPhase>('stake');
   const [stake,         setStake]         = useState<StakeTier | null>(null);
   const [ante,          setAnte]          = useState(0);
-  const [bonusMult,     setBonusMult]     = useState<0|1>(0);  // 0=off, 1=on (1x ante)
+  const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+  type BonusIdx = 0 | 1 | 2 | 3 | 4;
+  const [bonusMult,     setBonusMult]     = useState<BonusIdx>(0);
   const [playerCards,   setPlayerCards]   = useState<LIRCard[]>([]);
   const [community,     setCommunity]     = useState<LIRCard[]>([]);
   const [communityReveal, setCommunityReveal] = useState(0);   // 0,1,2 cards revealed
@@ -315,7 +317,7 @@ export default function LetItRideScreen() {
   // ── Deal ──────────────────────────────────────────────────────────────────
   const handleDeal = useCallback(async () => {
     if (!stake || busy) return;
-    const bonusBet  = bonusMult * ante;
+    const bonusBet  = BONUS_STEPS[bonusMult];
     const totalBet  = 3 * ante + bonusBet;
     if (profile.chips < totalBet) return;
 
@@ -417,7 +419,7 @@ export default function LetItRideScreen() {
       [cc[0], cc[1]],
     );
     const activeBets = 1 + (b1 ? 1 : 0) + (b2 ? 1 : 0);
-    const bonusBet   = bonusMult * ante;
+    const bonusBet   = BONUS_STEPS[bonusMult];
     const res = resolveLetItRide({ hand, activeBets, ante, bonusBet });
     setResult(res);
 
@@ -455,7 +457,7 @@ export default function LetItRideScreen() {
   }
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  const bonusBet     = bonusMult * ante;
+  const bonusBet     = BONUS_STEPS[bonusMult];
   const totalBet     = 3 * ante + bonusBet;
   const canAfford    = profile.chips >= totalBet;
   const isBusted     = profile.chips < (stake?.ante ?? 0);
@@ -612,11 +614,11 @@ export default function LetItRideScreen() {
         {phase === 'betting' && (
           <>
             <TouchableOpacity
-              onPress={() => setBonusMult(m => (m === 0 ? 1 : 0))}
+              onPress={() => setBonusMult(m => ((m + 1) % 5) as BonusIdx)}
               style={[s.bonusToggle, bonusMult > 0 && { borderColor: `${accent2}80`, backgroundColor: `${accent2}12` }]}
             >
               <Text style={[s.bonusToggleText, { color: bonusMult > 0 ? accent2 : 'rgba(255,255,255,0.35)' }]}>
-                {bonusMult > 0 ? `✓ BONUS BET  +${fmt(ante)}` : 'ADD BONUS BET  (optional)'}
+                {bonusMult > 0 ? `✓ BONUS BET  +${fmt(bonusBet)}` : 'ADD BONUS BET  (optional)'}
               </Text>
             </TouchableOpacity>
             <View style={s.btnRow}>

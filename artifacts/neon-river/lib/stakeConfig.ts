@@ -1,4 +1,4 @@
-export type StakeTierKey = 'micro' | 'low' | 'standard' | 'highroller' | 'vip' | 'elite';
+export type StakeTierKey = 'micro' | 'low' | 'standard' | 'highroller' | 'vip' | 'elite' | 'elite_plus';
 
 export interface StakeTier {
   key:         StakeTierKey;
@@ -33,6 +33,10 @@ export const STAKE_TIERS: StakeTier[] = [
   {
     key: 'elite', label: 'ELITE', sublabel: 'Legends Only',
     minBankroll: 25_000_000, ante: 250_000, color: '#bf5fff',
+  },
+  {
+    key: 'elite_plus', label: 'ELITE+', sublabel: 'Ultra High Stakes',
+    minBankroll: 50_000_000, ante: 500_000, color: '#ffd700',
   },
 ];
 

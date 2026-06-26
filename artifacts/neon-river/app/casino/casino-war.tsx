@@ -214,8 +214,10 @@ export default function CasinoWarScreen() {
   // ── Phase / game state ───────────────────────────────────────────────────────
   const [phase,         setPhase]         = useState<Phase>('stake');
   const [stake,         setStake]         = useState<StakeTier | null>(null);
+  const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+  type TieBetIdx = 0 | 1 | 2 | 3 | 4;
   const [ante,          setAnte]          = useState(0);
-  const [tieBetMult,    setTieBetMult]    = useState<0|1|2|3>(0);
+  const [tieBetMult,    setTieBetMult]    = useState<TieBetIdx>(0);
   const [deck,          setDeck]          = useState<CWCard[]>([]);
   const [playerCard,    setPlayerCard]    = useState<CWCard | null>(null);
   const [dealerCard,    setDealerCard]    = useState<CWCard | null>(null);
@@ -310,7 +312,7 @@ export default function CasinoWarScreen() {
   // ── Deal ─────────────────────────────────────────────────────────────────────
   const handleDeal = useCallback(async () => {
     if (!stake) return;
-    const tieBet   = tieBetMult * ante;
+    const tieBet   = BONUS_STEPS[tieBetMult];
     const totalBet = ante + tieBet;
     if (profile.chips < totalBet) return;
 
@@ -354,7 +356,7 @@ export default function CasinoWarScreen() {
   // ── War: Surrender ────────────────────────────────────────────────────────────
   const handleSurrender = useCallback(() => {
     if (!outcome) return;
-    const tieBet = tieBetMult * ante;
+    const tieBet = BONUS_STEPS[tieBetMult];
     const res = resolveCasinoWar({ outcome, isSurrender: true, ante, tieBet });
     setResult(res);
     setWinner(null);
@@ -386,7 +388,7 @@ export default function CasinoWarScreen() {
     await animateWarCards();
     await sleep(400);
 
-    const tieBet = tieBetMult * ante;
+    const tieBet = BONUS_STEPS[tieBetMult];
     const res = resolveCasinoWar({ outcome, warOutcome: wo, ante, tieBet });
     setResult(res);
     // Return: newTotalWagered + netChips (settles all bets cleanly)
@@ -423,7 +425,7 @@ export default function CasinoWarScreen() {
   }, [isMusicMuted]);
 
   // ─── Derived ──────────────────────────────────────────────────────────────────
-  const tieBet      = tieBetMult * ante;
+  const tieBet      = BONUS_STEPS[tieBetMult];
   const totalBet    = ante + tieBet;
   const canAfford   = profile.chips >= totalBet;
   const isBusted    = profile.chips < (stake?.ante ?? 0);
@@ -580,7 +582,7 @@ export default function CasinoWarScreen() {
               active={tieBetMult > 0}
               accent={accent2}
               sub={phase === 'betting' ? 'TAP TO SET' : undefined}
-              onPress={phase === 'betting' ? () => setTieBetMult(m => ((m + 1) % 4) as 0|1|2|3) : undefined}
+              onPress={phase === 'betting' ? () => setTieBetMult(m => ((m + 1) % 5) as TieBetIdx) : undefined}
             />
             <BetCircle
               label="ANTE"
