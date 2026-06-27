@@ -99,7 +99,7 @@ export const blocksTable = pgTable('blocks', {
 
 export const feedPostsTable = pgTable('feed_posts', {
   id:           text('id').primaryKey(),
-  authorId:     text('author_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  authorId:     text('author_id').notNull(),
   content:      text('content').notNull(),
   tag:          text('tag').notNull().default('WIN'),
   pot:          text('pot'),
@@ -111,14 +111,14 @@ export const feedPostsTable = pgTable('feed_posts', {
 
 export const postLikesTable = pgTable('post_likes', {
   postId:    text('post_id').notNull().references(() => feedPostsTable.id, { onDelete: 'cascade' }),
-  playerId:  text('player_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  playerId:  text('player_id').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (t) => [primaryKey({ columns: [t.postId, t.playerId] })]);
 
 export const postCommentsTable = pgTable('post_comments', {
   id:        text('id').primaryKey(),
   postId:    text('post_id').notNull().references(() => feedPostsTable.id, { onDelete: 'cascade' }),
-  authorId:  text('author_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  authorId:  text('author_id').notNull(),
   text:      text('text').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
