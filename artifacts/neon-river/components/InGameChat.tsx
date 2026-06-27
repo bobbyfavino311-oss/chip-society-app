@@ -47,6 +47,7 @@ export function useInGameChat() {
   const [presetsOnly,  setPresetsOnly]  = useState(false);
   const [input,        setInput]        = useState('');
   const [bubbles,      setBubbles]      = useState<Record<string, BubbleEntry>>({});
+  const [latestToast,  setLatestToast]  = useState<TableToastEntry | undefined>(undefined);
 
   const lastSendMs = useRef(0);
   const lastText   = useRef('');
@@ -77,9 +78,10 @@ export function useInGameChat() {
       return next.length > MAX_MESSAGES ? next.slice(next.length - MAX_MESSAGES) : next;
     });
 
-    // Floating bubble above player seat
+    // Floating bubble above player seat + table toast
     const bubbleId = `${msg.playerId}-${msg.ts}`;
     setBubbles(prev => ({ ...prev, [msg.playerId]: { text: msg.text, id: bubbleId } }));
+    setLatestToast({ id: bubbleId, senderName: msg.playerName, text: msg.text });
     setTimeout(() => {
       setBubbles(prev => {
         if (prev[msg.playerId]?.id !== bubbleId) return prev;
@@ -87,6 +89,7 @@ export function useInGameChat() {
         delete next[msg.playerId];
         return next;
       });
+      setLatestToast(prev => (prev?.id === bubbleId ? undefined : prev));
     }, BUBBLE_TTL);
 
     if (!panelRef.current) setUnread(u => u + 1);
@@ -114,40 +117,77 @@ export function useInGameChat() {
     messages, panelOpen, unread, muted, presetsOnly,
     input, setInput, setMuted, setPresetsOnly,
     openPanel, closePanel, slideAnim,
-    sendMessage, receiveBotMessage, bubbles,
+    sendMessage, receiveBotMessage, bubbles, latestToast,
   };
 }
 
-// ─── ChatBubble — floating above a player seat ────────────────────────────────
+// ─── Shared bubble animation hook ─────────────────────────────────────────────
 
-export function ChatBubble({ bubble }: { bubble?: BubbleEntry }) {
-  const opacity   = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(4)).current;
-  const prevId    = useRef<string | undefined>(undefined);
+function useBubbleAnim(bubbleId: string | undefined) {
+  const opacity    = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(5)).current;
+  const prevId     = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (!bubble || bubble.id === prevId.current) return;
-    prevId.current = bubble.id;
+    if (!bubbleId || bubbleId === prevId.current) return;
+    prevId.current = bubbleId;
     opacity.setValue(0);
-    translateY.setValue(4);
+    translateY.setValue(5);
     Animated.parallel([
-      Animated.timing(opacity,    { toValue: 1, duration: 200, useNativeDriver: true }),
-      Animated.timing(translateY, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(opacity,    { toValue: 1, duration: 220, useNativeDriver: true }),
+      Animated.timing(translateY, { toValue: 0, duration: 220, useNativeDriver: true }),
     ]).start();
     const t = setTimeout(() => {
       Animated.parallel([
-        Animated.timing(opacity,    { toValue: 0, duration: 350, useNativeDriver: true }),
-        Animated.timing(translateY, { toValue: -4, duration: 350, useNativeDriver: true }),
+        Animated.timing(opacity,    { toValue: 0, duration: 380, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: -5, duration: 380, useNativeDriver: true }),
       ]).start();
-    }, BUBBLE_TTL - 400);
+    }, BUBBLE_TTL - 420);
     return () => clearTimeout(t);
-  }, [bubble?.id]);
+  }, [bubbleId]);
 
+  return { opacity, translateY };
+}
+
+// ─── ChatBubble — absolute-positioned above an AI seat ────────────────────────
+
+export function ChatBubble({ bubble }: { bubble?: BubbleEntry }) {
+  const { opacity, translateY } = useBubbleAnim(bubble?.id);
   if (!bubble) return null;
-
   return (
     <Animated.View style={[chat.bubble, { opacity, transform: [{ translateY }] }]}>
       <Text style={chat.bubbleText} numberOfLines={2}>{bubble.text}</Text>
+    </Animated.View>
+  );
+}
+
+// ─── PlayerChatBubble — inline bubble for the human player's area ─────────────
+
+export function PlayerChatBubble({ bubble }: { bubble?: BubbleEntry }) {
+  const { opacity, translateY } = useBubbleAnim(bubble?.id);
+  if (!bubble) return null;
+  return (
+    <Animated.View style={[chat.playerBubble, { opacity, transform: [{ translateY }] }]}>
+      <View style={chat.playerBubbleTail} />
+      <Text style={chat.playerBubbleText} numberOfLines={2}>{bubble.text}</Text>
+    </Animated.View>
+  );
+}
+
+// ─── TableChatToast — brief message in the game center surface ────────────────
+
+export interface TableToastEntry { id: string; senderName: string; text: string }
+
+export function TableChatToast({ toast }: { toast?: TableToastEntry }) {
+  const { opacity, translateY } = useBubbleAnim(toast?.id);
+  if (!toast) return null;
+  return (
+    <Animated.View
+      style={[chat.tableBubble, { opacity, transform: [{ translateY }] }]}
+      pointerEvents="none"
+    >
+      <Text style={chat.tableBubbleName} numberOfLines={1}>{toast.senderName}</Text>
+      <Text style={chat.tableBubbleText} numberOfLines={2}>{toast.text}</Text>
     </Animated.View>
   );
 }
@@ -544,7 +584,7 @@ const chat = StyleSheet.create({
     fontSize: 10,
   },
 
-  // Floating bubble above seat
+  // Floating bubble above AI seat (absolute positioned within seat View)
   bubble: {
     position: 'absolute',
     top: -44,
@@ -565,5 +605,73 @@ const chat = StyleSheet.create({
     fontSize: 9,
     lineHeight: 13,
     textAlign: 'center',
+  },
+
+  // PlayerChatBubble — inline bubble above human player's cards
+  playerBubble: {
+    alignSelf: 'center',
+    backgroundColor: 'rgba(4,0,14,0.92)',
+    borderRadius: 10,
+    borderBottomLeftRadius: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(0,212,255,0.4)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    maxWidth: 220,
+    marginBottom: 2,
+    shadowColor: '#00d4ff',
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  playerBubbleTail: {
+    position: 'absolute',
+    bottom: -6,
+    left: 18,
+    width: 0,
+    height: 0,
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderTopWidth: 6,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: 'rgba(0,212,255,0.4)',
+  },
+  playerBubbleText: {
+    color: 'rgba(255,255,255,0.92)',
+    fontSize: 11,
+    lineHeight: 15,
+    textAlign: 'center',
+  },
+
+  // TableChatToast — game center overlay near community cards
+  tableBubble: {
+    position: 'absolute',
+    bottom: 8,
+    right: 10,
+    maxWidth: 130,
+    backgroundColor: 'rgba(4,0,14,0.88)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,212,255,0.28)',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    zIndex: 20,
+    shadowColor: '#00d4ff',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  tableBubbleName: {
+    color: '#00d4ff',
+    fontSize: 8,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  tableBubbleText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 10,
+    lineHeight: 14,
   },
 });

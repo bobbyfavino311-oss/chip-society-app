@@ -1,0 +1,150 @@
+MULTIPLAYER TABLE CHAT — FLOATING TABLE MESSAGE ADDITION
+
+Update the in-game multiplayer chat system so messages briefly appear directly on the poker table after being sent.
+
+This applies only to multiplayer poker variants:
+
+* Traditional Hold’em
+* Short Deck Hold’em
+* Omaha Hold’em
+* Joker Hold’em
+* Future multiplayer poker variants
+
+Do NOT add this to Casino Games.
+
+⸻
+
+New Behavior
+
+When a player sends a chat message, the message should display in two places:
+
+1. Inside the chat panel conversation history.
+2. Briefly as a floating message bubble on the table.
+
+The floating table message should appear even if the chat panel is closed.
+
+⸻
+
+Floating Message Placement
+
+Display the message near the player who sent it.
+
+Recommended placement:
+
+* Above or beside the player’s avatar
+* Never over cards
+* Never over the pot
+* Never over action buttons
+* Never over community cards
+
+The bubble should feel attached to the speaking player.
+
+⸻
+
+Floating Message Style
+
+Use a small rounded speech bubble.
+
+Style:
+
+* Dark translucent background
+* Thin cyan outline
+* Soft glow
+* White or light gray text
+* Small username label optional
+* Maximum one line if possible
+* Wrap to two lines only if needed
+
+Keep it subtle and premium.
+
+⸻
+
+Display Duration
+
+Floating messages should appear for:
+
+3–5 seconds
+
+Then fade out smoothly.
+
+Do not stay on the table permanently.
+
+⸻
+
+Animation
+
+Message appears with:
+
+* Soft fade in
+* Slight upward motion
+* Brief hold
+* Smooth fade out
+
+Do not use large popups.
+
+Do not shake.
+
+Do not bounce heavily.
+
+⸻
+
+Multiple Messages
+
+If multiple players send messages close together:
+
+* Stack bubbles vertically near each player
+* Maximum 2 visible bubbles per player
+* Older bubbles fade first
+* Do not cover gameplay
+
+⸻
+
+Quick Chat
+
+Preset messages should also appear as floating table messages.
+
+Examples:
+
+Nice hand!
+
+Good luck!
+
+Well played.
+
+Nice bluff.
+
+I should’ve folded.
+
+Tough river.
+
+All in!
+
+GG!
+
+⸻
+
+Custom Messages
+
+Custom typed messages should also appear as floating table messages.
+
+Still enforce:
+
+* 50 character maximum
+* Single line input
+* Anti-spam cooldown
+
+⸻
+
+Muted Table Behavior
+
+If player has muted table chat:
+
+* Floating table messages should not appear
+* Chat badge should not increment
+* Chat panel history can remain hidden until unmuted
+
+⸻
+
+Final Goal
+
+Players should be able to feel the table conversation without needing to keep the chat panel open. A quick “Nice hand!” or “Should’ve folded” should briefly float near the speaking player, making multiplayer tables feel alive while staying clean, subtle, and non-disruptive.

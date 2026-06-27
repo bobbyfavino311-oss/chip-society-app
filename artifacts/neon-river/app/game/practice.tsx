@@ -42,7 +42,7 @@ import CrimsonNoirBackground from '@/components/CrimsonNoirBackground';
 import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
 import VercettiBackground from '@/components/VercettiBackground';
 import VercettiCardFrame from '@/components/VercettiCardFrame';
-import { useInGameChat, ChatBubble, GameChatPanel, QUICK_CHATS } from '@/components/InGameChat';
+import { useInGameChat, ChatBubble, GameChatPanel, PlayerChatBubble, TableChatToast, QUICK_CHATS } from '@/components/InGameChat';
 import type { BubbleEntry } from '@/components/InGameChat';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -915,6 +915,9 @@ export default function PracticeScreen() {
         {/* Action feed — fades automatically */}
         <ActionFeed message={state.message} isHandOver={isHandOver} />
 
+        {/* Table chat toast — recent message floats near community cards */}
+        <TableChatToast toast={chat.latestToast} />
+
         {/* All-in runout */}
         {(() => {
           const nonFolded = state.players.filter(p => p.status !== 'folded');
@@ -927,6 +930,8 @@ export default function PracticeScreen() {
       {/* Human player area */}
       {humanPlayer && (
         <View style={styles.humanArea}>
+          {/* Human player chat bubble — appears above their cards */}
+          <PlayerChatBubble bubble={chat.bubbles['me']} />
           {/* Hole cards */}
           <View style={styles.humanCards}>
             {humanPlayer.holeCards.length > 0
