@@ -142,6 +142,40 @@ export function setupSocketIO(httpServer: HttpServer): void {
       room.handleAction(socket.id, { type: payload.type as any, amount: payload.amount });
     });
 
+    // ─── Chat ─────────────────────────────────────────────────────────────
+    socket.on('send_chat', (payload: { text: string }) => {
+      const room = manager.getRoomForSocket(socket.id) ?? manager.getSpectatingRoom(socket.id);
+      if (!room || !payload.text) return;
+      room.handleChat(socket.id, payload.text);
+    });
+
+    // ─── Spectate ─────────────────────────────────────────────────────────
+    socket.on('spectate_table', (payload: { tableId: string }) => {
+      const room = manager.getRoom(payload.tableId);
+      if (!room) { socket.emit('error', { message: 'Table not found.' }); return; }
+      socket.join(payload.tableId);
+      room.addSpectator(socket.id);
+      manager.registerSpectator(socket.id, payload.tableId);
+      logger.info({ roomId: payload.tableId, socketId: socket.id }, 'Spectator joined');
+    });
+
+    socket.on('stop_spectating', () => {
+      const roomId = manager.getSpectatingRoomId(socket.id);
+      if (roomId) {
+        manager.getRoom(roomId)?.removeSpectator(socket.id);
+        manager.unregisterSpectator(socket.id);
+        socket.leave(roomId);
+      }
+      socket.emit('stopped_spectating', {});
+    });
+
+    // ─── Sit out ──────────────────────────────────────────────────────────
+    socket.on('sit_out', (payload: { sitOut: boolean }) => {
+      const room = manager.getRoomForSocket(socket.id);
+      if (!room) return;
+      room.handleSitOut(socket.id, payload.sitOut);
+    });
+
     // ─── Disconnect ───────────────────────────────────────────────────────
     socket.on('disconnect', () => {
       logger.info({ socketId: socket.id }, 'Socket disconnected');
@@ -150,6 +184,12 @@ export function setupSocketIO(httpServer: HttpServer): void {
         playerSockets.delete(pid);
         socketPlayers.delete(socket.id);
         logger.info({ playerId: pid, socketId: socket.id }, 'Player presence removed on disconnect');
+      }
+      // Clean up spectator registration
+      const spectatingRoomId = manager.getSpectatingRoomId(socket.id);
+      if (spectatingRoomId) {
+        manager.getRoom(spectatingRoomId)?.removeSpectator(socket.id);
+        manager.unregisterSpectator(socket.id);
       }
       const room = manager.getRoomForSocket(socket.id);
       if (room) socket.leave(room.id);

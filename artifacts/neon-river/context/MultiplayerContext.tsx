@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import Constants from 'expo-constants';
-import type { ClientGameState, LobbyTable, StakeTier } from '@/lib/multiplayerTypes';
+import type { ChatMessage, ClientGameState, LobbyTable, StakeTier } from '@/lib/multiplayerTypes';
 
 function getSocketUrl(): string {
   // Web: use window.location origin — proxy handles /api/socket.io routing
@@ -39,6 +39,8 @@ interface MultiplayerContextValue {
   lobbyTables: LobbyTable[];
   error: string | null;
   buyIn: number | null;
+  chatMessages: ChatMessage[];
+  spectating: boolean;
 
   connect: () => void;
   disconnect: () => void;
@@ -47,6 +49,10 @@ interface MultiplayerContextValue {
   joinTable: (tableId: string, userId: string, username: string, avatarId: number, chips: number) => void;
   leaveTable: () => void;
   sendAction: (type: 'fold' | 'check' | 'call' | 'raise' | 'allin', amount?: number) => void;
+  sendChat: (text: string) => void;
+  spectate: (tableId: string) => void;
+  stopSpectating: () => void;
+  setSitOut: (sitOut: boolean) => void;
   clearError: () => void;
 }
 
@@ -61,6 +67,8 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
   const [lobbyTables, setLobbyTables] = useState<LobbyTable[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [buyIn, setBuyIn] = useState<number | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [spectating, setSpectating] = useState(false);
 
   const connect = useCallback(() => {
     if (socketRef.current?.connected) return;
@@ -116,6 +124,20 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
       setTableId(null);
       setGameState(null);
       setBuyIn(null);
+      setChatMessages([]);
+    });
+
+    socket.on('chat_message', (msg: { playerId: string; playerName: string; text: string; ts: number }) => {
+      setChatMessages(prev => {
+        const next = [...prev, { id: `${msg.playerId}-${msg.ts}`, ...msg }];
+        return next.length > 50 ? next.slice(next.length - 50) : next;
+      });
+    });
+
+    socket.on('stopped_spectating', () => {
+      setSpectating(false);
+      setGameState(null);
+      setChatMessages([]);
     });
 
     socket.on('error', (data: { message: string }) => {
@@ -161,6 +183,24 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     socketRef.current?.emit('player_action', { type, amount });
   }, []);
 
+  const sendChat = useCallback((text: string) => {
+    socketRef.current?.emit('send_chat', { text });
+  }, []);
+
+  const spectate = useCallback((tableId: string) => {
+    setChatMessages([]);
+    socketRef.current?.emit('spectate_table', { tableId });
+    setSpectating(true);
+  }, []);
+
+  const stopSpectating = useCallback(() => {
+    socketRef.current?.emit('stop_spectating');
+  }, []);
+
+  const setSitOut = useCallback((sitOut: boolean) => {
+    socketRef.current?.emit('sit_out', { sitOut });
+  }, []);
+
   const clearError = useCallback(() => setError(null), []);
 
   useEffect(() => () => { socketRef.current?.disconnect(); }, []);
@@ -168,7 +208,9 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
   return (
     <MultiplayerContext.Provider value={{
       connected, connecting, tableId, gameState, lobbyTables, error, buyIn,
-      connect, disconnect, getLobby, createTable, joinTable, leaveTable, sendAction, clearError,
+      chatMessages, spectating,
+      connect, disconnect, getLobby, createTable, joinTable, leaveTable,
+      sendAction, sendChat, spectate, stopSpectating, setSitOut, clearError,
     }}>
       {children}
     </MultiplayerContext.Provider>

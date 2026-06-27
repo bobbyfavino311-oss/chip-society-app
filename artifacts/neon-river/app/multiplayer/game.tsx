@@ -9,6 +9,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMultiplayer } from '@/context/MultiplayerContext';
 import { useUser } from '@/context/UserContext';
+import { useInGameChat, GameChatPanel } from '@/components/InGameChat';
 import { formatChips } from '@/lib/multiplayerTypes';
 import type { Card, SeatView, ClientGameState } from '@/lib/multiplayerTypes';
 
@@ -242,10 +243,12 @@ function TableSurface({ gs }: { gs: ClientGameState }) {
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 export default function MultiplayerGame() {
-  const { gameState, sendAction, leaveTable, tableId, buyIn } = useMultiplayer();
+  const { gameState, sendAction, leaveTable, tableId, buyIn, chatMessages, sendChat, setSitOut: emitSitOut } = useMultiplayer();
   const { addChips, updateProfile, profile } = useUser();
+  const chat = useInGameChat();
   const [raiseAmount, setRaiseAmount] = useState(0);
   const [showRaise, setShowRaise] = useState(false);
+  const [sitOutActive, setSitOutActive] = useState(false);
   const winAnim = useRef(new Animated.Value(0)).current;
 
   // Per-hand W/L tracking
@@ -292,6 +295,31 @@ export default function MultiplayerGame() {
       ]).start();
     }
   }, [gs?.winners]);
+
+  // ── Chat: receive incoming server messages ──────────────────────────────────
+  const myUserId = profile.playerId ?? profile.username;
+  const prevChatLenRef = useRef(0);
+  useEffect(() => {
+    if (chatMessages.length <= prevChatLenRef.current) return;
+    const incoming = chatMessages.slice(prevChatLenRef.current);
+    prevChatLenRef.current = chatMessages.length;
+    for (const msg of incoming) {
+      // Skip own messages — we already display via hook's local add
+      if (msg.playerId === myUserId) continue;
+      chat.receiveBotMessage(msg.playerId, msg.playerName, msg.text);
+    }
+  }, [chatMessages]);
+
+  const handleSendChat = (text: string) => {
+    chat.sendMessage(text);   // local echo + clear input
+    sendChat(text);           // server broadcast
+  };
+
+  const handleSitOut = () => {
+    const next = !sitOutActive;
+    setSitOutActive(next);
+    emitSitOut(next);
+  };
 
   const handleLeave = () => {
     Alert.alert('Leave Table', 'Leave this table? You will be folded if in a hand.', [
@@ -525,12 +553,22 @@ export default function MultiplayerGame() {
             )
           ) : gs.phase !== 'showdown' && gs.phase !== 'waiting' ? (
             <View style={g.waitRow}>
-              <Ionicons name="time-outline" size={14} color="#444" />
-              <Text style={g.waitTxt}>
-                {gs.activeSeat !== -1 && gs.seats[gs.activeSeat]
-                  ? `Waiting for ${gs.seats[gs.activeSeat]!.username}...`
-                  : 'Waiting for action...'}
-              </Text>
+              <View style={g.waitLeft}>
+                <Ionicons name="time-outline" size={14} color="#444" />
+                <Text style={g.waitTxt}>
+                  {gs.activeSeat !== -1 && gs.seats[gs.activeSeat]
+                    ? `Waiting for ${gs.seats[gs.activeSeat]!.username}...`
+                    : 'Waiting for action...'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[g.sitOutBtn, sitOutActive && g.sitOutActive]}
+                onPress={handleSitOut}
+              >
+                <Text style={[g.sitOutTxt, sitOutActive && { color: '#ff0090' }]}>
+                  {sitOutActive ? 'SITTING OUT' : 'SIT OUT'}
+                </Text>
+              </TouchableOpacity>
             </View>
           ) : null}
         </View>
@@ -550,6 +588,23 @@ export default function MultiplayerGame() {
             </Text>
           ))}
         </ScrollView>
+
+        {/* ── Chat Panel ── */}
+        <GameChatPanel
+          messages={chat.messages}
+          panelOpen={chat.panelOpen}
+          slideAnim={chat.slideAnim}
+          unread={chat.unread}
+          muted={chat.muted}
+          setMuted={chat.setMuted}
+          presetsOnly={chat.presetsOnly}
+          setPresetsOnly={chat.setPresetsOnly}
+          input={chat.input}
+          setInput={chat.setInput}
+          sendMessage={handleSendChat}
+          onClose={chat.closePanel}
+          onOpen={chat.openPanel}
+        />
 
       </SafeAreaView>
     </LinearGradient>
@@ -671,7 +726,11 @@ const g = StyleSheet.create({
   confirmRaiseTxt: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1 },
 
   // Wait
-  waitRow:   { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 12, justifyContent: 'center' },
+  waitRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 10 },
+  waitLeft:   { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  sitOutBtn:  { borderWidth: 1, borderColor: '#33333380', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
+  sitOutActive: { borderColor: '#ff009050', backgroundColor: '#ff009010' },
+  sitOutTxt:  { color: '#444', fontFamily: 'Orbitron_700Bold', fontSize: 9, letterSpacing: 1 },
   waitTxt:   { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 11 },
 
   // Card

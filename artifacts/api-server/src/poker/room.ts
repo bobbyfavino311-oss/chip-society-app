@@ -26,6 +26,10 @@ export class PokerRoom {
   winners: WinnerInfo[] = [];
   messages: GameMessage[] = [];
 
+  // Session 3 additions
+  spectators = new Set<string>();        // socketIds watching without a seat
+  private requestedSitOut = new Set<string>(); // socketIds who explicitly asked to sit out
+
   private actedThisRound = new Set<number>();
   private turnTimer: ReturnType<typeof setTimeout> | null = null;
   private handTimer: ReturnType<typeof setTimeout> | null = null;
@@ -53,7 +57,7 @@ export class PokerRoom {
     if (emptyIdx === -1) return -1;
     this.seats[emptyIdx] = {
       socketId, userId, username, avatarId,
-      chips, cards: [], currentBet: 0, totalBet: 0, status: 'sitting_out',
+      chips, cards: [], currentBet: 0, totalBet: 0, status: 'active',
     };
     this.addMessage(`${username} joined the table`, 'info');
     this.broadcastState();
@@ -61,7 +65,60 @@ export class PokerRoom {
     return emptyIdx;
   }
 
+  // ─── Spectator management ─────────────────────────────────────────────────
+
+  addSpectator(socketId: string): void {
+    this.spectators.add(socketId);
+    this.emit(socketId, 'game_state', this.getClientStateFor(socketId));
+  }
+
+  removeSpectator(socketId: string): void {
+    this.spectators.delete(socketId);
+  }
+
+  // ─── Sit-out toggle ───────────────────────────────────────────────────────
+
+  handleSitOut(socketId: string, wantsSitOut: boolean): void {
+    const seat = this.seats[this.findSeatBySocketId(socketId)];
+    if (!seat) return;
+    if (wantsSitOut) {
+      this.requestedSitOut.add(socketId);
+      if (this.phase === 'waiting') seat.status = 'sitting_out';
+      this.addMessage(`${seat.username} is sitting out next hand`, 'info');
+    } else {
+      this.requestedSitOut.delete(socketId);
+      if (seat.status === 'sitting_out') seat.status = 'active';
+      this.addMessage(`${seat.username} is back in`, 'info');
+      if (this.phase === 'waiting') this.maybeScheduleHandStart();
+    }
+    this.broadcastState();
+  }
+
+  // ─── Chat ─────────────────────────────────────────────────────────────────
+
+  handleChat(socketId: string, text: string): void {
+    const seat = this.seats[this.findSeatBySocketId(socketId)];
+    const spectator = this.spectators.has(socketId);
+    if (!seat && !spectator) return;
+    const username = seat?.username ?? 'Spectator';
+    const userId   = seat?.userId   ?? socketId;
+    const ts       = Date.now();
+    const cleaned  = text.replace(/\b(fuck|shit|bitch|cunt|cock|ass)\b/gi, m => '*'.repeat(m.length))
+                        .trim().slice(0, 100);
+    if (!cleaned) return;
+    const payload = { playerId: userId, playerName: username, text: cleaned, ts };
+    // Broadcast to all seated players
+    for (const s of this.seats) {
+      if (s) this.emit(s.socketId, 'chat_message', payload);
+    }
+    // Broadcast to spectators
+    for (const sid of this.spectators) {
+      this.emit(sid, 'chat_message', payload);
+    }
+  }
+
   removePlayer(socketId: string): void {
+    this.requestedSitOut.delete(socketId);
     const idx = this.findSeatBySocketId(socketId);
     if (idx === -1) return;
     const seat = this.seats[idx]!;
@@ -88,9 +145,13 @@ export class PokerRoom {
 
   // ─── Hand lifecycle ───────────────────────────────────────────────────────
 
+  private readyCount(): number {
+    return this.seats.filter(s => s !== null && !this.requestedSitOut.has(s.socketId)).length;
+  }
+
   private maybeScheduleHandStart(): void {
     if (this.phase !== 'waiting') return;
-    if (this.playerCount < 2) return;
+    if (this.readyCount() < 2) return;
     if (this.handTimer) return;
     this.handTimer = setTimeout(() => {
       this.handTimer = null;
@@ -99,7 +160,10 @@ export class PokerRoom {
   }
 
   private startHand(): void {
-    const activePlayers = this.seats.map((s, i) => ({ s, i })).filter(x => x.s !== null);
+    // Players who want to sit out stay out; everyone else plays
+    const allSeated = this.seats.map((s, i) => ({ s, i })).filter(x => x.s !== null);
+    const activePlayers = allSeated.filter(x => !this.requestedSitOut.has(x.s!.socketId));
+
     if (activePlayers.length < 2) {
       this.phase = 'waiting';
       this.broadcastState();
@@ -114,8 +178,14 @@ export class PokerRoom {
     this.messages = [];
     this.actedThisRound.clear();
 
-    for (const { s } of activePlayers) {
-      if (s) { s.cards = []; s.currentBet = 0; s.totalBet = 0; s.status = 'active'; }
+    // Mark sitting-out seats
+    for (const { s } of allSeated) {
+      if (!s) continue;
+      if (this.requestedSitOut.has(s.socketId)) {
+        s.status = 'sitting_out';
+      } else {
+        s.cards = []; s.currentBet = 0; s.totalBet = 0; s.status = 'active';
+      }
     }
 
     // Advance dealer
@@ -569,6 +639,10 @@ export class PokerRoom {
         const state = this.getClientStateFor(seat.socketId);
         this.emit(seat.socketId, 'game_state', state);
       }
+    }
+    // Push read-only state to spectators (mySeat will be -1)
+    for (const sid of this.spectators) {
+      this.emit(sid, 'game_state', this.getClientStateFor(sid));
     }
     this.broadcast(this.id, 'lobby_update', null);
   }

@@ -5,7 +5,8 @@ import type { EmitFn, BroadcastFn } from './room.js';
 
 export class RoomManager {
   private rooms = new Map<string, PokerRoom>();
-  private socketRoom = new Map<string, string>(); // socketId → roomId
+  private socketRoom = new Map<string, string>();       // socketId → roomId (seated)
+  private spectatorRoom = new Map<string, string>();    // socketId → roomId (spectating)
   private counter = 0;
 
   constructor(private emit: EmitFn, private broadcast: BroadcastFn) {}
@@ -73,6 +74,25 @@ export class RoomManager {
     return [...this.rooms.values()]
       .map(r => r.getLobbyInfo())
       .sort((a, b) => a.smallBlind - b.smallBlind);
+  }
+
+  // ─── Spectator tracking ───────────────────────────────────────────────────
+
+  registerSpectator(socketId: string, roomId: string): void {
+    this.spectatorRoom.set(socketId, roomId);
+  }
+
+  unregisterSpectator(socketId: string): void {
+    this.spectatorRoom.delete(socketId);
+  }
+
+  getSpectatingRoomId(socketId: string): string | undefined {
+    return this.spectatorRoom.get(socketId);
+  }
+
+  getSpectatingRoom(socketId: string): PokerRoom | undefined {
+    const roomId = this.spectatorRoom.get(socketId);
+    return roomId ? this.rooms.get(roomId) : undefined;
   }
 
   cleanupEmpty(): void {

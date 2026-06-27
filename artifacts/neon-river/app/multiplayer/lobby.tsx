@@ -38,7 +38,7 @@ export default function MultiplayerLobby() {
 
   const {
     connected, connecting, lobbyTables, error,
-    connect, getLobby, createTable, joinTable, tableId, clearError,
+    connect, getLobby, createTable, joinTable, spectate, tableId, clearError,
   } = useMultiplayer();
 
   const [showCreate, setShowCreate]   = useState(false);
@@ -133,11 +133,17 @@ export default function MultiplayerLobby() {
     setTimeout(() => setCodeCopied(false), 2000);
   };
 
+  const handleSpectate = (item: LobbyTable) => {
+    spectate(item.id);
+    router.replace('/multiplayer/game' as any);
+  };
+
   const renderTable = ({ item }: { item: LobbyTable }) => {
     const color = STAKE_COLORS[item.stakeTier];
     const isFull = item.playerCount >= item.maxPlayers;
+    const inProgress = item.phase !== 'waiting';
     const canAfford = (profile.chips ?? 0) >= item.minBuyIn;
-    const phaseLabel = item.phase === 'waiting' ? 'WAITING' : 'IN PROGRESS';
+    const phaseLabel = inProgress ? 'IN PROGRESS' : 'WAITING';
 
     return (
       <View style={[styles.tableCard, { borderColor: color + '40' }]}>
@@ -153,7 +159,7 @@ export default function MultiplayerLobby() {
             <Text style={styles.codeLabel}>CODE</Text>
             <Text style={styles.codeValue}>{item.id}</Text>
           </View>
-          <Text style={[styles.phaseTag, { color: item.phase === 'waiting' ? '#00ff88' : '#ffcc00' }]}>
+          <Text style={[styles.phaseTag, { color: inProgress ? '#ffcc00' : '#00ff88' }]}>
             {phaseLabel}
           </Text>
         </View>
@@ -171,18 +177,34 @@ export default function MultiplayerLobby() {
             <Text style={styles.infoValue}>{formatChips(item.minBuyIn)}</Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={[styles.joinBtn, { backgroundColor: isFull || !canAfford ? '#333' : color + '25', borderColor: isFull || !canAfford ? '#444' : color }]}
-          onPress={() => handleJoin(item)}
-          disabled={isFull || !canAfford || joining === item.id}
-        >
-          {joining === item.id
-            ? <ActivityIndicator color={color} size="small" />
-            : <Text style={[styles.joinBtnText, { color: isFull || !canAfford ? '#555' : color }]}>
-                {isFull ? 'FULL' : !canAfford ? 'NEED MORE CHIPS' : 'JOIN TABLE'}
-              </Text>
-          }
-        </TouchableOpacity>
+        <View style={styles.btnRow}>
+          {inProgress || isFull ? (
+            <TouchableOpacity
+              style={[styles.spectateBtn, { borderColor: color + '50' }]}
+              onPress={() => handleSpectate(item)}
+            >
+              <Ionicons name="eye-outline" size={14} color={color} />
+              <Text style={[styles.spectateTxt, { color }]}>SPECTATE</Text>
+            </TouchableOpacity>
+          ) : null}
+          {!isFull && (
+            <TouchableOpacity
+              style={[styles.joinBtn,
+                { flex: inProgress ? 0 : 1,
+                  backgroundColor: !canAfford ? '#333' : color + '25',
+                  borderColor: !canAfford ? '#444' : color }]}
+              onPress={() => handleJoin(item)}
+              disabled={!canAfford || joining === item.id}
+            >
+              {joining === item.id
+                ? <ActivityIndicator color={color} size="small" />
+                : <Text style={[styles.joinBtnText, { color: !canAfford ? '#555' : color }]}>
+                    {!canAfford ? 'NEED MORE CHIPS' : 'JOIN'}
+                  </Text>
+              }
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     );
   };
@@ -395,7 +417,10 @@ const styles = StyleSheet.create({
   infoCol: { alignItems: 'center', flex: 1 },
   infoLabel: { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 9, letterSpacing: 1, marginBottom: 4 },
   infoValue: { color: '#ccc', fontFamily: 'Inter_700Bold', fontSize: 14 },
-  joinBtn: { borderRadius: 8, borderWidth: 1, paddingVertical: 11, alignItems: 'center' },
+  btnRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  spectateBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 8, paddingVertical: 11, paddingHorizontal: 12, backgroundColor: 'rgba(255,255,255,0.03)' },
+  spectateTxt: { fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
+  joinBtn: { flex: 1, borderRadius: 8, borderWidth: 1, paddingVertical: 11, alignItems: 'center' },
   joinBtnText: { fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1.5 },
   offlineBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
   offlineText: { color: '#666', fontFamily: 'Orbitron_400Regular', fontSize: 13 },
