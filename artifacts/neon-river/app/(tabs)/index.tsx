@@ -834,9 +834,9 @@ const logo = StyleSheet.create({
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
-    fontSize: 9.5,
+    fontSize: 11,
     color: colors.textMuted,
-    letterSpacing: 5,
+    letterSpacing: 7,
     marginTop: 0,
   },
 });
