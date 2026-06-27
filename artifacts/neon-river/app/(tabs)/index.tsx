@@ -838,6 +838,8 @@ const logo = StyleSheet.create({
     color: colors.textMuted,
     letterSpacing: 7,
     marginTop: 4,
+    width: LOGO_IMG_W,
+    textAlign: 'center',
   },
 });
 
