@@ -61,15 +61,16 @@ export const MusicEngine = {
         const { sound } = await Audio.Sound.createAsync(
           MUSIC_ASSET,
           {
-            shouldPlay:         true,
+            shouldPlay:         false,  // load first, then set rate before playing
             isLooping:          true,
             volume:             _muted ? 0 : _vol,
-            rate:               0.75,   // −5 semitones + 25% slower
-            shouldCorrectPitch: false,  // let pitch drop with speed
           },
         );
-        // Apply current settings in case they changed while loading
+        // Set rate explicitly after load — createAsync rate param doesn't
+        // reliably persist across loops on iOS (expo-av known behaviour).
+        await sound.setRateAsync(0.75, false).catch(() => {});
         await sound.setVolumeAsync(_muted ? 0 : _vol).catch(() => {});
+        await sound.playAsync().catch(() => {});
         _sound = sound;
       } catch {
         // Silently fail — music is non-critical
