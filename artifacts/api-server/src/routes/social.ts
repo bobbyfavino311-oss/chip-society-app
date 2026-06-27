@@ -435,7 +435,7 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
         authorProfileJson: playersTable.profileJson,
       })
       .from(feedPostsTable)
-      .innerJoin(playersTable, eq(feedPostsTable.authorId, playersTable.playerId))
+      .leftJoin(playersTable, eq(feedPostsTable.authorId, playersTable.playerId))
       .$dynamic();
 
     if (tab === 'me') {
@@ -466,7 +466,7 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
     const posts = rows.map(r => ({
       id:              r.id,
       authorId:        r.authorId,
-      authorUsername:  r.authorUsername,
+      authorUsername:  r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
       authorAvatarIndex: (r.authorProfileJson as any)?.avatarIndex ?? 1,
       authorRank:      (r.authorProfileJson as any)?.rank ?? 'Neon Bronze',
       content:         r.content,
@@ -491,8 +491,9 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
 router.post('/social/posts', requirePlayer, async (req: any, res) => {
   try {
     const { playerId } = req;
-    const { content, tag, pot, handRank } = req.body as {
+    const { content, tag, pot, handRank, authorUsername, authorAvatarIndex, authorRank } = req.body as {
       content: string; tag: string; pot?: string; handRank?: string;
+      authorUsername?: string; authorAvatarIndex?: number; authorRank?: string;
     };
 
     if (!content || typeof content !== 'string' || !content.trim()) {
@@ -502,9 +503,12 @@ router.post('/social/posts', requirePlayer, async (req: any, res) => {
       res.status(400).json({ error: 'Post too long (max 280 characters)' }); return;
     }
 
-    const authorRow = await db.select({ username: playersTable.username, profileJson: playersTable.profileJson })
+    // Look up author info — tolerate missing player records (profile sync lag).
+    // Fall back to client-provided hints so username resolves correctly when the
+    // local social DB doesn't have the player's full account record.
+    const authorRows = await db.select({ username: playersTable.username, profileJson: playersTable.profileJson })
       .from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
-    if (!authorRow[0]) { res.status(404).json({ error: 'Player not found' }); return; }
+    const author = authorRows[0] ?? null;
 
     const id = randomUUID();
     const [created] = await db.insert(feedPostsTable).values({
@@ -519,9 +523,9 @@ router.post('/social/posts', requirePlayer, async (req: any, res) => {
     const post = {
       id:              created!.id,
       authorId:        playerId,
-      authorUsername:  authorRow[0].username,
-      authorAvatarIndex: (authorRow[0].profileJson as any)?.avatarIndex ?? 1,
-      authorRank:      (authorRow[0].profileJson as any)?.rank ?? 'Neon Bronze',
+      authorUsername:  author?.username ?? authorUsername ?? `player_${playerId.slice(0, 6)}`,
+      authorAvatarIndex: (author?.profileJson as any)?.avatarIndex ?? authorAvatarIndex ?? 1,
+      authorRank:      (author?.profileJson as any)?.rank ?? authorRank ?? 'Neon Bronze',
       content:         created!.content,
       tag:             created!.tag,
       pot:             created!.pot ?? null,

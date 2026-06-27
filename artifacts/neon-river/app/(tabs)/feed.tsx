@@ -7,6 +7,7 @@ import {
   FlatList,
   Image,
   KeyboardAvoidingView,
+  Alert,
   Modal,
   Platform,
   RefreshControl,
@@ -1886,10 +1887,14 @@ export default function FeedScreen() {
       <ComposeSheet
         visible={composeVisible}
         onClose={() => setComposeVisible(false)}
-        onPost={p => {
+        onPost={async p => {
           setMyPosts(prev => [p, ...prev]);
           if (profile.playerId) {
-            livePublish({ content: p.content, tag: p.tag, pot: p.pot, handRank: p.handRank });
+            try {
+              await livePublish({ content: p.content, tag: p.tag, pot: p.pot, handRank: p.handRank });
+            } catch {
+              Alert.alert('Post failed', 'Could not publish your post. Please check your connection and try again.');
+            }
           }
         }}
         bottomInset={insets.bottom}

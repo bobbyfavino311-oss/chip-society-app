@@ -3,6 +3,8 @@
 // Auth: pass playerId via x-player-id header.
 
 function getBase(): string {
+  const envUrl = process.env['EXPO_PUBLIC_API_URL'];
+  if (envUrl) return envUrl;
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 
@@ -194,7 +196,10 @@ export async function getFeed(
 
 export async function createPost(
   playerId: string,
-  data: { content: string; tag: string; pot?: string; handRank?: string },
+  data: {
+    content: string; tag: string; pot?: string; handRank?: string;
+    authorUsername?: string; authorAvatarIndex?: number; authorRank?: string;
+  },
 ): Promise<FeedPost> {
   const d = await req<{ post: FeedPost }>('/social/posts', playerId, {
     method: 'POST',

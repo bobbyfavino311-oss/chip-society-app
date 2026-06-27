@@ -105,12 +105,17 @@ export function LiveFeedProvider({ children }: { children: React.ReactNode }) {
     content: string; tag: string; pot?: string; handRank?: string;
   }): Promise<FeedPost | null> => {
     if (!playerId) return null;
-    try {
-      const post = await apiCreatePost(playerId, data);
-      setAllPosts(prev => [post, ...prev]);
-      return post;
-    } catch { return null; }
-  }, [playerId]);
+    const post = await apiCreatePost(playerId, {
+      ...data,
+      authorUsername:    profile?.username,
+      authorAvatarIndex: profile?.avatarIndex,
+      authorRank:        profile?.rank,
+    });
+    setAllPosts(prev => [post, ...prev]);
+    // Re-fetch after a short delay so the DB write is reflected on pull-to-refresh
+    setTimeout(() => { void fetchPosts(); }, 1500);
+    return post;
+  }, [playerId, fetchPosts]);
 
   const deletePost = useCallback((postId: string) => {
     setAllPosts(prev => prev.filter(p => p.id !== postId));
