@@ -263,7 +263,31 @@ function PostCard({ post }: { post: SocialPost }) {
   const [myComment, setMyComment]         = useState('');
   const [localComments, setLocalComments] = useState<LocalComment[]>([]);
 
-  const player       = MOCK_PLAYERS.find(p => p.id === post.playerId);
+  // User's own posts have playerId === 'me' — synthesise player from profile
+  const player = post.playerId === 'me'
+    ? {
+        id:               'me',
+        username:         profile.username || 'You',
+        handle:           profile.username?.toLowerCase() || 'me',
+        avatar:           profile.username?.[0] ?? 'Y',
+        avatarColor:      '#00d4ff',
+        avatarId:         profile.symbolIndex ?? 1,
+        bannerColors:     ['#00d4ff', '#bf5fff'] as [string, string],
+        rank:             profile.rank ?? 'PLAYER',
+        level:            profile.level ?? 1,
+        chips:            profile.chips ?? 0,
+        winRate:          0,
+        handsPlayed:      0,
+        biggestPot:       0,
+        tournamentWins:   0,
+        achievementCount: 0,
+        followers:        0,
+        following:        0,
+        status:           'online' as const,
+        badges:           [],
+        bio:              '',
+      }
+    : MOCK_PLAYERS.find(p => p.id === post.playerId);
   const typeColor    = POST_TAG_COLORS[post.tag];
   const myReaction   = getReaction(post.id);
   const liked        = isLiked(post.id);
@@ -967,26 +991,31 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
         renderItem={({ item: p }) => {
           const isFollowed = isFollowing(p.playerId);
           return (
-            <TouchableOpacity
-              style={srch.card}
-              onPress={() => router.push(`/social/player-profile?id=${p.playerId}`)}
-            >
+            <View style={srch.card}>
               <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
-              <NeonAvatar avatarId={p.avatarIndex ?? 1} size={38} />
-              <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={srch.username}>{p.username}</Text>
-                  {p.status in STATUS_COLOR && (
-                    <>
-                      <View style={[srch.statusDot, { backgroundColor: STATUS_COLOR[p.status] ?? colors.textDim }]} />
-                      <Text style={[srch.statusLabel, { color: STATUS_COLOR[p.status] ?? colors.textDim }]}>
-                        {STATUS_LABEL[p.status] ?? p.status}
-                      </Text>
-                    </>
-                  )}
+              {/* Info area — only this section navigates to the profile */}
+              <TouchableOpacity
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}
+                onPress={() => router.push(`/social/player-profile?id=${p.playerId}`)}
+                activeOpacity={0.75}
+              >
+                <NeonAvatar avatarId={p.avatarIndex ?? 1} size={38} />
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={srch.username}>{p.username}</Text>
+                    {p.status in STATUS_COLOR && (
+                      <>
+                        <View style={[srch.statusDot, { backgroundColor: STATUS_COLOR[p.status] ?? colors.textDim }]} />
+                        <Text style={[srch.statusLabel, { color: STATUS_COLOR[p.status] ?? colors.textDim }]}>
+                          {STATUS_LABEL[p.status] ?? p.status}
+                        </Text>
+                      </>
+                    )}
+                  </View>
+                  <Text style={srch.handle}>{p.rank} · {formatChips(p.chips)} chips · Lv.{p.level}</Text>
                 </View>
-                <Text style={srch.handle}>{p.rank} · {formatChips(p.chips)} chips · Lv.{p.level}</Text>
-              </View>
+              </TouchableOpacity>
+              {/* Action buttons — separate touchables, don't interfere with nav */}
               <View style={{ flexDirection: 'row', gap: 6 }}>
                 <TouchableOpacity
                   style={[srch.followBtn, isFollowed && { backgroundColor: `${colors.primary}15`, borderColor: `${colors.primary}40` }]}
@@ -1008,7 +1037,7 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                   />
                 </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </View>
           );
         }}
       />
@@ -1499,6 +1528,23 @@ export default function FeedScreen() {
   const { posts: aiPosts, refresh: refreshAIPosts } = useAISocial();
   const { isMuted, isBlocked } = useSocial();
 
+  // Convert user's MePost array → SocialPost shape so PostCard can render them
+  const myFeedPosts = useMemo<SocialPost[]>(() =>
+    myPosts.map(p => ({
+      id:        p.id,
+      playerId:  'me',
+      tag:       p.tag,
+      content:   p.content,
+      pot:       p.pot,
+      handRank:  p.handRank,
+      likes:     p.likes,
+      comments:  p.comments,
+      reactions: { fire: 0, spade: 0, money: 0, wow: 0, crown: 0 },
+      timeAgo:   p.timeAgo,
+      tab:       'trending' as const,
+    })),
+  [myPosts]);
+
   const filteredPosts = useCallback(() => {
     const base = (activeTab === 'all' || activeTab === 'trending')
       ? SOCIAL_POSTS
@@ -1522,8 +1568,15 @@ export default function FeedScreen() {
       if (t.includes('w')) return n * 604_800_000;
       return 0;
     };
-    return [...filtered].sort((a, b) => toMs(a.timeAgo) - toMs(b.timeAgo));
-  }, [activeTab, isMuted, isBlocked]);
+    const sorted = [...filtered].sort((a, b) => toMs(a.timeAgo) - toMs(b.timeAgo));
+
+    // Prepend user's own posts at the top of the All tab (newest first)
+    if (activeTab === 'all') {
+      const myNewest = [...myFeedPosts].sort((a, b) => toMs(a.timeAgo) - toMs(b.timeAgo));
+      return [...myNewest, ...sorted];
+    }
+    return sorted;
+  }, [activeTab, isMuted, isBlocked, myFeedPosts]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
