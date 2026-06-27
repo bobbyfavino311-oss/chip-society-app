@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMultiplayer } from '@/context/MultiplayerContext';
+import { useUser } from '@/context/UserContext';
 import { formatChips } from '@/lib/multiplayerTypes';
 import type { Card, SeatView, ClientGameState } from '@/lib/multiplayerTypes';
 
@@ -241,10 +242,17 @@ function TableSurface({ gs }: { gs: ClientGameState }) {
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 export default function MultiplayerGame() {
-  const { gameState, sendAction, leaveTable, tableId } = useMultiplayer();
+  const { gameState, sendAction, leaveTable, tableId, buyIn } = useMultiplayer();
+  const { addChips, updateProfile, profile } = useUser();
   const [raiseAmount, setRaiseAmount] = useState(0);
   const [showRaise, setShowRaise] = useState(false);
   const winAnim = useRef(new Animated.Value(0)).current;
+
+  // Per-hand W/L tracking
+  const prevWinnersKeyRef = useRef<string>('');
+  const handsWonRef       = useRef(0);
+  const handsLostRef      = useRef(0);
+  const xpEarnedRef       = useRef(0);
 
   const gs: ClientGameState | null = gameState;
 
@@ -255,6 +263,24 @@ export default function MultiplayerGame() {
   useEffect(() => {
     if (gs) setRaiseAmount(gs.minRaise);
   }, [gs?.minRaise]);
+
+  // Detect new showdown results each hand
+  useEffect(() => {
+    if (!gs || gs.phase !== 'showdown' || !gs.winners || gs.winners.length === 0) return;
+    const key = gs.winners.map(w => `${w.seatIndex}:${w.amount}`).join(',');
+    if (key === prevWinnersKeyRef.current) return;
+    prevWinnersKeyRef.current = key;
+
+    const iWon = gs.winners.some(w => w.seatIndex === gs.mySeat);
+    const myWinEntry = gs.winners.find(w => w.seatIndex === gs.mySeat);
+    if (iWon && myWinEntry) {
+      handsWonRef.current++;
+      xpEarnedRef.current += 500 + Math.min(500, Math.floor(myWinEntry.amount / 200));
+    } else if (gs.mySeat !== -1) {
+      handsLostRef.current++;
+      xpEarnedRef.current += 150;
+    }
+  }, [gs?.winners, gs?.phase]);
 
   useEffect(() => {
     if (gs?.winners && gs.winners.length > 0) {
@@ -270,7 +296,25 @@ export default function MultiplayerGame() {
   const handleLeave = () => {
     Alert.alert('Leave Table', 'Leave this table? You will be folded if in a hand.', [
       { text: 'Stay', style: 'cancel' },
-      { text: 'Leave', style: 'destructive', onPress: () => {
+      { text: 'Leave', style: 'destructive', onPress: async () => {
+        // Return remaining chips to profile
+        const finalChips = gs?.mySeat !== undefined && gs.mySeat !== -1
+          ? (gs.seats[gs.mySeat]?.chips ?? 0)
+          : 0;
+        if (finalChips > 0) {
+          await addChips(finalChips);
+        }
+        // Record session stats (XP, wins, losses, handsPlayed)
+        const totalHands = handsWonRef.current + handsLostRef.current;
+        if (totalHands > 0 || xpEarnedRef.current > 0) {
+          const newXp = profile.xp + xpEarnedRef.current;
+          await updateProfile({
+            wins:         profile.wins + handsWonRef.current,
+            losses:       profile.losses + handsLostRef.current,
+            handsPlayed:  profile.handsPlayed + totalHands,
+            xp:           newXp,
+          });
+        }
         leaveTable();
         router.replace('/multiplayer/lobby' as any);
       }},
@@ -317,6 +361,9 @@ export default function MultiplayerGame() {
           <View style={g.headerCenter}>
             <Text style={g.phaseTxt}>{phase}</Text>
             <Text style={g.tableIdTxt}>#{gs.tableId.slice(-6).toUpperCase()}</Text>
+            {buyIn != null && (
+              <Text style={g.buyInTxt}>BUY-IN {formatChips(buyIn)}</Text>
+            )}
           </View>
 
           <View style={g.potBadge}>
@@ -523,6 +570,7 @@ const g = StyleSheet.create({
   headerCenter: { flex: 1, alignItems: 'center' },
   phaseTxt:     { color: '#00d4ff', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 2 },
   tableIdTxt:   { color: '#2a2a3a', fontFamily: 'Orbitron_400Regular', fontSize: 8, marginTop: 1 },
+  buyInTxt:     { color: '#00ff8840', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1, marginTop: 1 },
   potBadge:     { alignItems: 'flex-end' },
   potLabel:     { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1 },
   potBig:       { color: '#ffcc00', fontFamily: 'Inter_700Bold', fontSize: 16 },

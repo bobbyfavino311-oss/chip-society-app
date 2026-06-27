@@ -38,6 +38,7 @@ interface MultiplayerContextValue {
   gameState: ClientGameState | null;
   lobbyTables: LobbyTable[];
   error: string | null;
+  buyIn: number | null;
 
   connect: () => void;
   disconnect: () => void;
@@ -59,6 +60,7 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
   const [gameState, setGameState] = useState<ClientGameState | null>(null);
   const [lobbyTables, setLobbyTables] = useState<LobbyTable[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [buyIn, setBuyIn] = useState<number | null>(null);
 
   const connect = useCallback(() => {
     if (socketRef.current?.connected) return;
@@ -101,6 +103,9 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     socket.on('joined_table', (data: { tableId: string; state: ClientGameState }) => {
       setTableId(data.tableId);
       setGameState(data.state);
+      // Capture buy-in from my seat's starting chip count
+      const mySeatData = data.state.mySeat !== -1 ? data.state.seats[data.state.mySeat] : null;
+      if (mySeatData) setBuyIn(mySeatData.chips);
     });
 
     socket.on('game_state', (state: ClientGameState) => {
@@ -110,6 +115,7 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     socket.on('left_table', () => {
       setTableId(null);
       setGameState(null);
+      setBuyIn(null);
     });
 
     socket.on('error', (data: { message: string }) => {
@@ -161,7 +167,7 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
 
   return (
     <MultiplayerContext.Provider value={{
-      connected, connecting, tableId, gameState, lobbyTables, error,
+      connected, connecting, tableId, gameState, lobbyTables, error, buyIn,
       connect, disconnect, getLobby, createTable, joinTable, leaveTable, sendAction, clearError,
     }}>
       {children}

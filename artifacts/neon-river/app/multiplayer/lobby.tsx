@@ -33,7 +33,7 @@ const TIER_MIN_BUYIN: Record<StakeTier, number> = {
 };
 
 export default function MultiplayerLobby() {
-  const { profile } = useUser();
+  const { profile, removeChips } = useUser();
   const params = useLocalSearchParams<{ code?: string; mode?: string }>();
 
   const {
@@ -88,9 +88,19 @@ export default function MultiplayerLobby() {
       Alert.alert('Not enough chips', `This table requires ${formatChips(table.minBuyIn)} minimum.`);
       return;
     }
-    setJoining(table.id);
     const buyIn = Math.min(chips, table.minBuyIn * 5);
-    joinTable(table.id, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
+    Alert.alert(
+      'Join Table',
+      `Buy in for ${formatChips(buyIn)} chips?\n\nYou can win or lose this amount.\nYour remaining balance will be returned when you leave.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: `Buy In — ${formatChips(buyIn)}`, onPress: () => {
+          setJoining(table.id);
+          removeChips(buyIn);
+          joinTable(table.id, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
+        }},
+      ]
+    );
   };
 
   const handleJoinByCode = () => {
@@ -111,8 +121,9 @@ export default function MultiplayerLobby() {
       Alert.alert('Not enough chips', `This stake requires ${formatChips(minBuy)} minimum.`);
       return;
     }
-    setShowCreate(false);
     const buyIn = Math.min(chips, minBuy * 5);
+    setShowCreate(false);
+    removeChips(buyIn);
     createTable(selectedTier, maxPlayers, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
   };
 
