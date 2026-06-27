@@ -51,6 +51,9 @@ curl -X POST "https://backboard.railway.app/graphql/v2" \
 ### GitHub token (classic PAT, `repo` scope):
 Use `GITHUB_PERSONAL_ACCESS_TOKEN` from Replit Secrets. Must be a **classic** PAT with `repo` scope — fine-grained PATs don't have repo creation or push permissions on a fresh account.
 
+### Railway API token:
+`RAILWAY_API_TOKEN` is now saved in Replit Secrets (named "multiplayer" by user). Use it for BUILD_ID bumps and serviceInstanceDeployV2 triggers.
+
 ## Admin API header
 Admin routes check `req.headers['x-admin-key']` (NOT `x-admin-secret`).
 
