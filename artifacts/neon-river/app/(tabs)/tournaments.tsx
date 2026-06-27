@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   Platform,
@@ -20,110 +20,175 @@ import {
   TournamentConfig,
   TournamentType,
   getPrizePool,
+  TEXAS_TOURNAMENTS,
+  SHORT_DECK_TOURNAMENTS,
 } from '@/constants/tournaments';
 import { BLIND_LEVELS } from '@/hooks/useTournamentGame';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function formatChips(n: number): string {
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
+  const v = (x: number) => (x % 1 === 0 ? x.toFixed(0) : x.toFixed(1));
   if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${v(n / 1_000)}K`;
+  if (n >= 1_000_000) return `${v(n / 1_000_000)}M`;
+  if (n >= 1_000) return `${v(n / 1_000)}K`;
   return String(n);
 }
 
-// ─── Tournament type card ────────────────────────────────────────────────────
+// ─── Tab pill ─────────────────────────────────────────────────────────────────
 
-function TournamentTypeCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {
-  const prizePool = getPrizePool(config);
-  const canAfford = userChips >= config.buyIn;
-  const isHighRoller = config.type === 'highroller';
+type Tab = 'texas' | 'shortdeck';
 
-
+function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
   return (
-    <View style={[card.wrap, isHighRoller && card.wrapGold]}>
-      <LinearGradient
-        colors={[`${config.color}18`, `${config.color}06`, 'transparent']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
-      <View style={[card.accent, { backgroundColor: config.color }]} />
-
-      {/* Header row */}
-      <View style={card.headerRow}>
-        <View style={[card.iconWrap, { borderColor: `${config.color}50`, backgroundColor: `${config.color}15` }]}>
-          <Ionicons name={config.icon as any} size={20} color={config.color} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[card.name, { color: config.color }]}>{config.name}</Text>
-          <Text style={card.subtitle}>{config.subtitle}</Text>
-        </View>
-        {isHighRoller && (
-          <View style={card.vipBadge}>
-            <Text style={card.vipText}>VIP</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Stats row */}
-      <View style={card.statsRow}>
-        <View style={card.statItem}>
-          <Text style={card.statLabel}>BUY-IN</Text>
-          <Text style={[card.statValue, { color: canAfford ? colors.text : colors.error }]}>
-            {formatChips(config.buyIn)}
-          </Text>
-        </View>
-        <View style={card.statDivider} />
-        <View style={card.statItem}>
-          <Text style={card.statLabel}>PRIZE POOL</Text>
-          <Text style={[card.statValue, { color: config.color }]}>{formatChips(prizePool)}</Text>
-        </View>
-        <View style={card.statDivider} />
-        <View style={card.statItem}>
-          <Text style={card.statLabel}>PLAYERS</Text>
-          <Text style={card.statValue}>{config.numPlayers}</Text>
-        </View>
-        <View style={card.statDivider} />
-        <View style={card.statItem}>
-          <Text style={card.statLabel}>STACKS</Text>
-          <Text style={card.statValue}>{formatChips(config.startingChips)}</Text>
-        </View>
-      </View>
-
-      {/* Prize label */}
-      <Text style={card.prizeLabel}>{config.prizeLabel}</Text>
-
-      {/* Coming soon — locked */}
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-        gap: 8, paddingVertical: 12, borderRadius: 10, borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)',
-      }}>
-        <Ionicons name="lock-closed-outline" size={13} color="rgba(255,255,255,0.25)" />
-        <Text style={{
-          color: 'rgba(255,255,255,0.25)', fontSize: 10, fontWeight: '800',
-          fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
-        }}>COMING SOON</Text>
-      </View>
+    <View style={tab.wrap}>
+      {(['texas', 'shortdeck'] as Tab[]).map(t => {
+        const isActive = active === t;
+        const label = t === 'texas' ? "TEXAS HOLD'EM" : 'SHORT DECK';
+        const accent = t === 'texas' ? colors.primary : colors.secondary;
+        return (
+          <TouchableOpacity
+            key={t}
+            style={[tab.btn, isActive && { borderColor: accent, backgroundColor: `${accent}15` }]}
+            onPress={() => onChange(t)}
+            activeOpacity={0.7}
+          >
+            {isActive && (
+              <LinearGradient
+                colors={[`${accent}22`, 'transparent']}
+                style={StyleSheet.absoluteFill}
+              />
+            )}
+            <Text style={[tab.label, isActive && { color: accent }]}>{label}</Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
 
-// ─── Blind schedule preview ───────────────────────────────────────────────────
+// ─── Tournament card ──────────────────────────────────────────────────────────
 
-function BlindSchedule({ handsPerLevel }: { handsPerLevel: number }) {
+function TournamentCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {
+  const prizePool = getPrizePool(config);
+  const canAfford = userChips >= config.buyIn;
+  const isHighRoller = config.type === 'highroller' || config.type === 'sd_royal';
+
+  const handleEnter = () => {
+    if (!canAfford) {
+      Alert.alert(
+        'Not Enough Chips',
+        `You need ${formatChips(config.buyIn)} chips to enter this tournament.\n\nYour balance: ${formatChips(userChips)}`,
+        [{ text: 'OK' }],
+      );
+      return;
+    }
+    Alert.alert(
+      `Enter ${config.name}?`,
+      `Buy-in: ${formatChips(config.buyIn)} chips\nPrize Pool: ${formatChips(prizePool)} chips\n\n${config.prizeLabel}`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Enter Tournament',
+          onPress: () =>
+            router.push({ pathname: '/game/tournament', params: { type: config.type } } as any),
+        },
+      ],
+    );
+  };
+
+  return (
+    <View style={[cd.wrap, isHighRoller && { borderColor: `${config.color}55` }]}>
+      <LinearGradient
+        colors={[`${config.color}16`, `${config.color}06`, 'transparent']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      <View style={[cd.accent, { backgroundColor: config.color }]} />
+
+      {/* Header */}
+      <View style={cd.headerRow}>
+        <View style={[cd.iconWrap, { borderColor: `${config.color}50`, backgroundColor: `${config.color}15` }]}>
+          <Ionicons name={config.icon as any} size={20} color={config.color} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[cd.name, { color: config.color }]}>{config.name}</Text>
+          <Text style={cd.subtitle}>{config.subtitle}</Text>
+        </View>
+        {isHighRoller && (
+          <View style={cd.vipBadge}>
+            <Text style={cd.vipText}>VIP</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Stats */}
+      <View style={cd.statsRow}>
+        <View style={cd.statItem}>
+          <Text style={cd.statLabel}>BUY-IN</Text>
+          <Text style={[cd.statValue, { color: canAfford ? config.color : colors.error }]}>
+            {formatChips(config.buyIn)}
+          </Text>
+        </View>
+        <View style={cd.statDivider} />
+        <View style={cd.statItem}>
+          <Text style={cd.statLabel}>PRIZE POOL</Text>
+          <Text style={[cd.statValue, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
+        </View>
+        <View style={cd.statDivider} />
+        <View style={cd.statItem}>
+          <Text style={cd.statLabel}>PLAYERS</Text>
+          <Text style={cd.statValue}>{config.numPlayers}</Text>
+        </View>
+        <View style={cd.statDivider} />
+        <View style={cd.statItem}>
+          <Text style={cd.statLabel}>STACKS</Text>
+          <Text style={cd.statValue}>{formatChips(config.startingChips)}</Text>
+        </View>
+      </View>
+
+      {/* Prize label */}
+      <Text style={cd.prizeLabel}>{config.prizeLabel}</Text>
+
+      {/* Enter button */}
+      <TouchableOpacity
+        style={[cd.enterBtn, !canAfford && cd.enterBtnDisabled]}
+        onPress={handleEnter}
+        activeOpacity={0.82}
+      >
+        {canAfford && (
+          <LinearGradient
+            colors={[config.color, `${config.color}99`]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        )}
+        <Ionicons
+          name={canAfford ? 'trophy' : 'lock-closed'}
+          size={13}
+          color={canAfford ? colors.background : colors.textDim}
+        />
+        <Text style={[cd.enterBtnText, !canAfford && cd.enterBtnTextDisabled]}>
+          {canAfford ? `ENTER  ·  ${formatChips(config.buyIn)} CHIPS` : 'NOT ENOUGH CHIPS'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ─── Blind schedule ───────────────────────────────────────────────────────────
+
+function BlindSchedule() {
   const levels = BLIND_LEVELS.slice(0, 4);
   return (
-    <View style={blind.wrap}>
-      <Text style={blind.title}>BLIND STRUCTURE (first 4 levels)</Text>
-      <View style={blind.grid}>
+    <View style={bl.wrap}>
+      <Text style={bl.title}>BLIND STRUCTURE (first 4 levels)</Text>
+      <View style={bl.grid}>
         {levels.map((lvl, i) => (
-          <View key={i} style={blind.row}>
-            <Text style={blind.level}>LVL {i + 1}</Text>
-            <Text style={blind.blinds}>{lvl.sb} / {lvl.bb}</Text>
-            <Text style={blind.hands}>{handsPerLevel} hands</Text>
+          <View key={i} style={bl.row}>
+            <Text style={bl.level}>LVL {i + 1}</Text>
+            <Text style={bl.blinds}>{lvl.sb} / {lvl.bb}</Text>
+            <Text style={bl.info}>Antes start level 3</Text>
           </View>
         ))}
       </View>
@@ -133,15 +198,17 @@ function BlindSchedule({ handsPerLevel }: { handsPerLevel: number }) {
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
-const TYPE_ORDER: TournamentType[] = ['beginner', 'sitandgo', 'turbo', 'highroller'];
-
 export default function TournamentsScreen() {
   const insets = useSafeAreaInsets();
   const dynColors = useColors();
   const { profile } = useUser();
+  const [activeTab, setActiveTab] = useState<Tab>('texas');
+
+  const tournamentList: TournamentType[] =
+    activeTab === 'texas' ? TEXAS_TOURNAMENTS : SHORT_DECK_TOURNAMENTS;
 
   return (
-    <View style={[styles.container, { backgroundColor: dynColors.background }]}>
+    <View style={[st.container, { backgroundColor: dynColors.background }]}>
       <LinearGradient
         colors={[dynColors.background, dynColors.surfaceElevated]}
         style={StyleSheet.absoluteFill}
@@ -149,49 +216,63 @@ export default function TournamentsScreen() {
 
       <ScrollView
         contentContainerStyle={[
-          styles.scroll,
+          st.scroll,
           { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 16), paddingBottom: insets.bottom + 100 },
         ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.headerRow}>
+        <View style={st.headerRow}>
           <View>
-            <Text style={styles.pageTitle}>TOURNAMENTS</Text>
-            <Text style={styles.pageSub}>Single-table · AI-filled · Virtual chips only</Text>
+            <Text style={st.pageTitle}>TOURNAMENTS</Text>
+            <Text style={st.pageSub}>Single-table · AI-filled · Virtual chips only</Text>
           </View>
-          <View style={styles.balanceBadge}>
+          <View style={st.balanceBadge}>
             <Ionicons name="wallet-outline" size={12} color={colors.gold} />
-            <Text style={styles.balanceText}>{formatChips(profile.chips)}</Text>
+            <Text style={st.balanceText}>{formatChips(profile.chips)}</Text>
           </View>
         </View>
 
-        {/* Coming soon notice */}
-        <View style={styles.betaNotice}>
-          <Ionicons name="lock-closed-outline" size={14} color="rgba(255,215,0,0.65)" />
-          <Text style={[styles.betaText, { color: 'rgba(255,215,0,0.65)' }]}>
-            Tournaments are in development — launching soon
-          </Text>
+        {/* Live badge */}
+        <View style={st.liveBadge}>
+          <View style={st.liveDot} />
+          <Text style={st.liveText}>LIVE · AI-filled tables start instantly</Text>
         </View>
 
-        {/* Tournament type cards */}
-        <Text style={styles.sectionLabel}>CHOOSE YOUR TOURNAMENT</Text>
+        {/* Tabs */}
+        <TabBar active={activeTab} onChange={setActiveTab} />
 
-        {TYPE_ORDER.map(type => (
-          <TournamentTypeCard
+        {/* Cards */}
+        <Text style={st.sectionLabel}>
+          {activeTab === 'texas' ? "TEXAS HOLD'EM" : 'SHORT DECK HOLD\'EM'}
+        </Text>
+
+        {tournamentList.map(type => (
+          <TournamentCard
             key={type}
             config={TOURNAMENT_CONFIGS[type]}
             userChips={profile.chips}
           />
         ))}
 
-        {/* Blind structure reference */}
-        <BlindSchedule handsPerLevel={4} />
+        {/* Blind reference */}
+        <BlindSchedule />
 
-        {/* Info footer */}
-        <View style={styles.footerNote}>
+        {/* Multiplayer teaser */}
+        <View style={st.mpTeaser}>
+          <Ionicons name="people-outline" size={16} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={st.mpTitle}>MULTIPLAYER TOURNAMENTS</Text>
+            <Text style={st.mpSub}>
+              Live events against real players with massive prize pools — arriving with the multiplayer update.
+            </Text>
+          </View>
+        </View>
+
+        {/* Footer */}
+        <View style={st.footerNote}>
           <Ionicons name="shield-checkmark-outline" size={13} color={colors.textMuted} />
-          <Text style={styles.footerText}>
+          <Text style={st.footerText}>
             All buy-ins and prizes are virtual chips only and have no real-world value.
           </Text>
         </View>
@@ -202,18 +283,39 @@ export default function TournamentsScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const card = StyleSheet.create({
+const tab = StyleSheet.create({
   wrap: {
-    borderRadius: colors.radiusLg,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  btn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  label: {
+    fontSize: 9,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 1.2,
+    color: colors.textMuted,
+  },
+});
+
+const cd = StyleSheet.create({
+  wrap: {
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
     padding: 16,
     gap: 12,
     position: 'relative',
-  },
-  wrapGold: {
-    borderColor: 'rgba(255,215,0,0.3)',
   },
   accent: {
     position: 'absolute',
@@ -236,10 +338,10 @@ const card = StyleSheet.create({
     justifyContent: 'center',
   },
   name: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
   },
   subtitle: {
     color: colors.textMuted,
@@ -295,20 +397,7 @@ const card = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0.5,
   },
-  insufficientRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(255,68,68,0.08)',
-    borderRadius: 8,
-    padding: 8,
-  },
-  insufficientText: {
-    color: colors.error,
-    fontSize: 11,
-    flex: 1,
-  },
-  playBtn: {
+  enterBtn: {
     borderRadius: 50,
     paddingVertical: 13,
     alignItems: 'center',
@@ -316,26 +405,25 @@ const card = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     overflow: 'hidden',
-    marginTop: 2,
   },
-  playBtnDisabled: {
+  enterBtnDisabled: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  playBtnText: {
+  enterBtnText: {
     color: colors.background,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
     fontFamily: 'Orbitron_700Bold',
     letterSpacing: 1.5,
   },
-  playBtnTextDisabled: {
+  enterBtnTextDisabled: {
     color: colors.textDim,
   },
 });
 
-const blind = StyleSheet.create({
+const bl = StyleSheet.create({
   wrap: {
     borderRadius: colors.radius,
     borderWidth: 1,
@@ -371,13 +459,13 @@ const blind = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     flex: 1,
   },
-  hands: {
+  info: {
     color: colors.textMuted,
     fontSize: 10,
   },
 });
 
-const styles = StyleSheet.create({
+const st = StyleSheet.create({
   container: { flex: 1 },
   scroll: { paddingHorizontal: 16, gap: 14 },
   headerRow: {
@@ -414,18 +502,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontFamily: 'Inter_700Bold',
   },
-  betaNotice: {
+  liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: colors.primaryDim,
+    gap: 7,
+    backgroundColor: 'rgba(0,232,135,0.08)',
     borderRadius: 10,
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderWidth: 1,
+    borderColor: 'rgba(0,232,135,0.25)',
   },
-  betaText: {
-    color: colors.primary,
+  liveDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#00e887',
+  },
+  liveText: {
+    color: '#00e887',
     fontSize: 11,
-    flex: 1,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   sectionLabel: {
     color: colors.textMuted,
@@ -433,6 +531,29 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 2,
     fontFamily: 'Orbitron_400Regular',
+  },
+  mpTeaser: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: `${colors.accent}33`,
+    backgroundColor: `${colors.accent}08`,
+    padding: 14,
+  },
+  mpTitle: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold',
+    letterSpacing: 1.5,
+  },
+  mpSub: {
+    color: colors.textMuted,
+    fontSize: 11,
+    marginTop: 3,
+    lineHeight: 16,
   },
   footerNote: {
     flexDirection: 'row',

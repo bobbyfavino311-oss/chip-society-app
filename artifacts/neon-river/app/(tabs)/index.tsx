@@ -44,7 +44,119 @@ const RANK_COLORS: Record<string, string> = {
   'CHIP SOCIETY ELITE': colors.accent,
 };
 
-// ─── Tournament Preview Hub ────────────────────────────────────────────────────
+// ─── Tournament Carousel ───────────────────────────────────────────────────────
+
+import {
+  TOURNAMENT_CONFIGS,
+  TournamentConfig,
+  TEXAS_TOURNAMENTS,
+  getPrizePool,
+} from '@/constants/tournaments';
+
+const HOME_TOURNAMENTS = TEXAS_TOURNAMENTS; // show Texas Hold'em on home
+
+function formatChipsMini(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
+function TournamentCarouselCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {
+  const prizePool = getPrizePool(config);
+  const canAfford = userChips >= config.buyIn;
+  return (
+    <TouchableOpacity
+      style={[tc.card, { borderColor: `${config.color}35` }]}
+      activeOpacity={0.82}
+      onPress={() => {
+        if (canAfford) {
+          router.push({ pathname: '/game/tournament', params: { type: config.type } } as any);
+        } else {
+          router.push('/(tabs)/tournaments');
+        }
+      }}
+    >
+      <LinearGradient
+        colors={['#120020', '#080018', '#050010']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      />
+      <LinearGradient
+        colors={[`${config.color}18`, 'transparent']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }} end={{ x: 0.9, y: 0.7 }}
+      />
+      <View style={[tc.accentBar, { backgroundColor: config.color }]} />
+      <View style={tc.body}>
+        <View style={tc.topRow}>
+          <View style={[tc.badge, { backgroundColor: `${config.color}18`, borderColor: `${config.color}45` }]}>
+            <View style={[tc.liveDot, { backgroundColor: config.color }]} />
+            <Text style={[tc.badgeText, { color: config.color }]}>LIVE</Text>
+          </View>
+        </View>
+        <View style={[tc.iconWrap, { borderColor: `${config.color}40`, backgroundColor: `${config.color}15` }]}>
+          <Ionicons name={config.icon as any} size={18} color={config.color} />
+        </View>
+        <Text style={[tc.name, { color: config.color }]} numberOfLines={2}>{config.name}</Text>
+        <Text style={tc.sub}>{config.subtitle}</Text>
+        <View style={tc.statsRow}>
+          <View style={tc.stat}>
+            <Text style={tc.statLbl}>BUY-IN</Text>
+            <Text style={[tc.statVal, { color: canAfford ? config.color : colors.error }]}>
+              {formatChipsMini(config.buyIn)}
+            </Text>
+          </View>
+          <View style={tc.statDiv} />
+          <View style={tc.stat}>
+            <Text style={tc.statLbl}>PRIZE</Text>
+            <Text style={[tc.statVal, { color: colors.gold }]}>{formatChipsMini(prizePool)}</Text>
+          </View>
+          <View style={tc.statDiv} />
+          <View style={tc.stat}>
+            <Text style={tc.statLbl}>SEATS</Text>
+            <Text style={tc.statVal}>{config.numPlayers}</Text>
+          </View>
+        </View>
+        <View style={[tc.enterBar, canAfford
+          ? { backgroundColor: `${config.color}22`, borderColor: `${config.color}50` }
+          : { backgroundColor: 'rgba(255,255,255,0.04)', borderColor: colors.border }
+        ]}>
+          <Ionicons
+            name={canAfford ? 'trophy-outline' : 'lock-closed-outline'}
+            size={10}
+            color={canAfford ? config.color : colors.textDim}
+          />
+          <Text style={[tc.enterText, { color: canAfford ? config.color : colors.textDim }]}>
+            {canAfford ? 'TAP TO ENTER' : 'NEED MORE CHIPS'}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function TournamentCarousel({ userChips }: { userChips: number }) {
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      snapToInterval={width * 0.64 + 12}
+      decelerationRate="fast"
+      snapToAlignment="start"
+      contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+    >
+      {HOME_TOURNAMENTS.map(type => (
+        <TournamentCarouselCard
+          key={type}
+          config={TOURNAMENT_CONFIGS[type]}
+          userChips={userChips}
+        />
+      ))}
+    </ScrollView>
+  );
+}
+
+// ─── Quick Play inline launcher ──────────────────────────────────────────────
 
 type TVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem' | 'omaha_holdem';
 
@@ -61,114 +173,6 @@ const QP_VARIANTS: QpVariantDef[] = [
   { key: 'omaha_holdem',      label: "OMAHA\nHOLD'EM",        sub: '4 hole cards · Use exactly 2',      color: '#00ff88', gradient: ['#00ff88', '#00aa55'], iconSet: 'ion', iconName: 'grid-outline' },
 ];
 
-interface TPreviewCard {
-  id: string;
-  emoji: string;
-  name: string;
-  color: string;
-  badge: string;
-  features: string[];
-}
-
-const PREVIEW_CARDS: TPreviewCard[] = [
-  {
-    id: '2', emoji: '⚡', name: 'TURBO SHOWDOWN', color: colors.primary,
-    badge: 'COMING SOON',
-    features: ['Fast blind increases', 'Shorter tournament sessions', 'Rapid chip accumulation', 'Quick competitive play'],
-  },
-  {
-    id: '3', emoji: '🎭', name: 'SEASONAL EVENTS', color: '#00e887',
-    badge: 'COMING SOON',
-    features: ['Halloween Event', 'Christmas Event', 'Summer Nights', 'Lucky Fortune Festival'],
-  },
-  {
-    id: '4', emoji: '🎯', name: 'MTT TOURNAMENTS', color: '#bf5fff',
-    badge: 'COMING SOON',
-    features: ['Large prize pools', 'Scheduled start times', 'Progressive blind levels', 'Final Table experience'],
-  },
-];
-
-function TournamentPreviewCard({ card }: { card: TPreviewCard }) {
-  return (
-    <View style={[tc.card, { borderColor: `${card.color}30` }]}>
-      <LinearGradient
-        colors={['#120020', '#080018', '#050010']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-      />
-      <LinearGradient
-        colors={[`${card.color}15`, 'transparent']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 0.9, y: 0.7 }}
-      />
-      <View style={[tc.accentBar, { backgroundColor: card.color }]} />
-      <View style={tc.body}>
-        <View style={tc.topRow}>
-          <View style={[tc.badge, { backgroundColor: `${card.color}15`, borderColor: `${card.color}40` }]}>
-            <Ionicons name="time-outline" size={8} color={card.color} />
-            <Text style={[tc.badgeText, { color: card.color }]}>{card.badge}</Text>
-          </View>
-        </View>
-        <Text style={tc.emoji}>{card.emoji}</Text>
-        <Text style={[tc.name, { color: card.color }]} numberOfLines={2}>{card.name}</Text>
-        <View style={tc.featureList}>
-          {card.features.map((f, i) => (
-            <View key={i} style={tc.featureRow}>
-              <Ionicons name="chevron-forward" size={9} color={`${card.color}80`} />
-              <Text style={tc.featureText}>{f}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={[tc.comingSoonBar, { borderColor: `${card.color}30` }]}>
-          <Ionicons name="time-outline" size={10} color={`${card.color}60`} />
-          <Text style={[tc.comingSoonText, { color: `${card.color}70` }]}>COMING SOON</Text>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function TournamentPreviewHub() {
-  return (
-    <View style={tour.wrap}>
-      {/* Main feature card */}
-      <View style={tour.featCard}>
-        <LinearGradient colors={['#1a0035', '#0a001f', '#050010']} style={StyleSheet.absoluteFill} />
-        <LinearGradient colors={[`${colors.gold}18`, 'transparent']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
-        <View style={[tour.featBar, { backgroundColor: colors.gold }]} />
-        <View style={tour.featBody}>
-          <View style={tour.featBadgeRow}>
-            <View style={tour.featBadge}>
-              <Ionicons name="time-outline" size={9} color={colors.gold} />
-              <Text style={tour.featBadgeText}>COMING SOON</Text>
-            </View>
-          </View>
-          <Text style={tour.featEmoji}>🏆</Text>
-          <Text style={tour.featTitle}>CHIP SOCIETY{'\n'}CHAMPIONSHIP</Text>
-          <Text style={tour.featDesc}>
-            The flagship tournament series of Chip Society. Battle for massive chip prizes, exclusive avatars, badges, and seasonal rewards.
-          </Text>
-          <View style={[tour.featComingSoon, { borderColor: `${colors.gold}30` }]}>
-            <Ionicons name="time-outline" size={10} color={`${colors.gold}80`} />
-            <Text style={[tour.featComingSoonText, { color: `${colors.gold}80` }]}>COMING SOON</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Horizontal preview cards */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={width * 0.72 + 12}
-        decelerationRate="fast"
-        snapToAlignment="start"
-        contentContainerStyle={{ gap: 12, paddingRight: 16 }}
-      >
-        {PREVIEW_CARDS.map(c => <TournamentPreviewCard key={c.id} card={c} />)}
-      </ScrollView>
-    </View>
-  );
-}
 
 // ─── Quick Play inline launcher ──────────────────────────────────────────────
 
@@ -634,14 +638,12 @@ export default function HomeScreen() {
 
         {/* 4 ─── Featured Tournaments ─── */}
         <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>FEATURED TOURNAMENTS</Text>
-          <View style={[styles.activeBadge, { borderColor: `${colors.gold}40`, backgroundColor: `${colors.gold}10` }]}>
-            <Ionicons name="time-outline" size={9} color={colors.gold} />
-            <Text style={[styles.activeCount, { color: colors.gold }]}>COMING SOON</Text>
-          </View>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>TOURNAMENTS</Text>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/tournaments')}>
+            <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={tour.hubSub}>The next major feature coming to Chip Society.</Text>
-        <TournamentPreviewHub />
+        <TournamentCarousel userChips={profile.chips} />
 
         {/* 5 ─── Player Stats ─── */}
         <View style={styles.sectionRow}>
@@ -674,77 +676,50 @@ export default function HomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 
-// ─── Tournament preview card styles ───────────────────────────────────────────
+// ─── Tournament carousel card styles ─────────────────────────────────────────
 const tc = StyleSheet.create({
   card: {
-    width: width * 0.72,
+    width: width * 0.64,
     borderRadius: 18,
     borderWidth: 1,
     overflow: 'hidden',
     flexDirection: 'row',
   },
   accentBar: { width: 4 },
-  body:      { flex: 1, padding: 14, gap: 8 },
+  body:      { flex: 1, padding: 13, gap: 8 },
   topRow:    { flexDirection: 'row', alignItems: 'center', gap: 6 },
   badge: {
     borderRadius: 6, borderWidth: 1,
     paddingHorizontal: 6, paddingVertical: 2,
-    flexDirection: 'row', alignItems: 'center', gap: 3,
+    flexDirection: 'row', alignItems: 'center', gap: 4,
   },
-  badgeText:    { fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
-  emoji:        { fontSize: 22, lineHeight: 28 },
+  liveDot: { width: 5, height: 5, borderRadius: 3 },
+  badgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
+  iconWrap: {
+    width: 36, height: 36, borderRadius: 18,
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
+  },
   name: {
-    fontSize: 13, fontWeight: '800',
+    fontSize: 12, fontWeight: '800',
     fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 0.2, lineHeight: 17,
+    letterSpacing: 0.3, lineHeight: 16,
   },
-  featureList:  { gap: 4, marginTop: 2 },
-  featureRow:   { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  featureText:  { color: 'rgba(255,255,255,0.45)', fontSize: 10, lineHeight: 14, flex: 1 },
-  comingSoonBar: {
+  sub: { color: 'rgba(255,255,255,0.4)', fontSize: 10, lineHeight: 14 },
+  statsRow: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 8, padding: 8,
+  },
+  stat:    { flex: 1, alignItems: 'center', gap: 2 },
+  statDiv: { width: 1, height: 22, backgroundColor: 'rgba(255,255,255,0.1)' },
+  statLbl: { color: 'rgba(255,255,255,0.35)', fontSize: 7, fontWeight: '700', letterSpacing: 0.8 },
+  statVal: { color: colors.text, fontSize: 11, fontWeight: '800', fontFamily: 'Inter_700Bold' },
+  enterBar: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     borderRadius: 7, borderWidth: 1,
-    paddingHorizontal: 8, paddingVertical: 5, marginTop: 4,
+    paddingHorizontal: 8, paddingVertical: 5,
   },
-  comingSoonText: { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8 },
-});
-
-// ─── Tournament hub wrapper styles ────────────────────────────────────────────
-const tour = StyleSheet.create({
-  wrap:     { gap: 12 },
-  hubSub:   { color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: -8, marginBottom: 2 },
-
-  featCard: {
-    borderRadius: 18, borderWidth: 1, borderColor: `${colors.gold}35`,
-    overflow: 'hidden', flexDirection: 'row',
-  },
-  featBar:  { width: 4, backgroundColor: colors.gold },
-  featBody: { flex: 1, padding: 16, gap: 10 },
-  featBadgeRow: { flexDirection: 'row' },
-  featBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    borderRadius: 6, borderWidth: 1,
-    borderColor: `${colors.gold}40`, backgroundColor: `${colors.gold}15`,
-    paddingHorizontal: 7, paddingVertical: 3,
-  },
-  featBadgeText: { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', color: colors.gold, letterSpacing: 0.5 },
-  featEmoji: { fontSize: 28, lineHeight: 34 },
-  featTitle: {
-    fontSize: 17, fontWeight: '900', fontFamily: 'Orbitron_900Black',
-    color: colors.gold, letterSpacing: 0.5, lineHeight: 22,
-  },
-  featDesc:  { color: 'rgba(255,255,255,0.42)', fontSize: 12, lineHeight: 18 },
-
-  featComingSoon: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderRadius: 8, borderWidth: 1,
-    paddingHorizontal: 10, paddingVertical: 6,
-    alignSelf: 'flex-start',
-  },
-  featComingSoonText: {
-    fontSize: 9, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
-  },
+  enterText: { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8 },
 });
 
 const logo = StyleSheet.create({
