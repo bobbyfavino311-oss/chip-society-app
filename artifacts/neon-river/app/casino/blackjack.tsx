@@ -145,64 +145,112 @@ const sb = StyleSheet.create({
 });
 
 // ─── Animated shuffle overlay ─────────────────────────────────────────────────
-function ShufflingOverlay({ visible, shuffleKey, numDecks }: { visible: boolean; shuffleKey: number; numDecks: number }) {
+function ShufflingOverlay({
+  visible, shuffleKey, numDecks, onComplete,
+}: {
+  visible: boolean;
+  shuffleKey: number;
+  numDecks: number;
+  onComplete?: () => void;
+}) {
   const [showReady, setShowReady] = useState(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
-  // 5 animated cards — x offset, y offset, rotation
-  const cardX   = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
-  const cardY   = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
-  const cardRot = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
+  const cardX     = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
+  const cardY     = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
+  const cardRot   = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
+  const cardScale = useRef(Array.from({ length: 5 }, () => new Animated.Value(1))).current;
+  const shoeGlow  = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!visible) { setShowReady(false); return; }
+    if (!visible) {
+      setShowReady(false);
+      return;
+    }
 
-    // Reset to stacked center
     cardX.forEach(a => a.setValue(0));
     cardY.forEach(a => a.setValue(0));
     cardRot.forEach(a => a.setValue(0));
+    cardScale.forEach(a => a.setValue(1));
+    shoeGlow.setValue(0);
     setShowReady(false);
 
-    // Phase 1: fan out (300ms)
-    const fanOut = Animated.parallel([
-      ...cardX.map((a, i) => Animated.timing(a, { toValue: (i - 2) * 38, duration: 300, useNativeDriver: true })),
-      ...cardRot.map((a, i) => Animated.timing(a, { toValue: (i - 2) * 10, duration: 300, useNativeDriver: true })),
+    let cancelled = false;
+    const ids: ReturnType<typeof setTimeout>[] = [];
+    const tick = (fn: () => void, ms: number) => { const id = setTimeout(fn, ms); ids.push(id); };
+
+    let fanAnim: Animated.CompositeAnimation | null = null;
+    let riffleAnim: Animated.CompositeAnimation | null = null;
+    let collapseAnim: Animated.CompositeAnimation | null = null;
+
+    // Phase 1 — Fan out (300ms)
+    fanAnim = Animated.parallel([
+      ...cardX.map((a, i) => Animated.timing(a, { toValue: (i - 2) * 40, duration: 300, useNativeDriver: true })),
+      ...cardRot.map((a, i) => Animated.timing(a, { toValue: (i - 2) * 12, duration: 300, useNativeDriver: true })),
     ]);
 
-    // Phase 2: riffle — alternating up/down 5 times (150ms each = 1500ms)
-    const riffleUp = Animated.parallel(
-      cardY.map((a, i) => Animated.timing(a, { toValue: i % 2 === 0 ? -14 : 14, duration: 140, useNativeDriver: true }))
-    );
-    const riffleDown = Animated.parallel(
-      cardY.map((a, i) => Animated.timing(a, { toValue: i % 2 === 0 ? 14 : -14, duration: 140, useNativeDriver: true }))
-    );
-    const riffle = Animated.loop(Animated.sequence([riffleUp, riffleDown]), { iterations: 6 });
+    fanAnim.start(({ finished }) => {
+      if (!finished || cancelled) return;
 
-    // Run fan → riffle → collapse in sequence; riffle runs for 6*280=1680ms then stop
-    fanOut.start(() => {
-      riffle.start();
-      setTimeout(() => {
-        riffle.stop();
-        // Phase 3: collapse to center (300ms)
-        Animated.parallel([
-          ...cardX.map(a => Animated.timing(a, { toValue: 0, duration: 350, useNativeDriver: true })),
-          ...cardY.map(a => Animated.timing(a, { toValue: 0, duration: 350, useNativeDriver: true })),
-          ...cardRot.map(a => Animated.timing(a, { toValue: 0, duration: 350, useNativeDriver: true })),
-        ]).start(() => setShowReady(true));
-      }, 1680);
+      // Phase 2 — Riffle shuffle (5 cycles × 260ms = 1300ms)
+      const up = Animated.parallel(
+        cardY.map((a, i) => Animated.timing(a, { toValue: i % 2 === 0 ? -16 : 16, duration: 130, useNativeDriver: true }))
+      );
+      const dn = Animated.parallel(
+        cardY.map((a, i) => Animated.timing(a, { toValue: i % 2 === 0 ? 16 : -16, duration: 130, useNativeDriver: true }))
+      );
+      riffleAnim = Animated.loop(Animated.sequence([up, dn]), { iterations: 5 });
+      riffleAnim.start();
+
+      tick(() => {
+        if (cancelled) return;
+        riffleAnim?.stop();
+
+        // Phase 3 — Collapse cards into the shoe slot (380ms)
+        collapseAnim = Animated.parallel([
+          ...cardX.map(a  => Animated.timing(a, { toValue: 0,    duration: 380, useNativeDriver: true })),
+          ...cardY.map(a  => Animated.timing(a, { toValue: 44,   duration: 380, useNativeDriver: true })),
+          ...cardRot.map(a => Animated.timing(a, { toValue: 0,   duration: 380, useNativeDriver: true })),
+          ...cardScale.map(a => Animated.timing(a, { toValue: 0, duration: 320, useNativeDriver: true })),
+        ]);
+        collapseAnim.start(({ finished: f }) => {
+          if (!f || cancelled) return;
+
+          // Phase 4 — Shoe glows (300ms), show READY
+          Animated.timing(shoeGlow, { toValue: 1, duration: 300, useNativeDriver: false }).start();
+          setShowReady(true);
+
+          // Fire onComplete after a brief "ready" display
+          tick(() => { if (!cancelled) onCompleteRef.current?.(); }, 650);
+        });
+      }, 1300);
     });
+
+    return () => {
+      cancelled = true;
+      ids.forEach(clearTimeout);
+      fanAnim?.stop();
+      riffleAnim?.stop();
+      collapseAnim?.stop();
+    };
   }, [shuffleKey, visible]);
 
   if (!visible) return null;
 
-  const deckLabel = numDecks === 1 ? 'Single deck · 52 cards' : numDecks === 5 ? 'Five decks · 260 cards' : `${numDecks} decks · ${numDecks * 52} cards`;
+  const deckLabel = numDecks === 1 ? 'Single deck · 52 cards' : `${numDecks} decks · ${numDecks * 52} cards`;
+  const glowBorder = shoeGlow.interpolate({ inputRange: [0, 1], outputRange: ['rgba(0,212,255,0.22)', 'rgba(0,212,255,0.75)'] });
+  const glowBg     = shoeGlow.interpolate({ inputRange: [0, 1], outputRange: ['rgba(0,212,255,0.04)', 'rgba(0,212,255,0.16)'] });
 
   return (
     <View style={[StyleSheet.absoluteFillObject, sovl.wrap]}>
       <LinearGradient colors={['rgba(5,0,16,0.97)', 'rgba(10,0,30,0.97)']} style={StyleSheet.absoluteFill} />
 
-      <Text style={sovl.title}>{showReady ? 'NEW SHOE READY' : 'SHUFFLING SHOE'}</Text>
+      <Text style={[sovl.title, showReady && { color: colors.success }]}>
+        {showReady ? 'NEW SHOE READY' : 'SHUFFLING SHOE'}
+      </Text>
 
-      {/* Animated card backs */}
+      {/* Animated card backs above shoe */}
       <View style={sovl.cardRow}>
         {cardX.map((ax, i) => (
           <Animated.View
@@ -214,28 +262,42 @@ function ShufflingOverlay({ visible, shuffleKey, numDecks }: { visible: boolean;
                   { translateX: ax },
                   { translateY: cardY[i] },
                   { rotate: cardRot[i].interpolate({ inputRange: [-20, 20], outputRange: ['-20deg', '20deg'] }) },
+                  { scale: cardScale[i] },
                 ],
                 zIndex: i,
               },
             ]}
           >
             <LinearGradient colors={['#1a003a', '#0d0025']} style={StyleSheet.absoluteFill} />
-            {/* diamond card-back pattern */}
             <View style={sovl.cardDiamond} />
           </Animated.View>
         ))}
       </View>
 
-      <Text style={[sovl.sub, showReady && { color: colors.success }]}>{deckLabel}</Text>
+      {/* Casino dealing shoe */}
+      <Animated.View style={[sovl.shoe, { borderColor: glowBorder, backgroundColor: glowBg }]}>
+        {/* slot at top where cards enter */}
+        <Animated.View style={[sovl.shoeSlot, { borderColor: glowBorder }]} />
+        <Text style={sovl.shoeLabel}>SHOE</Text>
+        <Text style={sovl.shoeCount}>{numDecks * 52} CARDS</Text>
+      </Animated.View>
+
+      <Text style={[sovl.sub, showReady && { color: colors.success }]}>
+        {showReady ? '▸ READY TO DEAL' : deckLabel}
+      </Text>
     </View>
   );
 }
 const sovl = StyleSheet.create({
-  wrap:        { zIndex: 999, alignItems: 'center', justifyContent: 'center', gap: 20 },
+  wrap:        { zIndex: 999, alignItems: 'center', justifyContent: 'center', gap: 14 },
   title:       { fontSize: 20, fontFamily: 'Orbitron_900Black', color: colors.gold, letterSpacing: 3, textAlign: 'center' },
   cardRow:     { flexDirection: 'row', alignItems: 'center', height: 80 },
-  card:        { position: 'absolute', width: 46, height: 65, borderRadius: 7, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.40)', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  cardDiamond: { width: 20, height: 20, borderRadius: 3, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.35)', transform: [{ rotate: '45deg' }] },
+  card:        { position: 'absolute', width: 44, height: 62, borderRadius: 6, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.40)', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  cardDiamond: { width: 18, height: 18, borderRadius: 3, borderWidth: 1.5, borderColor: 'rgba(0,212,255,0.35)', transform: [{ rotate: '45deg' }] },
+  shoe:        { borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 28, paddingVertical: 10, alignItems: 'center', gap: 3, minWidth: 130, position: 'relative' },
+  shoeSlot:    { position: 'absolute', top: -9, left: '25%', right: '25%', height: 9, borderTopLeftRadius: 4, borderTopRightRadius: 4, borderWidth: 1, borderBottomWidth: 0, backgroundColor: '#050010' },
+  shoeLabel:   { fontSize: 8,  fontFamily: 'Orbitron_700Bold',    color: 'rgba(0,212,255,0.45)', letterSpacing: 2 },
+  shoeCount:   { fontSize: 14, fontFamily: 'Inter_700Bold',        color: 'rgba(0,212,255,0.70)' },
   sub:         { fontSize: 10, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.45)', letterSpacing: 2, textAlign: 'center' },
 });
 
@@ -602,7 +664,13 @@ export default function BlackjackScreen() {
     setActiveIdx(0);
   }
 
-  // ─── New hand — FIXED sequential shuffle flow ─────────────────────────────────
+  // ─── Shuffle complete — called by ShufflingOverlay.onComplete ────────────────
+  const handleShuffleComplete = useCallback(() => {
+    setIsShuffling(false);
+    setPhase('betting');
+  }, []);
+
+  // ─── New hand ─────────────────────────────────────────────────────────────────
   function handleNewHand() {
     syncDealerCards([]);
     syncPlayerHands([]);
@@ -613,17 +681,14 @@ export default function BlackjackScreen() {
     MusicEngine.setIntensity('normal');
 
     if (shoePosRef.current >= TEST_RESHUFFLE) {
-      // Reshuffle: show animation, THEN go to betting after it completes
-      shoeRef.current  = createShoe(TEST_DECKS);
+      // Rebuild shoe, then let the ShufflingOverlay drive the phase transition
+      // via its onComplete callback — no hardcoded setTimeout here.
+      shoeRef.current    = createShoe(TEST_DECKS);
       shoePosRef.current = 0;
       setCardsDealt(0);
       setShuffleKey(k => k + 1);
       setIsShuffling(true);
       setPhase('shuffling');
-      setTimeout(() => {
-        setIsShuffling(false);
-        setPhase('betting');   // go to betting AFTER animation finishes
-      }, 2600);
     } else {
       setPhase('betting');
     }
@@ -652,7 +717,7 @@ export default function BlackjackScreen() {
       <View style={[s.glowTop,    { backgroundColor: 'rgba(0,212,255,0.05)' }]} />
       <View style={[s.glowBottom, { backgroundColor: 'rgba(255,215,0,0.04)' }]} />
 
-      <ShufflingOverlay visible={isShuffling} shuffleKey={shuffleKey} numDecks={TEST_DECKS} />
+      <ShufflingOverlay visible={isShuffling} shuffleKey={shuffleKey} numDecks={TEST_DECKS} onComplete={handleShuffleComplete} />
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <View style={[s.header, { paddingTop: insets.top + 10 }]}>
