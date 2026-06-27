@@ -95,7 +95,7 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
 
     const socket = io(url, {
       path: SOCKET_PATH,
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,

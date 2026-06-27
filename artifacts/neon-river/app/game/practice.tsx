@@ -24,7 +24,7 @@ import { useUser } from '@/context/UserContext';
 import { useAchievements } from '@/context/AchievementContext';
 import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame, TableConfig } from '@/hooks/usePokerGame';
-import { SoundEngine } from '@/lib/soundEngine';
+import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 import { getBestHandVariant, describeHand, isRedSuit, suitSymbol, valueLabel } from '@/lib/pokerEngine';
 import type { GameVariant } from '@/constants/gameVariants';
@@ -390,6 +390,9 @@ export default function PracticeScreen() {
   // ── Mounted guard — prevents async setState after router.back() ──────────
   const isMountedRef = useRef(true);
   useEffect(() => { isMountedRef.current = true; return () => { isMountedRef.current = false; }; }, []);
+
+  // ── Re-prime iOS audio session on every game entry ────────────────────────
+  useEffect(() => { void unlockAudio(); }, []);
 
   // ── Between-hand countdown ────────────────────────────────────────────────
   const [betweenSecs, setBetweenSecs]         = useState(10);

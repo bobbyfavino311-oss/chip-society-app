@@ -40,11 +40,14 @@ async function ensureAudio() {
   try {
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS:    true,
+      allowsRecordingIOS:      false,
       staysActiveInBackground: false,
       shouldDuckAndroid:       true,
     });
     _audioReady = true;
-  } catch {}
+  } catch {
+    // leave _audioReady false so the next call retries
+  }
 }
 
 /**

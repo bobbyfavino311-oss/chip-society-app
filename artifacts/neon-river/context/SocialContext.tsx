@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { PostReactions } from '@/lib/socialData';
+import { useUser } from '@/context/UserContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -48,69 +49,93 @@ interface SocialContextValue extends SocialState {
 
 const SocialContext = createContext<SocialContextValue | null>(null);
 
-// ── Storage keys ──────────────────────────────────────────────────────────────
+// ── Per-user storage keys ──────────────────────────────────────────────────────
+// Keys are namespaced by playerId so switching accounts never leaks data.
 
-const KEY_FOLLOWING     = '@chipsociety_social_following_v1';
-const KEY_LIKED         = '@chipsociety_social_liked_v1';
-const KEY_REACTIONS     = '@chipsociety_social_reactions_v1';
-const KEY_NOTIFICATIONS = '@chipsociety_social_notifications_v1';
+const BASE_FOLLOWING     = '@chipsociety_social_following_v1';
+const BASE_LIKED         = '@chipsociety_social_liked_v1';
+const BASE_REACTIONS     = '@chipsociety_social_reactions_v1';
+const BASE_NOTIFICATIONS = '@chipsociety_social_notifications_v1';
 
-// ── Seeded notifications (simulated social activity) ─────────────────────────
+function userKey(base: string, pid: string) {
+  return pid ? `${base}_${pid}` : base;
+}
 
 const SEED_NOTIFICATIONS: SocialNotification[] = [];
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 export function SocialProvider({ children }: { children: React.ReactNode }) {
-  const [following, setFollowing]     = useState<Set<string>>(new Set());
-  const [likedPosts, setLikedPosts]   = useState<Set<string>>(new Set());
-  const [myReactions, setMyReactions] = useState<Record<string, keyof PostReactions>>({});
-  const [notifications, setNotifications] = useState<SocialNotification[]>(SEED_NOTIFICATIONS);
-  const [muted, setMuted]             = useState<Set<string>>(new Set());
-  const [blocked, setBlocked]         = useState<Set<string>>(new Set());
-  const [reportedPosts, setReportedPosts] = useState<Set<string>>(new Set());
-  const loaded = useRef(false);
+  const { profile } = useUser();
+  const playerId = profile?.playerId ?? '';
 
-  // ── Load from AsyncStorage ────────────────────────────────────────────────
+  const [following, setFollowing]         = useState<Set<string>>(new Set());
+  const [likedPosts, setLikedPosts]       = useState<Set<string>>(new Set());
+  const [myReactions, setMyReactions]     = useState<Record<string, keyof PostReactions>>({});
+  const [notifications, setNotifications] = useState<SocialNotification[]>(SEED_NOTIFICATIONS);
+  const [muted, setMuted]                 = useState<Set<string>>(new Set());
+  const [blocked, setBlocked]             = useState<Set<string>>(new Set());
+  const [reportedPosts, setReportedPosts] = useState<Set<string>>(new Set());
+
+  const loaded       = useRef(false);
+  const playerIdRef  = useRef(playerId);
+  playerIdRef.current = playerId;
+
+  // ── Reload from per-user AsyncStorage when account changes ────────────────
 
   useEffect(() => {
+    // Sign-out: clear all social state
+    if (!playerId) {
+      setFollowing(new Set());
+      setLikedPosts(new Set());
+      setMyReactions({});
+      setNotifications(SEED_NOTIFICATIONS);
+      setMuted(new Set());
+      setBlocked(new Set());
+      setReportedPosts(new Set());
+      loaded.current = false;
+      return;
+    }
+
+    // New user signed in — load their own data
+    loaded.current = false;
     void (async () => {
       try {
         const [fRaw, lRaw, rRaw, nRaw] = await Promise.all([
-          AsyncStorage.getItem(KEY_FOLLOWING),
-          AsyncStorage.getItem(KEY_LIKED),
-          AsyncStorage.getItem(KEY_REACTIONS),
-          AsyncStorage.getItem(KEY_NOTIFICATIONS),
+          AsyncStorage.getItem(userKey(BASE_FOLLOWING, playerId)),
+          AsyncStorage.getItem(userKey(BASE_LIKED, playerId)),
+          AsyncStorage.getItem(userKey(BASE_REACTIONS, playerId)),
+          AsyncStorage.getItem(userKey(BASE_NOTIFICATIONS, playerId)),
         ]);
-        if (fRaw) setFollowing(new Set(JSON.parse(fRaw) as string[]));
-        if (lRaw) setLikedPosts(new Set(JSON.parse(lRaw) as string[]));
-        if (rRaw) setMyReactions(JSON.parse(rRaw) as Record<string, keyof PostReactions>);
-        if (nRaw) setNotifications(JSON.parse(nRaw) as SocialNotification[]);
+        setFollowing(fRaw ? new Set(JSON.parse(fRaw) as string[]) : new Set());
+        setLikedPosts(lRaw ? new Set(JSON.parse(lRaw) as string[]) : new Set());
+        setMyReactions(rRaw ? JSON.parse(rRaw) as Record<string, keyof PostReactions> : {});
+        setNotifications(nRaw ? JSON.parse(nRaw) as SocialNotification[] : SEED_NOTIFICATIONS);
       } catch {}
       loaded.current = true;
     })();
-  }, []);
+  }, [playerId]);
 
-  // ── Persist on change ─────────────────────────────────────────────────────
+  // ── Persist on change (per-user keys) ─────────────────────────────────────
 
   useEffect(() => {
-    if (!loaded.current) return;
-    void AsyncStorage.setItem(KEY_FOLLOWING, JSON.stringify([...following]));
+    if (!loaded.current || !playerIdRef.current) return;
+    void AsyncStorage.setItem(userKey(BASE_FOLLOWING, playerIdRef.current), JSON.stringify([...following]));
   }, [following]);
 
   useEffect(() => {
-    if (!loaded.current) return;
-    void AsyncStorage.setItem(KEY_LIKED, JSON.stringify([...likedPosts]));
+    if (!loaded.current || !playerIdRef.current) return;
+    void AsyncStorage.setItem(userKey(BASE_LIKED, playerIdRef.current), JSON.stringify([...likedPosts]));
   }, [likedPosts]);
 
   useEffect(() => {
-    if (!loaded.current) return;
-    void AsyncStorage.setItem(KEY_REACTIONS, JSON.stringify(myReactions));
+    if (!loaded.current || !playerIdRef.current) return;
+    void AsyncStorage.setItem(userKey(BASE_REACTIONS, playerIdRef.current), JSON.stringify(myReactions));
   }, [myReactions]);
 
   useEffect(() => {
-    if (!loaded.current) return;
-    void AsyncStorage.setItem(KEY_NOTIFICATIONS, JSON.stringify(notifications));
+    if (!loaded.current || !playerIdRef.current) return;
+    void AsyncStorage.setItem(userKey(BASE_NOTIFICATIONS, playerIdRef.current), JSON.stringify(notifications));
   }, [notifications]);
 
   // ── Actions ───────────────────────────────────────────────────────────────
@@ -125,16 +150,16 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
     setNotifications(prev => [notif, ...prev].slice(0, 50));
   }
 
-  const follow = useCallback((playerId: string, username: string) => {
-    setFollowing(prev => new Set([...prev, playerId]));
+  const follow = useCallback((pid: string, username: string) => {
+    setFollowing(prev => new Set([...prev, pid]));
     addNotif({ type: 'follow', fromUser: username, message: `You followed ${username}` });
   }, []);
 
-  const unfollow = useCallback((playerId: string) => {
-    setFollowing(prev => { const s = new Set(prev); s.delete(playerId); return s; });
+  const unfollow = useCallback((pid: string) => {
+    setFollowing(prev => { const s = new Set(prev); s.delete(pid); return s; });
   }, []);
 
-  const isFollowing = useCallback((playerId: string) => following.has(playerId), [following]);
+  const isFollowing = useCallback((pid: string) => following.has(pid), [following]);
 
   const toggleLike = useCallback((postId: string) => {
     setLikedPosts(prev => {
@@ -171,36 +196,30 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   }, []);
 
-  // ── Mute ──────────────────────────────────────────────────────────────────
-
-  const mute = useCallback((playerId: string, username: string) => {
-    setMuted(prev => new Set([...prev, playerId]));
-    setFollowing(prev => { const s = new Set(prev); s.delete(playerId); return s; });
+  const mute = useCallback((pid: string, username: string) => {
+    setMuted(prev => new Set([...prev, pid]));
+    setFollowing(prev => { const s = new Set(prev); s.delete(pid); return s; });
     addNotif({ type: 'achievement', fromUser: username, message: `@${username} has been muted` });
   }, []);
 
-  const unmute = useCallback((playerId: string) => {
-    setMuted(prev => { const s = new Set(prev); s.delete(playerId); return s; });
+  const unmute = useCallback((pid: string) => {
+    setMuted(prev => { const s = new Set(prev); s.delete(pid); return s; });
   }, []);
 
-  const isMuted = useCallback((playerId: string) => muted.has(playerId), [muted]);
+  const isMuted = useCallback((pid: string) => muted.has(pid), [muted]);
 
-  // ── Block ─────────────────────────────────────────────────────────────────
-
-  const block = useCallback((playerId: string, username: string) => {
-    setBlocked(prev => new Set([...prev, playerId]));
-    setMuted(prev => new Set([...prev, playerId]));
-    setFollowing(prev => { const s = new Set(prev); s.delete(playerId); return s; });
+  const block = useCallback((pid: string, username: string) => {
+    setBlocked(prev => new Set([...prev, pid]));
+    setMuted(prev => new Set([...prev, pid]));
+    setFollowing(prev => { const s = new Set(prev); s.delete(pid); return s; });
     addNotif({ type: 'achievement', fromUser: username, message: `@${username} has been blocked` });
   }, []);
 
-  const unblock = useCallback((playerId: string) => {
-    setBlocked(prev => { const s = new Set(prev); s.delete(playerId); return s; });
+  const unblock = useCallback((pid: string) => {
+    setBlocked(prev => { const s = new Set(prev); s.delete(pid); return s; });
   }, []);
 
-  const isBlocked = useCallback((playerId: string) => blocked.has(playerId), [blocked]);
-
-  // ── Report ────────────────────────────────────────────────────────────────
+  const isBlocked = useCallback((pid: string) => blocked.has(pid), [blocked]);
 
   const reportPost = useCallback((postId: string, _reason: string) => {
     setReportedPosts(prev => new Set([...prev, postId]));

@@ -262,10 +262,18 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     if (days >= 30) unlock('daily_30');
   }, [unlock]);
 
-  // Check login streak once after load, keyed on streakDays value
-  const streakChecked = useRef(0);
+  // Only fire streak achievement when streakDays actually *increases*
+  // (i.e. user just claimed daily reward). Seed the ref on first load so
+  // re-loading the profile on login never re-pops a stale achievement.
+  const streakChecked = useRef(-1);
   useEffect(() => {
-    if (!loaded.current || profile.streakDays <= 0 || streakChecked.current === profile.streakDays) return;
+    if (!loaded.current) return;
+    if (streakChecked.current === -1) {
+      // First non-trivial profile load — record current value without triggering
+      streakChecked.current = profile.streakDays;
+      return;
+    }
+    if (profile.streakDays <= streakChecked.current) return;
     streakChecked.current = profile.streakDays;
     onLoginStreak(profile.streakDays);
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -677,7 +677,7 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 80, paddingTop: insets.top + 56 }]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 80, paddingTop: insets.top + 8 }]}
         showsVerticalScrollIndicator={false}
       >
         <ChipSocietyLogo />
@@ -826,7 +826,7 @@ const tour = StyleSheet.create({
 });
 
 const logo = StyleSheet.create({
-  wrap: { alignItems: 'center', paddingTop: 12, paddingBottom: 14 },
+  wrap: { alignItems: 'center', paddingTop: 0, paddingBottom: 14 },
   img: {
     width: LOGO_IMG_W,
     height: LOGO_IMG_H,

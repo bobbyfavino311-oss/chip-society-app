@@ -77,8 +77,6 @@ function GateController() {
 
     if (profile.isNewUser) {
       router.replace('/entry');
-    } else if (!termsAccepted) {
-      router.replace('/terms');
     }
   }, [isLoaded, termsLoaded, profile.isNewUser, termsAccepted, segments]);
 
