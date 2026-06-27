@@ -3,7 +3,9 @@
 // Auth: pass playerId via x-player-id header.
 
 function getBase(): string {
-  const envUrl = process.env['EXPO_PUBLIC_API_URL'];
+  // Use dot notation — Metro's Babel transform only statically inlines EXPO_PUBLIC_*
+  // vars with dot notation (process.env.VAR), not bracket notation.
+  const envUrl = process.env.EXPO_PUBLIC_API_URL;
   if (envUrl) return envUrl;
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }

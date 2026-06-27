@@ -150,6 +150,40 @@ async function runMigrations() {
         updated_at  TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+    // ── Social feed tables ─────────────────────────────────────────────────────
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS feed_posts (
+        id            TEXT PRIMARY KEY,
+        author_id     TEXT NOT NULL,
+        content       TEXT NOT NULL,
+        tag           TEXT NOT NULL DEFAULT 'WIN',
+        pot           TEXT,
+        hand_rank     TEXT,
+        like_count    INTEGER NOT NULL DEFAULT 0,
+        comment_count INTEGER NOT NULL DEFAULT 0,
+        created_at    TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS feed_posts_created_idx ON feed_posts(created_at DESC);
+      CREATE INDEX IF NOT EXISTS feed_posts_author_idx  ON feed_posts(author_id, created_at DESC);
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS post_likes (
+        post_id    TEXT NOT NULL REFERENCES feed_posts(id) ON DELETE CASCADE,
+        player_id  TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (post_id, player_id)
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS post_comments (
+        id         TEXT PRIMARY KEY,
+        post_id    TEXT NOT NULL REFERENCES feed_posts(id) ON DELETE CASCADE,
+        author_id  TEXT NOT NULL,
+        text       TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS post_comments_post_idx ON post_comments(post_id, created_at);
+    `);
     logger.info('Startup migrations complete');
   } catch (err) {
     logger.error({ err }, 'Startup migration failed — continuing anyway');
