@@ -8,7 +8,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -491,12 +490,10 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile, isLoaded } = useUser();
   const colors = useColors();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const { isMusicMuted, toggleMusicMute } = useSoundSettings();
   const { unreadCount } = useNotifications();
   const { posts: aiPosts } = useAISocial();
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const dropAnim = useRef(new Animated.Value(0)).current;
   const trendScrollRef = useRef<ScrollView>(null);
   const trendIndexRef = useRef(0);
 
@@ -547,14 +544,6 @@ export default function HomeScreen() {
     timeAgo: p.timeAgo,
   }));
 
-  const openSettings = () => {
-    setSettingsOpen(true);
-    Animated.spring(dropAnim, { toValue: 1, useNativeDriver: true, tension: 80, friction: 10 }).start();
-  };
-  const closeSettings = () => {
-    Animated.timing(dropAnim, { toValue: 0, duration: 140, useNativeDriver: true }).start(() => setSettingsOpen(false));
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
@@ -566,18 +555,24 @@ export default function HomeScreen() {
         end={{ x: 1, y: 1 }}
       />
 
-      {/* Backdrop to close settings when tapping outside */}
-      {settingsOpen && (
-        <TouchableOpacity
-          style={[StyleSheet.absoluteFillObject, { zIndex: 5 }]}
-          onPress={closeSettings}
-          activeOpacity={1}
-        />
-      )}
-
-      {/* Top-left: notification bell */}
+      {/* Top-left: music toggle */}
       <TouchableOpacity
         style={[styles.topLeft, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}
+        onPress={toggleMusicMute}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.topIconBtn, { borderColor: isMusicMuted ? colors.border : `${colors.primary}60`, backgroundColor: colors.surface }]}>
+          <Ionicons
+            name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
+            size={18}
+            color={isMusicMuted ? colors.textMuted : colors.primary}
+          />
+        </View>
+      </TouchableOpacity>
+
+      {/* Top-right: notification bell */}
+      <TouchableOpacity
+        style={[styles.topCorner, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}
         onPress={() => router.push('/notifications' as any)}
         activeOpacity={0.8}
       >
@@ -602,79 +597,6 @@ export default function HomeScreen() {
           </View>
         )}
       </TouchableOpacity>
-
-      {/* Top-right: music + gear + avatar */}
-      <View style={[styles.topCorner, { top: insets.top + (Platform.OS === 'web' ? 20 : 8), zIndex: 20 }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          {/* Music toggle */}
-          <TouchableOpacity onPress={toggleMusicMute} activeOpacity={0.8}>
-            <View style={[styles.topAvatar, { borderColor: isMusicMuted ? colors.border : colors.primary + '60', backgroundColor: colors.surface }]}>
-              <Ionicons
-                name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
-                size={17}
-                color={isMusicMuted ? colors.textMuted : colors.primary}
-              />
-            </View>
-          </TouchableOpacity>
-          {/* Settings gear */}
-          <TouchableOpacity onPress={settingsOpen ? closeSettings : openSettings} activeOpacity={0.8}>
-            <View style={[styles.topAvatar, { borderColor: settingsOpen ? colors.primary : colors.border, backgroundColor: colors.surface }]}>
-              <Ionicons
-                name={settingsOpen ? 'close' : 'settings-outline'}
-                size={18}
-                color={settingsOpen ? colors.primary : colors.textMuted}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Settings dropdown panel */}
-        {settingsOpen && (
-          <Animated.View
-            style={[
-              styles.settingsDropdown,
-              {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                opacity: dropAnim,
-                transform: [{ translateY: dropAnim.interpolate({ inputRange: [0, 1], outputRange: [-6, 0] }) }],
-              },
-            ]}
-          >
-            {/* Profile row */}
-            <TouchableOpacity
-              style={styles.settingsItem}
-              onPress={() => { closeSettings(); setTimeout(() => router.push('/(tabs)/profile'), 180); }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="person-outline" size={18} color={colors.primary} />
-              <Text style={[styles.settingsItemText, { color: colors.text }]}>Profile</Text>
-              <Ionicons name="chevron-forward" size={15} color={colors.textMuted} style={{ marginLeft: 'auto' }} />
-            </TouchableOpacity>
-
-            <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
-
-            {/* Theme toggle row */}
-            <View style={styles.settingsItem}>
-              <Ionicons
-                name={isDark ? 'moon-outline' : 'sunny-outline'}
-                size={18}
-                color={colors.accent}
-              />
-              <Text style={[styles.settingsItemText, { color: colors.text }]}>
-                {isDark ? 'Dark Mode' : 'Light Mode'}
-              </Text>
-              <Switch
-                value={!isDark}
-                onValueChange={toggleTheme}
-                trackColor={{ false: colors.border, true: `${colors.accent}55` }}
-                thumbColor={!isDark ? colors.accent : colors.textMuted}
-                style={{ marginLeft: 'auto', transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }] }}
-              />
-            </View>
-          </Animated.View>
-        )}
-      </View>
 
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 80, paddingTop: insets.top + 8 }]}
@@ -957,40 +879,6 @@ const styles = StyleSheet.create({
   },
   notifBadgeText: {
     color: '#fff', fontSize: 9, fontWeight: '900', lineHeight: 12,
-  },
-  settingsDropdown: {
-    position: 'absolute',
-    top: 50,
-    right: 0,
-    width: 224,
-    borderRadius: 14,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
-    shadowRadius: 14,
-    elevation: 14,
-  },
-  settingsItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-    gap: 12,
-  },
-  settingsItemText: {
-    fontSize: 14,
-    fontWeight: '600',
-    letterSpacing: 0.2,
-  },
-  settingsDivider: {
-    height: 1,
-    marginHorizontal: 12,
-  },
-  topAvatar: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: colors.surface, borderWidth: 2,
-    alignItems: 'center', justifyContent: 'center',
   },
   scroll: { paddingHorizontal: 16, gap: 16 },
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
