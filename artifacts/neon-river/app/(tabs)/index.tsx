@@ -317,49 +317,38 @@ function QuickPlayCard() {
 
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
+const LOGO_IMG      = require('@/assets/images/chip-society-logo.png') as number;
+const LOGO_IMG_W    = width * 0.84;
+const LOGO_IMG_H    = LOGO_IMG_W * (576 / 1024); // native PNG aspect 1024×576
+
 function ChipSocietyLogo() {
-  const aceOpacity  = useRef(new Animated.Value(1)).current;
-  const socOpacity  = useRef(new Animated.Value(1)).current;
-  const aceGlow     = useRef(new Animated.Value(1)).current;
-  const socialGlow  = useRef(new Animated.Value(0.82)).current;
-  const [acePink, setAcePink] = useState(false);
+  const brightness  = useRef(new Animated.Value(1)).current;
   const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    // Slow alternating breathe between the two words
+    // Slow gentle breathe: 0.93 ↔ 1.0 over ~4 s
     Animated.loop(
       Animated.sequence([
-        Animated.timing(aceGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
-        Animated.timing(aceGlow, { toValue: 1,    duration: 2200, useNativeDriver: true }),
-      ])
-    ).start();
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(socialGlow, { toValue: 1,    duration: 2200, useNativeDriver: true }),
-        Animated.timing(socialGlow, { toValue: 0.82, duration: 2200, useNativeDriver: true }),
+        Animated.timing(brightness, { toValue: 0.93, duration: 2000, useNativeDriver: true }),
+        Animated.timing(brightness, { toValue: 1.0,  duration: 2000, useNativeDriver: true }),
       ])
     ).start();
 
-    // Neon-tube stutter on one word at a time, then swap colors
-    function flicker(anim: Animated.Value, cb: () => void) {
+    // Vintage neon-tube stutter — very infrequent, randomised 8–20 s
+    function flicker() {
       Animated.sequence([
-        Animated.timing(anim, { toValue: 0.08, duration: 35, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0.9,  duration: 55, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0.15, duration: 25, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 1,    duration: 70, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 0,    duration: 30, useNativeDriver: true }),
-        Animated.timing(anim, { toValue: 1,    duration: 90, useNativeDriver: true }),
-      ]).start(() => cb());
+        Animated.timing(brightness, { toValue: 0.12, duration: 30,  useNativeDriver: true }),
+        Animated.timing(brightness, { toValue: 0.88, duration: 55,  useNativeDriver: true }),
+        Animated.timing(brightness, { toValue: 0.20, duration: 22,  useNativeDriver: true }),
+        Animated.timing(brightness, { toValue: 1.0,  duration: 80,  useNativeDriver: true }),
+      ]).start();
     }
 
     function scheduleNext() {
-      const delay = 2500 + Math.random() * 4000;
+      const delay = 8000 + Math.random() * 12000;
       timeoutRef.current = setTimeout(() => {
-        const doAce = Math.random() > 0.5;
-        flicker(doAce ? aceOpacity : socOpacity, () => {
-          setAcePink(p => !p);
-          scheduleNext();
-        });
+        flicker();
+        scheduleNext();
       }, delay);
     }
     scheduleNext();
@@ -367,45 +356,13 @@ function ChipSocietyLogo() {
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, []);
 
-  const chipColor = acePink ? colors.secondary : colors.primary;
-  const socColor  = acePink ? colors.primary   : colors.secondary;
-
   return (
     <View style={logo.wrap}>
-      <View style={logo.wordGroup}>
-        <Animated.Text
-          style={[
-            logo.word,
-            {
-              color: chipColor,
-              lineHeight: LOGO_LINE_HEIGHT,
-              opacity: Animated.multiply(aceOpacity, aceGlow),
-              textShadowColor: chipColor,
-              textShadowRadius: 28,
-              textShadowOffset: { width: 0, height: 0 },
-            },
-          ]}
-          allowFontScaling={false}
-        >
-          Chip
-        </Animated.Text>
-        <Animated.Text
-          style={[
-            logo.word,
-            {
-              color: socColor,
-              lineHeight: LOGO_LINE_HEIGHT,
-              opacity: Animated.multiply(socOpacity, socialGlow),
-              textShadowColor: socColor,
-              textShadowRadius: 28,
-              textShadowOffset: { width: 0, height: 0 },
-            },
-          ]}
-          allowFontScaling={false}
-        >
-          Society
-        </Animated.Text>
-      </View>
+      <Animated.Image
+        source={LOGO_IMG}
+        style={[logo.img, { opacity: brightness }]}
+        resizeMode="contain"
+      />
       <Text style={logo.sub} allowFontScaling={false}>SOCIAL POKER NETWORK</Text>
     </View>
   );
@@ -794,10 +751,6 @@ export default function HomeScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const LOGO_SIZE = Math.min(46, width * 0.118);
-// Web needs a forced line-height to keep the two Pacifico words snug;
-// native uses the font's own metrics (forcing it clips the descender).
-const LOGO_LINE_HEIGHT = Platform.select({ web: LOGO_SIZE * 1.12, default: undefined });
 
 // ─── Tournament preview card styles ───────────────────────────────────────────
 const tc = StyleSheet.create({
@@ -874,17 +827,17 @@ const tour = StyleSheet.create({
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingVertical: 4 },
-  wordGroup: { alignItems: 'center', paddingBottom: 22 },
-  word: {
-    fontFamily: 'Pacifico_400Regular',
-    fontSize: LOGO_SIZE,
-    color: '#e8f4ff',
+  img: {
+    width: LOGO_IMG_W,
+    height: LOGO_IMG_H,
+    marginBottom: 2,
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
-    fontSize: 9,
+    fontSize: 9.5,
     color: colors.textMuted,
-    letterSpacing: 4,
+    letterSpacing: 5,
+    marginTop: 4,
   },
 });
 

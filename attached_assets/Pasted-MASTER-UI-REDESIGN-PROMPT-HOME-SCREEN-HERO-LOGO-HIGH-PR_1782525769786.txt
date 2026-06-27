@@ -1,0 +1,250 @@
+MASTER UI REDESIGN PROMPT — HOME SCREEN HERO LOGO (HIGH PRIORITY)
+
+This is a major visual redesign of the Chip Society Home Screen and should be treated as a premium branding update. The objective is to replace the existing header logo with a much stronger hero element that immediately communicates the identity of the game.
+
+The attached logo design is now the official direction for the Home screen.
+
+⸻
+
+Primary Goal
+
+Completely replace the existing “Chip Society” logo at the top of the Home screen with the new handwritten neon logo shown in the reference image.
+
+This logo becomes the centerpiece of the Home screen.
+
+Everything beneath it should be repositioned accordingly.
+
+⸻
+
+Logo Recreation Requirements
+
+Attempt to recreate the logo as accurately as possible using vector graphics instead of simply displaying a screenshot.
+
+The AI should match:
+
+• identical script style
+• identical proportions
+• identical line thickness
+• identical underline beneath “Society”
+• identical neon glow
+• identical color palette
+
+The logo should immediately feel like a premium casino resort sign.
+
+Not a generic neon font.
+
+Not cursive generated text.
+
+It should closely resemble the supplied artwork.
+
+⸻
+
+Color Palette
+
+Exactly use:
+
+Chip
+• Electric Cyan
+• subtle blue glow
+
+Society
+• Hot Pink
+• bright magenta glow
+
+Keep the glow soft.
+
+Not blurry.
+
+Not oversized.
+
+⸻
+
+Neon Motel Flash Animation
+
+The logo should not remain static.
+
+Instead it should behave like an authentic vintage motel sign.
+
+Animation should be extremely subtle.
+
+Examples:
+
+• occasional tiny brightness flicker
+
+• slight neon pulse
+
+• one letter flickers for 50–100ms before stabilizing
+
+• underline softly brightens
+
+• glow intensity breathes
+
+Never make it flashy.
+
+Never blink the whole logo.
+
+Never repeatedly flash.
+
+It should feel like a real neon sign that’s been hanging outside a casino for years.
+
+Think luxury—not arcade.
+
+⸻
+
+Animation Frequency
+
+Very infrequent.
+
+Every 10–20 seconds.
+
+Randomized.
+
+Never repetitive.
+
+⸻
+
+If Recreation Is Impossible
+
+If the AI cannot faithfully recreate the supplied logo while maintaining quality,
+
+THEN
+
+use the supplied logo image directly.
+
+Do NOT substitute another cursive font.
+
+Do NOT approximate it poorly.
+
+The supplied logo is preferable to a bad recreation.
+
+⸻
+
+Logo Placement
+
+Current logo location remains the same.
+
+Center aligned.
+
+However—
+
+Because the new logo is much larger,
+
+adjust all spacing beneath it.
+
+Everything below the logo should move downward naturally.
+
+Nothing should overlap.
+
+Nothing should feel cramped.
+
+⸻
+
+Social Poker Network Subtitle
+
+The subtitle
+
+SOCIAL POKER NETWORK
+
+already exists.
+
+It should remain.
+
+However it must be adjusted to fit the new logo.
+
+Requirements:
+
+• centered perfectly beneath logo
+
+• more breathing room
+
+• approximately 16–22 pixels below underline
+
+• keep current futuristic font
+
+• slightly increase letter spacing
+
+• medium gray
+
+• no glow
+
+• no animation
+
+The subtitle should act as elegant supporting typography.
+
+Never compete with the logo.
+
+⸻
+
+Logo Scale
+
+Increase overall logo size approximately 20–30%.
+
+The logo should become the obvious visual focal point.
+
+The Daily Rewards section should begin slightly lower on the screen.
+
+The overall balance should still feel premium.
+
+⸻
+
+Glow Behavior
+
+Glow should only extend a short distance around the lettering.
+
+Avoid giant blurry halos.
+
+Preferred look:
+
+bright neon tube
+
+↓
+
+small bloom
+
+↓
+
+fade naturally
+
+⸻
+
+Rendering Quality
+
+Render at very high resolution.
+
+Smooth bezier curves.
+
+No jagged edges.
+
+No pixelated glow.
+
+No fuzzy outlines.
+
+Looks excellent on:
+
+• Retina displays
+
+• OLED screens
+
+• iPhone Pro Max
+
+⸻
+
+Performance
+
+The logo animation should have essentially zero impact on performance.
+
+Use lightweight opacity/intensity animation only.
+
+Avoid particle systems.
+
+Avoid expensive blur animations.
+
+⸻
+
+Final Visual Goal
+
+When the app opens, the Home screen should instantly feel like a premium poker destination.
+
+The new glowing Chip Society sign should resemble the entrance sign of an upscale poker lounge or casino, with a tasteful animated neon effect that gives the app its own recognizable identity.
+
+The result should feel polished, iconic, and memorable—the kind of branding users immediately associate with Chip Society.
