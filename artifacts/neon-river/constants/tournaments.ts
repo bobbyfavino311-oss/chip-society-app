@@ -15,8 +15,13 @@ export interface TournamentConfig {
   handsPerLevel: number;
   color: string;
   icon: string;
+  emoji: string;
+  format: string;
   prizeLabel: string;
   variant: GameVariant;
+  capacityMax: number;
+  scheduleIntervalMin: number;
+  scheduleOffsetMin: number;
 }
 
 export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
@@ -29,10 +34,15 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     startingChips: 10_000,
     numPlayers: 5,
     handsPerLevel: 5,
-    color: '#00ff88',
+    color: '#00d4ff',
     icon: 'school-outline',
+    emoji: '🎰',
+    format: 'Freezeout · Easy Blinds',
     prizeLabel: '1st: 70%  ·  2nd: 30%',
     variant: 'texas_holdem',
+    capacityMax: 5,
+    scheduleIntervalMin: 15,
+    scheduleOffsetMin: 0,
   },
   sitandgo: {
     type: 'sitandgo',
@@ -43,10 +53,15 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     startingChips: 25_000,
     numPlayers: 5,
     handsPerLevel: 4,
-    color: '#00d4ff',
+    color: '#00e887',
     icon: 'flash-outline',
+    emoji: '⚡',
+    format: 'Freezeout · Starts Instantly',
     prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
     variant: 'texas_holdem',
+    capacityMax: 5,
+    scheduleIntervalMin: 30,
+    scheduleOffsetMin: 7,
   },
   turbo: {
     type: 'turbo',
@@ -57,10 +72,15 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     startingChips: 50_000,
     numPlayers: 6,
     handsPerLevel: 3,
-    color: '#ff0090',
+    color: '#ff6600',
     icon: 'speedometer-outline',
+    emoji: '🔥',
+    format: 'Turbo · Fast Blind Levels',
     prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
     variant: 'texas_holdem',
+    capacityMax: 6,
+    scheduleIntervalMin: 45,
+    scheduleOffsetMin: 18,
   },
   highroller: {
     type: 'highroller',
@@ -73,8 +93,13 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     handsPerLevel: 8,
     color: '#ffd700',
     icon: 'diamond-outline',
+    emoji: '👑',
+    format: 'Deep Stack · VIP Entry',
     prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
     variant: 'texas_holdem',
+    capacityMax: 6,
+    scheduleIntervalMin: 60,
+    scheduleOffsetMin: 34,
   },
   sd_lounge: {
     type: 'sd_lounge',
@@ -85,10 +110,15 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     startingChips: 10_000,
     numPlayers: 5,
     handsPerLevel: 5,
-    color: '#ff0090',
+    color: '#bf5fff',
     icon: 'layers-outline',
+    emoji: '🃏',
+    format: 'Short Deck · Freezeout',
     prizeLabel: '1st: 70%  ·  2nd: 30%',
     variant: 'short_deck_holdem',
+    capacityMax: 5,
+    scheduleIntervalMin: 20,
+    scheduleOffsetMin: 4,
   },
   sd_showdown: {
     type: 'sd_showdown',
@@ -99,10 +129,15 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     startingChips: 25_000,
     numPlayers: 5,
     handsPerLevel: 4,
-    color: '#bf5fff',
+    color: '#ff0090',
     icon: 'shuffle-outline',
+    emoji: '🎯',
+    format: 'Short Deck · Classic Format',
     prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
     variant: 'short_deck_holdem',
+    capacityMax: 5,
+    scheduleIntervalMin: 35,
+    scheduleOffsetMin: 12,
   },
   sd_rush: {
     type: 'sd_rush',
@@ -115,8 +150,13 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     handsPerLevel: 3,
     color: '#ff8800',
     icon: 'flash-outline',
+    emoji: '💨',
+    format: 'Short Deck · Turbo',
     prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
     variant: 'short_deck_holdem',
+    capacityMax: 6,
+    scheduleIntervalMin: 50,
+    scheduleOffsetMin: 23,
   },
   sd_royal: {
     type: 'sd_royal',
@@ -129,8 +169,13 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     handsPerLevel: 8,
     color: '#ffd700',
     icon: 'star-outline',
+    emoji: '💎',
+    format: 'Short Deck · Deep Stack VIP',
     prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
     variant: 'short_deck_holdem',
+    capacityMax: 6,
+    scheduleIntervalMin: 70,
+    scheduleOffsetMin: 41,
   },
 };
 
@@ -140,3 +185,4 @@ export function getPrizePool(config: TournamentConfig): number {
 
 export const TEXAS_TOURNAMENTS: TournamentType[] = ['beginner', 'sitandgo', 'turbo', 'highroller'];
 export const SHORT_DECK_TOURNAMENTS: TournamentType[] = ['sd_lounge', 'sd_showdown', 'sd_rush', 'sd_royal'];
+export const ALL_TOURNAMENTS: TournamentType[] = [...TEXAS_TOURNAMENTS, ...SHORT_DECK_TOURNAMENTS];

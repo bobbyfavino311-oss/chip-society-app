@@ -44,112 +44,34 @@ const RANK_COLORS: Record<string, string> = {
   'CHIP SOCIETY ELITE': colors.accent,
 };
 
-// ─── Tournament Carousel ───────────────────────────────────────────────────────
+// ─── Tournament Live Carousel ─────────────────────────────────────────────────
 
 import {
   TOURNAMENT_CONFIGS,
-  TournamentConfig,
   TEXAS_TOURNAMENTS,
-  getPrizePool,
 } from '@/constants/tournaments';
+import TournamentLiveCard from '@/components/TournamentLiveCard';
 
-const HOME_TOURNAMENTS = TEXAS_TOURNAMENTS; // show Texas Hold'em on home
-
-function formatChipsMini(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return String(n);
-}
-
-function TournamentCarouselCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {
-  const prizePool = getPrizePool(config);
-  const canAfford = userChips >= config.buyIn;
-  return (
-    <TouchableOpacity
-      style={[tc.card, { borderColor: `${config.color}35` }]}
-      activeOpacity={0.82}
-      onPress={() => {
-        if (canAfford) {
-          router.push({ pathname: '/game/tournament', params: { type: config.type } } as any);
-        } else {
-          router.push('/(tabs)/tournaments');
-        }
-      }}
-    >
-      <LinearGradient
-        colors={['#120020', '#080018', '#050010']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-      />
-      <LinearGradient
-        colors={[`${config.color}18`, 'transparent']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 0.9, y: 0.7 }}
-      />
-      <View style={[tc.accentBar, { backgroundColor: config.color }]} />
-      <View style={tc.body}>
-        <View style={tc.topRow}>
-          <View style={[tc.badge, { backgroundColor: `${config.color}18`, borderColor: `${config.color}45` }]}>
-            <View style={[tc.liveDot, { backgroundColor: config.color }]} />
-            <Text style={[tc.badgeText, { color: config.color }]}>LIVE</Text>
-          </View>
-        </View>
-        <View style={[tc.iconWrap, { borderColor: `${config.color}40`, backgroundColor: `${config.color}15` }]}>
-          <Ionicons name={config.icon as any} size={18} color={config.color} />
-        </View>
-        <Text style={[tc.name, { color: config.color }]} numberOfLines={2}>{config.name}</Text>
-        <Text style={tc.sub}>{config.subtitle}</Text>
-        <View style={tc.statsRow}>
-          <View style={tc.stat}>
-            <Text style={tc.statLbl}>BUY-IN</Text>
-            <Text style={[tc.statVal, { color: canAfford ? config.color : colors.error }]}>
-              {formatChipsMini(config.buyIn)}
-            </Text>
-          </View>
-          <View style={tc.statDiv} />
-          <View style={tc.stat}>
-            <Text style={tc.statLbl}>PRIZE</Text>
-            <Text style={[tc.statVal, { color: colors.gold }]}>{formatChipsMini(prizePool)}</Text>
-          </View>
-          <View style={tc.statDiv} />
-          <View style={tc.stat}>
-            <Text style={tc.statLbl}>SEATS</Text>
-            <Text style={tc.statVal}>{config.numPlayers}</Text>
-          </View>
-        </View>
-        <View style={[tc.enterBar, canAfford
-          ? { backgroundColor: `${config.color}22`, borderColor: `${config.color}50` }
-          : { backgroundColor: 'rgba(255,255,255,0.04)', borderColor: colors.border }
-        ]}>
-          <Ionicons
-            name={canAfford ? 'trophy-outline' : 'lock-closed-outline'}
-            size={10}
-            color={canAfford ? config.color : colors.textDim}
-          />
-          <Text style={[tc.enterText, { color: canAfford ? config.color : colors.textDim }]}>
-            {canAfford ? 'TAP TO ENTER' : 'NEED MORE CHIPS'}
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
+const HOME_TOURNAMENTS = TEXAS_TOURNAMENTS;
+const CARD_W = width * 0.78;
+const CARD_GAP = 12;
 
 function TournamentCarousel({ userChips }: { userChips: number }) {
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      snapToInterval={width * 0.64 + 12}
+      snapToInterval={CARD_W + CARD_GAP}
       decelerationRate="fast"
-      snapToAlignment="start"
-      contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+      snapToAlignment="center"
+      contentContainerStyle={{ gap: CARD_GAP, paddingRight: 16 }}
     >
       {HOME_TOURNAMENTS.map(type => (
-        <TournamentCarouselCard
+        <TournamentLiveCard
           key={type}
           config={TOURNAMENT_CONFIGS[type]}
           userChips={userChips}
+          cardWidth={CARD_W}
         />
       ))}
     </ScrollView>
@@ -676,51 +598,6 @@ export default function HomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 
-// ─── Tournament carousel card styles ─────────────────────────────────────────
-const tc = StyleSheet.create({
-  card: {
-    width: width * 0.64,
-    borderRadius: 18,
-    borderWidth: 1,
-    overflow: 'hidden',
-    flexDirection: 'row',
-  },
-  accentBar: { width: 4 },
-  body:      { flex: 1, padding: 13, gap: 8 },
-  topRow:    { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  badge: {
-    borderRadius: 6, borderWidth: 1,
-    paddingHorizontal: 6, paddingVertical: 2,
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-  },
-  liveDot: { width: 5, height: 5, borderRadius: 3 },
-  badgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
-  iconWrap: {
-    width: 36, height: 36, borderRadius: 18,
-    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
-  },
-  name: {
-    fontSize: 12, fontWeight: '800',
-    fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 0.3, lineHeight: 16,
-  },
-  sub: { color: 'rgba(255,255,255,0.4)', fontSize: 10, lineHeight: 14 },
-  statsRow: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 8, padding: 8,
-  },
-  stat:    { flex: 1, alignItems: 'center', gap: 2 },
-  statDiv: { width: 1, height: 22, backgroundColor: 'rgba(255,255,255,0.1)' },
-  statLbl: { color: 'rgba(255,255,255,0.35)', fontSize: 7, fontWeight: '700', letterSpacing: 0.8 },
-  statVal: { color: colors.text, fontSize: 11, fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  enterBar: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderRadius: 7, borderWidth: 1,
-    paddingHorizontal: 8, paddingVertical: 5,
-  },
-  enterText: { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8 },
-});
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingTop: 0, paddingBottom: 14 },

@@ -1,0 +1,538 @@
+I think this is a huge opportunity to make tournaments feel like the “featured attraction” of Chip Society rather than just another game card. Right now they look like enlarged Quick Play cards. They need to feel more like live events.
+
+Here’s the redesign I’d have the AI implement.
+
+TOURNAMENT SYSTEM OVERHAUL (MASTER PROMPT)
+
+This is a complete redesign of the Tournament experience.
+
+The current tournament cards feel like enlarged Quick Play cards.
+
+They should instead feel like premium LIVE EVENTS.
+
+Think:
+PokerStars Series
+WSOP Events
+Triton Poker
+GGPoker Tournaments
+
+while still matching Chip Society’s futuristic visual style.
+
+⸻
+
+HOME SCREEN
+
+Tournaments should ONLY exist on the Home screen.
+
+Remove the Tournament section from the Play tab entirely.
+
+The Play tab is for selecting poker variants and casino games only.
+
+The Home screen is where live events are discovered.
+
+⸻
+
+Tournament Card Redesign
+
+Completely redesign the cards.
+
+Current issues:
+
+• Too much empty space
+• Looks like Quick Play
+• Doesn’t feel exciting
+• Not enough tournament information
+
+⸻
+
+New Layout
+
+TOP LEFT
+
+LIVE indicator
+
+(animated pulsing dot)
+
+instead of just LIVE.
+
+Example:
+
+● LIVE
+
+The dot should slowly pulse.
+
+⸻
+
+TOP RIGHT
+
+Countdown timer
+
+Starts In
+
+08:43
+
+or
+
+Late Reg Ends
+
+12:31
+
+depending on tournament state.
+
+⸻
+
+Center
+
+Large tournament icon
+
+Much larger than current.
+
+Approximately 80–90 px.
+
+Examples
+
+⚡ Turbo
+
+🏆 Championship
+
+👑 High Roller
+
+🎯 Bounty
+
+🔥 Knockout
+
+⸻
+
+Tournament Name
+
+Large
+
+Bold
+
+Premium
+
+Examples
+
+Turbo Heat
+
+Sunday Major
+
+Daily Championship
+
+Night Grind
+
+Mega Stack
+
+High Roller
+
+Bounty Hunter
+
+⸻
+
+Subtitle
+
+Instead of generic text
+
+Examples
+
+Fast Blind Levels
+
+Deep Stack Structure
+
+Progressive Knockout
+
+Freezeout
+
+Turbo Format
+
+Bounty Event
+
+Deep Championship
+
+⸻
+
+Stats Panel
+
+Instead of
+
+Buy-in | Prize | Seats
+
+Make it:
+
+BUY-IN
+
+25K
+
+────────
+
+PLAYERS
+
+142 / 180
+
+────────
+
+PRIZE POOL
+
+3.6M
+
+Much cleaner.
+
+⸻
+
+Progress Bar
+
+Below stats.
+
+Registration Progress
+
+██████░░░
+
+142 / 180 Players
+
+Feels more alive.
+
+⸻
+
+Primary Button
+
+Large
+
+Full width
+
+ENTER TOURNAMENT
+
+instead of
+
+Tap To Enter
+
+⸻
+
+Color Themes
+
+Instead of random colors,
+
+each tournament category has its own identity.
+
+Turbo
+
+Hot Pink
+
+Deep Stack
+
+Electric Blue
+
+Championship
+
+Gold
+
+Knockout
+
+Orange
+
+High Roller
+
+Emerald
+
+Daily
+
+Purple
+
+This lets players instantly identify event types.
+
+⸻
+
+Card Animation
+
+LIVE events
+
+Subtle breathing border.
+
+LIVE dot pulses.
+
+Countdown updates live.
+
+Nothing excessive.
+
+⸻
+
+Carousel
+
+Keep horizontal scrolling.
+
+Center card should scale up slightly.
+
+Adjacent cards slightly smaller.
+
+Premium carousel feel.
+
+⸻
+
+TOURNAMENT RULES
+
+Every tournament has an Info button.
+
+Rules should include:
+
+Tournament Type
+
+Freezeout
+
+Rebuy
+
+Knockout
+
+Bounty
+
+Turbo
+
+Deep Stack
+
+Late Registration
+
+Blind Structure
+
+Prize Distribution
+
+Elimination Rules
+
+⸻
+
+TOURNAMENT STRUCTURE
+
+Players begin with equal stacks.
+
+Example
+
+10,000 Tournament Chips
+
+Tournament chips are completely separate from bankroll chips.
+
+Tournament chips disappear when eliminated.
+
+⸻
+
+Blind Levels
+
+Blinds increase automatically.
+
+Example
+
+Every 5 minutes
+
+(or whatever schedule the tournament uses.)
+
+Before each increase
+
+Display
+
+Blind Level Up
+
+3…
+
+2…
+
+1…
+
+Small notification.
+
+⸻
+
+Table Balancing
+
+When players are eliminated
+
+Automatically rebalance tables.
+
+Never allow one table to have significantly fewer players.
+
+Tables merge automatically.
+
+No user interaction required.
+
+⸻
+
+Final Table
+
+When enough players remain
+
+Automatically create
+
+FINAL TABLE
+
+Display animation
+
+FINAL TABLE
+
+Good luck!
+
+⸻
+
+Elimination
+
+When busted
+
+Show
+
+You Finished
+
+24th of 180
+
+Prize
+
+None
+
+or
+
++450K
+
+Continue button
+
+Watch Final Table
+
+Return Home
+
+⸻
+
+Prize Distribution
+
+Pay according to tournament structure.
+
+Examples
+
+Top 10%
+
+Top 15%
+
+Top 20%
+
+Displayed before joining.
+
+⸻
+
+Tournament Completion
+
+When winner is decided
+
+Tournament ends immediately.
+
+Players removed from tournament.
+
+Leaderboard locked.
+
+Results saved.
+
+⸻
+
+Next Tournament
+
+As soon as a tournament finishes
+
+Automatically generate the next scheduled event.
+
+Never leave empty tournament cards.
+
+Cards transition automatically.
+
+Example
+
+Turbo Heat Ends
+
+↓
+
+Night Turbo appears
+
+Countdown begins.
+
+The Home screen should always feel alive.
+
+⸻
+
+Tournament Schedule
+
+Support recurring tournaments.
+
+Examples
+
+Every Hour
+
+Every 4 Hours
+
+Daily
+
+Weekend Specials
+
+Championship Sundays
+
+Seasonal Events
+
+⸻
+
+Notifications
+
+Allow players to enable
+
+Notify Me
+
+for upcoming tournaments.
+
+Notifications occur
+
+15 minutes before start
+
+5 minutes before start
+
+Starting Now
+
+⸻
+
+Reconnect Protection
+
+If connection drops
+
+Reserve player seat.
+
+Reconnect automatically.
+
+Player remains blinded out.
+
+No immediate elimination.
+
+⸻
+
+Spectator Mode
+
+If eliminated
+
+Player may watch remaining tables.
+
+Leave anytime.
+
+⸻
+
+Tournament History
+
+Player Profile
+
+New tab
+
+Tournament Results
+
+Shows
+
+Wins
+
+Final Tables
+
+ITM %
+
+Largest Cash
+
+Biggest Win
+
+Recent Finishes
+
+⸻
+
+Overall Goal
+
+Tournaments should feel like premium live poker events rather than another menu card. Every tournament should feel active, competitive, and constantly changing, encouraging players to check the Home screen regularly to see what’s starting next.

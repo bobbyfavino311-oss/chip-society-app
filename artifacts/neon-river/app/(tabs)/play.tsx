@@ -1047,18 +1047,6 @@ export default function PlayScreen() {
           ]}
         />
 
-        {/* ── TOURNAMENTS ─────────────────────────────────────────────── */}
-        <SectionCard
-          section="TOURNAMENTS"
-          accent="#ffd700"
-          icon="trophy-outline"
-          title="TOURNAMENTS"
-          lines={['Multi-table tournaments · Prize pools · Brackets']}
-          options={[]}
-          locked
-          lockedLabel="TOURNAMENTS COMING SOON"
-          lockedSub="Poker tournaments, prize pools, and brackets are on the way."
-        />
       </ScrollView>
 
       <QuickPlayModal
