@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList,
-  ActivityIndicator, Modal, ScrollView, Alert,
+  ActivityIndicator, Modal, ScrollView, Alert, TextInput, Clipboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useMultiplayer } from '@/context/MultiplayerContext';
 import { useUser } from '@/context/UserContext';
 import { STAKE_LABELS, STAKE_COLORS, formatChips } from '@/lib/multiplayerTypes';
@@ -33,15 +34,22 @@ const TIER_MIN_BUYIN: Record<StakeTier, number> = {
 
 export default function MultiplayerLobby() {
   const { profile } = useUser();
+  const params = useLocalSearchParams<{ code?: string; mode?: string }>();
+
   const {
     connected, connecting, lobbyTables, error,
     connect, getLobby, createTable, joinTable, tableId, clearError,
   } = useMultiplayer();
 
-  const [showCreate, setShowCreate] = useState(false);
+  const [showCreate, setShowCreate]   = useState(false);
   const [selectedTier, setSelectedTier] = useState<StakeTier>('MICRO');
-  const [maxPlayers, setMaxPlayers] = useState(5);
-  const [joining, setJoining] = useState<string | null>(null);
+  const [maxPlayers, setMaxPlayers]   = useState(5);
+  const [joining, setJoining]         = useState<string | null>(null);
+
+  const [showJoinCode, setShowJoinCode] = useState(false);
+  const [codeInput, setCodeInput]       = useState('');
+  const [codeCopied, setCodeCopied]     = useState(false);
+  const codeRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (!connected && !connecting) connect();
@@ -63,6 +71,15 @@ export default function MultiplayerLobby() {
     }
   }, [error]);
 
+  useEffect(() => {
+    if (params.code && connected) {
+      setCodeInput(params.code.toUpperCase());
+      setShowJoinCode(true);
+    } else if (params.mode === 'host') {
+      setShowCreate(true);
+    }
+  }, [params.code, params.mode, connected]);
+
   const userId = profile.playerId ?? profile.username;
 
   const handleJoin = (table: LobbyTable) => {
@@ -76,6 +93,17 @@ export default function MultiplayerLobby() {
     joinTable(table.id, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
   };
 
+  const handleJoinByCode = () => {
+    const code = codeInput.trim().toUpperCase();
+    if (code.length < 4) return;
+    const table = lobbyTables.find(t => t.id.toUpperCase() === code);
+    if (!table) {
+      Alert.alert('Not found', `No open table with code "${code}". Ask your host to check the code.`);
+      return;
+    }
+    handleJoin(table);
+  };
+
   const handleCreate = () => {
     const chips = profile.chips ?? 0;
     const minBuy = TIER_MIN_BUYIN[selectedTier];
@@ -86,6 +114,12 @@ export default function MultiplayerLobby() {
     setShowCreate(false);
     const buyIn = Math.min(chips, minBuy * 5);
     createTable(selectedTier, maxPlayers, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
+  };
+
+  const copyCode = (code: string) => {
+    Clipboard.setString(code);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
   };
 
   const renderTable = ({ item }: { item: LobbyTable }) => {
@@ -103,6 +137,10 @@ export default function MultiplayerLobby() {
         <View style={styles.tableHeader}>
           <View style={[styles.tierBadge, { backgroundColor: color + '20', borderColor: color + '60' }]}>
             <Text style={[styles.tierText, { color }]}>{STAKE_LABELS[item.stakeTier]}</Text>
+          </View>
+          <View style={styles.codeRow}>
+            <Text style={styles.codeLabel}>CODE</Text>
+            <Text style={styles.codeValue}>{item.id}</Text>
           </View>
           <Text style={[styles.phaseTag, { color: item.phase === 'waiting' ? '#00ff88' : '#ffcc00' }]}>
             {phaseLabel}
@@ -142,7 +180,6 @@ export default function MultiplayerLobby() {
     <LinearGradient colors={['#050010', '#0a0020', '#050010']} style={styles.root}>
       <SafeAreaView style={styles.safe} edges={['top']}>
 
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <Text style={styles.backText}>← BACK</Text>
@@ -154,7 +191,6 @@ export default function MultiplayerLobby() {
           </View>
         </View>
 
-        {/* Status bar */}
         <View style={styles.statusBar}>
           <View style={[styles.statusDot, { backgroundColor: connected ? '#00ff88' : connecting ? '#ffcc00' : '#ff4444' }]} />
           <Text style={styles.statusText}>
@@ -165,14 +201,20 @@ export default function MultiplayerLobby() {
           )}
         </View>
 
-        {/* Create table button */}
-        <TouchableOpacity style={styles.createBtn} onPress={() => setShowCreate(true)} disabled={!connected}>
-          <LinearGradient colors={['#bf5fff', '#7b2fff']} style={styles.createGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            <Text style={styles.createText}>＋  CREATE TABLE</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        {/* Action buttons row */}
+        <View style={styles.actionRow}>
+          <TouchableOpacity style={styles.createBtn} onPress={() => setShowCreate(true)} disabled={!connected}>
+            <LinearGradient colors={['#bf5fff', '#7b2fff']} style={styles.createGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <Ionicons name="add-circle-outline" size={16} color="#fff" />
+              <Text style={styles.createText}>CREATE</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.codeBtn} onPress={() => setShowJoinCode(true)} disabled={!connected}>
+            <Ionicons name="keypad-outline" size={16} color="#ff0090" />
+            <Text style={styles.codeBtnText}>JOIN BY CODE</Text>
+          </TouchableOpacity>
+        </View>
 
-        {/* Table list */}
         {!connected && !connecting && (
           <View style={styles.offlineBox}>
             <Text style={styles.offlineText}>Could not connect to server.</Text>
@@ -191,8 +233,9 @@ export default function MultiplayerLobby() {
 
         {connected && lobbyTables.length === 0 && (
           <View style={styles.centerBox}>
+            <Ionicons name="people-outline" size={40} color="#222" />
             <Text style={styles.emptyText}>NO TABLES OPEN</Text>
-            <Text style={styles.emptySubText}>Create one to start playing</Text>
+            <Text style={styles.emptySubText}>Create one and share your code with friends</Text>
           </View>
         )}
 
@@ -206,7 +249,7 @@ export default function MultiplayerLobby() {
           />
         )}
 
-        {/* Create modal */}
+        {/* Create Table Modal */}
         <Modal visible={showCreate} transparent animationType="slide">
           <View style={styles.modalOverlay}>
             <View style={styles.modalBox}>
@@ -264,6 +307,45 @@ export default function MultiplayerLobby() {
           </View>
         </Modal>
 
+        {/* Join by Code Modal */}
+        <Modal visible={showJoinCode} transparent animationType="slide">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>JOIN BY CODE</Text>
+              <Text style={styles.joinCodeSub}>Ask your host for their 6-letter table code</Text>
+
+              <TextInput
+                ref={codeRef}
+                style={styles.codeInput}
+                value={codeInput}
+                onChangeText={t => setCodeInput(t.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
+                placeholder="XXXXXX"
+                placeholderTextColor="#333"
+                autoCapitalize="characters"
+                autoCorrect={false}
+                maxLength={6}
+                returnKeyType="done"
+                onSubmitEditing={handleJoinByCode}
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowJoinCode(false); setCodeInput(''); }}>
+                  <Text style={styles.cancelText}>CANCEL</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.confirmBtn, { opacity: codeInput.length < 4 ? 0.4 : 1 }]}
+                  onPress={handleJoinByCode}
+                  disabled={codeInput.length < 4}
+                >
+                  <LinearGradient colors={['#ff0090', '#cc0070']} style={styles.confirmGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                    <Text style={styles.confirmText}>JOIN</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
       </SafeAreaView>
     </LinearGradient>
   );
@@ -283,14 +365,20 @@ const styles = StyleSheet.create({
   statusDot: { width: 8, height: 8, borderRadius: 4 },
   statusText: { color: '#888', fontFamily: 'Orbitron_400Regular', fontSize: 10, letterSpacing: 1 },
   tableCount: { marginLeft: 'auto', color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 10 },
-  createBtn: { marginHorizontal: 16, marginBottom: 16, borderRadius: 10, overflow: 'hidden' },
-  createGrad: { paddingVertical: 14, alignItems: 'center' },
-  createText: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 2 },
+  actionRow: { flexDirection: 'row', gap: 10, marginHorizontal: 16, marginBottom: 16 },
+  createBtn: { flex: 1, borderRadius: 10, overflow: 'hidden' },
+  createGrad: { paddingVertical: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  createText: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1.5 },
+  codeBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1, borderColor: '#ff009055', borderRadius: 10, paddingVertical: 13, backgroundColor: 'rgba(255,0,144,0.07)' },
+  codeBtnText: { color: '#ff0090', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
   list: { paddingHorizontal: 16, paddingBottom: 20, gap: 12 },
   tableCard: { borderRadius: 14, borderWidth: 1, padding: 16, overflow: 'hidden' },
-  tableHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
+  tableHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 8 },
   tierBadge: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4 },
   tierText: { fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1.5 },
+  codeRow: { flex: 1, alignItems: 'center' },
+  codeLabel: { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1, marginBottom: 1 },
+  codeValue: { color: '#888', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 2 },
   phaseTag: { fontFamily: 'Orbitron_400Regular', fontSize: 10, letterSpacing: 1 },
   tableInfo: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 14 },
   infoCol: { alignItems: 'center', flex: 1 },
@@ -305,10 +393,12 @@ const styles = StyleSheet.create({
   centerBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   connectingText: { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 12, letterSpacing: 1 },
   emptyText: { color: '#444', fontFamily: 'Orbitron_700Bold', fontSize: 16, letterSpacing: 2 },
-  emptySubText: { color: '#333', fontFamily: 'Orbitron_400Regular', fontSize: 12 },
+  emptySubText: { color: '#333', fontFamily: 'Orbitron_400Regular', fontSize: 12, textAlign: 'center', paddingHorizontal: 30 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' },
   modalBox: { backgroundColor: '#0d0025', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 40, borderTopWidth: 1, borderColor: '#bf5fff40' },
-  modalTitle: { color: '#fff', fontFamily: 'Orbitron_900Black', fontSize: 18, letterSpacing: 3, marginBottom: 24, textAlign: 'center' },
+  modalTitle: { color: '#fff', fontFamily: 'Orbitron_900Black', fontSize: 18, letterSpacing: 3, marginBottom: 8, textAlign: 'center' },
+  joinCodeSub: { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 10, textAlign: 'center', marginBottom: 20, letterSpacing: 0.5 },
+  codeInput: { borderWidth: 2, borderColor: '#ff009060', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 20, fontFamily: 'Orbitron_700Bold', fontSize: 28, color: '#ff0090', textAlign: 'center', letterSpacing: 8, backgroundColor: 'rgba(255,0,144,0.05)', marginBottom: 24 },
   sectionLabel: { color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 10, letterSpacing: 2, marginBottom: 10 },
   tierRow: { marginBottom: 20, flexGrow: 0 },
   tierChip: { borderWidth: 1, borderRadius: 10, padding: 12, marginRight: 10, alignItems: 'center', minWidth: 100 },

@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated, Modal, Platform, Pressable, ScrollView,
-  StyleSheet, Text, TouchableOpacity, View,
+  StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -757,10 +757,20 @@ function PrivateTableModal({ visible, onClose }: { visible: boolean; onClose: ()
 
               <Text style={pt.sub}>Enter the room code from your host.</Text>
 
-              <View style={pt.codeInputWrap}>
-                {/* Simple letter buttons simulate code entry for now */}
-                <Text style={pt.codeDisplay}>{code || 'CS____'}</Text>
-              </View>
+              <TextInput
+                style={pt.codeInput}
+                value={code}
+                onChangeText={t => setCode(t.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
+                placeholder="XXXXXX"
+                placeholderTextColor="#440020"
+                autoCapitalize="characters"
+                autoCorrect={false}
+                maxLength={6}
+                returnKeyType="done"
+                onSubmitEditing={() => {
+                  if (code.length >= 4) { onClose(); router.push(`/multiplayer/lobby?code=${code}` as any); }
+                }}
+              />
 
               <View style={pt.btnRow2}>
                 <TouchableOpacity style={pt.cancelBtn} onPress={() => setMode('menu')}>
@@ -807,8 +817,7 @@ const pt = StyleSheet.create({
   closeTxt:      { color: 'rgba(255,255,255,0.3)', fontSize: 12 },
   backBtn:       { flexDirection: 'row', alignItems: 'center', gap: 4 },
   backText:      { color: 'rgba(255,255,255,0.5)', fontSize: 12 },
-  codeInputWrap: { alignItems: 'center', borderWidth: 1.5, borderColor: '#ff009060', borderRadius: 12, paddingVertical: 14, backgroundColor: 'rgba(255,0,144,0.06)' },
-  codeDisplay:   { fontFamily: 'Orbitron_700Bold', fontSize: 28, color: '#ff0090', letterSpacing: 8 },
+  codeInput:     { borderWidth: 1.5, borderColor: '#ff009060', borderRadius: 12, paddingVertical: 14, paddingHorizontal: 20, fontFamily: 'Orbitron_700Bold', fontSize: 28, color: '#ff0090', letterSpacing: 8, textAlign: 'center', backgroundColor: 'rgba(255,0,144,0.06)' },
   btnRow2:       { flexDirection: 'row', gap: 10 },
   cancelBtn:     { flex: 1, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 12 },
   cancelTxt:     { color: 'rgba(255,255,255,0.35)', fontSize: 12 },

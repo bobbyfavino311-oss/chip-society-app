@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  Animated, Dimensions, Alert, ScrollView,
+  Animated, Dimensions, Alert, ScrollView, Clipboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -218,9 +218,20 @@ function TableSurface({ gs }: { gs: ClientGameState }) {
         )}
 
         {isWaiting && (
-          <Text style={g.waitingTxt}>
-            {gs.seats.filter(Boolean).length < 2 ? 'Need 2+ players...' : 'Hand starting soon...'}
-          </Text>
+          <View style={g.waitingBox}>
+            <Text style={g.waitingTxt}>
+              {gs.seats.filter(Boolean).length < 2 ? 'Need 2+ players' : 'Hand starting soon...'}
+            </Text>
+            <TouchableOpacity
+              style={g.codeBox}
+              onPress={() => { Clipboard.setString(gs.tableId); }}
+              activeOpacity={0.7}
+            >
+              <Text style={g.codeLabel}>SHARE CODE</Text>
+              <Text style={g.codeValue}>{gs.tableId}</Text>
+              <Ionicons name="copy-outline" size={11} color="#bf5fff" style={{ marginTop: 2 }} />
+            </TouchableOpacity>
+          </View>
         )}
       </LinearGradient>
     </View>
@@ -552,7 +563,11 @@ const g = StyleSheet.create({
   communityRow: { flexDirection: 'row', gap: 4 },
   potRow:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
   potTxt:     { color: '#ffd700', fontFamily: 'Inter_700Bold', fontSize: 13 },
+  waitingBox: { alignItems: 'center', gap: 6 },
   waitingTxt: { color: '#1a5c2a', fontFamily: 'Orbitron_400Regular', fontSize: 9, textAlign: 'center' },
+  codeBox:    { alignItems: 'center', borderWidth: 1, borderColor: '#bf5fff40', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 5, backgroundColor: 'rgba(191,95,255,0.08)' },
+  codeLabel:  { color: '#bf5fff80', fontFamily: 'Orbitron_400Regular', fontSize: 7, letterSpacing: 1.5 },
+  codeValue:  { color: '#bf5fff', fontFamily: 'Orbitron_700Bold', fontSize: 14, letterSpacing: 3 },
 
   divider:    { height: 1, backgroundColor: '#ffffff08', marginVertical: 6 },
 

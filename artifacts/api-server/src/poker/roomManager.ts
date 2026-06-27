@@ -10,8 +10,15 @@ export class RoomManager {
 
   constructor(private emit: EmitFn, private broadcast: BroadcastFn) {}
 
+  private generateCode(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return this.rooms.has(code) ? this.generateCode() : code;
+  }
+
   createRoom(stakeTier: StakeTier, maxPlayers = 5): PokerRoom {
-    const id = `room_${++this.counter}_${stakeTier}`;
+    const id = this.generateCode();
     const config = { ...STAKE_CONFIG[stakeTier], maxPlayers };
     const room = new PokerRoom(id, config, this.emit, this.broadcast);
     this.rooms.set(id, room);
