@@ -100,10 +100,14 @@ export default function StreakScreen() {
           <Ionicons name="close" size={22} color={colors.textMuted} />
         </TouchableOpacity>
         <Text style={st.title}>DAILY STREAK</Text>
-        <View style={[st.streakBadge, { borderColor: currentStreak > 0 ? 'rgba(255,215,0,0.4)' : colors.border }]}>
-          {currentStreak > 0 && <Text style={st.streakEmoji}>🔥</Text>}
-          <Text style={[st.streakNum, { color: currentStreak > 0 ? '#ffd700' : colors.textDim }]}>{currentStreak}</Text>
-        </View>
+        {currentStreak > 0 ? (
+          <View style={[st.streakBadge, { borderColor: 'rgba(255,215,0,0.4)' }]}>
+            <Text style={st.streakEmoji}>🔥</Text>
+            <Text style={[st.streakNum, { color: '#ffd700' }]}>{currentStreak}</Text>
+          </View>
+        ) : (
+          <View style={{ width: 50 }} />
+        )}
       </View>
 
       <ScrollView contentContainerStyle={[st.scroll, { paddingBottom: insets.bottom + 40 }]} showsVerticalScrollIndicator={false}>

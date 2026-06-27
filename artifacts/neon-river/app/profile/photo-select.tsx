@@ -19,7 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useUser } from '@/context/UserContext';
-import { getNeonAvatar, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
+import { getNeonAvatar, NEON_AVATARS, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
 import NeonAvatarView from '@/components/NeonAvatar';
 
 export default function PhotoSelectScreen() {
@@ -131,7 +131,7 @@ export default function PhotoSelectScreen() {
           </View>
           <View style={styles.optionContent}>
             <Text style={styles.optionTitle}>SELECT AN AVATAR</Text>
-            <Text style={styles.optionSub}>Choose from 63 unique avatars</Text>
+            <Text style={styles.optionSub}>Choose from {NEON_AVATARS.length} unique avatars</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="rgba(0,212,255,0.5)" />
         </TouchableOpacity>

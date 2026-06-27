@@ -284,7 +284,7 @@ function PostCard({ post }: { post: SocialPost }) {
         followers:        0,
         following:        0,
         status:           'online' as const,
-        badges:           [],
+        badges:           profile.isFounder ? [{ id: 'founder', label: 'Founder', icon: '👑' }] : [],
         bio:              '',
       }
     : MOCK_PLAYERS.find(p => p.id === post.playerId);
@@ -1292,7 +1292,14 @@ function MeSection({ myPosts, onDeletePost, bottomInset }: { myPosts: MePost[]; 
           <LinearGradient colors={[`${neonCol}40`, 'transparent']} style={me.glow} />
         </View>
         <View style={me.profileInfo}>
-          <Text style={me.username}>{profile.username}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Text style={me.username}>{profile.username}</Text>
+            {profile.isFounder && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,215,0,0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,215,0,0.40)', paddingHorizontal: 5, paddingVertical: 2 }}>
+                <Text style={{ color: '#FFD700', fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 1 }}>👑 FOUNDER</Text>
+              </View>
+            )}
+          </View>
           <Text style={me.handle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
           <View style={[me.rankBadge, { borderColor: `${colors.accent}60` }]}>
             <Ionicons name="star" size={9} color={colors.accent} />

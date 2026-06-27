@@ -381,6 +381,11 @@ export default function ProfileScreen() {
               <Text style={[styles.username, { color: cardTheme.numColor, textShadowColor: cardTheme.glowColor, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10 }]}>
                 {profile.username}
               </Text>
+              {profile.isFounder && (
+                <View style={styles.founderBadge}>
+                  <Text style={styles.founderBadgeText}>👑 FOUNDER</Text>
+                </View>
+              )}
               <Ionicons name="pencil" size={12} color={`${cardTheme.numColor}88`} style={{ marginLeft: 8 }} />
             </TouchableOpacity>
           )}
@@ -1002,7 +1007,15 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.background,
   },
-  nameRow: { flexDirection: 'row', alignItems: 'center' },
+  nameRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
+  founderBadge: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: 'rgba(255,215,0,0.12)', borderRadius: 6, borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.40)', paddingHorizontal: 6, paddingVertical: 2,
+  },
+  founderBadgeText: {
+    color: '#FFD700', fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
+  },
   username: { color: colors.text, fontSize: 17, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
   editRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   nameInput: {
