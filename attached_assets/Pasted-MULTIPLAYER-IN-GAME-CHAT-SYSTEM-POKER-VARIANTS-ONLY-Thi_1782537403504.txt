@@ -1,0 +1,295 @@
+MULTIPLAYER IN-GAME CHAT SYSTEM (POKER VARIANTS ONLY)
+
+This feature applies only to multiplayer poker variants.
+
+Do NOT add this feature to any Casino Games.
+
+Supported games include:
+
+* Traditional Hold’em
+* Short Deck Hold’em
+* Omaha Hold’em
+* Joker Hold’em
+* Future multiplayer poker variants
+
+⸻
+
+Goal
+
+Add a lightweight in-game chat system that allows players to communicate during hands without becoming distracting or toxic.
+
+The system should feel polished, modern, and easy to use.
+
+⸻
+
+Chat Icon
+
+Add a small Chat Bubble icon in an unused area of the gameplay screen.
+
+Requirements:
+
+• Small and unobtrusive
+• Matches Chip Society neon UI
+• Cyan outline
+• Slight glow
+• Circular button
+• Never blocks cards or betting controls
+
+Recommended placement:
+
+Bottom-right corner above the betting controls.
+
+⸻
+
+Opening Chat
+
+Tapping the chat icon slides up a compact chat panel from the bottom.
+
+The panel should cover only the lower portion of the screen so gameplay remains visible.
+
+Smooth animation.
+
+Approximately 250–300ms slide animation.
+
+⸻
+
+Chat Layout
+
+The chat panel contains:
+
+Top
+
+• Recent messages
+
+Bottom
+
+• Quick Chat buttons
+
+• Text input field
+
+• Send button
+
+⸻
+
+Quick Chat Messages
+
+Players can instantly send one-tap preset messages.
+
+No typing required.
+
+Preset messages:
+
+• Nice hand!
+• Good luck!
+• Well played.
+• Nice bluff.
+• I should’ve folded.
+• Tough river.
+• All in!
+• GG!
+
+Messages send immediately with one tap.
+
+⸻
+
+Custom Messages
+
+Players may also type their own messages.
+
+Maximum length:
+
+50 characters
+
+No multiline messages.
+
+Single line only.
+
+Send button becomes active once text exists.
+
+⸻
+
+Message Display
+
+Messages appear as small floating chat bubbles above each player’s avatar.
+
+Example:
+
+officialbobbyf
+
+“Nice bluff!”
+
+Bubble fades away after:
+
+5–6 seconds
+
+⸻
+
+Chat Feed
+
+Opening chat shows the most recent conversation.
+
+Maximum stored messages:
+
+25
+
+Older messages automatically disappear.
+
+⸻
+
+Anti-Spam Protection
+
+Prevent spam.
+
+Rules:
+
+Maximum:
+
+1 message every 2 seconds
+
+Duplicate messages cannot be sent repeatedly.
+
+Example:
+
+“Nice hand”
+
+“Nice hand”
+
+“Nice hand”
+
+should not be allowed.
+
+⸻
+
+Character Filter
+
+Basic profanity filter.
+
+Replace offensive words with:
+
+⸻
+
+Keep moderation lightweight.
+
+⸻
+
+Muting
+
+Inside the chat panel include:
+
+🔇 Mute Table
+
+When enabled:
+
+• No incoming messages
+• User can still play normally
+
+⸻
+
+Disable Custom Chat Option
+
+Future-ready setting.
+
+Support a player preference:
+
+✔ Preset Messages Only
+
+When enabled:
+
+Only the eight quick messages are allowed.
+
+Custom typing disappears.
+
+⸻
+
+Emojis
+
+No emoji keyboard.
+
+Keep chat poker-focused.
+
+Only text.
+
+⸻
+
+Notifications
+
+When chat is closed and a new message arrives:
+
+Display a small red notification badge on the chat icon.
+
+Example:
+
+💬 (2)
+
+Opening chat clears the badge.
+
+⸻
+
+Animation
+
+Messages animate subtly.
+
+Fade in.
+
+Slight upward motion.
+
+Fade out.
+
+No large popups.
+
+⸻
+
+Performance
+
+Messages should be lightweight.
+
+Do not affect gameplay FPS.
+
+No excessive animations.
+
+⸻
+
+Visual Style
+
+Continue Chip Society’s UI language.
+
+Background:
+
+Dark translucent panel
+
+Border:
+
+Neon cyan
+
+Rounded corners
+
+Modern typography
+
+Soft glow
+
+Premium casino aesthetic.
+
+⸻
+
+Casino Games
+
+Do NOT implement this feature in:
+
+• Blackjack
+• Three Card Poker
+• Ultimate Texas Hold’em
+• Mississippi Stud
+• High Card Flush
+• Casino War
+• Let It Ride
+• Pai Gow Poker
+• Roulette
+• Any future Casino Games
+
+Only multiplayer poker variants receive in-game chat.
+
+⸻
+
+Overall Goal
+
+The feature should make multiplayer tables feel alive and social without overwhelming gameplay. Players should be able to congratulate good hands, bluff, joke, or interact briefly while remaining focused on the action. Chat should feel fast, clean, and premium, reinforcing Chip Society as a true Social Poker Network rather than just another poker app.
