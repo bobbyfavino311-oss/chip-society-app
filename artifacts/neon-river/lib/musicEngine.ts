@@ -102,6 +102,8 @@ export const MusicEngine = {
     const s  = _sound;
     _sound   = null;
     if (s) {
+      // Clear callback first so the manual-loop handler doesn't restart playback
+      s.setOnPlaybackStatusUpdate(null);
       void (async () => {
         try {
           await s.stopAsync();
