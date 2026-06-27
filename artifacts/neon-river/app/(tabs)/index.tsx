@@ -362,8 +362,7 @@ function ChipSocietyLogo() {
         style={[logo.img, { opacity: brightness }]}
         resizeMode="contain"
       />
-      <Text style={logo.sub} allowFontScaling={false}>SOCIAL POKER</Text>
-      <Text style={logo.sub} allowFontScaling={false}>NETWORK</Text>
+      <Text style={logo.sub} allowFontScaling={false}>SOCIAL POKER NETWORK</Text>
     </View>
   );
 }
