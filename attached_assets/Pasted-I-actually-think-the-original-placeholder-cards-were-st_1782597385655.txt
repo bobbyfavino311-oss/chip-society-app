@@ -1,0 +1,307 @@
+I actually think the original placeholder cards were stronger. They were cleaner, easier to scan, and looked more like premium event posters. The redesign added too many elements into a small space, which is why you’re getting truncated titles, cramped layouts, and buttons that don’t scale.
+
+I’d have the AI intentionally revert toward the original concept but polish it into a production version.
+
+⸻
+
+TOURNAMENT CARD REDESIGN V2 (MASTER PROMPT)
+
+The current tournament cards need a complete redesign.
+
+The current version feels cramped.
+
+Problems:
+
+* Tournament names get cut off.
+* Join button is oversized.
+* Countdown timer is empty and serves no purpose until launch.
+* Too much information is fighting for attention.
+* Cards no longer resemble premium live events.
+
+Remove Countdown
+
+Delete the countdown timer entirely.
+
+Do NOT leave an empty placeholder.
+
+When tournament scheduling goes live later, the timer can be re-added.
+
+For now the upper right corner should remain empty.
+
+⸻
+
+Return to Original Layout
+
+Use the original tournament card layout as the base.
+
+Large icon.
+
+Tournament title.
+
+One-line description.
+
+Simple stats.
+
+Large Enter button.
+
+No clutter.
+
+⸻
+
+Card Layout
+
+● LIVE
+       [Tournament Icon]
+LOW STAKES LOUNGE
+Freezeout • Easy Blinds
+----------------------------
+BUY-IN     PRIZE      SEATS
+5K         25K        5
+----------------------------
+1st 70%
+2nd 30%
+[ ENTER TOURNAMENT ]
+
+Everything centered.
+
+Very clean.
+
+Very readable.
+
+⸻
+
+Tournament Name Rules
+
+Tournament names must NEVER wrap.
+
+Never shrink the font.
+
+If necessary:
+
+Reduce font size slightly.
+
+or
+
+Automatically shorten names.
+
+Examples
+
+Low Stakes Lounge
+
+Turbo Heat
+
+Daily Championship
+
+Sunday Major
+
+Night Grind
+
+High Roller
+
+Never allow
+
+LOW STAKES LOU…
+
+⸻
+
+Icons
+
+Increase icon size slightly.
+
+Use clean line icons.
+
+No emoji art.
+
+Examples
+
+🏆 Championship
+
+⚡ Turbo
+
+🎯 Bounty
+
+💰 High Roller
+
+♠ Poker
+
+Icons should match Chip Society styling.
+
+⸻
+
+Simplify Stats
+
+Keep only
+
+BUY-IN
+
+PRIZE
+
+SEATS
+
+Do NOT add extra statistics.
+
+No registration percentage.
+
+No progress bars.
+
+No unnecessary complexity.
+
+⸻
+
+Prize Breakdown
+
+Instead of
+
+1st:70% • 2nd:30%
+
+Show
+
+PAYS TOP 2
+
+or
+
+PAYS TOP 3
+
+The exact payout percentages appear only inside the tournament information page after tapping the info button.
+
+This makes cards cleaner.
+
+⸻
+
+Enter Button
+
+Current button is oversized.
+
+Redesign.
+
+Full width.
+
+Shorter height.
+
+Text
+
+ENTER
+
+instead of
+
+ENTER TOURNAMENT
+
+Cleaner.
+
+More premium.
+
+⸻
+
+Info Button
+
+Keep the info button.
+
+Move it into the lower-left corner.
+
+It opens:
+
+Tournament Rules
+
+Blind Structure
+
+Prize Distribution
+
+Starting Stack
+
+Late Registration
+
+Rebuy Rules
+
+Table Balancing
+
+Disconnect Policy
+
+⸻
+
+Card Heights
+
+Reduce overall height by approximately 15%.
+
+This allows more tournaments to be visible on screen.
+
+⸻
+
+Hover Animation
+
+Selected card:
+
+Subtle glow.
+
+Small scale increase.
+
+Nothing flashy.
+
+⸻
+
+Functional Fixes
+
+Fix tournament entry.
+
+Currently every tournament’s ENTER button fails.
+
+The button must:
+
+• Open tournament lobby
+
+• Display event information
+
+• Show prize structure
+
+• Show player count
+
+• Allow Join
+
+• Deduct buy-in
+
+• Seat player
+
+This must work for every tournament.
+
+⸻
+
+Tournament Lobby
+
+Selecting ENTER opens a dedicated tournament lobby.
+
+Show:
+
+Tournament name
+
+Prize Pool
+
+Buy-In
+
+Entrants
+
+Blind Structure
+
+Starting Stack
+
+Payouts
+
+Estimated Duration
+
+Players Registered
+
+JOIN TOURNAMENT
+
+BACK
+
+⸻
+
+Final Goal
+
+The cards should feel like premium poker event posters—not oversized Quick Play cards. A player should be able to glance at the Home screen and immediately understand:
+
+* What the tournament is.
+* How much it costs.
+* What they can win.
+* How many seats are available.
+* How to join.
+
+With minimal text, no truncation, and a cleaner, more premium appearance.

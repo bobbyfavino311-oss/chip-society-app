@@ -1,8 +1,8 @@
 /**
- * TournamentLiveCard — premium live event card
+ * TournamentLiveCard v2 — premium live event card
  *
- * Displays an animated pulsing LIVE dot, auto-updating countdown,
- * large emoji icon, stats, and full-width ENTER TOURNAMENT button.
+ * Clean poster layout: LIVE dot · icon · name · stats · ENTER.
+ * No countdown (placeholder-free). No emoji art — uses Ionicons.
  * Safe to use anywhere — does NOT import PlayerSeat or ArcTimer.
  */
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,7 +11,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
-  Dimensions,
   Easing,
   Modal,
   ScrollView,
@@ -24,41 +23,28 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { TournamentConfig, getPrizePool } from '@/constants/tournaments';
 
-const { width } = Dimensions.get('window');
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatChips(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  if (n >= 1_000) return `${Math.floor(n / 1_000)}K`;
   return String(n);
 }
 
-function getNextStartSecs(config: TournamentConfig): number {
-  const nowMs = Date.now();
-  const intervalMs = config.scheduleIntervalMin * 60 * 1000;
-  const offsetMs = config.scheduleOffsetMin * 60 * 1000;
-  const shifted = nowMs - offsetMs;
-  const elapsed = shifted % intervalMs;
-  return Math.max(0, Math.floor((intervalMs - elapsed) / 1000));
-}
-
-function formatCountdown(secs: number): string {
-  const m = Math.floor(secs / 60);
-  const s = secs % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
+function getPaysTop(config: TournamentConfig): string {
+  return config.prizeLabel.includes('3rd') ? 'PAYS TOP 3' : 'PAYS TOP 2';
 }
 
 // ─── Animated pulsing dot ─────────────────────────────────────────────────────
 
 function PulsingDot({ color }: { color: string }) {
-  const pulse = useRef(new Animated.Value(0.4)).current;
+  const pulse = useRef(new Animated.Value(0.35)).current;
 
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0.4, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 950, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0.35, duration: 950, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
       ]),
     );
     anim.start();
@@ -74,9 +60,9 @@ function PulsingDot({ color }: { color: string }) {
 }
 
 const dot = StyleSheet.create({
-  wrap:  { width: 16, height: 16, alignItems: 'center', justifyContent: 'center' },
-  glow:  { position: 'absolute', width: 14, height: 14, borderRadius: 7 },
-  core:  { width: 7, height: 7, borderRadius: 4 },
+  wrap:  { width: 14, height: 14, alignItems: 'center', justifyContent: 'center' },
+  glow:  { position: 'absolute', width: 13, height: 13, borderRadius: 7 },
+  core:  { width: 6, height: 6, borderRadius: 3 },
 });
 
 // ─── Rules modal ──────────────────────────────────────────────────────────────
@@ -87,15 +73,20 @@ function RulesModal({ visible, config, onClose }: {
   onClose: () => void;
 }) {
   const prizePool = getPrizePool(config);
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableOpacity style={rm.overlay} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity style={rm.sheet} activeOpacity={1}>
-          <LinearGradient colors={['#1a0030', '#0d001c', '#050010']} style={StyleSheet.absoluteFill} />
-          <View style={[rm.accentBar, { backgroundColor: config.color }]} />
 
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={rm.overlay}>
+        <TouchableOpacity style={rm.backdrop} activeOpacity={1} onPress={onClose} />
+        <View style={rm.sheet}>
+          <LinearGradient colors={['#1a0030', '#0d001c', '#050010']} style={StyleSheet.absoluteFill} />
+          <View style={[rm.topBar, { backgroundColor: config.color }]} />
+
+          {/* Header */}
           <View style={rm.header}>
-            <Text style={rm.emoji}>{config.emoji}</Text>
+            <View style={[rm.headerIcon, { borderColor: `${config.color}50`, backgroundColor: `${config.color}15` }]}>
+              <Ionicons name={config.icon as any} size={22} color={config.color} />
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={[rm.title, { color: config.color }]}>{config.name}</Text>
               <Text style={rm.format}>{config.format}</Text>
@@ -105,56 +96,64 @@ function RulesModal({ visible, config, onClose }: {
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 420 }}>
+          <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 440 }} contentContainerStyle={{ gap: 16 }}>
+            {/* Prize pool */}
             <View style={rm.section}>
-              <Text style={rm.sectionTitle}>TOURNAMENT RULES</Text>
-              <RuleRow icon="trophy-outline" label="Format" value={config.format} />
-              <RuleRow icon="people-outline" label="Players" value={`${config.numPlayers} (AI-filled)`} />
-              <RuleRow icon="wallet-outline" label="Buy-in" value={formatChips(config.buyIn) + ' chips'} />
-              <RuleRow icon="layers-outline" label="Starting Stack" value={formatChips(config.startingChips) + ' chips'} />
-              <RuleRow icon="flash-outline" label="Blind Levels" value={`Every ${config.handsPerLevel} hands`} />
-              <RuleRow icon="card-outline" label="Variant" value={config.variant === 'texas_holdem' ? "Texas Hold'em" : "Short Deck Hold'em"} />
-            </View>
-
-            <View style={rm.section}>
-              <Text style={rm.sectionTitle}>PRIZE POOL</Text>
-              <View style={rm.prizeTotal}>
-                <Text style={rm.prizeTotalLabel}>TOTAL</Text>
-                <Text style={[rm.prizeTotalAmt, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
+              <Text style={rm.sectionLabel}>PRIZE POOL</Text>
+              <View style={rm.prizeRow}>
+                <Text style={[rm.prizeTotal, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
+                <View style={rm.prizeBreakdown}>
+                  {config.prizeLabel.split('  ·  ').map((p, i) => (
+                    <Text key={i} style={[rm.prizeItem, { color: config.color }]}>{p.trim()}</Text>
+                  ))}
+                </View>
               </View>
-              <Text style={[rm.prizeLabel, { color: config.color }]}>{config.prizeLabel}</Text>
             </View>
 
+            {/* Structure */}
             <View style={rm.section}>
-              <Text style={rm.sectionTitle}>ELIMINATION</Text>
+              <Text style={rm.sectionLabel}>TOURNAMENT STRUCTURE</Text>
+              <RuleRow icon="wallet-outline"        label="Buy-in"          value={`${formatChips(config.buyIn)} chips`} />
+              <RuleRow icon="layers-outline"        label="Starting Stack"  value={`${formatChips(config.startingChips)} chips`} />
+              <RuleRow icon="people-outline"        label="Players"         value={`${config.numPlayers} (AI-filled)`} />
+              <RuleRow icon="flash-outline"         label="Blind Levels"    value={`Every ${config.handsPerLevel} hands`} />
+              <RuleRow icon="card-outline"          label="Variant"         value={config.variant === 'texas_holdem' ? "Texas Hold'em" : "Short Deck Hold'em"} />
+              <RuleRow icon="git-branch-outline"    label="Format"          value={config.format} />
+            </View>
+
+            {/* Rules */}
+            <View style={rm.section}>
+              <Text style={rm.sectionLabel}>RULES</Text>
               <Text style={rm.ruleText}>
-                Freezeout format — no rebuys or add-ons. When your stack reaches zero, you are eliminated and your finishing position is locked.{'\n\n'}
-                Prizes are credited instantly to your chip balance upon tournament completion.
+                Freezeout format — no rebuys or add-ons. When your chips reach zero you are eliminated and your finishing position is locked.{'\n\n'}
+                Prizes credit instantly to your chip balance when the tournament ends.{'\n\n'}
+                AI bots fill all remaining seats and start immediately after you join.
               </Text>
             </View>
 
             {config.variant === 'short_deck_holdem' && (
               <View style={rm.section}>
-                <Text style={rm.sectionTitle}>SHORT DECK RULES</Text>
+                <Text style={rm.sectionLabel}>SHORT DECK RULES</Text>
                 <Text style={rm.ruleText}>
-                  Cards 2–5 are removed, leaving a 36-card deck.{'\n'}
+                  Cards 2–5 removed → 36-card deck.{'\n'}
                   Flush beats Full House.{'\n'}
                   Three of a Kind beats Straight.{'\n'}
-                  Aces play both high and low for straights (A-6-7-8-9).
+                  Aces play high and low (A-6-7-8-9 is a straight).
                 </Text>
               </View>
             )}
           </ScrollView>
 
+          {/* Footer button */}
           <TouchableOpacity
-            style={[rm.enterBtn, { backgroundColor: config.color }]}
+            style={[rm.okBtn, { backgroundColor: config.color }]}
             onPress={onClose}
             activeOpacity={0.85}
           >
-            <Text style={rm.enterBtnText}>GOT IT</Text>
+            <Text style={rm.okBtnText}>GOT IT</Text>
           </TouchableOpacity>
-        </TouchableOpacity>
-      </TouchableOpacity>
+        </View>
+      </View>
     </Modal>
   );
 }
@@ -170,39 +169,47 @@ function RuleRow({ icon, label, value }: { icon: string; label: string; value: s
 }
 
 const rm = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'flex-end' },
+  overlay:   { flex: 1, justifyContent: 'flex-end' },
+  backdrop:  { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.72)' },
   sheet: {
     borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    overflow: 'hidden', padding: 20, gap: 16,
+    overflow: 'hidden', padding: 20, paddingBottom: 36, gap: 16,
     borderTopWidth: 1, borderLeftWidth: 1, borderRightWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
   },
-  accentBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  emoji: { fontSize: 32 },
-  title: { fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 1 },
-  format: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
-  closeBtn: { padding: 4 },
-  section: { gap: 10, marginBottom: 4 },
-  sectionTitle: {
-    color: colors.textMuted, fontSize: 9, fontWeight: '700',
-    letterSpacing: 2, fontFamily: 'Orbitron_400Regular',
+  topBar:  { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  header:  { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  headerIcon: {
+    width: 44, height: 44, borderRadius: 22,
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
   },
-  ruleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  title:   { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0.8 },
+  format:  { color: colors.textMuted, fontSize: 11, marginTop: 2 },
+  closeBtn: { padding: 4 },
+
+  section:    { gap: 8 },
+  sectionLabel: {
+    color: colors.textMuted, fontSize: 9,
+    fontWeight: '700', letterSpacing: 2,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  prizeRow:       { gap: 6 },
+  prizeTotal:     { fontSize: 26, fontWeight: '800', fontFamily: 'Inter_700Bold' },
+  prizeBreakdown: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  prizeItem:      { fontSize: 12, fontWeight: '700' },
+
+  ruleRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 2 },
   ruleLabel: { color: colors.textDim, fontSize: 12, flex: 1 },
-  ruleVal: { color: colors.text, fontSize: 12, fontWeight: '700' },
-  prizeTotal: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  prizeTotalLabel: { color: colors.textMuted, fontSize: 10, letterSpacing: 1 },
-  prizeTotalAmt: { fontSize: 22, fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  prizeLabel: { fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
-  ruleText: { color: colors.textMuted, fontSize: 12, lineHeight: 18 },
-  enterBtn: {
+  ruleVal:   { color: colors.text, fontSize: 12, fontWeight: '700' },
+  ruleText:  { color: colors.textMuted, fontSize: 12, lineHeight: 19 },
+
+  okBtn: {
     borderRadius: 50, paddingVertical: 14,
     alignItems: 'center', justifyContent: 'center',
   },
-  enterBtnText: {
-    color: colors.background, fontSize: 13, fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
+  okBtnText: {
+    color: colors.background, fontSize: 13,
+    fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
   },
 });
 
@@ -217,17 +224,14 @@ interface Props {
 export default function TournamentLiveCard({ config, userChips, cardWidth }: Props) {
   const prizePool = getPrizePool(config);
   const canAfford = userChips >= config.buyIn;
-  const [secsLeft, setSecsLeft] = useState(() => getNextStartSecs(config));
+  const paysTop = getPaysTop(config);
   const [rulesVisible, setRulesVisible] = useState(false);
+  const pressScale = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    const id = setInterval(() => {
-      setSecsLeft(getNextStartSecs(config));
-    }, 1000);
-    return () => clearInterval(id);
-  }, [config]);
-
-  const cw = cardWidth ?? width * 0.78;
+  const handlePressIn = () =>
+    Animated.spring(pressScale, { toValue: 0.975, useNativeDriver: true, speed: 50 }).start();
+  const handlePressOut = () =>
+    Animated.spring(pressScale, { toValue: 1, useNativeDriver: true, speed: 50 }).start();
 
   const handleEnter = () => {
     if (!canAfford) {
@@ -240,7 +244,7 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
     }
     Alert.alert(
       `Enter ${config.name}?`,
-      `Buy-in: ${formatChips(config.buyIn)} chips\nPrize Pool: ${formatChips(prizePool)} chips\n\n${config.prizeLabel}\n\nAI bots will fill the remaining seats instantly.`,
+      `Buy-in: ${formatChips(config.buyIn)} chips\nPrize Pool: ${formatChips(prizePool)} chips\n\n${config.prizeLabel}\n\nAI bots fill the table and the game starts instantly.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -254,46 +258,58 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
 
   return (
     <>
-      <View style={[st.card, { width: cw, borderColor: `${config.color}40` }]}>
-        {/* Background */}
+      <Animated.View
+        style={[
+          st.card,
+          cardWidth ? { width: cardWidth } : undefined,
+          { borderColor: `${config.color}38`, transform: [{ scale: pressScale }] },
+        ]}
+      >
+        {/* Backgrounds */}
         <LinearGradient
           colors={['#130022', '#080016', '#050010']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         />
         <LinearGradient
-          colors={[`${config.color}20`, `${config.color}08`, 'transparent']}
+          colors={[`${config.color}18`, `${config.color}06`, 'transparent']}
           style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.7 }}
+          start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
         />
-        {/* Left accent */}
-        <View style={[st.accentBar, { backgroundColor: config.color }]} />
+        {/* Top accent line */}
+        <View style={[st.topLine, { backgroundColor: config.color }]} />
 
         <View style={st.inner}>
-          {/* ── Top row: LIVE + countdown ── */}
-          <View style={st.topRow}>
-            <View style={st.liveBadge}>
+          {/* ── LIVE badge (top-left, no countdown) ── */}
+          <View style={st.liveRow}>
+            <View style={[st.livePill, { borderColor: `${config.color}40`, backgroundColor: `${config.color}12` }]}>
               <PulsingDot color={config.color} />
               <Text style={[st.liveText, { color: config.color }]}>LIVE</Text>
             </View>
-            <View style={st.countdownWrap}>
-              <Text style={st.countdownLabel}>NEXT IN</Text>
-              <Text style={[st.countdown, { color: config.color }]}>{formatCountdown(secsLeft)}</Text>
-            </View>
           </View>
 
-          {/* ── Emoji icon ── */}
-          <View style={[st.iconCircle, { borderColor: `${config.color}35`, backgroundColor: `${config.color}12` }]}>
-            <Text style={st.emoji}>{config.emoji}</Text>
+          {/* ── Icon ── */}
+          <View style={[st.iconCircle, { borderColor: `${config.color}45`, backgroundColor: `${config.color}14` }]}>
+            <Ionicons name={config.icon as any} size={42} color={config.color} />
           </View>
 
-          {/* ── Name + format ── */}
-          <View style={st.nameBlock}>
-            <Text style={[st.name, { color: config.color }]} numberOfLines={1}>{config.name}</Text>
-            <Text style={st.format}>{config.format}</Text>
-          </View>
+          {/* ── Name (auto-shrinks to fit, never wraps) ── */}
+          <Text
+            style={[st.name, { color: config.color }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+          >
+            {config.name}
+          </Text>
 
-          {/* ── Stats row ── */}
+          {/* ── Format/subtitle ── */}
+          <Text style={st.format}>{config.format}</Text>
+
+          {/* ── Divider ── */}
+          <View style={[st.divider, { backgroundColor: `${config.color}22` }]} />
+
+          {/* ── Stats ── */}
           <View style={st.statsRow}>
             <View style={st.stat}>
               <Text style={st.statLbl}>BUY-IN</Text>
@@ -301,58 +317,60 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
                 {formatChips(config.buyIn)}
               </Text>
             </View>
-            <View style={st.statDivider} />
+            <View style={[st.statDivider, { backgroundColor: `${config.color}25` }]} />
+            <View style={st.stat}>
+              <Text style={st.statLbl}>PRIZE</Text>
+              <Text style={[st.statVal, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
+            </View>
+            <View style={[st.statDivider, { backgroundColor: `${config.color}25` }]} />
             <View style={st.stat}>
               <Text style={st.statLbl}>SEATS</Text>
               <Text style={st.statVal}>{config.numPlayers}</Text>
             </View>
-            <View style={st.statDivider} />
-            <View style={st.stat}>
-              <Text style={st.statLbl}>PRIZE POOL</Text>
-              <Text style={[st.statVal, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
-            </View>
           </View>
 
-          {/* ── Prize distribution ── */}
-          <Text style={[st.prizeLabel, { color: `${config.color}99` }]}>{config.prizeLabel}</Text>
+          {/* ── Divider ── */}
+          <View style={[st.divider, { backgroundColor: `${config.color}22` }]} />
 
-          {/* ── Action buttons ── */}
+          {/* ── Pays top ── */}
+          <Text style={[st.paysTop, { color: `${config.color}99` }]}>{paysTop}</Text>
+
+          {/* ── Actions: info + enter ── */}
           <View style={st.actions}>
+            {/* Info button — lower left */}
             <TouchableOpacity
-              style={st.infoBtn}
+              style={[st.infoBtn, { borderColor: `${config.color}30` }]}
               onPress={() => setRulesVisible(true)}
               activeOpacity={0.7}
             >
-              <Ionicons name="information-circle-outline" size={16} color={colors.textMuted} />
+              <Ionicons name="information-circle-outline" size={18} color={colors.textMuted} />
             </TouchableOpacity>
 
+            {/* ENTER button */}
             <TouchableOpacity
               style={[st.enterBtn, !canAfford && st.enterBtnDisabled]}
               onPress={handleEnter}
-              activeOpacity={0.85}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
+              activeOpacity={0.88}
             >
               {canAfford && (
                 <LinearGradient
-                  colors={[config.color, `${config.color}cc`]}
+                  colors={[config.color, `${config.color}bb`]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                 />
               )}
-              <Ionicons
-                name={canAfford ? 'trophy' : 'lock-closed'}
-                size={13}
-                color={canAfford ? colors.background : colors.textDim}
-              />
               <Text style={[st.enterBtnText, !canAfford && st.enterBtnTextDisabled]}>
-                {canAfford ? 'ENTER TOURNAMENT' : 'NEED MORE CHIPS'}
+                {canAfford ? 'ENTER' : 'NEED CHIPS'}
               </Text>
               {canAfford && (
-                <Ionicons name="chevron-forward" size={13} color={colors.background} />
+                <Ionicons name="arrow-forward" size={13} color={colors.background} />
               )}
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </Animated.View>
 
       <RulesModal
         visible={rulesVisible}
@@ -367,92 +385,99 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
 
 const st = StyleSheet.create({
   card: {
-    borderRadius: 20,
+    borderRadius: 18,
     borderWidth: 1,
     overflow: 'hidden',
-    flexDirection: 'row',
   },
-  accentBar: { width: 4 },
-  inner: { flex: 1, padding: 16, gap: 12 },
-
-  topRow: {
-    flexDirection: 'row',
+  topLine: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    height: 2,
+  },
+  inner: {
+    padding: 18,
+    gap: 11,
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
-  liveBadge: {
+
+  liveRow: {
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+  },
+  livePill: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderRadius: 20, borderWidth: 1,
+    paddingHorizontal: 9, paddingVertical: 4,
   },
   liveText: {
-    fontSize: 10, fontWeight: '900',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
-  },
-  countdownWrap: { alignItems: 'flex-end' },
-  countdownLabel: {
-    color: colors.textDim, fontSize: 7,
-    fontWeight: '700', letterSpacing: 1.5,
-  },
-  countdown: {
-    fontSize: 18, fontWeight: '800',
-    fontFamily: 'Inter_700Bold', letterSpacing: 0.5,
+    fontSize: 9, fontWeight: '900',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
   },
 
   iconCircle: {
-    width: 72, height: 72, borderRadius: 36,
-    borderWidth: 1, alignSelf: 'center',
+    width: 80, height: 80, borderRadius: 40,
+    borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },
-  emoji: { fontSize: 36 },
 
-  nameBlock: { alignItems: 'center', gap: 4 },
   name: {
-    fontSize: 17, fontWeight: '900',
+    fontSize: 18, fontWeight: '900',
     fontFamily: 'Orbitron_900Black', letterSpacing: 1.5,
     textAlign: 'center',
+    alignSelf: 'stretch',
   },
   format: {
-    color: colors.textMuted, fontSize: 11, textAlign: 'center',
+    color: colors.textMuted, fontSize: 11,
+    textAlign: 'center',
+  },
+
+  divider: {
+    height: 1, alignSelf: 'stretch',
   },
 
   statsRow: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 12, padding: 12,
+    flexDirection: 'row', alignSelf: 'stretch',
+    alignItems: 'center',
   },
-  stat: { flex: 1, alignItems: 'center', gap: 4 },
-  statDivider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.08)' },
+  stat: { flex: 1, alignItems: 'center', gap: 5 },
+  statDivider: { width: 1, height: 32 },
   statLbl: {
-    color: colors.textDim, fontSize: 7,
-    fontWeight: '700', letterSpacing: 1.2,
+    color: colors.textDim, fontSize: 8,
+    fontWeight: '700', letterSpacing: 1.5,
   },
   statVal: {
-    color: colors.text, fontSize: 15,
+    color: colors.text, fontSize: 16,
     fontWeight: '800', fontFamily: 'Inter_700Bold',
   },
 
-  prizeLabel: {
-    fontSize: 10, textAlign: 'center', letterSpacing: 0.5,
+  paysTop: {
+    fontSize: 10, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
+    textAlign: 'center',
   },
 
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  actions: {
+    flexDirection: 'row', alignSelf: 'stretch',
+    alignItems: 'center', gap: 8,
+  },
   infoBtn: {
-    width: 40, height: 44, borderRadius: 12,
+    width: 40, height: 38, borderRadius: 10,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
   },
   enterBtn: {
-    flex: 1, height: 44, borderRadius: 12,
+    flex: 1, height: 38, borderRadius: 10,
     flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'center', gap: 7, overflow: 'hidden',
+    justifyContent: 'center', gap: 6, overflow: 'hidden',
   },
   enterBtnDisabled: {
     backgroundColor: colors.surface,
     borderWidth: 1, borderColor: colors.border,
   },
   enterBtnText: {
-    color: colors.background, fontSize: 11,
-    fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.2,
+    color: colors.background, fontSize: 12,
+    fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
   },
   enterBtnTextDisabled: { color: colors.textDim },
 });
