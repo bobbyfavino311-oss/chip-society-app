@@ -20,7 +20,8 @@ import {
   MOCK_PLAYERS, SOCIAL_POSTS, POST_TAG_COLORS, POKER_REACTIONS,
   type MockPlayer, type SocialPost,
 } from '@/lib/socialData';
-import { getPlayerProfile, followPlayer, unfollowPlayer, type PlayerProfile } from '@/lib/socialApi';
+import { getPlayerProfile, followPlayer, unfollowPlayer, type PlayerProfile, type FeedPost } from '@/lib/socialApi';
+import { useLiveFeed } from '@/context/LiveFeedContext';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -79,10 +80,53 @@ function apiToDisplay(p: PlayerProfile): DisplayPlayer {
     bannerColors: ['#001a40', '#000d20'],
     rank: p.rank, level: p.level,
     chips: p.chips, winRate: p.winRate, handsPlayed: p.handsPlayed,
-    biggestPot: 0, followers: 0, following: 0,
+    biggestPot: 0, followers: p.followerCount ?? 0, following: p.followingCount ?? 0,
     achievementCount: 0, status: p.status,
     badges: [], bio: 'Chip Society player.', isMock: false,
   };
+}
+
+// ── Live Mini Post Card (real FeedPosts from server) ─────────────────────────
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 60_000) return 'just now';
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return `${Math.floor(diff / 86_400_000)}d ago`;
+}
+
+function LiveMiniPostCard({ post }: { post: FeedPost }) {
+  const typeColor = POST_TAG_COLORS[post.tag as keyof typeof POST_TAG_COLORS] ?? '#00d4ff';
+  return (
+    <View style={pc.wrap}>
+      <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: colors.primary, opacity: 0.45 }} />
+      <View style={pc.top}>
+        <View style={[pc.badge, { borderColor: `${typeColor}50`, backgroundColor: `${typeColor}15` }]}>
+          <Text style={[pc.badgeText, { color: typeColor }]}>{post.tag}</Text>
+        </View>
+        <Text style={pc.time}>{relativeTime(typeof post.createdAt === 'string' ? post.createdAt : (post.createdAt as Date).toISOString())}</Text>
+      </View>
+      <Text style={pc.content}>{post.content}</Text>
+      {post.pot && (
+        <View style={pc.pot}>
+          <Ionicons name="layers" size={9} color={colors.gold} />
+          <Text style={pc.potText}>Pot: <Text style={{ color: colors.gold }}>{post.pot}</Text></Text>
+        </View>
+      )}
+      <View style={pc.footer}>
+        <View style={pc.stat}>
+          <Ionicons name="heart" size={11} color={colors.secondary} />
+          <Text style={pc.statText}>{post.likeCount}</Text>
+        </View>
+        <View style={pc.stat}>
+          <Ionicons name="chatbubble" size={11} color={colors.textMuted} />
+          <Text style={pc.statText}>{post.commentCount}</Text>
+        </View>
+      </View>
+    </View>
+  );
 }
 
 // ── Mini Post Card ────────────────────────────────────────────────────────────
@@ -164,6 +208,7 @@ export default function PlayerProfileScreen() {
   const insets = useSafeAreaInsets();
   const { isFollowing, follow, unfollow } = useSocial();
   const { profile: myProfile } = useUser();
+  const { allPosts: liveFeedPosts } = useLiveFeed();
 
   const [player, setPlayer] = useState<DisplayPlayer | null>(() => {
     const mock = MOCK_PLAYERS.find(p => p.id === id);
@@ -185,6 +230,9 @@ export default function PlayerProfileScreen() {
   const posts: SocialPost[] = player?.isMock
     ? SOCIAL_POSTS.filter(p => p.playerId === id)
     : [];
+  const realPosts: FeedPost[] = player?.isMock
+    ? []
+    : liveFeedPosts.filter(p => p.authorId === id);
 
   const following = isFollowing(id ?? '');
 
@@ -342,12 +390,15 @@ export default function PlayerProfileScreen() {
           </View>
         </View>
 
-        {/* Recent posts (mock players only) */}
-        {posts.length > 0 && (
+        {/* Recent posts */}
+        {(posts.length > 0 || realPosts.length > 0) && (
           <View style={s.statsSection}>
             <Text style={s.sectionTitle}>RECENT POSTS</Text>
             <View style={{ gap: 10 }}>
-              {posts.slice(0, 4).map(post => (
+              {realPosts.slice(0, 4).map(post => (
+                <LiveMiniPostCard key={post.id} post={post} />
+              ))}
+              {posts.slice(0, Math.max(0, 4 - realPosts.length)).map(post => (
                 <MiniPostCard key={post.id} post={post} />
               ))}
             </View>

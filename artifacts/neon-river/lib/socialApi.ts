@@ -133,6 +133,8 @@ export interface PlayerProfile {
   winRate: number;
   handsPlayed: number;
   status: string;
+  followerCount?: number;
+  followingCount?: number;
 }
 
 export async function getPlayerProfile(targetId: string): Promise<PlayerProfile | null> {

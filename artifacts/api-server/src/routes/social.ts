@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable } from '@workspace/db';
+import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable, playerNotificationsTable } from '@workspace/db';
 import { eq, or, and, ilike, ne, desc, sql, lt, inArray } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { emitToPlayer, emitToAll } from '../sockets/index.js';
@@ -87,17 +87,29 @@ router.get('/social/players/:id', async (req, res) => {
     if (!rows.length) { res.status(404).json({ error: 'Player not found' }); return; }
     const r = rows[0]!;
     const pj = r.profileJson as any;
+
+    const [followerRow] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(followsTable)
+      .where(eq(followsTable.followingId, id));
+    const [followingRow] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(followsTable)
+      .where(eq(followsTable.followerId, id));
+
     res.json({
       player: {
-        playerId:    r.playerId,
-        username:    r.username,
-        level:       pj?.level ?? 1,
-        chips:       pj?.chips ?? 0,
-        avatarIndex: pj?.avatarIndex ?? 1,
-        rank:        pj?.rank ?? 'Neon Bronze',
-        winRate:     pj?.winRate ?? 0,
-        handsPlayed: pj?.handsPlayed ?? 0,
-        status:      r.status,
+        playerId:      r.playerId,
+        username:      r.username,
+        level:         pj?.level ?? 1,
+        chips:         pj?.chips ?? 0,
+        avatarIndex:   pj?.avatarIndex ?? 1,
+        rank:          pj?.rank ?? 'Neon Bronze',
+        winRate:       pj?.winRate ?? 0,
+        handsPlayed:   pj?.handsPlayed ?? 0,
+        status:        r.status,
+        followerCount: followerRow?.count ?? 0,
+        followingCount: followingRow?.count ?? 0,
       },
     });
   } catch (e) {
@@ -572,8 +584,18 @@ router.post('/social/posts/:id/like', requirePlayer, async (req: any, res) => {
       liked = true;
     }
 
-    const [updated] = await db.select({ likeCount: feedPostsTable.likeCount })
+    const [updated] = await db
+      .select({ likeCount: feedPostsTable.likeCount, authorId: feedPostsTable.authorId })
       .from(feedPostsTable).where(eq(feedPostsTable.id, postId)).limit(1);
+
+    // Notify the post author (fire-and-forget, never blocks the response)
+    if (liked && updated?.authorId && updated.authorId !== playerId) {
+      db.insert(playerNotificationsTable).values({
+        notificationId: randomUUID(), playerId: updated.authorId,
+        type: 'like', title: 'Someone liked your post',
+        reason: 'post_like', amount: 0,
+      }).catch(() => {});
+    }
 
     res.json({ liked, likeCount: updated?.likeCount ?? 0 });
   } catch (e) {

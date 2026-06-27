@@ -300,6 +300,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
   return (
     <View style={cd.wrap}>
       <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: colors.primary, opacity: 0.45 }} />
 
       {/* Header */}
       <View style={cd.header}>
@@ -1715,7 +1716,7 @@ export default function FeedScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { profile } = useUser();
   const { posts: aiPosts, refresh: refreshAIPosts } = useAISocial();
-  const { isMuted, isBlocked } = useSocial();
+  const { isMuted, isBlocked, following } = useSocial();
   const {
     allPosts: livePosts,
     myPosts: liveMyPosts,
@@ -1765,19 +1766,55 @@ export default function FeedScreen() {
   type FeedItem = { _k: 'live'; post: FeedPost } | { _k: 'mock'; post: SocialPost };
 
   const feedItems = useCallback((): FeedItem[] => {
-    // Real posts from Railway DB
     const liveFiltered = livePosts.filter(p => !isMuted(p.authorId) && !isBlocked(p.authorId));
     const liveItems: FeedItem[] = liveFiltered.map(p => ({ _k: 'live' as const, post: p }));
 
-    // Mock/AI filler — only shown while real players are scarce
     const useFiller = liveItems.length < 8;
     const mockBase = SOCIAL_POSTS.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
     const mockItems: FeedItem[] = useFiller
       ? mockBase.map(p => ({ _k: 'mock' as const, post: p }))
       : [];
 
+    const all = [...liveItems, ...mockItems];
+
+    if (activeTab === 'following') {
+      return all.filter(item =>
+        item._k === 'live'
+          ? following.has(item.post.authorId)
+          : following.has((item.post as SocialPost).playerId),
+      );
+    }
+
+    if (activeTab === 'pots') {
+      const parsePot = (s: string | null | undefined): number => {
+        if (!s) return 0;
+        const c = s.replace(/,/g, '').trim().toUpperCase();
+        if (c.endsWith('K')) return parseFloat(c) * 1_000;
+        if (c.endsWith('M')) return parseFloat(c) * 1_000_000;
+        return parseFloat(c) || 0;
+      };
+      return all
+        .filter(item => {
+          const p = item._k === 'live' ? item.post.pot : (item.post as SocialPost).pot;
+          return parsePot(p) > 0;
+        })
+        .sort((a, b) => {
+          const pA = a._k === 'live' ? parsePot(a.post.pot) : parsePot((a.post as SocialPost).pot);
+          const pB = b._k === 'live' ? parsePot(b.post.pot) : parsePot((b.post as SocialPost).pot);
+          return pB - pA;
+        });
+    }
+
+    if (activeTab === 'highlights') {
+      const HIGHLIGHT_TAGS = new Set(['HIGHLIGHT', 'WIN', 'JACKPOT', 'ALL-IN']);
+      return all.filter(item => {
+        const tag = item._k === 'live' ? item.post.tag : (item.post as SocialPost).tag;
+        return HIGHLIGHT_TAGS.has(tag);
+      });
+    }
+
     if (activeTab === 'trending') {
-      return [...liveItems, ...mockItems].sort((a, b) => {
+      return [...all].sort((a, b) => {
         const sA = a._k === 'live'
           ? a.post.likeCount + a.post.commentCount * 2
           : (a.post as SocialPost).likes + (a.post as SocialPost).comments * 2;
@@ -1788,9 +1825,8 @@ export default function FeedScreen() {
       });
     }
 
-    // All tab — live newest first, then mock filler
-    return [...liveItems, ...mockItems];
-  }, [activeTab, livePosts, isMuted, isBlocked]);
+    return all;
+  }, [activeTab, livePosts, isMuted, isBlocked, following]);
 
   // Keep legacy filteredPosts for any remaining references
   const filteredPosts = useCallback(() => {
@@ -1893,6 +1929,15 @@ export default function FeedScreen() {
             (activeTab === 'all' || activeTab === 'trending')
               ? <AIPostsStrip posts={aiPosts.slice(0, 6)} />
               : null
+          }
+          ListEmptyComponent={
+            activeTab === 'following' ? (
+              <View style={{ alignItems: 'center', paddingTop: 60, gap: 12, paddingHorizontal: 32 }}>
+                <Ionicons name="people-outline" size={40} color={colors.textDim} />
+                <Text style={{ color: colors.textMuted, fontSize: 14, fontWeight: '600', textAlign: 'center' }}>Follow players to see their posts here</Text>
+                <Text style={{ color: colors.textDim, fontSize: 12, textAlign: 'center' }}>Head to Search to find players</Text>
+              </View>
+            ) : null
           }
           contentContainerStyle={{ paddingTop: 4, paddingBottom: insets.bottom + 90, gap: 12 }}
           showsVerticalScrollIndicator={false}
