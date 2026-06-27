@@ -38,6 +38,7 @@ import SakuraBackground from '@/components/SakuraBackground';
 import SakuraCardFrame from '@/components/SakuraCardFrame';
 import FrozenNeonBackground from '@/components/FrozenNeonBackground';
 import FrozenNeonCardFrame from '@/components/FrozenNeonCardFrame';
+import ShareToFeedModal from '@/components/ShareToFeedModal';
 import CrimsonNoirBackground from '@/components/CrimsonNoirBackground';
 import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
 import VercettiBackground from '@/components/VercettiBackground';
@@ -607,6 +608,7 @@ export default function PracticeScreen() {
   const canCheck = callAmount === 0;
 
   const isHandOver = state.phase === 'handover' || state.phase === 'showdown';
+  const [pendingShare, setPendingShare] = useState<{ content: string; tag: string; pot: string; handRank: string } | null>(null);
   const isGameOver = state.phase === 'idle' && state.message.includes('Not enough');
 
   const showRunItOut = isAllIn && !isHandOver && state.phase !== 'idle';
@@ -627,6 +629,17 @@ export default function PracticeScreen() {
       }
       const wasAllIn = human?.status === 'allIn' || isAllIn;
       recordGameWin(handDesc, wasAllIn, state.pot, gameVariant);
+      if (state.pot >= 2000) {
+        const potK = state.pot >= 1000 ? `${Math.floor(state.pot / 1000)}K` : String(state.pot);
+        setPendingShare({
+          content: wasAllIn
+            ? `All-in and survived! Won a ${potK} chip pot${handDesc ? ` with ${handDesc}` : ''} in practice. 🙏`
+            : `Just stacked a ${potK} chip pot${handDesc ? ` with ${handDesc}` : ''} in practice. 🃏`,
+          tag: wasAllIn ? 'ALL-IN' : 'WIN',
+          pot: String(state.pot),
+          handRank: handDesc,
+        });
+      }
       onChipBalance(finalHumanChips);
     } else {
       await recordLoss();
@@ -1257,6 +1270,16 @@ export default function PracticeScreen() {
         onOpen={chat.openPanel}
         onClose={chat.closePanel}
       />
+      {pendingShare && (
+        <ShareToFeedModal
+          visible={!!pendingShare}
+          onClose={() => setPendingShare(null)}
+          defaultContent={pendingShare.content}
+          defaultTag={pendingShare.tag as any}
+          pot={pendingShare.pot}
+          handRank={pendingShare.handRank}
+        />
+      )}
     </View>
   );
 }

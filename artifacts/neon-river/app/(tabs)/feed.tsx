@@ -1718,9 +1718,32 @@ export default function FeedScreen() {
   const { isMuted, isBlocked } = useSocial();
   const {
     allPosts: livePosts,
+    myPosts: liveMyPosts,
     refresh: refreshLiveFeed,
     publishPost: livePublish,
   } = useLiveFeed();
+
+  // Seed "Me" tab with server-backed posts on first load
+  useEffect(() => {
+    if (!liveMyPosts.length) return;
+    setMyPosts(prev => {
+      const existingIds = new Set(prev.map(p => p.id));
+      const toAdd: MePost[] = liveMyPosts
+        .filter(p => !existingIds.has(p.id))
+        .map(p => {
+          const ms = Date.now() - new Date(p.createdAt).getTime();
+          const m = Math.floor(ms / 60000);
+          const timeAgo = m < 1 ? 'just now' : m < 60 ? `${m}m` : m < 1440 ? `${Math.floor(m / 60)}h` : `${Math.floor(m / 1440)}d`;
+          return {
+            id: p.id, tag: (p.tag as PostTag) ?? 'WIN',
+            content: p.content, pot: p.pot ?? undefined,
+            handRank: p.handRank ?? undefined,
+            likes: p.likeCount, comments: p.commentCount, timeAgo,
+          };
+        });
+      return toAdd.length ? [...toAdd, ...prev.filter(p => p.id.startsWith('mp'))] : prev;
+    });
+  }, [liveMyPosts]);
 
   // Convert user's MePost array → SocialPost shape so PostCard can render them
   const myFeedPosts = useMemo<SocialPost[]>(() =>

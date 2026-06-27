@@ -19,6 +19,8 @@ import { useLocalSearchParams } from 'expo-router';
 import { useTournamentGame, BLIND_LEVELS, Standing, Prize } from '@/hooks/useTournamentGame';
 import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType } from '@/constants/tournaments';
 import NeonAvatarSeat from '@/components/NeonAvatar';
+import ShareToFeedModal from '@/components/ShareToFeedModal';
+import type { PostTag } from '@/lib/socialData';
 
 
 const HAND_COLORS: Record<string, string> = {
@@ -235,10 +237,19 @@ function EliminationOverlay({ eliminations, prizes, onDismiss }:
 
 // ─── Results screen ───────────────────────────────────────────────────────────
 
-function ResultsScreen({ standings, prizes, myPlace, myPrize, onPlayAgain, onExit }:
-  { standings: Standing[]; prizes: Prize[]; myPlace: number | null; myPrize: number | null; onPlayAgain: () => void; onExit: () => void }) {
+function ResultsScreen({ standings, prizes, myPlace, myPrize, onPlayAgain, onExit, tConfig }:
+  { standings: Standing[]; prizes: Prize[]; myPlace: number | null; myPrize: number | null; onPlayAgain: () => void; onExit: () => void; tConfig: TournamentConfig }) {
   const insets = useSafeAreaInsets();
   const sorted = [...standings].sort((a, b) => a.finishPlace - b.finishPlace);
+  const [shareVisible, setShareVisible] = useState(false);
+  const shareContent = myPlace === 1
+    ? `🏆 Just won the ${tConfig.name}! Took down ${formatChips(myPrize ?? 0)} chips. GGs.`
+    : myPlace === 2
+    ? `Finished 2nd in ${tConfig.name}. Cashed ${formatChips(myPrize ?? 0)} chips. So close. 🤙`
+    : myPlace === 3
+    ? `3rd place in ${tConfig.name}. ${formatChips(myPrize ?? 0)} chips in the pocket.`
+    : `Busted out of the ${tConfig.name}. The grind continues. 💪`;
+  const shareTag: PostTag = (myPlace !== null && myPlace <= 3) ? 'TOURNAMENT' : 'BAD BEAT';
   return (
     <View style={[results.screen, { paddingTop: insets.top }]}>
       <LinearGradient colors={['#1a0040', '#050010', '#050010']} style={StyleSheet.absoluteFill} />
@@ -283,6 +294,16 @@ function ResultsScreen({ standings, prizes, myPlace, myPrize, onPlayAgain, onExi
           );
         })}
       </ScrollView>
+      <TouchableOpacity
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, marginHorizontal: 16, marginBottom: 8, borderRadius: 12, borderWidth: 1, borderColor: `${colors.primary}40`, backgroundColor: `${colors.primary}0a` }}
+        onPress={() => setShareVisible(true)}
+        activeOpacity={0.85}
+      >
+        <Ionicons name="share-social-outline" size={14} color={colors.primary} />
+        <Text style={{ color: colors.primary, fontSize: 10, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5 }}>
+          SHARE RESULT TO FEED
+        </Text>
+      </TouchableOpacity>
       <View style={[results.btns, { paddingBottom: insets.bottom + 16 }]}>
         <TouchableOpacity style={results.btnSecondary} onPress={onExit} activeOpacity={0.85}>
           <Text style={results.btnSecondaryText}>LOBBY</Text>
@@ -293,6 +314,13 @@ function ResultsScreen({ standings, prizes, myPlace, myPrize, onPlayAgain, onExi
           <Text style={results.btnPrimaryText}>PLAY AGAIN</Text>
         </TouchableOpacity>
       </View>
+      <ShareToFeedModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        defaultContent={shareContent}
+        defaultTag={shareTag}
+        pot={myPrize ? String(myPrize) : undefined}
+      />
     </View>
   );
 }
@@ -578,6 +606,7 @@ export default function TournamentScreen() {
         myPrize={tournament.myPrize}
         onPlayAgain={() => { startTournament(); }}
         onExit={() => router.back()}
+        tConfig={tConfig}
       />
     );
   }
