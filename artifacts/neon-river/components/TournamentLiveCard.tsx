@@ -1,8 +1,9 @@
 /**
  * TournamentLiveCard v2 — premium live event card
  *
- * Clean poster layout: LIVE dot · icon · name · stats · ENTER.
- * No countdown (placeholder-free). No emoji art — uses Ionicons.
+ * Centered poster layout: LIVE dot · icon · name · stats · ENTER.
+ * ENTER navigates directly to /game/tournament (lobby+game screen).
+ * No countdown timer. No emoji art — Ionicons only.
  * Safe to use anywhere — does NOT import PlayerSeat or ArcTimer.
  */
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,6 +14,7 @@ import {
   Animated,
   Easing,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -35,16 +37,24 @@ function getPaysTop(config: TournamentConfig): string {
   return config.prizeLabel.includes('3rd') ? 'PAYS TOP 3' : 'PAYS TOP 2';
 }
 
-// ─── Animated pulsing dot ─────────────────────────────────────────────────────
+// ─── Animated pulsing LIVE dot ────────────────────────────────────────────────
 
 function PulsingDot({ color }: { color: string }) {
-  const pulse = useRef(new Animated.Value(0.35)).current;
+  const pulse = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 950, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0.35, duration: 950, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulse, {
+          toValue: 1, duration: 900,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: Platform.OS !== 'web',
+        }),
+        Animated.timing(pulse, {
+          toValue: 0.3, duration: 900,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: Platform.OS !== 'web',
+        }),
       ]),
     );
     anim.start();
@@ -60,12 +70,12 @@ function PulsingDot({ color }: { color: string }) {
 }
 
 const dot = StyleSheet.create({
-  wrap:  { width: 14, height: 14, alignItems: 'center', justifyContent: 'center' },
-  glow:  { position: 'absolute', width: 13, height: 13, borderRadius: 7 },
-  core:  { width: 6, height: 6, borderRadius: 3 },
+  wrap: { width: 14, height: 14, alignItems: 'center', justifyContent: 'center' },
+  glow: { position: 'absolute', width: 12, height: 12, borderRadius: 6 },
+  core: { width: 6, height: 6, borderRadius: 3 },
 });
 
-// ─── Rules modal ──────────────────────────────────────────────────────────────
+// ─── Info / Rules modal ───────────────────────────────────────────────────────
 
 function RulesModal({ visible, config, onClose }: {
   visible: boolean;
@@ -73,6 +83,7 @@ function RulesModal({ visible, config, onClose }: {
   onClose: () => void;
 }) {
   const prizePool = getPrizePool(config);
+  const payouts = config.prizeLabel.split('  ·  ').map(p => p.trim());
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -80,77 +91,79 @@ function RulesModal({ visible, config, onClose }: {
         <TouchableOpacity style={rm.backdrop} activeOpacity={1} onPress={onClose} />
         <View style={rm.sheet}>
           <LinearGradient colors={['#1a0030', '#0d001c', '#050010']} style={StyleSheet.absoluteFill} />
-          <View style={[rm.topBar, { backgroundColor: config.color }]} />
+          <View style={[rm.topAccent, { backgroundColor: config.color }]} />
 
           {/* Header */}
           <View style={rm.header}>
-            <View style={[rm.headerIcon, { borderColor: `${config.color}50`, backgroundColor: `${config.color}15` }]}>
-              <Ionicons name={config.icon as any} size={22} color={config.color} />
+            <View style={[rm.iconWrap, { borderColor: `${config.color}45`, backgroundColor: `${config.color}12` }]}>
+              <Ionicons name={config.icon as any} size={20} color={config.color} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[rm.title, { color: config.color }]}>{config.name}</Text>
-              <Text style={rm.format}>{config.format}</Text>
+              <Text style={[rm.title, { color: config.color }]} numberOfLines={1}>{config.name}</Text>
+              <Text style={rm.sub}>{config.format}</Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={rm.closeBtn}>
-              <Ionicons name="close" size={20} color={colors.textMuted} />
+            <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="close-circle" size={22} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 440 }} contentContainerStyle={{ gap: 16 }}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={rm.body}>
+
             {/* Prize pool */}
             <View style={rm.section}>
-              <Text style={rm.sectionLabel}>PRIZE POOL</Text>
-              <View style={rm.prizeRow}>
-                <Text style={[rm.prizeTotal, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
-                <View style={rm.prizeBreakdown}>
-                  {config.prizeLabel.split('  ·  ').map((p, i) => (
-                    <Text key={i} style={[rm.prizeItem, { color: config.color }]}>{p.trim()}</Text>
-                  ))}
-                </View>
+              <Text style={rm.secLabel}>PRIZE POOL</Text>
+              <Text style={[rm.prizeTotal, { color: colors.gold }]}>{formatChips(prizePool)} chips</Text>
+              <View style={rm.payoutRow}>
+                {payouts.map((p, i) => (
+                  <View key={i} style={[rm.payoutChip, { borderColor: `${config.color}40`, backgroundColor: `${config.color}10` }]}>
+                    <Text style={[rm.payoutText, { color: config.color }]}>{p}</Text>
+                  </View>
+                ))}
               </View>
             </View>
 
             {/* Structure */}
             <View style={rm.section}>
-              <Text style={rm.sectionLabel}>TOURNAMENT STRUCTURE</Text>
-              <RuleRow icon="wallet-outline"        label="Buy-in"          value={`${formatChips(config.buyIn)} chips`} />
-              <RuleRow icon="layers-outline"        label="Starting Stack"  value={`${formatChips(config.startingChips)} chips`} />
-              <RuleRow icon="people-outline"        label="Players"         value={`${config.numPlayers} (AI-filled)`} />
-              <RuleRow icon="flash-outline"         label="Blind Levels"    value={`Every ${config.handsPerLevel} hands`} />
-              <RuleRow icon="card-outline"          label="Variant"         value={config.variant === 'texas_holdem' ? "Texas Hold'em" : "Short Deck Hold'em"} />
-              <RuleRow icon="git-branch-outline"    label="Format"          value={config.format} />
+              <Text style={rm.secLabel}>STRUCTURE</Text>
+              <InfoRow icon="wallet-outline"     label="Buy-in"         value={`${formatChips(config.buyIn)} chips`} />
+              <InfoRow icon="layers-outline"     label="Starting Stack" value={`${formatChips(config.startingChips)} chips`} />
+              <InfoRow icon="people-outline"     label="Players"        value={`${config.numPlayers} (AI-filled)`} />
+              <InfoRow icon="flash-outline"      label="Blind Levels"   value={`Every ${config.handsPerLevel} hands`} />
+              <InfoRow icon="card-outline"       label="Variant"        value={config.variant === 'texas_holdem' ? "Texas Hold'em" : "Short Deck"} />
             </View>
 
             {/* Rules */}
             <View style={rm.section}>
-              <Text style={rm.sectionLabel}>RULES</Text>
+              <Text style={rm.secLabel}>RULES</Text>
               <Text style={rm.ruleText}>
-                Freezeout format — no rebuys or add-ons. When your chips reach zero you are eliminated and your finishing position is locked.{'\n\n'}
-                Prizes credit instantly to your chip balance when the tournament ends.{'\n\n'}
-                AI bots fill all remaining seats and start immediately after you join.
+                Freezeout format — no rebuys or add-ons. When your chips hit zero you are eliminated.
+                {'\n\n'}
+                Prizes credit instantly to your chip balance at the end of the tournament.
+                {'\n\n'}
+                AI bots fill remaining seats and the tournament starts immediately after you join.
               </Text>
             </View>
 
             {config.variant === 'short_deck_holdem' && (
               <View style={rm.section}>
-                <Text style={rm.sectionLabel}>SHORT DECK RULES</Text>
+                <Text style={rm.secLabel}>SHORT DECK RULES</Text>
                 <Text style={rm.ruleText}>
                   Cards 2–5 removed → 36-card deck.{'\n'}
                   Flush beats Full House.{'\n'}
                   Three of a Kind beats Straight.{'\n'}
-                  Aces play high and low (A-6-7-8-9 is a straight).
+                  Aces play high and low (A-6-7-8-9 is the lowest straight).
                 </Text>
               </View>
             )}
+
           </ScrollView>
 
-          {/* Footer button */}
           <TouchableOpacity
             style={[rm.okBtn, { backgroundColor: config.color }]}
             onPress={onClose}
             activeOpacity={0.85}
           >
-            <Text style={rm.okBtnText}>GOT IT</Text>
+            <Text style={rm.okText}>GOT IT</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -158,57 +171,53 @@ function RulesModal({ visible, config, onClose }: {
   );
 }
 
-function RuleRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+function InfoRow({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <View style={rm.ruleRow}>
-      <Ionicons name={icon as any} size={13} color={colors.textDim} />
-      <Text style={rm.ruleLabel}>{label}</Text>
-      <Text style={rm.ruleVal}>{value}</Text>
+    <View style={rm.infoRow}>
+      <Ionicons name={icon as any} size={13} color={colors.textDim} style={{ marginTop: 1 }} />
+      <Text style={rm.infoLabel}>{label}</Text>
+      <Text style={rm.infoVal}>{value}</Text>
     </View>
   );
 }
 
 const rm = StyleSheet.create({
   overlay:   { flex: 1, justifyContent: 'flex-end' },
-  backdrop:  { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.72)' },
+  backdrop:  { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.75)' },
   sheet: {
     borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    overflow: 'hidden', padding: 20, paddingBottom: 36, gap: 16,
+    overflow: 'hidden', paddingTop: 20, paddingHorizontal: 20, paddingBottom: 36,
     borderTopWidth: 1, borderLeftWidth: 1, borderRightWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
   },
-  topBar:  { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  header:  { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  headerIcon: {
-    width: 44, height: 44, borderRadius: 22,
+  topAccent: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
+  iconWrap: {
+    width: 40, height: 40, borderRadius: 20,
     borderWidth: 1, alignItems: 'center', justifyContent: 'center',
   },
-  title:   { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0.8 },
-  format:  { color: colors.textMuted, fontSize: 11, marginTop: 2 },
-  closeBtn: { padding: 4 },
-
-  section:    { gap: 8 },
-  sectionLabel: {
-    color: colors.textMuted, fontSize: 9,
-    fontWeight: '700', letterSpacing: 2,
-    fontFamily: 'Orbitron_400Regular',
+  title: { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0.5 },
+  sub:   { color: colors.textMuted, fontSize: 11, marginTop: 2 },
+  body:  { gap: 20, paddingBottom: 8 },
+  section: { gap: 10 },
+  secLabel: {
+    color: colors.textMuted, fontSize: 9, fontWeight: '700',
+    letterSpacing: 2, fontFamily: 'Orbitron_400Regular',
   },
-  prizeRow:       { gap: 6 },
-  prizeTotal:     { fontSize: 26, fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  prizeBreakdown: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  prizeItem:      { fontSize: 12, fontWeight: '700' },
-
-  ruleRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 2 },
-  ruleLabel: { color: colors.textDim, fontSize: 12, flex: 1 },
-  ruleVal:   { color: colors.text, fontSize: 12, fontWeight: '700' },
-  ruleText:  { color: colors.textMuted, fontSize: 12, lineHeight: 19 },
-
+  prizeTotal:  { fontSize: 24, fontWeight: '800', fontFamily: 'Inter_700Bold' },
+  payoutRow:   { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  payoutChip:  { borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
+  payoutText:  { fontSize: 12, fontWeight: '700' },
+  infoRow:     { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  infoLabel:   { flex: 1, color: colors.textDim, fontSize: 12 },
+  infoVal:     { color: colors.text, fontSize: 12, fontWeight: '700' },
+  ruleText:    { color: colors.textMuted, fontSize: 12, lineHeight: 19 },
   okBtn: {
-    borderRadius: 50, paddingVertical: 14,
-    alignItems: 'center', justifyContent: 'center',
+    borderRadius: 50, paddingVertical: 13,
+    alignItems: 'center', marginTop: 16,
   },
-  okBtnText: {
-    color: colors.background, fontSize: 13,
+  okText: {
+    color: '#000', fontSize: 13,
     fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
   },
 });
@@ -226,34 +235,27 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
   const canAfford = userChips >= config.buyIn;
   const paysTop = getPaysTop(config);
   const [rulesVisible, setRulesVisible] = useState(false);
-  const pressScale = useRef(new Animated.Value(1)).current;
+  const pressAnim = useRef(new Animated.Value(1)).current;
 
-  const handlePressIn = () =>
-    Animated.spring(pressScale, { toValue: 0.975, useNativeDriver: true, speed: 50 }).start();
-  const handlePressOut = () =>
-    Animated.spring(pressScale, { toValue: 1, useNativeDriver: true, speed: 50 }).start();
+  const onPressIn = () =>
+    Animated.spring(pressAnim, { toValue: 0.975, useNativeDriver: Platform.OS !== 'web', speed: 60 }).start();
+  const onPressOut = () =>
+    Animated.spring(pressAnim, { toValue: 1, useNativeDriver: Platform.OS !== 'web', speed: 60 }).start();
 
   const handleEnter = () => {
     if (!canAfford) {
       Alert.alert(
-        'Not Enough Chips',
-        `You need ${formatChips(config.buyIn)} chips to enter.\n\nYour balance: ${formatChips(userChips)}`,
+        'Insufficient Chips',
+        `You need ${formatChips(config.buyIn)} chips to enter this tournament.\n\nYour balance: ${formatChips(userChips)} chips`,
         [{ text: 'OK' }],
       );
       return;
     }
-    Alert.alert(
-      `Enter ${config.name}?`,
-      `Buy-in: ${formatChips(config.buyIn)} chips\nPrize Pool: ${formatChips(prizePool)} chips\n\n${config.prizeLabel}\n\nAI bots fill the table and the game starts instantly.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Enter Tournament',
-          onPress: () =>
-            router.push({ pathname: '/game/tournament', params: { type: config.type } } as any),
-        },
-      ],
-    );
+    // Navigate directly to the tournament lobby (no redundant Alert — lobby screen shows full details)
+    router.push({
+      pathname: '/game/tournament',
+      params: { type: config.type },
+    } as any);
   };
 
   return (
@@ -262,97 +264,100 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
         style={[
           st.card,
           cardWidth ? { width: cardWidth } : undefined,
-          { borderColor: `${config.color}38`, transform: [{ scale: pressScale }] },
+          { borderColor: `${config.color}35`, transform: [{ scale: pressAnim }] },
         ]}
       >
         {/* Backgrounds */}
         <LinearGradient
-          colors={['#130022', '#080016', '#050010']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        />
-        <LinearGradient
-          colors={[`${config.color}18`, `${config.color}06`, 'transparent']}
+          colors={['#120020', '#080016', '#050010']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
+        />
+        <LinearGradient
+          colors={[`${config.color}16`, `${config.color}05`, 'transparent']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 0.6 }}
         />
         {/* Top accent line */}
         <View style={[st.topLine, { backgroundColor: config.color }]} />
 
         <View style={st.inner}>
-          {/* ── LIVE badge (top-left, no countdown) ── */}
+
+          {/* ── LIVE badge ── */}
           <View style={st.liveRow}>
-            <View style={[st.livePill, { borderColor: `${config.color}40`, backgroundColor: `${config.color}12` }]}>
+            <View style={[st.livePill, { borderColor: `${config.color}35`, backgroundColor: `${config.color}10` }]}>
               <PulsingDot color={config.color} />
               <Text style={[st.liveText, { color: config.color }]}>LIVE</Text>
             </View>
           </View>
 
           {/* ── Icon ── */}
-          <View style={[st.iconCircle, { borderColor: `${config.color}45`, backgroundColor: `${config.color}14` }]}>
-            <Ionicons name={config.icon as any} size={42} color={config.color} />
+          <View style={[st.iconCircle, { borderColor: `${config.color}40`, backgroundColor: `${config.color}12` }]}>
+            <Ionicons name={config.icon as any} size={40} color={config.color} />
           </View>
 
-          {/* ── Name (auto-shrinks to fit, never wraps) ── */}
+          {/* ── Name — never wraps, auto-shrinks on native ── */}
           <Text
             style={[st.name, { color: config.color }]}
             numberOfLines={1}
             adjustsFontSizeToFit
-            minimumFontScale={0.7}
+            minimumFontScale={0.72}
+            ellipsizeMode="clip"
           >
             {config.name}
           </Text>
 
-          {/* ── Format/subtitle ── */}
-          <Text style={st.format}>{config.format}</Text>
+          {/* ── Format ── */}
+          <Text style={st.format} numberOfLines={1}>{config.format}</Text>
 
           {/* ── Divider ── */}
-          <View style={[st.divider, { backgroundColor: `${config.color}22` }]} />
+          <View style={[st.divider, { backgroundColor: `${config.color}20` }]} />
 
           {/* ── Stats ── */}
           <View style={st.statsRow}>
             <View style={st.stat}>
-              <Text style={st.statLbl}>BUY-IN</Text>
-              <Text style={[st.statVal, { color: canAfford ? config.color : colors.error }]}>
+              <Text style={st.statLabel}>BUY-IN</Text>
+              <Text style={[st.statValue, { color: canAfford ? config.color : colors.error }]}>
                 {formatChips(config.buyIn)}
               </Text>
             </View>
-            <View style={[st.statDivider, { backgroundColor: `${config.color}25` }]} />
+            <View style={[st.statSep, { backgroundColor: `${config.color}22` }]} />
             <View style={st.stat}>
-              <Text style={st.statLbl}>PRIZE</Text>
-              <Text style={[st.statVal, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
+              <Text style={st.statLabel}>PRIZE</Text>
+              <Text style={[st.statValue, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
             </View>
-            <View style={[st.statDivider, { backgroundColor: `${config.color}25` }]} />
+            <View style={[st.statSep, { backgroundColor: `${config.color}22` }]} />
             <View style={st.stat}>
-              <Text style={st.statLbl}>SEATS</Text>
-              <Text style={st.statVal}>{config.numPlayers}</Text>
+              <Text style={st.statLabel}>SEATS</Text>
+              <Text style={st.statValue}>{config.numPlayers}</Text>
             </View>
           </View>
 
           {/* ── Divider ── */}
-          <View style={[st.divider, { backgroundColor: `${config.color}22` }]} />
+          <View style={[st.divider, { backgroundColor: `${config.color}20` }]} />
 
           {/* ── Pays top ── */}
-          <Text style={[st.paysTop, { color: `${config.color}99` }]}>{paysTop}</Text>
+          <Text style={[st.paysTop, { color: `${config.color}88` }]}>{paysTop}</Text>
 
-          {/* ── Actions: info + enter ── */}
+          {/* ── Actions ── */}
           <View style={st.actions}>
-            {/* Info button — lower left */}
+            {/* Info button */}
             <TouchableOpacity
-              style={[st.infoBtn, { borderColor: `${config.color}30` }]}
+              style={[st.infoBtn, { borderColor: `${config.color}28` }]}
               onPress={() => setRulesVisible(true)}
               activeOpacity={0.7}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Ionicons name="information-circle-outline" size={18} color={colors.textMuted} />
+              <Ionicons name="information-circle-outline" size={19} color={colors.textMuted} />
             </TouchableOpacity>
 
-            {/* ENTER button */}
+            {/* ENTER */}
             <TouchableOpacity
-              style={[st.enterBtn, !canAfford && st.enterBtnDisabled]}
+              style={[st.enterBtn, !canAfford && st.enterBtnLocked]}
               onPress={handleEnter}
-              onPressIn={handlePressIn}
-              onPressOut={handlePressOut}
-              activeOpacity={0.88}
+              onPressIn={onPressIn}
+              onPressOut={onPressOut}
+              activeOpacity={0.85}
             >
               {canAfford && (
                 <LinearGradient
@@ -361,22 +366,17 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
                   start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                 />
               )}
-              <Text style={[st.enterBtnText, !canAfford && st.enterBtnTextDisabled]}>
+              <Text style={[st.enterText, !canAfford && st.enterTextLocked]}>
                 {canAfford ? 'ENTER' : 'NEED CHIPS'}
               </Text>
-              {canAfford && (
-                <Ionicons name="arrow-forward" size={13} color={colors.background} />
-              )}
+              {canAfford && <Ionicons name="chevron-forward" size={12} color="#000" />}
             </TouchableOpacity>
           </View>
+
         </View>
       </Animated.View>
 
-      <RulesModal
-        visible={rulesVisible}
-        config={config}
-        onClose={() => setRulesVisible(false)}
-      />
+      <RulesModal visible={rulesVisible} config={config} onClose={() => setRulesVisible(false)} />
     </>
   );
 }
@@ -385,28 +385,26 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
 
 const st = StyleSheet.create({
   card: {
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
     overflow: 'hidden',
   },
   topLine: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0,
-    height: 2,
+    position: 'absolute', top: 0, left: 0, right: 0, height: 2,
   },
   inner: {
-    padding: 18,
-    gap: 11,
+    padding: 16,
+    paddingBottom: 18,
+    gap: 10,
     alignItems: 'center',
   },
 
-  liveRow: {
-    alignSelf: 'stretch',
-    flexDirection: 'row',
-  },
+  // LIVE
+  liveRow:  { alignSelf: 'stretch' },
   livePill: {
+    alignSelf: 'flex-start',
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    borderRadius: 20, borderWidth: 1,
+    borderWidth: 1, borderRadius: 20,
     paddingHorizontal: 9, paddingVertical: 4,
   },
   liveText: {
@@ -414,48 +412,55 @@ const st = StyleSheet.create({
     fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
   },
 
+  // Icon
   iconCircle: {
-    width: 80, height: 80, borderRadius: 40,
+    width: 76, height: 76, borderRadius: 38,
     borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },
 
+  // Name — base 15px; adjustsFontSizeToFit handles native overflow
   name: {
-    fontSize: 18, fontWeight: '900',
-    fontFamily: 'Orbitron_900Black', letterSpacing: 1.5,
+    fontSize: 15,
+    fontWeight: '900',
+    fontFamily: 'Orbitron_900Black',
+    letterSpacing: 1.2,
     textAlign: 'center',
     alignSelf: 'stretch',
   },
+
   format: {
-    color: colors.textMuted, fontSize: 11,
+    color: colors.textMuted,
+    fontSize: 11,
     textAlign: 'center',
   },
 
-  divider: {
-    height: 1, alignSelf: 'stretch',
-  },
+  // Divider
+  divider: { height: 1, alignSelf: 'stretch' },
 
+  // Stats row
   statsRow: {
-    flexDirection: 'row', alignSelf: 'stretch',
-    alignItems: 'center',
+    flexDirection: 'row', alignSelf: 'stretch', alignItems: 'center',
   },
-  stat: { flex: 1, alignItems: 'center', gap: 5 },
-  statDivider: { width: 1, height: 32 },
-  statLbl: {
+  stat:      { flex: 1, alignItems: 'center', gap: 4 },
+  statSep:   { width: 1, height: 30 },
+  statLabel: {
     color: colors.textDim, fontSize: 8,
     fontWeight: '700', letterSpacing: 1.5,
   },
-  statVal: {
-    color: colors.text, fontSize: 16,
+  statValue: {
+    color: colors.text, fontSize: 15,
     fontWeight: '800', fontFamily: 'Inter_700Bold',
   },
 
+  // Pays top
   paysTop: {
     fontSize: 10, fontWeight: '800',
     fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
     textAlign: 'center',
   },
 
+  // Actions row
   actions: {
     flexDirection: 'row', alignSelf: 'stretch',
     alignItems: 'center', gap: 8,
@@ -463,21 +468,21 @@ const st = StyleSheet.create({
   infoBtn: {
     width: 40, height: 38, borderRadius: 10,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
     borderWidth: 1,
   },
   enterBtn: {
     flex: 1, height: 38, borderRadius: 10,
     flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'center', gap: 6, overflow: 'hidden',
+    justifyContent: 'center', gap: 5, overflow: 'hidden',
   },
-  enterBtnDisabled: {
+  enterBtnLocked: {
     backgroundColor: colors.surface,
     borderWidth: 1, borderColor: colors.border,
   },
-  enterBtnText: {
-    color: colors.background, fontSize: 12,
+  enterText: {
+    color: '#000', fontSize: 11,
     fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
   },
-  enterBtnTextDisabled: { color: colors.textDim },
+  enterTextLocked: { color: colors.textDim },
 });
