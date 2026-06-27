@@ -826,18 +826,18 @@ const tour = StyleSheet.create({
 });
 
 const logo = StyleSheet.create({
-  wrap: { alignItems: 'center', paddingVertical: 4 },
+  wrap: { alignItems: 'center', paddingTop: 12, paddingBottom: 14 },
   img: {
     width: LOGO_IMG_W,
     height: LOGO_IMG_H,
-    marginBottom: -10,
+    marginBottom: 6,
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 11,
     color: colors.textMuted,
     letterSpacing: 7,
-    marginTop: 0,
+    marginTop: 4,
   },
 });
 
