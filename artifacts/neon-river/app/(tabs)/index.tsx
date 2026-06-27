@@ -830,14 +830,14 @@ const logo = StyleSheet.create({
   img: {
     width: LOGO_IMG_W,
     height: LOGO_IMG_H,
-    marginBottom: 2,
+    marginBottom: -10,
   },
   sub: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 9.5,
     color: colors.textMuted,
     letterSpacing: 5,
-    marginTop: 4,
+    marginTop: 0,
   },
 });
 
