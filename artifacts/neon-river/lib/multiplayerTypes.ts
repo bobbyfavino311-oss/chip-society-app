@@ -25,6 +25,7 @@ export interface SeatView {
   cards?: Card[];
   revealedCards?: Card[];
   revealedHand?: string;
+  isDisconnected?: boolean;
 }
 
 export interface WinnerInfo {

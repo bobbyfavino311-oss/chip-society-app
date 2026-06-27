@@ -1,4 +1,5 @@
-- [Multiplayer architecture](multiplayer-architecture.md) — Socket.IO path must be /api/socket.io (proxy doesn't rewrite); api-server uses http.createServer(app) not app.listen(); UserProfile has avatarIndex not avatarId.
+- [Multiplayer architecture](multiplayer-architecture.md) — Socket.IO path must be /api/socket.io; production-grade: soft-disconnect with 60s grace, chip auth from DB on join, chip sync to DB after each hand, quick_join for matchmaking.
+- [Multiplayer production patterns](multiplayer-production.md) — softDisconnect in RoomManager owns the 60s timer; room.markDisconnected returns userId; onChipSync callback flows Manager→Room; sessionStartChips map tracks delta per session.
 - [Short Deck variant architecture](short-deck-variant.md) — GameVariant lives in pokerEngine.ts; GameState carries variant field so all pure functions see it without extra params.
 - [Dual GameVariant definition](dual-game-variant.md) — GameVariant is defined in BOTH pokerEngine.ts AND constants/gameVariants.ts; both must be updated in sync when adding a new variant.
 - [Omaha Hold'em implementation](omaha-holdem.md) — 4 hole cards dealt via numHoleCards in dealAndPostBlinds; getBestHandOmaha enforces C(4,2)×C(5,3)=60 combos; practice.tsx uses `size="md"` for 4-card hands; VALID_VARIANTS set in practice.tsx must include new variants.

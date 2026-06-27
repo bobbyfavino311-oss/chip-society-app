@@ -1,7 +1,7 @@
 import { createDeck, shuffleDeck, getBestHand, compareHands } from './engine.js';
 import type {
   Card, Seat, RoomPhase, RoomConfig, GameMessage,
-  ClientGameState, SeatView, WinnerInfo, PlayerAction,
+  ClientGameState, SeatView, WinnerInfo, PlayerAction, ChipSyncFn,
 } from './types.js';
 
 const TURN_TIMEOUT_MS = 30_000;
@@ -26,9 +26,8 @@ export class PokerRoom {
   winners: WinnerInfo[] = [];
   messages: GameMessage[] = [];
 
-  // Session 3 additions
-  spectators = new Set<string>();        // socketIds watching without a seat
-  private requestedSitOut = new Set<string>(); // socketIds who explicitly asked to sit out
+  spectators = new Set<string>();
+  private requestedSitOut = new Set<string>();
 
   private actedThisRound = new Set<number>();
   private turnTimer: ReturnType<typeof setTimeout> | null = null;
@@ -37,13 +36,21 @@ export class PokerRoom {
 
   private emit: EmitFn;
   private broadcast: BroadcastFn;
+  private onChipSync: ChipSyncFn | null;
 
-  constructor(id: string, config: RoomConfig, emit: EmitFn, broadcast: BroadcastFn) {
+  constructor(
+    id: string,
+    config: RoomConfig,
+    emit: EmitFn,
+    broadcast: BroadcastFn,
+    onChipSync?: ChipSyncFn,
+  ) {
     this.id = id;
     this.config = config;
     this.seats = new Array(config.maxPlayers).fill(null);
     this.emit = emit;
     this.broadcast = broadcast;
+    this.onChipSync = onChipSync ?? null;
   }
 
   // ─── Player management ────────────────────────────────────────────────────
@@ -52,17 +59,91 @@ export class PokerRoom {
     return this.seats.findIndex(s => s?.socketId === socketId);
   }
 
+  findSeatByUserId(userId: string): number {
+    return this.seats.findIndex(s => s?.userId === userId);
+  }
+
   addPlayer(socketId: string, userId: string, username: string, avatarId: number, chips: number): number {
     const emptyIdx = this.seats.findIndex(s => s === null);
     if (emptyIdx === -1) return -1;
     this.seats[emptyIdx] = {
       socketId, userId, username, avatarId,
-      chips, cards: [], currentBet: 0, totalBet: 0, status: 'active',
+      chips, startingChips: chips,
+      cards: [], currentBet: 0, totalBet: 0, status: 'active',
     };
     this.addMessage(`${username} joined the table`, 'info');
     this.broadcastState();
     this.maybeScheduleHandStart();
     return emptyIdx;
+  }
+
+  // ─── Soft disconnect (60 s reconnect window, handled by RoomManager) ──────
+
+  /**
+   * Mark a player as disconnected. Auto-folds their turn if active.
+   * Returns the player's userId so the caller can schedule a hard-remove timer.
+   */
+  markDisconnected(socketId: string): string | null {
+    const idx = this.findSeatBySocketId(socketId);
+    if (idx === -1) return null;
+    const seat = this.seats[idx]!;
+    seat.isDisconnected = true;
+    seat.disconnectedAt = Date.now();
+    this.addMessage(`${seat.username} disconnected — 60s to rejoin`, 'info');
+
+    if (
+      this.phase !== 'waiting' &&
+      this.phase !== 'showdown' &&
+      idx === this.activeSeat &&
+      seat.status === 'active'
+    ) {
+      this.clearTurnTimer();
+      seat.status = 'folded';
+      this.actedThisRound.add(idx);
+      this.broadcastState();
+      this.advanceAfterAction();
+    } else {
+      this.broadcastState();
+    }
+
+    return seat.userId;
+  }
+
+  /** Restore a player's socket after they reconnect. */
+  reconnectPlayer(userId: string, newSocketId: string): boolean {
+    const idx = this.findSeatByUserId(userId);
+    if (idx === -1) return false;
+    const seat = this.seats[idx]!;
+
+    seat.socketId = newSocketId;
+    seat.isDisconnected = false;
+    delete seat.disconnectedAt;
+
+    this.addMessage(`${seat.username} reconnected`, 'info');
+    this.broadcastState();
+    return true;
+  }
+
+  /** Hard-remove a player by userId (called after the 60 s grace period). */
+  removePlayerByUserId(userId: string): void {
+    const idx = this.findSeatByUserId(userId);
+    if (idx === -1) return;
+    const seat = this.seats[idx]!;
+    this.addMessage(`${seat.username} removed (timed out)`, 'info');
+    if (
+      this.phase !== 'waiting' &&
+      this.phase !== 'showdown' &&
+      idx === this.activeSeat
+    ) {
+      this.seats[idx]!.status = 'folded';
+      this.seats[idx] = null;
+      this.broadcastState();
+      this.advanceAfterAction();
+    } else {
+      this.seats[idx] = null;
+      this.broadcastState();
+    }
+    this.checkTableVacant();
   }
 
   // ─── Spectator management ─────────────────────────────────────────────────
@@ -107,11 +188,9 @@ export class PokerRoom {
                         .trim().slice(0, 100);
     if (!cleaned) return;
     const payload = { playerId: userId, playerName: username, text: cleaned, ts };
-    // Broadcast to all seated players
     for (const s of this.seats) {
       if (s) this.emit(s.socketId, 'chat_message', payload);
     }
-    // Broadcast to spectators
     for (const sid of this.spectators) {
       this.emit(sid, 'chat_message', payload);
     }
@@ -146,7 +225,9 @@ export class PokerRoom {
   // ─── Hand lifecycle ───────────────────────────────────────────────────────
 
   private readyCount(): number {
-    return this.seats.filter(s => s !== null && !this.requestedSitOut.has(s.socketId)).length;
+    return this.seats.filter(
+      s => s !== null && !this.requestedSitOut.has(s.socketId) && !s.isDisconnected
+    ).length;
   }
 
   private maybeScheduleHandStart(): void {
@@ -160,9 +241,10 @@ export class PokerRoom {
   }
 
   private startHand(): void {
-    // Players who want to sit out stay out; everyone else plays
     const allSeated = this.seats.map((s, i) => ({ s, i })).filter(x => x.s !== null);
-    const activePlayers = allSeated.filter(x => !this.requestedSitOut.has(x.s!.socketId));
+    const activePlayers = allSeated.filter(
+      x => !this.requestedSitOut.has(x.s!.socketId) && !x.s!.isDisconnected
+    );
 
     if (activePlayers.length < 2) {
       this.phase = 'waiting';
@@ -178,25 +260,22 @@ export class PokerRoom {
     this.messages = [];
     this.actedThisRound.clear();
 
-    // Mark sitting-out seats
     for (const { s } of allSeated) {
       if (!s) continue;
-      if (this.requestedSitOut.has(s.socketId)) {
+      if (this.requestedSitOut.has(s.socketId) || s.isDisconnected) {
         s.status = 'sitting_out';
       } else {
         s.cards = []; s.currentBet = 0; s.totalBet = 0; s.status = 'active';
+        s.startingChips = s.chips;
       }
     }
 
-    // Advance dealer
     this.dealerSeat = this.nextActiveSeatFrom(this.dealerSeat === -1 ? 0 : this.dealerSeat, true);
 
-    // Deal hole cards
     for (const { s } of activePlayers) {
       s!.cards = [this.deck.pop()!, this.deck.pop()!];
     }
 
-    // Post blinds
     const isHeadsUp = activePlayers.length === 2;
     const sbSeat = isHeadsUp ? this.dealerSeat : this.nextActiveSeatFrom(this.dealerSeat);
     const bbSeat = this.nextActiveSeatFrom(sbSeat);
@@ -208,7 +287,6 @@ export class PokerRoom {
     this.phase = 'preflop';
     this.addMessage('New hand started', 'info');
 
-    // UTG acts first preflop (player after BB); in heads-up dealer=SB acts first
     const utg = this.nextActiveSeatFrom(bbSeat);
     this.activeSeat = utg;
 
@@ -255,7 +333,6 @@ export class PokerRoom {
 
   private doCheck(seat: Seat, seatIdx: number): void {
     if (seat.currentBet < this.currentBet) {
-      // Must call — treat as call
       this.doCall(seat, seatIdx);
       return;
     }
@@ -318,23 +395,19 @@ export class PokerRoom {
   // ─── Betting round progression ────────────────────────────────────────────
 
   private advanceAfterAction(): void {
-    // Check if only one non-folded player remains
     const nonFolded = this.seats.filter(s => s !== null && s.status !== 'folded');
     if (nonFolded.length === 1) {
       this.endHand();
       return;
     }
 
-    // Check if betting round is complete
     if (this.isBettingRoundComplete()) {
       this.nextPhase();
       return;
     }
 
-    // Find next active player
     const next = this.nextActiveSeatFrom(this.activeSeat);
     if (next === this.activeSeat) {
-      // No other active player — move to next phase
       this.nextPhase();
       return;
     }
@@ -354,7 +427,6 @@ export class PokerRoom {
   }
 
   private nextPhase(): void {
-    // Reset per-round bets
     for (const seat of this.seats) {
       if (seat) seat.currentBet = 0;
     }
@@ -384,7 +456,6 @@ export class PokerRoom {
         return;
     }
 
-    // If ≤1 active (non-folded, non-allin) players, run out the board and go to showdown
     if (canBetPlayers.length <= 1) {
       while (this.communityCards.length < 5) this.communityCards.push(this.deck.pop()!);
       this.endHand();
@@ -399,14 +470,12 @@ export class PokerRoom {
   // ─── Side pot calculation ─────────────────────────────────────────────────
 
   private awardSidePots(): void {
-    // Build contributor list — includes folded players (their chips ARE in pots)
     const contributors = this.seats
       .map((s, i) => ({ seat: s!, idx: i }))
       .filter(x => x.seat !== null && x.seat.totalBet > 0);
 
     if (contributors.length === 0) return;
 
-    // Unique contribution levels ascending — each creates one pot
     const levels = [...new Set(contributors.map(c => c.seat.totalBet))].sort((a, b) => a - b);
 
     this.winners = [];
@@ -415,22 +484,18 @@ export class PokerRoom {
     for (const level of levels) {
       const perPlayer = level - prevLevel;
 
-      // Each contributor puts in up to perPlayer chips at this level
       let potAmount = 0;
       for (const c of contributors) {
         potAmount += Math.min(Math.max(0, c.seat.totalBet - prevLevel), perPlayer);
       }
 
-      // Eligible to win: non-folded AND contributed at least up to this level
       const eligible = contributors.filter(
         c => c.seat.status !== 'folded' && c.seat.totalBet >= level
       );
 
       if (potAmount > 0 && eligible.length === 1) {
-        // Uncalled bet — return chips to the sole eligible player (no contest)
         eligible[0].seat.chips += potAmount;
       } else if (potAmount > 0 && eligible.length > 1) {
-        // Contested pot — evaluate hands among eligible players
         const evaluated = eligible.map(e => ({
           idx: e.idx,
           seat: e.seat,
@@ -461,7 +526,6 @@ export class PokerRoom {
       prevLevel = level;
     }
 
-    // Log results
     for (const w of this.winners) {
       this.addMessage(
         `${w.username} wins ${w.amount.toLocaleString()}${w.handRank ? ` with ${w.handRank}` : ''}!`,
@@ -481,23 +545,22 @@ export class PokerRoom {
       .filter(({ s }) => s !== null && s.status !== 'folded');
 
     if (nonFolded.length === 1) {
-      // Uncontested — sole survivor wins everything
       const { s, i } = nonFolded[0];
       s!.chips += this.pot;
       this.winners = [{ seatIndex: i, username: s!.username, amount: this.pot }];
       this.addMessage(`${s!.username} wins ${this.pot.toLocaleString()} (uncontested)`, 'result');
       this.pot = 0;
     } else {
-      // Full showdown with proper side pot calculation
       this.awardSidePots();
     }
 
     this.broadcastState();
 
-    // Schedule next hand or go back to waiting
+    // Sync chip counts to DB after pots are distributed
+    this.fireChipSync();
+
     this.handTimer = setTimeout(() => {
       this.handTimer = null;
-      // Remove broke players
       for (let i = 0; i < this.seats.length; i++) {
         if (this.seats[i] && this.seats[i]!.chips <= 0) {
           this.addMessage(`${this.seats[i]!.username} is out of chips and leaves`, 'info');
@@ -511,6 +574,14 @@ export class PokerRoom {
         this.broadcastState();
       }
     }, SHOWDOWN_DELAY_MS);
+  }
+
+  private fireChipSync(): void {
+    if (!this.onChipSync) return;
+    const seated = this.seats
+      .filter(s => s !== null)
+      .map(s => ({ userId: s!.userId, chips: s!.chips }));
+    this.onChipSync(seated);
   }
 
   // ─── Turn timer ───────────────────────────────────────────────────────────
@@ -594,6 +665,7 @@ export class PokerRoom {
         revealedHand: this.phase === 'showdown' && isWinner
           ? (this.winners.find(w => w.seatIndex === i)?.handRank)
           : undefined,
+        isDisconnected: s.isDisconnected,
       };
     });
 
@@ -635,12 +707,11 @@ export class PokerRoom {
 
   private broadcastState(): void {
     for (const seat of this.seats) {
-      if (seat) {
+      if (seat && !seat.isDisconnected) {
         const state = this.getClientStateFor(seat.socketId);
         this.emit(seat.socketId, 'game_state', state);
       }
     }
-    // Push read-only state to spectators (mySeat will be -1)
     for (const sid of this.spectators) {
       this.emit(sid, 'game_state', this.getClientStateFor(sid));
     }

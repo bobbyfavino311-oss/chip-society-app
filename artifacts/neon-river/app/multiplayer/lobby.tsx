@@ -38,13 +38,15 @@ export default function MultiplayerLobby() {
 
   const {
     connected, connecting, lobbyTables, error,
-    connect, getLobby, createTable, joinTable, spectate, tableId, clearError,
+    connect, getLobby, createTable, joinTable, quickJoin, spectate, tableId, clearError,
   } = useMultiplayer();
 
-  const [showCreate, setShowCreate]   = useState(false);
-  const [selectedTier, setSelectedTier] = useState<StakeTier>('MICRO');
-  const [maxPlayers, setMaxPlayers]   = useState(5);
-  const [joining, setJoining]         = useState<string | null>(null);
+  const [showCreate, setShowCreate]       = useState(false);
+  const [showQuickJoin, setShowQuickJoin] = useState(false);
+  const [selectedTier, setSelectedTier]   = useState<StakeTier>('MICRO');
+  const [quickTier, setQuickTier]         = useState<StakeTier>('MICRO');
+  const [maxPlayers, setMaxPlayers]       = useState(5);
+  const [joining, setJoining]             = useState<string | null>(null);
 
   const [showJoinCode, setShowJoinCode] = useState(false);
   const [codeInput, setCodeInput]       = useState('');
@@ -131,6 +133,17 @@ export default function MultiplayerLobby() {
     Clipboard.setString(code);
     setCodeCopied(true);
     setTimeout(() => setCodeCopied(false), 2000);
+  };
+
+  const handleQuickJoin = () => {
+    const chips = profile.chips ?? 0;
+    const minBuy = TIER_MIN_BUYIN[quickTier];
+    if (chips < minBuy) {
+      Alert.alert('Not enough chips', `Quick Match at this level requires ${formatChips(minBuy)} minimum.`);
+      return;
+    }
+    setShowQuickJoin(false);
+    quickJoin(quickTier, userId, profile.username, profile.avatarIndex ?? 1);
   };
 
   const handleSpectate = (item: LobbyTable) => {
@@ -242,6 +255,12 @@ export default function MultiplayerLobby() {
               <Text style={styles.createText}>CREATE</Text>
             </LinearGradient>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.quickBtn} onPress={() => setShowQuickJoin(true)} disabled={!connected}>
+            <LinearGradient colors={['#00d4ff', '#0066cc']} style={styles.quickGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <Ionicons name="flash" size={16} color="#fff" />
+              <Text style={styles.quickText}>QUICK MATCH</Text>
+            </LinearGradient>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.codeBtn} onPress={() => setShowJoinCode(true)} disabled={!connected}>
             <Ionicons name="keypad-outline" size={16} color="#ff0090" />
             <Text style={styles.codeBtnText}>JOIN BY CODE</Text>
@@ -340,6 +359,51 @@ export default function MultiplayerLobby() {
           </View>
         </Modal>
 
+        {/* Quick Match Modal */}
+        <Modal visible={showQuickJoin} transparent animationType="slide">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>QUICK MATCH</Text>
+              <Text style={styles.joinCodeSub}>Find or create a table instantly — no code needed</Text>
+
+              <Text style={styles.sectionLabel}>STAKE LEVEL</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tierRow}>
+                {TIERS.map(tier => {
+                  const color = STAKE_COLORS[tier];
+                  const canAfford = (profile.chips ?? 0) >= TIER_MIN_BUYIN[tier];
+                  return (
+                    <TouchableOpacity
+                      key={tier}
+                      style={[styles.tierChip,
+                        { borderColor: quickTier === tier ? color : '#333',
+                          backgroundColor: quickTier === tier ? color + '25' : 'transparent',
+                          opacity: canAfford ? 1 : 0.4 }]}
+                      onPress={() => canAfford && setQuickTier(tier)}
+                    >
+                      <Text style={[styles.tierChipText, { color: quickTier === tier ? color : '#888' }]}>
+                        {STAKE_LABELS[tier]}
+                      </Text>
+                      <Text style={styles.tierChipBlinds}>{TIER_BLINDS[tier]}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowQuickJoin(false)}>
+                  <Text style={styles.cancelText}>CANCEL</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.confirmBtn} onPress={handleQuickJoin}>
+                  <LinearGradient colors={['#00d4ff', '#0066cc']} style={styles.confirmGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                    <Ionicons name="flash" size={14} color="#fff" />
+                    <Text style={styles.confirmText}>FIND GAME</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         {/* Join by Code Modal */}
         <Modal visible={showJoinCode} transparent animationType="slide">
           <View style={styles.modalOverlay}>
@@ -402,6 +466,9 @@ const styles = StyleSheet.create({
   createBtn: { flex: 1, borderRadius: 10, overflow: 'hidden' },
   createGrad: { paddingVertical: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
   createText: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1.5 },
+  quickBtn: { flex: 1, borderRadius: 10, overflow: 'hidden' },
+  quickGrad: { paddingVertical: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  quickText: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1.5 },
   codeBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1, borderColor: '#ff009055', borderRadius: 10, paddingVertical: 13, backgroundColor: 'rgba(255,0,144,0.07)' },
   codeBtnText: { color: '#ff0090', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
   list: { paddingHorizontal: 16, paddingBottom: 20, gap: 12 },

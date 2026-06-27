@@ -2,18 +2,18 @@ import React, {
   createContext, useCallback, useContext, useEffect, useRef, useState,
 } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import type { ChatMessage, ClientGameState, LobbyTable, StakeTier } from '@/lib/multiplayerTypes';
 
+const LAST_ROOM_KEY = 'chip_society_last_room';
+
 function getSocketUrl(): string {
-  // Web: use window.location origin — proxy handles /api/socket.io routing
   if (typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;
   }
-  // Native: derive origin from EXPO_PUBLIC_API_URL (e.g. https://domain.com/api → https://domain.com)
   const explicit = process.env['EXPO_PUBLIC_API_URL'];
   if (explicit) return explicit.replace(/\/api\/?$/, '');
-  // Native: derive from Expo manifest bundle URL
   try {
     const bundleUrl =
       (Constants.manifest as Record<string, unknown> | null)?.['bundleUrl'] as string | undefined ??
@@ -25,11 +25,17 @@ function getSocketUrl(): string {
   } catch { /* ignore */ }
   const domain = process.env['EXPO_PUBLIC_DOMAIN'];
   if (domain) return `https://${domain}`;
-  // Hardcoded Railway fallback — permanent 24/7 multiplayer server.
   return 'https://api-server-production-bbc2.up.railway.app';
 }
 
 const SOCKET_PATH = '/api/socket.io';
+
+interface LastRoomData {
+  roomId: string;
+  userId: string;
+  username: string;
+  avatarId: number;
+}
 
 interface MultiplayerContextValue {
   connected: boolean;
@@ -47,6 +53,7 @@ interface MultiplayerContextValue {
   getLobby: () => void;
   createTable: (stakeTier: StakeTier, maxPlayers: number, userId: string, username: string, avatarId: number, chips: number) => void;
   joinTable: (tableId: string, userId: string, username: string, avatarId: number, chips: number) => void;
+  quickJoin: (stakeTier: StakeTier, userId: string, username: string, avatarId: number) => void;
   leaveTable: () => void;
   sendAction: (type: 'fold' | 'check' | 'call' | 'raise' | 'allin', amount?: number) => void;
   sendChat: (text: string) => void;
@@ -59,44 +66,67 @@ interface MultiplayerContextValue {
 const MultiplayerContext = createContext<MultiplayerContextValue | null>(null);
 
 export function MultiplayerProvider({ children }: { children: React.ReactNode }) {
-  const socketRef = useRef<Socket | null>(null);
-  const [connected, setConnected] = useState(false);
-  const [connecting, setConnecting] = useState(false);
-  const [tableId, setTableId] = useState<string | null>(null);
-  const [gameState, setGameState] = useState<ClientGameState | null>(null);
+  const socketRef    = useRef<Socket | null>(null);
+  const userInfoRef  = useRef<LastRoomData>({ roomId: '', userId: '', username: '', avatarId: 0 });
+
+  const [connected, setConnected]     = useState(false);
+  const [connecting, setConnecting]   = useState(false);
+  const [tableId, setTableId]         = useState<string | null>(null);
+  const [gameState, setGameState]     = useState<ClientGameState | null>(null);
   const [lobbyTables, setLobbyTables] = useState<LobbyTable[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [buyIn, setBuyIn] = useState<number | null>(null);
+  const [error, setError]             = useState<string | null>(null);
+  const [buyIn, setBuyIn]             = useState<number | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [spectating, setSpectating] = useState(false);
+  const [spectating, setSpectating]   = useState(false);
+
+  const saveLastRoom = useCallback(async (data: LastRoomData) => {
+    try { await AsyncStorage.setItem(LAST_ROOM_KEY, JSON.stringify(data)); } catch { /* ignore */ }
+  }, []);
+
+  const clearLastRoom = useCallback(async () => {
+    try { await AsyncStorage.removeItem(LAST_ROOM_KEY); } catch { /* ignore */ }
+  }, []);
 
   const connect = useCallback(() => {
     if (socketRef.current?.connected) return;
     const url = getSocketUrl();
-    if (!url) {
-      setError('Cannot connect: server URL unavailable.');
-      return;
-    }
+    if (!url) { setError('Cannot connect: server URL unavailable.'); return; }
     setConnecting(true);
 
     const socket = io(url, {
       path: SOCKET_PATH,
       transports: ['websocket', 'polling'],
       reconnection: true,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     });
 
     socket.on('connect', () => {
       setConnected(true);
       setConnecting(false);
       socket.emit('get_lobby');
+
+      // Auto-rejoin previous room on reconnect
+      AsyncStorage.getItem(LAST_ROOM_KEY).then((stored) => {
+        if (!stored) return;
+        try {
+          const data: LastRoomData = JSON.parse(stored);
+          if (data.roomId && data.userId) {
+            socket.emit('rejoin_table', {
+              tableId:  data.roomId,
+              userId:   data.userId,
+              username: data.username,
+              avatarId: data.avatarId,
+            });
+          }
+        } catch { /* ignore bad data */ }
+      }).catch(() => {});
     });
 
     socket.on('disconnect', () => {
       setConnected(false);
-      setTableId(null);
-      setGameState(null);
+      // Don't clear tableId/gameState here — allow reconnect to restore state
     });
 
     socket.on('connect_error', (err: Error) => {
@@ -111,9 +141,16 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     socket.on('joined_table', (data: { tableId: string; state: ClientGameState }) => {
       setTableId(data.tableId);
       setGameState(data.state);
-      // Capture buy-in from my seat's starting chip count
       const mySeatData = data.state.mySeat !== -1 ? data.state.seats[data.state.mySeat] : null;
       if (mySeatData) setBuyIn(mySeatData.chips);
+
+      // Persist for reconnect
+      const { userId, username, avatarId } = userInfoRef.current;
+      if (userId) {
+        const roomData: LastRoomData = { roomId: data.tableId, userId, username, avatarId };
+        userInfoRef.current = roomData;
+        saveLastRoom(roomData);
+      }
     });
 
     socket.on('game_state', (state: ClientGameState) => {
@@ -125,6 +162,14 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
       setGameState(null);
       setBuyIn(null);
       setChatMessages([]);
+      clearLastRoom();
+    });
+
+    socket.on('rejoin_failed', () => {
+      // The room expired — clear stored data and let user rejoin manually
+      setTableId(null);
+      setGameState(null);
+      clearLastRoom();
     });
 
     socket.on('chat_message', (msg: { playerId: string; playerName: string; text: string; ts: number }) => {
@@ -145,7 +190,7 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     });
 
     socketRef.current = socket;
-  }, []);
+  }, [saveLastRoom, clearLastRoom]);
 
   const disconnect = useCallback(() => {
     socketRef.current?.disconnect();
@@ -162,15 +207,24 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
 
   const createTable = useCallback((
     stakeTier: StakeTier, maxPlayers: number,
-    userId: string, username: string, avatarId: number, chips: number
+    userId: string, username: string, avatarId: number, chips: number,
   ) => {
+    userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
     socketRef.current?.emit('create_table', { stakeTier, maxPlayers, userId, username, avatarId, chips });
   }, []);
 
   const joinTable = useCallback((
-    tableId: string, userId: string, username: string, avatarId: number, chips: number
+    tableId: string, userId: string, username: string, avatarId: number, chips: number,
   ) => {
+    userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
     socketRef.current?.emit('join_table', { tableId, userId, username, avatarId, chips });
+  }, []);
+
+  const quickJoin = useCallback((
+    stakeTier: StakeTier, userId: string, username: string, avatarId: number,
+  ) => {
+    userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
+    socketRef.current?.emit('quick_join', { stakeTier, userId, username, avatarId });
   }, []);
 
   const leaveTable = useCallback(() => {
@@ -178,7 +232,7 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const sendAction = useCallback((
-    type: 'fold' | 'check' | 'call' | 'raise' | 'allin', amount?: number
+    type: 'fold' | 'check' | 'call' | 'raise' | 'allin', amount?: number,
   ) => {
     socketRef.current?.emit('player_action', { type, amount });
   }, []);
@@ -209,7 +263,7 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     <MultiplayerContext.Provider value={{
       connected, connecting, tableId, gameState, lobbyTables, error, buyIn,
       chatMessages, spectating,
-      connect, disconnect, getLobby, createTable, joinTable, leaveTable,
+      connect, disconnect, getLobby, createTable, joinTable, quickJoin, leaveTable,
       sendAction, sendChat, spectate, stopSpectating, setSitOut, clearError,
     }}>
       {children}
