@@ -24,7 +24,9 @@ import { useUser } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
 import { useSocial } from '@/context/SocialContext';
 import { useAISocial } from '@/context/AISocialContext';
+import { useLiveFeed } from '@/context/LiveFeedContext';
 import type { AIPost } from '@/lib/aiSocialEngine';
+import type { FeedPost, FeedComment } from '@/lib/socialApi';
 import {
   SOCIAL_POSTS, MOCK_PLAYERS, POKER_REACTIONS, POST_TAG_COLORS,
   AVATAR_SYMBOLS, AVATAR_COLORS, getLeaderboard,
@@ -245,6 +247,184 @@ const notifStyle = StyleSheet.create({
   time: { color: colors.textDim, fontSize: 11, marginTop: 2 },
   unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary },
 });
+
+// ─── Live Post Card (real API-backed posts) ───────────────────────────────────
+
+function timeSince(dt: string | Date): string {
+  const diff = Date.now() - new Date(dt as string).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
+}
+
+function LivePostCard({ post }: { post: FeedPost }) {
+  const { likePost, commentOnPost, getPostComments, deletePost } = useLiveFeed();
+  const { follow, unfollow, isFollowing, mute, block } = useSocial();
+  const { profile } = useUser();
+  const [showComments, setShowComments] = useState(false);
+  const [liveComments, setLiveComments]       = useState<FeedComment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [myComment, setMyComment] = useState('');
+  const [showMenu,  setShowMenu]  = useState(false);
+
+  const isOwn      = post.authorId === profile.playerId;
+  const following  = isFollowing(post.authorId);
+  const typeColor  = POST_TAG_COLORS[post.tag as PostTag] ?? '#00d4ff';
+  const typeIcon   = POST_TYPE_ICONS[post.tag as PostTag] ?? 'star-outline';
+
+  async function loadComments() {
+    setLoadingComments(true);
+    const c = await getPostComments(post.id);
+    setLiveComments(c);
+    setLoadingComments(false);
+  }
+
+  function handleShowComments() {
+    const next = !showComments;
+    setShowComments(next);
+    if (next && liveComments.length === 0) loadComments();
+  }
+
+  async function handleComment() {
+    const t = myComment.trim();
+    if (!t) return;
+    setMyComment('');
+    const c = await commentOnPost(post.id, t);
+    if (c) setLiveComments(prev => [c, ...prev]);
+  }
+
+  return (
+    <View style={cd.wrap}>
+      <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+
+      {/* Header */}
+      <View style={cd.header}>
+        <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}`)}>
+          <NeonAvatar avatarId={post.authorAvatarIndex} size={44} />
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}`)}>
+            <Text style={cd.username}>{post.authorUsername}</Text>
+          </TouchableOpacity>
+          <Text style={cd.handle}>{post.authorRank} · {timeSince(post.createdAt)}</Text>
+        </View>
+        <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
+          <Ionicons name={typeIcon} size={9} color={typeColor} />
+          <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+        </View>
+        {!isOwn && (
+          <TouchableOpacity
+            style={[cd.followBtn, following && cd.followBtnActive]}
+            onPress={() => following ? unfollow(post.authorId) : follow(post.authorId, post.authorUsername)}
+          >
+            <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={() => setShowMenu(true)} style={cd.moreBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Ionicons name="ellipsis-horizontal" size={16} color={colors.textMuted} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Content */}
+      <Text style={cd.content}>{post.content}</Text>
+
+      {/* Stats chips */}
+      {(post.pot || post.handRank) && (
+        <View style={cd.statsRow}>
+          {post.pot && (
+            <View style={cd.statChip}>
+              <Ionicons name="layers" size={10} color={colors.gold} />
+              <Text style={cd.statText}>Pot: <Text style={{ color: colors.gold }}>{post.pot}</Text></Text>
+            </View>
+          )}
+          {post.handRank && (
+            <View style={cd.statChip}>
+              <Ionicons name="card" size={10} color={colors.primary} />
+              <Text style={cd.statText}><Text style={{ color: colors.primary }}>{post.handRank}</Text></Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Actions */}
+      <View style={cd.actions}>
+        <TouchableOpacity style={cd.actionBtn} onPress={() => likePost(post.id)}>
+          <Ionicons name={post.likedByMe ? 'heart' : 'heart-outline'} size={17} color={post.likedByMe ? '#ff0090' : colors.textMuted} />
+          <Text style={[cd.actionCount, post.likedByMe && { color: '#ff0090' }]}>{post.likeCount}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={cd.actionBtn} onPress={handleShowComments}>
+          <Ionicons name={showComments ? 'chatbubble' : 'chatbubble-outline'} size={15} color={showComments ? colors.accent : colors.textMuted} />
+          <Text style={[cd.actionCount, showComments && { color: colors.accent }]}>{post.commentCount}</Text>
+        </TouchableOpacity>
+        {isOwn ? (
+          <TouchableOpacity style={[cd.actionBtn, { marginLeft: 'auto' }]} onPress={() => deletePost(post.id)}>
+            <Ionicons name="trash-outline" size={15} color="rgba(255,80,80,0.5)" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={[cd.actionBtn, { marginLeft: 'auto' }]}>
+            <Ionicons name="share-outline" size={17} color={colors.textMuted} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Inline Comments */}
+      {showComments && (
+        <View style={cd.commentsSection}>
+          {loadingComments && <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 8 }} />}
+          {liveComments.map(c => (
+            <View key={c.id} style={cd.commentRow}>
+              <NeonAvatar avatarId={c.authorAvatarIndex} size={28} />
+              <View style={cd.commentBubble}>
+                <Text style={cd.commentName}>{c.authorUsername}</Text>
+                <Text style={cd.commentText}>{c.text}</Text>
+              </View>
+            </View>
+          ))}
+          <View style={cd.commentCompose}>
+            <TextInput
+              value={myComment} onChangeText={setMyComment}
+              placeholder="Add a comment..." placeholderTextColor={colors.textDim}
+              style={cd.commentInput} returnKeyType="send" onSubmitEditing={handleComment}
+            />
+            <TouchableOpacity onPress={handleComment} disabled={!myComment.trim()}>
+              <Ionicons name="send" size={16} color={myComment.trim() ? colors.primary : colors.textDim} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* Options sheet */}
+      <Modal transparent visible={showMenu} animationType="fade" onRequestClose={() => setShowMenu(false)}>
+        <TouchableOpacity style={mnu.overlay} activeOpacity={1} onPress={() => setShowMenu(false)}>
+          <View style={mnu.sheet}>
+            <LinearGradient colors={['#1a002e', '#0a0018']} style={StyleSheet.absoluteFill} />
+            <View style={mnu.handle} />
+            {isOwn ? (
+              <TouchableOpacity style={mnu.option} onPress={() => { setShowMenu(false); deletePost(post.id); }}>
+                <Ionicons name="trash-outline" size={18} color="#ff4466" />
+                <Text style={[mnu.optionText, { color: '#ff4466' }]}>Delete Post</Text>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <TouchableOpacity style={mnu.option} onPress={() => { setShowMenu(false); mute(post.authorId, post.authorUsername); }}>
+                  <Ionicons name="volume-mute-outline" size={18} color={colors.textMuted} />
+                  <Text style={mnu.optionText}>Mute @{post.authorUsername}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={mnu.option} onPress={() => { setShowMenu(false); block(post.authorId, post.authorUsername); }}>
+                  <Ionicons name="ban-outline" size={18} color="#ff4466" />
+                  <Text style={[mnu.optionText, { color: '#ff4466' }]}>Block @{post.authorUsername}</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+}
 
 // ─── Post Card ───────────────────────────────────────────────────────────────
 
@@ -1532,8 +1712,14 @@ export default function FeedScreen() {
   const [myPosts, setMyPosts] = useState<MePost[]>(INITIAL_MY_POSTS);
   const [notifVisible, setNotifVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const { profile } = useUser();
   const { posts: aiPosts, refresh: refreshAIPosts } = useAISocial();
   const { isMuted, isBlocked } = useSocial();
+  const {
+    allPosts: livePosts,
+    refresh: refreshLiveFeed,
+    publishPost: livePublish,
+  } = useLiveFeed();
 
   // Convert user's MePost array → SocialPost shape so PostCard can render them
   const myFeedPosts = useMemo<SocialPost[]>(() =>
@@ -1552,45 +1738,49 @@ export default function FeedScreen() {
     })),
   [myPosts]);
 
-  const filteredPosts = useCallback(() => {
-    const base = (activeTab === 'all' || activeTab === 'trending')
-      ? SOCIAL_POSTS
-      : SOCIAL_POSTS.filter(p => p.tab === activeTab);
-    const filtered = base.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
+  type FeedItem = { _k: 'live'; post: FeedPost } | { _k: 'mock'; post: SocialPost };
+
+  const feedItems = useCallback((): FeedItem[] => {
+    // Real posts from Railway DB
+    const liveFiltered = livePosts.filter(p => !isMuted(p.authorId) && !isBlocked(p.authorId));
+    const liveItems: FeedItem[] = liveFiltered.map(p => ({ _k: 'live' as const, post: p }));
+
+    // Mock/AI filler — only shown while real players are scarce
+    const useFiller = liveItems.length < 8;
+    const mockBase = SOCIAL_POSTS.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
+    const mockItems: FeedItem[] = useFiller
+      ? mockBase.map(p => ({ _k: 'mock' as const, post: p }))
+      : [];
 
     if (activeTab === 'trending') {
-      return [...filtered].sort((a, b) => {
-        const scoreA = a.likes + a.comments * 2;
-        const scoreB = b.likes + b.comments * 2;
-        return scoreB - scoreA;
+      return [...liveItems, ...mockItems].sort((a, b) => {
+        const sA = a._k === 'live'
+          ? a.post.likeCount + a.post.commentCount * 2
+          : (a.post as SocialPost).likes + (a.post as SocialPost).comments * 2;
+        const sB = b._k === 'live'
+          ? b.post.likeCount + b.post.commentCount * 2
+          : (b.post as SocialPost).likes + (b.post as SocialPost).comments * 2;
+        return sB - sA;
       });
     }
 
-    // All / tab-filtered: newest first (parse timeAgo strings)
-    const toMs = (t: string): number => {
-      const n = parseInt(t, 10) || 0;
-      if (t.includes('m')) return n * 60_000;
-      if (t.includes('h')) return n * 3_600_000;
-      if (t.includes('d')) return n * 86_400_000;
-      if (t.includes('w')) return n * 604_800_000;
-      return 0;
-    };
-    const sorted = [...filtered].sort((a, b) => toMs(a.timeAgo) - toMs(b.timeAgo));
+    // All tab — live newest first, then mock filler
+    return [...liveItems, ...mockItems];
+  }, [activeTab, livePosts, isMuted, isBlocked]);
 
-    // Prepend user's own posts at the top of the All tab (newest first)
-    if (activeTab === 'all') {
-      const myNewest = [...myFeedPosts].sort((a, b) => toMs(a.timeAgo) - toMs(b.timeAgo));
-      return [...myNewest, ...sorted];
-    }
-    return sorted;
-  }, [activeTab, isMuted, isBlocked, myFeedPosts]);
+  // Keep legacy filteredPosts for any remaining references
+  const filteredPosts = useCallback(() => {
+    const base = (activeTab === 'all' || activeTab === 'trending')
+      ? SOCIAL_POSTS : SOCIAL_POSTS.filter(p => p.tab === activeTab);
+    return base.filter(p => !isMuted(p.playerId) && !isBlocked(p.playerId));
+  }, [activeTab, isMuted, isBlocked]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     if (typeof refreshAIPosts === 'function') refreshAIPosts();
-    await new Promise(r => setTimeout(r, 900));
+    await refreshLiveFeed();
     setRefreshing(false);
-  }, [refreshAIPosts]);
+  }, [refreshAIPosts, refreshLiveFeed]);
 
   return (
     <View style={[ss.container, { backgroundColor: cls.background }]}>
@@ -1669,9 +1859,12 @@ export default function FeedScreen() {
         <SearchSection bottomInset={insets.bottom} />
       ) : (
         <FlatList
-          data={filteredPosts()}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <PostCard post={item} />}
+          data={feedItems()}
+          keyExtractor={item => item._k === 'live' ? `live_${item.post.id}` : `mock_${(item.post as SocialPost).id}`}
+          renderItem={({ item }) => item._k === 'live'
+            ? <LivePostCard post={item.post} />
+            : <PostCard post={item.post as SocialPost} />
+          }
           ListHeaderComponent={
             (activeTab === 'all' || activeTab === 'trending')
               ? <AIPostsStrip posts={aiPosts.slice(0, 6)} />
@@ -1693,7 +1886,12 @@ export default function FeedScreen() {
       <ComposeSheet
         visible={composeVisible}
         onClose={() => setComposeVisible(false)}
-        onPost={p => setMyPosts(prev => [p, ...prev])}
+        onPost={p => {
+          setMyPosts(prev => [p, ...prev]);
+          if (profile.playerId) {
+            livePublish({ content: p.content, tag: p.tag, pot: p.pot, handRank: p.handRank });
+          }
+        }}
         bottomInset={insets.bottom}
       />
 

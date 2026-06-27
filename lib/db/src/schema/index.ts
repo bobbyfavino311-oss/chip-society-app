@@ -95,6 +95,34 @@ export const blocksTable = pgTable('blocks', {
   createdAt:  timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (t) => [primaryKey({ columns: [t.blockerId, t.blockedId] })]);
 
+// ── Feed posts ────────────────────────────────────────────────────────────────
+
+export const feedPostsTable = pgTable('feed_posts', {
+  id:           text('id').primaryKey(),
+  authorId:     text('author_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  content:      text('content').notNull(),
+  tag:          text('tag').notNull().default('WIN'),
+  pot:          text('pot'),
+  handRank:     text('hand_rank'),
+  likeCount:    integer('like_count').notNull().default(0),
+  commentCount: integer('comment_count').notNull().default(0),
+  createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const postLikesTable = pgTable('post_likes', {
+  postId:    text('post_id').notNull().references(() => feedPostsTable.id, { onDelete: 'cascade' }),
+  playerId:  text('player_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (t) => [primaryKey({ columns: [t.postId, t.playerId] })]);
+
+export const postCommentsTable = pgTable('post_comments', {
+  id:        text('id').primaryKey(),
+  postId:    text('post_id').notNull().references(() => feedPostsTable.id, { onDelete: 'cascade' }),
+  authorId:  text('author_id').notNull().references(() => playersTable.playerId, { onDelete: 'cascade' }),
+  text:      text('text').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
 // ── Bug reports ───────────────────────────────────────────────────────────────
 
 export const bugReportsTable = pgTable('bug_reports', {
@@ -125,3 +153,7 @@ export type Conversation          = typeof conversationsTable.$inferSelect;
 export type DirectMessage         = typeof directMessagesTable.$inferSelect;
 export type Block                 = typeof blocksTable.$inferSelect;
 export type BugReport             = typeof bugReportsTable.$inferSelect;
+export type FeedPost              = typeof feedPostsTable.$inferSelect;
+export type NewFeedPost           = typeof feedPostsTable.$inferInsert;
+export type PostLike              = typeof postLikesTable.$inferSelect;
+export type PostComment           = typeof postCommentsTable.$inferSelect;

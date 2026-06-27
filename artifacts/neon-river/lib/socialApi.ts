@@ -152,3 +152,81 @@ export async function getBlocks(playerId: string): Promise<string[]> {
   const d = await req<{ blocks: string[] }>('/social/blocks', playerId);
   return d.blocks;
 }
+
+// ── Live Feed ──────────────────────────────────────────────────────────────────
+
+export interface FeedPost {
+  id:                string;
+  authorId:          string;
+  authorUsername:    string;
+  authorAvatarIndex: number;
+  authorRank:        string;
+  content:           string;
+  tag:               string;
+  pot:               string | null;
+  handRank:          string | null;
+  likeCount:         number;
+  commentCount:      number;
+  likedByMe:         boolean;
+  createdAt:         string | Date;
+}
+
+export interface FeedComment {
+  id:                string;
+  postId:            string;
+  authorId:          string;
+  authorUsername:    string;
+  authorAvatarIndex: number;
+  text:              string;
+  createdAt:         string | Date;
+}
+
+export async function getFeed(
+  playerId: string,
+  tab: 'all' | 'trending' | 'me',
+  cursor?: string,
+): Promise<FeedPost[]> {
+  const params = new URLSearchParams({ tab });
+  if (cursor) params.set('cursor', cursor);
+  const d = await req<{ posts: FeedPost[] }>(`/social/feed?${params}`, playerId);
+  return d.posts;
+}
+
+export async function createPost(
+  playerId: string,
+  data: { content: string; tag: string; pot?: string; handRank?: string },
+): Promise<FeedPost> {
+  const d = await req<{ post: FeedPost }>('/social/posts', playerId, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return d.post;
+}
+
+export async function toggleLike(
+  playerId: string,
+  postId: string,
+): Promise<{ liked: boolean; likeCount: number }> {
+  return req<{ liked: boolean; likeCount: number }>(
+    `/social/posts/${postId}/like`, playerId, { method: 'POST' },
+  );
+}
+
+export async function getComments(postId: string, playerId: string): Promise<FeedComment[]> {
+  const d = await req<{ comments: FeedComment[] }>(`/social/posts/${postId}/comments`, playerId);
+  return d.comments;
+}
+
+export async function addComment(
+  playerId: string, postId: string, text: string,
+): Promise<FeedComment> {
+  const d = await req<{ comment: FeedComment }>(`/social/posts/${postId}/comments`, playerId, {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+  return d.comment;
+}
+
+export async function deleteFeedPost(playerId: string, postId: string): Promise<void> {
+  await req<{ ok: boolean }>(`/social/posts/${postId}`, playerId, { method: 'DELETE' });
+}

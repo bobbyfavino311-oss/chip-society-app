@@ -17,6 +17,11 @@ const sessionStartChips = new Map<string, number>(); // userId → chips at sess
 
 let _io: SocketIOServer | null = null;
 
+export function emitToAll(event: string, data: unknown): void {
+  if (!_io) return;
+  _io.emit(event, data);
+}
+
 export function emitToPlayer(playerId: string, event: string, data: unknown): boolean {
   const socketId = playerSockets.get(playerId);
   if (!socketId || !_io) {

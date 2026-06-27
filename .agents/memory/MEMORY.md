@@ -16,3 +16,4 @@
 - [Hermes/iOS missing APIs](hermes-missing-apis.md) — AbortSignal.timeout() crashes on iOS (Hermes). Use AbortController + setTimeout instead.
 - [Railway deployment](railway-deployment.md) — API server deployed to Railway at api-server-production-bbc2.up.railway.app; DB on Railway Postgres (public: yamanote.proxy.rlwy.net:50049); Replit git push is blocked (use GitHub API or project tasks); Railway CLI v5 token auth broken (use GraphQL API directly).
 - [Moderation system](moderation-system.md) — warn/suspend/ban API + Socket.IO delivery + login gate + admin modals + mobile ModerationModal; after DB schema changes always run `pnpm run typecheck:libs` before api-server typecheck.
+- [Live social feed architecture](live-feed-architecture.md) — feedPostsTable/postLikesTable/postCommentsTable; discriminated union FlatList (live|mock); LiveFeedContext 30s polling; RAILWAY_API_TOKEN not in Replit env.

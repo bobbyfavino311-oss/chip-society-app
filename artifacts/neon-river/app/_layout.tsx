@@ -27,6 +27,7 @@ import { SoundProvider, useSoundSettings } from '@/context/SoundContext';
 import { AchievementProvider, useAchievements } from '@/context/AchievementContext';
 import { SocialProvider } from '@/context/SocialContext';
 import { AISocialProvider } from '@/context/AISocialContext';
+import { LiveFeedProvider } from '@/context/LiveFeedContext';
 import { MultiplayerProvider } from '@/context/MultiplayerContext';
 import { NotificationProvider } from '@/context/NotificationContext';
 import { TableThemeProvider } from '@/context/TableThemeContext';
@@ -244,6 +245,7 @@ export default function RootLayout() {
                   <AchievementProvider>
                     <SocialProvider>
                       <AISocialProvider>
+                      <LiveFeedProvider>
                       <MultiplayerProvider>
                       <NotificationBridge>
                         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -253,6 +255,7 @@ export default function RootLayout() {
                         </GestureHandlerRootView>
                       </NotificationBridge>
                       </MultiplayerProvider>
+                      </LiveFeedProvider>
                       </AISocialProvider>
                     </SocialProvider>
                   </AchievementProvider>
