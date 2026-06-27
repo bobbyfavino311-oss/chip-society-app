@@ -111,9 +111,11 @@ export function LiveFeedProvider({ children }: { children: React.ReactNode }) {
       authorAvatarIndex: profile?.avatarIndex,
       authorRank:        profile?.rank,
     });
-    setAllPosts(prev => [post, ...prev]);
-    // Re-fetch after a short delay so the DB write is reflected on pull-to-refresh
-    setTimeout(() => { void fetchPosts(); }, 1500);
+    if (post) {
+      setAllPosts(prev => [post, ...prev]);
+      // Re-fetch after a short delay so the DB write is reflected on pull-to-refresh
+      setTimeout(() => { void fetchPosts(); }, 1500);
+    }
     return post;
   }, [playerId, fetchPosts]);
 
