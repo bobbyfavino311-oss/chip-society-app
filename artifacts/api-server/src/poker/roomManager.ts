@@ -2,6 +2,7 @@ import { PokerRoom } from './room.js';
 import { STAKE_CONFIG } from './types.js';
 import type { StakeTier, LobbyTable, ChipSyncFn } from './types.js';
 import type { EmitFn, BroadcastFn } from './room.js';
+import { pickBot, botBuyIn } from './botEngine.js';
 
 export class RoomManager {
   private rooms        = new Map<string, PokerRoom>();
@@ -142,6 +143,43 @@ export class RoomManager {
       }
     }
     return this.createRoom(stakeTier, maxPlayers);
+  }
+
+  /**
+   * Fill empty seats with bots after a delay.
+   * Called when a real player joins and the room still needs more players.
+   * Bots are added immediately (one bot) so the game starts quickly, then
+   * optionally more bots fill remaining empty seats.
+   *
+   * @param room        The room to fill
+   * @param targetCount Desired total player count (capped at maxPlayers)
+   * @param delayMs     How long to wait before adding the first bot (default 8 s)
+   */
+  scheduleBotFill(room: PokerRoom, targetCount = 3, delayMs = 8_000): void {
+    const roomId = room.id;
+
+    const doFill = () => {
+      const r = this.rooms.get(roomId);
+      if (!r) return; // room was cleaned up
+
+      const currentCount = r.playerCount;
+      if (currentCount >= targetCount) return; // enough real players joined
+
+      const seated = new Set(
+        r.seats.filter(Boolean).map(s => s!.username)
+      );
+      const toAdd = Math.min(targetCount - currentCount, r.config.maxPlayers - currentCount);
+
+      for (let i = 0; i < toAdd; i++) {
+        const bot   = pickBot(seated);
+        const chips = botBuyIn(r.config);
+        const idx   = r.addBot(bot, chips);
+        if (idx === -1) break;
+        seated.add(bot.username);
+      }
+    };
+
+    setTimeout(doFill, delayMs);
   }
 
   getLobbyTables(): LobbyTable[] {

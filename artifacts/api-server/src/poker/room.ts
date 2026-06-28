@@ -3,6 +3,8 @@ import type {
   Card, Seat, RoomPhase, RoomConfig, GameMessage,
   ClientGameState, SeatView, WinnerInfo, PlayerAction, ChipSyncFn,
 } from './types.js';
+import { decideBotAction } from './botEngine.js';
+import type { BotProfile } from './botEngine.js';
 
 const TURN_TIMEOUT_MS = 30_000;
 const SHOWDOWN_DELAY_MS = 5_000;
@@ -75,6 +77,101 @@ export class PokerRoom {
     this.broadcastState();
     this.maybeScheduleHandStart();
     return emptyIdx;
+  }
+
+  // ─── Bot management ───────────────────────────────────────────────────────
+
+  /** Add a bot to an empty seat. Returns the seat index, or -1 if table is full. */
+  addBot(profile: BotProfile, chips: number): number {
+    const emptyIdx = this.seats.findIndex(s => s === null);
+    if (emptyIdx === -1) return -1;
+    const socketId = `bot_${profile.userId}`;
+    this.seats[emptyIdx] = {
+      socketId,
+      userId:   profile.userId,
+      username: profile.username,
+      avatarId: profile.avatarId,
+      chips,
+      startingChips: chips,
+      cards: [], currentBet: 0, totalBet: 0, status: 'active',
+    };
+    this.addMessage(`${profile.username} joined the table`, 'info');
+    this.broadcastState();
+    this.maybeScheduleHandStart();
+    return emptyIdx;
+  }
+
+  isBotSeat(seatIdx: number): boolean {
+    const seat = this.seats[seatIdx];
+    return seat?.socketId.startsWith('bot_') ?? false;
+  }
+
+  getBotIds(): string[] {
+    return this.seats
+      .filter(s => s?.socketId.startsWith('bot_'))
+      .map(s => s!.userId);
+  }
+
+  /** Remove all bots. Called when enough real players have joined. */
+  removeBotsWhenFull(): void {
+    // Only remove bots if we'd still have 2+ real players after removal — but
+    // we never forcibly remove bots mid-hand; wait until a natural seat-exit.
+    // For now this is a no-op — bots stay for the duration of their "session."
+  }
+
+  /**
+   * Fire bot decisions for the active seat if it belongs to a bot.
+   * Called by RoomManager after every broadcastState if activeSeat is a bot.
+   */
+  triggerBotTurn(): void {
+    if (this.phase === 'waiting' || this.phase === 'showdown') return;
+    const idx = this.activeSeat;
+    if (idx < 0 || !this.isBotSeat(idx)) return;
+    const seat = this.seats[idx];
+    if (!seat || seat.status !== 'active') return;
+
+    // Pull difficulty from userId tag if present
+    const uid = seat.userId;
+    const diff = uid.includes('robo') || uid.includes('bluff') || uid.includes('midnight')
+      ? 'SHARK'
+      : uid.includes('fold') || uid.includes('safe')
+      ? 'ROOKIE'
+      : 'SOLID';
+
+    const position: 'early' | 'middle' | 'late' =
+      idx < this.config.maxPlayers / 3 ? 'early'
+      : idx < (this.config.maxPlayers * 2) / 3 ? 'middle'
+      : 'late';
+
+    const toCall = Math.min(
+      Math.max(0, this.currentBet - seat.currentBet),
+      seat.chips,
+    );
+
+    const decision = decideBotAction({
+      difficulty:     diff,
+      holeCards:      seat.cards,
+      communityCards: this.communityCards,
+      toCall,
+      chips:          seat.chips,
+      currentBet:     this.currentBet,
+      minRaise:       this.currentBet + this.config.bigBlind,
+      bigBlind:       this.config.bigBlind,
+      potSize:        this.pot,
+      isPreflop:      this.phase === 'preflop',
+      position,
+    });
+
+    // Small random delay so it feels like thinking (300–900 ms)
+    const delay = 300 + Math.floor(Math.random() * 600);
+    setTimeout(() => {
+      // Re-verify bot is still active (hand state may have changed)
+      if (this.activeSeat !== idx || !this.isBotSeat(idx)) return;
+      const s = this.seats[idx];
+      if (!s || s.status !== 'active') return;
+      this.clearTurnTimer();
+      this.handleAction(seat.socketId, decision);
+    }, delay);
   }
 
   // ─── Soft disconnect (60 s reconnect window, handled by RoomManager) ──────
@@ -707,7 +804,7 @@ export class PokerRoom {
 
   private broadcastState(): void {
     for (const seat of this.seats) {
-      if (seat && !seat.isDisconnected) {
+      if (seat && !seat.isDisconnected && !seat.socketId.startsWith('bot_')) {
         const state = this.getClientStateFor(seat.socketId);
         this.emit(seat.socketId, 'game_state', state);
       }
@@ -716,5 +813,10 @@ export class PokerRoom {
       this.emit(sid, 'game_state', this.getClientStateFor(sid));
     }
     this.broadcast(this.id, 'lobby_update', null);
+
+    // If the active seat is a bot, schedule their decision
+    if (this.activeSeat >= 0 && this.isBotSeat(this.activeSeat)) {
+      this.triggerBotTurn();
+    }
   }
 }

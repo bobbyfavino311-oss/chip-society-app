@@ -178,6 +178,9 @@ export function setupSocketIO(httpServer: HttpServer): void {
         socket.emit('joined_table', { tableId: room.id, state: room.getClientStateFor(socket.id) });
         io.emit('lobby_state', { tables: manager.getLobbyTables() });
         logger.info({ roomId: room.id, socketId: socket.id, userId: payload.userId }, 'Table created');
+
+        // Auto-fill with bots after 8 s if no other real players join
+        manager.scheduleBotFill(room, 3, 8_000);
       } catch (e) {
         logger.error({ err: e }, 'create_table error');
         socket.emit('error', { message: 'Failed to create table.' });
@@ -259,6 +262,10 @@ export function setupSocketIO(httpServer: HttpServer): void {
         socket.emit('joined_table', { tableId: room.id, state: room.getClientStateFor(socket.id) });
         io.emit('lobby_state', { tables: manager.getLobbyTables() });
         logger.info({ roomId: room.id, userId: payload.userId, tier }, 'Quick join');
+
+        // If only one real player so far, schedule bot fill after 8 s
+        const realCount = room.seats.filter(s => s && !s.socketId.startsWith('bot_')).length;
+        if (realCount < 2) manager.scheduleBotFill(room, 3, 8_000);
       } catch (e) {
         logger.error({ err: e }, 'quick_join error');
         socket.emit('error', { message: 'Quick join failed. Please try again.' });

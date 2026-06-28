@@ -185,9 +185,28 @@ function SeatBubble({ seat, gameState, style }: {
 
 // ─── Oval Table Surface ────────────────────────────────────────────────────────
 
+function BotCountdown() {
+  const [secs, setSecs] = useState(8);
+  useEffect(() => {
+    if (secs <= 0) return;
+    const t = setTimeout(() => setSecs(s => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [secs]);
+  return (
+    <Text style={g.botCountdown}>
+      {secs > 0
+        ? `AI players joining in ${secs}s…`
+        : 'AI players joining…'}
+    </Text>
+  );
+}
+
 function TableSurface({ gs }: { gs: ClientGameState }) {
   const phase = gs.phase;
   const isWaiting = phase === 'waiting';
+  const needPlayers = gs.seats.filter(Boolean).length < 2;
+  // Room code is always the tableId (6-char uppercase from the server)
+  const roomCode = gs.tableId;
 
   return (
     <View style={g.tableOuter}>
@@ -222,17 +241,19 @@ function TableSurface({ gs }: { gs: ClientGameState }) {
         {isWaiting && (
           <View style={g.waitingBox}>
             <Text style={g.waitingTxt}>
-              {gs.seats.filter(Boolean).length < 2 ? 'Need 2+ players' : 'Hand starting soon...'}
+              {needPlayers ? 'Waiting for players...' : 'Hand starting soon...'}
             </Text>
+            {needPlayers && <BotCountdown />}
             <TouchableOpacity
               style={g.codeBox}
-              onPress={() => { Clipboard.setString(gs.tableId); }}
+              onPress={() => { Clipboard.setString(roomCode); }}
               activeOpacity={0.7}
             >
-              <Text style={g.codeLabel}>SHARE CODE</Text>
-              <Text style={g.codeValue}>{gs.tableId}</Text>
+              <Text style={g.codeLabel}>INVITE CODE</Text>
+              <Text style={g.codeValue}>{roomCode}</Text>
               <Ionicons name="copy-outline" size={11} color="#bf5fff" style={{ marginTop: 2 }} />
             </TouchableOpacity>
+            <Text style={g.codeHint}>Friends can join using this code in the lobby</Text>
           </View>
         )}
       </LinearGradient>
@@ -671,6 +692,8 @@ const g = StyleSheet.create({
   codeBox:    { alignItems: 'center', borderWidth: 1, borderColor: '#bf5fff40', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 5, backgroundColor: 'rgba(191,95,255,0.08)' },
   codeLabel:  { color: '#bf5fff80', fontFamily: 'Orbitron_400Regular', fontSize: 7, letterSpacing: 1.5 },
   codeValue:  { color: '#bf5fff', fontFamily: 'Orbitron_700Bold', fontSize: 14, letterSpacing: 3 },
+  codeHint:    { color: '#2a6e3a', fontFamily: 'Inter_400Regular', fontSize: 9, textAlign: 'center', marginTop: 2 },
+  botCountdown: { color: '#00d4ff', fontFamily: 'Inter_400Regular', fontSize: 10, textAlign: 'center', opacity: 0.8 },
 
   divider:    { height: 1, backgroundColor: '#ffffff08', marginVertical: 6 },
 
