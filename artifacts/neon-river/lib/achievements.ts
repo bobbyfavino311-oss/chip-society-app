@@ -88,7 +88,7 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'hand_royal_flush',
-    name: 'Neon Royalty',
+    name: 'Royalty',
     description: 'Win a hand with a Royal Flush.',
     rarity: 'legendary', icon: '👑', chipReward: 25_000, xpReward: 3_000,
     category: 'hands', target: 1,
@@ -111,7 +111,7 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'wins_50',
-    name: 'Neon Hustler',
+    name: 'Hustler',
     description: 'Win 50 hands total.',
     rarity: 'rare', icon: '🔥', chipReward: 4_000, xpReward: 600,
     category: 'milestone', target: 50,
@@ -139,7 +139,7 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'big_pot',
-    name: 'Neon Pot',
+    name: 'Big Pot',
     description: 'Win a pot of 50,000 chips or more.',
     rarity: 'epic', icon: '💰', chipReward: 5_000, xpReward: 700,
     category: 'milestone',
@@ -155,7 +155,7 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'streak_5',
-    name: 'Neon Streak',
+    name: 'Win Streak',
     description: 'Win 5 hands in a row.',
     rarity: 'rare', icon: '⚡', chipReward: 2_500, xpReward: 350,
     category: 'streak', target: 5,
@@ -206,14 +206,14 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'chips_1m',
-    name: 'Neon Millionaire',
+    name: 'Millionaire',
     description: 'Reach a chip balance of 1,000,000.',
     rarity: 'epic', icon: '💎', chipReward: 8_000, xpReward: 1_200,
     category: 'bankroll', target: 1_000_000,
   },
   {
     id: 'chips_10m',
-    name: 'Neon Legend',
+    name: 'Legend',
     description: 'Reach a chip balance of 10,000,000.',
     rarity: 'legendary', icon: '🌌', chipReward: 25_000, xpReward: 3_000,
     category: 'bankroll', target: 10_000_000,

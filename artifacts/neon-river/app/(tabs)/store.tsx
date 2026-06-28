@@ -28,7 +28,7 @@ interface ChipPackage {
 
 const PACKAGES: ChipPackage[] = [
   { id: 'starter',    name: 'STARTER STACK',  chips: 100_000,    price: '$1.99',  priceNum: 1.99,  color: '#00d4ff' },
-  { id: 'neon',       name: 'NEON STACK',      chips: 500_000,    price: '$4.99',  priceNum: 4.99,  color: '#bf5fff' },
+  { id: 'neon',       name: 'CHIP STACK',      chips: 500_000,    price: '$4.99',  priceNum: 4.99,  color: '#bf5fff' },
   { id: 'highroller', name: 'HIGH ROLLER',     chips: 2_000_000,  price: '$19.99', priceNum: 19.99, color: '#ffd700', highlight: true, badge: 'BEST VALUE' },
   { id: 'vault',      name: 'VAULT STACK',     chips: 10_000_000, price: '$49.99', priceNum: 49.99, color: '#ff0090' },
   { id: 'legend',     name: 'LEGEND STACK',    chips: 50_000_000, price: '$99.99', priceNum: 99.99, color: '#ff6600', badge: 'ULTIMATE' },

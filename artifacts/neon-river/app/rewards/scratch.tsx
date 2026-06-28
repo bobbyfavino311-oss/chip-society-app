@@ -37,7 +37,7 @@ interface TicketTheme {
 }
 
 const THEMES: TicketTheme[] = [
-  { name: 'Neon Nights',        rarity: 'COMMON',    rarityColor: '#00d4ff', foilA: '#0a1830', foilB: '#152845', foilC: '#0d2040', accent: '#00d4ff', border: '#00d4ff40', icon: '🌃' },
+  { name: 'Miami Nights',        rarity: 'COMMON',    rarityColor: '#00d4ff', foilA: '#0a1830', foilB: '#152845', foilC: '#0d2040', accent: '#00d4ff', border: '#00d4ff40', icon: '🌃' },
   { name: 'Vice Jackpot',       rarity: 'RARE',      rarityColor: '#bf5fff', foilA: '#180030', foilB: '#280050', foilC: '#1e0040', accent: '#bf5fff', border: '#bf5fff50', icon: '🎰' },
   { name: 'Midnight Mirage',    rarity: 'RARE',      rarityColor: '#00ccaa', foilA: '#001a28', foilB: '#002a40', foilC: '#001f35', accent: '#00ccaa', border: '#00ccaa44', icon: '🌙' },
   { name: 'Diamond Rush',       rarity: 'EPIC',      rarityColor: '#80c0ff', foilA: '#081020', foilB: '#10183a', foilC: '#0c1430', accent: '#80c0ff', border: '#80c0ff44', icon: '💎' },

@@ -73,7 +73,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p1', username: 'NightShark99', handle: '@nightshark99',
     avatar: '♠', avatarColor: '#00d4ff', avatarId: 12, bannerColors: ['#001a40', '#000d20'],
-    rank: 'Neon Legend', level: 99, chips: 4_280_000, winRate: 68,
+    rank: 'Legend', level: 99, chips: 4_280_000, winRate: 68,
     handsPlayed: 12_401, biggestPot: 1_240_000, tournamentWins: 0,
     achievementCount: 24, followers: 12_400, following: 892,
     status: 'in_game',
@@ -87,7 +87,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p2', username: 'VegasMirage', handle: '@vegasmirage',
     avatar: '♥', avatarColor: '#ff0090', avatarId: 15, bannerColors: ['#3d0020', '#1a0010'],
-    rank: 'Neon Elite', level: 82, chips: 2_910_000, winRate: 61,
+    rank: 'Elite', level: 82, chips: 2_910_000, winRate: 61,
     handsPlayed: 9_808, biggestPot: 820_000, tournamentWins: 0,
     achievementCount: 22, followers: 8_770, following: 1_204,
     status: 'online',
@@ -98,9 +98,9 @@ export const MOCK_PLAYERS: MockPlayer[] = [
     bio: 'The art of the fold. Three-barrel or bust. Vegas never sleeps.',
   },
   {
-    id: 'p3', username: 'NeonAce_', handle: '@neonace_',
+    id: 'p3', username: 'AceHunter_', handle: '@acehunter_',
     avatar: '♦', avatarColor: '#ffd700', avatarId: 10, bannerColors: ['#2a1a00', '#110d00'],
-    rank: 'Neon Diamond', level: 71, chips: 1_650_000, winRate: 55,
+    rank: 'Diamond', level: 71, chips: 1_650_000, winRate: 55,
     handsPlayed: 7_302, biggestPot: 520_000, tournamentWins: 0,
     achievementCount: 20, followers: 5_420, following: 778,
     status: 'offline',
@@ -112,7 +112,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p4', username: 'ShadowKing', handle: '@shadowking',
     avatar: '♣', avatarColor: '#bf5fff', avatarId: 13, bannerColors: ['#1e0040', '#0d001f'],
-    rank: 'Neon Legend', level: 95, chips: 3_740_000, winRate: 72,
+    rank: 'Legend', level: 95, chips: 3_740_000, winRate: 72,
     handsPlayed: 11_200, biggestPot: 980_000, tournamentWins: 0,
     achievementCount: 23, followers: 10_900, following: 640,
     status: 'in_game',
@@ -125,7 +125,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p5', username: 'MiamiDreams', handle: '@miamidreams',
     avatar: '★', avatarColor: '#00ff88', avatarId: 8, bannerColors: ['#003322', '#001510'],
-    rank: 'Neon Platinum', level: 58, chips: 890_000, winRate: 49,
+    rank: 'Platinum', level: 58, chips: 890_000, winRate: 49,
     handsPlayed: 4_500, biggestPot: 210_000, tournamentWins: 0,
     achievementCount: 18, followers: 2_100, following: 890,
     status: 'online',
@@ -137,7 +137,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p6', username: 'BlazeFire77', handle: '@blazefire77',
     avatar: '♥', avatarColor: '#ff6600', avatarId: 9, bannerColors: ['#301000', '#160800'],
-    rank: 'Neon Gold', level: 44, chips: 540_000, winRate: 42,
+    rank: 'Gold', level: 44, chips: 540_000, winRate: 42,
     handsPlayed: 3_100, biggestPot: 140_000, tournamentWins: 0,
     achievementCount: 12, followers: 980, following: 420,
     status: 'online',
@@ -147,7 +147,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p7', username: 'PokerPhantom', handle: '@pokerphantom',
     avatar: '♠', avatarColor: '#bf5fff', avatarId: 11, bannerColors: ['#150030', '#080018'],
-    rank: 'Neon Elite', level: 77, chips: 2_200_000, winRate: 64,
+    rank: 'Elite', level: 77, chips: 2_200_000, winRate: 64,
     handsPlayed: 8_800, biggestPot: 710_000, tournamentWins: 0,
     achievementCount: 21, followers: 6_800, following: 910,
     status: 'in_game',
@@ -160,7 +160,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p8', username: 'GlacierGhost', handle: '@glacierghost',
     avatar: '♦', avatarColor: '#00d4ff', avatarId: 12, bannerColors: ['#001433', '#000a1a'],
-    rank: 'Neon Diamond', level: 65, chips: 1_120_000, winRate: 58,
+    rank: 'Diamond', level: 65, chips: 1_120_000, winRate: 58,
     handsPlayed: 5_900, biggestPot: 380_000, tournamentWins: 0,
     achievementCount: 22, followers: 3_200, following: 560,
     status: 'offline',
@@ -168,9 +168,9 @@ export const MOCK_PLAYERS: MockPlayer[] = [
     bio: 'Patient as ice. Cold as the flop. Grind sessions 5+ hours daily.',
   },
   {
-    id: 'p9', username: 'NeonWitch', handle: '@neonwitch',
+    id: 'p9', username: 'MidnightWitch', handle: '@midnightwitch',
     avatar: '♥', avatarColor: '#ff0090', avatarId: 6, bannerColors: ['#2d0022', '#150010'],
-    rank: 'Neon Elite', level: 80, chips: 2_750_000, winRate: 66,
+    rank: 'Elite', level: 80, chips: 2_750_000, winRate: 66,
     handsPlayed: 9_200, biggestPot: 890_000, tournamentWins: 0,
     achievementCount: 22, followers: 9_100, following: 1_050,
     status: 'online',
@@ -183,7 +183,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p10', username: 'CryptoKid', handle: '@cryptokid',
     avatar: '♣', avatarColor: '#ffd700', avatarId: 3, bannerColors: ['#1a1400', '#0d0a00'],
-    rank: 'Neon Gold', level: 38, chips: 320_000, winRate: 37,
+    rank: 'Gold', level: 38, chips: 320_000, winRate: 37,
     handsPlayed: 1_800, biggestPot: 82_000, tournamentWins: 0,
     achievementCount: 8, followers: 540, following: 1_200,
     status: 'offline',
@@ -195,7 +195,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p11', username: 'RiverRuler', handle: '@riverruler',
     avatar: '★', avatarColor: '#00d4ff', avatarId: 14, bannerColors: ['#001830', '#000b17'],
-    rank: 'Neon Platinum', level: 54, chips: 760_000, winRate: 51,
+    rank: 'Platinum', level: 54, chips: 760_000, winRate: 51,
     handsPlayed: 4_200, biggestPot: 190_000, tournamentWins: 0,
     achievementCount: 16, followers: 1_600, following: 700,
     status: 'in_game',
@@ -205,7 +205,7 @@ export const MOCK_PLAYERS: MockPlayer[] = [
   {
     id: 'p12', username: 'AceHunter', handle: '@acehunter',
     avatar: '♠', avatarColor: '#ff6600', avatarId: 10, bannerColors: ['#301000', '#180700'],
-    rank: 'Neon Diamond', level: 62, chips: 980_000, winRate: 53,
+    rank: 'Diamond', level: 62, chips: 980_000, winRate: 53,
     handsPlayed: 5_400, biggestPot: 290_000, tournamentWins: 0,
     achievementCount: 20, followers: 2_800, following: 660,
     status: 'online',
@@ -317,7 +317,7 @@ export const SOCIAL_POSTS: SocialPost[] = [
   },
   {
     id: 'sp15', playerId: 'p7', tag: 'LEVEL UP',
-    content: 'Hit Neon Elite rank. 8 months of grinding. Every bad beat was a lesson. Onwards to Legend. 💜',
+    content: 'Hit Elite rank. 8 months of grinding. Every bad beat was a lesson. Onwards to Legend. 💜',
     likes: 2400, comments: 356,
     reactions: { fire: 1600, spade: 600, money: 900, wow: 1200, crown: 2000 },
     timeAgo: '2d', tab: 'highlights',

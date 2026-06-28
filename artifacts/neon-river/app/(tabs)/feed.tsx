@@ -69,7 +69,7 @@ const REPORT_REASONS: Array<{
 const MOCK_COMMENT_POOL: Array<{ username: string; avatarId: number; text: string }> = [
   { username: 'NightShark99', avatarId: 12, text: 'Sick hand! Well played.' },
   { username: 'VegasMirage',  avatarId: 7,  text: 'What was the read on the river?' },
-  { username: 'NeonWitch',    avatarId: 3,  text: 'GGs. That river was brutal.' },
+  { username: 'MidnightWitch',    avatarId: 3,  text: 'GGs. That river was brutal.' },
   { username: 'ShadowKing',   avatarId: 9,  text: 'How did they call that??' },
   { username: 'PokerPhantom', avatarId: 13, text: 'Massive pot. Clean lines.' },
   { username: 'Blaze_RNG',    avatarId: 15, text: 'I would have done the same thing.' },
@@ -1438,7 +1438,7 @@ const MY_REPOSTS: MePost[] = [
   { id: 'mr2', tag: 'BLUFF', content: 'Check-raised the flop, barreled turn, went all-in river with air. They folded top pair. 😤', pot: '33,600', likes: 1109, comments: 177, timeAgo: '1d', repostedFrom: 'PokerPhantom' },
 ];
 const MY_LIKES: MePost[] = [
-  { id: 'ml1', tag: 'BAD BEAT', content: 'Quad Aces cracked by a straight flush. The odds are 0.000000001%.', pot: '91,000', handRank: 'Quad Aces', likes: 2103, comments: 318, timeAgo: '6h', repostedFrom: 'NeonAce_' },
+  { id: 'ml1', tag: 'BAD BEAT', content: 'Quad Aces cracked by a straight flush. The odds are 0.000000001%.', pot: '91,000', handRank: 'Quad Aces', likes: 2103, comments: 318, timeAgo: '6h', repostedFrom: 'AceHunter_' },
   { id: 'ml2', tag: 'ALL-IN', content: 'Five-way all-in pre-flop. I had AA. Flopped a set. Turned quads.', pot: '62,500', handRank: 'Quad Aces', likes: 1876, comments: 204, timeAgo: '8h', repostedFrom: 'ShadowKing' },
 ];
 const INITIAL_MY_POSTS: MePost[] = [

@@ -26,7 +26,7 @@ const BLIND_LEVELS = [
   { id: 'highroller' as BlindLevel, label: 'High Roller', blinds: '5K / 10K',       color: '#ff8800' },
 ];
 
-const WORDS = ['VICE', 'NEON', 'ECHO', 'FLUX', 'NOVA', 'HAZE', 'GRID', 'VOLT', 'APEX', 'CYAN', 'DUSK', 'GLOW'];
+const WORDS = ['VICE', 'ROOK', 'ECHO', 'FLUX', 'NOVA', 'HAZE', 'GRID', 'VOLT', 'APEX', 'CYAN', 'DUSK', 'GLOW'];
 
 function generateCode(): string {
   const word = WORDS[Math.floor(Math.random() * WORDS.length)];
@@ -72,7 +72,7 @@ export default function PrivateTableScreen() {
     }
     // Validate format loosely (WORD-NNN)
     if (!/^[A-Z]{3,6}-\d{3}$/.test(code)) {
-      Alert.alert('Invalid Code', 'Code format should be like NEON-742. Check the code and try again.');
+      Alert.alert('Invalid Code', 'Code format should be like VICE-742. Check the code and try again.');
       return;
     }
     router.replace('/game/practice');
@@ -181,7 +181,7 @@ export default function PrivateTableScreen() {
               <LinearGradient colors={['rgba(255,0,144,0.08)', 'transparent']} style={StyleSheet.absoluteFill} />
               <Ionicons name="key" size={36} color={blazeColor} style={{ marginBottom: 8 }} />
               <Text style={p.joinTitle}>Enter Room Code</Text>
-              <Text style={p.joinSub}>Get the code from your host. Example: NEON-742</Text>
+              <Text style={p.joinSub}>Get the code from your host. Example: VICE-742</Text>
               <TextInput
                 style={p.codeInput}
                 value={joinCode}

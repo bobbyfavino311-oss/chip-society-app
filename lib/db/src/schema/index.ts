@@ -104,9 +104,12 @@ export const feedPostsTable = pgTable('feed_posts', {
   tag:          text('tag').notNull().default('WIN'),
   pot:          text('pot'),
   handRank:     text('hand_rank'),
-  likeCount:    integer('like_count').notNull().default(0),
-  commentCount: integer('comment_count').notNull().default(0),
-  createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow(),
+  likeCount:         integer('like_count').notNull().default(0),
+  commentCount:      integer('comment_count').notNull().default(0),
+  authorUsername:    text('author_username'),
+  authorAvatarIndex: integer('author_avatar_index'),
+  authorRank:        text('author_rank'),
+  createdAt:         timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
 export const postLikesTable = pgTable('post_likes', {

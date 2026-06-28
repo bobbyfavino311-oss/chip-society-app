@@ -184,6 +184,11 @@ async function runMigrations() {
       );
       CREATE INDEX IF NOT EXISTS post_comments_post_idx ON post_comments(post_id, created_at);
     `);
+    await client.query(`
+      ALTER TABLE feed_posts ADD COLUMN IF NOT EXISTS author_username    TEXT;
+      ALTER TABLE feed_posts ADD COLUMN IF NOT EXISTS author_avatar_index INTEGER DEFAULT 1;
+      ALTER TABLE feed_posts ADD COLUMN IF NOT EXISTS author_rank        TEXT DEFAULT 'Player';
+    `);
     logger.info('Startup migrations complete');
   } catch (err) {
     logger.error({ err }, 'Startup migration failed — continuing anyway');

@@ -63,7 +63,7 @@ router.get('/social/search', async (req, res) => {
       level:       (r.profileJson as any)?.level ?? 1,
       chips:       (r.profileJson as any)?.chips ?? 0,
       avatarIndex: (r.profileJson as any)?.avatarIndex ?? 1,
-      rank:        (r.profileJson as any)?.rank ?? 'Neon Bronze',
+      rank:        (r.profileJson as any)?.rank ?? 'Player',
       status:      r.status,
     }));
 
@@ -104,7 +104,7 @@ router.get('/social/players/:id', async (req, res) => {
         level:         pj?.level ?? 1,
         chips:         pj?.chips ?? 0,
         avatarIndex:   pj?.avatarIndex ?? 1,
-        rank:          pj?.rank ?? 'Neon Bronze',
+        rank:          pj?.rank ?? 'Player',
         winRate:       pj?.winRate ?? 0,
         handsPlayed:   pj?.handsPlayed ?? 0,
         status:        r.status,
@@ -434,20 +434,20 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
 
     let query = db
       .select({
-        id:           feedPostsTable.id,
-        authorId:     feedPostsTable.authorId,
-        content:      feedPostsTable.content,
-        tag:          feedPostsTable.tag,
-        pot:          feedPostsTable.pot,
-        handRank:     feedPostsTable.handRank,
-        likeCount:    feedPostsTable.likeCount,
-        commentCount: feedPostsTable.commentCount,
-        createdAt:    feedPostsTable.createdAt,
-        authorUsername:    playersTable.username,
-        authorProfileJson: playersTable.profileJson,
+        id:                feedPostsTable.id,
+        authorId:          feedPostsTable.authorId,
+        content:           feedPostsTable.content,
+        tag:               feedPostsTable.tag,
+        pot:               feedPostsTable.pot,
+        handRank:          feedPostsTable.handRank,
+        likeCount:         feedPostsTable.likeCount,
+        commentCount:      feedPostsTable.commentCount,
+        createdAt:         feedPostsTable.createdAt,
+        authorUsername:    feedPostsTable.authorUsername,
+        authorAvatarIndex: feedPostsTable.authorAvatarIndex,
+        authorRank:        feedPostsTable.authorRank,
       })
       .from(feedPostsTable)
-      .leftJoin(playersTable, eq(feedPostsTable.authorId, playersTable.playerId))
       .$dynamic();
 
     if (tab === 'me') {
@@ -479,8 +479,8 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
       id:              r.id,
       authorId:        r.authorId,
       authorUsername:  r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
-      authorAvatarIndex: (r.authorProfileJson as any)?.avatarIndex ?? 1,
-      authorRank:      (r.authorProfileJson as any)?.rank ?? 'Neon Bronze',
+      authorAvatarIndex: r.authorAvatarIndex ?? 1,
+      authorRank:      r.authorRank ?? 'Player',
       content:         r.content,
       tag:             r.tag,
       pot:             r.pot ?? null,
@@ -522,22 +522,31 @@ router.post('/social/posts', requirePlayer, async (req: any, res) => {
       .from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
     const author = authorRows[0] ?? null;
 
+    // Prefer the client-provided display name — the DB may have a stale
+    // or auto-generated username that doesn't match what the user sees.
+    const resolvedUsername    = authorUsername ?? author?.username ?? `player_${playerId.slice(0, 6)}`;
+    const resolvedAvatarIndex = authorAvatarIndex ?? (author?.profileJson as any)?.avatarIndex ?? 1;
+    const resolvedRank        = authorRank ?? (author?.profileJson as any)?.rank ?? 'Player';
+
     const id = randomUUID();
     const [created] = await db.insert(feedPostsTable).values({
       id,
-      authorId: playerId,
-      content:  content.trim(),
-      tag:      tag ?? 'WIN',
-      pot:      pot?.trim() || null,
-      handRank: handRank?.trim() || null,
+      authorId:          playerId,
+      content:           content.trim(),
+      tag:               tag ?? 'WIN',
+      pot:               pot?.trim() || null,
+      handRank:          handRank?.trim() || null,
+      authorUsername:    resolvedUsername,
+      authorAvatarIndex: resolvedAvatarIndex,
+      authorRank:        resolvedRank,
     }).returning();
 
     const post = {
       id:              created!.id,
       authorId:        playerId,
-      authorUsername:  author?.username ?? authorUsername ?? `player_${playerId.slice(0, 6)}`,
-      authorAvatarIndex: (author?.profileJson as any)?.avatarIndex ?? authorAvatarIndex ?? 1,
-      authorRank:      (author?.profileJson as any)?.rank ?? authorRank ?? 'Neon Bronze',
+      authorUsername:  created!.authorUsername ?? resolvedUsername,
+      authorAvatarIndex: created!.authorAvatarIndex ?? resolvedAvatarIndex,
+      authorRank:      created!.authorRank ?? resolvedRank,
       content:         created!.content,
       tag:             created!.tag,
       pot:             created!.pot ?? null,

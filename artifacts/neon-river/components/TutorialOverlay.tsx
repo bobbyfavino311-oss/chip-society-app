@@ -56,7 +56,7 @@ const STEPS: Step[] = [
   {
     emoji: '🏆',
     title: 'RISE THE RANKS',
-    desc: 'From Neon Bronze to Neon Legend.\nBuild your reputation on the live poker feed.',
+    desc: 'From Bronze to Legend.\nBuild your reputation on the live poker feed.',
     accent: '#ff0090',
     gradFrom: '#1a0010',
   },

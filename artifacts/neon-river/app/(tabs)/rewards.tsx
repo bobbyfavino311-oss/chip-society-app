@@ -210,7 +210,7 @@ export default function RewardsScreen() {
           <LinearGradient colors={['rgba(191,95,255,0.15)', 'rgba(255,0,144,0.08)']} style={StyleSheet.absoluteFill} />
           <View style={styles.vipHeader}>
             <Ionicons name="diamond" size={28} color={colors.accent} />
-            <Text style={styles.vipTitle}>NEON VIP</Text>
+            <Text style={styles.vipTitle}>CHIP VIP</Text>
           </View>
           <Text style={styles.vipDesc}>
             Daily chip bonuses • Exclusive table skins • Premium card backs • VIP tournaments
