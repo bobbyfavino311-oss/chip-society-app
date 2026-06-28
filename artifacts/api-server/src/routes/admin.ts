@@ -497,4 +497,34 @@ router.post('/players/:id/notifications/read', async (req, res) => {
   }
 });
 
+// ── PUT /api/admin/players/:id/founder ───────────────────────────────────────
+router.put('/admin/players/:id/founder', async (req, res) => {
+  try {
+    const { isFounder } = req.body as { isFounder: boolean };
+    const pid = req.params['id']!;
+
+    const rows = await db
+      .select({ profileJson: playersTable.profileJson })
+      .from(playersTable)
+      .where(eq(playersTable.playerId, pid))
+      .limit(1);
+
+    if (!rows.length) {
+      res.status(404).json({ error: 'Player not found' });
+      return;
+    }
+
+    const updated = { ...(rows[0]!.profileJson as Record<string, unknown>), isFounder };
+    await db.update(playersTable)
+      .set({ profileJson: updated, updatedAt: new Date() })
+      .where(eq(playersTable.playerId, pid));
+
+    req.log.info({ playerId: pid, isFounder }, 'founder badge toggled');
+    res.json({ success: true, isFounder });
+  } catch (e) {
+    req.log.error(e, 'admin/founder error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 export default router;

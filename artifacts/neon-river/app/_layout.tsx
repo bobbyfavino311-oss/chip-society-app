@@ -152,6 +152,7 @@ function RootLayoutNav() {
         <Stack.Screen name="auth/signup"      options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="auth/signin"      options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="auth/forgot-pin"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+        <Stack.Screen name="profile/change-pin" options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="terms"         options={{ headerShown: false, animation: 'slide_from_bottom' }} />
         <Stack.Screen name="(tabs)"        options={{ headerShown: false }} />
         <Stack.Screen

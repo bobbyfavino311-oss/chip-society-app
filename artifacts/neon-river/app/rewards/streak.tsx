@@ -92,7 +92,6 @@ export default function StreakScreen() {
   return (
     <View style={st.container}>
       <LinearGradient colors={['#051015', '#050010', '#0a0515']} style={StyleSheet.absoluteFill} />
-      <View style={st.glowGold} />
 
       {/* Header */}
       <View style={[st.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 16) }]}>
@@ -241,7 +240,6 @@ export default function StreakScreen() {
 
 const st = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050010' },
-  glowGold: { position: 'absolute', top: -60, right: -60, width: 280, height: 280, borderRadius: 140, backgroundColor: 'rgba(255,215,0,0.05)' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 16 },
   closeBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: colors.border },
   title: { color: colors.text, fontSize: 18, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },

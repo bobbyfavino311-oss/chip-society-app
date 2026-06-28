@@ -34,4 +34,5 @@ export const api = {
   resolveReport:     (id: string, b: any)          => req<any>('PUT',  `/admin/reports/${id}`, b),
   bugReports:        (status?: string, category?: string) => req<any>('GET', `/admin/bug-reports?status=${status??'all'}&category=${category??'all'}`),
   updateBugReport:   (id: string, b: any)          => req<any>('PATCH', `/admin/bug-reports/${id}`, b),
+  toggleFounder:     (id: string, isFounder: boolean) => req<any>('PUT', `/admin/players/${id}/founder`, { isFounder }),
 };

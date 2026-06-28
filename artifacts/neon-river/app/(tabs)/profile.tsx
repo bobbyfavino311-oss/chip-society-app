@@ -635,6 +635,27 @@ export default function ProfileScreen() {
           <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.7)" />
         </TouchableOpacity>
 
+        {/* Change PIN */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={() => router.push('/profile/change-pin')}
+        >
+          <LinearGradient
+            colors={['rgba(0,212,255,0.10)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={[achStyles.iconWrap, { backgroundColor: 'rgba(0,212,255,0.10)' }]}>
+            <Ionicons name="keypad-outline" size={20} color="rgba(0,212,255,0.85)" />
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>CHANGE PIN</Text>
+            <Text style={achStyles.achSub}>Update your 4-digit account PIN</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(0,212,255,0.5)" />
+        </TouchableOpacity>
+
         {/* Report a Bug */}
         <TouchableOpacity
           style={achStyles.row}

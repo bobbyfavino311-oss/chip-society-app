@@ -51,6 +51,9 @@ export default function SignupScreen() {
   const [username, setUsername] = useState('');
   const [avatarIndex, setAvatarIndex] = useState(1);
 
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [pinPhase, setPinPhase] = useState<'enter' | 'confirm'>('enter');
@@ -75,6 +78,17 @@ export default function SignupScreen() {
       Animated.timing(chipAnim, { toValue: 1, duration: 1200, useNativeDriver: false }).start();
     }
   }, [step]);
+
+  const validateEmail = (val: string) => {
+    if (!val) return '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return 'Enter a valid email address.';
+    return '';
+  };
+
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    setEmailError(validateEmail(val));
+  };
 
   const validateUsername = (val: string) => {
     if (val.length < 3)  return 'At least 3 characters required.';
@@ -143,7 +157,7 @@ export default function SignupScreen() {
     } else if (step === 2) {
       setLoading(true);
       setError('');
-      const result = await registerAccount(username, pin, '', avatarIndex);
+      const result = await registerAccount(username, pin, email.trim(), avatarIndex);
       setLoading(false);
       if (result.success) {
         setStep(3);
@@ -253,6 +267,35 @@ export default function SignupScreen() {
                         <Text style={s.ruleText}>{r}</Text>
                       </View>
                     ))}
+                  </View>
+
+                  {/* Optional email for account recovery */}
+                  <View style={s.emailSection}>
+                    <Text style={s.emailLabel}>EMAIL <Text style={s.emailOptional}>(optional — for PIN recovery)</Text></Text>
+                    <View style={[s.inputWrap, { borderColor: emailError ? colors.error : email ? colors.success : 'rgba(255,255,255,0.15)' }]}>
+                      <TextInput
+                        style={s.input}
+                        placeholder="your@email.com"
+                        placeholderTextColor="rgba(255,255,255,0.2)"
+                        value={email}
+                        onChangeText={handleEmailChange}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        keyboardType="email-address"
+                      />
+                      {email.length > 0 && (
+                        <Ionicons
+                          name={emailError ? 'close-circle' : 'checkmark-circle'}
+                          size={18}
+                          color={emailError ? colors.error : colors.success}
+                        />
+                      )}
+                    </View>
+                    {emailError ? (
+                      <Text style={s.inputError}>{emailError}</Text>
+                    ) : (
+                      <Text style={s.emailHint}>If you forget your PIN, we'll send a reset link here.</Text>
+                    )}
                   </View>
                 </View>
               )}
@@ -520,6 +563,11 @@ const s = StyleSheet.create({
   },
   ctaDisabled: { borderColor: 'rgba(255,255,255,0.15)', backgroundColor: 'rgba(255,255,255,0.04)' },
   ctaText: { fontFamily: 'Orbitron_700Bold', fontSize: 13, color: colors.primary, letterSpacing: 2 },
+
+  emailSection: { gap: 6 },
+  emailLabel:   { fontFamily: 'Orbitron_400Regular', fontSize: 8, color: colors.primary, letterSpacing: 2 },
+  emailOptional:{ fontFamily: 'Inter_400Regular', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'none', letterSpacing: 0 },
+  emailHint:    { fontSize: 10, color: 'rgba(255,255,255,0.3)', lineHeight: 14 },
 
   serverPill: {
     flexDirection: 'row', alignItems: 'center', gap: 7,

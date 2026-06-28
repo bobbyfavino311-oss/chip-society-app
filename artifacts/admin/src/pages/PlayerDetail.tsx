@@ -380,6 +380,7 @@ export default function PlayerDetail() {
   const [showWarn, setShowWarn] = useState(false);
   const [showSuspend, setShowSuspend] = useState(false);
   const [showBan, setShowBan] = useState(false);
+  const [founderLoading, setFounderLoading] = useState(false);
 
   function load() {
     setLoading(true);
@@ -409,6 +410,13 @@ export default function PlayerDetail() {
     try { await api.unban(id); load(); } catch { /* ignore */ }
   }
 
+  async function handleToggleFounder() {
+    const current = !!(data?.player?.profileJson?.isFounder);
+    setFounderLoading(true);
+    try { await api.toggleFounder(id, !current); load(); } catch { /* ignore */ }
+    finally { setFounderLoading(false); }
+  }
+
   return (
     <div className="p-8 max-w-4xl">
       <Link href="/players">
@@ -431,6 +439,17 @@ export default function PlayerDetail() {
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={handleToggleFounder}
+            disabled={founderLoading}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-md border text-xs font-semibold transition-colors disabled:opacity-50 ${
+              profile.isFounder
+                ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/30'
+                : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            👑 {profile.isFounder ? 'Remove Founder' : 'Grant Founder'}
+          </button>
           <button onClick={() => setShowBonus(true)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-400 text-xs font-semibold hover:bg-amber-500/25 transition-colors">
             <Gift size={12} />Casino Bonus
