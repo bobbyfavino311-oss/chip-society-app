@@ -257,7 +257,6 @@ export default function ProfileScreen() {
   const [name, setName] = useState(profile.username);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
-  const [showTournamentInfo, setShowTournamentInfo] = useState(false);
 
   const claimedCount = achievementCompletion(unlockedIds);
   const { theme: tableTheme } = useTableTheme();
@@ -465,72 +464,76 @@ export default function ProfileScreen() {
           <NeonStatBox label="LOSSES"    value={profile.losses}        accentColor="#ff4466" />
         </View>
 
-        {/* Tournament stats section — locked preview */}
+        {/* Tournament stats section — live */}
         <NeonSectionTitle label="TOURNAMENTS" color="rgba(191,95,255,0.8)" />
         <View style={styles.tournamentCard}>
-          {/* Background tint */}
           <LinearGradient
             colors={['rgba(191,95,255,0.08)', 'transparent']}
             style={StyleSheet.absoluteFill}
           />
 
-          {/* Ghost stats — low opacity behind the overlay */}
-          <View style={{ opacity: 0.18 }}>
-            <View style={styles.tournamentRow}>
-              <View style={styles.tournamentStat}>
-                <Text style={[styles.tournamentValue, { color: '#ffd700' }]}>--</Text>
-                <Text style={styles.tournamentLabel}>WINS</Text>
-              </View>
-              <View style={styles.tournamentDivider} />
-              <View style={styles.tournamentStat}>
-                <Text style={[styles.tournamentValue, { color: '#ff4466' }]}>--</Text>
-                <Text style={styles.tournamentLabel}>LOSSES</Text>
-              </View>
-              <View style={styles.tournamentDivider} />
-              <View style={styles.tournamentStat}>
-                <Text style={[styles.tournamentValue, { color: '#00d4ff' }]}>--</Text>
-                <Text style={styles.tournamentLabel}>WIN RATE</Text>
-              </View>
+          <View style={styles.tournamentRow}>
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#ffd700' }]}>
+                {profile.tournamentWins}
+              </Text>
+              <Text style={styles.tournamentLabel}>WINS</Text>
             </View>
-            <View style={styles.tournamentRow}>
-              <View style={styles.tournamentStat}>
-                <Text style={[styles.tournamentValue, { color: '#bf5fff' }]}>--</Text>
-                <Text style={styles.tournamentLabel}>BEST FINISH</Text>
-              </View>
-              <View style={styles.tournamentDivider} />
-              <View style={[styles.tournamentStat, { flex: 2 }]}>
-                <Text style={[styles.tournamentValue, { color: '#00ff88', fontSize: 18 }]}>--</Text>
-                <Text style={styles.tournamentLabel}>BIGGEST PRIZE</Text>
-              </View>
+            <View style={styles.tournamentDivider} />
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#ff4466' }]}>
+                {profile.tournamentLosses}
+              </Text>
+              <Text style={styles.tournamentLabel}>LOSSES</Text>
+            </View>
+            <View style={styles.tournamentDivider} />
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#00d4ff' }]}>
+                {tournamentTotal > 0 ? `${tournamentWinRate}%` : '--'}
+              </Text>
+              <Text style={styles.tournamentLabel}>WIN RATE</Text>
             </View>
           </View>
 
-          {/* Dark overlay */}
-          <View style={styles.tournamentOverlay}>
-            <LinearGradient
-              colors={['rgba(4,0,26,0.82)', 'rgba(8,0,22,0.9)']}
-              style={StyleSheet.absoluteFill}
-            />
-            {/* Top-left info button */}
-            <TouchableOpacity
-              style={styles.tournamentInfoBtn}
-              onPress={() => setShowTournamentInfo(true)}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Ionicons name="information-circle-outline" size={18} color="rgba(191,95,255,0.65)" />
-            </TouchableOpacity>
-            {/* Top-right lock icon */}
-            <View style={styles.tournamentLockCorner}>
-              <Ionicons name="lock-closed" size={14} color="rgba(191,95,255,0.65)" />
-            </View>
-            {/* Centered headline */}
-            <View style={styles.tournamentLockContent}>
-              <Text style={styles.tournamentLockTitle}>TOURNAMENTS COMING SOON</Text>
-              <Text style={styles.tournamentLockSub}>
-                Tournament statistics will become available when tournaments launch.
+          <View style={styles.tournamentDividerH} />
+
+          <View style={styles.tournamentRow}>
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#00d4ff' }]}>
+                {tournamentTotal}
               </Text>
+              <Text style={styles.tournamentLabel}>ENTERED</Text>
+            </View>
+            <View style={styles.tournamentDivider} />
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#bf5fff' }]}>
+                {profile.bestTournamentFinish > 0 ? `#${profile.bestTournamentFinish}` : '--'}
+              </Text>
+              <Text style={styles.tournamentLabel}>BEST FINISH</Text>
+            </View>
+            <View style={styles.tournamentDivider} />
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#00ff88', fontSize: 16 }]}>
+                {profile.biggestTournamentPrize > 0
+                  ? profile.biggestTournamentPrize >= 1_000_000
+                    ? `${(profile.biggestTournamentPrize / 1_000_000).toFixed(1)}M`
+                    : profile.biggestTournamentPrize >= 1_000
+                      ? `${(profile.biggestTournamentPrize / 1_000).toFixed(0)}K`
+                      : `${profile.biggestTournamentPrize}`
+                  : '--'}
+              </Text>
+              <Text style={styles.tournamentLabel}>BEST PRIZE</Text>
             </View>
           </View>
+
+          {!hasTournamentData && (
+            <View style={styles.tournamentEmpty}>
+              <Ionicons name="trophy-outline" size={18} color="rgba(191,95,255,0.3)" />
+              <Text style={styles.tournamentEmptyText}>
+                Enter a tournament to start tracking your record
+              </Text>
+            </View>
+          )}
         </View>
 
         <NeonSectionTitle label="SOCIAL" color="rgba(0,212,255,0.8)" />
@@ -696,51 +699,6 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <BugReportModal visible={showBugReport} onClose={() => setShowBugReport(false)} />
-
-      {/* Tournament info modal */}
-      <Modal
-        visible={showTournamentInfo}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowTournamentInfo(false)}
-      >
-        <View style={achStyles.overlay}>
-          <View style={[achStyles.modalCard, { maxHeight: '80%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <Text style={[achStyles.modalTitle, { fontSize: 12, letterSpacing: 1.5 }]}>TOURNAMENT STATISTICS</Text>
-              <TouchableOpacity onPress={() => setShowTournamentInfo(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Ionicons name="close" size={20} color="rgba(255,255,255,0.5)" />
-              </TouchableOpacity>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={[achStyles.modalBody, { marginBottom: 14 }]}>
-                Tournament statistics will begin tracking automatically when tournaments become available.
-              </Text>
-              <Text style={tiStyles.subhead}>THIS SECTION WILL TRACK:</Text>
-              {[
-                'Tournament Entries',
-                'Tournament Wins',
-                'Final Table Appearances',
-                'Cash Finishes',
-                'Biggest Prize Won',
-                'Best Finish Position',
-                'Average Finish',
-                'Return on Investment (ROI)',
-                'Tournament Win Rate',
-                'Total Tournament Chips Won',
-              ].map(item => (
-                <View key={item} style={tiStyles.bullet}>
-                  <View style={tiStyles.dot} />
-                  <Text style={tiStyles.bulletText}>{item}</Text>
-                </View>
-              ))}
-              <Text style={[achStyles.modalBody, { marginTop: 16, color: 'rgba(191,95,255,0.7)' }]}>
-                Compete in tournaments to build your record and climb future leaderboards.
-              </Text>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
       {/* Sign-out confirmation modal */}
       <Modal
@@ -1094,39 +1052,26 @@ const styles = StyleSheet.create({
     height: 36,
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
-  tournamentEmpty: {
-    color: 'rgba(255,255,255,0.25)',
-    fontSize: 9,
-    fontFamily: 'Orbitron_400Regular',
-    textAlign: 'center',
-    letterSpacing: 0.5,
-    paddingVertical: 4,
+  tournamentDividerH: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginHorizontal: 4,
   },
-  tournamentOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: colors.radius,
+  tournamentEmpty: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  tournamentInfoBtn: {
-    position: 'absolute', top: 10, left: 10,
-  },
-  tournamentLockCorner: {
-    position: 'absolute', top: 12, right: 12,
-  },
-  tournamentLockContent: {
-    alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 32,
+    paddingVertical: 6,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.04)',
+    marginTop: 2,
   },
-  tournamentLockTitle: {
-    fontSize: 10, fontWeight: '900', fontFamily: 'Orbitron_700Bold',
-    color: 'rgba(191,95,255,0.85)', letterSpacing: 1.5, textAlign: 'center',
-  },
-  tournamentLockSub: {
-    fontSize: 9, color: 'rgba(255,255,255,0.35)',
-    fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 14,
+  tournamentEmptyText: {
+    color: 'rgba(255,255,255,0.25)',
+    fontSize: 9,
+    fontFamily: 'Inter_400Regular',
+    letterSpacing: 0.3,
   },
   chipCard: {
     backgroundColor: colors.surface,
