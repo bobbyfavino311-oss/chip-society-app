@@ -15,9 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
-import { useUser } from '@/context/UserContext';
-
-const API_BASE = `${process.env['EXPO_PUBLIC_API_BASE'] ?? ''}/api`;
+import { useUser, getApiBase } from '@/context/UserContext';
 
 type Category = 'crash' | 'casino' | 'ui' | 'account' | 'performance' | 'other';
 
@@ -80,7 +78,7 @@ export default function BugReportModal({ visible, onClose }: Props) {
     };
 
     try {
-      const r = await fetch(`${API_BASE}/bug-reports`, {
+      const r = await fetch(`${getApiBase()}/bug-reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

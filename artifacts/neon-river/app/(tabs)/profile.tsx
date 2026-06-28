@@ -6,7 +6,6 @@ import {
   Alert,
   Animated,
   Image,
-  Linking,
   Modal,
   Platform,
   ScrollView,
@@ -259,10 +258,6 @@ export default function ProfileScreen() {
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
   const [showTournamentInfo, setShowTournamentInfo] = useState(false);
-  const [showAdminModal, setShowAdminModal] = useState(false);
-  const [adminPin, setAdminPin] = useState('');
-  const [adminError, setAdminError] = useState('');
-  const ADMIN_URL = 'https://b3b2c260-e342-4050-891f-eb469a231792-00-361hrkzhaddip.janeway.replit.dev/admin/';
 
   const claimedCount = achievementCompletion(unlockedIds);
   const { theme: tableTheme } = useTableTheme();
@@ -698,15 +693,6 @@ export default function ProfileScreen() {
           <Text style={achStyles.signOutText}>SIGN OUT</Text>
         </TouchableOpacity>
 
-        {/* Hidden admin entry */}
-        <TouchableOpacity
-          style={adminStyles.adminEntry}
-          activeOpacity={0.4}
-          onPress={() => { setAdminPin(''); setAdminError(''); setShowAdminModal(true); }}
-        >
-          <Ionicons name="shield-outline" size={13} color="rgba(255,255,255,0.18)" />
-          <Text style={adminStyles.adminEntryText}>ADMIN</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       <BugReportModal visible={showBugReport} onClose={() => setShowBugReport(false)} />
@@ -788,53 +774,6 @@ export default function ProfileScreen() {
         </View>
       </Modal>
 
-      {/* Admin PIN modal */}
-      <Modal
-        visible={showAdminModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowAdminModal(false)}
-      >
-        <View style={achStyles.overlay}>
-          <View style={[achStyles.modalCard, { width: 300 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Ionicons name="shield" size={16} color="rgba(0,212,255,0.7)" />
-                <Text style={[achStyles.modalTitle, { fontSize: 11 }]}>ADMIN ACCESS</Text>
-              </View>
-              <TouchableOpacity onPress={() => setShowAdminModal(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Ionicons name="close" size={20} color="rgba(255,255,255,0.4)" />
-              </TouchableOpacity>
-            </View>
-            <TextInput
-              style={adminStyles.pinInput}
-              placeholder="Enter admin PIN"
-              placeholderTextColor="rgba(255,255,255,0.3)"
-              secureTextEntry
-              keyboardType="number-pad"
-              maxLength={10}
-              value={adminPin}
-              onChangeText={t => { setAdminPin(t); setAdminError(''); }}
-              autoFocus
-            />
-            {adminError ? <Text style={adminStyles.pinError}>{adminError}</Text> : null}
-            <TouchableOpacity
-              style={[achStyles.confirmBtn, { marginTop: 14, opacity: adminPin.length > 0 ? 1 : 0.4 }]}
-              disabled={adminPin.length === 0}
-              onPress={() => {
-                if (adminPin === '327569') {
-                  setShowAdminModal(false);
-                  Linking.openURL(ADMIN_URL + '?key=' + adminPin);
-                } else {
-                  setAdminError('Incorrect PIN.');
-                }
-              }}
-            >
-              <Text style={achStyles.confirmText}>OPEN ADMIN PANEL</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -1253,39 +1192,3 @@ const devStyles = StyleSheet.create({
   },
 });
 
-const adminStyles = StyleSheet.create({
-  adminEntry: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-    paddingVertical: 14,
-    marginTop: 4,
-    marginBottom: 8,
-  },
-  adminEntryText: {
-    fontFamily: 'Orbitron_700Bold',
-    fontSize: 9,
-    color: 'rgba(255,255,255,0.18)',
-    letterSpacing: 2,
-  },
-  pinInput: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,212,255,0.25)',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: '#fff',
-    fontFamily: 'Inter_400Regular',
-    fontSize: 15,
-    letterSpacing: 4,
-  },
-  pinError: {
-    color: '#ff4466',
-    fontSize: 11,
-    fontFamily: 'Inter_400Regular',
-    marginTop: 6,
-    textAlign: 'center',
-  },
-});
