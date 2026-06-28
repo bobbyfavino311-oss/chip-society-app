@@ -138,7 +138,7 @@ async function seedRevenueCat() {
     const body: CreateProductData["body"] = {
       store_identifier: identifier,
       app_id: targetApp.id,
-      type: "one_time",
+      type: "consumable",
       display_name: displayName,
     };
     if (isTestStore) {
