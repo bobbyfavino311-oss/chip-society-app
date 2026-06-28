@@ -157,7 +157,7 @@ const AUTH_SEGMENTS = new Set(['entry', 'auth', 'terms']);
 
 function GateController() {
   const { profile, isLoaded } = useUser();
-  const { termsAccepted, termsLoaded } = useTerms();
+  const { termsNeedsPrompt, termsLoaded } = useTerms();
   const segments = useSegments();
 
   useEffect(() => {
@@ -167,9 +167,15 @@ function GateController() {
     if (inAuthFlow) return;
 
     if (profile.isNewUser) {
+      // Brand-new account — start the onboarding flow (signup handles terms).
       router.replace('/entry');
+    } else if (termsNeedsPrompt) {
+      // Returning user whose stored terms version is older than TERMS_VERSION
+      // (i.e., we published an update). Show terms once, then never again until
+      // TERMS_VERSION is bumped again.
+      router.replace('/terms');
     }
-  }, [isLoaded, termsLoaded, profile.isNewUser, termsAccepted, segments]);
+  }, [isLoaded, termsLoaded, profile.isNewUser, termsNeedsPrompt, segments]);
 
   return null;
 }

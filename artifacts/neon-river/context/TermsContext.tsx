@@ -1,8 +1,15 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { clearTermsRecord, needsTermsAcceptance, saveTermsAcceptance, TERMS_VERSION } from '../lib/termsStorage';
+import {
+  hasAcceptedCurrentTerms,
+  needsTermsPrompt,
+  saveTermsAcceptance,
+  saveTermsDecline,
+  TERMS_VERSION,
+} from '../lib/termsStorage';
 
 interface TermsContextValue {
-  termsAccepted: boolean;
+  termsAccepted: boolean;    // true only when the user actively accepted the current version
+  termsNeedsPrompt: boolean; // true when the terms screen should be shown (new install or version bump)
   termsLoaded: boolean;
   termsVersion: string;
   acceptTerms: () => Promise<void>;
@@ -12,28 +19,38 @@ interface TermsContextValue {
 const TermsContext = createContext<TermsContextValue | null>(null);
 
 export function TermsProvider({ children }: { children: React.ReactNode }) {
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [termsLoaded, setTermsLoaded] = useState(false);
+  const [termsAccepted, setTermsAccepted]         = useState(false);
+  const [termsNeedsPrompt, setTermsNeedsPrompt]   = useState(false);
+  const [termsLoaded, setTermsLoaded]             = useState(false);
 
   useEffect(() => {
-    needsTermsAcceptance().then(needs => {
-      setTermsAccepted(!needs);
-      setTermsLoaded(true);
-    });
+    Promise.all([hasAcceptedCurrentTerms(), needsTermsPrompt()]).then(
+      ([accepted, needsPrompt]) => {
+        setTermsAccepted(accepted);
+        setTermsNeedsPrompt(needsPrompt);
+        setTermsLoaded(true);
+      }
+    );
   }, []);
 
   const acceptTerms = useCallback(async () => {
     await saveTermsAcceptance();
     setTermsAccepted(true);
+    setTermsNeedsPrompt(false);
   }, []);
 
+  // Saves a "seen this version" record so the user is NOT re-prompted on
+  // their next session. Does NOT clear the record (which would cause re-prompts).
   const declineTerms = useCallback(async () => {
-    await clearTermsRecord();
+    await saveTermsDecline();
     setTermsAccepted(false);
+    setTermsNeedsPrompt(false);
   }, []);
 
   return (
-    <TermsContext.Provider value={{ termsAccepted, termsLoaded, termsVersion: TERMS_VERSION, acceptTerms, declineTerms }}>
+    <TermsContext.Provider
+      value={{ termsAccepted, termsNeedsPrompt, termsLoaded, termsVersion: TERMS_VERSION, acceptTerms, declineTerms }}
+    >
       {children}
     </TermsContext.Provider>
   );

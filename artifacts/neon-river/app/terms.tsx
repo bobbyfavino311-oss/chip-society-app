@@ -47,7 +47,7 @@ const SECTIONS = [
   },
   {
     title: '7. CHILDREN\'S PRIVACY',
-    body: `Chip Society is not intended for users under 13 years old.\n\nWe do not knowingly collect personal information from children under 13.`,
+    body: `Chip Society is rated 17+ and is not intended for users under 17 years old.\n\nWe do not knowingly collect personal information from children under 17.`,
   },
   {
     title: '8. ACCOUNT TERMINATION',
