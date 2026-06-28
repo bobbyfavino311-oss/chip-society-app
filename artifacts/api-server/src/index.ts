@@ -189,6 +189,16 @@ async function runMigrations() {
       ALTER TABLE feed_posts ADD COLUMN IF NOT EXISTS author_avatar_index INTEGER DEFAULT 1;
       ALTER TABLE feed_posts ADD COLUMN IF NOT EXISTS author_rank        TEXT DEFAULT 'Player';
     `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS announcements (
+        id         TEXT PRIMARY KEY,
+        title      TEXT NOT NULL,
+        body       TEXT NOT NULL,
+        posted_by  TEXT NOT NULL DEFAULT 'Dev Team',
+        pinned     BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
     logger.info('Startup migrations complete');
   } catch (err) {
     logger.error({ err }, 'Startup migration failed — continuing anyway');
