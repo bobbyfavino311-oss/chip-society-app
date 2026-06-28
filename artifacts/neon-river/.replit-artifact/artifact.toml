@@ -1,6 +1,6 @@
 kind = "mobile"
 previewPath = "/"
-title = "Chip Society-Build"
+title = "Chip Society"
 version = "1.0.0"
 id = "artifacts/neon-river"
 router = "expo-domain"

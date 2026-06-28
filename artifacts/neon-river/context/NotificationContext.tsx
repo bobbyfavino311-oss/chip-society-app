@@ -26,11 +26,13 @@ export interface AppNotification {
 interface NotifContextValue {
   notifications: AppNotification[];
   unreadCount: number;
+  pushToken: string | null;
   addNotification: (n: Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'dismissed'>) => void;
   markRead: (id: string) => void;
   markAllRead: () => void;
   dismiss: (id: string) => void;
   clearAllRead: () => void;
+  setPushToken: (token: string | null) => void;
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -38,15 +40,18 @@ interface NotifContextValue {
 const NotifContext = createContext<NotifContextValue>({
   notifications: [],
   unreadCount: 0,
+  pushToken: null,
   addNotification: () => {},
   markRead: () => {},
   markAllRead: () => {},
   dismiss: () => {},
   clearAllRead: () => {},
+  setPushToken: () => {},
 });
 
-const STORAGE_KEY = '@chipsociety_notifications_v1';
-const LAST_OPEN_KEY = '@chipsociety_last_open';
+const STORAGE_KEY    = '@chipsociety_notifications_v1';
+const LAST_OPEN_KEY  = '@chipsociety_last_open';
+const PUSH_TOKEN_KEY = '@chipsociety_push_token_v1';
 
 // ─── Returning-player auto-notifications ──────────────────────────────────────
 
@@ -100,7 +105,6 @@ function buildReturningNotifications(
   }
 
   if (away > 4 * 60 * 60 * 1000) {
-    // Away > 4 hours
     notifs.push({
       category: 'gameplay',
       priority: 'medium',
@@ -169,21 +173,27 @@ export function NotificationProvider({
   streakDays = 0,
 }: ProviderProps) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [pushToken, setPushTokenState]    = useState<string | null>(null);
   const initialized = useRef(false);
 
-  // Load from storage
+  // Load notifications + push token from storage
   useEffect(() => {
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
-        const lastOpenRaw = await AsyncStorage.getItem(LAST_OPEN_KEY);
+        const [raw, lastOpenRaw, savedToken] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY),
+          AsyncStorage.getItem(LAST_OPEN_KEY),
+          AsyncStorage.getItem(PUSH_TOKEN_KEY),
+        ]);
+
         const lastOpen = lastOpenRaw ? parseInt(lastOpenRaw, 10) : 0;
         const now = Date.now();
+
+        if (savedToken) setPushTokenState(savedToken);
 
         let saved: AppNotification[] = raw ? JSON.parse(raw) : [];
 
         if (saved.length === 0) {
-          // First time — seed with welcome notifications
           const seeded = SEED_NOTIFICATIONS.map((n, i) => ({
             ...n,
             id: `seed_${i}_${now}`,
@@ -193,7 +203,6 @@ export function NotificationProvider({
           }));
           saved = seeded;
         } else if (lastOpen > 0) {
-          // Returning player — add contextual notifications
           const returning = buildReturningNotifications(
             lastOpen, canClaimWheel, canClaimDaily, pendingAchievements, streakDays,
           );
@@ -204,10 +213,9 @@ export function NotificationProvider({
             read: false,
             dismissed: false,
           }));
-          // Avoid duplicates by title
           const existingTitles = new Set(saved.map(s => s.title));
           const fresh = newNotifs.filter(n => !existingTitles.has(n.title));
-          saved = [...fresh, ...saved].slice(0, 80); // cap at 80
+          saved = [...fresh, ...saved].slice(0, 80);
         }
 
         // Prune dismissed older than 7 days
@@ -258,17 +266,28 @@ export function NotificationProvider({
     setNotifications(prev => prev.filter(n => !n.read));
   }, []);
 
+  const setPushToken = useCallback((token: string | null) => {
+    setPushTokenState(token);
+    if (token) {
+      AsyncStorage.setItem(PUSH_TOKEN_KEY, token).catch(() => {});
+    } else {
+      AsyncStorage.removeItem(PUSH_TOKEN_KEY).catch(() => {});
+    }
+  }, []);
+
   const unreadCount = notifications.filter(n => !n.read && !n.dismissed).length;
 
   return (
     <NotifContext.Provider value={{
       notifications: notifications.filter(n => !n.dismissed),
       unreadCount,
+      pushToken,
       addNotification,
       markRead,
       markAllRead,
       dismiss,
       clearAllRead,
+      setPushToken,
     }}>
       {children}
     </NotifContext.Provider>

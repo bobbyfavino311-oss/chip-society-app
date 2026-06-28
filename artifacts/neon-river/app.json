@@ -1,22 +1,28 @@
 {
   "expo": {
-    "name": "CHIP SOCIETY",
-    "slug": "neon-river",
+    "name": "Chip Society",
+    "slug": "chip-society",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "neon-river",
+    "scheme": "chip-society",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/images/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#050010"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.chipsociety.app",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
     },
-    "android": {},
+    "android": {
+      "package": "com.chipsociety.app"
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
@@ -28,7 +34,14 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#050010"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

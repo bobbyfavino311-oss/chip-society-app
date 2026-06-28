@@ -10,13 +10,29 @@ import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
 import { Asset } from 'expo-asset';
+import * as Notifications from 'expo-notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+// ─── Foreground notification handler (must be set at module level) ─────────────
+// Shows banner + plays sound + sets badge when a push arrives while app is open.
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 import AVATAR_IMAGES from '@/constants/avatarImages';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -29,7 +45,7 @@ import { SocialProvider } from '@/context/SocialContext';
 import { AISocialProvider } from '@/context/AISocialContext';
 import { LiveFeedProvider } from '@/context/LiveFeedContext';
 import { MultiplayerProvider } from '@/context/MultiplayerContext';
-import { NotificationProvider } from '@/context/NotificationContext';
+import { NotificationProvider, useNotifications } from '@/context/NotificationContext';
 import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
 import TutorialOverlay from '@/components/TutorialOverlay';
@@ -57,6 +73,81 @@ function SoundSyncer() {
   React.useEffect(() => {
     MusicEngine.configure({ volume: musicVolume, muted: isMusicMuted });
   }, [musicVolume, isMusicMuted]);
+  return null;
+}
+
+// ─── Push notification setup ──────────────────────────────────────────────────
+// Requests permission, registers the Expo push token, and wires up listeners
+// for foreground notifications and user taps on notification banners.
+
+function PushSetup() {
+  const { addNotification, setPushToken } = useNotifications();
+  const notifListener = useRef<Notifications.EventSubscription | null>(null);
+  const responseListener = useRef<Notifications.EventSubscription | null>(null);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        // Cast through `unknown` — PermissionResponse.granted is real at runtime but
+        // the base type from 'expo' doesn't resolve in this project's module setup.
+        const existing  = await Notifications.getPermissionsAsync()  as unknown as { granted: boolean };
+        let granted     = existing.granted;
+
+        if (!granted) {
+          const requested = await Notifications.requestPermissionsAsync() as unknown as { granted: boolean };
+          granted = requested.granted;
+        }
+
+        if (!granted || cancelled) return;
+
+        // Get Expo push token — works on physical devices; silently fails on simulators
+        const tokenData = await Notifications.getExpoPushTokenAsync({
+          projectId: 'chip-society',
+        }).catch(() => null);
+
+        if (tokenData && !cancelled) {
+          setPushToken(tokenData.data);
+        }
+      } catch {
+        // Non-fatal — push is a nice-to-have, not a launch blocker
+      }
+    })();
+
+    // Listener: push arrives while the app is in the foreground → add to in-app center
+    notifListener.current = Notifications.addNotificationReceivedListener(notification => {
+      const { title, body, data } = notification.request.content;
+      if (!title) return;
+      addNotification({
+        category: (data?.category as any) ?? 'system',
+        priority:  (data?.priority as any) ?? 'medium',
+        title:     title,
+        message:   body ?? '',
+        actionRoute:  data?.actionRoute as string | undefined,
+        actionLabel:  data?.actionLabel as string | undefined,
+        icon:      (data?.icon as string) ?? 'notifications',
+        iconColor: (data?.iconColor as string) ?? '#00d4ff',
+      });
+    });
+
+    // Listener: user taps a push notification → navigate to the action route
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+      if (data?.actionRoute && typeof data.actionRoute === 'string') {
+        router.push(data.actionRoute as any);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      notifListener.current?.remove();
+      responseListener.current?.remove();
+    };
+  }, []);
+
   return null;
 }
 
@@ -142,6 +233,7 @@ function RootLayoutNav() {
   return (
     <>
       <SoundSyncer />
+      <PushSetup />
       <GateController />
       <AchievementPopupRenderer />
       <BonusNotificationRenderer />

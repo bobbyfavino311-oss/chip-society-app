@@ -63,6 +63,7 @@
     "@expo-google-fonts/righteous": "^0.4.1",
     "expo-asset": "^56.0.17",
     "expo-av": "~15.0.2",
+    "expo-notifications": "^56.0.18",
     "socket.io-client": "4.8.1"
   }
 }
