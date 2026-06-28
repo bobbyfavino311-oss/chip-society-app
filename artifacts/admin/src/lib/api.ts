@@ -1,4 +1,4 @@
-const BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? '/api';
+const BASE = '/api';
 
 export function adminHeaders(): Record<string, string> {
   const key = localStorage.getItem('admin_key') ?? '';
