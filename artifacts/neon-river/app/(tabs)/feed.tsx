@@ -918,40 +918,43 @@ const ach = StyleSheet.create({
 
 type Announcement = { id: string; title: string; body: string; postedBy: string; createdAt: string };
 
-const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
-  {
-    id: 'ann1',
-    title: '🎉 Welcome to Chip Society!',
-    body: 'The neon tables are open. Jump into AI Practice mode to sharpen your game, build your stack, and climb the leaderboard. Multiplayer rooms are coming next — stay tuned.',
-    postedBy: 'Dev Team',
-    createdAt: new Date('2026-06-28').toISOString(),
-  },
-  {
-    id: 'ann2',
-    title: '🛒 Chip Shop is Now Live!',
-    body: 'Head to the Profile tab to stock up on virtual chips. Six bundles available — from 100K all the way to 50M. Keep your seat at the table.',
-    postedBy: 'Dev Team',
-    createdAt: new Date('2026-06-28').toISOString(),
-  },
-];
-
 function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
   const [posts, setPosts] = useState<Announcement[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchAnnouncements = useCallback(() => {
     const base = process.env.EXPO_PUBLIC_API_URL
       ?? 'https://api-server-production-bbc2.up.railway.app/api';
     fetch(`${base}/announcements`)
       .then(r => r.ok ? (r.json() as Promise<{ announcements: Announcement[] }>) : Promise.resolve({ announcements: [] }))
-      .then(d => {
-        setPosts(d.announcements.length > 0 ? d.announcements : FALLBACK_ANNOUNCEMENTS);
-      })
-      .catch(() => setPosts(FALLBACK_ANNOUNCEMENTS))
-      .finally(() => setLoaded(true));
+      .then(d => setPosts(d.announcements))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const displayPosts = loaded ? posts : FALLBACK_ANNOUNCEMENTS;
+  useEffect(() => {
+    fetchAnnouncements();
+    const interval = setInterval(fetchAnnouncements, 30_000);
+    return () => clearInterval(interval);
+  }, [fetchAnnouncements]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 }}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60, gap: 8 }}>
+        <Ionicons name="megaphone-outline" size={32} color={colors.textDim} />
+        <Text style={{ color: colors.textDim, fontSize: 14 }}>No announcements yet</Text>
+        <Text style={{ color: colors.textDim, fontSize: 12, opacity: 0.6 }}>Check back soon</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomInset + 100, paddingTop: 4 }}>
@@ -960,7 +963,7 @@ function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
           <Ionicons name="megaphone" size={13} color={colors.primary} />
           <Text style={[lb.sectionTitle, { marginBottom: 0 }]}>PINNED FROM DEV TEAM</Text>
         </View>
-        {displayPosts.map(a => (
+        {posts.map(a => (
           <View key={a.id} style={ann.card}>
             <LinearGradient colors={['#1a0035', '#060014']} style={StyleSheet.absoluteFill} />
             <View style={ann.pinnedBadge}>
