@@ -1,4 +1,4 @@
-const BASE = '/api';
+const BASE = 'https://api-server-production-bbc2.up.railway.app/api';
 
 export function adminHeaders(): Record<string, string> {
   const key = localStorage.getItem('admin_key') ?? '';
