@@ -1,4 +1,4 @@
-const BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? 'https://api-server-production-bbc2.up.railway.app/api';
+const BASE = '/api';
 
 export function adminHeaders(): Record<string, string> {
   const key = localStorage.getItem('admin_key') ?? '';
