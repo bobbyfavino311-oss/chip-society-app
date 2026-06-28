@@ -23,7 +23,7 @@ import { type StakeTier } from '@/lib/stakeConfig';
 
 // ─── Testing mode ─────────────────────────────────────────────────────────────
 // Flip TESTING_MODE to false to restore six-deck production shoe.
-const TESTING_MODE    = true;
+const TESTING_MODE    = false;
 const TEST_DECKS      = TESTING_MODE ? 1 : 5;
 const TEST_SHOE_TOTAL = TEST_DECKS * 52;          // 52 (testing) or 312
 const TEST_RESHUFFLE  = TEST_SHOE_TOTAL - 10;     // reshuffle when ≤10 remain
@@ -753,7 +753,6 @@ export default function BlackjackScreen() {
         {/* Center title */}
         <View style={s.titleBlock}>
           <Text style={s.titleText}>BLACKJACK</Text>
-          <Text style={s.subtitleText}>{TESTING_MODE ? 'SINGLE DECK · TEST MODE' : 'FIVE DECK SHOE'}</Text>
         </View>
 
         {/* Right: shoe indicator only */}
