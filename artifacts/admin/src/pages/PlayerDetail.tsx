@@ -381,6 +381,7 @@ export default function PlayerDetail() {
   const [showSuspend, setShowSuspend] = useState(false);
   const [showBan, setShowBan] = useState(false);
   const [founderLoading, setFounderLoading] = useState(false);
+  const [founderError, setFounderError]     = useState('');
   const [unwarnLoading, setUnwarnLoading]   = useState(false);
   const [unwarnError, setUnwarnError]       = useState('');
 
@@ -391,10 +392,9 @@ export default function PlayerDetail() {
         setData(playerData);
         return api.moderationHistory().then(modData => {
           setModHistory((modData.actions ?? []).filter((a: any) => a.playerId === id));
-        }).catch(() => {
-          setModHistory([]);
-        });
+        }).catch(() => setModHistory([]));
       })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }
 
@@ -417,7 +417,12 @@ export default function PlayerDetail() {
     setUnwarnLoading(true);
     try {
       await api.unwarn(id);
-      load();
+      // Optimistic update — clear warning immediately in UI
+      setData((prev: any) => prev ? {
+        ...prev,
+        player: { ...prev.player, status: 'active', banReason: null },
+      } : prev);
+      load(); // background full refresh
     } catch (e: any) {
       setUnwarnError(e.message ?? 'Failed to clear warning');
     } finally {
@@ -427,9 +432,25 @@ export default function PlayerDetail() {
 
   async function handleToggleFounder() {
     const current = !!(data?.player?.profileJson?.isFounder);
+    const next = !current;
+    setFounderError('');
     setFounderLoading(true);
-    try { await api.toggleFounder(id, !current); load(); } catch { /* ignore */ }
-    finally { setFounderLoading(false); }
+    try {
+      await api.toggleFounder(id, next);
+      // Optimistic update — flip founder badge immediately in UI
+      setData((prev: any) => prev ? {
+        ...prev,
+        player: {
+          ...prev.player,
+          profileJson: { ...(prev.player.profileJson ?? {}), isFounder: next },
+        },
+      } : prev);
+      load(); // background full refresh
+    } catch (e: any) {
+      setFounderError(e.message ?? 'Failed to update founder status');
+    } finally {
+      setFounderLoading(false);
+    }
   }
 
   return (
@@ -454,17 +475,20 @@ export default function PlayerDetail() {
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={handleToggleFounder}
-            disabled={founderLoading}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-md border text-xs font-semibold transition-colors disabled:opacity-50 ${
-              profile.isFounder
-                ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/30'
-                : 'bg-muted border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            👑 {profile.isFounder ? 'Remove Founder' : 'Grant Founder'}
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              onClick={handleToggleFounder}
+              disabled={founderLoading}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-md border text-xs font-semibold transition-colors disabled:opacity-50 ${
+                profile.isFounder
+                  ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/30'
+                  : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              👑 {founderLoading ? 'Saving…' : profile.isFounder ? 'Remove Founder' : 'Grant Founder'}
+            </button>
+            {founderError && <p className="text-[10px] text-destructive">{founderError}</p>}
+          </div>
           <button onClick={() => setShowBonus(true)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-400 text-xs font-semibold hover:bg-amber-500/25 transition-colors">
             <Gift size={12} />Casino Bonus
