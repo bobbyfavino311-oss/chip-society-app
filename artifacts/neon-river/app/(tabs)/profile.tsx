@@ -556,6 +556,21 @@ export default function ProfileScreen() {
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
         </View>
 
+        {/* Buy chips — navigates to the Chip Shop */}
+        <TouchableOpacity
+          style={styles.buyChipsBtn}
+          activeOpacity={0.8}
+          onPress={() => router.push('/chip-shop' as any)}
+        >
+          <LinearGradient
+            colors={['#00d4ff22', '#00d4ff11']}
+            style={styles.buyChipsBtnGrad}
+          >
+            <Text style={styles.buyChipsIcon}>💎</Text>
+            <Text style={styles.buyChipsTxt}>BUY CHIPS</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
         {/* Dev: add chips for testing */}
         <TouchableOpacity
           style={devStyles.addChipsBtn}
@@ -1090,6 +1105,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
   },
   chipLabel: { color: colors.textMuted, fontSize: 10, letterSpacing: 2, fontWeight: '600' },
+  buyChipsBtn: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginTop: 12,
+    width: 200,
+  },
+  buyChipsBtnGrad: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0,212,255,0.4)',
+  },
+  buyChipsIcon: { fontSize: 16 },
+  buyChipsTxt: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 12,
+    color: '#00d4ff',
+    letterSpacing: 2,
+  },
   streakNum: { color: colors.text, fontSize: 18, fontWeight: '700' },
   streakSub: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
   avatarPickerWrap: {

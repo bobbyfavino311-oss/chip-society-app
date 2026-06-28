@@ -53,8 +53,16 @@ import BonusNotificationModal from '@/components/BonusNotificationModal';
 import ModerationModal from '@/components/ModerationModal';
 import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
+import { initializeRevenueCat, SubscriptionProvider } from '@/lib/revenuecat';
+import { Alert } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
+
+try {
+  initializeRevenueCat();
+} catch (err: any) {
+  Alert.alert('Store Unavailable', err?.message ?? 'Could not load the chip shop.');
+}
 
 const queryClient = new QueryClient();
 
@@ -285,6 +293,10 @@ function RootLayoutNav() {
           name="multiplayer/game"
           options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
         />
+        <Stack.Screen
+          name="chip-shop"
+          options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }}
+        />
       </Stack>
     </>
   );
@@ -336,6 +348,7 @@ export default function RootLayout() {
         <ThemeProvider>
           <TableThemeProvider>
           <QueryClientProvider client={queryClient}>
+            <SubscriptionProvider>
             <UserProvider>
               <TermsProvider>
                 <SoundProvider>
@@ -359,6 +372,7 @@ export default function RootLayout() {
                 </SoundProvider>
               </TermsProvider>
             </UserProvider>
+            </SubscriptionProvider>
           </QueryClientProvider>
           </TableThemeProvider>
         </ThemeProvider>

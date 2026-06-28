@@ -13,5 +13,8 @@
     "prettier": "^3.8.1",
     "sharp": "^0.34.5",
     "typescript": "~5.9.2"
+  },
+  "dependencies": {
+    "@replit/revenuecat-sdk": "^4.2.0"
   }
 }
