@@ -324,6 +324,22 @@ router.post('/admin/players/:id/unban', async (req, res) => {
   } catch (e) { req.log.error(e, 'admin/unban error'); res.status(500).json({ error: 'Server error' }); }
 });
 
+// ── POST /api/admin/players/:id/unwarn ───────────────────────────────────────
+router.post('/admin/players/:id/unwarn', async (req, res) => {
+  try {
+    const pid = req.params['id']!;
+    await db.update(playersTable)
+      .set({ status: 'active', banReason: null, updatedAt: new Date() })
+      .where(eq(playersTable.playerId, pid));
+
+    const actionId = randomUUID();
+    await db.insert(moderationActionsTable).values({ id: actionId, playerId: pid, adminId: 'admin', type: 'unban', reason: 'Warning cleared by admin', message: null });
+    emitToPlayer(pid, 'player_unbanned', { timestamp: new Date().toISOString() });
+    req.log.info({ playerId: pid }, 'player warning cleared');
+    res.json({ success: true });
+  } catch (e) { req.log.error(e, 'admin/unwarn error'); res.status(500).json({ error: 'Server error' }); }
+});
+
 // ── GET /api/admin/moderation ─────────────────────────────────────────────────
 router.get('/admin/moderation', async (req, res) => {
   try {

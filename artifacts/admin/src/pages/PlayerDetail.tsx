@@ -410,6 +410,10 @@ export default function PlayerDetail() {
     try { await api.unban(id); load(); } catch { /* ignore */ }
   }
 
+  async function handleUnwarn() {
+    try { await api.unwarn(id); load(); } catch { /* ignore */ }
+  }
+
   async function handleToggleFounder() {
     const current = !!(data?.player?.profileJson?.isFounder);
     setFounderLoading(true);
@@ -466,17 +470,23 @@ export default function PlayerDetail() {
             className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold hover:bg-orange-500/20 transition-colors">
             <ShieldBan size={12} />Suspend
           </button>
-          {!isSanctioned ? (
+          {player.status === 'warned' && (
+            <button onClick={handleUnwarn}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs font-semibold hover:bg-yellow-500/20 transition-colors">
+              <ShieldCheck size={12} />Clear Warning
+            </button>
+          )}
+          {player.status !== 'warned' && !isSanctioned ? (
             <button onClick={() => setShowBan(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-destructive/10 border border-destructive/30 text-destructive text-xs font-semibold hover:bg-destructive/20 transition-colors">
               <ShieldX size={12} />Ban
             </button>
-          ) : (
+          ) : player.status !== 'warned' ? (
             <button onClick={handleUnban}
               className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-colors">
               <ShieldCheck size={12} />Restore
             </button>
-          )}
+          ) : null}
         </div>
       </div>
 

@@ -29,6 +29,7 @@ export const api = {
   suspend:           (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/suspend`, b),
   ban:               (id: string, b: any)          => req<any>('POST', `/admin/players/${id}/ban`, b),
   unban:             (id: string)                  => req<any>('POST', `/admin/players/${id}/unban`, {}),
+  unwarn:            (id: string)                  => req<any>('POST', `/admin/players/${id}/unwarn`, {}),
   moderationHistory: ()                            => req<any>('GET',  '/admin/moderation'),
   reports:           (status?: string)             => req<any>('GET',  `/admin/reports?status=${status??'open'}`),
   resolveReport:     (id: string, b: any)          => req<any>('PUT',  `/admin/reports/${id}`, b),

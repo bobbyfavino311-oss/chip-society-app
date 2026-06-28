@@ -93,7 +93,14 @@ export default function Players() {
             ) : players.map((p, i) => (
               <tr key={p.playerId} className={`hover:bg-muted/40 transition-colors ${i < players.length - 1 ? 'border-b border-border/60' : ''}`}>
                 <td className="px-5 py-3.5">
-                  <div className="font-semibold text-foreground">{p.username}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-foreground">{p.username}</span>
+                    {p.profileJson?.isFounder && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide bg-yellow-500/15 border border-yellow-500/30 text-yellow-300">
+                        👑 FOUNDER
+                      </span>
+                    )}
+                  </div>
                   {p.email && <div className="text-xs text-muted-foreground mt-0.5">{p.email}</div>}
                 </td>
                 <td className="px-4 py-3.5 font-mono text-sm text-foreground">{formatChips(p)}</td>
