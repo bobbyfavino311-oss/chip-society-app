@@ -1,6 +1,5 @@
 // ─── Avatar Select — Premium Collectible Badge Gallery ────────────────────────
-// Luxury casino collectible feel. Miami nightlife 1980s aesthetic.
-// No rarity labels — avatars displayed as a clean unified collection.
+// First 9 free. Rest unlock by level. Small lock icon in corner; tap to see requirement.
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -9,6 +8,7 @@ import {
   Animated,
   Dimensions,
   FlatList,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -35,7 +35,6 @@ const USABLE = Math.min(SCREEN_W, 420) - H_PAD * 2;
 const SLOT_W = Math.floor(USABLE / COLS);
 const AV_SIZE = Math.min(SLOT_W - 20, 90);
 
-// Total avatar count — updates automatically as avatars are added
 const TOTAL_AVATARS = NEON_AVATARS.length;
 
 export default function AvatarSelectScreen() {
@@ -46,26 +45,33 @@ export default function AvatarSelectScreen() {
     ? profile.symbolIndex
     : 1;
 
-  const [previewId, setPreviewId]       = useState<number>(currentId);
-  const [justEquipped, setJustEquipped] = useState(false);
+  const [previewId, setPreviewId]         = useState<number>(currentId);
+  const [justEquipped, setJustEquipped]   = useState(false);
+  const [lockedModal, setLockedModal]     = useState<NeonAvatarData | null>(null);
 
   const previewScale = useRef(new Animated.Value(1)).current;
 
-  const preview    = getNeonAvatar(previewId) as NeonAvatarData;
-  const unlocked   = isNeonAvatarUnlocked(preview, profile.xp);
-  const isEquipped = profile.profileImageType === 'symbol'
+  const playerLevel = profile.level ?? 1;
+  const preview     = getNeonAvatar(previewId) as NeonAvatarData;
+  const unlocked    = isNeonAvatarUnlocked(preview, profile.xp, playerLevel);
+  const isEquipped  = profile.profileImageType === 'symbol'
     && (profile.symbolIndex ?? 0) === previewId;
   const accentColor = preview.color;
 
   function pulse() {
     Animated.sequence([
       Animated.timing(previewScale, { toValue: 0.93, duration: 70, useNativeDriver: true }),
-      Animated.spring(previewScale, { toValue: 1, friction: 4,    useNativeDriver: true }),
+      Animated.spring(previewScale, { toValue: 1, friction: 4, useNativeDriver: true }),
     ]).start();
   }
 
   function handleSelect(av: NeonAvatarData) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const avUnlocked = isNeonAvatarUnlocked(av, profile.xp, playerLevel);
+    if (!avUnlocked) {
+      setLockedModal(av);
+      return;
+    }
     setPreviewId(av.id);
     pulse();
   }
@@ -78,9 +84,9 @@ export default function AvatarSelectScreen() {
     setTimeout(() => setJustEquipped(false), 1600);
   }
 
-  // ── Grid cell ─────────────────────────────────────────────────────────────
+  // ── Grid cell ──────────────────────────────────────────────────────────────
   function renderBadge({ item }: { item: NeonAvatarData }) {
-    const avLocked  = !isNeonAvatarUnlocked(item, profile.xp);
+    const avLocked  = !isNeonAvatarUnlocked(item, profile.xp, playerLevel);
     const ac        = item.color;
     const selected  = previewId === item.id;
     const equipped  = profile.profileImageType === 'symbol'
@@ -90,9 +96,9 @@ export default function AvatarSelectScreen() {
       <TouchableOpacity
         style={[s.cell, { width: SLOT_W }]}
         onPress={() => handleSelect(item)}
-        activeOpacity={0.75}
+        activeOpacity={avLocked ? 0.9 : 0.75}
       >
-        {/* Selection ring — visible when selected */}
+        {/* Selection ring */}
         <View style={[s.selectionRing, {
           width:  AV_SIZE + 8,
           height: AV_SIZE + 8,
@@ -106,6 +112,11 @@ export default function AvatarSelectScreen() {
 
         {/* Avatar + status badge */}
         <View style={{ position: 'relative', width: AV_SIZE, height: AV_SIZE }}>
+          {/* Dim overlay for locked */}
+          {avLocked && (
+            <View style={[StyleSheet.absoluteFill, s.lockedOverlay, { borderRadius: AV_SIZE / 2 }]} />
+          )}
+
           <NeonAvatarView
             avatarId={item.id}
             size={AV_SIZE}
@@ -113,31 +124,23 @@ export default function AvatarSelectScreen() {
             isEquipped={equipped}
           />
 
-          {/* Equipped indicator — gold check */}
+          {/* Equipped — gold check */}
           {equipped && (
-            <View style={[s.statusBadge, {
-              backgroundColor: '#ffd700',
-              borderColor: '#000',
-              bottom: 1, right: 1,
-            }]}>
+            <View style={[s.statusBadge, { backgroundColor: '#ffd700', borderColor: '#000', bottom: 1, right: 1 }]}>
               <Ionicons name="checkmark" size={8} color="#000" />
             </View>
           )}
 
-          {/* Locked indicator */}
+          {/* Locked — small lock icon in corner */}
           {avLocked && !equipped && (
-            <View style={[s.statusBadge, {
-              backgroundColor: '#0d0d22',
-              borderColor: '#222244',
-              bottom: 1, right: 1,
-            }]}>
-              <Ionicons name="lock-closed" size={7} color="#44446a" />
+            <View style={[s.statusBadge, { backgroundColor: 'rgba(5,0,16,0.88)', borderColor: 'rgba(255,255,255,0.15)', bottom: 1, right: 1 }]}>
+              <Ionicons name="lock-closed" size={7} color="rgba(255,255,255,0.55)" />
             </View>
           )}
         </View>
 
         <Text
-          style={[s.badgeName, { color: selected ? ac : '#3a3a60' }]}
+          style={[s.badgeName, { color: avLocked ? '#28284a' : selected ? ac : '#3a3a60' }]}
           numberOfLines={1}
         >
           {item.name}
@@ -149,13 +152,11 @@ export default function AvatarSelectScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: '#050010' }}>
 
-      {/* Deep Miami night gradient */}
       <LinearGradient
         colors={['#0a001f', '#050010', '#010008']}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Accent radial glow behind hero */}
       <LinearGradient
         colors={[accentColor + '1a', 'transparent']}
         style={[StyleSheet.absoluteFill, { height: 220 }]}
@@ -163,7 +164,7 @@ export default function AvatarSelectScreen() {
         end={{ x: 0.5, y: 1 }}
       />
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
+      {/* Header */}
       <View style={[s.header, { paddingTop: insets.top + 6 }]}>
         <TouchableOpacity style={s.backBtn} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={22} color={colors.primary} />
@@ -184,7 +185,6 @@ export default function AvatarSelectScreen() {
           <Animated.View
             style={[s.hero, { transform: [{ scale: previewScale }] }]}
           >
-            {/* Avatar with double ring */}
             <View style={s.heroAvatarWrap}>
               <View style={[s.heroGlowRing, {
                 width: 112, height: 112, borderRadius: 56,
@@ -203,9 +203,15 @@ export default function AvatarSelectScreen() {
               />
             </View>
 
-            {/* Info panel */}
             <View style={s.heroInfo}>
               <Text style={s.heroName}>{preview.name}</Text>
+
+              {!unlocked && (
+                <View style={s.levelBadge}>
+                  <Ionicons name="lock-closed" size={10} color="rgba(255,255,255,0.4)" />
+                  <Text style={s.levelBadgeText}>{preview.unlockCondition}</Text>
+                </View>
+              )}
 
               <TouchableOpacity
                 style={[s.equipBtn, {
@@ -219,11 +225,9 @@ export default function AvatarSelectScreen() {
                 disabled={!unlocked || isEquipped}
                 activeOpacity={0.7}
               >
-                <Text style={[s.equipBtnText, {
-                  color: unlocked ? accentColor : '#22225a',
-                }]}>
+                <Text style={[s.equipBtnText, { color: unlocked ? accentColor : '#22225a' }]}>
                   {!unlocked
-                    ? `LOCKED  —  ${(preview.unlockXP - profile.xp).toLocaleString()} XP`
+                    ? `LOCKED — ${preview.unlockCondition.toUpperCase()}`
                     : isEquipped   ? '✓  EQUIPPED'
                     : justEquipped ? '✓  EQUIPPED!'
                     : 'EQUIP'}
@@ -235,12 +239,53 @@ export default function AvatarSelectScreen() {
         renderItem={renderBadge}
         contentContainerStyle={[s.grid, { paddingBottom: insets.bottom + 32 }]}
       />
+
+      {/* Locked avatar tap → info modal */}
+      <Modal
+        visible={!!lockedModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLockedModal(null)}
+      >
+        <TouchableOpacity
+          style={s.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setLockedModal(null)}
+        >
+          <View style={s.modalCard}>
+            <LinearGradient
+              colors={['#12002a', '#050010']}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={[s.modalLockIcon, { borderColor: lockedModal ? lockedModal.color + '55' : '#333' }]}>
+              <Ionicons name="lock-closed" size={28} color={lockedModal?.color ?? colors.primary} />
+            </View>
+            <Text style={s.modalAvatarName}>{lockedModal?.name}</Text>
+            <Text style={s.modalRequirement}>{lockedModal?.unlockCondition}</Text>
+            <Text style={s.modalCurrentLevel}>
+              YOUR LEVEL: <Text style={{ color: colors.primary }}>{playerLevel}</Text>
+              {lockedModal && lockedModal.unlockLevel > 0 && (
+                <>
+                  {'  '}·{'  '}
+                  <Text style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {lockedModal.unlockLevel - playerLevel} LEVELS TO GO
+                  </Text>
+                </>
+              )}
+            </Text>
+            <Text style={s.modalHint}>Keep playing to earn XP and level up!</Text>
+            <TouchableOpacity style={s.modalBtn} onPress={() => setLockedModal(null)}>
+              <Text style={s.modalBtnText}>GOT IT</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  // ── Header ────────────────────────────────────────────────────────────────
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -268,14 +313,13 @@ const s = StyleSheet.create({
     marginTop: 2,
   },
 
-  // ── Hero ──────────────────────────────────────────────────────────────────
   hero: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 18,
     paddingVertical: 14,
     gap: 16,
-    minHeight: 122,
+    minHeight: 130,
   },
   heroAvatarWrap: {
     position: 'relative',
@@ -295,7 +339,7 @@ const s = StyleSheet.create({
   },
   heroInfo: {
     flex: 1,
-    gap: 10,
+    gap: 8,
   },
   heroName: {
     fontFamily: 'Orbitron_700Bold',
@@ -303,6 +347,17 @@ const s = StyleSheet.create({
     color: '#ffffff',
     letterSpacing: 1,
     lineHeight: 19,
+  },
+  levelBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  levelBadgeText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.35)',
+    letterSpacing: 0.3,
   },
   equipBtn: {
     paddingVertical: 8,
@@ -317,7 +372,6 @@ const s = StyleSheet.create({
     letterSpacing: 1.5,
   },
 
-  // ── Grid ──────────────────────────────────────────────────────────────────
   grid: {
     paddingHorizontal: H_PAD,
     paddingTop: 8,
@@ -335,11 +389,17 @@ const s = StyleSheet.create({
     borderWidth: 1.5,
     shadowOffset: { width: 0, height: 0 },
   },
+  lockedOverlay: {
+    position: 'absolute',
+    backgroundColor: 'rgba(5,0,16,0.55)',
+    zIndex: 1,
+  },
   statusBadge: {
     position: 'absolute',
     width: 15, height: 15, borderRadius: 7.5,
     borderWidth: 1.5,
     alignItems: 'center', justifyContent: 'center',
+    zIndex: 2,
   },
   badgeName: {
     fontFamily: 'Orbitron_700Bold',
@@ -348,5 +408,78 @@ const s = StyleSheet.create({
     marginTop: 7,
     textAlign: 'center',
     width: SLOT_W - 8,
+  },
+
+  // Locked modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 300,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 24,
+    gap: 10,
+  },
+  modalLockIcon: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1.5,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 4,
+  },
+  modalAvatarName: {
+    fontFamily: 'Orbitron_900Black',
+    fontSize: 16,
+    color: '#fff',
+    letterSpacing: 2,
+    textAlign: 'center',
+  },
+  modalRequirement: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 12,
+    color: colors.primary,
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  modalCurrentLevel: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.35)',
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  modalHint: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.25)',
+    textAlign: 'center',
+    lineHeight: 16,
+    marginTop: 2,
+  },
+  modalBtn: {
+    marginTop: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 28,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: 'rgba(0,212,255,0.4)',
+    backgroundColor: 'rgba(0,212,255,0.07)',
+  },
+  modalBtnText: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 11,
+    color: colors.primary,
+    letterSpacing: 2,
   },
 });

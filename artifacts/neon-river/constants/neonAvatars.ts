@@ -1,6 +1,5 @@
 // ─── CHIP SOCIETY — Collectible Scene Avatars ────────────────────────────────
-// IDs 1-15: original set  |  IDs 16-30: premium vaporwave expansion
-// IDs 54-71: face card collection + specials
+// IDs 1-9: free from the start  |  all others unlock by level
 
 export type NeonRarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
 
@@ -8,7 +7,7 @@ export interface NeonAvatar {
   id: number;
   name: string;
   rarity: NeonRarity;
-  unlockXP: number;
+  unlockLevel: number;   // 0 = free; >0 = level required
   unlockCondition: string;
   color: string;
   bgColor: string;
@@ -33,108 +32,88 @@ export const NEON_RARITY_BORDER: Record<NeonRarity, number> = {
 };
 
 export const NEON_AVATARS: NeonAvatar[] = [
-  // ── COMMON (1–4) — unlocked from the start ───────────────────────────────────
-  { id: 1,  name: 'MARTINI',        rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#00d4ff', bgColor: '#001822' },
-  { id: 2,  name: 'PALM',           rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff0090', bgColor: '#1a0012' },
-  { id: 3,  name: 'DICE',           rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#8b5cf6', bgColor: '#0e0018' },
-  { id: 4,  name: 'CASSETTE',       rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#00d4ff', bgColor: '#001822' },
-  // ── RARE (5–9) ────────────────────────────────────────────────────────────────
-  { id: 5,  name: 'SATURN',         rarity: 'RARE',      unlockXP: 5000,   unlockCondition: 'Reach 5,000 XP',   color: '#a855f7', bgColor: '#0f001e' },
-  { id: 6,  name: 'VINYL',          rarity: 'RARE',      unlockXP: 10000,  unlockCondition: 'Reach 10,000 XP',  color: '#ff1a6e', bgColor: '#1a000e' },
-  { id: 7,  name: 'CHERRY',         rarity: 'RARE',      unlockXP: 16000,  unlockCondition: 'Reach 16,000 XP',  color: '#ff3344', bgColor: '#1a0008' },
-  { id: 8,  name: 'FLAMINGO',       rarity: 'RARE',      unlockXP: 22000,  unlockCondition: 'Reach 22,000 XP',  color: '#ff69b4', bgColor: '#1a000f' },
-  { id: 9,  name: 'SUNSET',         rarity: 'RARE',      unlockXP: 30000,  unlockCondition: 'Reach 30,000 XP',  color: '#ff6b35', bgColor: '#1a0600' },
-  // ── EPIC (10–13) ──────────────────────────────────────────────────────────────
-  { id: 10, name: 'ACE',            rarity: 'EPIC',      unlockXP: 50000,  unlockCondition: 'Reach 50,000 XP',  color: '#ffd700', bgColor: '#1a1100' },
-  { id: 11, name: 'HOURGLASS',      rarity: 'EPIC',      unlockXP: 70000,  unlockCondition: 'Reach 70,000 XP',  color: '#bf5fff', bgColor: '#120020' },
-  { id: 12, name: 'DRAGON',         rarity: 'EPIC',      unlockXP: 100000, unlockCondition: 'Reach 100,000 XP', color: '#00ff88', bgColor: '#001a0a' },
-  { id: 13, name: 'CHIP',           rarity: 'EPIC',      unlockXP: 130000, unlockCondition: 'Reach 130,000 XP', color: '#bf5fff', bgColor: '#120020' },
-  // ── LEGENDARY (14–15) ─────────────────────────────────────────────────────────
-  { id: 14, name: 'CHAMPAGNE',      rarity: 'LEGENDARY', unlockXP: 200000, unlockCondition: 'Reach 200,000 XP', color: '#ffaa00', bgColor: '#1a0d00' },
-  { id: 15, name: 'MOON',           rarity: 'LEGENDARY', unlockXP: 300000, unlockCondition: 'Reach 300,000 XP', color: '#a855f7', bgColor: '#0f001e' },
+  // ── FREE STARTERS (1–9) — first 9 always unlocked ────────────────────────
+  { id: 1,  name: 'MARTINI',        rarity: 'COMMON',    unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#00d4ff', bgColor: '#001822' },
+  { id: 2,  name: 'PALM',           rarity: 'COMMON',    unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#ff0090', bgColor: '#1a0012' },
+  { id: 3,  name: 'DICE',           rarity: 'COMMON',    unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#8b5cf6', bgColor: '#0e0018' },
+  { id: 4,  name: 'CASSETTE',       rarity: 'COMMON',    unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#00d4ff', bgColor: '#001822' },
+  { id: 5,  name: 'SATURN',         rarity: 'RARE',      unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#a855f7', bgColor: '#0f001e' },
+  { id: 6,  name: 'VINYL',          rarity: 'RARE',      unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#ff1a6e', bgColor: '#1a000e' },
+  { id: 7,  name: 'CHERRY',         rarity: 'RARE',      unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#ff3344', bgColor: '#1a0008' },
+  { id: 8,  name: 'FLAMINGO',       rarity: 'RARE',      unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#ff69b4', bgColor: '#1a000f' },
+  { id: 9,  name: 'SUNSET',         rarity: 'RARE',      unlockLevel: 0,   unlockCondition: 'Free starter avatar',     color: '#ff6b35', bgColor: '#1a0600' },
 
-  // ── COMMON expansion (16–18) ──────────────────────────────────────────────────
-  { id: 16, name: 'YACHT',          rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#00d4ff', bgColor: '#001422' },
-  { id: 17, name: 'VICE SKYLINE',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff0090', bgColor: '#12001a' },
-  { id: 18, name: 'PALM PARADISE',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff6b35', bgColor: '#1a0800' },
-  // ── RARE expansion (19–22) ────────────────────────────────────────────────────
-  { id: 19, name: 'SPORTS CAR',     rarity: 'RARE',      unlockXP: 8000,   unlockCondition: 'Reach 8,000 XP',   color: '#ff1a1a', bgColor: '#1a0000' },
-  { id: 20, name: 'OCEAN DRIVE',    rarity: 'RARE',      unlockXP: 14000,  unlockCondition: 'Reach 14,000 XP',  color: '#00d4ff', bgColor: '#001422' },
-  { id: 21, name: 'CONVERTIBLE',    rarity: 'RARE',      unlockXP: 20000,  unlockCondition: 'Reach 20,000 XP',  color: '#ff6b35', bgColor: '#1a0600' },
-  { id: 22, name: 'SYNTHWAVE MOON', rarity: 'RARE',      unlockXP: 28000,  unlockCondition: 'Reach 28,000 XP',  color: '#bf5fff', bgColor: '#0f001e' },
-  // ── EPIC expansion (23–27) ────────────────────────────────────────────────────
-  { id: 23, name: 'PENTHOUSE',      rarity: 'EPIC',      unlockXP: 45000,  unlockCondition: 'Reach 45,000 XP',  color: '#a855f7', bgColor: '#0f001e' },
-  { id: 24, name: 'TIGER',          rarity: 'EPIC',      unlockXP: 60000,  unlockCondition: 'Reach 60,000 XP',  color: '#00d4ff', bgColor: '#001422' },
-  { id: 25, name: 'ROYAL FLUSH',    rarity: 'EPIC',      unlockXP: 80000,  unlockCondition: 'Reach 80,000 XP',  color: '#ffd700', bgColor: '#1a1100' },
-  { id: 26, name: 'MILLION POT',    rarity: 'EPIC',      unlockXP: 110000, unlockCondition: 'Reach 110,000 XP', color: '#bf5fff', bgColor: '#120020' },
-  { id: 27, name: 'ROULETTE',       rarity: 'EPIC',      unlockXP: 140000, unlockCondition: 'Reach 140,000 XP', color: '#ff0090', bgColor: '#1a0012' },
-  // ── LEGENDARY expansion (28–30) ───────────────────────────────────────────────
-  { id: 28, name: 'CASINO CROWN',   rarity: 'LEGENDARY', unlockXP: 175000, unlockCondition: 'Reach 175,000 XP', color: '#ffd700', bgColor: '#1a1100' },
-  { id: 29, name: 'POKER KING',     rarity: 'LEGENDARY', unlockXP: 250000, unlockCondition: 'Reach 250,000 XP', color: '#ffaa00', bgColor: '#1a0d00' },
-  { id: 30, name: 'MIDNIGHT MIRAGE',rarity: 'LEGENDARY', unlockXP: 400000, unlockCondition: 'Reach 400,000 XP', color: '#a855f7', bgColor: '#0f001e' },
+  // ── LEVEL-GATED — unlocks every ~5-10 levels through progression ─────────
+  { id: 16, name: 'YACHT',          rarity: 'COMMON',    unlockLevel: 10,  unlockCondition: 'Reach Level 10',          color: '#00d4ff', bgColor: '#001422' },
+  { id: 17, name: 'VICE SKYLINE',   rarity: 'COMMON',    unlockLevel: 12,  unlockCondition: 'Reach Level 12',          color: '#ff0090', bgColor: '#12001a' },
+  { id: 18, name: 'PALM PARADISE',  rarity: 'COMMON',    unlockLevel: 15,  unlockCondition: 'Reach Level 15',          color: '#ff6b35', bgColor: '#1a0800' },
+  { id: 31, name: 'BRASS KNUCKLES', rarity: 'COMMON',    unlockLevel: 18,  unlockCondition: 'Reach Level 18',          color: '#00d4ff', bgColor: '#001822' },
+  { id: 49, name: 'SPRAY CAN',      rarity: 'COMMON',    unlockLevel: 20,  unlockCondition: 'Reach Level 20',          color: '#ff0090', bgColor: '#1a0012' },
 
-  // ── COLLECTION 01 — STREET LEGENDS (31) ─────────────────────────────────────
-  { id: 31, name: 'BRASS KNUCKLES', rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#00d4ff', bgColor: '#001822' },
+  { id: 19, name: 'SPORTS CAR',     rarity: 'RARE',      unlockLevel: 22,  unlockCondition: 'Reach Level 22',          color: '#ff1a1a', bgColor: '#1a0000' },
+  { id: 66, name: 'JACK OF SPADES', rarity: 'COMMON',    unlockLevel: 25,  unlockCondition: 'Reach Level 25',          color: '#00d4ff', bgColor: '#001422' },
+  { id: 67, name: 'JACK OF HEARTS', rarity: 'COMMON',    unlockLevel: 27,  unlockCondition: 'Reach Level 27',          color: '#ff0090', bgColor: '#1a0012' },
+  { id: 68, name: 'JACK OF DIAMONDS',rarity: 'COMMON',   unlockLevel: 29,  unlockCondition: 'Reach Level 29',          color: '#ffd700', bgColor: '#1a1100' },
+  { id: 69, name: 'JACK OF CLUBS',  rarity: 'COMMON',    unlockLevel: 30,  unlockCondition: 'Reach Level 30',          color: '#00ff88', bgColor: '#001a0a' },
 
-  // ── COLLECTION 02 — HIGH ROLLER ARSENAL (37–44) ──────────────────────────────
-  { id: 37, name: 'COMPACT PISTOL', rarity: 'RARE',      unlockXP: 18000,  unlockCondition: 'Reach 18,000 XP',  color: '#00d4ff', bgColor: '#001422' },
-  { id: 38, name: 'TACTICAL PISTOL',rarity: 'RARE',      unlockXP: 25000,  unlockCondition: 'Reach 25,000 XP',  color: '#8b5cf6', bgColor: '#0e0018' },
-  { id: 39, name: 'SMG',            rarity: 'EPIC',      unlockXP: 40000,  unlockCondition: 'Reach 40,000 XP',  color: '#00d4ff', bgColor: '#001422' },
-  { id: 40, name: 'COMPACT SMG',    rarity: 'RARE',      unlockXP: 32000,  unlockCondition: 'Reach 32,000 XP',  color: '#ff0090', bgColor: '#1a0012' },
-  { id: 41, name: 'ASSAULT RIFLE',  rarity: 'EPIC',      unlockXP: 55000,  unlockCondition: 'Reach 55,000 XP',  color: '#00ff88', bgColor: '#001a0a' },
-  { id: 42, name: 'AK PLATFORM',    rarity: 'EPIC',      unlockXP: 75000,  unlockCondition: 'Reach 75,000 XP',  color: '#ff6b35', bgColor: '#1a0600' },
-  { id: 44, name: 'SNIPER RIFLE',   rarity: 'EPIC',      unlockXP: 90000,  unlockCondition: 'Reach 90,000 XP',  color: '#a855f7', bgColor: '#0f001e' },
+  { id: 20, name: 'OCEAN DRIVE',    rarity: 'RARE',      unlockLevel: 33,  unlockCondition: 'Reach Level 33',          color: '#00d4ff', bgColor: '#001422' },
+  { id: 51, name: 'RADIO DEVICE',   rarity: 'RARE',      unlockLevel: 35,  unlockCondition: 'Reach Level 35',          color: '#ffd700', bgColor: '#1a1100' },
+  { id: 40, name: 'COMPACT SMG',    rarity: 'RARE',      unlockLevel: 38,  unlockCondition: 'Reach Level 38',          color: '#ff0090', bgColor: '#1a0012' },
+  { id: 21, name: 'CONVERTIBLE',    rarity: 'RARE',      unlockLevel: 40,  unlockCondition: 'Reach Level 40',          color: '#ff6b35', bgColor: '#1a0600' },
+  { id: 37, name: 'COMPACT PISTOL', rarity: 'RARE',      unlockLevel: 43,  unlockCondition: 'Reach Level 43',          color: '#00d4ff', bgColor: '#001422' },
+  { id: 46, name: 'FLASHBANG',      rarity: 'RARE',      unlockLevel: 45,  unlockCondition: 'Reach Level 45',          color: '#00d4ff', bgColor: '#001422' },
+  { id: 22, name: 'SYNTHWAVE MOON', rarity: 'RARE',      unlockLevel: 48,  unlockCondition: 'Reach Level 48',          color: '#bf5fff', bgColor: '#0f001e' },
+  { id: 38, name: 'TACTICAL PISTOL',rarity: 'RARE',      unlockLevel: 50,  unlockCondition: 'Reach Level 50',          color: '#8b5cf6', bgColor: '#0e0018' },
 
-  // ── COLLECTION 03 — CHAOS COLLECTION (45–48) ─────────────────────────────────
-  { id: 45, name: 'FRAG GRENADE',   rarity: 'EPIC',      unlockXP: 65000,  unlockCondition: 'Reach 65,000 XP',  color: '#00ff88', bgColor: '#001a0a' },
-  { id: 46, name: 'FLASHBANG',      rarity: 'RARE',      unlockXP: 35000,  unlockCondition: 'Reach 35,000 XP',  color: '#00d4ff', bgColor: '#001422' },
-  { id: 47, name: 'SMOKE GRENADE',  rarity: 'EPIC',      unlockXP: 85000,  unlockCondition: 'Reach 85,000 XP',  color: '#bf5fff', bgColor: '#120020' },
+  { id: 58, name: 'KING OF SPADES', rarity: 'RARE',      unlockLevel: 55,  unlockCondition: 'Reach Level 55',          color: '#8b5cf6', bgColor: '#0e0018' },
+  { id: 59, name: 'KING OF HEARTS', rarity: 'RARE',      unlockLevel: 58,  unlockCondition: 'Reach Level 58',          color: '#ff0090', bgColor: '#1a0012' },
+  { id: 60, name: 'KING OF DIAMONDS',rarity: 'RARE',     unlockLevel: 60,  unlockCondition: 'Reach Level 60',          color: '#ff8800', bgColor: '#1a0900' },
+  { id: 61, name: 'KING OF CLUBS',  rarity: 'RARE',      unlockLevel: 63,  unlockCondition: 'Reach Level 63',          color: '#00d4ff', bgColor: '#001822' },
+  { id: 62, name: 'QUEEN OF SPADES',rarity: 'RARE',      unlockLevel: 65,  unlockCondition: 'Reach Level 65',          color: '#bf5fff', bgColor: '#120020' },
+  { id: 63, name: 'QUEEN OF HEARTS',rarity: 'RARE',      unlockLevel: 68,  unlockCondition: 'Reach Level 68',          color: '#ff69b4', bgColor: '#1a000f' },
+  { id: 64, name: 'QUEEN OF DIAMONDS',rarity: 'RARE',    unlockLevel: 70,  unlockCondition: 'Reach Level 70',          color: '#ff6b35', bgColor: '#1a0600' },
+  { id: 65, name: 'QUEEN OF CLUBS', rarity: 'RARE',      unlockLevel: 73,  unlockCondition: 'Reach Level 73',          color: '#00d4ff', bgColor: '#001822' },
 
-  // ── COLLECTION 04 — UTILITY SERIES (49–52) ───────────────────────────────────
-  { id: 49, name: 'SPRAY CAN',      rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '',                  color: '#ff0090', bgColor: '#1a0012' },
-  { id: 51, name: 'RADIO DEVICE',   rarity: 'RARE',      unlockXP: 15000,  unlockCondition: '',  color: '#ffd700', bgColor: '#1a1100' },
-  { id: 52, name: '80S CAMERA',     rarity: 'EPIC',      unlockXP: 120000, unlockCondition: 'Reach 120,000 XP', color: '#a855f7', bgColor: '#0f001e' },
+  { id: 10, name: 'ACE',            rarity: 'EPIC',      unlockLevel: 75,  unlockCondition: 'Reach Level 75',          color: '#ffd700', bgColor: '#1a1100' },
+  { id: 23, name: 'PENTHOUSE',      rarity: 'EPIC',      unlockLevel: 80,  unlockCondition: 'Reach Level 80',          color: '#a855f7', bgColor: '#0f001e' },
+  { id: 39, name: 'SMG',            rarity: 'EPIC',      unlockLevel: 85,  unlockCondition: 'Reach Level 85',          color: '#00d4ff', bgColor: '#001422' },
+  { id: 45, name: 'FRAG GRENADE',   rarity: 'EPIC',      unlockLevel: 88,  unlockCondition: 'Reach Level 88',          color: '#00ff88', bgColor: '#001a0a' },
+  { id: 24, name: 'TIGER',          rarity: 'EPIC',      unlockLevel: 90,  unlockCondition: 'Reach Level 90',          color: '#00d4ff', bgColor: '#001422' },
+  { id: 54, name: 'ACE OF SPADES',  rarity: 'EPIC',      unlockLevel: 93,  unlockCondition: 'Reach Level 93',          color: '#00d4ff', bgColor: '#001822' },
+  { id: 55, name: 'ACE OF HEARTS',  rarity: 'EPIC',      unlockLevel: 95,  unlockCondition: 'Reach Level 95',          color: '#ff0090', bgColor: '#1a0012' },
+  { id: 56, name: 'ACE OF DIAMONDS',rarity: 'EPIC',      unlockLevel: 98,  unlockCondition: 'Reach Level 98',          color: '#ff4444', bgColor: '#1a0008' },
+  { id: 57, name: 'ACE OF CLUBS',   rarity: 'EPIC',      unlockLevel: 100, unlockCondition: 'Reach Level 100',         color: '#00ff88', bgColor: '#001a0a' },
+  { id: 41, name: 'ASSAULT RIFLE',  rarity: 'EPIC',      unlockLevel: 105, unlockCondition: 'Reach Level 105',         color: '#00ff88', bgColor: '#001a0a' },
+  { id: 11, name: 'HOURGLASS',      rarity: 'EPIC',      unlockLevel: 110, unlockCondition: 'Reach Level 110',         color: '#bf5fff', bgColor: '#120020' },
+  { id: 25, name: 'ROYAL FLUSH',    rarity: 'EPIC',      unlockLevel: 115, unlockCondition: 'Reach Level 115',         color: '#ffd700', bgColor: '#1a1100' },
+  { id: 42, name: 'AK PLATFORM',    rarity: 'EPIC',      unlockLevel: 120, unlockCondition: 'Reach Level 120',         color: '#ff6b35', bgColor: '#1a0600' },
+  { id: 47, name: 'SMOKE GRENADE',  rarity: 'EPIC',      unlockLevel: 125, unlockCondition: 'Reach Level 125',         color: '#bf5fff', bgColor: '#120020' },
+  { id: 44, name: 'SNIPER RIFLE',   rarity: 'EPIC',      unlockLevel: 130, unlockCondition: 'Reach Level 130',         color: '#a855f7', bgColor: '#0f001e' },
+  { id: 26, name: 'MILLION POT',    rarity: 'EPIC',      unlockLevel: 140, unlockCondition: 'Reach Level 140',         color: '#bf5fff', bgColor: '#120020' },
+  { id: 12, name: 'DRAGON',         rarity: 'EPIC',      unlockLevel: 150, unlockCondition: 'Reach Level 150',         color: '#00ff88', bgColor: '#001a0a' },
+  { id: 52, name: '80S CAMERA',     rarity: 'EPIC',      unlockLevel: 160, unlockCondition: 'Reach Level 160',         color: '#a855f7', bgColor: '#0f001e' },
+  { id: 27, name: 'ROULETTE',       rarity: 'EPIC',      unlockLevel: 170, unlockCondition: 'Reach Level 170',         color: '#ff0090', bgColor: '#1a0012' },
+  { id: 13, name: 'CHIP',           rarity: 'EPIC',      unlockLevel: 180, unlockCondition: 'Reach Level 180',         color: '#bf5fff', bgColor: '#120020' },
+  { id: 71, name: 'RAZOR BLADE',    rarity: 'EPIC',      unlockLevel: 190, unlockCondition: 'Reach Level 190',         color: '#00d4ff', bgColor: '#001422' },
 
-  // ── LEGENDARY ICON (53) ───────────────────────────────────────────────────────
-  { id: 53, name: 'GOLDEN TIKI',    rarity: 'LEGENDARY', unlockXP: 500000, unlockCondition: 'Reach 500,000 XP', color: '#ffd700', bgColor: '#1a1100' },
-
-  // ── FACE CARD COLLECTION — ACES (54–57) ───────────────────────────────────────
-  { id: 54, name: 'ACE OF SPADES',   rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
-  { id: 55, name: 'ACE OF HEARTS',   rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#ff0090', bgColor: '#1a0012' },
-  { id: 56, name: 'ACE OF DIAMONDS', rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#ff4444', bgColor: '#1a0008' },
-  { id: 57, name: 'ACE OF CLUBS',    rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#00ff88', bgColor: '#001a0a' },
-
-  // ── FACE CARD COLLECTION — KINGS (58–61) ─────────────────────────────────────
-  { id: 58, name: 'KING OF SPADES',  rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#8b5cf6', bgColor: '#0e0018' },
-  { id: 59, name: 'KING OF HEARTS',  rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#ff0090', bgColor: '#1a0012' },
-  { id: 60, name: 'KING OF DIAMONDS',rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#ff8800', bgColor: '#1a0900' },
-  { id: 61, name: 'KING OF CLUBS',   rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
-
-  // ── FACE CARD COLLECTION — QUEENS (62–65) ────────────────────────────────────
-  { id: 62, name: 'QUEEN OF SPADES', rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#bf5fff', bgColor: '#120020' },
-  { id: 63, name: 'QUEEN OF HEARTS', rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#ff69b4', bgColor: '#1a000f' },
-  { id: 64, name: 'QUEEN OF DIAMONDS',rarity: 'RARE',     unlockXP: 0,      unlockCondition: '', color: '#ff6b35', bgColor: '#1a0600' },
-  { id: 65, name: 'QUEEN OF CLUBS',  rarity: 'RARE',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001822' },
-
-  // ── FACE CARD COLLECTION — JACKS (66–69) ─────────────────────────────────────
-  { id: 66, name: 'JACK OF SPADES',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001422' },
-  { id: 67, name: 'JACK OF HEARTS',  rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#ff0090', bgColor: '#1a0012' },
-  { id: 68, name: 'JACK OF DIAMONDS',rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#ffd700', bgColor: '#1a1100' },
-  { id: 69, name: 'JACK OF CLUBS',   rarity: 'COMMON',    unlockXP: 0,      unlockCondition: '', color: '#00ff88', bgColor: '#001a0a' },
-
-  // ── SPECIALS (70–71) ─────────────────────────────────────────────────────────
-  { id: 70, name: 'JOKER',           rarity: 'LEGENDARY', unlockXP: 0,      unlockCondition: '', color: '#bf5fff', bgColor: '#120020' },
-  { id: 71, name: 'RAZOR BLADE',     rarity: 'EPIC',      unlockXP: 0,      unlockCondition: '', color: '#00d4ff', bgColor: '#001422' },
+  { id: 28, name: 'CASINO CROWN',   rarity: 'LEGENDARY', unlockLevel: 200, unlockCondition: 'Reach Level 200',         color: '#ffd700', bgColor: '#1a1100' },
+  { id: 14, name: 'CHAMPAGNE',      rarity: 'LEGENDARY', unlockLevel: 225, unlockCondition: 'Reach Level 225',         color: '#ffaa00', bgColor: '#1a0d00' },
+  { id: 15, name: 'MOON',           rarity: 'LEGENDARY', unlockLevel: 250, unlockCondition: 'Reach Level 250',         color: '#a855f7', bgColor: '#0f001e' },
+  { id: 29, name: 'POKER KING',     rarity: 'LEGENDARY', unlockLevel: 300, unlockCondition: 'Reach Level 300',         color: '#ffaa00', bgColor: '#1a0d00' },
+  { id: 70, name: 'JOKER',          rarity: 'LEGENDARY', unlockLevel: 350, unlockCondition: 'Reach Level 350',         color: '#bf5fff', bgColor: '#120020' },
+  { id: 30, name: 'MIDNIGHT MIRAGE',rarity: 'LEGENDARY', unlockLevel: 400, unlockCondition: 'Reach Level 400',         color: '#a855f7', bgColor: '#0f001e' },
+  { id: 53, name: 'GOLDEN TIKI',    rarity: 'LEGENDARY', unlockLevel: 500, unlockCondition: 'Reach Level 500',         color: '#ffd700', bgColor: '#1a1100' },
 ];
 
 /** Returns the NeonAvatar for a given id, falling back to id 1. */
 export function getNeonAvatar(id: number): NeonAvatar {
-  return NEON_AVATARS.find(a => a.id === Math.round(id || 1)) ?? NEON_AVATARS[0];
+  return NEON_AVATARS.find(a => a.id === Math.round(id || 1)) ?? NEON_AVATARS[0]!;
 }
 
-export function isNeonAvatarUnlocked(_avatar: NeonAvatar, _xp: number): boolean {
-  return true; // XP gating will be re-enabled in a later phase
+/** True if the player's level meets the avatar's unlock requirement. */
+export function isNeonAvatarUnlocked(avatar: NeonAvatar, _xp: number, level: number): boolean {
+  return level >= (avatar.unlockLevel ?? 0);
 }
 
+export const STARTER_AVATARS = NEON_AVATARS.filter(a => a.unlockLevel === 0);
 export const COMMON_AVATARS  = NEON_AVATARS.filter(a => a.rarity === 'COMMON');
-export const STARTER_AVATARS = COMMON_AVATARS;

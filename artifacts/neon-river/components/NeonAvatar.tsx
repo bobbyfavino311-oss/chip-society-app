@@ -81,10 +81,8 @@ export default function NeonAvatar({
   const glowPad  = avatar.rarity === 'LEGENDARY' ? 18 : avatar.rarity === 'EPIC' ? 12 : 0;
   const glowSize = size + glowPad;
 
-  const xpLabel = isLocked
-    ? avatar.unlockXP >= 1000
-      ? `${(avatar.unlockXP / 1000).toFixed(0)}K XP`
-      : `${avatar.unlockXP} XP`
+  const xpLabel = isLocked && avatar.unlockLevel > 0
+    ? `LVL ${avatar.unlockLevel}`
     : undefined;
 
   const inner = Math.max(size - borderWidth * 2, 4);
