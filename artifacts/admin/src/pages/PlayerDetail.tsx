@@ -381,6 +381,8 @@ export default function PlayerDetail() {
   const [showSuspend, setShowSuspend] = useState(false);
   const [showBan, setShowBan] = useState(false);
   const [founderLoading, setFounderLoading] = useState(false);
+  const [unwarnLoading, setUnwarnLoading]   = useState(false);
+  const [unwarnError, setUnwarnError]       = useState('');
 
   function load() {
     setLoading(true);
@@ -411,7 +413,16 @@ export default function PlayerDetail() {
   }
 
   async function handleUnwarn() {
-    try { await api.unwarn(id); load(); } catch { /* ignore */ }
+    setUnwarnError('');
+    setUnwarnLoading(true);
+    try {
+      await api.unwarn(id);
+      load();
+    } catch (e: any) {
+      setUnwarnError(e.message ?? 'Failed to clear warning');
+    } finally {
+      setUnwarnLoading(false);
+    }
   }
 
   async function handleToggleFounder() {
@@ -471,10 +482,13 @@ export default function PlayerDetail() {
             <ShieldBan size={12} />Suspend
           </button>
           {player.status === 'warned' && (
-            <button onClick={handleUnwarn}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs font-semibold hover:bg-yellow-500/20 transition-colors">
-              <ShieldCheck size={12} />Clear Warning
-            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button onClick={handleUnwarn} disabled={unwarnLoading}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs font-semibold hover:bg-yellow-500/20 transition-colors disabled:opacity-50">
+                <ShieldCheck size={12} />{unwarnLoading ? 'Clearing…' : 'Clear Warning'}
+              </button>
+              {unwarnError && <p className="text-[10px] text-destructive">{unwarnError}</p>}
+            </div>
           )}
           {player.status !== 'warned' && !isSanctioned ? (
             <button onClick={() => setShowBan(true)}

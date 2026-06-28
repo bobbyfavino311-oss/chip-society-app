@@ -1016,7 +1016,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const r = await fetch(`${getApiBase()}/players/${pid}/notifications`);
       if (!r.ok) return;
       const data = (await r.json()) as { notifications: Array<{
-        notificationId: string; type: string; amount: number;
+        notificationId: string; type: string; title?: string; amount: number;
         reason: string; message: string | null; read: boolean; createdAt: string;
       }> };
       const fresh = data.notifications.filter(
@@ -1031,25 +1031,47 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notificationIds: ids }),
       }).catch(() => {});
-      // Queue for display (oldest first)
-      const bonuses = fresh.reverse().map(n => ({
-        notificationId: n.notificationId,
-        amount: n.amount,
-        reason: n.reason,
-        message: n.message,
-        createdAt: n.createdAt,
-      }));
-      setPendingBonuses(prev => [...prev, ...bonuses]);
-      // Update chip balance — add the total of all fresh bonus amounts to the
-      // current local balance (the server already credited them when the bonus
-      // was sent; we just need to reflect that in the UI immediately).
-      const totalBonusAmount = fresh.reduce((sum, n) => sum + n.amount, 0);
-      if (totalBonusAmount > 0) {
-        setProfile(prev => {
-          const next = { ...prev, chips: prev.chips + totalBonusAmount };
-          void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-          return next;
+
+      // Split: moderation events → ModerationModal; bonuses → BonusNotificationModal
+      const moderationItems = fresh.filter(n => n.type === 'moderation');
+      const bonusItems      = fresh.filter(n => n.type !== 'moderation');
+
+      // Show the most recent unread moderation event (oldest first so last one wins)
+      if (moderationItems.length > 0) {
+        const latest = moderationItems[moderationItems.length - 1]!;
+        const title  = latest.title ?? '';
+        const modType: 'warning' | 'suspension' | 'ban' =
+          title.toLowerCase().includes('suspend') ? 'suspension' :
+          title.toLowerCase().includes('ban')     ? 'ban'        :
+          'warning';
+        setPendingModeration({
+          type:      modType,
+          reason:    latest.reason,
+          message:   latest.message ?? null,
+          actionId:  latest.notificationId,
+          // expiresAt not stored in the notifications table — omit
         });
+      }
+
+      // Queue bonus notifications for display (oldest first)
+      if (bonusItems.length > 0) {
+        const bonuses = bonusItems.reverse().map(n => ({
+          notificationId: n.notificationId,
+          amount: n.amount,
+          reason: n.reason,
+          message: n.message,
+          createdAt: n.createdAt,
+        }));
+        setPendingBonuses(prev => [...prev, ...bonuses]);
+        // Reflect credited chips in local balance immediately
+        const totalBonusAmount = bonusItems.reduce((sum, n) => sum + n.amount, 0);
+        if (totalBonusAmount > 0) {
+          setProfile(prev => {
+            const next = { ...prev, chips: prev.chips + totalBonusAmount };
+            void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+            return next;
+          });
+        }
       }
     } catch {}
   }, []);
