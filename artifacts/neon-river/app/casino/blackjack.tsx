@@ -214,8 +214,11 @@ function ShufflingOverlay({
           ...cardRot.map(a => Animated.timing(a, { toValue: 0,   duration: 380, useNativeDriver: true })),
           ...cardScale.map(a => Animated.timing(a, { toValue: 0, duration: 320, useNativeDriver: true })),
         ]);
-        collapseAnim.start(({ finished: f }) => {
-          if (!f || cancelled) return;
+        collapseAnim.start(() => {
+          // Do NOT gate on `finished` — on Expo Go web the native-driver fallback
+          // can report finished:false even when the anim completes normally, which
+          // would silently drop onComplete and freeze the game in 'shuffling' phase.
+          if (cancelled) return;
 
           // Phase 4 — Shoe glows (300ms), show READY
           Animated.timing(shoeGlow, { toValue: 1, duration: 300, useNativeDriver: false }).start();
@@ -674,6 +677,7 @@ export default function BlackjackScreen() {
   function handleNewHand() {
     syncDealerCards([]);
     syncPlayerHands([]);
+    setActiveIdx(0);      // reset after potential split (activeIdx might be 1)
     setHoleRevealed(false);
     setResult(null);
     setDealerLog([]);
@@ -681,14 +685,23 @@ export default function BlackjackScreen() {
     MusicEngine.setIntensity('normal');
 
     if (shoePosRef.current >= TEST_RESHUFFLE) {
-      // Rebuild shoe, then let the ShufflingOverlay drive the phase transition
-      // via its onComplete callback — no hardcoded setTimeout here.
+      // Rebuild shoe immediately so drawCard() is safe from here on.
+      // Let ShufflingOverlay.onComplete drive the phase back to 'betting'
+      // so we never skip the animation.
       shoeRef.current    = createShoe(TEST_DECKS);
       shoePosRef.current = 0;
       setCardsDealt(0);
       setShuffleKey(k => k + 1);
       setIsShuffling(true);
       setPhase('shuffling');
+
+      // Safety fallback: if the animation callback silently drops for any
+      // reason (device wake, Expo Go web quirk, etc.) we force-exit
+      // 'shuffling' after 4 s so the game is never permanently locked.
+      setTimeout(() => {
+        setPhase(prev => prev === 'shuffling' ? 'betting' : prev);
+        setIsShuffling(prev => prev ? false : prev);
+      }, 4000);
     } else {
       setPhase('betting');
     }
