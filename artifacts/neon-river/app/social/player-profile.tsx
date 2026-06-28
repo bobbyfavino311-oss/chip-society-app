@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -20,7 +21,7 @@ import {
   MOCK_PLAYERS, SOCIAL_POSTS, POST_TAG_COLORS, POKER_REACTIONS,
   type MockPlayer, type SocialPost,
 } from '@/lib/socialData';
-import { getPlayerProfile, followPlayer, unfollowPlayer, type PlayerProfile, type FeedPost } from '@/lib/socialApi';
+import { getPlayerProfile, followPlayer, unfollowPlayer, startConversation, type PlayerProfile, type FeedPost } from '@/lib/socialApi';
 import { useLiveFeed } from '@/context/LiveFeedContext';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -276,6 +277,16 @@ export default function PlayerProfileScreen() {
 
   const following = isFollowing(id ?? '');
 
+  async function handleMessage() {
+    if (!player || !myProfile.playerId) return;
+    try {
+      const convId = await startConversation(myProfile.playerId, player.id);
+      router.push(`/inbox/${convId}?otherUsername=${encodeURIComponent(player.username)}&otherAvatarIndex=${player.avatarId ?? 1}`);
+    } catch {
+      router.push('/inbox');
+    }
+  }
+
   function handleFollow() {
     if (!player) return;
     if (following) {
@@ -354,7 +365,7 @@ export default function PlayerProfileScreen() {
             <Ionicons name={following ? 'checkmark-circle' : 'person-add'} size={14} color={following ? `${colors.primary}90` : colors.primary} />
             <Text style={[s.followText, following && s.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={s.msgBtn}>
+          <TouchableOpacity style={s.msgBtn} onPress={handleMessage}>
             <Ionicons name="chatbubble-ellipses-outline" size={14} color={colors.textMuted} />
             <Text style={s.msgText}>Message</Text>
           </TouchableOpacity>
@@ -379,19 +390,19 @@ export default function PlayerProfileScreen() {
       >
         {/* Social counts */}
         <View style={s.socialRow}>
-          <View style={s.socialStat}>
+          <TouchableOpacity style={s.socialStat} onPress={() => Alert.alert('Followers', 'Follower list coming in a future update.')}>
             <Text style={s.socialVal}>
               {(player.followers + followerDelta) >= 1000 ? `${((player.followers + followerDelta) / 1000).toFixed(1)}K` : (player.followers + followerDelta)}
             </Text>
             <Text style={s.socialLabel}>Followers</Text>
-          </View>
+          </TouchableOpacity>
           <View style={s.socialDiv} />
-          <View style={s.socialStat}>
+          <TouchableOpacity style={s.socialStat} onPress={() => Alert.alert('Following', 'Following list coming in a future update.')}>
             <Text style={s.socialVal}>
               {player.following >= 1000 ? `${(player.following / 1000).toFixed(1)}K` : player.following}
             </Text>
             <Text style={s.socialLabel}>Following</Text>
-          </View>
+          </TouchableOpacity>
           <View style={s.socialDiv} />
           <View style={s.socialStat}>
             <Text style={[s.socialVal, { color: colors.gold }]}>{player.achievementCount}/26</Text>

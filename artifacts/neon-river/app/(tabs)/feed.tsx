@@ -92,11 +92,10 @@ function seedComments(postId: string, count: number) {
 }
 
 const FEED_TABS = [
-  { id: 'all',         label: 'All',         icon: 'globe' as const },
-  { id: 'trending',    label: 'Trending',    icon: 'flame' as const },
-  { id: 'leaderboard', label: 'Leaderboard', icon: 'podium' as const },
-  { id: 'search',      label: 'Search',      icon: 'search' as const },
-  { id: 'me',          label: 'Me',          icon: 'person-circle' as const },
+  { id: 'all',           label: 'All',           icon: 'globe' as const },
+  { id: 'announcements', label: 'Announcements',  icon: 'megaphone' as const },
+  { id: 'leaderboard',   label: 'Leaderboard',   icon: 'podium' as const },
+  { id: 'me',            label: 'Me',            icon: 'person-circle' as const },
 ];
 
 const ME_SUBTABS = [
@@ -915,6 +914,64 @@ const ach = StyleSheet.create({
   xpText:        { color: '#00ff88', fontSize: 11, fontWeight: '700' },
 });
 
+// ─── Announcements Section ───────────────────────────────────────────────────
+
+const ANNOUNCEMENTS = [
+  {
+    id: 'ann1',
+    title: '🎉 Welcome to Chip Society!',
+    body: 'The neon tables are open. Jump into AI Practice mode to sharpen your game, build your stack, and climb the leaderboard. Multiplayer rooms are coming next — stay tuned.',
+    date: 'Jun 28, 2026',
+  },
+  {
+    id: 'ann2',
+    title: '🛒 Chip Shop is Now Live!',
+    body: 'Head to the Profile tab to stock up on virtual chips. Six bundles available — from 100K all the way to 50M. Keep your seat at the table.',
+    date: 'Jun 28, 2026',
+  },
+];
+
+function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomInset + 100, paddingTop: 4 }}>
+      <View style={{ padding: 14, gap: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Ionicons name="pin" size={13} color={colors.primary} />
+          <Text style={[lb.sectionTitle, { marginBottom: 0 }]}>PINNED FROM DEV TEAM</Text>
+        </View>
+        {ANNOUNCEMENTS.map(a => (
+          <View key={a.id} style={ann.card}>
+            <LinearGradient colors={['#1a0035', '#060014']} style={StyleSheet.absoluteFill} />
+            <View style={ann.pinnedBadge}>
+              <Ionicons name="megaphone-outline" size={10} color={colors.primary} />
+              <Text style={ann.pinnedText}>ANNOUNCEMENT</Text>
+            </View>
+            <Text style={ann.title}>{a.title}</Text>
+            <Text style={ann.body}>{a.body}</Text>
+            <Text style={ann.date}>{a.date} · Chip Society Dev Team</Text>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+}
+
+const ann = StyleSheet.create({
+  card: {
+    borderRadius: 14, borderWidth: 1, borderColor: `${colors.primary}40`,
+    padding: 16, gap: 9, overflow: 'hidden',
+  },
+  pinnedBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start',
+    backgroundColor: `${colors.primary}15`, borderRadius: 6, borderWidth: 1,
+    borderColor: `${colors.primary}40`, paddingHorizontal: 7, paddingVertical: 3,
+  },
+  pinnedText: { color: colors.primary, fontSize: 9, fontWeight: '800', letterSpacing: 1.2 },
+  title: { color: '#fff', fontSize: 15, fontWeight: '800' },
+  body: { color: 'rgba(255,255,255,0.62)', fontSize: 13, lineHeight: 19 },
+  date: { color: colors.textDim, fontSize: 11 },
+});
+
 // ─── Leaderboard Section ─────────────────────────────────────────────────────
 
 const LB_CATS = [
@@ -927,6 +984,11 @@ const LB_CATS = [
 function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
   const [cat, setCat] = useState<typeof LB_CATS[number]['id']>('chips');
   const { profile } = useUser();
+  const [realPlayers, setRealPlayers] = useState<SearchPlayer[]>([]);
+
+  useEffect(() => {
+    searchPlayers('').then(setRealPlayers).catch(() => {});
+  }, []);
 
   const entries = useMemo(() => {
     const base = getLeaderboard(cat);
@@ -947,12 +1009,41 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
       avatarId: profile.avatarIndex, status: 'online' as const,
       posts: [], isMock: false,
     };
+
+    // Convert real registered players to leaderboard entry format
+    const realIds = new Set(realPlayers.map(p => p.playerId));
+    const realEntries = realPlayers
+      .filter(p => p.playerId !== profile.playerId)
+      .map(p => {
+        let value = 0, label = '—';
+        if (cat === 'chips')   { value = p.chips;  label = p.chips >= 1_000_000 ? `${(p.chips / 1_000_000).toFixed(1)}M` : `${(p.chips / 1_000).toFixed(0)}K`; }
+        if (cat === 'xp')      { value = p.level;  label = `Lv ${p.level}`; }
+        return {
+          player: {
+            id: p.playerId, username: p.username,
+            rank: p.rank ?? 'Player',
+            level: p.level, chips: p.chips,
+            winRate: 0, handsPlayed: 0,
+            biggestPot: 0, tournamentWins: 0,
+            avatarId: p.avatarIndex, status: (p.status ?? 'offline') as 'online' | 'in_game' | 'offline',
+            posts: [], isMock: false,
+          },
+          value, label,
+        };
+      });
+
+    // Mock players fill gaps, but real players take priority (exclude by ID)
+    const mockEntries = base
+      .filter(e => e.player.id !== '__me__' && !realIds.has(e.player.id))
+      .slice(0, Math.max(0, 8 - realEntries.length));
+
     const merged = [
-      ...base.filter(e => e.player.id !== '__me__'),
+      ...realEntries,
+      ...mockEntries,
       { player: mePlayer as Parameters<typeof getLeaderboard>[0] extends never ? never : any, value: myValue, label: myLabel },
     ];
     return merged.sort((a, b) => b.value - a.value).slice(0, 10);
-  }, [cat, profile]);
+  }, [cat, profile, realPlayers]);
 
   const medalColors = ['#ffd700', '#a0a8c0', '#cd7f32'];
 
@@ -1447,12 +1538,9 @@ const MY_LIKES: MePost[] = [
   { id: 'ml1', tag: 'BAD BEAT', content: 'Quad Aces cracked by a straight flush. The odds are 0.000000001%.', pot: '91,000', handRank: 'Quad Aces', likes: 2103, comments: 318, timeAgo: '6h', repostedFrom: 'AceHunter_' },
   { id: 'ml2', tag: 'ALL-IN', content: 'Five-way all-in pre-flop. I had AA. Flopped a set. Turned quads.', pot: '62,500', handRank: 'Quad Aces', likes: 1876, comments: 204, timeAgo: '8h', repostedFrom: 'ShadowKing' },
 ];
-const INITIAL_MY_POSTS: MePost[] = [
-  { id: 'mp1', tag: 'WIN', content: 'Picked up Aces UTG, ran it up to a 3-way all-in and held. First Royal Flush of my career. 🃏', pot: '24,800', handRank: 'Royal Flush', likes: 312, comments: 28, timeAgo: '3h' },
-  { id: 'mp2', tag: 'ALL-IN', content: 'Short-stacked on the bubble. Shoved A9s, got called by KK, hit an ace on the flop. Still alive. 🙏', pot: '9,600', handRank: 'Pair of Aces', likes: 144, comments: 19, timeAgo: '1d' },
-];
+const INITIAL_MY_POSTS: MePost[] = [];
 
-function MeSection({ myPosts, onDeletePost, bottomInset }: { myPosts: MePost[]; onDeletePost: (id: string) => void; bottomInset: number }) {
+function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts: MePost[]; onDeletePost: (id: string) => void; bottomInset: number; onCompose?: () => void }) {
   const { profile, winRate } = useUser();
   const { following, notifications } = useSocial();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
@@ -1528,10 +1616,29 @@ function MeSection({ myPosts, onDeletePost, bottomInset }: { myPosts: MePost[]; 
       {/* Posts */}
       <View style={{ paddingHorizontal: 14, paddingTop: 12, gap: 12 }}>
         {data.length === 0 ? (
-          <View style={me.empty}>
-            <Ionicons name="albums-outline" size={34} color={colors.textDim} />
-            <Text style={me.emptyText}>Nothing here yet</Text>
-          </View>
+          subTab === 'posts' ? (
+            <View style={{ alignItems: 'center', paddingTop: 48, gap: 14, paddingHorizontal: 24 }}>
+              <LinearGradient colors={[`${colors.primary}20`, 'transparent']} style={{ width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="create-outline" size={32} color={colors.primary} />
+              </LinearGradient>
+              <Text style={{ color: '#fff', fontSize: 17, fontWeight: '800', textAlign: 'center' }}>Share your first hand</Text>
+              <Text style={{ color: colors.textDim, fontSize: 13, textAlign: 'center', lineHeight: 19 }}>
+                Tell the table about your biggest win, a brutal bad beat, or a bluff that paid off.
+              </Text>
+              <TouchableOpacity
+                onPress={onCompose}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: `${colors.primary}18`, borderWidth: 1, borderColor: colors.primary, borderRadius: 24, paddingHorizontal: 22, paddingVertical: 11 }}
+              >
+                <Ionicons name="add-circle-outline" size={16} color={colors.primary} />
+                <Text style={{ color: colors.primary, fontSize: 14, fontWeight: '800' }}>Create First Post</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={me.empty}>
+              <Ionicons name="albums-outline" size={34} color={colors.textDim} />
+              <Text style={me.emptyText}>Nothing here yet</Text>
+            </View>
+          )
         ) : data.map(post => {
           const typeColor = POST_TAG_COLORS[post.tag];
           const isRepost = subTab === 'reposts' || subTab === 'likes';
@@ -1819,18 +1926,6 @@ export default function FeedScreen() {
       });
     }
 
-    if (activeTab === 'trending') {
-      return [...all].sort((a, b) => {
-        const sA = a._k === 'live'
-          ? a.post.likeCount + a.post.commentCount * 2
-          : (a.post as SocialPost).likes + (a.post as SocialPost).comments * 2;
-        const sB = b._k === 'live'
-          ? b.post.likeCount + b.post.commentCount * 2
-          : (b.post as SocialPost).likes + (b.post as SocialPost).comments * 2;
-        return sB - sA;
-      });
-    }
-
     return all;
   }, [activeTab, livePosts, isMuted, isBlocked, following]);
 
@@ -1856,6 +1951,9 @@ export default function FeedScreen() {
       <View style={[ss.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
         <Text style={ss.headerTitle}>FEED</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <TouchableOpacity style={hdrStyle.bell} onPress={() => setActiveTab('search')}>
+            <Ionicons name={activeTab === 'search' ? 'search' : 'search-outline'} size={20} color={activeTab === 'search' ? colors.primary : colors.textMuted} />
+          </TouchableOpacity>
           <NotifBell onPress={() => setNotifVisible(true)} />
           <InboxBubble />
           {activeTab !== 'me' && (
@@ -1918,7 +2016,10 @@ export default function FeedScreen() {
           myPosts={myPosts}
           onDeletePost={(id) => setMyPosts(prev => prev.filter(p => p.id !== id))}
           bottomInset={insets.bottom}
+          onCompose={() => setComposeVisible(true)}
         />
+      ) : activeTab === 'announcements' ? (
+        <AnnouncementsSection bottomInset={insets.bottom} />
       ) : activeTab === 'leaderboard' ? (
         <LeaderboardSection bottomInset={insets.bottom} />
       ) : activeTab === 'search' ? (
@@ -1932,7 +2033,7 @@ export default function FeedScreen() {
             : <PostCard post={item.post as SocialPost} />
           }
           ListHeaderComponent={
-            (activeTab === 'all' || activeTab === 'trending')
+            activeTab === 'all'
               ? <AIPostsStrip posts={aiPosts.slice(0, 6)} />
               : null
           }

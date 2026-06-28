@@ -499,6 +499,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
+  // Sync isFounder from server (admin may have toggled it since last local save)
+  useEffect(() => {
+    if (!isLoaded) return;
+    setProfile(current => {
+      if (!current.playerId) return current;
+      const id = current.playerId;
+      fetch(`${getApiBase()}/auth/profile/${id}`)
+        .then(r => r.ok ? (r.json() as Promise<{ success?: boolean; profile?: Record<string, unknown> }>) : Promise.resolve(null))
+        .then(d => {
+          if (d?.profile?.isFounder !== undefined) {
+            setProfile(p => p.isFounder === d.profile!.isFounder ? p : { ...p, isFounder: d.profile!.isFounder as boolean });
+          }
+        })
+        .catch(() => {});
+      return current;
+    });
+  }, [isLoaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Debounced server sync — fires 3 s after the last save() call.
   // For critical one-time events (tutorial completion) we bypass the debounce and save immediately.
   const scheduleSyncToServer = useCallback((updated: UserProfile) => {
