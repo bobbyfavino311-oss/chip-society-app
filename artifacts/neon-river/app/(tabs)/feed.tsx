@@ -916,39 +916,64 @@ const ach = StyleSheet.create({
 
 // ─── Announcements Section ───────────────────────────────────────────────────
 
-const ANNOUNCEMENTS = [
+type Announcement = { id: string; title: string; body: string; postedBy: string; createdAt: string };
+
+const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
   {
     id: 'ann1',
     title: '🎉 Welcome to Chip Society!',
     body: 'The neon tables are open. Jump into AI Practice mode to sharpen your game, build your stack, and climb the leaderboard. Multiplayer rooms are coming next — stay tuned.',
-    date: 'Jun 28, 2026',
+    postedBy: 'Dev Team',
+    createdAt: new Date('2026-06-28').toISOString(),
   },
   {
     id: 'ann2',
     title: '🛒 Chip Shop is Now Live!',
     body: 'Head to the Profile tab to stock up on virtual chips. Six bundles available — from 100K all the way to 50M. Keep your seat at the table.',
-    date: 'Jun 28, 2026',
+    postedBy: 'Dev Team',
+    createdAt: new Date('2026-06-28').toISOString(),
   },
 ];
 
 function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
+  const [posts, setPosts] = useState<Announcement[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const base = process.env.EXPO_PUBLIC_API_URL
+      ? `${process.env.EXPO_PUBLIC_API_URL}/api`
+      : 'https://api-server-production-bbc2.up.railway.app/api';
+    fetch(`${base}/announcements`)
+      .then(r => r.ok ? (r.json() as Promise<{ announcements: Announcement[] }>) : Promise.resolve({ announcements: [] }))
+      .then(d => {
+        setPosts(d.announcements.length > 0 ? d.announcements : FALLBACK_ANNOUNCEMENTS);
+      })
+      .catch(() => setPosts(FALLBACK_ANNOUNCEMENTS))
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const displayPosts = loaded ? posts : FALLBACK_ANNOUNCEMENTS;
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomInset + 100, paddingTop: 4 }}>
       <View style={{ padding: 14, gap: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Ionicons name="pin" size={13} color={colors.primary} />
+          <Ionicons name="megaphone" size={13} color={colors.primary} />
           <Text style={[lb.sectionTitle, { marginBottom: 0 }]}>PINNED FROM DEV TEAM</Text>
         </View>
-        {ANNOUNCEMENTS.map(a => (
+        {displayPosts.map(a => (
           <View key={a.id} style={ann.card}>
             <LinearGradient colors={['#1a0035', '#060014']} style={StyleSheet.absoluteFill} />
             <View style={ann.pinnedBadge}>
-              <Ionicons name="megaphone-outline" size={10} color={colors.primary} />
-              <Text style={ann.pinnedText}>ANNOUNCEMENT</Text>
+              <Text style={ann.pinnedEmoji}>📣</Text>
+              <Text style={ann.pinnedText}>FROM DEV TEAM</Text>
             </View>
             <Text style={ann.title}>{a.title}</Text>
             <Text style={ann.body}>{a.body}</Text>
-            <Text style={ann.date}>{a.date} · Chip Society Dev Team</Text>
+            <Text style={ann.date}>
+              {new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {' · '}{a.postedBy}
+            </Text>
           </View>
         ))}
       </View>
@@ -966,6 +991,7 @@ const ann = StyleSheet.create({
     backgroundColor: `${colors.primary}15`, borderRadius: 6, borderWidth: 1,
     borderColor: `${colors.primary}40`, paddingHorizontal: 7, paddingVertical: 3,
   },
+  pinnedEmoji: { fontSize: 10 },
   pinnedText: { color: colors.primary, fontSize: 9, fontWeight: '800', letterSpacing: 1.2 },
   title: { color: '#fff', fontSize: 15, fontWeight: '800' },
   body: { color: 'rgba(255,255,255,0.62)', fontSize: 13, lineHeight: 19 },

@@ -143,6 +143,17 @@ export const bugReportsTable = pgTable('bug_reports', {
   updatedAt:   timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+// ── Announcements ─────────────────────────────────────────────────────────────
+
+export const announcementsTable = pgTable('announcements', {
+  id:        text('id').primaryKey(),
+  title:     text('title').notNull(),
+  body:      text('body').notNull(),
+  postedBy:  text('posted_by').notNull().default('Dev Team'),
+  pinned:    boolean('pinned').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export type Player                = typeof playersTable.$inferSelect;
@@ -160,3 +171,4 @@ export type FeedPost              = typeof feedPostsTable.$inferSelect;
 export type NewFeedPost           = typeof feedPostsTable.$inferInsert;
 export type PostLike              = typeof postLikesTable.$inferSelect;
 export type PostComment           = typeof postCommentsTable.$inferSelect;
+export type Announcement          = typeof announcementsTable.$inferSelect;

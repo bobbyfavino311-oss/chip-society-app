@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db, playersTable, chipTransactionsTable, playerReportsTable, playerNotificationsTable, moderationActionsTable } from '@workspace/db';
+import { db, playersTable, chipTransactionsTable, playerReportsTable, playerNotificationsTable, moderationActionsTable, announcementsTable } from '@workspace/db';
 import { eq, or, desc } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { emitToPlayer } from '../sockets/index.js';
@@ -539,6 +539,70 @@ router.put('/admin/players/:id/founder', async (req, res) => {
     res.json({ success: true, isFounder });
   } catch (e) {
     req.log.error(e, 'admin/founder error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── GET /api/announcements (PUBLIC — mobile app reads this) ───────────────────
+router.get('/announcements', async (req, res) => {
+  try {
+    const rows = await db
+      .select()
+      .from(announcementsTable)
+      .orderBy(desc(announcementsTable.createdAt));
+    res.json({ announcements: rows });
+  } catch (e) {
+    req.log.error(e, 'announcements/get error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── GET /api/admin/announcements ──────────────────────────────────────────────
+router.get('/admin/announcements', async (req, res) => {
+  try {
+    const rows = await db
+      .select()
+      .from(announcementsTable)
+      .orderBy(desc(announcementsTable.createdAt));
+    res.json({ announcements: rows });
+  } catch (e) {
+    req.log.error(e, 'admin/announcements/get error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── POST /api/admin/announcements ─────────────────────────────────────────────
+router.post('/admin/announcements', async (req, res) => {
+  try {
+    const { title, body } = req.body as { title?: string; body?: string };
+    if (!title?.trim() || !body?.trim()) {
+      res.status(400).json({ error: 'title and body are required' });
+      return;
+    }
+    const id = randomUUID();
+    await db.insert(announcementsTable).values({
+      id,
+      title: title.trim(),
+      body: body.trim(),
+      postedBy: 'Dev Team',
+      pinned: true,
+    });
+    res.json({ success: true, id });
+  } catch (e) {
+    req.log.error(e, 'admin/announcements/post error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── DELETE /api/admin/announcements/:id ───────────────────────────────────────
+router.delete('/admin/announcements/:id', async (req, res) => {
+  try {
+    await db
+      .delete(announcementsTable)
+      .where(eq(announcementsTable.id, req.params['id']!));
+    res.json({ success: true });
+  } catch (e) {
+    req.log.error(e, 'admin/announcements/delete error');
     res.status(500).json({ error: 'Server error' });
   }
 });
