@@ -204,11 +204,40 @@ const si = StyleSheet.create({
 // ── Main screen ───────────────────────────────────────────────────────────────
 
 export default function PlayerProfileScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const params = useLocalSearchParams<{
+    id: string; username?: string; avatarIndex?: string; rank?: string;
+  }>();
+  const { id } = params;
   const insets = useSafeAreaInsets();
   const { isFollowing, follow, unfollow } = useSocial();
   const { profile: myProfile } = useUser();
   const { allPosts: liveFeedPosts } = useLiveFeed();
+
+  // Build a minimal fallback player from URL params (passed by the live post card)
+  function fallbackPlayer(): DisplayPlayer | null {
+    if (!params.username) return null;
+    return {
+      id: id ?? '',
+      username: params.username,
+      handle: `@${params.username.toLowerCase().replace(/\s+/g, '')}`,
+      avatarColor: '#00d4ff',
+      avatarId: Number(params.avatarIndex ?? 1),
+      bannerColors: ['#001a40', '#000d20'],
+      rank: params.rank ?? 'Player',
+      level: 1,
+      chips: 0,
+      winRate: 0,
+      handsPlayed: 0,
+      biggestPot: 0,
+      followers: 0,
+      following: 0,
+      achievementCount: 0,
+      status: 'offline',
+      badges: [],
+      bio: 'Chip Society player.',
+      isMock: false,
+    };
+  }
 
   const [player, setPlayer] = useState<DisplayPlayer | null>(() => {
     const mock = MOCK_PLAYERS.find(p => p.id === id);
@@ -222,9 +251,20 @@ export default function PlayerProfileScreen() {
     if (player || !id) return;
     setLoading(true);
     getPlayerProfile(id).then(p => {
-      if (p) setPlayer(apiToDisplay(p));
+      if (p) {
+        setPlayer(apiToDisplay(p));
+      } else {
+        // API returned null — use URL-param fallback if available
+        const fb = fallbackPlayer();
+        if (fb) setPlayer(fb);
+        else setError(true);
+      }
+    }).catch(() => {
+      // Network/API error — use URL-param fallback if available
+      const fb = fallbackPlayer();
+      if (fb) setPlayer(fb);
       else setError(true);
-    }).catch(() => setError(true)).finally(() => setLoading(false));
+    }).finally(() => setLoading(false));
   }, [id]);
 
   const posts: SocialPost[] = player?.isMock

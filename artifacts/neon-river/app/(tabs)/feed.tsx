@@ -304,11 +304,11 @@ function LivePostCard({ post }: { post: FeedPost }) {
 
       {/* Header */}
       <View style={cd.header}>
-        <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}`)}>
+        <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
           <NeonAvatar avatarId={post.authorAvatarIndex} size={44} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}`)}>
+          <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
             <Text style={cd.username}>{post.authorUsername}</Text>
           </TouchableOpacity>
           <Text style={cd.handle}>{post.authorRank} · {timeSince(post.createdAt)}</Text>
@@ -500,14 +500,20 @@ function PostCard({ post }: { post: SocialPost }) {
 
       {/* Header */}
       <View style={cd.header}>
-        <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}>
+        <TouchableOpacity style={cd.avatarWrap} onPress={() => {
+          if (post.playerId === 'me') { router.push('/(tabs)/profile'); return; }
+          router.push(`/social/player-profile?id=${post.playerId}`);
+        }}>
           <NeonAvatar avatarId={player?.avatarId ?? 1} size={44} />
           {player?.status === 'online'  && <View style={cd.onlineDot} />}
           {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
         </TouchableOpacity>
 
         <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.playerId}`)}>
+          <TouchableOpacity onPress={() => {
+            if (post.playerId === 'me') { router.push('/(tabs)/profile'); return; }
+            router.push(`/social/player-profile?id=${post.playerId}`);
+          }}>
             <View style={cd.usernameRow}>
               <Text style={cd.username}>{player?.username ?? 'Unknown'}</Text>
               {primaryBadge && <Text style={cd.badgeIcon}>{primaryBadge.icon}</Text>}
