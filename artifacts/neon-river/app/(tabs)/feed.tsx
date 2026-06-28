@@ -923,9 +923,7 @@ function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
   const [loading, setLoading] = useState(true);
 
   const fetchAnnouncements = useCallback(() => {
-    const base = process.env.EXPO_PUBLIC_API_URL
-      ?? 'https://api-server-production-bbc2.up.railway.app/api';
-    fetch(`${base}/announcements`)
+    fetch('https://api-server-production-bbc2.up.railway.app/api/announcements')
       .then(r => r.ok ? (r.json() as Promise<{ announcements: Announcement[] }>) : Promise.resolve({ announcements: [] }))
       .then(d => setPosts(d.announcements))
       .catch(() => {})
