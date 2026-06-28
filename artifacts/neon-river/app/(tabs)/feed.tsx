@@ -941,8 +941,7 @@ function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
 
   useEffect(() => {
     const base = process.env.EXPO_PUBLIC_API_URL
-      ? `${process.env.EXPO_PUBLIC_API_URL}/api`
-      : 'https://api-server-production-bbc2.up.railway.app/api';
+      ?? 'https://api-server-production-bbc2.up.railway.app/api';
     fetch(`${base}/announcements`)
       .then(r => r.ok ? (r.json() as Promise<{ announcements: Announcement[] }>) : Promise.resolve({ announcements: [] }))
       .then(d => {
