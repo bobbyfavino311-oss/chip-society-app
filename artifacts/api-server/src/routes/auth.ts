@@ -170,6 +170,8 @@ router.get('/auth/profile', async (req, res) => {
 });
 
 // ── PUT /api/auth/profile ─────────────────────────────────────────────────────
+// Merges client profile over the existing DB record so that server-only fields
+// (isFounder, moderation flags) set by admins are never stomped by client syncs.
 router.put('/auth/profile', async (req, res) => {
   try {
     const { playerId, profile } = req.body as {
@@ -181,9 +183,25 @@ router.put('/auth/profile', async (req, res) => {
       return;
     }
 
+    // Read existing record to preserve server-controlled fields
+    const existing = await db
+      .select({ profileJson: playersTable.profileJson })
+      .from(playersTable)
+      .where(eq(playersTable.playerId, playerId))
+      .limit(1);
+
+    const current = (existing[0]?.profileJson ?? {}) as Record<string, unknown>;
+
+    // Server-authoritative fields that must survive client syncs
+    const merged: Record<string, unknown> = {
+      ...profile,
+      // Preserve server-only flags — client cannot clear these
+      isFounder: current['isFounder'] ?? profile['isFounder'] ?? false,
+    };
+
     await db
       .update(playersTable)
-      .set({ profileJson: profile, updatedAt: new Date() })
+      .set({ profileJson: merged, updatedAt: new Date() })
       .where(eq(playersTable.playerId, playerId));
 
     res.json({ success: true });

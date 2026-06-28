@@ -435,6 +435,7 @@ function backfillProfile(base: UserProfile, saved: Partial<UserProfile>): UserPr
     tutorialCompleted: saved.tutorialCompleted ?? false,
     profileImageType: saved.profileImageType ?? (saved.avatarUri ? 'custom' : 'symbol'),
     symbolIndex: saved.symbolIndex ?? 0,
+    isFounder: saved.isFounder ?? false,
     tournamentWins: saved.tournamentWins ?? 0,
     tournamentLosses: saved.tournamentLosses ?? 0,
     bestTournamentFinish: saved.bestTournamentFinish ?? 0,

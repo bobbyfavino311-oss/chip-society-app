@@ -105,7 +105,7 @@ export default function StreakScreen() {
             <Text style={[st.streakNum, { color: '#ffd700' }]}>{currentStreak}</Text>
           </View>
         ) : (
-          <View style={{ width: 50 }} />
+          <View style={{ width: 50, height: 28 }} />
         )}
       </View>
 
