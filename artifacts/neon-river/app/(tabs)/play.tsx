@@ -423,6 +423,7 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
   const glowAnim  = useRef(new Animated.Value(0)).current;
   const joinedBuyInRef  = useRef(0);
   const pendingJoinRef  = useRef(false);
+  const celebratedRef   = useRef(false);
 
   // Multiplayer matchmaking only exists for standard No Limit Hold'em today —
   // other variants stay AI-only until the server supports those rulesets.
@@ -434,6 +435,7 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
       setStep('opponent'); setOpponent('ai'); setStake(null);
       setDotCount(0); setFound(false); setMatchError(null);
       pendingJoinRef.current = false;
+      celebratedRef.current = false;
       scaleAnim.setValue(0.92);
       return;
     }
@@ -497,14 +499,20 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
   }, [connected, stake]);
 
   useEffect(() => {
-    if (step !== 'matching' || opponent !== 'live' || found || !tableId) return;
+    if (step !== 'matching' || opponent !== 'live' || !tableId) return;
+    if (celebratedRef.current) return;
+    celebratedRef.current = true;
     celebrate();
     const t = setTimeout(() => {
       onClose();
       router.replace('/multiplayer/game' as any);
     }, 900);
     return () => clearTimeout(t);
-  }, [tableId, step, opponent, found]);
+    // `found` is intentionally excluded — celebrate() sets it, and including it
+    // here would re-run this effect (cancelling the just-scheduled navigation
+    // timer via cleanup) the instant it flips true. celebratedRef guards
+    // against double-firing instead.
+  }, [tableId, step, opponent]);
 
   useEffect(() => {
     if (step !== 'matching' || opponent !== 'live' || !error) return;
