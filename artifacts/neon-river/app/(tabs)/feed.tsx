@@ -921,12 +921,20 @@ type Announcement = { id: string; title: string; body: string; postedBy: string;
 function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
   const [posts, setPosts] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debugError, setDebugError] = useState<string | null>(null);
 
   const fetchAnnouncements = useCallback(() => {
+    setDebugError(null);
     fetch('https://api-server-production-bbc2.up.railway.app/api/announcements')
-      .then(r => r.ok ? (r.json() as Promise<{ announcements: Announcement[] }>) : Promise.resolve({ announcements: [] }))
+      .then(r => {
+        if (!r.ok) {
+          setDebugError(`HTTP ${r.status}`);
+          return { announcements: [] };
+        }
+        return r.json() as Promise<{ announcements: Announcement[] }>;
+      })
       .then(d => setPosts(d.announcements))
-      .catch(() => {})
+      .catch(e => setDebugError(String(e?.message ?? e)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -950,6 +958,11 @@ function AnnouncementsSection({ bottomInset }: { bottomInset: number }) {
         <Ionicons name="megaphone-outline" size={32} color={colors.textDim} />
         <Text style={{ color: colors.textDim, fontSize: 14 }}>No announcements yet</Text>
         <Text style={{ color: colors.textDim, fontSize: 12, opacity: 0.6 }}>Check back soon</Text>
+        {debugError ? (
+          <Text style={{ color: '#ff5577', fontSize: 11, opacity: 0.9, marginTop: 8, paddingHorizontal: 24, textAlign: 'center' }}>
+            DEBUG: {debugError}
+          </Text>
+        ) : null}
       </View>
     );
   }
