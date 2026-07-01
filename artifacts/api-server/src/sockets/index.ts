@@ -1,19 +1,25 @@
 import { Server as SocketIOServer } from 'socket.io';
 import type { Server as HttpServer } from 'http';
 import { eq } from 'drizzle-orm';
-import { db, playersTable, chipTransactionsTable } from '@workspace/db';
+import { db, playersTable } from '@workspace/db';
 import { RoomManager } from '../poker/roomManager.js';
 import { logger } from '../lib/logger.js';
-import type { StakeTier, ChipSyncFn } from '../poker/types.js';
+import type { StakeTier } from '../poker/types.js';
 
 // ── Player presence registry ───────────────────────────────────────────────────
 const playerSockets = new Map<string, string>(); // playerId → socketId
 const socketPlayers = new Map<string, string>(); // socketId → playerId
 
-// ── Chip session tracking ──────────────────────────────────────────────────────
-// Tracks what chips each player had when they sat down.
-// Used to compute the delta to write to the DB after each hand.
-const sessionStartChips = new Map<string, number>(); // userId → chips at session join
+// NOTE: Chip persistence is client-authoritative, exactly like AI Practice mode.
+// The client debits the buy-in via removeChips() before joining (see
+// app/multiplayer/lobby.tsx) and credits the final table stack back via
+// addChips() on leave (see app/multiplayer/game.tsx doLeave()). The server used
+// to also overwrite the player's DB bankroll after every hand via a
+// sessionStartChips/syncChipsToDb mechanism — that wrote the seat's small table
+// stack directly over the player's full bankroll (using the pre-buy-in DB value
+// as a stale baseline), destroying the rest of their balance after the very
+// first hand. That mechanism has been removed; the room only tracks chips
+// in-memory for the duration of the session.
 
 let _io: SocketIOServer | null = null;
 
@@ -51,55 +57,6 @@ async function loadPlayerChips(userId: string): Promise<number | null> {
   }
 }
 
-async function syncChipsToDb(userId: string, newChips: number): Promise<void> {
-  try {
-    const startChips = sessionStartChips.get(userId);
-    if (startChips === undefined) return;
-    const delta = newChips - startChips;
-    if (delta === 0) return;
-
-    // Load current profileJson and merge chips
-    const rows = await db
-      .select({ profileJson: playersTable.profileJson })
-      .from(playersTable)
-      .where(eq(playersTable.playerId, userId))
-      .limit(1);
-    if (!rows.length) return;
-
-    const updated = { ...(rows[0]!.profileJson as Record<string, unknown>), chips: newChips };
-    await db
-      .update(playersTable)
-      .set({ profileJson: updated, updatedAt: new Date() })
-      .where(eq(playersTable.playerId, userId));
-
-    await db.insert(chipTransactionsTable).values({
-      txId:         `mp_${userId}_${Date.now()}`,
-      playerId:     userId,
-      type:         delta > 0 ? 'multiplayer_win' : 'multiplayer_loss',
-      amount:       Math.abs(delta),
-      balanceAfter: newChips,
-      note:         'Multiplayer hand result',
-    });
-
-    // Update session baseline for the next hand
-    sessionStartChips.set(userId, newChips);
-
-    logger.info({ userId, delta, newChips }, 'Chip sync complete');
-  } catch (e) {
-    logger.error({ err: e, userId }, 'Chip sync failed');
-  }
-}
-
-// ── Chip sync callback (passed to RoomManager → PokerRoom) ───────────────────
-const onChipSync: ChipSyncFn = (seats) => {
-  for (const { userId, chips } of seats) {
-    // Fire-and-forget — don't block the game loop
-    syncChipsToDb(userId, chips).catch((e) =>
-      logger.error({ err: e, userId }, 'syncChipsToDb unhandled rejection')
-    );
-  }
-};
-
 export function setupSocketIO(httpServer: HttpServer): void {
   const io = new SocketIOServer(httpServer, {
     path: '/api/socket.io',
@@ -117,7 +74,7 @@ export function setupSocketIO(httpServer: HttpServer): void {
     io.emit('lobby_state', { tables: manager.getLobbyTables() });
   };
 
-  const manager = new RoomManager(emit, broadcast, onChipSync);
+  const manager = new RoomManager(emit, broadcast);
 
   io.on('connection', (socket) => {
     logger.info({ socketId: socket.id, transport: socket.conn.transport.name }, 'Socket connected');
@@ -181,7 +138,6 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        sessionStartChips.set(payload.userId, chips);
         socket.join(room.id);
         socket.emit('joined_table', { tableId: room.id, state: room.getClientStateFor(socket.id) });
         io.emit('lobby_state', { tables: manager.getLobbyTables() });
@@ -223,7 +179,6 @@ export function setupSocketIO(httpServer: HttpServer): void {
         }
 
         const room = manager.getRoom(payload.tableId)!;
-        sessionStartChips.set(payload.userId, chips);
         socket.join(payload.tableId);
         socket.emit('joined_table', { tableId: payload.tableId, state: room.getClientStateFor(socket.id) });
         io.emit('lobby_state', { tables: manager.getLobbyTables() });
@@ -265,7 +220,6 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        sessionStartChips.set(payload.userId, dbChips);
         socket.join(room.id);
         socket.emit('joined_table', { tableId: room.id, state: room.getClientStateFor(socket.id) });
         io.emit('lobby_state', { tables: manager.getLobbyTables() });

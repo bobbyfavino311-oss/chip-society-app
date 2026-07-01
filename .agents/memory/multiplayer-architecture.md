@@ -43,3 +43,10 @@ description: Socket.IO real-time multiplayer setup — server paths, room design
 - All room state lives in RoomManager's Map. Chips lost on server restart.
 - Players kicked if chips drop to 0 between hands.
 - DATABASE_URL not provisioned yet — add Drizzle persistence when ready.
+
+## Chip persistence is client-authoritative (do not add server-side per-hand DB sync)
+Chip bankroll persistence works exactly like AI Practice mode: the client deducts the buy-in via `removeChips()` before joining (`app/multiplayer/lobby.tsx`) and credits the final table stack back via `addChips()` on leave (`app/multiplayer/game.tsx` `doLeave()`). The server does NOT persist chips mid-session.
+
+**Why:** a prior version added a `sessionStartChips` map + `syncChipsToDb()` + `onChipSync` callback that overwrote the player's DB bankroll after every hand, computing a delta against the DB balance captured at join time. Because the seat only ever holds the (possibly capped) buy-in while the DB balance is the player's full bankroll, this delta calculation was wrong and it clobbered `profileJson.chips` with the tiny seat stack — destroying the rest of the bankroll after the very first hand (reported as "chips instantly drain when joining a multiplayer table"). This mechanism was removed entirely.
+
+**How to apply:** never reintroduce mid-session server→DB chip writes for multiplayer. `RoomManager`/`PokerRoom` still accept an optional `onChipSync` callback (types kept for compatibility) but `sockets/index.ts` now constructs `new RoomManager(emit, broadcast)` with it omitted, so `fireChipSync()` no-ops. If future work needs server-authoritative persistence, it must compute deltas from the seat's own buy-in baseline, not the DB balance at join time.

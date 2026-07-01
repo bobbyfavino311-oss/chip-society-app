@@ -4,11 +4,20 @@ import type {
   ClientGameState, SeatView, WinnerInfo, PlayerAction, ChipSyncFn,
 } from './types.js';
 import { decideBotAction } from './botEngine.js';
-import type { BotProfile } from './botEngine.js';
+import type { BotProfile, BotDifficulty } from './botEngine.js';
 
 const TURN_TIMEOUT_MS = 30_000;
 const SHOWDOWN_DELAY_MS = 5_000;
 const HAND_START_DELAY_MS = 3_000;
+
+// Bot "thinking" delay ranges, mirrored from AI Practice mode's
+// DIFFICULTY_CONFIGS[*].delayMs (lib/aiBot.ts) so multiplayer bots feel
+// identical in pacing to practice-mode bots instead of acting instantly.
+const BOT_DELAY_MS: Record<BotDifficulty, [number, number]> = {
+  ROOKIE: [1800, 3500],
+  SOLID:  [1300, 2800],
+  SHARK:  [1000, 2200],
+};
 
 export type EmitFn = (socketId: string, event: string, data: unknown) => void;
 export type BroadcastFn = (roomId: string, event: string, data: unknown) => void;
@@ -162,8 +171,10 @@ export class PokerRoom {
       position,
     });
 
-    // Small random delay so it feels like thinking (300–900 ms)
-    const delay = 300 + Math.floor(Math.random() * 600);
+    // Thinking delay — matches AI Practice mode's per-difficulty pacing so
+    // multiplayer bots feel identical to practice bots, not instant/robotic.
+    const [minDelay, maxDelay] = BOT_DELAY_MS[diff];
+    const delay = minDelay + Math.floor(Math.random() * (maxDelay - minDelay));
     setTimeout(() => {
       // Re-verify bot is still active (hand state may have changed)
       if (this.activeSeat !== idx || !this.isBotSeat(idx)) return;

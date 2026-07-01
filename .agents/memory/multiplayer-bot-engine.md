@@ -15,8 +15,15 @@ description: Server-side AI bots for multiplayer tables — architecture, trigge
 
 ## Trigger flow
 1. `broadcastState()` → if `activeSeat` is a bot → calls `triggerBotTurn()` inline
-2. `triggerBotTurn()` → computes decision via `decideBotAction()` → fires after 300–900ms random delay via `setTimeout`
+2. `triggerBotTurn()` → computes decision via `decideBotAction()` → fires after a difficulty-based delay via `setTimeout`
 3. `handleAction(seat.socketId, decision)` — bot's synthetic socketId works because `handleAction` looks up by socketId in `this.seats`
+
+## Bot thinking delay (must match AI Practice pacing)
+`room.ts` has a `BOT_DELAY_MS: Record<BotDifficulty, [number, number]>` lookup — ROOKIE [1800,3500], SOLID [1300,2800], SHARK [1000,2200] ms — mirrored from the client's `lib/aiBot.ts` `DIFFICULTY_CONFIGS[*].delayMs`.
+
+**Why:** an earlier version hardcoded a flat 300–900ms delay for all bots regardless of difficulty, which felt instant/robotic compared to AI Practice mode and was reported as a bug ("bots act far too fast").
+
+**How to apply:** if AI Practice's `DIFFICULTY_CONFIGS` delay ranges change, update `BOT_DELAY_MS` in `room.ts` to match — the two are intentionally kept in the same relative shape but are separate constants (api-server can't import from the neon-river artifact).
 
 ## Auto-fill timing
 - `quick_join` and `create_table` both call `manager.scheduleBotFill(room, 3, 8_000)` if <2 real players
