@@ -124,10 +124,11 @@ async function seedRevenueCat() {
     path: { project_id: project.id },
     query: { limit: 100 },
   });
-  if (listProductsError) throw new Error("Failed to list products");
+  if (listProductsError || !existingProducts) throw new Error("Failed to list products");
+  const existingProductItems = existingProducts.items ?? [];
 
   async function ensureProduct(targetApp: App, label: string, identifier: string, displayName: string, isTestStore: boolean): Promise<Product> {
-    const existing = existingProducts.items?.find(
+    const existing = existingProductItems.find(
       (p) => p.store_identifier === identifier && p.app_id === targetApp.id,
     );
     if (existing) {
