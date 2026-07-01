@@ -7,7 +7,7 @@ const router = Router();
 
 function requireAdmin(req: any, res: any, next: any) {
   const key = req.headers['x-admin-key'];
-  if (!key || key !== process.env['ADMIN_KEY']) {
+  if (!key || key !== process.env['ADMIN_SECRET']) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   return next();
