@@ -142,7 +142,13 @@ export default function MultiplayerLobby() {
       Alert.alert('Not enough chips', `Quick Match at this level requires ${formatChips(minBuy)} minimum.`);
       return;
     }
+    // Mirror the create/join flows: deduct the buy-in locally so the table
+    // stack isn't double-counted against the bankroll when the seat's final
+    // chips are added back on leave (server always seats you with your full
+    // DB-authoritative balance, capped at the tier's max buy-in).
+    const buyIn = Math.min(chips, minBuy * 5);
     setShowQuickJoin(false);
+    removeChips(buyIn);
     quickJoin(quickTier, userId, profile.username, profile.avatarIndex ?? 1);
   };
 

@@ -313,20 +313,34 @@ const LOCAL_CREDS_KEY   = '@chip_society_local_creds';
 const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── Notification socket URL ──────────────────────────────────────────────────
-// Always connect directly to the Railway production server — this is the same
-// server instance that receives admin bonus requests via POST /api/admin/players/:id/bonus,
-// so emitToPlayer() fires on the correct Socket.IO registry whether the player
-// is on iOS, Android, or the web preview. CORS is open (*) on Railway.
+// Native apps connect directly to the Railway production server — this is the
+// same server instance that receives admin bonus requests via
+// POST /api/admin/players/:id/bonus, so emitToPlayer() fires on the correct
+// Socket.IO registry. CORS is open (*) on Railway.
 function getNotificationSocketUrl(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    // Web preview only (running inside the Replit workspace) — keep the
+    // notification socket on the same server that holds the player's account,
+    // matching MultiplayerContext's getSocketUrl() so both stay in sync.
+    return window.location.origin;
+  }
   return 'https://api-server-production-bbc2.up.railway.app';
 }
 
 // ─── API base URL ─────────────────────────────────────────────────────────────
-// Always talk to the Railway production server — this is the single source of
-// truth for all player accounts, chip balances, and notifications.
-// The admin panel also points here so bonus pushes arrive on the same server
-// instance that holds the Socket.IO registry.
+// Native apps (Expo Go / standalone) always talk to the stable Railway
+// production server — this is the single source of truth for all player
+// accounts, chip balances, and notifications there.
+// Web preview (running inside the Replit workspace) instead uses the current
+// origin, so it hits the local dev api-server — the SAME server that
+// MultiplayerContext.getSocketUrl() and socialApi.ts route to in dev. Keeping
+// these two in sync is required: registering/loading a player's DB row on one
+// server while sockets/matchmaking hit a different server produces
+// "Account not found" errors during quick_join (dbChips lookup fails).
 export function getApiBase(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}/api`;
+  }
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 

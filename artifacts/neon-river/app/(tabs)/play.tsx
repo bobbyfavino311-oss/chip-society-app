@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Ellipse, G, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { useUser } from '@/context/UserContext';
+import { useMultiplayer } from '@/context/MultiplayerContext';
 import StakeSelectModal from '@/components/StakeSelectModal';
 
 // ─── Casino SVG icons ─────────────────────────────────────────────────────────
@@ -406,20 +407,33 @@ type OpponentType = 'ai' | 'live';
 function QuickPlayModal({ visible, variant, chips, onClose }: {
   visible: boolean; variant: string; chips: number; onClose: () => void;
 }) {
+  const { profile, removeChips, addChips } = useUser();
+  const {
+    connected, connecting, tableId, error,
+    connect, quickJoin, clearError,
+  } = useMultiplayer();
+
   const [step, setStep]          = useState<QpStep>('opponent');
   const [opponent, setOpponent]  = useState<OpponentType>('ai');
   const [stake, setStake]        = useState<StakeDef | null>(null);
   const [dotCount, setDotCount]  = useState(0);
   const [found, setFound]        = useState(false);
+  const [matchError, setMatchError] = useState<string | null>(null);
   const scaleAnim = useRef(new Animated.Value(0.92)).current;
   const glowAnim  = useRef(new Animated.Value(0)).current;
+  const joinedBuyInRef  = useRef(0);
+  const pendingJoinRef  = useRef(false);
 
+  // Multiplayer matchmaking only exists for standard No Limit Hold'em today —
+  // other variants stay AI-only until the server supports those rulesets.
+  const liveSupported = variant === 'texas_holdem';
   const availableStakes = STAKES.filter(s => chips >= s.minBuyIn);
 
   useEffect(() => {
     if (!visible) {
       setStep('opponent'); setOpponent('ai'); setStake(null);
-      setDotCount(0); setFound(false);
+      setDotCount(0); setFound(false); setMatchError(null);
+      pendingJoinRef.current = false;
       scaleAnim.setValue(0.92);
       return;
     }
@@ -427,26 +441,80 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
   }, [visible]);
 
   useEffect(() => {
-    if (step !== 'matching') return;
+    if (!liveSupported && opponent === 'live') setOpponent('ai');
+  }, [liveSupported]);
+
+  // Animated dot ticker while searching (both AI seating + live matchmaking).
+  useEffect(() => {
+    if (step !== 'matching' || found) return;
     const dotTimer = setInterval(() => setDotCount(d => (d + 1) % 4), 500);
+    return () => clearInterval(dotTimer);
+  }, [step, found]);
+
+  const celebrate = () => {
+    setFound(true);
+    Animated.loop(Animated.sequence([
+      Animated.timing(glowAnim, { toValue: 1, duration: 420, useNativeDriver: true }),
+      Animated.timing(glowAnim, { toValue: 0.3, duration: 420, useNativeDriver: true }),
+    ])).start();
+  };
+
+  // ── AI path: instant offline seating, unchanged timing/feel ──
+  useEffect(() => {
+    if (step !== 'matching' || opponent !== 'ai') return;
     const foundTimer = setTimeout(() => {
-      setFound(true);
-      clearInterval(dotTimer);
-      Animated.loop(Animated.sequence([
-        Animated.timing(glowAnim, { toValue: 1, duration: 420, useNativeDriver: true }),
-        Animated.timing(glowAnim, { toValue: 0.3, duration: 420, useNativeDriver: true }),
-      ])).start();
+      celebrate();
       setTimeout(() => {
         onClose();
-        if (opponent === 'live') {
-          router.push('/multiplayer/lobby' as any);
-        } else {
-          router.push(`/game/practice?variant=${variant}&players=5&tier=${QP_TO_GAME[stake?.tier ?? 'STANDARD'] ?? 'mid'}` as any);
-        }
+        router.push(`/game/practice?variant=${variant}&players=5&tier=${QP_TO_GAME[stake?.tier ?? 'STANDARD'] ?? 'mid'}` as any);
       }, 1000);
     }, 2400);
-    return () => { clearInterval(dotTimer); clearTimeout(foundTimer); };
-  }, [step]);
+    return () => clearTimeout(foundTimer);
+  }, [step, opponent]);
+
+  // ── Live path: real matchmaking via the multiplayer socket ──
+  // Joins/creates a real-player table first; the server only fills empty
+  // seats with bots as a last resort (after an 8s grace period with < 2
+  // real players seated) — see roomManager.scheduleBotFill.
+  useEffect(() => {
+    if (step !== 'matching' || opponent !== 'live' || !stake) return;
+    setMatchError(null);
+    pendingJoinRef.current = true;
+    if (!connected && !connecting) connect();
+    return () => { pendingJoinRef.current = false; };
+  }, [step, opponent, stake]);
+
+  useEffect(() => {
+    if (!pendingJoinRef.current || !connected || !stake) return;
+    pendingJoinRef.current = false;
+
+    const buyIn = Math.min(chips, stake.maxBuyIn);
+    joinedBuyInRef.current = buyIn;
+    removeChips(buyIn);
+
+    const userId = profile.playerId ?? profile.username;
+    quickJoin(stake.tier as any, userId, profile.username, profile.avatarIndex ?? 1);
+  }, [connected, stake]);
+
+  useEffect(() => {
+    if (step !== 'matching' || opponent !== 'live' || found || !tableId) return;
+    celebrate();
+    const t = setTimeout(() => {
+      onClose();
+      router.replace('/multiplayer/game' as any);
+    }, 900);
+    return () => clearTimeout(t);
+  }, [tableId, step, opponent, found]);
+
+  useEffect(() => {
+    if (step !== 'matching' || opponent !== 'live' || !error) return;
+    if (joinedBuyInRef.current > 0) {
+      addChips(joinedBuyInRef.current);
+      joinedBuyInRef.current = 0;
+    }
+    setMatchError(error);
+    clearError();
+  }, [error, step, opponent]);
 
   if (!visible) return null;
 
@@ -482,16 +550,27 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[qp.opponentCard, opponent === 'live' && qp.opponentCardActive, { borderColor: opponent === 'live' ? '#ff0090' : '#222' }]}
-                onPress={() => setOpponent('live')}
-                activeOpacity={0.8}
+                style={[
+                  qp.opponentCard, opponent === 'live' && qp.opponentCardActive,
+                  { borderColor: opponent === 'live' ? '#ff0090' : '#222' },
+                  !liveSupported && qp.opponentCardDisabled,
+                ]}
+                onPress={() => liveSupported && setOpponent('live')}
+                activeOpacity={liveSupported ? 0.8 : 1}
+                disabled={!liveSupported}
               >
                 {opponent === 'live' && <LinearGradient colors={['#ff009015', 'transparent']} style={StyleSheet.absoluteFill} />}
                 <Text style={qp.opponentEmoji}>🌎</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={[qp.opponentTitle, opponent === 'live' && { color: '#ff0090' }]}>LIVE PLAYERS</Text>
-                  <Text style={qp.opponentSub}>Search for real players</Text>
-                  <Text style={qp.opponentSub}>Fill empty seats with AI if needed</Text>
+                  {liveSupported ? (
+                    <>
+                      <Text style={qp.opponentSub}>Matched with real players first</Text>
+                      <Text style={qp.opponentSub}>Bots fill empty seats only as a last resort</Text>
+                    </>
+                  ) : (
+                    <Text style={qp.opponentSub}>Coming soon for this variant — AI only for now</Text>
+                  )}
                 </View>
                 {opponent === 'live' && <Ionicons name="checkmark-circle" size={20} color="#ff0090" />}
               </TouchableOpacity>
@@ -572,7 +651,26 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
           {/* ── Step 3: Matching ── */}
           {step === 'matching' && (
             <>
-              {!found ? (
+              {matchError ? (
+                <>
+                  <View style={[qp.searchIcon, { borderColor: 'rgba(255,80,80,0.3)' }]}>
+                    <Ionicons name="alert-circle" size={28} color="#ff5050" />
+                  </View>
+                  <Text style={[qp.matchTitle, { color: '#ff5050' }]}>MATCH FAILED</Text>
+                  <Text style={qp.matchDesc}>{matchError}</Text>
+                  <View style={qp.btnRow}>
+                    <TouchableOpacity style={qp.cancelBtn} onPress={onClose}>
+                      <Text style={qp.cancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[qp.nextBtn, { backgroundColor: `${color}22`, borderColor: color }]}
+                      onPress={() => { setMatchError(null); setStep('stakes'); }}
+                    >
+                      <Text style={[qp.nextText, { color }]}>TRY AGAIN</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              ) : !found ? (
                 <>
                   <View style={qp.searchIcon}>
                     <Ionicons name={opponent === 'ai' ? 'game-controller' : 'search'} size={28} color={color} />
@@ -634,6 +732,7 @@ const qp = StyleSheet.create({
     overflow: 'hidden',
   },
   opponentCardActive: { },
+  opponentCardDisabled: { opacity: 0.4 },
   opponentEmoji: { fontSize: 28 },
   opponentTitle:{ fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#fff', letterSpacing: 0.5 },
   opponentSub:  { fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 },
