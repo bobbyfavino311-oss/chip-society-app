@@ -3,29 +3,23 @@ import React, {
 } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 import type { ChatMessage, ClientGameState, LobbyTable, StakeTier } from '@/lib/multiplayerTypes';
 
 const LAST_ROOM_KEY = 'chip_society_last_room';
 
+const PRODUCTION_SERVER_URL = 'https://api-server-production-bbc2.up.railway.app';
+
 function getSocketUrl(): string {
+  // Native apps (Expo Go / standalone) always talk to the stable production
+  // server. Never derive this from EXPO_PUBLIC_API_URL / the Expo manifest —
+  // those bake in the ephemeral Replit dev-preview domain, which can change
+  // across sessions and silently break sockets in a cached JS bundle.
   if (typeof window !== 'undefined' && window.location?.origin) {
+    // Web preview only (running inside the Replit workspace) — safe to use
+    // the current origin since it's not a persisted/cached native bundle.
     return window.location.origin;
   }
-  const explicit = process.env['EXPO_PUBLIC_API_URL'];
-  if (explicit) return explicit.replace(/\/api\/?$/, '');
-  try {
-    const bundleUrl =
-      (Constants.manifest as Record<string, unknown> | null)?.['bundleUrl'] as string | undefined ??
-      (Constants as unknown as { manifest2?: { launchAsset?: { url?: string } } }).manifest2?.launchAsset?.url;
-    if (bundleUrl) {
-      const parsed = new URL(bundleUrl);
-      return `${parsed.protocol}//${parsed.host}`;
-    }
-  } catch { /* ignore */ }
-  const domain = process.env['EXPO_PUBLIC_DOMAIN'];
-  if (domain) return `https://${domain}`;
-  return 'https://api-server-production-bbc2.up.railway.app';
+  return PRODUCTION_SERVER_URL;
 }
 
 const SOCKET_PATH = '/api/socket.io';
