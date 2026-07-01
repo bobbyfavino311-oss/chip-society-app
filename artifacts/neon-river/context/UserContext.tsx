@@ -962,8 +962,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       console.log('[BonusSocket] disconnected:', reason);
     });
 
-    socket.on('connect_error', (err: Error) => {
-      console.log('[BonusSocket] connect_error:', err.message);
+    socket.on('connect_error', (err: Error & { type?: string }) => {
+      const activeTransport = socket.io?.engine?.transport?.name ?? 'unknown';
+      const configuredTransports = JSON.stringify((socket.io?.opts as { transports?: string[] })?.transports ?? []);
+      console.log(
+        `[BonusSocket] connect_error: ${err.message} [transport=${activeTransport} configured=${configuredTransports} type=${err.type ?? 'n/a'} url=${url}]`
+      );
     });
 
     socket.on('casino_bonus_received', (data: {

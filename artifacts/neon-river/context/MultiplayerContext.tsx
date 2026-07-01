@@ -127,9 +127,13 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
       // Don't clear tableId/gameState here — allow reconnect to restore state
     });
 
-    socket.on('connect_error', (err: Error) => {
+    socket.on('connect_error', (err: Error & { type?: string; description?: unknown }) => {
       setConnecting(false);
-      setError(`Connection failed: ${err.message}`);
+      const activeTransport = socket.io?.engine?.transport?.name ?? 'unknown';
+      const configuredTransports = JSON.stringify((socket.io?.opts as { transports?: string[] })?.transports ?? []);
+      setError(
+        `Connection failed: ${err.message} [transport=${activeTransport} configured=${configuredTransports} type=${err.type ?? 'n/a'} url=${url}]`
+      );
     });
 
     socket.on('lobby_state', (data: { tables: LobbyTable[] }) => {
