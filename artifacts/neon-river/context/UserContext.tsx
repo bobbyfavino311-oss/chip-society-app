@@ -179,6 +179,11 @@ export interface UserProfile {
   omahaWins: number;
   omahaLosses: number;
   omahaBiggestPot: number;
+  // Terms & Conditions version the account has actively accepted, synced
+  // server-side so acceptance is tied to the account (not just on-device
+  // storage) — a reinstall, device swap, or wiped AsyncStorage should never
+  // force a returning registered player to re-accept the same version.
+  termsAcceptedVersion?: string;
 }
 
 
@@ -250,7 +255,7 @@ interface UserContextValue {
   consumeScratchTickets: (n: number) => Promise<void>;
   addScratchTickets: (n: number) => Promise<void>;
   completeTutorial: () => Promise<void>;
-  registerAccount: (username: string, pin: string, email: string, avatarIndex: number) => Promise<{ success: boolean; error?: string }>;
+  registerAccount: (username: string, pin: string, email: string, avatarIndex: number, referrerUsername?: string) => Promise<{ success: boolean; error?: string }>;
   signIn: (username: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
   changePin: (oldPin: string, newPin: string) => Promise<{ success: boolean; error?: string }>;
@@ -538,7 +543,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
     // tutorialCompleted transitioning to true is a once-in-a-lifetime event —
     // save immediately so it can never be lost to a premature app close.
-    if (updated.tutorialCompleted) {
+    // Same for terms acceptance — must not be lost to the debounce window,
+    // since it's the source of truth for skipping the re-prompt next login.
+    if (updated.tutorialCompleted || updated.termsAcceptedVersion) {
       void serverSaveProfile(updated.playerId, updated);
       return;
     }
@@ -754,6 +761,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     pin: string,
     email: string,
     avatarIndex: number,
+    referrerUsername?: string,
   ): Promise<{ success: boolean; error?: string }> => {
     if (username.length < 3) return { success: false, error: 'Username must be at least 3 characters.' };
     if (username.length > 20) return { success: false, error: 'Username must be under 20 characters.' };
@@ -792,7 +800,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: res.error };
     }
 
-    const fullProfile: UserProfile = { ...newProfile, playerId: res.playerId };
+    let fullProfile: UserProfile = { ...newProfile, playerId: res.playerId };
+
+    // Claim the invite bonus, if one was provided. Failure here should never
+    // block account creation — the account already exists server-side.
+    if (referrerUsername?.trim() && res.playerId) {
+      try {
+        const claimRes = await fetch(`${getApiBase()}/referrals/claim`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refereeId: res.playerId, referrerUsername: referrerUsername.trim() }),
+        });
+        const claimData = await claimRes.json() as { success?: boolean; refereeBonus?: number };
+        if (claimRes.ok && claimData.success && claimData.refereeBonus) {
+          fullProfile = { ...fullProfile, chips: fullProfile.chips + claimData.refereeBonus };
+        }
+      } catch { /* silent — invite bonus is a nice-to-have, not critical path */ }
+    }
+
     setProfile(fullProfile);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
     // Also store local creds so sign-in works offline.
@@ -1029,6 +1054,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     socket.on('player_ban', (data: { actionId: string; reason: string; message?: string | null; timestamp: string }) => {
       console.log('[BonusSocket] player_ban', data);
       setPendingModeration({ type: 'ban', reason: data.reason, message: data.message ?? null, actionId: data.actionId });
+    });
+
+    socket.on('player_unbanned', (data: { timestamp: string }) => {
+      console.log('[BonusSocket] player_unbanned', data);
+      // Restored to good standing server-side — clear any moderation modal
+      // still showing so the UI reflects it immediately without requiring
+      // a re-login. (No local "status" field to reset — the app never
+      // blocks gameplay based on a cached warned/banned state; the login
+      // gate re-checks status with the server on every sign-in.)
+      setPendingModeration(null);
     });
 
     socket.on('dm_received', (data: DmReceivedPayload) => {

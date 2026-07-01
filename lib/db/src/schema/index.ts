@@ -143,6 +143,17 @@ export const bugReportsTable = pgTable('bug_reports', {
   updatedAt:   timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+// ── Referrals ─────────────────────────────────────────────────────────────────
+
+export const referralsTable = pgTable('referrals', {
+  referralId:    text('referral_id').primaryKey(),
+  referrerId:    text('referrer_id').notNull().references(() => playersTable.playerId),
+  refereeId:     text('referee_id').notNull().unique().references(() => playersTable.playerId),
+  referrerBonus: integer('referrer_bonus').notNull(),
+  refereeBonus:  integer('referee_bonus').notNull(),
+  createdAt:     timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
 // ── Announcements ─────────────────────────────────────────────────────────────
 
 export const announcementsTable = pgTable('announcements', {

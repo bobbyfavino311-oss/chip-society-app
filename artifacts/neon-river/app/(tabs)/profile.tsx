@@ -9,6 +9,7 @@ import {
   Modal,
   Platform,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
@@ -667,6 +668,33 @@ export default function ProfileScreen() {
             <Text style={achStyles.achSub}>Update your 4-digit account PIN</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="rgba(0,212,255,0.5)" />
+        </TouchableOpacity>
+
+        {/* Invite Friends */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={async () => {
+            try {
+              await Share.share({
+                message: `Join me on Chip Society! Use my invite code "${profile.username}" when you sign up and we'll both get a bonus chip stack. 🎰`,
+              });
+            } catch { /* user dismissed the share sheet — nothing to do */ }
+          }}
+        >
+          <LinearGradient
+            colors={['rgba(255,0,144,0.10)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={[achStyles.iconWrap, { backgroundColor: 'rgba(255,0,144,0.10)' }]}>
+            <Ionicons name="share-social-outline" size={20} color="rgba(255,0,144,0.85)" />
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>INVITE FRIENDS</Text>
+            <Text style={achStyles.achSub}>Share your code · earn bonus chips together</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(255,0,144,0.5)" />
         </TouchableOpacity>
 
         {/* Report a Bug */}

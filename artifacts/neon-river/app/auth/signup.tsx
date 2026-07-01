@@ -54,6 +54,11 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
 
+  const [inviteCode, setInviteCode] = useState('');
+  const [inviteStatus, setInviteStatus] = useState<'idle' | 'checking' | 'ok' | 'error'>('idle');
+  const [inviteError, setInviteError] = useState('');
+  const inviteDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [pinPhase, setPinPhase] = useState<'enter' | 'confirm'>('enter');
@@ -95,6 +100,29 @@ export default function SignupScreen() {
     if (val.length > 20) return 'Maximum 20 characters.';
     if (!/^[a-zA-Z0-9_]+$/.test(val)) return 'Only letters, numbers, underscores.';
     return '';
+  };
+
+  const handleInviteCodeChange = (val: string) => {
+    setInviteCode(val);
+    setInviteError('');
+    if (!val.trim()) { setInviteStatus('idle'); return; }
+    setInviteStatus('checking');
+    if (inviteDebounce.current) clearTimeout(inviteDebounce.current);
+    inviteDebounce.current = setTimeout(async () => {
+      try {
+        const r = await fetch(`${getApiBase()}/referrals/lookup?username=${encodeURIComponent(val.trim())}`);
+        const d = await r.json() as { valid?: boolean };
+        if (d.valid) {
+          setInviteStatus('ok');
+        } else {
+          setInviteStatus('error');
+          setInviteError('Invite code not found.');
+        }
+      } catch {
+        setInviteStatus('error');
+        setInviteError('Could not verify code — you can still continue.');
+      }
+    }, 600);
   };
 
   const handleUsernameChange = (val: string) => {
@@ -157,7 +185,7 @@ export default function SignupScreen() {
     } else if (step === 2) {
       setLoading(true);
       setError('');
-      const result = await registerAccount(username, pin, email.trim(), avatarIndex);
+      const result = await registerAccount(username, pin, email.trim(), avatarIndex, inviteCode.trim() || undefined);
       setLoading(false);
       if (result.success) {
         setStep(3);
@@ -295,6 +323,32 @@ export default function SignupScreen() {
                       <Text style={s.inputError}>{emailError}</Text>
                     ) : (
                       <Text style={s.emailHint}>If you forget your PIN, we'll send a reset link here.</Text>
+                    )}
+                  </View>
+
+                  {/* Optional invite code — bonus chips for referrer + referee */}
+                  <View style={s.emailSection}>
+                    <Text style={s.emailLabel}>INVITE CODE <Text style={s.emailOptional}>(optional — get a chip bonus)</Text></Text>
+                    <View style={[s.inputWrap, { borderColor: inviteStatus === 'error' ? colors.error : inviteStatus === 'ok' ? colors.success : 'rgba(255,255,255,0.15)' }]}>
+                      <TextInput
+                        style={s.input}
+                        placeholder="Friend's username"
+                        placeholderTextColor="rgba(255,255,255,0.2)"
+                        value={inviteCode}
+                        onChangeText={handleInviteCodeChange}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        maxLength={20}
+                      />
+                      {inviteStatus === 'ok' && <Ionicons name="checkmark-circle" size={18} color={colors.success} />}
+                      {inviteStatus === 'error' && <Ionicons name="close-circle" size={18} color={colors.error} />}
+                    </View>
+                    {inviteError ? (
+                      <Text style={s.inputError}>{inviteError}</Text>
+                    ) : inviteStatus === 'ok' ? (
+                      <Text style={s.inputOk}>Valid code — you'll both get bonus chips!</Text>
+                    ) : (
+                      <Text style={s.emailHint}>Enter a friend's username to unlock a signup bonus for both of you.</Text>
                     )}
                   </View>
                 </View>

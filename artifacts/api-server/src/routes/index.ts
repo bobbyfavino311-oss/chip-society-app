@@ -4,6 +4,7 @@ import authRouter from "./auth";
 import adminRouter from "./admin";
 import socialRouter from "./social";
 import bugsRouter from "./bugs";
+import referralsRouter from "./referrals";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(authRouter);
 router.use(adminRouter);
 router.use(socialRouter);
 router.use(bugsRouter);
+router.use(referralsRouter);
 
 export default router;
