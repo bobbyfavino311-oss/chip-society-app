@@ -89,7 +89,11 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
 
     const socket = io(url, {
       path: SOCKET_PATH,
-      transports: ['polling', 'websocket'],
+      // Railway's edge proxy kills long-held polling connections, which
+      // surfaces as a persistent "xhr poll error" on native clients even
+      // though the initial handshake succeeds. Skip polling and connect
+      // via WebSocket directly.
+      transports: ['websocket'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,

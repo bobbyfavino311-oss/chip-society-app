@@ -945,7 +945,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     const socket = io(url, {
       path: '/api/socket.io',
-      transports: ['websocket', 'polling'],
+      // Railway's edge proxy kills long-held polling connections; skip
+      // straight to WebSocket to avoid "xhr poll error" on native clients.
+      transports: ['websocket'],
       reconnection: true,
       reconnectionDelay: 2000,
       reconnectionAttempts: Infinity,
