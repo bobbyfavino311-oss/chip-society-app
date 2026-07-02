@@ -16,7 +16,7 @@ import { useUser } from '@/context/UserContext';
 import { SoundEngine } from '@/lib/soundEngine';
 import { getBestHand, describeHand } from '@/lib/pokerEngine';
 import { useLocalSearchParams } from 'expo-router';
-import { useTournamentGame, BLIND_LEVELS, Standing, Prize } from '@/hooks/useTournamentGame';
+import { useTournamentGame, Standing, Prize } from '@/hooks/useTournamentGame';
 import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType } from '@/constants/tournaments';
 import NeonAvatarSeat from '@/components/NeonAvatar';
 import ShareToFeedModal from '@/components/ShareToFeedModal';
@@ -396,7 +396,7 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
         <View style={lobby.section}>
           <Text style={lobby.sectionLabel}>BLIND SCHEDULE</Text>
           <View style={lobby.blindsList}>
-            {BLIND_LEVELS.map((lvl, i) => (
+            {tConfig.blindSchedule.map((lvl, i) => (
               <View key={i} style={lobby.blindRow}>
                 <Text style={lobby.blindLevel}>LVL {i + 1}</Text>
                 <Text style={lobby.blindAmt}>{lvl.sb} / {lvl.bb}</Text>
@@ -409,7 +409,7 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
         <View style={lobby.infoBox}>
           <Ionicons name="information-circle" size={16} color={colors.primary} />
           <Text style={lobby.infoText}>
-            {tConfig.numPlayers} players total · {tConfig.numPlayers - 1} AI opponents · Mixed skill levels
+            {tConfig.numPlayers} players total · {tConfig.numPlayers - 1} AI opponents · ~{tConfig.estimatedDuration}
           </Text>
         </View>
 
@@ -451,6 +451,7 @@ export default function TournamentScreen() {
     startingChips: tConfig.startingChips,
     buyIn: tConfig.buyIn,
     handsPerLevel: tConfig.handsPerLevel,
+    blindSchedule: tConfig.blindSchedule,
   });
 
   const insets = useSafeAreaInsets();

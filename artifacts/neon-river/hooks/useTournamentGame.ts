@@ -382,11 +382,12 @@ const INITIAL_META: TournamentMeta = {
 export function useTournamentGame(
   humanName: string,
   numPlayers: 4 | 5 | 6 = 6,
-  config?: { startingChips?: number; buyIn?: number; handsPerLevel?: number },
+  config?: { startingChips?: number; buyIn?: number; handsPerLevel?: number; blindSchedule?: { sb: number; bb: number }[] },
 ) {
   const startingChips = config?.startingChips ?? STARTING_CHIPS;
   const buyIn         = config?.buyIn         ?? BUY_IN;
   const handsPerLevel = config?.handsPerLevel  ?? HANDS_PER_LEVEL;
+  const blindLevels   = config?.blindSchedule && config.blindSchedule.length > 0 ? config.blindSchedule : BLIND_LEVELS;
 
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME);
   const [tournament, setTournament] = useState<TournamentMeta>(INITIAL_META);
@@ -448,7 +449,7 @@ export function useTournamentGame(
     const numBots = numPlayers - 1;
     const bots = BOT_ROSTER.slice(0, numBots);
     const prizes = buildPrizes(numPlayers, buyIn);
-    const blinds = BLIND_LEVELS[0];
+    const blinds = blindLevels[0];
 
     const players: GamePlayer[] = [
       {
@@ -471,7 +472,7 @@ export function useTournamentGame(
       myPlace: null, myPrize: null, blindJustIncreased: false,
     });
     setGameState(dealAndPostBlinds(players, 0, blinds.sb, blinds.bb));
-  }, [humanName, numPlayers, clearTimer, clearAI]);
+  }, [humanName, numPlayers, buyIn, startingChips, blindLevels, clearTimer, clearAI]);
 
   // ── Handle player action ──────────────────────────────────────────────────────
   const handleAction = useCallback((action: AIAction, raiseAmount?: number) => {
@@ -557,13 +558,13 @@ export function useTournamentGame(
         let blindLevel = prevT.blindLevel;
         let newHandsThisLevel = handsThisLevel;
         let blindJustIncreased = false;
-        if (handsThisLevel >= handsPerLevel && blindLevel < BLIND_LEVELS.length) {
-          blindLevel = Math.min(prevT.blindLevel, BLIND_LEVELS.length - 1) + 1;
+        if (handsThisLevel >= handsPerLevel && blindLevel < blindLevels.length) {
+          blindLevel = Math.min(prevT.blindLevel, blindLevels.length - 1) + 1;
           newHandsThisLevel = 0;
           blindJustIncreased = true;
         }
-        const blindIdx = Math.min(blindLevel - 1, BLIND_LEVELS.length - 1);
-        const { sb, bb } = BLIND_LEVELS[blindIdx];
+        const blindIdx = Math.min(blindLevel - 1, blindLevels.length - 1);
+        const { sb, bb } = blindLevels[blindIdx];
 
         // Deal new hand
         const nextDealer = (prev.dealerIndex + 1) % survivors.length;
@@ -590,7 +591,7 @@ export function useTournamentGame(
       // Return idle state while we schedule the real deal above
       return { ...prev, phase: 'idle' };
     });
-  }, [clearTimer, clearAI, humanName, numPlayers, startingChips, buyIn]);
+  }, [clearTimer, clearAI, humanName, numPlayers, startingChips, buyIn, handsPerLevel, blindLevels]);
 
   const clearPendingEliminations = useCallback(() => {
     setTournament(prev => ({ ...prev, pendingEliminations: [], blindJustIncreased: false }));

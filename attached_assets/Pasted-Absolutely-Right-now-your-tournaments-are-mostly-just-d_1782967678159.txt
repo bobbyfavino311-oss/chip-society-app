@@ -1,0 +1,521 @@
+Absolutely. Right now your tournaments are mostly just different names with different colors. To make Chip Society feel like a real poker platform, every tournament should have its own identity, where the blind structure, starting stack, pacing, and strategy actually change how the game is played.
+
+Here’s the master prompt I’d give your AI.
+
+⸻
+
+CHIP SOCIETY TOURNAMENT SYSTEM OVERHAUL
+
+The current tournament system is only changing names, colors, and buy-ins.
+
+This is NOT acceptable.
+
+Every tournament must feel like an entirely different poker experience.
+
+Each tournament should have its own:
+
+* Blind structure
+* Starting stack
+* Blind timer
+* Buy-in
+* Average game length
+* Target player
+* Strategy
+* Tournament pacing
+
+When a player joins a tournament, they should immediately feel the difference.
+
+⸻
+
+GENERAL TOURNAMENT RULES
+
+All tournaments use tournament chips only.
+
+Tournament chips never convert back into bankroll.
+
+No rebuys unless specifically stated.
+
+Prize pools are distributed automatically.
+
+Players are eliminated at zero chips.
+
+Final table forms automatically.
+
+Tables rebalance automatically after eliminations.
+
+Tournament statistics save permanently.
+
+⸻
+
+1. LOW STAKES LOUNGE
+
+Purpose
+
+Beginner-friendly tournament.
+
+Designed for casual players.
+
+Buy-In
+
+5,000
+
+Starting Stack
+
+10,000 chips
+
+Starting Blinds
+
+25 / 50
+
+Blind Increase
+
+Every 8 minutes
+
+Average Duration
+
+25–35 minutes
+
+Structure
+
+Very forgiving.
+
+Lots of post-flop play.
+
+Deep enough for beginners.
+
+⸻
+
+2. SIT & GO RUSH
+
+Purpose
+
+Quick tournament.
+
+Starts instantly when seats fill.
+
+Buy-In
+
+15,000
+
+Starting Stack
+
+7,500
+
+Starting Blinds
+
+50 / 100
+
+Blind Increase
+
+Every 4 minutes
+
+Average Duration
+
+12–18 minutes
+
+Structure
+
+Fast.
+
+Aggressive.
+
+Little room for mistakes.
+
+⸻
+
+3. TURBO HEAT
+
+Purpose
+
+Very fast tournament.
+
+Action begins immediately.
+
+Buy-In
+
+25,000
+
+Starting Stack
+
+5,000
+
+Starting Blinds
+
+100 / 200
+
+Blind Increase
+
+Every 2 minutes
+
+Average Duration
+
+8–12 minutes
+
+Designed for:
+
+Constant all-ins.
+
+Short stacks.
+
+High action.
+
+⸻
+
+4. DAILY CHAMPIONSHIP
+
+Purpose
+
+Main daily tournament.
+
+Balanced structure.
+
+Buy-In
+
+100,000
+
+Starting Stack
+
+20,000
+
+Starting Blinds
+
+50 / 100
+
+Blind Increase
+
+Every 10 minutes
+
+Average Duration
+
+45–60 minutes
+
+Strategy
+
+Deep poker.
+
+Best overall tournament.
+
+⸻
+
+5. HIGH ROLLER
+
+Purpose
+
+Elite tournament.
+
+Largest buy-in.
+
+Buy-In
+
+500,000
+
+Starting Stack
+
+30,000
+
+Starting Blinds
+
+100 / 200
+
+Blind Increase
+
+Every 12 minutes
+
+Average Duration
+
+60–90 minutes
+
+Strategy
+
+Very deep stacked.
+
+Maximum skill.
+
+Biggest prizes.
+
+⸻
+
+6. NIGHT GRIND
+
+Purpose
+
+Long-form tournament.
+
+Rewards patience.
+
+Buy-In
+
+250,000
+
+Starting Stack
+
+25,000
+
+Starting Blinds
+
+25 / 50
+
+Blind Increase
+
+Every 15 minutes
+
+Average Duration
+
+75+ minutes
+
+Very slow blind growth.
+
+Encourages real poker.
+
+⸻
+
+7. WEEKEND MAJOR
+
+Purpose
+
+Large featured event.
+
+Premium tournament.
+
+Buy-In
+
+1,000,000
+
+Starting Stack
+
+50,000
+
+Starting Blinds
+
+100 / 200
+
+Blind Increase
+
+Every 12 minutes
+
+Average Duration
+
+90–120 minutes
+
+Largest prize pool.
+
+Most prestigious.
+
+⸻
+
+8. DEEP STACK CLASSIC
+
+Purpose
+
+Professional-style poker.
+
+Longest tournament.
+
+Buy-In
+
+250,000
+
+Starting Stack
+
+50,000
+
+Starting Blinds
+
+25 / 50
+
+Blind Increase
+
+Every 15 minutes
+
+Average Duration
+
+90+ minutes
+
+Designed for:
+
+Slow strategy.
+
+Minimal luck.
+
+Maximum skill.
+
+⸻
+
+9. HYPER TURBO
+
+Purpose
+
+Pure chaos.
+
+Buy-In
+
+100,000
+
+Starting Stack
+
+3,000
+
+Starting Blinds
+
+200 / 400
+
+Blind Increase
+
+Every 60 seconds
+
+Average Duration
+
+5–8 minutes
+
+Very high variance.
+
+Huge action.
+
+⸻
+
+BLIND PROGRESSION
+
+Every tournament must have its own blind schedule.
+
+Example:
+
+Deep Stack
+
+25/50
+
+50/100
+
+75/150
+
+100/200
+
+150/300
+
+200/400
+
+Turbo
+
+100/200
+
+200/400
+
+400/800
+
+800/1600
+
+1600/3200
+
+Hyper
+
+200/400
+
+400/800
+
+800/1600
+
+1600/3200
+
+3200/6400
+
+Never use the same blind progression across all tournaments.
+
+⸻
+
+TABLE BALANCING
+
+Automatically merge tables as players bust.
+
+Never allow empty seats if another table has excess players.
+
+Create final table automatically.
+
+⸻
+
+FINAL TABLE
+
+Special animation.
+
+New table banner.
+
+Final Table music.
+
+Highlight remaining players.
+
+⸻
+
+ELIMINATIONS
+
+Show:
+
+Player name
+
+Finishing position
+
+Prize won
+
+XP earned
+
+Immediately reseat remaining players.
+
+⸻
+
+PRIZE DISTRIBUTION
+
+Automatically pay prizes.
+
+Display winnings.
+
+Update bankroll.
+
+Update tournament statistics.
+
+Update achievements.
+
+⸻
+
+TOURNAMENT LOBBY
+
+Every tournament should display:
+
+Tournament Name
+
+Description
+
+Buy-In
+
+Starting Stack
+
+Blind Timer
+
+Blind Structure
+
+Prize Pool
+
+Payouts
+
+Entrants
+
+Players Registered
+
+Estimated Duration
+
+Game Variant (Traditional Hold’em, Omaha, Short Deck, Joker Hold’em)
+
+⸻
+
+GAMEPLAY DIFFERENTIATION
+
+The tournament name alone should never define the experience.
+
+The gameplay itself must reflect the tournament type.
+
+Examples:
+
+* Turbo Heat should feel relentless, forcing frequent all-ins as blinds escalate rapidly.
+* Deep Stack Classic should reward patience, with long blind levels and meaningful post-flop play.
+* Sit & Go Rush should start immediately when full and finish quickly.
+* Night Grind should be a marathon built around endurance and careful chip management.
+* High Roller should feature deeper stacks, tougher AI, and the highest prestige.
+* Weekend Major should feel like Chip Society’s flagship event with the biggest prizes and strongest competition.
+
+Every tournament should have its own pace, strategy, and personality so players immediately recognize the style of event they’ve entered—not just by the title, but by how it actually plays.

@@ -20,7 +20,9 @@ import {
   getPrizePool,
 } from '@/constants/tournaments';
 
-const TYPE_ORDER: TournamentType[] = ['beginner', 'sitandgo', 'turbo', 'highroller'];
+const TYPE_ORDER: TournamentType[] = [
+  'beginner', 'sitandgo', 'turbo', 'daily', 'highroller', 'nightgrind', 'weekendmajor', 'deepstack', 'hyperturbo',
+];
 
 function formatChips(n: number): string {
   const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
