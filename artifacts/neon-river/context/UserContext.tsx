@@ -929,20 +929,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
           // Last resort: server is unreachable and no local data exists for this
           // username (Expo Go may have cleared AsyncStorage on bundle re-download).
-          // Create a fresh local account so the user can get back into the app.
-          // Chips/stats will start fresh — they were already lost with the storage wipe.
-          const localPlayerId = `local_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-          const freshProfile: UserProfile = {
-            ...DEFAULT_PROFILE,
-            username: username.toLowerCase(),
-            accountType: 'registered',
-            playerId: localPlayerId,
-            isNewUser: false,
+          // Do NOT silently fabricate a fresh local account here — that would let
+          // a player appear "signed in" under a real username while actually
+          // playing on a disconnected, unregistered profile with none of their
+          // real chips/stats, which is far more confusing than a clear error.
+          return {
+            success: false,
+            error: "Can't reach the server right now. Check your connection and try again.",
           };
-          setProfile(freshProfile);
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(freshProfile));
-          await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pin, playerId: localPlayerId }));
-          return { success: true };
         } catch { /* fall through */ }
         return { success: false, error: 'Sign-in failed. Please try again.' };
       }
