@@ -5,6 +5,7 @@ import {
   Animated,
   Dimensions,
   Image,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -77,6 +78,164 @@ function TournamentCarousel({ userChips }: { userChips: number }) {
     </ScrollView>
   );
 }
+
+// ─── Early Access Tournaments banner + roadmap modal ─────────────────────────
+
+function RoadmapModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const insets = useSafeAreaInsets();
+  const stages = [
+    {
+      label: 'SEASON ZERO',
+      status: 'LIVE NOW',
+      color: '#00e887',
+      icon: 'flash-outline' as const,
+      copy: 'Single-table tournaments with AI-filled seats. Freezeout format, rising blinds, instant start — the foundation for everything ahead.',
+    },
+    {
+      label: 'SEASON ONE',
+      status: 'IN DEVELOPMENT',
+      color: colors.primary,
+      icon: 'construct-outline' as const,
+      copy: 'Scheduled events, deeper payout structures, and new tournament formats across both Texas Hold\'em and Short Deck.',
+    },
+    {
+      label: 'THE FUTURE',
+      status: 'ON THE ROADMAP',
+      color: colors.secondary,
+      icon: 'people-outline' as const,
+      copy: 'Real opponents, multi-table tournaments, live leaderboards, and seasonal rankings — full multiplayer tournament play.',
+    },
+  ];
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={roadmap.overlay}>
+        <TouchableOpacity style={roadmap.backdrop} activeOpacity={1} onPress={onClose} />
+        <View style={[roadmap.sheet, { paddingBottom: insets.bottom + 24 }]}>
+          <LinearGradient colors={['#1a0030', '#0d001c', '#050010']} style={StyleSheet.absoluteFill} />
+          <View style={roadmap.topAccent} />
+
+          <View style={roadmap.header}>
+            <View>
+              <Text style={roadmap.title}>EARLY ACCESS</Text>
+              <Text style={roadmap.subtitle}>Tournament Roadmap</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="close-circle" size={22} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={roadmap.body}>
+            {stages.map((s, i) => (
+              <View key={s.label} style={roadmap.stageRow}>
+                <View style={roadmap.stageLine}>
+                  <View style={[roadmap.stageDot, { borderColor: s.color, backgroundColor: `${s.color}18` }]}>
+                    <Ionicons name={s.icon} size={15} color={s.color} />
+                  </View>
+                  {i < stages.length - 1 && <View style={roadmap.stageConnector} />}
+                </View>
+                <View style={roadmap.stageContent}>
+                  <View style={roadmap.stageHeaderRow}>
+                    <Text style={[roadmap.stageLabel, { color: s.color }]}>{s.label}</Text>
+                    <View style={[roadmap.statusPill, { borderColor: `${s.color}40`, backgroundColor: `${s.color}12` }]}>
+                      <Text style={[roadmap.statusText, { color: s.color }]}>{s.status}</Text>
+                    </View>
+                  </View>
+                  <Text style={roadmap.stageCopy}>{s.copy}</Text>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+
+          <TouchableOpacity style={roadmap.okBtn} onPress={onClose} activeOpacity={0.85}>
+            <Text style={roadmap.okText}>GOT IT</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function EarlyAccessBanner() {
+  const [modalVisible, setModalVisible] = useState(false);
+  return (
+    <>
+      <View style={eaBanner.wrap}>
+        <LinearGradient
+          colors={['rgba(191,95,255,0.10)', 'rgba(0,212,255,0.05)']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        />
+        <View style={eaBanner.iconWrap}>
+          <Ionicons name="rocket-outline" size={16} color={colors.accent} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={eaBanner.title}>EARLY ACCESS TOURNAMENTS</Text>
+          <Text style={eaBanner.sub}>Season Zero is live — more formats and multiplayer events on the way.</Text>
+        </View>
+        <TouchableOpacity onPress={() => setModalVisible(true)} activeOpacity={0.75} style={eaBanner.learnBtn}>
+          <Text style={eaBanner.learnText}>Learn More</Text>
+        </TouchableOpacity>
+      </View>
+      <RoadmapModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+    </>
+  );
+}
+
+const roadmap = StyleSheet.create({
+  overlay: { flex: 1, justifyContent: 'flex-end' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.75)' },
+  sheet: {
+    borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    overflow: 'hidden', paddingTop: 20, paddingHorizontal: 20,
+    borderTopWidth: 1, borderLeftWidth: 1, borderRightWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)', maxHeight: '80%',
+  },
+  topAccent: { position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: colors.accent },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
+  title: { color: colors.accent, fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 1 },
+  subtitle: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
+  body: { gap: 4, paddingBottom: 12 },
+  stageRow: { flexDirection: 'row', gap: 12 },
+  stageLine: { alignItems: 'center', width: 32 },
+  stageDot: {
+    width: 32, height: 32, borderRadius: 16, borderWidth: 1.5,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  stageConnector: { width: 1, flex: 1, minHeight: 24, backgroundColor: 'rgba(255,255,255,0.12)', marginVertical: 4 },
+  stageContent: { flex: 1, paddingBottom: 20 },
+  stageHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 5 },
+  stageLabel: { fontSize: 12, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  statusPill: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
+  statusText: { fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  stageCopy: { color: colors.textMuted, fontSize: 12, lineHeight: 18, marginTop: 6 },
+  okBtn: {
+    borderRadius: 50, paddingVertical: 13, alignItems: 'center',
+    backgroundColor: colors.accent, marginTop: 4,
+  },
+  okText: { color: '#000', fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
+});
+
+const eaBanner = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    borderRadius: 14, borderWidth: 1, borderColor: 'rgba(191,95,255,0.28)',
+    paddingHorizontal: 14, paddingVertical: 12, overflow: 'hidden',
+  },
+  iconWrap: {
+    width: 32, height: 32, borderRadius: 16,
+    borderWidth: 1, borderColor: 'rgba(191,95,255,0.35)',
+    backgroundColor: 'rgba(191,95,255,0.1)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  title: { color: colors.text, fontSize: 11, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
+  sub: { color: colors.textMuted, fontSize: 10.5, marginTop: 3, lineHeight: 14 },
+  learnBtn: {
+    borderRadius: 8, borderWidth: 1, borderColor: 'rgba(191,95,255,0.4)',
+    paddingHorizontal: 10, paddingVertical: 7,
+  },
+  learnText: { color: colors.accent, fontSize: 10, fontWeight: '800', letterSpacing: 0.3 },
+});
 
 // ─── Quick Play inline launcher ──────────────────────────────────────────────
 
@@ -566,6 +725,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         <TournamentCarousel userChips={profile.chips} />
+        <EarlyAccessBanner />
 
         {/* 5 ─── Player Stats ─── */}
         <View style={styles.sectionRow}>

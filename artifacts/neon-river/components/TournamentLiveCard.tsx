@@ -393,9 +393,9 @@ const st = StyleSheet.create({
     position: 'absolute', top: 0, left: 0, right: 0, height: 2,
   },
   inner: {
-    padding: 16,
-    paddingBottom: 18,
-    gap: 10,
+    padding: 13,
+    paddingBottom: 14,
+    gap: 7,
     alignItems: 'center',
   },
 
@@ -414,7 +414,7 @@ const st = StyleSheet.create({
 
   // Icon
   iconCircle: {
-    width: 76, height: 76, borderRadius: 38,
+    width: 62, height: 62, borderRadius: 31,
     borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },
@@ -442,8 +442,8 @@ const st = StyleSheet.create({
   statsRow: {
     flexDirection: 'row', alignSelf: 'stretch', alignItems: 'center',
   },
-  stat:      { flex: 1, alignItems: 'center', gap: 4 },
-  statSep:   { width: 1, height: 30 },
+  stat:      { flex: 1, alignItems: 'center', gap: 3 },
+  statSep:   { width: 1, height: 26 },
   statLabel: {
     color: colors.textDim, fontSize: 8,
     fontWeight: '700', letterSpacing: 1.5,
@@ -464,15 +464,16 @@ const st = StyleSheet.create({
   actions: {
     flexDirection: 'row', alignSelf: 'stretch',
     alignItems: 'center', gap: 8,
+    marginTop: 2,
   },
   infoBtn: {
-    width: 40, height: 38, borderRadius: 10,
+    width: 36, height: 32, borderRadius: 9,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderWidth: 1,
   },
   enterBtn: {
-    flex: 1, height: 38, borderRadius: 10,
+    flex: 1, height: 32, borderRadius: 9,
     flexDirection: 'row', alignItems: 'center',
     justifyContent: 'center', gap: 5, overflow: 'hidden',
   },
