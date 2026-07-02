@@ -15,6 +15,7 @@ export type RoomPhase = 'waiting' | 'preflop' | 'flop' | 'turn' | 'river' | 'sho
 export type SeatStatus = 'active' | 'folded' | 'allin' | 'sitting_out';
 export type StakeTier = 'MICRO' | 'LOW' | 'STANDARD' | 'HIGH_ROLLER' | 'VIP' | 'ELITE';
 export type PlayerActionType = 'fold' | 'check' | 'call' | 'raise' | 'allin';
+export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem' | 'omaha_holdem';
 
 export interface PlayerAction {
   type: PlayerActionType;
@@ -49,6 +50,7 @@ export interface RoomConfig {
   bigBlind: number;
   minBuyIn: number;
   maxBuyIn: number;
+  variant: GameVariant;
 }
 
 export interface SeatView {
@@ -97,6 +99,7 @@ export interface ClientGameState {
   turnTimeoutAt: number | null;
   messages: GameMessage[];
   winners?: WinnerInfo[];
+  variant: GameVariant;
 }
 
 export interface LobbyTable {
@@ -108,9 +111,10 @@ export interface LobbyTable {
   maxPlayers: number;
   phase: RoomPhase;
   minBuyIn: number;
+  variant: GameVariant;
 }
 
-export const STAKE_CONFIG: Record<StakeTier, RoomConfig> = {
+export const STAKE_CONFIG: Record<StakeTier, Omit<RoomConfig, 'variant'>> = {
   MICRO:       { stakeTier: 'MICRO',       maxPlayers: 5, smallBlind: 25,    bigBlind: 50,    minBuyIn: 1_000,   maxBuyIn: 5_000    },
   LOW:         { stakeTier: 'LOW',         maxPlayers: 5, smallBlind: 100,   bigBlind: 200,   minBuyIn: 4_000,   maxBuyIn: 20_000   },
   STANDARD:    { stakeTier: 'STANDARD',    maxPlayers: 5, smallBlind: 500,   bigBlind: 1_000, minBuyIn: 20_000,  maxBuyIn: 100_000  },

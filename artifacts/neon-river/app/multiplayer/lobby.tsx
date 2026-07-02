@@ -10,7 +10,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMultiplayer } from '@/context/MultiplayerContext';
 import { useUser } from '@/context/UserContext';
 import { STAKE_LABELS, STAKE_COLORS, formatChips } from '@/lib/multiplayerTypes';
-import type { LobbyTable, StakeTier } from '@/lib/multiplayerTypes';
+import type { LobbyTable, StakeTier, MultiplayerGameVariant } from '@/lib/multiplayerTypes';
+import { VARIANT_CONFIGS } from '@/constants/gameVariants';
+
+const VARIANTS: MultiplayerGameVariant[] = ['texas_holdem', 'short_deck_holdem', 'omaha_holdem', 'joker_holdem'];
 
 const TIERS: StakeTier[] = ['MICRO', 'LOW', 'STANDARD', 'HIGH_ROLLER', 'VIP', 'ELITE'];
 
@@ -46,6 +49,7 @@ export default function MultiplayerLobby() {
   const [selectedTier, setSelectedTier]   = useState<StakeTier>('MICRO');
   const [quickTier, setQuickTier]         = useState<StakeTier>('MICRO');
   const [maxPlayers, setMaxPlayers]       = useState(5);
+  const [selectedVariant, setSelectedVariant] = useState<MultiplayerGameVariant>('texas_holdem');
   const [joining, setJoining]             = useState<string | null>(null);
 
   const [showJoinCode, setShowJoinCode] = useState(false);
@@ -126,7 +130,7 @@ export default function MultiplayerLobby() {
     const buyIn = Math.min(chips, minBuy * 5);
     setShowCreate(false);
     removeChips(buyIn);
-    createTable(selectedTier, maxPlayers, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
+    createTable(selectedTier, maxPlayers, userId, profile.username, profile.avatarIndex ?? 1, buyIn, selectedVariant);
   };
 
   const copyCode = (code: string) => {
@@ -182,6 +186,13 @@ export default function MultiplayerLobby() {
             {phaseLabel}
           </Text>
         </View>
+        {item.variant !== 'texas_holdem' && (
+          <View style={[styles.variantBadge, { borderColor: VARIANT_CONFIGS[item.variant].color + '60' }]}>
+            <Text style={[styles.variantBadgeText, { color: VARIANT_CONFIGS[item.variant].color }]}>
+              {VARIANT_CONFIGS[item.variant].shortLabel.toUpperCase()}
+            </Text>
+          </View>
+        )}
         <View style={styles.tableInfo}>
           <View style={styles.infoCol}>
             <Text style={styles.infoLabel}>BLINDS</Text>
@@ -336,6 +347,28 @@ export default function MultiplayerLobby() {
                 })}
               </ScrollView>
 
+              <Text style={styles.sectionLabel}>GAME VARIANT</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tierRow}>
+                {VARIANTS.map(v => {
+                  const cfg = VARIANT_CONFIGS[v];
+                  const active = selectedVariant === v;
+                  return (
+                    <TouchableOpacity
+                      key={v}
+                      style={[styles.tierChip,
+                        { borderColor: active ? cfg.color : '#333',
+                          backgroundColor: active ? cfg.color + '25' : 'transparent' }]}
+                      onPress={() => setSelectedVariant(v)}
+                    >
+                      <Text style={[styles.tierChipText, { color: active ? cfg.color : '#888' }]}>
+                        {cfg.shortLabel}
+                      </Text>
+                      <Text style={styles.tierChipBlinds}>{cfg.deckLabel}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+
               <Text style={styles.sectionLabel}>MAX PLAYERS</Text>
               <View style={styles.playerRow}>
                 {[2, 3, 4, 5].map(n => (
@@ -481,6 +514,8 @@ const styles = StyleSheet.create({
   tableCard: { borderRadius: 14, borderWidth: 1, padding: 16, overflow: 'hidden' },
   tableHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 8 },
   tierBadge: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4 },
+  variantBadge: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginBottom: 10 },
+  variantBadgeText: { fontFamily: 'Orbitron_700Bold', fontSize: 9, letterSpacing: 1 },
   tierText: { fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1.5 },
   codeRow: { flex: 1, alignItems: 'center' },
   codeLabel: { color: '#444', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1, marginBottom: 1 },

@@ -1,4 +1,4 @@
-import { createDeck, shuffleDeck, getBestHand, compareHands } from './engine.js';
+import { createDeckForVariant, holeCardCountForVariant, shuffleDeck, getBestHandForVariant, compareHands } from './engine.js';
 import type {
   Card, Seat, RoomPhase, RoomConfig, GameMessage,
   ClientGameState, SeatView, WinnerInfo, PlayerAction, ChipSyncFn,
@@ -360,7 +360,7 @@ export class PokerRoom {
       return;
     }
 
-    this.deck = shuffleDeck(createDeck());
+    this.deck = shuffleDeck(createDeckForVariant(this.config.variant));
     this.communityCards = [];
     this.pot = 0;
     this.currentBet = 0;
@@ -380,8 +380,11 @@ export class PokerRoom {
 
     this.dealerSeat = this.nextActiveSeatFrom(this.dealerSeat === -1 ? 0 : this.dealerSeat, true);
 
+    const numHoleCards = holeCardCountForVariant(this.config.variant);
     for (const { s } of activePlayers) {
-      s!.cards = [this.deck.pop()!, this.deck.pop()!];
+      const cards: Card[] = [];
+      for (let n = 0; n < numHoleCards; n++) cards.push(this.deck.pop()!);
+      s!.cards = cards;
     }
 
     const isHeadsUp = activePlayers.length === 2;
@@ -607,7 +610,7 @@ export class PokerRoom {
         const evaluated = eligible.map(e => ({
           idx: e.idx,
           seat: e.seat,
-          hand: getBestHand(e.seat.cards, this.communityCards),
+          hand: getBestHandForVariant(this.config.variant, e.seat.cards, this.communityCards),
         }));
         evaluated.sort((a, b) => compareHands(b.hand, a.hand));
         const best = evaluated[0].hand;
@@ -797,6 +800,7 @@ export class PokerRoom {
       turnTimeoutAt: isMyTurn ? this.turnTimeoutAt : null,
       messages: this.messages,
       winners: this.phase === 'showdown' ? this.winners : undefined,
+      variant: this.config.variant,
     };
   }
 
@@ -810,6 +814,7 @@ export class PokerRoom {
       maxPlayers: this.config.maxPlayers,
       phase: this.phase,
       minBuyIn: this.config.minBuyIn,
+      variant: this.config.variant,
     };
   }
 

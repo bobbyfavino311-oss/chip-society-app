@@ -9,6 +9,7 @@ export type RoomPhase = 'waiting' | 'preflop' | 'flop' | 'turn' | 'river' | 'sho
 export type SeatStatus = 'active' | 'folded' | 'allin' | 'sitting_out';
 export type StakeTier = 'MICRO' | 'LOW' | 'STANDARD' | 'HIGH_ROLLER' | 'VIP' | 'ELITE';
 export type PlayerActionType = 'fold' | 'check' | 'call' | 'raise' | 'allin';
+export type MultiplayerGameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem' | 'omaha_holdem';
 
 export interface SeatView {
   seatIndex: number;
@@ -62,6 +63,7 @@ export interface ClientGameState {
   turnTimeoutAt: number | null;
   messages: GameMessage[];
   winners?: WinnerInfo[];
+  variant: MultiplayerGameVariant;
 }
 
 export interface LobbyTable {
@@ -73,6 +75,7 @@ export interface LobbyTable {
   maxPlayers: number;
   phase: RoomPhase;
   minBuyIn: number;
+  variant: MultiplayerGameVariant;
 }
 
 export const STAKE_LABELS: Record<StakeTier, string> = {

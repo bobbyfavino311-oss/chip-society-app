@@ -1,6 +1,6 @@
 import { PokerRoom } from './room.js';
 import { STAKE_CONFIG } from './types.js';
-import type { StakeTier, LobbyTable, ChipSyncFn } from './types.js';
+import type { StakeTier, LobbyTable, ChipSyncFn, GameVariant } from './types.js';
 import type { EmitFn, BroadcastFn } from './room.js';
 import { pickBot, botBuyIn } from './botEngine.js';
 
@@ -24,9 +24,9 @@ export class RoomManager {
     return this.rooms.has(code) ? this.generateCode() : code;
   }
 
-  createRoom(stakeTier: StakeTier, maxPlayers = 5): PokerRoom {
+  createRoom(stakeTier: StakeTier, maxPlayers = 5, variant: GameVariant = 'texas_holdem'): PokerRoom {
     const id = this.generateCode();
-    const config = { ...STAKE_CONFIG[stakeTier], maxPlayers };
+    const config = { ...STAKE_CONFIG[stakeTier], maxPlayers, variant };
     const room = new PokerRoom(id, config, this.emit, this.broadcast, this.onChipSync);
     this.rooms.set(id, room);
     return room;
@@ -132,17 +132,18 @@ export class RoomManager {
     return room;
   }
 
-  findOrCreateRoom(stakeTier: StakeTier, maxPlayers: number): PokerRoom {
+  findOrCreateRoom(stakeTier: StakeTier, maxPlayers: number, variant: GameVariant = 'texas_holdem'): PokerRoom {
     for (const room of this.rooms.values()) {
       if (
         room.config.stakeTier === stakeTier &&
         room.config.maxPlayers === maxPlayers &&
+        room.config.variant === variant &&
         room.playerCount < room.config.maxPlayers
       ) {
         return room;
       }
     }
-    return this.createRoom(stakeTier, maxPlayers);
+    return this.createRoom(stakeTier, maxPlayers, variant);
   }
 
   /**

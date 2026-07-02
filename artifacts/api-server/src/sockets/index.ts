@@ -4,7 +4,15 @@ import { eq } from 'drizzle-orm';
 import { db, playersTable } from '@workspace/db';
 import { RoomManager } from '../poker/roomManager.js';
 import { logger } from '../lib/logger.js';
-import type { StakeTier } from '../poker/types.js';
+import type { StakeTier, GameVariant } from '../poker/types.js';
+
+const VALID_VARIANTS: ReadonlySet<string> = new Set([
+  'texas_holdem', 'short_deck_holdem', 'joker_holdem', 'omaha_holdem',
+]);
+
+function resolveVariant(v: unknown): GameVariant {
+  return typeof v === 'string' && VALID_VARIANTS.has(v) ? (v as GameVariant) : 'texas_holdem';
+}
 
 // ── Player presence registry ───────────────────────────────────────────────────
 const playerSockets = new Map<string, string>(); // playerId → socketId
@@ -110,6 +118,7 @@ export function setupSocketIO(httpServer: HttpServer): void {
     socket.on('create_table', async (payload: {
       stakeTier: string;
       maxPlayers?: number;
+      variant?: string;
       userId: string;
       username: string;
       avatarId: number;
@@ -127,7 +136,8 @@ export function setupSocketIO(httpServer: HttpServer): void {
         const chips = dbChips !== null ? dbChips : payload.chips;
 
         const tier = payload.stakeTier as StakeTier;
-        const room = manager.createRoom(tier, payload.maxPlayers ?? 5);
+        const variant = resolveVariant(payload.variant);
+        const room = manager.createRoom(tier, payload.maxPlayers ?? 5, variant);
         const ok = manager.joinRoom(
           socket.id, room.id,
           payload.userId, payload.username, payload.avatarId, chips,
@@ -192,6 +202,7 @@ export function setupSocketIO(httpServer: HttpServer): void {
     // ─── Quick join (matchmaking) ──────────────────────────────────────────
     socket.on('quick_join', async (payload: {
       stakeTier: string;
+      variant?: string;
       userId: string;
       username: string;
       avatarId: number;
@@ -210,7 +221,8 @@ export function setupSocketIO(httpServer: HttpServer): void {
         }
 
         const tier = payload.stakeTier as StakeTier;
-        const room = manager.findOrCreateRoom(tier, 5);
+        const variant = resolveVariant(payload.variant);
+        const room = manager.findOrCreateRoom(tier, 5, variant);
         const ok = manager.joinRoom(
           socket.id, room.id,
           payload.userId, payload.username, payload.avatarId, dbChips,

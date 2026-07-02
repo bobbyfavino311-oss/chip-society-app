@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { ChatMessage, ClientGameState, LobbyTable, StakeTier } from '@/lib/multiplayerTypes';
+import type { ChatMessage, ClientGameState, LobbyTable, StakeTier, MultiplayerGameVariant } from '@/lib/multiplayerTypes';
 
 const LAST_ROOM_KEY = 'chip_society_last_room';
 
@@ -45,9 +45,9 @@ interface MultiplayerContextValue {
   connect: () => void;
   disconnect: () => void;
   getLobby: () => void;
-  createTable: (stakeTier: StakeTier, maxPlayers: number, userId: string, username: string, avatarId: number, chips: number) => void;
+  createTable: (stakeTier: StakeTier, maxPlayers: number, userId: string, username: string, avatarId: number, chips: number, variant?: MultiplayerGameVariant) => void;
   joinTable: (tableId: string, userId: string, username: string, avatarId: number, chips: number) => void;
-  quickJoin: (stakeTier: StakeTier, userId: string, username: string, avatarId: number) => void;
+  quickJoin: (stakeTier: StakeTier, userId: string, username: string, avatarId: number, variant?: MultiplayerGameVariant) => void;
   leaveTable: () => void;
   sendAction: (type: 'fold' | 'check' | 'call' | 'raise' | 'allin', amount?: number) => void;
   sendChat: (text: string) => void;
@@ -210,9 +210,10 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
   const createTable = useCallback((
     stakeTier: StakeTier, maxPlayers: number,
     userId: string, username: string, avatarId: number, chips: number,
+    variant: MultiplayerGameVariant = 'texas_holdem',
   ) => {
     userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
-    socketRef.current?.emit('create_table', { stakeTier, maxPlayers, userId, username, avatarId, chips });
+    socketRef.current?.emit('create_table', { stakeTier, maxPlayers, variant, userId, username, avatarId, chips });
   }, []);
 
   const joinTable = useCallback((
@@ -224,9 +225,10 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
 
   const quickJoin = useCallback((
     stakeTier: StakeTier, userId: string, username: string, avatarId: number,
+    variant: MultiplayerGameVariant = 'texas_holdem',
   ) => {
     userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
-    socketRef.current?.emit('quick_join', { stakeTier, userId, username, avatarId });
+    socketRef.current?.emit('quick_join', { stakeTier, variant, userId, username, avatarId });
   }, []);
 
   const leaveTable = useCallback(() => {

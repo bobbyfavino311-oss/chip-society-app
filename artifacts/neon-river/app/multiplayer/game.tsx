@@ -329,6 +329,7 @@ export default function MultiplayerGame() {
               cards={gs.communityCards}
               phase={gs.phase}
               holeCards={gs.myCards}
+              variant={gs.variant}
             />
             {isWaiting && (
               <View style={g.waitingBox}>
@@ -378,8 +379,10 @@ export default function MultiplayerGame() {
       <View style={chrome.humanArea}>
         <View style={chrome.humanCards}>
           {!isWaiting && gs.myCards.length > 0
-            ? gs.myCards.map((c, i) => <PlayingCard key={i} card={c} size="lg" />)
-            : [0, 1].map(i => <PlayingCard key={i} faceDown size="lg" />)
+            ? gs.myCards.map((c, i) => <PlayingCard key={i} card={c} size={gs.variant === 'omaha_holdem' ? 'md' : 'lg'} />)
+            : Array.from({ length: gs.variant === 'omaha_holdem' ? 4 : 2 }, (_, i) => (
+                <PlayingCard key={i} faceDown size={gs.variant === 'omaha_holdem' ? 'md' : 'lg'} />
+              ))
           }
         </View>
         <View style={chrome.humanStrip}>
