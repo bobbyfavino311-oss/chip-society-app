@@ -49,11 +49,19 @@ const RANK_COLORS: Record<string, string> = {
 
 import {
   TOURNAMENT_CONFIGS,
-  TEXAS_TOURNAMENTS,
+  TournamentType,
 } from '@/constants/tournaments';
 import TournamentLiveCard from '@/components/TournamentLiveCard';
 
-const HOME_TOURNAMENTS = TEXAS_TOURNAMENTS;
+// Surface every poker variant directly on Home — no hidden tabs. Two events
+// per variant (an entry-level event + a flagship/turbo event), grouped by
+// variant so players immediately see the full lineup while scrolling.
+const HOME_TOURNAMENTS: TournamentType[] = [
+  'beginner', 'daily',                     // Traditional Hold'em · Championship
+  'sd_lounge', 'sd_rush',                  // Short Deck Hold'em · Turbo
+  'omaha_championship', 'omaha_highroller', // Omaha Hold'em · High Roller
+  'joker_showdown', 'joker_jackpot',       // Joker Hold'em · Jackpot
+];
 const CARD_W = width * 0.78;
 const CARD_GAP = 12;
 

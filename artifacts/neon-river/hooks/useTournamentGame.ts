@@ -383,7 +383,7 @@ const INITIAL_META: TournamentMeta = {
 
 export function useTournamentGame(
   humanName: string,
-  numPlayers: 4 | 5 | 6 = 6,
+  numPlayers: 4 | 5 | 6 = 5,
   config?: { startingChips?: number; buyIn?: number; handsPerLevel?: number; blindSchedule?: { sb: number; bb: number }[]; variant?: GameVariant },
 ) {
   const startingChips = config?.startingChips ?? STARTING_CHIPS;

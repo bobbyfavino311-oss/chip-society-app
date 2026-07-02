@@ -8,13 +8,16 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BettingPanel from '@/components/BettingPanel';
 import PlayingCard from '@/components/PlayingCard';
 import DotTimer from '@/components/DotTimer';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { useAchievements } from '@/context/AchievementContext';
 import { SoundEngine } from '@/lib/soundEngine';
-import { getBestHand, describeHand } from '@/lib/pokerEngine';
+import { MusicEngine } from '@/lib/musicEngine';
+import { getBestHand, getBestHandVariant, describeHand } from '@/lib/pokerEngine';
 import { useLocalSearchParams } from 'expo-router';
 import { useTournamentGame, Standing, Prize } from '@/hooks/useTournamentGame';
 import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType, getVariantBadge } from '@/constants/tournaments';
@@ -174,8 +177,8 @@ const g = StyleSheet.create({
 
 // ─── Tournament HUD ───────────────────────────────────────────────────────────
 
-function TournamentHUD({ blindLevel, sb, bb, activePlayers, handsPlayed, totalPrizePool, onExit }:
-  { blindLevel: number; sb: number; bb: number; activePlayers: number; handsPlayed: number; totalPrizePool: number; onExit: () => void }) {
+function TournamentHUD({ blindLevel, sb, bb, activePlayers, handsPlayed, totalPrizePool, onExit, fxEnabled, onToggleFx }:
+  { blindLevel: number; sb: number; bb: number; activePlayers: number; handsPlayed: number; totalPrizePool: number; onExit: () => void; fxEnabled: boolean; onToggleFx: () => void }) {
   return (
     <View style={hud.bar}>
       <TouchableOpacity onPress={onExit} style={hud.backBtn} activeOpacity={0.75}>
@@ -189,7 +192,16 @@ function TournamentHUD({ blindLevel, sb, bb, activePlayers, handsPlayed, totalPr
         <Text style={hud.pillDim}> left  ·  </Text>
         <Text style={{ color: '#ffd700' }}>{formatChips(totalPrizePool)}</Text>
       </Text>
-      <Text style={hud.handNum}>#{handsPlayed + 1}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <Text style={hud.handNum}>#{handsPlayed + 1}</Text>
+        <TouchableOpacity onPress={onToggleFx} style={hud.musicBtn} activeOpacity={0.75}>
+          <Ionicons
+            name={fxEnabled ? 'musical-notes' : 'musical-notes-outline'}
+            size={14}
+            color={fxEnabled ? '#00d4ff' : 'rgba(255,255,255,0.3)'}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -439,7 +451,8 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export default function TournamentScreen() {
-  const { profile, recordWin, recordLoss, removeChips, addChips, recordTournamentResult } = useUser();
+  const { profile, recordWin, recordLoss, removeChips, addChips, recordTournamentResult, recordTournamentBuyIn } = useUser();
+  const { recordGameWin, recordGameLoss, recordOmahaHand, onChipBalance } = useAchievements();
   const params = useLocalSearchParams<{ type?: string }>();
   const tType = ((params.type as TournamentType) in TOURNAMENT_CONFIGS ? params.type as TournamentType : 'sitandgo');
   const tConfig = TOURNAMENT_CONFIGS[tType];
@@ -447,6 +460,23 @@ export default function TournamentScreen() {
   const [exitConfirm, setExitConfirm] = useState(false);
   const [humanElimOverlay, setHumanElimOverlay] = useState(false);
   const prizeAwardedRef = useRef(false);
+  const [fxEnabled, setFxEnabled] = useState(true);
+
+  useEffect(() => {
+    AsyncStorage.getItem('musicEnabled').then(v => {
+      const enabled = v === null ? true : v === 'true';
+      setFxEnabled(enabled);
+      MusicEngine.configure({ muted: !enabled });
+    }).catch(() => {});
+  }, []);
+
+  const toggleFx = () => {
+    const next = !fxEnabled;
+    setFxEnabled(next);
+    MusicEngine.configure({ muted: !next });
+    AsyncStorage.setItem('musicEnabled', String(next)).catch(() => {});
+    SoundEngine.button();
+  };
 
   const {
     gameState: state, tournament,
@@ -518,7 +548,8 @@ export default function TournamentScreen() {
     prevPotRef.current = state.pot;
   }, [state.pot, state.phase]);
 
-  // Win animation
+  // Win animation + per-hand stat/achievement tracking — tournament hands
+  // must count toward overall poker stats exactly like practice hands do.
   useEffect(() => {
     if (state.phase !== 'handover') { prevPhaseRef.current = state.phase; return; }
     if (prevPhaseRef.current === 'handover') return;
@@ -526,6 +557,24 @@ export default function TournamentScreen() {
     if (state.winnerIds.length === 0) return;
     const isHumanWin = state.winnerIds.includes('human');
     if (isHumanWin) { SoundEngine.win(); } else { SoundEngine.lose(); }
+
+    const humanForHand = state.players.find(p => p.isHuman);
+    if (isHumanWin) {
+      recordWin(0, state.pot);
+      const wasAllIn = humanForHand?.status === 'allIn';
+      let handDesc = state.winnerHand ?? '';
+      if (!handDesc && humanForHand && humanForHand.holeCards.length >= 2) {
+        const best = getBestHandVariant(humanForHand.holeCards, state.communityCards, tConfig.variant);
+        handDesc = describeHand(best);
+      }
+      recordGameWin(handDesc, wasAllIn, state.pot, tConfig.variant);
+      onChipBalance(humanForHand?.chips ?? 0);
+    } else {
+      recordLoss();
+      recordGameLoss();
+    }
+    if (tConfig.variant === 'omaha_holdem') recordOmahaHand();
+
     const winnerId = state.winnerIds[0];
     const aiIdx = isHumanWin ? -1 : aiPlayers.findIndex(p => p.id === winnerId);
     const vecIdx = isHumanWin ? seatVec.length - 1 : Math.min(aiIdx < 0 ? 0 : aiIdx, seatVec.length - 2);
@@ -545,12 +594,13 @@ export default function TournamentScreen() {
     ).start();
   }, [state.phase]);
 
-  // Handle elimination notifications
+  // Handle elimination notifications — the per-hand loss stat/achievement is
+  // already recorded by the win-animation effect above for this same hand,
+  // so this only drives the elimination overlay UI.
   useEffect(() => {
     if (tournament.pendingEliminations.length === 0) return;
     const humanElim = tournament.pendingEliminations.find(e => e.isHuman);
     if (humanElim) {
-      recordLoss();
       setHumanElimOverlay(true);
     }
   }, [tournament.pendingEliminations]);
@@ -562,10 +612,11 @@ export default function TournamentScreen() {
     prizeAwardedRef.current = true;
     const prize = tournament.myPrize ?? 0;
     const place = tournament.myPlace ?? 99;
-    if (prize > 0) {
-      if (place === 1) recordWin(prize);
-      else addChips(prize);
-    }
+    // Prize chips are awarded here regardless of placement. The per-hand
+    // win/loss (and hand-played) counters are already tracked by the
+    // win-animation effect above for the final hand, so we must NOT call
+    // recordWin/recordLoss again here — that would double-count a hand.
+    if (prize > 0) addChips(prize);
     recordTournamentResult(place, prize, place === 1, tConfig.variant);
   }, [tournament.phase, tournament.myPrize, tournament.myPlace]);
 
@@ -600,7 +651,7 @@ export default function TournamentScreen() {
 
   // ── Lobby ──────────────────────────────────────────────────────────────────
   if (tournament.phase === 'idle') {
-    const onStartWithDeduct = () => { removeChips(tConfig.buyIn); startTournament(); };
+    const onStartWithDeduct = () => { removeChips(tConfig.buyIn); recordTournamentBuyIn(tConfig.buyIn); startTournament(); };
     return <LobbyScreen tConfig={tConfig} userChips={profile.chips} onStart={onStartWithDeduct} prizes={prizes} />;
   }
 
@@ -688,6 +739,8 @@ export default function TournamentScreen() {
           handsPlayed={tournament.handsPlayed}
           totalPrizePool={tournament.totalPrizePool}
           onExit={() => setExitConfirm(true)}
+          fxEnabled={fxEnabled}
+          onToggleFx={toggleFx}
         />
       </View>
 
@@ -931,6 +984,11 @@ const hud = StyleSheet.create({
     color: 'rgba(255,255,255,0.28)', fontSize: 9,
     fontWeight: '600', letterSpacing: 1, fontFamily: 'Orbitron_400Regular',
     minWidth: 32, textAlign: 'right',
+  },
+  musicBtn: {
+    width: 24, height: 24, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.04)',
   },
 });
 

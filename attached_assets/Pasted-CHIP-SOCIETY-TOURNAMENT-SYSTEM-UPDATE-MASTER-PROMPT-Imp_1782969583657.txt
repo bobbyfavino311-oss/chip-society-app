@@ -1,0 +1,277 @@
+CHIP SOCIETY – TOURNAMENT SYSTEM UPDATE (MASTER PROMPT)
+
+Implement the following tournament improvements across the entire tournament system. These updates should apply to every tournament unless specifically stated otherwise.
+
+⸻
+
+1. STANDARDIZE ALL TOURNAMENTS TO 5 PLAYERS
+
+For launch, every tournament should use the same table size:
+
+1 Human Player + 4 AI Players
+
+Total Seats:
+
+5
+
+Update every tournament card, lobby, and description to reflect this.
+
+Examples:
+
+Current:
+
+Seats: 9
+
+Replace with:
+
+Seats: 5
+
+or
+
+5 Players
+
+Every tournament should accurately display the correct number of seats.
+
+Do not leave any references to larger player counts.
+
+This applies to:
+
+* Hold’em tournaments
+* Short Deck tournaments
+* Omaha tournaments
+* Joker Hold’em tournaments
+
+⸻
+
+2. UPDATE TOURNAMENT DESCRIPTIONS
+
+Every tournament description should reflect the new five-player format.
+
+Examples:
+
+Turbo Heat
+
+Fast-paced 5-player turbo tournament with rapidly increasing blinds.
+
+⸻
+
+Low Stakes Lounge
+
+Relaxed 5-player tournament designed for beginners.
+
+⸻
+
+Daily Championship
+
+Balanced 5-player tournament featuring deeper strategy and larger prize pools.
+
+⸻
+
+Omaha Championship
+
+Five-player Omaha tournament using official Omaha rules.
+
+⸻
+
+Joker Showdown
+
+Five-player Joker Hold’em tournament featuring two wild Jokers.
+
+⸻
+
+3. ADD TABLE MUSIC TO EVERY TOURNAMENT
+
+Every tournament table should include the same Table Music toggle button that exists on standard poker tables.
+
+Requirements:
+
+* Music button available in every tournament.
+* Same placement as normal poker tables.
+* Uses the same music toggle logic.
+* Persists between hands.
+* Works across all tournament variants.
+
+Tournament types include:
+
+* Traditional Hold’em
+* Short Deck
+* Omaha
+* Joker Hold’em
+
+Tournament tables should feel identical to standard tables, including music controls.
+
+⸻
+
+4. HOME SCREEN QUICK PLAY CAROUSEL
+
+The Quick Play carousel currently hides additional poker variants behind an extra tab.
+
+This is not desirable.
+
+Players should immediately see that Chip Society offers multiple poker variants.
+
+Rebuild the carousel to display all variants directly.
+
+New order:
+
+Traditional Hold’em
+
+Traditional Hold’em Championship
+
+Short Deck Hold’em
+
+Short Deck Turbo
+
+Omaha Hold’em
+
+Omaha Championship
+
+Joker Hold’em
+
+Joker Showdown
+
+This gives players immediate visibility into the variety of poker available without requiring them to discover hidden tabs.
+
+Allow horizontal scrolling naturally if needed, but do not hide variants behind a secondary menu.
+
+⸻
+
+5. TOURNAMENT PRIZE VALIDATION
+
+Every tournament payout must be fully wired into the backend.
+
+When a tournament ends:
+
+Automatically:
+
+* Award chips.
+* Update bankroll.
+* Save winnings permanently.
+* Update lifetime tournament earnings.
+* Update tournament statistics.
+* Update achievements.
+* Update leaderboard values where applicable.
+
+Do not simply display a victory popup.
+
+The prize must actually be credited to the player’s account immediately.
+
+Run a full validation across every tournament type to ensure payouts function correctly.
+
+⸻
+
+6. VERIFY TOURNAMENT PAYOUTS
+
+Before considering tournaments complete, verify:
+
+* 1st place payout works.
+* 2nd place payout works.
+* 3rd place payout works (where applicable).
+* Prize pool matches displayed values.
+* Buy-ins are deducted correctly.
+* Total payouts equal the tournament prize pool.
+
+No tournament should award incorrect chip amounts.
+
+⸻
+
+7. PLAYER PROFILE TOURNAMENT STATISTICS
+
+Tournament activity should now appear on the player’s profile.
+
+Add:
+
+Tournament Wins
+
+Final Tables
+
+Tournaments Played
+
+ITM (In The Money) Finishes
+
+Largest Tournament Cash
+
+Tournament Profit
+
+Tournament ROI (optional)
+
+These values should update automatically after every tournament.
+
+⸻
+
+8. SOCIAL PROFILE STATISTICS
+
+The public profile should also display tournament accomplishments.
+
+Include:
+
+Tournament Wins
+
+Final Tables
+
+Tournaments Played
+
+Largest Cash
+
+Current Tournament Rank (if applicable)
+
+Other players should immediately see a player’s tournament accomplishments.
+
+⸻
+
+9. LIVE STAT TRACKING
+
+Tournament statistics should update immediately after each completed tournament.
+
+No logout should be required.
+
+No manual refresh should be required.
+
+Changes should be reflected instantly on:
+
+* Player Profile
+* Social Profile
+* Leaderboards (when applicable)
+* Tournament History
+
+⸻
+
+10. HAND STATISTICS
+
+Hands played during tournaments should count toward overall poker statistics.
+
+Tournament hands should contribute to:
+
+* Total Hands Played
+* VPIP (future)
+* Win Rate
+* Biggest Pot Won
+* Total Chips Won
+* Achievements
+
+Tournament play should never be excluded from overall progression.
+
+⸻
+
+11. QUALITY ASSURANCE
+
+Perform a complete audit of the tournament system.
+
+Verify:
+
+* Every tournament launches correctly.
+* Every tournament ends correctly.
+* Prize payouts are awarded correctly.
+* Statistics save correctly.
+* Profile data updates correctly.
+* Social profile updates correctly.
+* Music button functions correctly.
+* Five-player seating is reflected everywhere.
+* Carousel displays every poker variant correctly.
+* No outdated seat counts remain anywhere in the UI.
+
+⸻
+
+FINAL GOAL
+
+The tournament system should feel complete, polished, and production-ready. Every tournament should accurately represent its five-player format, every poker variant should be immediately visible from the Home screen, table music should be available in every event, tournament prizes must always be awarded correctly, and every tournament hand, finish, and victory should immediately update the player’s statistics and public profile.

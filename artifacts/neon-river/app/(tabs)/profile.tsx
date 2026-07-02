@@ -83,6 +83,12 @@ function NeonSectionTitle({ label, color = '#00d4ff88' }: { label: string; color
 }
 
 // ─── Neon stat box ──────────────────────────────────────────────────────────
+function formatBigNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
 function NeonStatBox({ label, value, accentColor }: { label: string; value: string | number; accentColor: string }) {
   return (
     <View style={[neonStat.box, { borderColor: accentColor + '35' }]}>
@@ -307,10 +313,14 @@ export default function ProfileScreen() {
   };
 
   // Tournament stats derived values
-  const hasTournamentData = profile.tournamentWins > 0 || profile.tournamentLosses > 0;
-  const tournamentTotal = profile.tournamentWins + profile.tournamentLosses;
+  const hasTournamentData = profile.tournamentsPlayed > 0;
+  const tournamentTotal = profile.tournamentsPlayed;
   const tournamentWinRate = tournamentTotal > 0
     ? Math.round((profile.tournamentWins / tournamentTotal) * 100)
+    : 0;
+  const tournamentProfit = profile.totalTournamentPrizesWon - profile.tournamentBuyInsSpent;
+  const tournamentRoi = profile.tournamentBuyInsSpent > 0
+    ? Math.round((tournamentProfit / profile.tournamentBuyInsSpent) * 100)
     : 0;
 
   return (
@@ -524,6 +534,35 @@ export default function ProfileScreen() {
                   : '--'}
               </Text>
               <Text style={styles.tournamentLabel}>BEST PRIZE</Text>
+            </View>
+          </View>
+
+          <View style={styles.tournamentDividerH} />
+
+          <View style={styles.tournamentRow}>
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#00d4ff' }]}>
+                {profile.tournamentFinalTables}
+              </Text>
+              <Text style={styles.tournamentLabel}>FINAL TABLES</Text>
+            </View>
+            <View style={styles.tournamentDivider} />
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, { color: '#ffd700' }]}>
+                {profile.itmFinishes}
+              </Text>
+              <Text style={styles.tournamentLabel}>ITM</Text>
+            </View>
+            <View style={styles.tournamentDivider} />
+            <View style={styles.tournamentStat}>
+              <Text style={[styles.tournamentValue, {
+                color: tournamentProfit >= 0 ? '#00ff88' : '#ff4466', fontSize: 16,
+              }]}>
+                {tournamentProfit >= 0 ? '+' : '-'}{formatBigNumber(Math.abs(tournamentProfit))}
+              </Text>
+              <Text style={styles.tournamentLabel}>
+                PROFIT{profile.tournamentBuyInsSpent > 0 ? ` · ${tournamentRoi >= 0 ? '+' : ''}${tournamentRoi}% ROI` : ''}
+              </Text>
             </View>
           </View>
 

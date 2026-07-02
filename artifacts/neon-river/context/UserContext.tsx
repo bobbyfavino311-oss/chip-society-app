@@ -175,11 +175,18 @@ export interface UserProfile {
   tournamentLosses: number;
   bestTournamentFinish: number;
   biggestTournamentPrize: number;
+  tournamentsPlayed: number;
+  tournamentFinalTables: number;
+  itmFinishes: number;
+  totalTournamentPrizesWon: number;
+  tournamentBuyInsSpent: number;
   // Per-variant tournament wins
   texasTournamentWins: number;
   shortDeckTournamentWins: number;
   omahaTournamentWins: number;
   jokerTournamentWins: number;
+  // Biggest single pot won across all game modes (practice + tournaments)
+  biggestPot: number;
   // Omaha stats
   omahaHandsPlayed: number;
   omahaWins: number;
@@ -235,10 +242,16 @@ const DEFAULT_PROFILE: UserProfile = {
   tournamentLosses: 0,
   bestTournamentFinish: 0,
   biggestTournamentPrize: 0,
+  tournamentsPlayed: 0,
+  tournamentFinalTables: 0,
+  itmFinishes: 0,
+  totalTournamentPrizesWon: 0,
+  tournamentBuyInsSpent: 0,
   texasTournamentWins: 0,
   shortDeckTournamentWins: 0,
   omahaTournamentWins: 0,
   jokerTournamentWins: 0,
+  biggestPot: 0,
   omahaHandsPlayed: 0,
   omahaWins: 0,
   omahaLosses: 0,
@@ -252,9 +265,10 @@ interface UserContextValue {
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   addChips: (amount: number) => Promise<void>;
   removeChips: (amount: number) => Promise<void>;
-  recordWin: (chipsWon: number) => Promise<void>;
+  recordWin: (chipsWon: number, potSize?: number) => Promise<void>;
   recordLoss: () => Promise<void>;
   recordTournamentResult: (placement: number, prizeWon: number, isWin: boolean, variant?: GameVariant) => Promise<void>;
+  recordTournamentBuyIn: (buyIn: number) => Promise<void>;
   claimDailyReward: () => Promise<number>;
   claimHourlyBonus: () => Promise<number>;
   claimComebackBonus: () => Promise<number>;
@@ -469,10 +483,16 @@ function backfillProfile(base: UserProfile, saved: Partial<UserProfile>): UserPr
     tournamentLosses: saved.tournamentLosses ?? 0,
     bestTournamentFinish: saved.bestTournamentFinish ?? 0,
     biggestTournamentPrize: saved.biggestTournamentPrize ?? 0,
+    tournamentsPlayed: saved.tournamentsPlayed ?? 0,
+    tournamentFinalTables: saved.tournamentFinalTables ?? 0,
+    itmFinishes: saved.itmFinishes ?? 0,
+    totalTournamentPrizesWon: saved.totalTournamentPrizesWon ?? 0,
+    tournamentBuyInsSpent: saved.tournamentBuyInsSpent ?? 0,
     texasTournamentWins: saved.texasTournamentWins ?? 0,
     shortDeckTournamentWins: saved.shortDeckTournamentWins ?? 0,
     omahaTournamentWins: saved.omahaTournamentWins ?? 0,
     jokerTournamentWins: saved.jokerTournamentWins ?? 0,
+    biggestPot: saved.biggestPot ?? 0,
     // Uncommon cookies removed — migrate any existing to common
     commonCookies:    (saved.commonCookies ?? (saved as any).fortuneCookies ?? 0) + ((saved as any).uncommonCookies ?? (saved as any).goldenCookies ?? 0),
     rareCookies:      saved.rareCookies      ?? (saved as any).dragonCookies  ?? 0,
@@ -602,12 +622,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     });
   }, [save]);
 
-  const recordWin = useCallback(async (chipsWon: number) => {
+  const recordWin = useCallback(async (chipsWon: number, potSize?: number) => {
     setProfile(prev => {
       const xpGain = 500 + Math.min(500, Math.floor(chipsWon / 200));
       const next = {
         ...prev, wins: prev.wins + 1, handsPlayed: prev.handsPlayed + 1,
         chips: prev.chips + chipsWon, xp: prev.xp + xpGain,
+        biggestPot: potSize != null ? Math.max(prev.biggestPot, potSize) : prev.biggestPot,
       };
       next.level = getLevelFromXP(next.xp);
       next.rank  = getRankFromLevel(next.level);
@@ -634,6 +655,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         omaha_holdem: 'omahaTournamentWins',
         joker_holdem: 'jokerTournamentWins',
       } as const)[variant];
+      const isITM = prizeWon > 0;
       const next = {
         ...prev,
         tournamentWins:   isWin ? prev.tournamentWins + 1 : prev.tournamentWins,
@@ -642,8 +664,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           ? placement
           : Math.min(prev.bestTournamentFinish, placement),
         biggestTournamentPrize: Math.max(prev.biggestTournamentPrize, prizeWon),
+        // All tournaments in Chip Society are single-table (max 5 seats), so
+        // every completed tournament is, by definition, a final table.
+        tournamentsPlayed: prev.tournamentsPlayed + 1,
+        tournamentFinalTables: prev.tournamentFinalTables + 1,
+        itmFinishes: isITM ? prev.itmFinishes + 1 : prev.itmFinishes,
+        totalTournamentPrizesWon: prev.totalTournamentPrizesWon + prizeWon,
         ...(variantField ? { [variantField]: (prev[variantField] as number) + 1 } : {}),
       };
+      save(next);
+      return next;
+    });
+  }, [save]);
+
+  const recordTournamentBuyIn = useCallback(async (buyIn: number) => {
+    setProfile(prev => {
+      const next = { ...prev, tournamentBuyInsSpent: prev.tournamentBuyInsSpent + buyIn };
       save(next);
       return next;
     });
@@ -1253,7 +1289,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   return (
     <UserContext.Provider value={{
       profile, updateProfile, addChips, removeChips, recordWin, recordLoss,
-      recordTournamentResult,
+      recordTournamentResult, recordTournamentBuyIn,
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
       awardRankedPoints, claimWheelSpin, useScratchTicket, consumeScratchTickets, addScratchTickets,
       completeTutorial, registerAccount, signIn, signOut,

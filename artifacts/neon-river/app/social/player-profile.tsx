@@ -52,6 +52,7 @@ interface DisplayPlayer {
   winRate: number;
   handsPlayed: number;
   biggestPot: number;
+  tournamentWins: number;
   followers: number;
   following: number;
   achievementCount: number;
@@ -67,7 +68,8 @@ function mockToDisplay(p: MockPlayer): DisplayPlayer {
     avatarColor: p.avatarColor, avatarId: p.avatarId ?? 1,
     bannerColors: p.bannerColors, rank: p.rank, level: p.level,
     chips: p.chips, winRate: p.winRate, handsPlayed: p.handsPlayed,
-    biggestPot: p.biggestPot, followers: p.followers, following: p.following,
+    biggestPot: p.biggestPot, tournamentWins: p.tournamentWins ?? 0,
+    followers: p.followers, following: p.following,
     achievementCount: p.achievementCount, status: p.status,
     badges: p.badges, bio: p.bio, isMock: true,
   };
@@ -81,7 +83,8 @@ function apiToDisplay(p: PlayerProfile): DisplayPlayer {
     bannerColors: ['#001a40', '#000d20'],
     rank: p.rank, level: p.level,
     chips: p.chips, winRate: p.winRate, handsPlayed: p.handsPlayed,
-    biggestPot: 0, followers: p.followerCount ?? 0, following: p.followingCount ?? 0,
+    biggestPot: 0, tournamentWins: 0,
+    followers: p.followerCount ?? 0, following: p.followingCount ?? 0,
     achievementCount: 0, status: p.status,
     badges: [], bio: 'Chip Society player.', isMock: false,
   };
@@ -230,6 +233,7 @@ export default function PlayerProfileScreen() {
       winRate: 0,
       handsPlayed: 0,
       biggestPot: 0,
+      tournamentWins: 0,
       followers: 0,
       following: 0,
       achievementCount: 0,
@@ -276,6 +280,7 @@ export default function PlayerProfileScreen() {
     : liveFeedPosts.filter(p => p.authorId === id);
 
   const following = isFollowing(id ?? '');
+  const isOwnProfile = !!myProfile.playerId && player?.id === myProfile.playerId;
 
   async function handleMessage() {
     if (!player || !myProfile.playerId) return;
@@ -430,15 +435,56 @@ export default function PlayerProfileScreen() {
           </View>
         </View>
 
-        {/* Tournaments — COMING SOON */}
+        {/* Tournaments */}
         <View style={s.statsSection}>
           <Text style={s.sectionTitle}>TOURNAMENTS</Text>
-          <View style={s.comingSoonBox}>
-            <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
-            <Ionicons name="trophy-outline" size={28} color={`${colors.accent}60`} />
-            <Text style={s.comingSoonTitle}>COMING SOON</Text>
-            <Text style={s.comingSoonSub}>Tournament leaderboards and match history are launching soon.</Text>
-          </View>
+          {isOwnProfile ? (
+            (() => {
+              const played = myProfile.tournamentsPlayed;
+              if (played <= 0) {
+                return (
+                  <View style={s.comingSoonBox}>
+                    <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
+                    <Ionicons name="trophy-outline" size={28} color={`${colors.accent}60`} />
+                    <Text style={s.comingSoonTitle}>NO TOURNAMENTS YET</Text>
+                    <Text style={s.comingSoonSub}>Enter a tournament to start building your record.</Text>
+                  </View>
+                );
+              }
+              const profit = myProfile.totalTournamentPrizesWon - myProfile.tournamentBuyInsSpent;
+              return (
+                <>
+                  <View style={s.statsRow}>
+                    <StatItem label="WINS" value={String(myProfile.tournamentWins)} color={colors.gold} icon="trophy" />
+                    <StatItem label="PLAYED" value={String(played)} icon="card" />
+                  </View>
+                  <View style={s.statsRow}>
+                    <StatItem label="FINAL TABLES" value={String(myProfile.tournamentFinalTables)} icon="podium" />
+                    <StatItem label="ITM" value={String(myProfile.itmFinishes)} color={colors.success} icon="cash" />
+                  </View>
+                  <View style={s.statsRow}>
+                    <StatItem label="LARGEST CASH" value={formatBig(myProfile.biggestTournamentPrize)} color={colors.gold} icon="diamond" />
+                    <StatItem
+                      label="PROFIT"
+                      value={`${profit >= 0 ? '+' : '-'}${formatBig(Math.abs(profit))}`}
+                      color={profit >= 0 ? colors.success : colors.error}
+                      icon="stats-chart"
+                    />
+                  </View>
+                </>
+              );
+            })()
+          ) : (player.tournamentWins ?? 0) > 0 ? (
+            <View style={s.statsRow}>
+              <StatItem label="TOURNAMENT WINS" value={String(player.tournamentWins)} color={colors.gold} icon="trophy" />
+            </View>
+          ) : (
+            <View style={s.comingSoonBox}>
+              <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
+              <Ionicons name="trophy-outline" size={28} color={`${colors.accent}60`} />
+              <Text style={s.comingSoonTitle}>NO TOURNAMENTS YET</Text>
+            </View>
+          )}
         </View>
 
         {/* Recent posts */}
