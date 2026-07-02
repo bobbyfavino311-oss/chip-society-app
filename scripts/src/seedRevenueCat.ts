@@ -48,6 +48,19 @@ const CHIP_BUNDLES: BundleDef[] = [
   { identifier: "chips_50m",   displayName: "Shark — 50M Chips",           chips: 50_000_000,  priceUsdCents: 9999 },
 ];
 
+type TicketBundleDef = {
+  identifier: string;
+  displayName: string;
+  tickets: number;
+  priceUsdCents: number;
+};
+
+const TICKET_BUNDLES: TicketBundleDef[] = [
+  { identifier: "tickets_3",  displayName: "3 Scratch Tickets",  tickets: 3,  priceUsdCents: 99  },
+  { identifier: "tickets_10", displayName: "10 Scratch Tickets", tickets: 10, priceUsdCents: 299 },
+  { identifier: "tickets_25", displayName: "25 Scratch Tickets", tickets: 25, priceUsdCents: 599 },
+];
+
 type TestStorePricesResponse = {
   object: string;
   prices: { amount_micros: number; currency: string }[];
@@ -156,9 +169,10 @@ async function seedRevenueCat() {
     return created;
   }
 
-  const bundleProducts: { bundle: BundleDef; testProduct: Product; appStoreProduct: Product; playStoreProduct: Product }[] = [];
+  type BundleLike = { identifier: string; displayName: string; priceUsdCents: number };
+  const bundleProducts: { bundle: BundleLike; testProduct: Product; appStoreProduct: Product; playStoreProduct: Product }[] = [];
 
-  for (const bundle of CHIP_BUNDLES) {
+  for (const bundle of [...CHIP_BUNDLES, ...TICKET_BUNDLES] as BundleLike[]) {
     const testProduct      = await ensureProduct(testStoreApp, "Test Store", bundle.identifier, bundle.displayName, true);
     const appStoreProduct  = await ensureProduct(appStoreApp,  "App Store",  bundle.identifier, bundle.displayName, false);
     const playStoreProduct = await ensureProduct(playStoreApp, "Play Store", bundle.identifier, bundle.displayName, false);

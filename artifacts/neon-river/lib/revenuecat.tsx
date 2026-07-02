@@ -29,6 +29,22 @@ export const CHIP_BUNDLE_MAP: Record<string, ChipBundle> = {
   chips_50m:   { chips: 50_000_000, label: "Shark",         bonus: "+25% XP", color: "#ffd700", glow: "#ffd700" },
 };
 
+// ─── Ticket bundle metadata ───────────────────────────────────────────────────
+// Maps RevenueCat product identifier → scratch ticket count and display label.
+// Must stay in sync with seedRevenueCat.ts TICKET_BUNDLES.
+
+export type TicketBundle = {
+  tickets: number;
+  label:   string;
+  color:   string;
+};
+
+export const TICKET_BUNDLE_MAP: Record<string, TicketBundle> = {
+  tickets_3:  { tickets: 3,  label: "3 Tickets",  color: "#00d4ff" },
+  tickets_10: { tickets: 10, label: "10 Tickets", color: "#bf5fff" },
+  tickets_25: { tickets: 25, label: "25 Tickets", color: "#ffd700" },
+};
+
 // ─── Initialization ───────────────────────────────────────────────────────────
 
 function getRevenueCatApiKey(): string {

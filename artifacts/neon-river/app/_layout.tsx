@@ -293,10 +293,6 @@ function RootLayoutNav() {
           name="multiplayer/game"
           options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
         />
-        <Stack.Screen
-          name="chip-shop"
-          options={{ headerShown: false, animation: 'slide_from_bottom', presentation: 'modal' }}
-        />
       </Stack>
     </>
   );

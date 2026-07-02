@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Platform,
   ScrollView,
@@ -12,27 +13,14 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import type { PurchasesPackage } from 'react-native-purchases';
 import { useColors } from '@/hooks/useColors';
 import { useTheme } from '@/context/ThemeContext';
 import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { formatChips, getChipColor } from '@/utils/chipColor';
 import ChipIcon from '@/components/ChipIcon';
-
-
-// ─── Chip packages ─────────────────────────────────────────────────────────────
-interface ChipPackage {
-  id: string; name: string; chips: number; price: string;
-  priceNum: number; color: string; highlight?: boolean; badge?: string;
-}
-
-const PACKAGES: ChipPackage[] = [
-  { id: 'starter',    name: 'STARTER STACK',  chips: 100_000,    price: '$1.99',  priceNum: 1.99,  color: '#00d4ff' },
-  { id: 'neon',       name: 'CHIP STACK',      chips: 500_000,    price: '$4.99',  priceNum: 4.99,  color: '#bf5fff' },
-  { id: 'highroller', name: 'HIGH ROLLER',     chips: 2_000_000,  price: '$19.99', priceNum: 19.99, color: '#ffd700', highlight: true, badge: 'BEST VALUE' },
-  { id: 'vault',      name: 'VAULT STACK',     chips: 10_000_000, price: '$49.99', priceNum: 49.99, color: '#ff0090' },
-  { id: 'legend',     name: 'LEGEND STACK',    chips: 50_000_000, price: '$99.99', priceNum: 99.99, color: '#ff6600', badge: 'ULTIMATE' },
-];
+import { useSubscription, CHIP_BUNDLE_MAP, TICKET_BUNDLE_MAP, type ChipBundle } from '@/lib/revenuecat';
 
 // ─── Shared styles factory ─────────────────────────────────────────────────────
 function createStyles(c: Colors) {
@@ -246,34 +234,36 @@ const fc = StyleSheet.create({
 });
 
 // ─── PackageCard ──────────────────────────────────────────────────────────────
-function PackageCard({ pkg, onPress }: { pkg: ChipPackage; onPress: () => void }) {
+function PackageCard({ pkg, bundle, isPurchasing, onPress }: { pkg: PurchasesPackage; bundle: ChipBundle; isPurchasing: boolean; onPress: () => void }) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const chipsPerDollar = Math.floor(pkg.chips / pkg.priceNum / 1000);
   return (
     <TouchableOpacity
-      style={[styles.packageCard, pkg.highlight && styles.packageHighlight, { borderColor: `${pkg.color}44` }]}
-      onPress={onPress} activeOpacity={0.8}
+      style={[styles.packageCard, { borderColor: `${bundle.color}44` }]}
+      onPress={onPress} activeOpacity={0.8} disabled={isPurchasing}
     >
       <LinearGradient
-        colors={pkg.highlight ? [`${pkg.color}22`, `${pkg.color}08`] : [`${pkg.color}12`, 'transparent']}
+        colors={[`${bundle.color}12`, 'transparent']}
         style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
-      {pkg.badge && (
-        <View style={[styles.packageBadge, { backgroundColor: pkg.color }]}>
-          <Text style={styles.packageBadgeText}>{pkg.badge}</Text>
+      {bundle.bonus && (
+        <View style={[styles.packageBadge, { backgroundColor: bundle.color }]}>
+          <Text style={styles.packageBadgeText}>{bundle.bonus}</Text>
         </View>
       )}
       <View style={styles.packageLeft}>
         <ChipIcon variant="gold" size={32} />
         <View style={{ gap: 2 }}>
-          <Text style={[styles.packageName, { color: pkg.highlight ? pkg.color : colors.text }]}>{pkg.name}</Text>
-          <Text style={[styles.packageChips, { color: pkg.color }]}>{formatChips(pkg.chips)} chips</Text>
-          <Text style={styles.packageRate}>{chipsPerDollar}K chips / $1</Text>
+          <Text style={[styles.packageName, { color: colors.text }]}>{bundle.label.toUpperCase()}</Text>
+          <Text style={[styles.packageChips, { color: bundle.color }]}>{formatChips(bundle.chips)} chips</Text>
         </View>
       </View>
-      <View style={[styles.packagePriceBtn, { backgroundColor: pkg.color }]}>
-        <Text style={styles.packagePrice}>{pkg.price}</Text>
+      <View style={[styles.packagePriceBtn, { backgroundColor: bundle.color }]}>
+        {isPurchasing ? (
+          <ActivityIndicator color="#050010" />
+        ) : (
+          <Text style={styles.packagePrice}>{pkg.product.priceString}</Text>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -328,13 +318,30 @@ function DailyBonusCard() {
 
 // ─── ScratchSection ───────────────────────────────────────────────────────────
 function ScratchSection() {
-  const { profile } = useUser();
+  const { profile, addScratchTickets } = useUser();
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const canPlay = profile.scratchTickets > 0;
+  const { offerings, purchase } = useSubscription();
+  const [activeTicketPkg, setActiveTicketPkg] = useState<string | null>(null);
 
-  const handleBuyTickets = (count: number, label: string) => {
-    Alert.alert('SCRATCH TICKETS', `${label} will be available when the app launches on the App Store.\n\nTickets let you scratch & win up to 250K chips!`, [{ text: 'Got it' }]);
+  const ticketPackages = (offerings?.current?.availablePackages ?? []).filter(
+    (p) => TICKET_BUNDLE_MAP[p.product.identifier],
+  );
+
+  const handleBuyTickets = async (pkg: PurchasesPackage) => {
+    const bundle = TICKET_BUNDLE_MAP[pkg.product.identifier];
+    if (!bundle) return;
+    setActiveTicketPkg(pkg.identifier);
+    try {
+      await purchase(pkg);
+      await addScratchTickets(bundle.tickets);
+      Alert.alert('Tickets Added!', `+${bundle.tickets} scratch tickets added to your account.`);
+    } catch (e: any) {
+      if (!e?.userCancelled) Alert.alert('Purchase Failed', e?.message ?? 'Please try again.');
+    } finally {
+      setActiveTicketPkg(null);
+    }
   };
 
   return (
@@ -375,22 +382,32 @@ function ScratchSection() {
       </TouchableOpacity>
 
       <View style={styles.ticketPackRow}>
-        {[
-          { label: '3 TICKETS',  count: 3,  price: '$0.99', color: '#00d4ff' },
-          { label: '10 TICKETS', count: 10, price: '$2.99', color: '#bf5fff', best: true },
-          { label: '25 TICKETS', count: 25, price: '$5.99', color: '#ffd700' },
-        ].map(tp => (
-          <TouchableOpacity
-            key={tp.label}
-            style={[styles.ticketPack, { borderColor: `${tp.color}44` }, tp.best && { borderWidth: 1.5 }]}
-            onPress={() => handleBuyTickets(tp.count, tp.label)} activeOpacity={0.8}
-          >
-            <LinearGradient colors={[`${tp.color}18`, 'transparent']} style={StyleSheet.absoluteFill} />
-            {tp.best && <View style={[styles.ticketPackBest, { backgroundColor: tp.color }]}><Text style={styles.ticketPackBestText}>BEST</Text></View>}
-            <Text style={[styles.ticketPackCount, { color: tp.color }]}>{tp.count}×</Text>
-            <Text style={[styles.ticketPackPrice, { color: tp.color }]}>{tp.price}</Text>
-          </TouchableOpacity>
-        ))}
+        {ticketPackages.length === 0 && (
+          <Text style={[styles.sectionSub, { marginTop: 4 }]}>Loading ticket packs…</Text>
+        )}
+        {ticketPackages.map(pkg => {
+          const bundle = TICKET_BUNDLE_MAP[pkg.product.identifier]!;
+          const isBest = pkg.product.identifier === 'tickets_10';
+          const isActive = activeTicketPkg === pkg.identifier;
+          return (
+            <TouchableOpacity
+              key={pkg.identifier}
+              style={[styles.ticketPack, { borderColor: `${bundle.color}44` }, isBest && { borderWidth: 1.5 }]}
+              onPress={() => handleBuyTickets(pkg)} activeOpacity={0.8} disabled={isActive}
+            >
+              <LinearGradient colors={[`${bundle.color}18`, 'transparent']} style={StyleSheet.absoluteFill} />
+              {isBest && <View style={[styles.ticketPackBest, { backgroundColor: bundle.color }]}><Text style={styles.ticketPackBestText}>BEST</Text></View>}
+              {isActive ? (
+                <ActivityIndicator color={bundle.color} />
+              ) : (
+                <>
+                  <Text style={[styles.ticketPackCount, { color: bundle.color }]}>{bundle.tickets}×</Text>
+                  <Text style={[styles.ticketPackPrice, { color: bundle.color }]}>{pkg.product.priceString}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -399,13 +416,30 @@ function ScratchSection() {
 // ─── Main screen ───────────────────────────────────────────────────────────────
 export default function StoreScreen() {
   const insets = useSafeAreaInsets();
-  const { profile } = useUser();
+  const { profile, addChips } = useUser();
   const colors = useColors();
   const { isDark } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { offerings, isLoading, purchase } = useSubscription();
+  const [activeChipPkg, setActiveChipPkg] = useState<string | null>(null);
 
-  const handlePurchase = (pkg: ChipPackage) => {
-    Alert.alert(`${pkg.name}`, `${formatChips(pkg.chips)} chips for ${pkg.price}\n\nIn-app purchases will be available when the app launches on the App Store.`, [{ text: 'Got it' }]);
+  const chipPackages = (offerings?.current?.availablePackages ?? []).filter(
+    (p) => CHIP_BUNDLE_MAP[p.product.identifier],
+  );
+
+  const handlePurchase = async (pkg: PurchasesPackage) => {
+    const bundle = CHIP_BUNDLE_MAP[pkg.product.identifier];
+    if (!bundle) return;
+    setActiveChipPkg(pkg.identifier);
+    try {
+      await purchase(pkg);
+      await addChips(bundle.chips);
+      Alert.alert('Chips Added!', `+${formatChips(bundle.chips)} chips added to your stack!`);
+    } catch (e: any) {
+      if (!e?.userCancelled) Alert.alert('Purchase Failed', e?.message ?? 'Please try again.');
+    } finally {
+      setActiveChipPkg(null);
+    }
   };
 
   const handleVIP = () => {
@@ -444,9 +478,21 @@ export default function StoreScreen() {
         <View style={styles.packagesSection}>
           <Text style={styles.sectionLabel}>CHIP PACKAGES</Text>
           <Text style={styles.sectionSub}>Virtual chips · No real-money value</Text>
-          {PACKAGES.map(pkg => (
-            <PackageCard key={pkg.id} pkg={pkg} onPress={() => handlePurchase(pkg)} />
-          ))}
+          {isLoading && chipPackages.length === 0 && (
+            <Text style={styles.sectionSub}>Loading chip packages…</Text>
+          )}
+          {chipPackages.map(pkg => {
+            const bundle = CHIP_BUNDLE_MAP[pkg.product.identifier]!;
+            return (
+              <PackageCard
+                key={pkg.identifier}
+                pkg={pkg}
+                bundle={bundle}
+                isPurchasing={activeChipPkg === pkg.identifier}
+                onPress={() => handlePurchase(pkg)}
+              />
+            );
+          })}
         </View>
 
         <TouchableOpacity style={styles.vipCard} onPress={handleVIP} activeOpacity={0.85}>

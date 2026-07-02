@@ -557,11 +557,11 @@ export default function ProfileScreen() {
           <Text style={styles.chipLabel}>VIRTUAL CHIPS</Text>
         </View>
 
-        {/* Buy chips — navigates to the Chip Shop */}
+        {/* Buy chips — navigates to the Chip Store (same packages as the Store tab) */}
         <TouchableOpacity
           style={styles.buyChipsBtn}
           activeOpacity={0.8}
-          onPress={() => router.push('/chip-shop' as any)}
+          onPress={() => router.push('/(tabs)/store')}
         >
           <LinearGradient
             colors={['#00d4ff22', '#00d4ff11']}
