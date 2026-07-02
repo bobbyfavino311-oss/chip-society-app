@@ -347,7 +347,12 @@ const LEGACY_KEY   = '@neon_river_profile';
 // POST /api/admin/players/:id/bonus, so emitToPlayer() fires on the correct
 // Socket.IO registry. CORS is open (*) on Railway.
 function getNotificationSocketUrl(): string {
-  if (typeof window !== 'undefined' && window.location?.origin) {
+  // IMPORTANT: gate on Platform.OS === 'web', not just `typeof window`.
+  // On native (Expo Go / standalone builds), `window` can end up defined by
+  // dev-mode polyfills/HMR tooling even though we're not in a real browser —
+  // relying on `typeof window` alone let native clients silently fall through
+  // to the ephemeral Replit dev-preview domain baked into the bundle.
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
     // Web preview only (running inside the Replit workspace) — keep the
     // notification socket on the same server that holds the player's account,
     // matching MultiplayerContext's getSocketUrl() so both stay in sync.
@@ -367,7 +372,9 @@ function getNotificationSocketUrl(): string {
 // server while sockets/matchmaking hit a different server produces
 // "Account not found" errors during quick_join (dbChips lookup fails).
 export function getApiBase(): string {
-  if (typeof window !== 'undefined' && window.location?.origin) {
+  // See getNotificationSocketUrl() above — must gate on Platform.OS === 'web'
+  // so native clients never fall through to the ephemeral dev-preview domain.
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}/api`;
   }
   return 'https://api-server-production-bbc2.up.railway.app/api';

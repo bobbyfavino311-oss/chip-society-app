@@ -2,11 +2,19 @@
 // Thin wrapper around fetch for the social endpoints.
 // Auth: pass playerId via x-player-id header.
 
+import { Platform } from 'react-native';
+
 function getBase(): string {
   // Use dot notation — Metro's Babel transform only statically inlines EXPO_PUBLIC_*
   // vars with dot notation (process.env.VAR), not bracket notation.
+  // IMPORTANT: only trust EXPO_PUBLIC_API_URL on web. It's baked into the JS
+  // bundle at dev-server build time as the ephemeral Replit dev-preview
+  // domain — native clients (Expo Go / standalone) load that SAME bundle
+  // over the QR/tunnel connection, so relying on this var unconditionally
+  // silently routed native devices to the local dev server instead of the
+  // stable Railway production server (see UserContext.getApiBase()).
   const envUrl = process.env.EXPO_PUBLIC_API_URL;
-  if (envUrl) return envUrl;
+  if (Platform.OS === 'web' && envUrl) return envUrl;
   return 'https://api-server-production-bbc2.up.railway.app/api';
 }
 

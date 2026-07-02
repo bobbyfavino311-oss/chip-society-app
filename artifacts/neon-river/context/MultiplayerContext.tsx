@@ -1,6 +1,7 @@
 import React, {
   createContext, useCallback, useContext, useEffect, useRef, useState,
 } from 'react';
+import { Platform } from 'react-native';
 import { io, type Socket } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { ChatMessage, ClientGameState, LobbyTable, StakeTier, MultiplayerGameVariant } from '@/lib/multiplayerTypes';
@@ -14,7 +15,11 @@ function getSocketUrl(): string {
   // server. Never derive this from EXPO_PUBLIC_API_URL / the Expo manifest —
   // those bake in the ephemeral Replit dev-preview domain, which can change
   // across sessions and silently break sockets in a cached JS bundle.
-  if (typeof window !== 'undefined' && window.location?.origin) {
+  // IMPORTANT: gate on Platform.OS === 'web', not just `typeof window` — on
+  // native, dev-mode polyfills/HMR tooling can leave `window` defined even
+  // though we're not in a real browser, which silently routed native clients
+  // to the local dev server instead of Railway.
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
     // Web preview only (running inside the Replit workspace) — safe to use
     // the current origin since it's not a persisted/cached native bundle.
     return window.location.origin;

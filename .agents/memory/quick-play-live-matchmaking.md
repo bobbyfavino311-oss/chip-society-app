@@ -13,6 +13,8 @@ description: Two bugs fixed when wiring QuickPlayModal's "LIVE PLAYERS" option t
 
 **How to apply:** When adding a new client → server call in this app, mirror the existing `window.location.origin` (web preview) / hardcoded Railway URL (native) branching pattern already used by `getSocketUrl()`, `getApiBase()`, and `socialApi.ts` — don't hardcode Railway unconditionally.
 
+**Update:** the `window.location.origin` branch alone was later found to leak into native Expo Go too (see `expo-production-api-url.md`) — it must also be gated on `Platform.OS === 'web'`.
+
 ## Bug 2: self-referential useEffect dependency canceled its own timer
 
 An effect that both set `found=true` (via `celebrate()`) and depended on `found` in its own dependency array caused the effect to immediately re-run and clean up (via `clearTimeout`) the just-scheduled navigation timer, before it could fire. Symptom: modal stuck forever on "MATCH FOUND!" with no navigation, no error.
