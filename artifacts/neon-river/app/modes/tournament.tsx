@@ -18,10 +18,14 @@ import {
   TournamentConfig,
   TournamentType,
   getPrizePool,
+  getVariantBadge,
 } from '@/constants/tournaments';
 
 const TYPE_ORDER: TournamentType[] = [
   'beginner', 'sitandgo', 'turbo', 'daily', 'highroller', 'nightgrind', 'weekendmajor', 'deepstack', 'hyperturbo',
+  'sd_lounge', 'sd_showdown', 'sd_rush', 'sd_royal',
+  'omaha_championship', 'omaha_highroller',
+  'joker_showdown', 'joker_jackpot',
 ];
 
 function formatChips(n: number): string {
@@ -35,6 +39,7 @@ function formatChips(n: number): string {
 function TournamentCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {
   const prizePool = getPrizePool(config);
   const canAfford = userChips >= config.buyIn;
+  const variantBadge = getVariantBadge(config.variant);
 
   const handlePress = () => {
     router.push({ pathname: '/game/tournament', params: { type: config.type } } as any);
@@ -59,7 +64,12 @@ function TournamentCard({ config, userChips }: { config: TournamentConfig; userC
           <Ionicons name={config.icon as any} size={18} color={config.color} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[st.cardName, { color: config.color }]}>{config.name}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={[st.cardName, { color: config.color }]}>{config.name}</Text>
+            <View style={[st.variantBadge, { borderColor: `${variantBadge.color}40`, backgroundColor: `${variantBadge.color}12` }]}>
+              <Text style={[st.variantBadgeText, { color: variantBadge.color }]}>{variantBadge.label}</Text>
+            </View>
+          </View>
           <Text style={st.cardSub}>{config.subtitle}</Text>
         </View>
         {!canAfford && <Ionicons name="lock-closed" size={14} color={colors.textDim} />}
@@ -207,6 +217,8 @@ const st = StyleSheet.create({
   },
   cardName: { fontSize: 14, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
   cardSub: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
+  variantBadge: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 7, paddingVertical: 2 },
+  variantBadgeText: { fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
   statsRow: {
     flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 10, padding: 10, alignItems: 'center',

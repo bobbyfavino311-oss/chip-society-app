@@ -22,13 +22,14 @@ import { useAchievements, achievementCompletion } from '@/context/AchievementCon
 import { useUser } from '@/context/UserContext';
 
 const CATEGORY_LABELS: Record<AchievementCategory, string> = {
-  hands:     'POKER HANDS',
-  milestone: 'MILESTONES',
-  streak:    'STREAKS',
-  bankroll:  'BANKROLL',
-  omaha:     'OMAHA HOLD\'EM',
+  hands:      'POKER HANDS',
+  milestone:  'MILESTONES',
+  streak:     'STREAKS',
+  bankroll:   'BANKROLL',
+  omaha:      'OMAHA HOLD\'EM',
+  tournament: 'TOURNAMENTS',
 };
-const CATEGORIES: AchievementCategory[] = ['hands', 'milestone', 'streak', 'bankroll', 'omaha'];
+const CATEGORIES: AchievementCategory[] = ['hands', 'milestone', 'streak', 'bankroll', 'omaha', 'tournament'];
 
 interface AchCardProps {
   ach: Achievement;
@@ -193,7 +194,7 @@ export default function AchievementsScreen() {
   };
 
   const byCategory = useMemo(() => {
-    const map: Record<AchievementCategory, Achievement[]> = { hands: [], milestone: [], streak: [], bankroll: [], omaha: [] };
+    const map: Record<AchievementCategory, Achievement[]> = { hands: [], milestone: [], streak: [], bankroll: [], omaha: [], tournament: [] };
     for (const ach of ALL_ACHIEVEMENTS) map[ach.category].push(ach);
     return map;
   }, []);

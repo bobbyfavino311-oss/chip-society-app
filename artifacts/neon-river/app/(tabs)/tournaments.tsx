@@ -18,18 +18,31 @@ import {
   TournamentType,
   TEXAS_TOURNAMENTS,
   SHORT_DECK_TOURNAMENTS,
+  OMAHA_TOURNAMENTS,
+  JOKER_TOURNAMENTS,
+  getVariantBadge,
 } from '@/constants/tournaments';
 import TournamentLiveCard from '@/components/TournamentLiveCard';
 
-type Tab = 'texas' | 'shortdeck';
+type Tab = 'texas' | 'shortdeck' | 'omaha' | 'joker';
+
+const TAB_LABELS: Record<Tab, string> = {
+  texas: "TEXAS HOLD'EM",
+  shortdeck: 'SHORT DECK',
+  omaha: 'OMAHA',
+  joker: 'JOKER',
+};
 
 function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
   return (
     <View style={tab.wrap}>
-      {(['texas', 'shortdeck'] as Tab[]).map(t => {
+      {(['texas', 'shortdeck', 'omaha', 'joker'] as Tab[]).map(t => {
         const isActive = active === t;
-        const label = t === 'texas' ? "TEXAS HOLD'EM" : 'SHORT DECK';
-        const accent = t === 'texas' ? colors.primary : colors.secondary;
+        const label = TAB_LABELS[t];
+        const accent =
+          t === 'texas' ? colors.primary :
+          t === 'shortdeck' ? colors.secondary :
+          getVariantBadge(t === 'omaha' ? 'omaha_holdem' : 'joker_holdem').color;
         return (
           <TouchableOpacity
             key={t}
@@ -58,7 +71,10 @@ export default function TournamentsScreen() {
   const [activeTab, setActiveTab] = useState<Tab>('texas');
 
   const tournamentList: TournamentType[] =
-    activeTab === 'texas' ? TEXAS_TOURNAMENTS : SHORT_DECK_TOURNAMENTS;
+    activeTab === 'texas' ? TEXAS_TOURNAMENTS :
+    activeTab === 'shortdeck' ? SHORT_DECK_TOURNAMENTS :
+    activeTab === 'omaha' ? OMAHA_TOURNAMENTS :
+    JOKER_TOURNAMENTS;
 
   return (
     <View style={[st.container, { backgroundColor: dynColors.background }]}>
@@ -106,7 +122,7 @@ export default function TournamentsScreen() {
 
         {/* Section label */}
         <Text style={st.sectionLabel}>
-          {activeTab === 'texas' ? "TEXAS HOLD'EM EVENTS" : 'SHORT DECK EVENTS'}
+          {TAB_LABELS[activeTab]} EVENTS
         </Text>
 
         {/* Tournament cards */}

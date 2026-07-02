@@ -262,6 +262,31 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     if (days >= 30) unlock('daily_30');
   }, [unlock]);
 
+  // ── Multi-variant tournament achievements ─────────────────────────────────
+  // Watches per-variant tournament win counters on the profile and unlocks
+  // Omaha Champion / Joker Champion / Variant Master / Triple Crown as they
+  // cross their thresholds. Driven off profile state (not an explicit call
+  // site) so it stays correct regardless of where recordTournamentResult runs.
+  useEffect(() => {
+    if (!loaded.current) return;
+    if (profile.omahaTournamentWins >= 1) unlock('omaha_champion');
+    if (profile.jokerTournamentWins >= 1) unlock('joker_champion');
+    const variantsWon = [
+      profile.texasTournamentWins >= 1,
+      profile.shortDeckTournamentWins >= 1,
+      profile.omahaTournamentWins >= 1,
+      profile.jokerTournamentWins >= 1,
+    ].filter(Boolean).length;
+    if (variantsWon >= 3) unlock('variant_master');
+    if (variantsWon >= 4) unlock('triple_crown');
+  }, [
+    profile.texasTournamentWins,
+    profile.shortDeckTournamentWins,
+    profile.omahaTournamentWins,
+    profile.jokerTournamentWins,
+    unlock,
+  ]);
+
   // Only fire streak achievement when streakDays actually *increases*
   // (i.e. user just claimed daily reward). Seed the ref on first load so
   // re-loading the profile on login never re-pops a stale achievement.

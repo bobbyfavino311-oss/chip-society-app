@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import type { GameVariant } from '../constants/gameVariants';
 
 export type Rank =
   | 'LOCAL'
@@ -174,6 +175,11 @@ export interface UserProfile {
   tournamentLosses: number;
   bestTournamentFinish: number;
   biggestTournamentPrize: number;
+  // Per-variant tournament wins
+  texasTournamentWins: number;
+  shortDeckTournamentWins: number;
+  omahaTournamentWins: number;
+  jokerTournamentWins: number;
   // Omaha stats
   omahaHandsPlayed: number;
   omahaWins: number;
@@ -229,6 +235,10 @@ const DEFAULT_PROFILE: UserProfile = {
   tournamentLosses: 0,
   bestTournamentFinish: 0,
   biggestTournamentPrize: 0,
+  texasTournamentWins: 0,
+  shortDeckTournamentWins: 0,
+  omahaTournamentWins: 0,
+  jokerTournamentWins: 0,
   omahaHandsPlayed: 0,
   omahaWins: 0,
   omahaLosses: 0,
@@ -244,7 +254,7 @@ interface UserContextValue {
   removeChips: (amount: number) => Promise<void>;
   recordWin: (chipsWon: number) => Promise<void>;
   recordLoss: () => Promise<void>;
-  recordTournamentResult: (placement: number, prizeWon: number, isWin: boolean) => Promise<void>;
+  recordTournamentResult: (placement: number, prizeWon: number, isWin: boolean, variant?: GameVariant) => Promise<void>;
   claimDailyReward: () => Promise<number>;
   claimHourlyBonus: () => Promise<number>;
   claimComebackBonus: () => Promise<number>;
@@ -459,6 +469,10 @@ function backfillProfile(base: UserProfile, saved: Partial<UserProfile>): UserPr
     tournamentLosses: saved.tournamentLosses ?? 0,
     bestTournamentFinish: saved.bestTournamentFinish ?? 0,
     biggestTournamentPrize: saved.biggestTournamentPrize ?? 0,
+    texasTournamentWins: saved.texasTournamentWins ?? 0,
+    shortDeckTournamentWins: saved.shortDeckTournamentWins ?? 0,
+    omahaTournamentWins: saved.omahaTournamentWins ?? 0,
+    jokerTournamentWins: saved.jokerTournamentWins ?? 0,
     // Uncommon cookies removed — migrate any existing to common
     commonCookies:    (saved.commonCookies ?? (saved as any).fortuneCookies ?? 0) + ((saved as any).uncommonCookies ?? (saved as any).goldenCookies ?? 0),
     rareCookies:      saved.rareCookies      ?? (saved as any).dragonCookies  ?? 0,
@@ -612,8 +626,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     });
   }, [save]);
 
-  const recordTournamentResult = useCallback(async (placement: number, prizeWon: number, isWin: boolean) => {
+  const recordTournamentResult = useCallback(async (placement: number, prizeWon: number, isWin: boolean, variant?: GameVariant) => {
     setProfile(prev => {
+      const variantField: keyof UserProfile | null = !isWin || !variant ? null : ({
+        texas_holdem: 'texasTournamentWins',
+        short_deck_holdem: 'shortDeckTournamentWins',
+        omaha_holdem: 'omahaTournamentWins',
+        joker_holdem: 'jokerTournamentWins',
+      } as const)[variant];
       const next = {
         ...prev,
         tournamentWins:   isWin ? prev.tournamentWins + 1 : prev.tournamentWins,
@@ -622,6 +642,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           ? placement
           : Math.min(prev.bestTournamentFinish, placement),
         biggestTournamentPrize: Math.max(prev.biggestTournamentPrize, prizeWon),
+        ...(variantField ? { [variantField]: (prev[variantField] as number) + 1 } : {}),
       };
       save(next);
       return next;

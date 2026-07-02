@@ -3,7 +3,27 @@ import type { GameVariant } from './gameVariants';
 export type TournamentType =
   | 'beginner' | 'sitandgo' | 'turbo' | 'daily' | 'highroller'
   | 'nightgrind' | 'weekendmajor' | 'deepstack' | 'hyperturbo'
-  | 'sd_lounge' | 'sd_showdown' | 'sd_rush' | 'sd_royal';
+  | 'sd_lounge' | 'sd_showdown' | 'sd_rush' | 'sd_royal'
+  | 'omaha_championship' | 'omaha_highroller'
+  | 'joker_showdown' | 'joker_jackpot';
+
+export interface VariantBadge {
+  icon: string;
+  label: string;
+  symbol: string;
+  color: string;
+}
+
+export const VARIANT_BADGES: Record<GameVariant, VariantBadge> = {
+  texas_holdem:      { icon: 'diamond-outline',   label: "HOLD'EM",    symbol: '♠',  color: '#00d4ff' },
+  short_deck_holdem: { icon: 'layers-outline',    label: 'SHORT DECK', symbol: '6+', color: '#bf5fff' },
+  omaha_holdem:      { icon: 'apps-outline',      label: 'OMAHA',      symbol: '🂠', color: '#7c3aed' },
+  joker_holdem:      { icon: 'sparkles-outline',  label: 'JOKER',      symbol: '🃏', color: '#22c55e' },
+};
+
+export function getVariantBadge(variant: GameVariant): VariantBadge {
+  return VARIANT_BADGES[variant];
+}
 
 export interface BlindLevel {
   sb: number;
@@ -368,6 +388,109 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     scheduleIntervalMin: 70,
     scheduleOffsetMin: 41,
   },
+  omaha_championship: {
+    type: 'omaha_championship',
+    name: 'OMAHA CHAMPIONSHIP',
+    subtitle: '6 players · 4-card action',
+    description: 'The flagship Omaha Hold\'em event. Four hole cards, exactly two must be used — huge draws, huge pots, balanced pacing.',
+    buyIn: 250_000,
+    startingChips: 25_000,
+    numPlayers: 6,
+    handsPerLevel: 7,
+    blindSchedule: [
+      { sb: 50, bb: 100 }, { sb: 75, bb: 150 }, { sb: 100, bb: 200 },
+      { sb: 150, bb: 300 }, { sb: 250, bb: 500 }, { sb: 400, bb: 800 },
+      { sb: 600, bb: 1200 }, { sb: 900, bb: 1800 },
+    ],
+    estimatedDuration: '60–75 min',
+    targetPlayer: 'Omaha regulars chasing big multi-way pots',
+    color: '#7c3aed',
+    icon: 'apps-outline',
+    emoji: '🂠',
+    format: "Omaha Hold'em · Freezeout",
+    prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
+    variant: 'omaha_holdem',
+    capacityMax: 6,
+    scheduleIntervalMin: 65,
+    scheduleOffsetMin: 15,
+  },
+  omaha_highroller: {
+    type: 'omaha_highroller',
+    name: 'OMAHA HIGH ROLLER',
+    subtitle: '6 players · Elite 4-card stakes',
+    description: 'The biggest Omaha buy-in on offer. Deep stacks, patient blind growth, and massive prizes for elite Omaha specialists.',
+    buyIn: 1_000_000,
+    startingChips: 40_000,
+    numPlayers: 6,
+    handsPerLevel: 8,
+    blindSchedule: [
+      { sb: 100, bb: 200 }, { sb: 150, bb: 300 }, { sb: 200, bb: 400 },
+      { sb: 300, bb: 600 }, { sb: 400, bb: 800 }, { sb: 600, bb: 1200 },
+      { sb: 800, bb: 1600 }, { sb: 1200, bb: 2400 },
+    ],
+    estimatedDuration: '~90 min',
+    targetPlayer: 'Elite Omaha players chasing the biggest prize',
+    color: '#c026d3',
+    icon: 'diamond-outline',
+    emoji: '💜',
+    format: "Omaha Hold'em · Deep Stack VIP",
+    prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
+    variant: 'omaha_holdem',
+    capacityMax: 6,
+    scheduleIntervalMin: 100,
+    scheduleOffsetMin: 45,
+  },
+  joker_showdown: {
+    type: 'joker_showdown',
+    name: 'JOKER SHOWDOWN',
+    subtitle: '5 players · Wild card chaos',
+    description: 'Joker Hold\'em with wild Jokers in the deck — Five of a Kind is possible. Fast pacing keeps every hand unpredictable.',
+    buyIn: 100_000,
+    startingChips: 15_000,
+    numPlayers: 5,
+    handsPerLevel: 4,
+    blindSchedule: [
+      { sb: 50, bb: 100 }, { sb: 100, bb: 200 }, { sb: 150, bb: 300 },
+      { sb: 250, bb: 500 }, { sb: 400, bb: 800 }, { sb: 600, bb: 1200 },
+    ],
+    estimatedDuration: '~45 min',
+    targetPlayer: 'Players who love wild-card chaos',
+    color: '#22c55e',
+    icon: 'sparkles-outline',
+    emoji: '🃏',
+    format: "Joker Hold'em · Wild Cards",
+    prizeLabel: '1st: 70%  ·  2nd: 30%',
+    variant: 'joker_holdem',
+    capacityMax: 5,
+    scheduleIntervalMin: 40,
+    scheduleOffsetMin: 20,
+  },
+  joker_jackpot: {
+    type: 'joker_jackpot',
+    name: 'JOKER JACKPOT',
+    subtitle: '6 players · Wild card featured event',
+    description: 'The premium Joker Hold\'em event. Wild Jokers, Five of a Kind hands, and a bigger prize pool than Joker Showdown.',
+    buyIn: 500_000,
+    startingChips: 30_000,
+    numPlayers: 6,
+    handsPerLevel: 6,
+    blindSchedule: [
+      { sb: 100, bb: 200 }, { sb: 150, bb: 300 }, { sb: 200, bb: 400 },
+      { sb: 300, bb: 600 }, { sb: 450, bb: 900 }, { sb: 700, bb: 1400 },
+      { sb: 1000, bb: 2000 },
+    ],
+    estimatedDuration: '~60 min',
+    targetPlayer: 'High rollers who love wild-card poker',
+    color: '#eab308',
+    icon: 'game-controller-outline',
+    emoji: '🎪',
+    format: "Joker Hold'em · Featured Event",
+    prizeLabel: '1st: 50%  ·  2nd: 30%  ·  3rd: 20%',
+    variant: 'joker_holdem',
+    capacityMax: 6,
+    scheduleIntervalMin: 80,
+    scheduleOffsetMin: 32,
+  },
 };
 
 export function getPrizePool(config: TournamentConfig): number {
@@ -378,4 +501,8 @@ export const TEXAS_TOURNAMENTS: TournamentType[] = [
   'beginner', 'sitandgo', 'turbo', 'daily', 'highroller', 'nightgrind', 'weekendmajor', 'deepstack', 'hyperturbo',
 ];
 export const SHORT_DECK_TOURNAMENTS: TournamentType[] = ['sd_lounge', 'sd_showdown', 'sd_rush', 'sd_royal'];
-export const ALL_TOURNAMENTS: TournamentType[] = [...TEXAS_TOURNAMENTS, ...SHORT_DECK_TOURNAMENTS];
+export const OMAHA_TOURNAMENTS: TournamentType[] = ['omaha_championship', 'omaha_highroller'];
+export const JOKER_TOURNAMENTS: TournamentType[] = ['joker_showdown', 'joker_jackpot'];
+export const ALL_TOURNAMENTS: TournamentType[] = [
+  ...TEXAS_TOURNAMENTS, ...SHORT_DECK_TOURNAMENTS, ...OMAHA_TOURNAMENTS, ...JOKER_TOURNAMENTS,
+];

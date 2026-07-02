@@ -1,5 +1,5 @@
 export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary';
-export type AchievementCategory = 'hands' | 'milestone' | 'streak' | 'bankroll' | 'omaha';
+export type AchievementCategory = 'hands' | 'milestone' | 'streak' | 'bankroll' | 'omaha' | 'tournament';
 
 export interface Achievement {
   id: string;
@@ -282,6 +282,36 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
     description: 'Play 500 Omaha Hold\'em hands.',
     rarity: 'legendary', icon: '🌟', chipReward: 20_000, xpReward: 3_000,
     category: 'omaha', target: 500,
+  },
+
+  // ── Multi-variant tournaments ──────────────────────────────────────────────
+  {
+    id: 'omaha_champion',
+    name: 'Omaha Champion',
+    description: 'Win an Omaha Hold\'em tournament.',
+    rarity: 'epic', icon: '🂠', chipReward: 15_000, xpReward: 1_500,
+    category: 'tournament',
+  },
+  {
+    id: 'joker_champion',
+    name: 'Joker Champion',
+    description: 'Win a Joker Hold\'em tournament.',
+    rarity: 'epic', icon: '🃏', chipReward: 15_000, xpReward: 1_500,
+    category: 'tournament',
+  },
+  {
+    id: 'variant_master',
+    name: 'Variant Master',
+    description: 'Win a tournament in 3 different game variants.',
+    rarity: 'legendary', icon: '🎭', chipReward: 30_000, xpReward: 3_000,
+    category: 'tournament', target: 3,
+  },
+  {
+    id: 'triple_crown',
+    name: 'Triple Crown',
+    description: 'Win a tournament in every game variant: Hold\'em, Short Deck, Omaha, and Joker.',
+    rarity: 'legendary', icon: '👑', chipReward: 50_000, xpReward: 5_000,
+    category: 'tournament', target: 4,
   },
 ];
 

@@ -17,7 +17,7 @@ import { SoundEngine } from '@/lib/soundEngine';
 import { getBestHand, describeHand } from '@/lib/pokerEngine';
 import { useLocalSearchParams } from 'expo-router';
 import { useTournamentGame, Standing, Prize } from '@/hooks/useTournamentGame';
-import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType } from '@/constants/tournaments';
+import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType, getVariantBadge } from '@/constants/tournaments';
 import NeonAvatarSeat from '@/components/NeonAvatar';
 import ShareToFeedModal from '@/components/ShareToFeedModal';
 import type { PostTag } from '@/lib/socialData';
@@ -339,6 +339,7 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
   const insets = useSafeAreaInsets();
   const canAfford = userChips >= tConfig.buyIn;
   const handsPerLevel = tConfig.handsPerLevel;
+  const variantBadge = getVariantBadge(tConfig.variant);
   return (
     <View style={[lobby.screen, { paddingTop: insets.top }]}>
       <LinearGradient colors={['#0d0030', '#050010']} style={StyleSheet.absoluteFill} />
@@ -350,6 +351,10 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
         <View style={[lobby.typeHeader, { borderColor: `${tConfig.color}40` }]}>
           <Ionicons name={tConfig.icon as any} size={28} color={tConfig.color} />
           <Text style={[lobby.title, { color: tConfig.color }]}>{tConfig.name}</Text>
+        </View>
+        <View style={[lobby.variantBadge, { borderColor: `${variantBadge.color}45`, backgroundColor: `${variantBadge.color}12` }]}>
+          <Ionicons name={variantBadge.icon as any} size={12} color={variantBadge.color} />
+          <Text style={[lobby.variantBadgeText, { color: variantBadge.color }]}>{variantBadge.label} VARIANT</Text>
         </View>
         <Text style={lobby.subtitle}>{tConfig.subtitle}</Text>
         <Text style={lobby.description}>{tConfig.description}</Text>
@@ -434,7 +439,7 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export default function TournamentScreen() {
-  const { profile, recordWin, recordLoss, removeChips, addChips } = useUser();
+  const { profile, recordWin, recordLoss, removeChips, addChips, recordTournamentResult } = useUser();
   const params = useLocalSearchParams<{ type?: string }>();
   const tType = ((params.type as TournamentType) in TOURNAMENT_CONFIGS ? params.type as TournamentType : 'sitandgo');
   const tConfig = TOURNAMENT_CONFIGS[tType];
@@ -452,6 +457,7 @@ export default function TournamentScreen() {
     buyIn: tConfig.buyIn,
     handsPerLevel: tConfig.handsPerLevel,
     blindSchedule: tConfig.blindSchedule,
+    variant: tConfig.variant,
   });
 
   const insets = useSafeAreaInsets();
@@ -560,6 +566,7 @@ export default function TournamentScreen() {
       if (place === 1) recordWin(prize);
       else addChips(prize);
     }
+    recordTournamentResult(place, prize, place === 1, tConfig.variant);
   }, [tournament.phase, tournament.myPrize, tournament.myPlace]);
 
   const prizes = useMemo(() => {
@@ -1009,6 +1016,13 @@ const lobby = StyleSheet.create({
   typeHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 12, justifyContent: 'center',
     borderRadius: 14, borderWidth: 1, padding: 14, backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  variantBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'center',
+    borderRadius: 20, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 5,
+  },
+  variantBadgeText: {
+    fontSize: 10, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
   },
   description: { color: colors.textDim, fontSize: 12, textAlign: 'center', lineHeight: 18 },
   buyInCard: {

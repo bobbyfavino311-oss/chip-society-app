@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AIDifficulty, AIAction, AIPersonality, getAIDecision, getAIDelay, getRaiseAmount, getBotPersonality, analyzeBoardTexture } from '../lib/aiBot';
-import { Card, createDeck, describeHand, determineWinners, getPreflopStrength, getPostflopStrength, shuffleDeck } from '../lib/pokerEngine';
+import { Card, createVariantDeck, describeHand, determineWinnersVariant, GameVariant, getPreflopStrength, getPostflopStrengthVariant, shuffleDeck } from '../lib/pokerEngine';
 import { GamePlayer, GameState, SidePot, PlayerStatus } from './usePokerGame';
 
 // ─── Tournament constants ─────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ function doShowdown(state: GameState): GameState {
     const msgs: string[] = [];
     for (const sp of sidePots) {
       const spEl = players.filter(p => sp.eligiblePlayerIds.includes(p.id) && (p.status === 'active' || p.status === 'allIn'));
-      const results = determineWinners(spEl.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards);
+      const results = determineWinnersVariant(spEl.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards, s.variant);
       const topScore = Math.max(...results.map(r => r.handResult.rank));
       const winners = results.filter(r => r.handResult.rank === topScore);
       const share = Math.floor(sp.amount / winners.length);
@@ -178,7 +178,7 @@ function doShowdown(state: GameState): GameState {
     }
     const allWinners = [...new Set(sidePots.flatMap(sp => {
       const spEl = players.filter(p => sp.eligiblePlayerIds.includes(p.id));
-      const results = determineWinners(spEl.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards);
+      const results = determineWinnersVariant(spEl.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards, s.variant);
       const top = Math.max(...results.map(r => r.handResult.rank));
       return results.filter(r => r.handResult.rank === top).map(r => r.winnerId);
     }))];
@@ -189,7 +189,7 @@ function doShowdown(state: GameState): GameState {
     };
   }
 
-  const results = determineWinners(eligible.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards);
+  const results = determineWinnersVariant(eligible.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards, s.variant);
   const topScore = Math.max(...results.map(r => r.handResult.rank));
   const winners = results.filter(r => r.handResult.rank === topScore);
   const isSplit = winners.length > 1;
@@ -318,7 +318,7 @@ function executeAIAction(prev: GameState): GameState {
   const board = analyzeBoardTexture(prev.communityCards);
   const handStrength = prev.phase === 'preflop'
     ? getPreflopStrength(player.holeCards)
-    : getPostflopStrength(player.holeCards, prev.communityCards);
+    : getPostflopStrengthVariant(player.holeCards, prev.communityCards, prev.variant);
 
   const decision = getAIDecision({
     holeCards: player.holeCards, communityCards: prev.communityCards,
@@ -336,15 +336,16 @@ function executeAIAction(prev: GameState): GameState {
   return applyAction(prev, decision, raiseAmt);
 }
 
-function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, smallBlind: number, bigBlind: number): GameState {
-  const deck = shuffleDeck(createDeck());
+function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, smallBlind: number, bigBlind: number, variant: GameVariant = 'texas_holdem'): GameState {
+  const deck = shuffleDeck(createVariantDeck(variant));
   const ps = players.map(p => ({
     ...p, holeCards: [] as Card[], betInRound: 0, chipDelta: 0, status: 'active' as PlayerStatus,
     isDealer: false, isSmallBlind: false, isBigBlind: false,
   }));
   ps[dealerIdx].isDealer = true;
   let cur = 0;
-  for (let r = 0; r < 2; r++) for (const p of ps) p.holeCards.push(deck[cur++]);
+  const numHoleCards = variant === 'omaha_holdem' ? 4 : 2;
+  for (let r = 0; r < numHoleCards; r++) for (const p of ps) p.holeCards.push(deck[cur++]);
 
   const sbIdx = (dealerIdx + 1) % ps.length;
   const bbIdx = (dealerIdx + 2) % ps.length;
@@ -367,6 +368,7 @@ function dealAndPostBlinds(players: GamePlayer[], dealerIdx: number, smallBlind:
     lastAggressorIndex: bbIdx, dealerIndex: dealerIdx,
     numToAct: ps.filter(p => p.status === 'active').length,
     timer: TIMER_SECONDS, message: 'Cards dealt!', minRaise: bigBlind,
+    variant,
   };
 }
 
@@ -382,12 +384,13 @@ const INITIAL_META: TournamentMeta = {
 export function useTournamentGame(
   humanName: string,
   numPlayers: 4 | 5 | 6 = 6,
-  config?: { startingChips?: number; buyIn?: number; handsPerLevel?: number; blindSchedule?: { sb: number; bb: number }[] },
+  config?: { startingChips?: number; buyIn?: number; handsPerLevel?: number; blindSchedule?: { sb: number; bb: number }[]; variant?: GameVariant },
 ) {
   const startingChips = config?.startingChips ?? STARTING_CHIPS;
   const buyIn         = config?.buyIn         ?? BUY_IN;
   const handsPerLevel = config?.handsPerLevel  ?? HANDS_PER_LEVEL;
   const blindLevels   = config?.blindSchedule && config.blindSchedule.length > 0 ? config.blindSchedule : BLIND_LEVELS;
+  const variant: GameVariant = config?.variant ?? 'texas_holdem';
 
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME);
   const [tournament, setTournament] = useState<TournamentMeta>(INITIAL_META);
@@ -471,8 +474,8 @@ export function useTournamentGame(
       totalPrizePool: numPlayers * buyIn, prizes, standings: [], pendingEliminations: [],
       myPlace: null, myPrize: null, blindJustIncreased: false,
     });
-    setGameState(dealAndPostBlinds(players, 0, blinds.sb, blinds.bb));
-  }, [humanName, numPlayers, buyIn, startingChips, blindLevels, clearTimer, clearAI]);
+    setGameState(dealAndPostBlinds(players, 0, blinds.sb, blinds.bb, variant));
+  }, [humanName, numPlayers, buyIn, startingChips, blindLevels, variant, clearTimer, clearAI]);
 
   // ── Handle player action ──────────────────────────────────────────────────────
   const handleAction = useCallback((action: AIAction, raiseAmount?: number) => {
@@ -575,7 +578,7 @@ export function useTournamentGame(
 
         // Schedule the game state update separately after tournament state settles
         setTimeout(() => {
-          setGameState(dealAndPostBlinds(cleanSurvivors, nextDealer, sb, bb));
+          setGameState(dealAndPostBlinds(cleanSurvivors, nextDealer, sb, bb, variant));
         }, 0);
 
         return {
@@ -591,7 +594,7 @@ export function useTournamentGame(
       // Return idle state while we schedule the real deal above
       return { ...prev, phase: 'idle' };
     });
-  }, [clearTimer, clearAI, humanName, numPlayers, startingChips, buyIn, handsPerLevel, blindLevels]);
+  }, [clearTimer, clearAI, humanName, numPlayers, startingChips, buyIn, handsPerLevel, blindLevels, variant]);
 
   const clearPendingEliminations = useCallback(() => {
     setTournament(prev => ({ ...prev, pendingEliminations: [], blindJustIncreased: false }));

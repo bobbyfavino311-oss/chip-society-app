@@ -1,0 +1,282 @@
+I actually think this is a great idea because it reinforces that Chip Society isn’t just Texas Hold’em. As you add more poker variants, your tournaments should showcase them. Players who prefer Omaha or Joker Hold’em should have tournaments built specifically for those formats rather than forcing everyone into standard Hold’em.
+
+Here’s how I’d expand the tournament system:
+
+⸻
+
+NEW TOURNAMENT VARIANTS
+
+Expand the tournament system to support multiple poker variants.
+
+Each tournament card should clearly display the game variant being played.
+
+Add a small game badge beneath the tournament title.
+
+Examples:
+
+♠ Traditional Hold’em
+
+🃏 Joker Hold’em
+
+🂠 Omaha Hold’em
+
+This should be immediately visible before a player joins.
+
+⸻
+
+OMAHA CHAMPIONSHIP
+
+Tournament Name
+
+OMAHA CHAMPIONSHIP
+
+Subtitle
+
+4 Hole Cards • Use Exactly 2
+
+Game Type
+
+Omaha Hold’em
+
+Buy-In
+
+250,000
+
+Starting Stack
+
+25,000
+
+Starting Blinds
+
+50 / 100
+
+Blind Increase
+
+Every 10 minutes
+
+Average Duration
+
+60–75 minutes
+
+Strategy
+
+Designed for players who enjoy deeper strategy, larger draws, and complex post-flop decisions.
+
+The tournament engine must enforce Omaha rules throughout:
+
+* 4 private hole cards
+* Exactly 2 hole cards used
+* Exactly 3 community cards used
+* Standard Omaha hand evaluation
+* Omaha achievements and statistics tracked
+
+⸻
+
+OMAHA HIGH ROLLER
+
+Tournament Name
+
+OMAHA HIGH ROLLER
+
+Game Type
+
+Omaha Hold’em
+
+Buy-In
+
+1,000,000
+
+Starting Stack
+
+40,000
+
+Starting Blinds
+
+100 / 200
+
+Blind Increase
+
+Every 12 minutes
+
+Average Duration
+
+90 minutes
+
+This becomes the premier Omaha tournament.
+
+⸻
+
+JOKER SHOWDOWN
+
+Tournament Name
+
+JOKER SHOWDOWN
+
+Subtitle
+
+Wild Jokers Enabled
+
+Game Type
+
+Joker Hold’em
+
+Buy-In
+
+100,000
+
+Starting Stack
+
+15,000
+
+Starting Blinds
+
+50 / 100
+
+Blind Increase
+
+Every 8 minutes
+
+Average Duration
+
+45 minutes
+
+Rules
+
+* Two Jokers remain in the deck.
+* Jokers are always wild.
+* Five of a Kind is the highest possible hand.
+* Standard Joker Hold’em hand evaluator is used.
+
+This tournament should feel exciting and unpredictable due to the presence of wild cards.
+
+⸻
+
+JOKER JACKPOT
+
+Tournament Name
+
+JOKER JACKPOT
+
+Game Type
+
+Joker Hold’em
+
+Buy-In
+
+500,000
+
+Starting Stack
+
+30,000
+
+Starting Blinds
+
+100 / 200
+
+Blind Increase
+
+Every 10 minutes
+
+Average Duration
+
+60 minutes
+
+This is the flagship Joker Hold’em tournament with larger prize pools and tougher competition.
+
+⸻
+
+TOURNAMENT FILTERING
+
+Update the Home Screen tournament carousel to include a small game variant badge on every card.
+
+Examples:
+
+♠ HOLD’EM
+
+🂠 OMAHA
+
+🃏 JOKER
+
+Players should immediately know which poker variant the tournament uses.
+
+⸻
+
+TOURNAMENT LOBBY
+
+Every tournament lobby should clearly display:
+
+Game Variant
+
+Traditional Hold’em
+
+Short Deck Hold’em
+
+Omaha Hold’em
+
+Joker Hold’em
+
+before the player joins.
+
+⸻
+
+MATCHMAKING
+
+Never mix poker variants.
+
+An Omaha tournament only seats Omaha players.
+
+A Joker tournament only seats Joker Hold’em players.
+
+Traditional Hold’em tournaments only seat Traditional Hold’em players.
+
+Each tournament should launch using the correct game engine, rules, hand evaluator, AI behavior, achievements, and statistics for that specific variant.
+
+⸻
+
+STATISTICS
+
+Track tournament performance separately for each poker variant.
+
+Examples:
+
+Traditional Tournament Wins
+
+Omaha Tournament Wins
+
+Joker Tournament Wins
+
+Final Tables Reached
+
+Biggest Tournament Cash
+
+Tournament ROI
+
+Variant-Specific Win Rate
+
+⸻
+
+ACHIEVEMENTS
+
+Add new achievements:
+
+Omaha Champion
+
+* Win an Omaha tournament.
+
+Joker Champion
+
+* Win a Joker Hold’em tournament.
+
+Variant Master
+
+* Win at least one tournament in Traditional Hold’em, Omaha Hold’em, and Joker Hold’em.
+
+Triple Crown
+
+* Win a championship tournament in all three variants.
+
+⸻
+
+DESIGN GOAL
+
+Chip Society tournaments should showcase the full range of poker variants rather than centering exclusively on Texas Hold’em. Players should instantly recognize which variant a tournament uses, and each event should play according to that variant’s official rules, creating distinct tournament experiences for Traditional Hold’em, Omaha Hold’em, and Joker Hold’em.

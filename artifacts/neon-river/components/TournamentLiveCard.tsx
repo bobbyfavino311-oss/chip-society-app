@@ -23,7 +23,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
-import { TournamentConfig, getPrizePool } from '@/constants/tournaments';
+import { TournamentConfig, getPrizePool, getVariantBadge } from '@/constants/tournaments';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -129,7 +129,16 @@ function RulesModal({ visible, config, onClose }: {
               <InfoRow icon="layers-outline"     label="Starting Stack" value={`${formatChips(config.startingChips)} chips`} />
               <InfoRow icon="people-outline"     label="Players"        value={`${config.numPlayers} (AI-filled)`} />
               <InfoRow icon="flash-outline"      label="Blind Levels"   value={`Every ${config.handsPerLevel} hands`} />
-              <InfoRow icon="card-outline"       label="Variant"        value={config.variant === 'texas_holdem' ? "Texas Hold'em" : "Short Deck"} />
+              <InfoRow
+                icon="card-outline"
+                label="Variant"
+                value={
+                  config.variant === 'texas_holdem' ? "Texas Hold'em" :
+                  config.variant === 'short_deck_holdem' ? 'Short Deck' :
+                  config.variant === 'omaha_holdem' ? "Omaha Hold'em" :
+                  "Joker Hold'em"
+                }
+              />
             </View>
 
             {/* Rules */}
@@ -152,6 +161,28 @@ function RulesModal({ visible, config, onClose }: {
                   Flush beats Full House.{'\n'}
                   Three of a Kind beats Straight.{'\n'}
                   Aces play high and low (A-6-7-8-9 is the lowest straight).
+                </Text>
+              </View>
+            )}
+
+            {config.variant === 'omaha_holdem' && (
+              <View style={rm.section}>
+                <Text style={rm.secLabel}>OMAHA RULES</Text>
+                <Text style={rm.ruleText}>
+                  Each player is dealt 4 hole cards instead of 2.{'\n'}
+                  You must use exactly 2 hole cards and exactly 3 community cards to make your best hand.{'\n'}
+                  Standard hand rankings apply (Royal Flush high, High Card low).
+                </Text>
+              </View>
+            )}
+
+            {config.variant === 'joker_holdem' && (
+              <View style={rm.section}>
+                <Text style={rm.secLabel}>JOKER RULES</Text>
+                <Text style={rm.ruleText}>
+                  Two Jokers are added to the deck as wild cards.{'\n'}
+                  A Joker can substitute for any card to make the best possible hand.{'\n'}
+                  Standard hand rankings apply — five of a kind (via Joker) beats a Royal Flush.
                 </Text>
               </View>
             )}
@@ -234,6 +265,7 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
   const prizePool = getPrizePool(config);
   const canAfford = userChips >= config.buyIn;
   const paysTop = getPaysTop(config);
+  const variantBadge = getVariantBadge(config.variant);
   const [rulesVisible, setRulesVisible] = useState(false);
   const pressAnim = useRef(new Animated.Value(1)).current;
 
@@ -283,11 +315,15 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
 
         <View style={st.inner}>
 
-          {/* ── LIVE badge ── */}
+          {/* ── LIVE badge + variant badge ── */}
           <View style={st.liveRow}>
             <View style={[st.livePill, { borderColor: `${config.color}35`, backgroundColor: `${config.color}10` }]}>
               <PulsingDot color={config.color} />
               <Text style={[st.liveText, { color: config.color }]}>LIVE</Text>
+            </View>
+            <View style={[st.variantPill, { borderColor: `${variantBadge.color}40`, backgroundColor: `${variantBadge.color}12` }]}>
+              <Ionicons name={variantBadge.icon as any} size={10} color={variantBadge.color} />
+              <Text style={[st.variantText, { color: variantBadge.color }]}>{variantBadge.label}</Text>
             </View>
           </View>
 
@@ -400,7 +436,7 @@ const st = StyleSheet.create({
   },
 
   // LIVE
-  liveRow:  { alignSelf: 'stretch' },
+  liveRow:  { alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   livePill: {
     alignSelf: 'flex-start',
     flexDirection: 'row', alignItems: 'center', gap: 6,
@@ -410,6 +446,15 @@ const st = StyleSheet.create({
   liveText: {
     fontSize: 9, fontWeight: '900',
     fontFamily: 'Orbitron_700Bold', letterSpacing: 2,
+  },
+  variantPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    borderWidth: 1, borderRadius: 20,
+    paddingHorizontal: 8, paddingVertical: 4,
+  },
+  variantText: {
+    fontSize: 8, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
   },
 
   // Icon
