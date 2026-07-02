@@ -17,7 +17,7 @@ import { useUser } from '@/context/UserContext';
 import { useAchievements } from '@/context/AchievementContext';
 import { SoundEngine } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
-import { getBestHand, getBestHandVariant, describeHand } from '@/lib/pokerEngine';
+import { getBestHandVariant, describeHand, type GameVariant } from '@/lib/pokerEngine';
 import { useLocalSearchParams } from 'expo-router';
 import { useTournamentGame, Standing, Prize } from '@/hooks/useTournamentGame';
 import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType, getVariantBadge } from '@/constants/tournaments';
@@ -42,9 +42,9 @@ function formatChips(n: number): string {
 
 // ─── Community cards ──────────────────────────────────────────────────────────
 
-function CommunityCards({ cards, holeCards }: { cards: any[]; holeCards: any[] }) {
+function CommunityCards({ cards, holeCards, variant }: { cards: any[]; holeCards: any[]; variant: GameVariant }) {
   const handResult = cards.length > 0 && holeCards.length >= 2
-    ? getBestHand(holeCards, cards) : null;
+    ? getBestHandVariant(holeCards, cards, variant) : null;
   const handColor = handResult ? (HAND_COLORS[handResult.name] ?? colors.textMuted) : colors.textMuted;
   return (
     <View style={tbl.communityArea}>
@@ -774,7 +774,7 @@ export default function TournamentScreen() {
         {/* Community card board — dark glass surface */}
         <View style={styles.tableSurface}>
           <View style={styles.tableCenterGlow} />
-          <CommunityCards cards={state.communityCards} holeCards={humanPlayer?.holeCards ?? []} />
+          <CommunityCards cards={state.communityCards} holeCards={humanPlayer?.holeCards ?? []} variant={tConfig.variant} />
         </View>
 
         {/* Floating pot */}
@@ -886,7 +886,7 @@ export default function TournamentScreen() {
             return (
               <View style={styles.showdownPanel}>
                 {showdownPlayers.map(p => {
-                  const hand = p.holeCards.length === 2 ? getBestHand(p.holeCards, state.communityCards) : null;
+                  const hand = p.holeCards.length === 2 ? getBestHandVariant(p.holeCards, state.communityCards, tConfig.variant) : null;
                   const isWinner = state.winnerIds.includes(p.id);
                   return (
                     <View key={p.id} style={[styles.showdownRow, isWinner && styles.showdownRowWin]}>

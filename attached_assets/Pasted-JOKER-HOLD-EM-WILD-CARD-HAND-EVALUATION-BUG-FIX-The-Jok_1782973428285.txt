@@ -1,0 +1,325 @@
+JOKER HOLD’EM — WILD CARD HAND EVALUATION BUG FIX
+
+The Joker system is not registering Joker cards correctly in Joker Hold’em.
+
+This appears to affect the tournament version and may also affect regular Joker Hold’em.
+
+This is a critical gameplay bug.
+
+⸻
+
+CURRENT BUG
+
+Example:
+
+Player has:
+
+• Joker in hand
+
+Board has:
+
+• Pair on the board
+
+Correct result should be:
+
+Three of a Kind
+
+because the Joker should automatically become the third matching card.
+
+Instead, the game is not recognizing the Joker properly.
+
+⸻
+
+REQUIRED JOKER RULE
+
+In Joker Hold’em:
+
+The Joker is always wild.
+
+The Joker must automatically become whatever card creates the strongest possible legal hand.
+
+The player should never manually select the Joker value.
+
+The game engine must calculate the best possible hand.
+
+⸻
+
+BUG FIX REQUIREMENT
+
+Update the Joker Hold’em hand evaluator so that it properly handles:
+
+• Joker in player hand
+• Joker on board
+• Two Jokers in a hand
+• Joker in tournament mode
+• Joker in regular mode
+• Joker at showdown
+• Joker when calculating AI hands
+• Joker when calculating player hands
+
+The same evaluator must be used for both:
+
+• Regular Joker Hold’em
+• Joker Hold’em tournaments
+
+Do not use separate broken logic.
+
+⸻
+
+EXAMPLE TEST CASE
+
+Player hole cards:
+
+Joker
+8♣
+
+Board:
+
+K♠
+K♥
+4♦
+9♣
+2♠
+
+Correct result:
+
+Three of a Kind — Kings
+
+The Joker becomes:
+
+K♦ or K♣
+
+The hand should display:
+
+Three of a Kind
+
+Joker Used
+
+⸻
+
+ADDITIONAL TEST CASES
+
+Pair on Board + Joker
+
+Player:
+
+Joker
+A♣
+
+Board:
+
+7♠
+7♦
+Q♥
+4♣
+2♦
+
+Correct result:
+
+Three of a Kind — 7s
+
+⸻
+
+Player Pair + Joker
+
+Player:
+
+Joker
+10♠
+
+Board:
+
+10♥
+K♦
+8♣
+3♠
+2♥
+
+Correct result:
+
+Three of a Kind — 10s
+
+⸻
+
+Four of a Kind + Joker
+
+Player:
+
+Joker
+A♠
+
+Board:
+
+A♥
+A♦
+A♣
+9♠
+3♦
+
+Correct result:
+
+Four of a Kind or Five of a Kind depending on available ranks.
+
+If all four Aces plus Joker are present:
+
+Five of a Kind — Aces
+
+⸻
+
+Straight With Joker
+
+Player:
+
+Joker
+9♠
+
+Board:
+
+10♦
+J♣
+Q♥
+2♠
+5♦
+
+Correct result:
+
+Straight — 9 to King
+
+or stronger if possible.
+
+⸻
+
+Flush With Joker
+
+Player:
+
+Joker
+A♠
+
+Board:
+
+2♠
+6♠
+9♠
+K♦
+4♥
+
+Correct result:
+
+Flush — Ace High
+
+Joker becomes best missing spade.
+
+⸻
+
+Royal Flush With Joker
+
+Player:
+
+Joker
+A♠
+
+Board:
+
+K♠
+Q♠
+J♠
+3♦
+7♣
+
+Correct result:
+
+Royal Flush
+
+Joker becomes 10♠.
+
+⸻
+
+FIVE OF A KIND RULE
+
+Five of a Kind is the only new hand ranking in Joker Hold’em.
+
+It ranks above Royal Flush.
+
+Five of a Kind can only happen when:
+
+• Four cards of the same rank are present
+• Plus at least one Joker
+
+Example:
+
+A♠ A♥ A♦ A♣ Joker
+
+Result:
+
+Five of a Kind — Aces
+
+⸻
+
+HAND RANKING ORDER
+
+Use this order:
+
+1. Five of a Kind
+2. Royal Flush
+3. Straight Flush
+4. Four of a Kind
+5. Full House
+6. Flush
+7. Straight
+8. Three of a Kind
+9. Two Pair
+10. One Pair
+11. High Card
+
+⸻
+
+SHOWDOWN DISPLAY
+
+If Joker is used:
+
+Display:
+
+Joker Used
+
+Example:
+
+THREE OF A KIND — KINGS
+Joker Used
+
+If Joker creates Five of a Kind:
+
+Display:
+
+FIVE OF A KIND — ACES
+Joker Used
+
+⸻
+
+TOURNAMENT REQUIREMENT
+
+This must work inside Joker Hold’em tournaments.
+
+The tournament engine must use the exact same Joker hand evaluator as the regular Joker Hold’em table.
+
+Do not let tournament mode fall back to standard Hold’em evaluation.
+
+⸻
+
+FINAL VALIDATION
+
+Before completion, test:
+
+✅ Joker + board pair = Three of a Kind
+✅ Joker + player pair = Three of a Kind
+✅ Joker completes Straight
+✅ Joker completes Flush
+✅ Joker completes Full House
+✅ Joker completes Four of a Kind
+✅ Joker creates Five of a Kind
+✅ Joker completes Royal Flush
+✅ Two Jokers evaluate correctly
+✅ Regular Joker Hold’em works
+✅ Joker Hold’em tournaments work
+✅ AI hands evaluate Jokers correctly
+✅ Winning hand display says Joker Used
