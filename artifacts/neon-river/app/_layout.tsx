@@ -54,9 +54,12 @@ import ModerationModal from '@/components/ModerationModal';
 import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 import { initializeRevenueCat, SubscriptionProvider } from '@/lib/revenuecat';
+import { initializeSentry, reportError } from '@/lib/sentry';
 import { Alert } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
+
+initializeSentry();
 
 try {
   initializeRevenueCat();
@@ -340,7 +343,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ErrorBoundary>
+      <ErrorBoundary onError={(error) => reportError(error)}>
         <ThemeProvider>
           <TableThemeProvider>
           <QueryClientProvider client={queryClient}>

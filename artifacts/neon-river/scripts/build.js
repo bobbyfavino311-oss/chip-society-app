@@ -154,6 +154,7 @@ async function startMetro(expoPublicDomain, expoPublicReplId) {
     EXPO_PUBLIC_DOMAIN: expoPublicDomain,
     EXPO_PUBLIC_API_URL: apiUrl,
     EXPO_PUBLIC_REPL_ID: expoPublicReplId,
+    EXPO_PUBLIC_SENTRY_DSN: process.env.SENTRY_DSN,
   };
 
   if (expoPublicReplId) {

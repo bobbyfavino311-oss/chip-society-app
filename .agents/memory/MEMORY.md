@@ -23,3 +23,4 @@
 - [Account system status](account-system.md) — username+PIN+hash+DB+login+signup+forgot-pin+Remember Me all exist; email optional field added to signup UI in step 0; Change PIN screen at profile/change-pin; Founder badge granted via PUT /api/admin/players/:id/founder, displayed on profile+feed.
 - [Shared game chrome pattern](shared-poker-chrome.md) — practice.tsx and multiplayer/game.tsx render through one shared components/PokerChrome.tsx to guarantee visual parity.
 - [Chip Store / Buy Chips unification](chip-store-unification.md) — both entry points share one screen; catalog is RevenueCat-driven via CHIP_BUNDLE_MAP/TICKET_BUNDLE_MAP, never hardcoded.
+- [Sentry crash reporting](sentry-crash-reporting.md) — pin @sentry/react-native to expo's expected version; alias plain SENTRY_DSN secret to EXPO_PUBLIC_SENTRY_DSN at spawn time in both dev script and build.js.

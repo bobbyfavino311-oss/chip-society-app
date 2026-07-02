@@ -4,7 +4,7 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "dev": "EXPO_PACKAGER_PROXY_URL=https://$REPLIT_EXPO_DEV_DOMAIN EXPO_PUBLIC_DOMAIN=$REPLIT_DEV_DOMAIN EXPO_PUBLIC_API_URL=https://$REPLIT_DEV_DOMAIN/api EXPO_PUBLIC_REPL_ID=$REPL_ID REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN pnpm exec expo start --localhost --port $PORT",
+    "dev": "EXPO_PACKAGER_PROXY_URL=https://$REPLIT_EXPO_DEV_DOMAIN EXPO_PUBLIC_DOMAIN=$REPLIT_DEV_DOMAIN EXPO_PUBLIC_API_URL=https://$REPLIT_DEV_DOMAIN/api EXPO_PUBLIC_REPL_ID=$REPL_ID EXPO_PUBLIC_SENTRY_DSN=$SENTRY_DSN REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN pnpm exec expo start --localhost --port $PORT",
     "build": "node scripts/build.js",
     "serve": "node server/serve.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
@@ -61,6 +61,7 @@
     "@expo-google-fonts/orbitron": "^0.4.2",
     "@expo-google-fonts/pacifico": "^0.4.1",
     "@expo-google-fonts/righteous": "^0.4.1",
+    "@sentry/react-native": "^7.2.0",
     "expo-asset": "^56.0.17",
     "expo-av": "~15.0.2",
     "expo-notifications": "^56.0.18",
