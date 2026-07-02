@@ -1,0 +1,98 @@
+I agree. A roadmap is overkill for this spot. Players really just need a quick explanation so they understand why they’re seeing AI tournaments and know that live tournaments are planned, without making it feel like something is missing.
+
+I’d replace the entire “Learn More” concept with a single elegant information panel.
+
+⸻
+
+EARLY ACCESS TOURNAMENT NOTICE (FINAL)
+
+Remove the Tournament Roadmap entirely.
+
+Do not show future features, timelines, or season roadmaps.
+
+Instead, create a simple informational popup that briefly explains why tournaments currently use AI players.
+
+⸻
+
+Home Screen Banner
+
+Place a premium information banner directly underneath the Tournament carousel.
+
+Design:
+
+* Dark translucent background
+* Soft cyan neon border
+* Rounded corners
+* Small trophy icon on the left
+* Premium Chip Society styling
+* Height approximately 70–80 px
+* No warning colors
+
+⸻
+
+Title
+
+EARLY ACCESS TOURNAMENTS
+
+⸻
+
+Body Text
+
+Tournament seats are currently filled with AI competitors while the Chip Society community continues to grow.
+
+Live multiplayer tournaments will automatically replace AI-filled events as more players join the network.
+
+Until then, every tournament still awards chips, achievements, XP, and leaderboard progress just like future live events.
+
+⸻
+
+Button
+
+How It Works →
+
+⸻
+
+Information Popup
+
+Selecting How It Works opens a small modal.
+
+Title:
+
+Tournament Information
+
+Body:
+
+Chip Society is launching with AI-supported tournaments to ensure that every event starts instantly and provides a consistent competitive experience.
+
+As the player community grows, tournament seats will gradually transition from AI competitors to real players. Eventually, tournaments will become fully live multiplayer events without requiring any changes from you.
+
+During Early Access:
+
+• Every tournament is fully playable.
+
+• AI players use realistic poker strategies.
+
+• All chips, XP, achievements, statistics, and tournament winnings are permanent.
+
+• Your tournament history, wins, and accomplishments will carry forward into future live tournaments.
+
+The goal is to guarantee full tournaments at any time of day while the community grows.
+
+⸻
+
+Footer
+
+Close
+
+⸻
+
+Design Goal
+
+This message should reassure players that:
+
+* AI tournaments are intentional.
+* They are part of the launch experience—not a placeholder.
+* Progress earned now remains valuable.
+* Live tournaments will naturally become available as the player base grows.
+
+The overall tone should feel confident, polished, and premium, reinforcing Chip Society as a growing social poker network rather than apologizing for being in an early stage.
