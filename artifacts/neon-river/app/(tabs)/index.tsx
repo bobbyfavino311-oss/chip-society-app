@@ -24,6 +24,8 @@ import { useColors } from '@/hooks/useColors';
 import { useNotifications } from '@/context/NotificationContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import { useAISocial } from '@/context/AISocialContext';
+import { useLiveFeed } from '@/context/LiveFeedContext';
+import { formatTimeAgo } from '@/lib/aiSocialEngine';
 import NeonAvatar from '@/components/NeonAvatar';
 
 const { width } = Dimensions.get('window');
@@ -563,6 +565,7 @@ export default function HomeScreen() {
   const { isMusicMuted, toggleMusicMute } = useSoundSettings();
   const { unreadCount } = useNotifications();
   const { posts: aiPosts } = useAISocial();
+  const { allPosts: livePosts } = useLiveFeed();
   const trendScrollRef = useRef<ScrollView>(null);
   const trendIndexRef = useRef(0);
 
@@ -577,17 +580,18 @@ export default function HomeScreen() {
     }
   }, [isLoaded, profile.isNewUser]);
 
-  // Auto-scroll trending carousel every 3.5 s (dep on aiPosts.length — same signal)
+  // Auto-scroll trending carousel every 3.5 s (dep on trendingPostCount — real posts + AI filler)
+  const trendingPostCount = Math.min(8, livePosts.length + aiPosts.length);
   useEffect(() => {
     const CARD_W = width * 0.72 + 12;
     const timer = setInterval(() => {
-      const postCount = Math.min(8, aiPosts.length);
+      const postCount = trendingPostCount;
       if (!trendScrollRef.current || postCount < 2) return;
       trendIndexRef.current = (trendIndexRef.current + 1) % postCount;
       trendScrollRef.current.scrollTo({ x: trendIndexRef.current * CARD_W, animated: true });
     }, 3500);
     return () => clearInterval(timer);
-  }, [aiPosts.length]);
+  }, [trendingPostCount]);
 
   // ─── Derived values (must be before effects that reference them) ──────────
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
@@ -599,7 +603,29 @@ export default function HomeScreen() {
     return String(n);
   };
 
-  const trendingPosts: TrendPost[] = aiPosts.slice(0, 8).map((p, i) => ({
+  const TREND_TYPE_COLORS: Record<string, string> = {
+    WIN: '#00ff88', BAD_BEAT: '#ff3355', 'BAD BEAT': '#ff3355', BLUFF: '#ffd700',
+    JACKPOT: '#bf5fff', MILESTONE: '#00d4ff', TOURNEY: '#ff9900', GENERAL: colors.textMuted,
+  };
+
+  const realTrendPosts: TrendPost[] = [...livePosts]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 8)
+    .map(p => ({
+      id: p.id,
+      user: p.authorUsername,
+      avatar: p.authorUsername[0]?.toUpperCase() ?? 'P',
+      avatarColor: colors.primary,
+      avatarId: p.authorAvatarIndex,
+      type: p.tag,
+      typeColor: TREND_TYPE_COLORS[p.tag] ?? colors.primary,
+      content: p.content,
+      likes: p.likeCount,
+      pot: p.pot ?? undefined,
+      timeAgo: formatTimeAgo(new Date(p.createdAt).getTime()),
+    }));
+
+  const aiTrendPosts: TrendPost[] = aiPosts.slice(0, 8).map((p, i) => ({
     id: p.id,
     user: p.personality.username,
     avatar: p.personality.avatarInitials[0],
@@ -612,6 +638,13 @@ export default function HomeScreen() {
     pot: p.pot,
     timeAgo: p.timeAgo,
   }));
+
+  // Real player posts always take priority — AI posts are filler used only to
+  // top up the carousel when there aren't enough real posts to fill it.
+  const trendingPosts: TrendPost[] = [
+    ...realTrendPosts,
+    ...aiTrendPosts.slice(0, Math.max(0, 8 - realTrendPosts.length)),
+  ];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

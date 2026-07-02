@@ -1,0 +1,182 @@
+CHIP SOCIETY — HOME TRENDING FEED + TOURNAMENT ICON FIXES
+
+Apply the following updates exactly.
+
+⸻
+
+1. HOME SCREEN TRENDING NOW FIX
+
+The Trending Now carousel on the Home screen is currently too heavily wired to AI-generated posts.
+
+This must be changed.
+
+New real player posts should appear immediately in:
+
+• Home Screen Trending Now carousel
+• Social Feed ALL tab
+
+⸻
+
+REAL PLAYER POST PRIORITY
+
+When a real player creates a post:
+
+Immediately push that post to the top of:
+
+• Home Screen Trending Now
+• Social Feed ALL
+
+Do not wait for refresh.
+
+Do not bury the post under AI content.
+
+Do not require logout/login.
+
+Do not require app restart.
+
+⸻
+
+TRENDING NOW SOURCE ORDER
+
+Home Screen Trending Now should prioritize content in this order:
+
+1. Real player posts created recently
+2. Real player posts with engagement
+3. AI filler posts only if there are not enough real player posts
+
+AI posts should never replace or outrank brand-new real player posts.
+
+⸻
+
+SOCIAL ALL FEED
+
+The ALL tab should show:
+
+• Real player posts
+• Player’s own posts
+• AI filler posts only if needed
+
+Sorted by newest first.
+
+When a player posts:
+
+Their post appears at the top immediately.
+
+⸻
+
+AI POST RULE
+
+AI posts are only filler.
+
+They should keep the feed from feeling empty, but they must never block real player content.
+
+If real posts exist, show them first.
+
+⸻
+
+2. TOURNAMENT ICON REDESIGN
+
+Some tournament icons currently look unrelated to poker.
+
+Fix them.
+
+⸻
+
+LOW STAKES LOUNGE ICON
+
+Current issue:
+
+The icon resembles a graduation cap.
+
+This feels unrelated to poker.
+
+Replace with something more appropriate.
+
+Recommended icon:
+
+• Poker chip stack
+• Small lounge chair + poker chip
+• Low-stakes table icon
+• Simple club/spade symbol
+• Casual card table icon
+
+Best recommendation:
+
+Use a small poker chip stack with a spade.
+
+It should feel beginner-friendly and poker-related.
+
+⸻
+
+REMOVE VIDEO GAME CONTROLLER ICONS
+
+Any tournament icon that resembles a video game controller must be removed.
+
+This especially applies to the Joker tournament.
+
+A controller icon feels unrelated to poker and casino gameplay.
+
+⸻
+
+JOKER TOURNAMENT ICON
+
+Replace the controller-style icon with:
+
+• Jester hat symbol
+• Joker card silhouette
+• Wild card icon
+• Two cards with jester hat overlay
+
+Best recommendation:
+
+Use the same official Joker Hold’em jester hat icon.
+
+The icon should clearly communicate:
+
+Joker Hold’em / Wild Card Poker
+
+not video games.
+
+⸻
+
+ICON STYLE RULES
+
+All tournament icons must feel like poker/casino icons.
+
+Acceptable icon themes:
+
+• Poker chips
+• Playing cards
+• Spades
+• Clubs
+• Diamonds
+• Hearts
+• Trophy
+• Crown
+• Lightning bolt for turbo
+• Jester hat for Joker
+• Four-card stack for Omaha
+• Short deck card stack for Short Deck
+
+Do not use:
+
+• Game controllers
+• Graduation caps
+• Random objects
+• Generic app icons
+• Icons unrelated to poker
+
+⸻
+
+FINAL VALIDATION
+
+Verify:
+
+✅ Real player posts appear instantly in Home Trending Now
+✅ Real player posts appear instantly in Social ALL feed
+✅ AI posts only appear as filler
+✅ AI posts never override new player posts
+✅ Low Stakes Lounge no longer uses graduation-cap-looking icon
+✅ Joker tournament no longer uses controller-looking icon
+✅ No tournament uses unrelated video game controller icons
+✅ All tournament icons feel poker/casino related
