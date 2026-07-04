@@ -10,7 +10,7 @@ import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
 import { Asset } from 'expo-asset';
-import * as Notifications from 'expo-notifications';
+import type * as NotificationsType from 'expo-notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -20,19 +20,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// ─── Foreground notification handler (must be set at module level) ─────────────
-// Shows banner + plays sound + sets badge when a push arrives while app is open.
-if (Platform.OS !== 'web') {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
-}
 
 import AVATAR_IMAGES from '@/constants/avatarImages';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -56,6 +43,32 @@ import { MusicEngine } from '@/lib/musicEngine';
 import { initializeRevenueCat, SubscriptionProvider } from '@/lib/revenuecat';
 import { initializeSentry, reportError } from '@/lib/sentry';
 import { Alert } from 'react-native';
+
+// expo-notifications removed Android support in Expo Go SDK 53+.
+// Use a safe runtime require so the module doesn't crash on Android Expo Go.
+// Using `any` avoids a TS2502 circular-type-annotation error from `typeof NotificationsType`.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Notifications: any = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  Notifications = require('expo-notifications');
+} catch {
+  // Not available on Android Expo Go — push notifications silently disabled
+}
+
+// ─── Foreground notification handler (must be set at module level) ─────────────
+// Shows banner + plays sound + sets badge when a push arrives while app is open.
+if (Platform.OS !== 'web' && Notifications) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -93,11 +106,12 @@ function SoundSyncer() {
 
 function PushSetup() {
   const { addNotification, setPushToken } = useNotifications();
-  const notifListener = useRef<Notifications.EventSubscription | null>(null);
-  const responseListener = useRef<Notifications.EventSubscription | null>(null);
+  const notifListener = useRef<{ remove: () => void } | null>(null);
+  const responseListener = useRef<{ remove: () => void } | null>(null);
 
   useEffect(() => {
-    if (Platform.OS === 'web') return;
+    // Bail out if expo-notifications is unavailable (Android Expo Go SDK 53+)
+    if (Platform.OS === 'web' || !Notifications) return;
 
     let cancelled = false;
 
@@ -129,7 +143,7 @@ function PushSetup() {
     })();
 
     // Listener: push arrives while the app is in the foreground → add to in-app center
-    notifListener.current = Notifications.addNotificationReceivedListener(notification => {
+    notifListener.current = Notifications.addNotificationReceivedListener((notification: NotificationsType.Notification) => {
       const { title, body, data } = notification.request.content;
       if (!title) return;
       addNotification({
@@ -145,7 +159,7 @@ function PushSetup() {
     });
 
     // Listener: user taps a push notification → navigate to the action route
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response: NotificationsType.NotificationResponse) => {
       const data = response.notification.request.content.data;
       if (data?.actionRoute && typeof data.actionRoute === 'string') {
         router.push(data.actionRoute as any);
