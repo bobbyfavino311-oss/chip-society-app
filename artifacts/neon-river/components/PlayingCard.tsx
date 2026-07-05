@@ -437,26 +437,14 @@ function CrimsonSilkBack({ w, h, r }: { w: number; h: number; r: number }) {
 }
 
 // ─── Joker card face ──────────────────────────────────────────────────────────
+// Five-pointed star: outer R=40 inner R=17 centered at (50,50)
+const STAR_POINTS = '50,10 59.99,36.26 88.04,37.64 66.17,55.25 73.51,82.36 50,67 26.49,82.36 33.83,55.25 11.96,37.64 40.01,36.26';
 function JokerFace({ w, h }: { w: number; h: number }) {
+  const size = Math.min(w, h) * 0.58;
   return (
     <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
-      <Svg width={w * 0.84} height={h * 0.74} viewBox="0 0 100 110">
-        {/* Left prong */}
-        <Ellipse cx={24} cy={47} rx={9} ry={24} fill="#111" transform="rotate(-28 24 47)" />
-        {/* Center prong */}
-        <Ellipse cx={50} cy={43} rx={9} ry={26} fill="#111" />
-        {/* Right prong */}
-        <Ellipse cx={76} cy={47} rx={9} ry={24} fill="#111" transform="rotate(28 76 47)" />
-        {/* Left bell */}
-        <Circle cx={13} cy={15} r={11} fill="#111" />
-        {/* Center bell */}
-        <Circle cx={50} cy={11} r={11} fill="#111" />
-        {/* Right bell */}
-        <Circle cx={87} cy={15} r={11} fill="#111" />
-        {/* Hat band */}
-        <Rect x={11} y={63} width={78} height={12} fill="#111" />
-        {/* Brim */}
-        <Rect x={2} y={73} width={96} height={15} rx={5} fill="#111" />
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        <Polygon points={STAR_POINTS} fill="#111111" />
       </Svg>
     </View>
   );
@@ -578,7 +566,6 @@ export default function PlayingCard({
               style={[
                 cardBase,
                 styles.cardFront,
-                isJokerCard && styles.jokerGlow,
                 highlighted && styles.highlightInner,
                 StyleSheet.absoluteFillObject,
               ]}

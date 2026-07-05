@@ -1,0 +1,152 @@
+I actually like this direction better. A solid five-pointed star is much more iconic at mobile size than a detailed jester. Players will recognize it instantly, and it won’t be mistaken for a crown or other symbol.
+
+Here’s the revised implementation prompt:
+
+⸻
+
+CHIP SOCIETY – JOKER CARD REDESIGN (FINAL)
+
+Completely redesign the Joker card used in Joker Hold’em.
+
+The previous Joker artwork is being retired.
+
+The new Joker card should be extremely clean, modern, and instantly recognizable.
+
+This design becomes the official Joker card throughout the entire game.
+
+⸻
+
+Design Goal
+
+The Joker should look like it belongs in a premium casino deck.
+
+The design should be simple enough to recognize immediately, even when the card is very small on a mobile device.
+
+Less is more.
+
+⸻
+
+Card Background
+
+Use the standard Chip Society playing card design.
+
+* White background
+* Rounded corners
+* Thin black border
+* No decorative frame
+* No textures
+* No gradients
+
+Keep the card clean.
+
+⸻
+
+Center Symbol
+
+Replace the current Joker artwork with:
+
+One solid five-pointed star.
+
+Requirements:
+
+* Perfectly symmetrical
+* Five points only
+* Filled completely in solid black
+* No outline
+* No gradients
+* No glow
+* No shadow
+* No bevel effects
+
+The star should be bold, crisp, and flat.
+
+⸻
+
+Star Size
+
+The star should occupy approximately 45–55% of the card height.
+
+Large enough to identify instantly.
+
+Small enough to leave comfortable white space around it.
+
+It should sit perfectly centered on the card.
+
+⸻
+
+Remove Completely
+
+Do not include:
+
+* Jester artwork
+* Joker illustrations
+* Hats
+* Crowns
+* Faces
+* Playing card graphics
+* Decorative flourishes
+* Scrollwork
+* Patterns
+* “JOKER” text
+* “J” letters
+* Corner labels
+* Suit symbols
+
+The only graphic on the face of the card should be the single black five-pointed star.
+
+⸻
+
+Minimalist Style
+
+The card should feel modern and premium.
+
+Think:
+
+* Luxury casino deck
+* Apple-level simplicity
+* Clean geometric design
+
+Avoid anything that makes the card feel busy or cartoonish.
+
+⸻
+
+Gameplay Visibility
+
+The star must remain easy to recognize at:
+
+* Mobile hand size
+* Community card size
+* Showdown animations
+* Tournament gameplay
+* Spectator mode
+
+The design should still be unmistakable when displayed very small.
+
+⸻
+
+Global Replacement
+
+Replace the Joker card everywhere in the game.
+
+This includes:
+
+* Regular Joker Hold’em
+* Joker Hold’em tournaments
+* AI hands
+* Player hands
+* Community cards (if dealt)
+* Hand reveal animations
+* Winning hand displays
+* Hand history
+* Replays
+* Spectator mode
+
+There should only be one official Joker card design across the entire game.
+
+⸻
+
+Joker Hold’em Branding
+
+Keep the jester hat as the game mode icon for Joker Hold’em in menus and tournament cards if desired, but the actual playing card should use only the minimalist black star.
+
+This creates a clear distinction between the Joker Hold’em brand (jester icon) and the wild card itself (black star), while maintaining a clean, premium playing-card aesthetic.
