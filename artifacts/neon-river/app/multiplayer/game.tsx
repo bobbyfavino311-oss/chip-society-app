@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  Animated, Alert, ScrollView, Clipboard, Modal, Platform,
+  Animated, Alert, Clipboard, Modal, Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -422,18 +422,7 @@ export default function MultiplayerGame() {
           />
         </View>
       ) : (
-        <View style={[chrome.waitingPanel, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 8) }]}>
-          {!isWaiting && gs.phase !== 'showdown' && (
-            <View style={g.waitRow}>
-              <Ionicons name="time-outline" size={14} color="rgba(255,255,255,0.3)" />
-              <Text style={g.waitTxt}>
-                {gs.activeSeat !== -1 && gs.seats[gs.activeSeat]
-                  ? `Waiting for ${gs.seats[gs.activeSeat]!.username}...`
-                  : 'Waiting for action...'}
-              </Text>
-            </View>
-          )}
-        </View>
+        <View style={[chrome.waitingPanel, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 8) }]} />
       )}
 
       {/* Chat panel */}
@@ -476,8 +465,5 @@ const g = StyleSheet.create({
   winBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,215,0,0.08)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.4)', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14, justifyContent: 'center' },
   winTxt:    { color: '#ffd700', fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 1 },
   winHand:   { color: '#ffcc00', fontFamily: 'Orbitron_400Regular', fontSize: 10 },
-
-  waitRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  waitTxt:    { color: 'rgba(255,255,255,0.3)', fontFamily: 'Orbitron_400Regular', fontSize: 11 },
 
 });
