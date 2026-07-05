@@ -31,24 +31,18 @@ function timeAgo(ts: number): string {
 
 // ─── Category tabs config ─────────────────────────────────────────────────────
 
-type TabKey = 'all' | NotifCategory;
+type TabKey = 'all' | 'reward' | 'social';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
-  { key: 'all',         label: 'ALL',         icon: 'apps-outline' },
-  { key: 'reward',      label: 'REWARDS',     icon: 'gift-outline' },
-  { key: 'social',      label: 'SOCIAL',      icon: 'people-outline' },
-  { key: 'tournament',  label: 'TOURNAMENTS', icon: 'trophy-outline' },
-  { key: 'gameplay',    label: 'GAMEPLAY',    icon: 'game-controller-outline' },
-  { key: 'system',      label: 'SYSTEM',      icon: 'settings-outline' },
+  { key: 'all',    label: 'ALL',     icon: 'apps-outline' },
+  { key: 'reward', label: 'REWARDS', icon: 'gift-outline' },
+  { key: 'social', label: 'SOCIAL',  icon: 'people-outline' },
 ];
 
 const TAB_ACCENT: Record<TabKey, string> = {
-  all:        '#00d4ff',
-  reward:     '#bf5fff',
-  social:     '#ff0090',
-  tournament: '#ffd700',
-  gameplay:   '#00ff88',
-  system:     '#8888aa',
+  all:    '#00d4ff',
+  reward: '#bf5fff',
+  social: '#ff0090',
 };
 
 // ─── Styles factory ───────────────────────────────────────────────────────────
@@ -270,11 +264,14 @@ export default function NotificationsScreen() {
     });
   }, [notifications, activeTab]);
 
-  // Unread counts per category for badges
+  // Unread counts per visible tab for badges
   const unreadPerCat = useMemo(() => {
     const map: Partial<Record<TabKey, number>> = { all: unreadCount };
     notifications.forEach(n => {
-      if (!n.read) map[n.category] = (map[n.category] ?? 0) + 1;
+      if (!n.read && (n.category === 'reward' || n.category === 'social')) {
+        const key = n.category as TabKey;
+        map[key] = (map[key] ?? 0) + 1;
+      }
     });
     return map;
   }, [notifications, unreadCount]);

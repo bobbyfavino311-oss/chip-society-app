@@ -117,7 +117,7 @@ export function LiveFeedProvider({ children }: { children: React.ReactNode }) {
       setTimeout(() => { void fetchPosts(); }, 1500);
     }
     return post;
-  }, [playerId, fetchPosts]);
+  }, [playerId, profile, fetchPosts]);
 
   const deletePost = useCallback((postId: string) => {
     setAllPosts(prev => prev.filter(p => p.id !== postId));
