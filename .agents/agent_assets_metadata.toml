@@ -642,6 +642,42 @@ uri = "file://artifacts/neon-river/assets/avatars/razor_blade.png"
 type = "image"
 title = "razor blade brushed steel"
 
+[[generated]]
+id = "2LGhSNFCcuUdQbH5K4vTP"
+uri = "file://artifacts/landing/src/assets/images/hero-bg.png"
+type = "image"
+title = "neon synthwave grid background"
+
+[[generated]]
+id = "7pxuYpwMrwd5yoDcLoa5C"
+uri = "file://artifacts/landing/src/assets/images/character-1.png"
+type = "image"
+title = "synthwave poker character portrait"
+
+[[generated]]
+id = "YxIByYUw-sAaJXB39AEeJ"
+uri = "file://artifacts/landing/src/assets/images/character-2.png"
+type = "image"
+title = "synthwave female poker character"
+
+[[generated]]
+id = "mZXZYSw868_zRMJHdY_Ls"
+uri = "file://artifacts/landing/src/assets/images/game-ui.png"
+type = "image"
+title = "neon poker table top view"
+
+[[generated]]
+id = "xWE79C72Vxtp6T4_8J_Q5"
+uri = "file://artifacts/landing/src/assets/images/tournament.png"
+type = "image"
+title = "synthwave poker tournament banner"
+
+[[generated]]
+id = "kiWN0l3ld3YjsiExNStST"
+uri = "file://artifacts/landing/src/assets/images/chips.png"
+type = "image"
+title = "neon glowing poker chips"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
