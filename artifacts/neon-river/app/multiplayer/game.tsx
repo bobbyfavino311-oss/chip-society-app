@@ -405,9 +405,9 @@ export default function MultiplayerGame() {
         </View>
       </View>
 
-      {/* Bottom controls — identical layout to practice.tsx (BettingPanel or waiting panel) */}
+      {/* Bottom controls — docked flush to the bottom */}
       {isMyTurnAndActive ? (
-        <View style={{ paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) }}>
+        <View style={[g.panelDock, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) }]}>
           <BettingPanel
             canCheck={canCheck}
             callAmount={gs.callAmount}
@@ -467,4 +467,9 @@ const g = StyleSheet.create({
   winTxt:    { color: '#ffd700', fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 1 },
   winHand:   { color: '#ffcc00', fontFamily: 'Orbitron_400Regular', fontSize: 10 },
 
+  panelDock: {
+    backgroundColor: 'rgba(5,0,16,0.92)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
+  },
 });

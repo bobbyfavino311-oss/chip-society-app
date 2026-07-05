@@ -5,8 +5,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import PlayingCard from '@/components/PlayingCard';
-import DotTimer from '@/components/DotTimer';
 import NeonAvatarSeat from '@/components/NeonAvatar';
 import colors from '@/constants/colors';
 import { getBestHandVariant } from '@/lib/pokerEngine';
@@ -139,6 +139,62 @@ export function ActionFeed({ message, isHandOver }: { message: string; isHandOve
   );
 }
 
+// ─── Circular countdown ring (replaces DotTimer for multiplayer avatar seats) ──
+
+function TimerRing({ timeoutAt, maxSeconds = 30, size = 44 }: {
+  timeoutAt: number; maxSeconds?: number; size?: number;
+}) {
+  const [progress, setProgress] = useState(1);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const pulsingRef = useRef(false);
+  const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
+
+  useEffect(() => {
+    const update = () => setProgress(Math.min(1, Math.max(0, (timeoutAt - Date.now()) / 1000 / maxSeconds)));
+    update();
+    const id = setInterval(update, 100);
+    return () => clearInterval(id);
+  }, [timeoutAt, maxSeconds]);
+
+  useEffect(() => {
+    const secondsLeft = progress * maxSeconds;
+    if (secondsLeft <= 3 && secondsLeft > 0 && !pulsingRef.current) {
+      pulsingRef.current = true;
+      pulseLoop.current = Animated.loop(Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.13, duration: 280, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1,    duration: 280, useNativeDriver: true }),
+      ]));
+      pulseLoop.current.start();
+    } else if ((secondsLeft > 3 || secondsLeft === 0) && pulsingRef.current) {
+      pulsingRef.current = false;
+      pulseLoop.current?.stop();
+      pulseAnim.setValue(1);
+    }
+  }, [progress < 0.1, progress === 0]);
+
+  const sw = 2.5;
+  const r  = (size - sw * 2) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - progress);
+  const color = progress > 0.6 ? '#00d4ff' : progress > 0.35 ? '#ffcc00' : progress > 0.15 ? '#ff8800' : '#ff2200';
+
+  return (
+    <Animated.View style={{ position: 'absolute', top: -(size - 36) / 2, left: -(size - 36) / 2, transform: [{ scale: pulseAnim }] }}>
+      <Svg width={size} height={size}>
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(255,255,255,0.08)" strokeWidth={sw} fill="none" />
+        <Circle
+          cx={size / 2} cy={size / 2} r={r}
+          stroke={color} strokeWidth={sw} fill="none"
+          strokeDasharray={`${circ} ${circ}`}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          rotation={-90} originX={size / 2} originY={size / 2}
+        />
+      </Svg>
+    </Animated.View>
+  );
+}
+
 // ─── Compact seat (top row) ────────────────────────────────────────────────────
 // `player` is a normalized shape shared by AI bots and multiplayer opponents:
 // { id, name, chips, avatarIndex, status, isDealer, isSmallBlind, isBigBlind, holeCards }
@@ -151,41 +207,32 @@ export function CompactAISeat({
 }) {
   const folded = player.status === 'folded';
   const avatarId = player.avatarIndex > 0 ? player.avatarIndex : 1;
-
-  // Live countdown when timeoutAt is provided (multiplayer); fall back to static timer (practice)
-  const [liveSeconds, setLiveSeconds] = useState(() =>
-    timeoutAt ? Math.max(0, Math.ceil((timeoutAt - Date.now()) / 1000)) : (timer ?? 30)
-  );
-  useEffect(() => {
-    if (!timeoutAt) { setLiveSeconds(timer ?? 30); return; }
-    const update = () => setLiveSeconds(Math.max(0, Math.ceil((timeoutAt - Date.now()) / 1000)));
-    update();
-    const id = setInterval(update, 250);
-    return () => clearInterval(id);
-  }, [timeoutAt, timer]);
+  const showRing = isCurrentTurn && !folded && !!timeoutAt;
 
   return (
-    <View style={[seat.seat, folded && seat.seatFolded, { position: 'relative' }]}>
+    <View style={[seat.seat, folded && seat.seatFolded]}>
       <ChatBubble bubble={bubble} />
-      <View style={[
-        seat.avatarRing,
-        isCurrentTurn && seat.avatarRingActive,
-        isWinner && seat.avatarRingWinner,
-      ]}>
-        <NeonAvatarSeat avatarId={avatarId} size={30} />
-        {player.isDealer && <View style={seat.posBadge}><Text style={seat.posBadgeText}>D</Text></View>}
-        {player.isSmallBlind && !player.isDealer && (
-          <View style={[seat.posBadge, { backgroundColor: 'rgba(0,212,255,0.2)', borderColor: '#00d4ff' }]}>
-            <Text style={[seat.posBadgeText, { color: '#00d4ff' }]}>S</Text>
-          </View>
-        )}
-        {player.isBigBlind && !player.isDealer && (
-          <View style={[seat.posBadge, { backgroundColor: 'rgba(255,0,144,0.2)', borderColor: '#ff0090' }]}>
-            <Text style={[seat.posBadgeText, { color: '#ff0090' }]}>B</Text>
-          </View>
-        )}
+      <View style={{ position: 'relative', width: 36, height: 36 }}>
+        <View style={[
+          seat.avatarRing,
+          isCurrentTurn && seat.avatarRingActive,
+          isWinner && seat.avatarRingWinner,
+        ]}>
+          <NeonAvatarSeat avatarId={avatarId} size={30} />
+          {player.isDealer && <View style={seat.posBadge}><Text style={seat.posBadgeText}>D</Text></View>}
+          {player.isSmallBlind && !player.isDealer && (
+            <View style={[seat.posBadge, { backgroundColor: 'rgba(0,212,255,0.2)', borderColor: '#00d4ff' }]}>
+              <Text style={[seat.posBadgeText, { color: '#00d4ff' }]}>S</Text>
+            </View>
+          )}
+          {player.isBigBlind && !player.isDealer && (
+            <View style={[seat.posBadge, { backgroundColor: 'rgba(255,0,144,0.2)', borderColor: '#ff0090' }]}>
+              <Text style={[seat.posBadgeText, { color: '#ff0090' }]}>B</Text>
+            </View>
+          )}
+        </View>
+        {showRing && <TimerRing timeoutAt={timeoutAt} maxSeconds={30} size={44} />}
       </View>
-      {isCurrentTurn && !folded && <DotTimer seconds={liveSeconds} maxSeconds={30} isActive size={3} gap={2} />}
       <Text style={[seat.seatName, isWinner && seat.seatNameWinner]} numberOfLines={1}>{player.name}</Text>
       <Text style={[seat.seatChips, folded && seat.dimText]}>{formatChips(player.chips)}</Text>
       {player.holeCards && player.holeCards.length > 0 && showCards && (

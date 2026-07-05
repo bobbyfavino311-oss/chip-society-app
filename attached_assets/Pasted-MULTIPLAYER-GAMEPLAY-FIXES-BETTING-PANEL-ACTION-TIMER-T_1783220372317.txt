@@ -1,0 +1,281 @@
+MULTIPLAYER GAMEPLAY FIXES — BETTING PANEL & ACTION TIMER
+
+These are critical multiplayer gameplay issues that must be corrected before launch.
+
+⸻
+
+1. FIX FLOATING BETTING PANEL
+
+Current Bug
+
+The betting/action panel is floating upward and no longer sits flush against the bottom of the screen.
+
+This wastes screen space and makes the interface feel unstable.
+
+⸻
+
+Required Behavior
+
+The betting controls should always remain docked to the bottom of the display.
+
+There should never be empty space underneath the betting panel.
+
+The betting panel becomes the bottom-most UI element.
+
+⸻
+
+Bottom Panel Layout
+
+Bottom to top:
+
+• Fold
+• Check / Call
+• Raise
+• All In
+
+Above buttons:
+
+• Raise Slider
+
+Above slider:
+
+• Quick Raise Buttons
+
+Above quick raise buttons:
+
+• Player cards
+
+The entire betting area should feel like one anchored component.
+
+⸻
+
+Safe Area
+
+Respect iPhone safe area.
+
+Do not float upward.
+
+Do not overlap gameplay.
+
+⸻
+
+2. PLAYER ACTION TIMER
+
+Currently there is no action timer.
+
+Players can sit indefinitely without acting.
+
+This is unacceptable for multiplayer.
+
+Every active player must have a visible countdown timer.
+
+⸻
+
+TIMER DESIGN
+
+Use a circular countdown ring around the player’s avatar.
+
+Exactly like modern online poker.
+
+The ring should slowly disappear as time expires.
+
+⸻
+
+Color Progression
+
+Start:
+
+Cyan
+
+↓
+
+Yellow
+
+↓
+
+Orange
+
+↓
+
+Red
+
+Final 3 seconds:
+
+Pulse red.
+
+⸻
+
+TIME LIMITS
+
+Regular Multiplayer:
+
+20 seconds
+
+Turbo Tables:
+
+12 seconds
+
+Sit & Go:
+
+15 seconds
+
+Tournaments:
+
+15 seconds
+
+Casino Games:
+
+No timer (unchanged)
+
+⸻
+
+WHEN TIMER STARTS
+
+Timer begins immediately when action reaches the player.
+
+Not before.
+
+Not after.
+
+⸻
+
+WHEN PLAYER ACTS
+
+Immediately:
+
+Stop timer
+
+Reset ring
+
+Pass action
+
+Start next player’s timer
+
+⸻
+
+OTHER PLAYERS
+
+Every player at the table should also display the same timer when action reaches them.
+
+This lets everyone know whose turn it is.
+
+⸻
+
+PLAYER WHOSE TURN IT IS
+
+While a player is acting:
+
+Highlight avatar.
+
+Glow stack.
+
+Timer ring active.
+
+Everyone else remains inactive.
+
+⸻
+
+TIME BANK
+
+If a player reaches zero:
+
+Automatically use a Time Bank.
+
+Each player receives:
+
+2 Time Banks
+
+Each Time Bank adds:
+
+15 seconds.
+
+Show:
+
+TIME BANK USED
+
+above the avatar.
+
+⸻
+
+OUT OF TIME
+
+If no Time Banks remain:
+
+Perform the correct automatic action.
+
+If check available:
+
+Automatically CHECK.
+
+Otherwise:
+
+Automatically FOLD.
+
+Never allow the table to stall.
+
+⸻
+
+VISUAL EFFECTS
+
+Last 3 seconds:
+
+Timer pulses.
+
+Avatar glows softly.
+
+Small countdown tick sound.
+
+No loud alarms.
+
+⸻
+
+TABLE FLOW
+
+Once action is completed:
+
+Immediately:
+
+Animate chips.
+
+Move pot if necessary.
+
+Pass action.
+
+Start next timer.
+
+Gameplay should never pause waiting on UI.
+
+⸻
+
+DISCONNECT HANDLING
+
+If a player disconnects:
+
+Timer continues.
+
+If time expires:
+
+Auto Check if possible.
+
+Otherwise Auto Fold.
+
+Game continues.
+
+⸻
+
+FINAL VALIDATION
+
+Verify:
+
+✅ Betting panel is permanently docked to the bottom of the screen.
+✅ No floating betting controls.
+✅ No empty space beneath the action panel.
+✅ Every active player has a visible circular action timer.
+✅ Timer rings animate smoothly.
+✅ Timer colors transition Cyan → Yellow → Orange → Red.
+✅ Last three seconds pulse red.
+✅ Action passes immediately after a player acts.
+✅ Two Time Banks per player are available.
+✅ Auto Check or Auto Fold occurs when timers expire.
+✅ Multiplayer tables can never stall because a player refuses to act.
+✅ Gameplay pacing now feels polished, responsive, and comparable to modern online poker platforms.
