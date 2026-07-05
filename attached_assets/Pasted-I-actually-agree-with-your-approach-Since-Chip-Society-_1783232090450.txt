@@ -1,0 +1,55 @@
+I actually agree with your approach. Since Chip Society only allows text (no photos, videos, GIFs, or file uploads), you don’t need an extensive content policy like Reddit or Facebook.
+
+Also, if your philosophy is “players can say what they want”, then your Community Guidelines should focus on protecting the integrity of the platform, not policing ordinary trash talk or profanity.
+
+I’d make it much shorter—almost like the rules posted on the wall of a poker room.
+
+⸻
+
+# CHIP SOCIETY COMMUNITY GUIDELINES
+Effective Date: July 4, 2026
+Last Updated: July 4, 2026
+Welcome to Chip Society.
+Chip Society is built around competitive poker, social interaction, and fair play.
+By using Chip Society, you agree to follow these Community Guidelines.
+━━━━━━━━━━━━━━━━━━━━━━
+RESPECT THE GAME
+Play fairly.
+Do not cheat, exploit bugs, collude with other players, use bots, or manipulate gameplay.
+━━━━━━━━━━━━━━━━━━━━━━
+SOCIAL FEATURES
+Chip Society allows players to communicate using text.
+Players are free to express themselves, including friendly banter and poker table trash talk.
+However, you may not use Chip Society to:
+• Threaten or encourage real-world violence.
+• Promote illegal activity.
+• Impersonate Chip Society staff.
+• Spam, scam, or repeatedly flood the platform.
+• Share another person's private or personal information without permission.
+Chip Society does not allow images, videos, or file uploads within posts, comments, or private messages.
+━━━━━━━━━━━━━━━━━━━━━━
+PLAYER ACCOUNTS
+Do not:
+• Sell accounts.
+• Share accounts.
+• Use multiple accounts to gain an unfair advantage.
+• Exploit bugs or glitches.
+━━━━━━━━━━━━━━━━━━━━━━
+FAIR PLAY
+Poker should be won through skill and strategy.
+The use of cheats, automation, exploits, unauthorized software, chip dumping, collusion, or any attempt to gain an unfair advantage may result in account penalties, including permanent suspension.
+━━━━━━━━━━━━━━━━━━━━━━
+ENFORCEMENT
+Violations of these Guidelines may result in:
+• Warning
+• Chat restriction
+• Suspension
+• Permanent account termination
+Chip Society reserves the right to take action when necessary to protect the platform, its players, and the integrity of the game.
+━━━━━━━━━━━━━━━━━━━━━━
+CONTACT
+Questions regarding these Community Guidelines may be directed to:
+support@chipsociety.app
+(Replace with your official support email before launch.)
+
+I think this version better reflects the culture you’re building. It doesn’t try to micromanage language, it acknowledges that poker players will joke, bluff, and trash talk, and it keeps the focus on what actually matters: fair play, no scams, no spam, no impersonation, no doxxing, and no illegal activity. Since the app doesn’t support image uploads, you also avoid having to write long moderation rules for visual content.
