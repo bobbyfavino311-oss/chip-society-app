@@ -474,6 +474,10 @@ export default function ProfileScreen() {
           <NeonStatBox label="WINS"      value={profile.wins}          accentColor="#ffd700" />
           <NeonStatBox label="LOSSES"    value={profile.losses}        accentColor="#ff4466" />
         </View>
+        <View style={styles.statsGrid}>
+          <NeonStatBox label="COOKIES OPENED" value={profile.cookiesOpened} accentColor="#D4A017" />
+          <NeonStatBox label="XP"              value={profile.xp.toLocaleString()} accentColor="#bf5fff" />
+        </View>
 
         {/* Tournament stats section — live */}
         <NeonSectionTitle label="TOURNAMENTS" color="rgba(191,95,255,0.8)" />

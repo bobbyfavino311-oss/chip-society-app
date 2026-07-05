@@ -1,0 +1,181 @@
+FORTUNE COOKIE — OPEN ALL + PROFILE STAT UPDATE
+
+Add an Open All Cookies feature to the Fortune Cookie section, similar to the Scratch All feature on Lottery Tickets.
+
+⸻
+
+OPEN ALL COOKIES BUTTON
+
+Add a button near the existing Open Cookie button:
+
+OPEN ALL
+
+This button opens all cookies of the currently selected rarity.
+
+Example:
+
+Selected tab:
+
+Legendary
+
+Player owns:
+
+Legendary x9
+
+Pressing:
+
+OPEN ALL
+
+should open all 9 Legendary Cookies at once.
+
+⸻
+
+OPEN ALL BEHAVIOR
+
+Open All must respect the selected cookie rarity.
+
+If selected:
+
+Common → opens all Common Cookies
+
+Rare → opens all Rare Cookies
+
+Epic → opens all Epic Cookies
+
+Legendary → opens all Legendary Cookies
+
+Mythic → opens all Mythic Cookies if owned
+
+Do not default back to Common.
+
+Do not open the wrong rarity.
+
+⸻
+
+BULK REWARD SUMMARY
+
+After Open All completes, show a summary screen.
+
+Example:
+
+9 Legendary Cookies Opened
+
+Rewards:
+
+• Chips: +8.4M
+• XP: +25K
+• Tickets: +12
+
+Button:
+
+COLLECT
+
+Rewards should be added immediately and saved server-side.
+
+⸻
+
+ANIMATION
+
+Do not play the full cookie crack animation for every cookie.
+
+Instead:
+
+• Play one fast premium opening animation
+• Show multiple cookie cracks quickly
+• Reveal total rewards at once
+
+This prevents the feature from feeling slow.
+
+⸻
+
+ZERO COOKIE STATE
+
+If player owns 0 cookies of selected rarity:
+
+Disable Open All.
+
+Show:
+
+NO LEGENDARY COOKIES
+
+or the selected rarity name.
+
+⸻
+
+COOKIES OPENED STAT
+
+Add a new stat to the Player Profile:
+
+Cookies Opened
+
+This stat tracks every Fortune Cookie opened.
+
+It should include cookies opened by:
+
+• Open Cookie
+• Open All
+• Any future cookie opening method
+
+⸻
+
+STAT COUNTING RULE
+
+If player opens:
+
+1 cookie manually
+
+Cookies Opened +1
+
+If player uses Open All on:
+
+9 cookies
+
+Cookies Opened +9
+
+If player opens:
+
+2 Mythic Cookies
+
+Cookies Opened +2
+
+⸻
+
+PROFILE LOCATIONS
+
+Display Cookies Opened on:
+
+• Player Profile
+• Social Profile
+• Stats section
+• Any future leaderboard/stat page
+
+⸻
+
+SERVER REQUIREMENT
+
+Cookies Opened must be saved server-side.
+
+It must persist after:
+
+• Logout
+• App restart
+• Device switch
+• Server refresh
+
+Do not store this only locally.
+
+⸻
+
+FINAL VALIDATION
+
+Verify:
+
+✅ Open All opens the selected rarity only
+✅ Rewards are totaled correctly
+✅ Cookie inventory decreases correctly
+✅ Rewards are saved server-side
+✅ Cookies Opened increases by the exact number opened
+✅ Profile displays Cookies Opened
+✅ Social profile displays Cookies Opened
+✅ Open All does not reset to Common
+✅ Open All works for Common, Rare, Epic, Legendary, and Mythic if owned

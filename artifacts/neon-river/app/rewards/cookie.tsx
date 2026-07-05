@@ -282,7 +282,7 @@ export default function FortuneCookieScreen() {
   const insets = useSafeAreaInsets();
   const {
     profile, addChips, addXP, addScratchTickets,
-    consumeFortuneCookie, canClaimFreeCookie, claimFreeCookie,
+    consumeFortuneCookie, consumeFortuneCookieBulk, canClaimFreeCookie, claimFreeCookie,
   } = useUser();
 
   // ── Cookie inventory totals ────────────────────────────────────────────────
@@ -304,6 +304,11 @@ export default function FortuneCookieScreen() {
   const [reward,     setReward]     = useState<FortuneReward | null>(null);
   const [fortuneMsg, setFortuneMsg] = useState('');
   const [unlockPopup, setUnlockPopup] = useState<CookieTier | null>(null);
+
+  // Bulk open state
+  interface BulkSummary { tier: CookieTier; count: number; chips: number; xp: number; tickets: number }
+  const [bulkSummary,   setBulkSummary]   = useState<BulkSummary | null>(null);
+  const [bulkAnimating, setBulkAnimating] = useState(false);
 
   // Check for newly unlocked cookie tiers on each level-up
   useEffect(() => {
@@ -499,6 +504,69 @@ export default function FortuneCookieScreen() {
     });
   }, [phase, cookieTier, hasCookies, canClaimFreeCookie, profile]);
 
+  // ── Open All ──────────────────────────────────────────────────────────────
+  const handleOpenAll = useCallback(async () => {
+    if (phase !== 'idle' || bulkAnimating || bulkSummary) return;
+    const count = inv[cookieTier];
+    if (count <= 0) return;
+
+    // Pick rewards for every cookie upfront
+    const rewards = Array.from({ length: count }, () => pickReward(cookieTier));
+    let totalChips = 0, totalXp = 0, totalTickets = 0;
+    for (const r of rewards) {
+      if (r.type === 'chips')   totalChips   += r.amount;
+      else if (r.type === 'xp')      totalXp      += r.amount;
+      else if (r.type === 'tickets') totalTickets += r.amount;
+    }
+
+    // Consume all in a single profile update
+    const consumed = await consumeFortuneCookieBulk(cookieTier, count);
+    if (!consumed) return;
+
+    // Apply totals
+    if (totalChips   > 0) await addChips(totalChips);
+    if (totalXp      > 0) await addXP(totalXp);
+    if (totalTickets > 0) await addScratchTickets(totalTickets);
+
+    // Auto-switch to next non-empty tier
+    const nextTier = (['mythic','legendary','epic','rare','common'] as CookieTier[])
+      .find(t => t !== cookieTier && inv[t] > 0);
+    if (nextTier) setCookieTier(nextTier);
+
+    // Capture tier before async state changes
+    const openedTier = cookieTier;
+
+    // Quick multi-burst animation
+    setBulkAnimating(true);
+    SoundEngine.cookieCrack(openedTier);
+    breatheScale.setValue(1);
+
+    flashOp.setValue(0);
+    Animated.sequence([
+      Animated.timing(flashOp, { toValue: 0.95, duration: 100, useNativeDriver: true }),
+      Animated.timing(flashOp, { toValue: 0,    duration: 300, useNativeDriver: true }),
+    ]).start();
+
+    particles.forEach((p, i) => {
+      const angle = (i / N_PARTICLES_MYTHIC) * 2 * Math.PI;
+      const dist  = 65 + Math.random() * 70;
+      p.x.setValue(0); p.y.setValue(0); p.op.setValue(0);
+      Animated.parallel([
+        Animated.timing(p.op, { toValue: 1, duration: 60, useNativeDriver: true }),
+        Animated.timing(p.x,  { toValue: Math.cos(angle) * dist, duration: 560, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(p.y,  { toValue: Math.sin(angle) * dist, duration: 560, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(p.op, { toValue: 0, duration: 420, delay: 170, useNativeDriver: true }),
+      ]).start();
+    });
+
+    setTimeout(() => {
+      setBulkAnimating(false);
+      SoundEngine.fortuneReward(openedTier.toUpperCase() as any);
+      setBulkSummary({ tier: openedTier, count, chips: totalChips, xp: totalXp, tickets: totalTickets });
+    }, 700);
+  }, [phase, bulkAnimating, bulkSummary, cookieTier, inv,
+      consumeFortuneCookieBulk, addChips, addXP, addScratchTickets]);
+
   const leftRotDeg  = leftRot.interpolate({ inputRange: [-1,0,1], outputRange: ['-32deg','0deg','32deg'] });
   const rightRotDeg = rightRot.interpolate({ inputRange: [-1,0,1], outputRange: ['-32deg','0deg','32deg'] });
 
@@ -637,11 +705,12 @@ export default function FortuneCookieScreen() {
                 })}
             </View>
 
-            {/* ── Single open button — controlled by selected tab ── */}
+            {/* ── Open / Open All buttons — controlled by selected tab ── */}
             {(() => {
               const tierQty   = inv[cookieTier];
               const isDailyOk = cookieTier === 'common' && canClaimFreeCookie;
               const canOpenThis = tierQty > 0 || isDailyOk;
+              const isBusy = bulkAnimating || !!bulkSummary;
 
               if (!hasCookies && !canClaimFreeCookie) {
                 return (
@@ -662,21 +731,44 @@ export default function FortuneCookieScreen() {
               }
 
               return (
-                <TouchableOpacity
-                  style={[styles.openBtn, { overflow: 'hidden' }]}
-                  onPress={handleOpen}
-                  activeOpacity={0.82}
-                >
-                  <LinearGradient
-                    colors={isMythicSelected ? ['#FF0090', '#FF69B4', '#FFD700'] : [cfg.color, cfg.color + 'cc']}
-                    style={StyleSheet.absoluteFill}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                  />
-                  <Text style={[styles.openBtnText, { color: isMythicSelected ? '#fff' : '#050010' }]}>
-                    {isDailyOk && tierQty === 0 ? `CLAIM & OPEN ${cfg.label}` : `OPEN ${cfg.label}`}
-                  </Text>
-                  <Ionicons name="chevron-forward" size={18} color={isMythicSelected ? '#fff' : '#050010'} />
-                </TouchableOpacity>
+                <View style={styles.openBtnRow}>
+                  {/* OPEN (single) */}
+                  <TouchableOpacity
+                    style={[styles.openBtn, { overflow: 'hidden', flex: 1 }]}
+                    onPress={handleOpen}
+                    activeOpacity={0.82}
+                    disabled={isBusy}
+                  >
+                    <LinearGradient
+                      colors={isMythicSelected ? ['#FF0090', '#FF69B4', '#FFD700'] : [cfg.color, cfg.color + 'cc']}
+                      style={StyleSheet.absoluteFill}
+                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    />
+                    <Text style={[styles.openBtnText, { color: isMythicSelected ? '#fff' : '#050010', fontSize: 11 }]}>
+                      {isDailyOk && tierQty === 0 ? `CLAIM & OPEN` : `OPEN ${cfg.label}`}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {/* OPEN ALL (only shown when 2+ cookies) */}
+                  {tierQty >= 2 && (
+                    <TouchableOpacity
+                      style={[styles.openAllBtn, {
+                        borderColor: isBusy ? 'rgba(255,255,255,0.10)' : cfg.color + '55',
+                        opacity: isBusy ? 0.38 : 1,
+                      }]}
+                      onPress={handleOpenAll}
+                      activeOpacity={0.80}
+                      disabled={isBusy}
+                    >
+                      <Text style={[styles.openAllBtnLabel, { color: isBusy ? 'rgba(255,255,255,0.30)' : cfg.color }]}>
+                        OPEN ALL
+                      </Text>
+                      <Text style={[styles.openAllBtnCount, { color: isBusy ? 'rgba(255,255,255,0.20)' : cfg.color + 'aa' }]}>
+                        ×{tierQty}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               );
             })()}
 
@@ -784,6 +876,70 @@ export default function FortuneCookieScreen() {
           </View>
         )}
       </View>
+
+      {/* ── Bulk Open Summary Overlay ─────────────────────────────────────────── */}
+      {bulkSummary && (() => {
+        const bc = TIER_CFG[bulkSummary.tier];
+        return (
+          <View style={styles.unlockOverlay}>
+            <View style={styles.unlockBackdrop} />
+            <View style={[styles.bulkCard, { borderColor: bc.color + '88' }]}>
+              <LinearGradient
+                colors={[bc.color + '28', 'transparent', bc.color + '10']}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={styles.bulkCookieEmoji}>🥠</Text>
+              <Text style={[styles.bulkTitle, { color: bc.color }]}>
+                {bulkSummary.count} {bc.label} {bulkSummary.count === 1 ? 'COOKIE' : 'COOKIES'} OPENED
+              </Text>
+
+              <View style={styles.bulkDivider} />
+              <Text style={styles.bulkRewardsLabel}>REWARDS</Text>
+
+              {bulkSummary.chips > 0 && (
+                <View style={styles.bulkRewardRow}>
+                  <Text style={styles.bulkRewardIcon}>💰</Text>
+                  <Text style={[styles.bulkRewardText, { color: bc.color }]}>
+                    Chips: +{formatChips(bulkSummary.chips)}
+                  </Text>
+                </View>
+              )}
+              {bulkSummary.tickets > 0 && (
+                <View style={styles.bulkRewardRow}>
+                  <Text style={styles.bulkRewardIcon}>🎟️</Text>
+                  <Text style={[styles.bulkRewardText, { color: bc.color }]}>
+                    Tickets: +{bulkSummary.tickets}
+                  </Text>
+                </View>
+              )}
+              {bulkSummary.xp > 0 && (
+                <View style={styles.bulkRewardRow}>
+                  <Text style={styles.bulkRewardIcon}>⚡</Text>
+                  <Text style={[styles.bulkRewardText, { color: bc.color }]}>
+                    XP: +{bulkSummary.xp.toLocaleString()}
+                  </Text>
+                </View>
+              )}
+              {bulkSummary.chips === 0 && bulkSummary.tickets === 0 && bulkSummary.xp === 0 && (
+                <Text style={styles.bulkRewardText}>Rewards applied!</Text>
+              )}
+
+              <View style={styles.bulkStatRow}>
+                <Text style={styles.bulkStatLbl}>Total Cookies Opened</Text>
+                <Text style={styles.bulkStatVal}>{profile.cookiesOpened}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.unlockBtn, { backgroundColor: bc.color, marginTop: 4 }]}
+                onPress={() => { setBulkSummary(null); router.back(); }}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.unlockBtnText}>COLLECT</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      })()}
 
       {/* ── Cookie Tier Unlock Popup ──────────────────────────────────────────── */}
       {unlockPopup && (() => {
@@ -900,6 +1056,63 @@ const styles = StyleSheet.create({
   emptyIcon:  { fontSize: 48 },
   emptyTitle: { color: '#555', fontSize: 16, fontFamily: 'Orbitron_700Bold', letterSpacing: 2 },
   emptySub:   { color: '#333', fontSize: 12, fontFamily: 'Orbitron_400Regular', textAlign: 'center', lineHeight: 18 },
+
+  openBtnRow: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
+  openAllBtn: {
+    borderRadius: 14, borderWidth: 1.5,
+    paddingHorizontal: 14, paddingVertical: 0,
+    alignItems: 'center', justifyContent: 'center',
+    minWidth: 90,
+  },
+  openAllBtnLabel: {
+    fontSize: 10, fontFamily: 'Orbitron_900Black', letterSpacing: 1.5,
+  },
+  openAllBtnCount: {
+    fontSize: 13, fontFamily: 'Inter_700Bold', marginTop: 1,
+  },
+
+  bulkCard: {
+    width: Math.min(W - 40, 340),
+    borderRadius: 20, borderWidth: 1.5,
+    backgroundColor: 'rgba(5,0,16,0.97)',
+    padding: 24, alignItems: 'center', gap: 10,
+    overflow: 'hidden',
+  },
+  bulkCookieEmoji: { fontSize: 40 },
+  bulkTitle: {
+    fontSize: 13, fontFamily: 'Orbitron_900Black',
+    letterSpacing: 1.5, textAlign: 'center', lineHeight: 20,
+  },
+  bulkDivider: {
+    width: '80%', height: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    marginVertical: 2,
+  },
+  bulkRewardsLabel: {
+    color: 'rgba(255,255,255,0.30)', fontSize: 9,
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 2.5,
+  },
+  bulkRewardRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    width: '100%',
+  },
+  bulkRewardIcon: { fontSize: 22, width: 30, textAlign: 'center' },
+  bulkRewardText: {
+    fontSize: 16, fontFamily: 'Inter_700Bold', flex: 1,
+    color: 'rgba(255,255,255,0.80)',
+  },
+  bulkStatRow: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    width: '100%', paddingTop: 10, marginTop: 2,
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)',
+  },
+  bulkStatLbl: {
+    color: '#555', fontSize: 10,
+    fontFamily: 'Orbitron_400Regular', letterSpacing: 1,
+  },
+  bulkStatVal: {
+    color: '#ccc', fontSize: 13, fontFamily: 'Inter_700Bold',
+  },
 
   // ── Tier selector tabs ──────────────────────────────────────────────────────
   tierTabRow: { flexDirection: 'row', gap: 6 },

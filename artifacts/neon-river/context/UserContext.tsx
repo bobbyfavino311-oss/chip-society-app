@@ -299,6 +299,7 @@ interface UserContextValue {
   nextCookieIn: number;
   addXP: (amount: number) => Promise<void>;
   consumeFortuneCookie: (tier: CookieTier) => Promise<boolean>;
+  consumeFortuneCookieBulk: (tier: CookieTier, count: number) => Promise<number>;
   addFortuneCookies: (common?: number, rare?: number, epic?: number, legendary?: number, mythic?: number) => Promise<void>;
   claimFreeCookie: () => Promise<CookieTier | false>;
   pendingBonuses: PendingBonus[];
@@ -770,6 +771,20 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       cookiesOpened: profile.cookiesOpened + 1,
     });
     return true;
+  }, [profile, updateProfile]);
+
+  const consumeFortuneCookieBulk = useCallback(async (tier: CookieTier, count: number): Promise<number> => {
+    const invKey  = COOKIE_INV_FIELD[tier];
+    const statKey = COOKIE_STAT_FIELD[tier];
+    const available = profile[invKey] as number;
+    const toConsume = Math.min(count, available);
+    if (toConsume <= 0) return 0;
+    await updateProfile({
+      [invKey]:      available - toConsume,
+      [statKey]:     (profile[statKey] as number) + toConsume,
+      cookiesOpened: profile.cookiesOpened + toConsume,
+    });
+    return toConsume;
   }, [profile, updateProfile]);
 
   const addFortuneCookies = useCallback(async (
@@ -1298,7 +1313,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,
       canClaimFreeCookie, nextCookieIn,
-      addXP, consumeFortuneCookie, addFortuneCookies, claimFreeCookie,
+      addXP, consumeFortuneCookie, consumeFortuneCookieBulk, addFortuneCookies, claimFreeCookie,
       pendingBonuses, dismissBonus,
       pendingModeration, dismissModeration,
       unreadDmCount, clearDmUnread, onDmReceived,
