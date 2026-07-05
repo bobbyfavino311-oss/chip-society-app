@@ -1,0 +1,369 @@
+CHIP SOCIETY – TOURNAMENT ALL-IN SIDE POT BUG & TURBO BLIND FIX
+
+These are critical gameplay bugs affecting tournament integrity and must be fixed immediately before launch.
+
+⸻
+
+1. ALL-IN CHIP DISTRIBUTION BUG (CRITICAL)
+
+There is a major bug in tournament gameplay that also previously existed in regular gameplay.
+
+Current example:
+
+Player Stack:
+
+200,000
+
+AI Stack:
+
+18,000
+
+Player goes All-In.
+
+AI calls.
+
+Player loses.
+
+Current result:
+
+The AI incorrectly receives the player’s entire 200,000 chip stack.
+
+This is incorrect.
+
+⸻
+
+Correct Poker Rule
+
+A player can only win the amount they have matched.
+
+In this example:
+
+Player:
+
+200,000
+
+AI:
+
+18,000
+
+Maximum pot between those two players is:
+
+18,000 (AI)
+
+18,000 (Player)
+
+Total Main Pot:
+
+36,000
+
+The remaining:
+
+182,000
+
+Must immediately be returned to the player.
+
+The AI can NEVER win chips it never matched.
+
+⸻
+
+Correct Result
+
+Player loses.
+
+AI receives:
+
+36,000 total pot
+
+Player keeps:
+
+182,000
+
+Player’s remaining stack:
+
+182,000
+
+NOT zero.
+
+⸻
+
+Required Fix
+
+Audit the betting engine.
+
+Specifically inspect:
+
+* All-in logic
+* Main pot calculation
+* Side pot calculation
+* Tournament betting engine
+* Regular gameplay betting engine
+
+Ensure both systems use the exact same betting rules.
+
+⸻
+
+Side Pot Rules
+
+Whenever stacks differ:
+
+Always create:
+
+Main Pot
+
+Side Pot(s)
+
+Only players contributing to each pot may win that pot.
+
+Unmatched chips must immediately return to their owner.
+
+Never transfer unmatched chips to another player.
+
+⸻
+
+Test Cases
+
+Test 1
+
+Player A
+
+200K
+
+Player B
+
+18K
+
+Player A All-In
+
+Player B Calls
+
+Player B Wins
+
+Correct:
+
+Player B = 36K
+
+Player A = 182K
+
+⸻
+
+Test 2
+
+Player
+
+500K
+
+AI
+
+250K
+
+Player All-In
+
+AI Calls
+
+AI Wins
+
+Correct:
+
+AI wins:
+
+500K
+
+Player retains:
+
+250K
+
+⸻
+
+Test 3
+
+Multiple All-In
+
+Player A
+
+500K
+
+Player B
+
+200K
+
+Player C
+
+50K
+
+Verify:
+
+Main Pot
+
+Side Pot 1
+
+Side Pot 2
+
+All calculate correctly.
+
+⸻
+
+Tournament Requirement
+
+The tournament engine must use the exact same side-pot calculation as regular multiplayer.
+
+There should never be duplicate betting logic.
+
+One shared betting engine.
+
+⸻
+
+2. TURBO BLIND STRUCTURE BUG
+
+Turbo tournaments are currently increasing blinds incorrectly.
+
+Current behavior:
+
+Blinds only increase when a player is eliminated.
+
+This is incorrect.
+
+⸻
+
+Required Behavior
+
+Turbo tournaments increase blinds based on completed hands.
+
+NOT eliminations.
+
+NOT elapsed time.
+
+NOT player count.
+
+⸻
+
+Turbo Rule
+
+Increase blinds:
+
+Every 3 completed hands
+
+Examples:
+
+Hand 1
+
+Hand 2
+
+Hand 3
+
+⬆ Blind Increase
+
+Hand 4
+
+Hand 5
+
+Hand 6
+
+⬆ Blind Increase
+
+Continue for the entire tournament.
+
+⸻
+
+Blind Counter
+
+Track:
+
+Completed Hands
+
+Every time a hand fully finishes:
+
+Increment:
+
+HandsPlayed++
+
+When:
+
+HandsPlayed % 3 == 0
+
+Increase blinds.
+
+Reset countdown.
+
+⸻
+
+Tournament Banner
+
+After every third hand display:
+
+BLINDS INCREASED
+
+Small Blind:
+
+100 → 200
+
+Big Blind:
+
+200 → 400
+
+Display briefly.
+
+Fade out.
+
+⸻
+
+Applies To
+
+Every Turbo tournament.
+
+Examples:
+
+Turbo Heat
+
+Turbo Championship
+
+Turbo Sit & Go
+
+Short Deck Turbo
+
+Joker Turbo
+
+Future Turbo events
+
+All Turbo tournaments use the same blind progression rule.
+
+⸻
+
+Non-Turbo Events
+
+Do NOT change.
+
+Deep Stack
+
+Championship
+
+High Roller
+
+Night Grind
+
+Sit & Go (unless marked Turbo)
+
+continue using their own configured blind schedules.
+
+⸻
+
+Final Validation
+
+Verify:
+
+✅ 200K vs 18K all-in returns unmatched chips correctly.
+
+✅ Side pots calculate correctly.
+
+✅ Main pots calculate correctly.
+
+✅ Regular gameplay uses identical betting logic.
+
+✅ Tournament gameplay uses identical betting logic.
+
+✅ Turbo blinds increase every 3 completed hands.
+
+✅ Eliminations no longer trigger blind increases.
+
+✅ Every Turbo tournament follows the same 3-hand blind progression.
+
+These fixes are mandatory, as incorrect all-in chip distribution and blind progression directly impact competitive integrity and player trust.

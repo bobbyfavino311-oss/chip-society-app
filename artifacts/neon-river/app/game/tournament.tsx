@@ -710,7 +710,7 @@ export default function TournamentScreen() {
         <EliminationOverlay
           eliminations={tournament.pendingEliminations}
           prizes={tournament.prizes}
-          onDismiss={() => { clearPendingEliminations(); nextHand(); }}
+          onDismiss={() => clearPendingEliminations()}
         />
       )}
       {humanElimOverlay && tournament.pendingEliminations.some(e => e.isHuman) && (

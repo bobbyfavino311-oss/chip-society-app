@@ -163,8 +163,21 @@ function doShowdown(state: GameState): GameState {
   if (sidePots.length > 1) {
     let players = s.players.map(p => ({ ...p }));
     const msgs: string[] = [];
+    let mainWinnerIds: string[] = [];
+    let mainWinnerHand = '';
+
     for (const sp of sidePots) {
       const spEl = players.filter(p => sp.eligiblePlayerIds.includes(p.id) && (p.status === 'active' || p.status === 'allIn'));
+      if (spEl.length === 0) continue;
+
+      // Single eligible player = unmatched excess returned uncontested, no showdown
+      if (spEl.length === 1) {
+        const r = spEl[0];
+        const idx = players.findIndex(p => p.id === r.id);
+        if (idx >= 0) { players[idx].chips += sp.amount; players[idx].chipDelta += sp.amount; }
+        continue;
+      }
+
       const results = determineWinnersVariant(spEl.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards, s.variant);
       const topScore = Math.max(...results.map(r => r.handResult.rank));
       const winners = results.filter(r => r.handResult.rank === topScore);
@@ -175,17 +188,23 @@ function doShowdown(state: GameState): GameState {
       }
       const wNames = winners.map(w => players.find(p => p.id === w.winnerId)?.name ?? '').filter(Boolean);
       msgs.push(`${wNames.join(' & ')} takes ${sp.amount}`);
+      if (mainWinnerIds.length === 0) {
+        mainWinnerIds = winners.map(w => w.winnerId);
+        mainWinnerHand = describeHand(winners[0].handResult);
+      }
     }
-    const allWinners = [...new Set(sidePots.flatMap(sp => {
-      const spEl = players.filter(p => sp.eligiblePlayerIds.includes(p.id));
-      const results = determineWinnersVariant(spEl.map(p => ({ id: p.id, holeCards: p.holeCards })), s.communityCards, s.variant);
-      const top = Math.max(...results.map(r => r.handResult.rank));
-      return results.filter(r => r.handResult.rank === top).map(r => r.winnerId);
-    }))];
+
+    if (mainWinnerIds.length === 0) mainWinnerIds = [eligible[0].id];
+    const humanWon = mainWinnerIds.includes('human');
+    const winLabel = mainWinnerIds.map(id => players.find(p => p.id === id)?.name ?? '').join(' & ');
+    const message = msgs.length > 0
+      ? msgs.join(' | ')
+      : (humanWon ? 'You won!' : `${winLabel} wins!`);
+
     return {
       ...s, players, phase: 'handover', showCards: true, allInRunout: false,
-      winnerIds: allWinners, winnerHand: '', winnerPot: potSize,
-      message: msgs.join(' | '), pot: 0, sidePots, isSplitPot: false,
+      winnerIds: mainWinnerIds, winnerHand: mainWinnerHand, winnerPot: potSize,
+      message, pot: 0, sidePots, isSplitPot: mainWinnerIds.length > 1,
     };
   }
 

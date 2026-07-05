@@ -114,7 +114,7 @@ export const TOURNAMENT_CONFIGS: Record<TournamentType, TournamentConfig> = {
     buyIn: 25_000,
     startingChips: 5_000,
     numPlayers: 5,
-    handsPerLevel: 2,
+    handsPerLevel: 3,
     blindSchedule: [
       { sb: 100, bb: 200 }, { sb: 200, bb: 400 }, { sb: 400, bb: 800 },
       { sb: 800, bb: 1600 }, { sb: 1600, bb: 3200 }, { sb: 3200, bb: 6400 },
