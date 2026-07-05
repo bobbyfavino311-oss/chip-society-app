@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+        Chip Society — PrivacyInfo.xcprivacy
+        App does NOT track users, does NOT collect personal data,
+        and does NOT sell data to third parties.
+        Virtual chips only — no real-money transactions.
+    -->
+
+    <!-- No user tracking -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+
+    <!-- No tracking domains -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <!-- No personal data collected -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+
+    <!-- Required API access declarations -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+
+        <!-- NSUserDefaults — used by @react-native-async-storage/async-storage
+             to persist player profile, chip balance, settings, and terms acceptance.
+             Reason CA92.1: Access info previously written by the same app. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+
+        <!-- File timestamps — used by expo-av (sound playback) and
+             React Native's bundler file loading.
+             Reason C617.1: Access files in the app's own container. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>C617.1</string>
+            </array>
+        </dict>
+
+        <!-- System boot time — used by React Native's internal performance
+             timing and animation scheduling.
+             Reason 35F9.1: Calculate relative timing of in-app events. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>35F9.1</string>
+            </array>
+        </dict>
+
+        <!-- Disk space — used by expo-file-system to check available space
+             before writing cached assets.
+             Reason E174.1: Display storage information within the app. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>E174.1</string>
+            </array>
+        </dict>
+
+    </array>
+</dict>
+</plist>

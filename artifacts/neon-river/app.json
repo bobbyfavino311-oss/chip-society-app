@@ -10,18 +10,20 @@
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "cover",
+      "resizeMode": "contain",
       "backgroundColor": "#050010"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.chipsociety.app",
+      "buildNumber": "1",
       "infoPlist": {
         "UIBackgroundModes": ["remote-notification"]
       }
     },
     "android": {
-      "package": "com.chipsociety.app"
+      "package": "com.chipsociety.app",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/icon.png"
@@ -41,7 +43,8 @@
           "icon": "./assets/images/icon.png",
           "color": "#050010"
         }
-      ]
+      ],
+      "./plugins/withPrivacyManifest"
     ],
     "experiments": {
       "typedRoutes": true,
