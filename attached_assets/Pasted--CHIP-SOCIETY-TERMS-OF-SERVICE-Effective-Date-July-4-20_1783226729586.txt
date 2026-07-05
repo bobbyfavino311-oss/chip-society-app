@@ -1,0 +1,376 @@
+# CHIP SOCIETY TERMS OF SERVICE
+
+Effective Date: July 4, 2026
+Last Updated: July 4, 2026
+
+Welcome to Chip Society ("Chip Society," "we," "our," or "us").
+
+These Terms of Service ("Terms") govern your access to and use of the Chip Society mobile application, website, and all related services. By creating an account or using Chip Society, you acknowledge that you have read, understood, and agree to these Terms of Service and our Privacy Policy.
+
+If you do not agree to these Terms, do not create an account or use the Service.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ACCOUNT ACCEPTANCE
+
+These Terms of Service must be presented together with the Chip Society Privacy Policy during the initial account creation process.
+
+Users should see one agreement screen containing:
+
+• Privacy Policy
+• Terms of Service
+
+The player must review both documents before continuing.
+
+Buttons:
+
+VIEW PRIVACY POLICY
+
+VIEW TERMS OF SERVICE
+
+I AGREE & CONTINUE
+
+Acceptance is required only once.
+
+After the user accepts:
+
+• Store the acceptance date.
+• Store the Terms version.
+• Store the Privacy Policy version.
+• Save this information server-side with the player's account.
+
+The player should NEVER be asked to agree again during normal login.
+
+Only request acceptance again if either the Privacy Policy or Terms of Service are materially updated in the future.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+1. ELIGIBILITY
+
+You must be at least seventeen (17) years old to create an account or use Chip Society.
+
+By using the Service, you represent and warrant that:
+
+• You are at least 17 years of age.
+• You have the legal capacity to agree to these Terms.
+• You are not prohibited from using the Service under applicable law.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+2. ABOUT CHIP SOCIETY
+
+Chip Society is a social poker and casino entertainment platform.
+
+The application is intended solely for entertainment purposes.
+
+Chip Society does not offer real-money gambling.
+
+Chip Society does not allow players to wager real money against one another.
+
+All gameplay uses virtual chips only.
+
+No chips, rewards, or virtual items possess any real-world monetary value.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+3. VIRTUAL CHIPS
+
+All chips inside Chip Society are virtual.
+
+Virtual chips:
+
+• Cannot be redeemed for cash.
+• Cannot be exchanged for real-world currency.
+• Cannot be transferred outside the game.
+• Cannot be sold.
+• Cannot be traded for value.
+
+Chip Society retains ownership of all virtual currency.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+4. VIRTUAL ITEMS
+
+The following items are virtual entertainment items only:
+
+• Fortune Cookies
+• Lottery Tickets
+• XP
+• Themes
+• Avatars
+• Tournament Rewards
+• Collectibles
+• Cosmetics
+• Badges
+• Achievements
+
+These items:
+
+• Have no monetary value.
+• Cannot be redeemed.
+• Cannot be exchanged.
+• Cannot be transferred outside Chip Society.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+5. PLAYER ACCOUNTS
+
+Each player is responsible for maintaining the security of their account.
+
+Players agree:
+
+• To provide accurate information.
+• To maintain account security.
+• Not to share login credentials.
+• Not to allow another individual to use their account.
+
+Chip Society may suspend or terminate accounts involved in unauthorized sharing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+6. FAIR PLAY POLICY
+
+Players must compete honestly.
+
+The following are prohibited:
+
+• Cheating
+• Chip dumping
+• Collusion
+• Multi-accounting
+• Automated play
+• Bots
+• Scripts
+• Exploits
+• Hacking
+• Memory editing
+• Reverse engineering
+• Unauthorized software
+• Network manipulation
+• Match fixing
+
+Violations may result in:
+
+• Warning
+• Chip removal
+• Tournament disqualification
+• Suspension
+• Permanent account termination
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+7. SOCIAL FEATURES
+
+Players are responsible for all content they create.
+
+This includes:
+
+• Posts
+• Comments
+• Usernames
+• Chat messages
+• Profile biographies
+
+The following content is prohibited:
+
+• Threats
+• Harassment
+• Hate speech
+• Illegal content
+• Copyright infringement
+• Spam
+• Malware
+• Fraud
+• Personal information belonging to others
+
+Chip Society reserves the right to remove content or restrict accounts at its sole discretion.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+8. MULTIPLAYER CONDUCT
+
+Players are expected to maintain respectful conduct during multiplayer gameplay.
+
+Players may not:
+
+• Intentionally stall games.
+• Abuse in-game chat.
+• Harass opponents.
+• Exploit gameplay mechanics.
+• Manipulate tournament outcomes.
+
+Repeated violations may result in chat restrictions or permanent account penalties.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+9. AI OPPONENTS
+
+Certain game modes contain AI-controlled opponents.
+
+AI players exist solely for entertainment and practice purposes.
+
+AI opponents are not real users.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+10. TOURNAMENTS
+
+Tournament prizes consist solely of virtual rewards.
+
+Tournament chips are separate from a player's bankroll and have no real-world value.
+
+Chip Society reserves the right to:
+
+• Modify tournament structures.
+• Adjust blind schedules.
+• Change prize pools.
+• Cancel tournaments.
+• Restart tournaments.
+• Remove players violating tournament rules.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+11. PURCHASES
+
+If virtual purchases become available:
+
+• Purchases are final unless otherwise required by law.
+• Prices may change without notice.
+• Refunds are handled according to Apple App Store or Google Play policies.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+12. INTELLECTUAL PROPERTY
+
+All Chip Society content is protected by intellectual property law.
+
+This includes:
+
+• Logos
+• Artwork
+• Game designs
+• Audio
+• Animations
+• Themes
+• User Interface
+• Software
+• Branding
+
+No content may be copied, reproduced, or distributed without written permission.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+13. GAME UPDATES
+
+Chip Society may modify the Service at any time.
+
+This includes:
+
+• Game balance
+• Rewards
+• Odds
+• Features
+• Poker variants
+• Casino games
+• Tournament structures
+• User Interface
+• Audio
+• Visual assets
+
+Updates may occur without prior notice.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+14. SERVICE AVAILABILITY
+
+Chip Society strives to provide uninterrupted service but cannot guarantee continuous availability.
+
+Temporary interruptions may occur due to:
+
+• Maintenance
+• Server upgrades
+• Technical issues
+• Internet outages
+• Security updates
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+15. ACCOUNT SUSPENSION OR TERMINATION
+
+Chip Society reserves the right to suspend or permanently terminate any account for violations of these Terms.
+
+Reasons may include:
+
+• Cheating
+• Exploiting bugs
+• Offensive behavior
+• Fraud
+• Unauthorized software
+• Multiple account abuse
+• Illegal activity
+
+Termination may result in permanent loss of:
+
+• Chips
+• Tournament progress
+• Statistics
+• Cosmetics
+• Virtual items
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+16. DISCLAIMER
+
+Chip Society is provided "AS IS" and "AS AVAILABLE."
+
+To the fullest extent permitted by law, Chip Society disclaims all warranties, express or implied, regarding uninterrupted service, accuracy, or fitness for a particular purpose.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+17. LIMITATION OF LIABILITY
+
+To the maximum extent permitted by law, Chip Society shall not be liable for any indirect, incidental, consequential, special, or punitive damages arising from the use of the Service.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+18. CHANGES TO THESE TERMS
+
+Chip Society may update these Terms periodically.
+
+If material changes are made:
+
+• Players will be notified.
+• Updated Terms will be presented.
+• Continued use will require acceptance of the revised Terms.
+
+Acceptance will again be required only once for the new version.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+19. CONTACT
+
+Questions regarding these Terms may be directed to:
+
+support@chipsociety.app
+
+(Replace with your official support email before public launch.)
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+USER ACKNOWLEDGEMENT
+
+By selecting "I AGREE & CONTINUE," you confirm that:
+
+• You are at least 17 years old.
+
+• You have read and agree to the Chip Society Privacy Policy.
+
+• You have read and agree to these Terms of Service.
+
+• You understand that Chip Society is a social poker entertainment platform using virtual currency only.
+
+• You understand that chips, virtual items, tournament prizes, Fortune Cookies, achievements, and all other in-game rewards have no real-world monetary value.
+
+• You agree to follow the Community Guidelines, Fair Play Policy, and all future updates to these Terms.
+
+This acknowledgement should be presented only once during account creation (unless these Terms or the Privacy Policy are materially updated), and the acceptance should be permanently stored on the server with the player's account.

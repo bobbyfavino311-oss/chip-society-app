@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Bump this whenever the terms content changes materially.
 // All users (new + returning) will be shown the updated terms once.
-export const TERMS_VERSION = '1.1';
+export const TERMS_VERSION = '2.0';
 
 const STORAGE_KEY = '@chipsociety_terms_v2';
 
