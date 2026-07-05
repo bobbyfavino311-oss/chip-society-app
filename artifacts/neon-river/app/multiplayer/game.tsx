@@ -436,22 +436,6 @@ export default function MultiplayerGame() {
         </View>
       )}
 
-      {/* Action log */}
-      <ScrollView
-        style={g.logScroll}
-        contentContainerStyle={g.logContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {gs.messages.slice(0, 5).map((msg, i) => (
-          <Text key={i} style={[g.logMsg,
-            msg.type === 'result' ? { color: '#ffcc00' } :
-            msg.type === 'info'   ? { color: 'rgba(255,255,255,0.25)' } : { color: 'rgba(255,255,255,0.35)' }
-          ]}>
-            {msg.text}
-          </Text>
-        ))}
-      </ScrollView>
-
       {/* Chat panel */}
       <GameChatPanel
         messages={chat.messages}
@@ -496,7 +480,4 @@ const g = StyleSheet.create({
   waitRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   waitTxt:    { color: 'rgba(255,255,255,0.3)', fontFamily: 'Orbitron_400Regular', fontSize: 11 },
 
-  logScroll:  { maxHeight: 60 },
-  logContent: { paddingHorizontal: 14, paddingBottom: 6, gap: 2 },
-  logMsg:     { fontSize: 10, fontFamily: 'Orbitron_400Regular', letterSpacing: 0.3 },
 });
