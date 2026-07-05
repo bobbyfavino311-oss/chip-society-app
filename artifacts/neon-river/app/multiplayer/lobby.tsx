@@ -266,21 +266,23 @@ export default function MultiplayerLobby() {
 
         {/* Action buttons row */}
         <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.createBtn} onPress={() => setShowCreate(true)} disabled={!connected}>
-            <LinearGradient colors={['#bf5fff', '#7b2fff']} style={styles.createGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-              <Ionicons name="add-circle-outline" size={16} color="#fff" />
-              <Text style={styles.createText}>CREATE</Text>
+          <TouchableOpacity style={[styles.actionBtn, !connected && { opacity: 0.4 }]} onPress={() => setShowCreate(true)} disabled={!connected}>
+            <LinearGradient colors={['#bf5fff', '#7b2fff']} style={styles.actionGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+              <Ionicons name="add-circle-outline" size={22} color="#fff" />
+              <Text style={styles.actionLabel}>CREATE</Text>
             </LinearGradient>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickBtn} onPress={() => setShowQuickJoin(true)} disabled={!connected}>
-            <LinearGradient colors={['#00d4ff', '#0066cc']} style={styles.quickGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-              <Ionicons name="flash" size={16} color="#fff" />
-              <Text style={styles.quickText}>QUICK MATCH</Text>
+          <TouchableOpacity style={[styles.actionBtn, !connected && { opacity: 0.4 }]} onPress={() => setShowQuickJoin(true)} disabled={!connected}>
+            <LinearGradient colors={['#00cfff', '#005fcc']} style={styles.actionGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+              <Ionicons name="flash" size={22} color="#fff" />
+              <Text style={styles.actionLabel}>QUICK{'\n'}MATCH</Text>
             </LinearGradient>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.codeBtn} onPress={() => setShowJoinCode(true)} disabled={!connected}>
-            <Ionicons name="keypad-outline" size={16} color="#ff0090" />
-            <Text style={styles.codeBtnText}>JOIN BY CODE</Text>
+          <TouchableOpacity style={[styles.actionBtn, !connected && { opacity: 0.4 }]} onPress={() => setShowJoinCode(true)} disabled={!connected}>
+            <LinearGradient colors={['#ff0090', '#990055']} style={styles.actionGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+              <Ionicons name="keypad-outline" size={22} color="#fff" />
+              <Text style={styles.actionLabel}>JOIN BY{'\n'}CODE</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
@@ -502,14 +504,9 @@ const styles = StyleSheet.create({
   statusText: { color: '#888', fontFamily: 'Orbitron_400Regular', fontSize: 10, letterSpacing: 1 },
   tableCount: { marginLeft: 'auto', color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 10 },
   actionRow: { flexDirection: 'row', gap: 10, marginHorizontal: 16, marginBottom: 16 },
-  createBtn: { flex: 1, borderRadius: 10, overflow: 'hidden' },
-  createGrad: { paddingVertical: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
-  createText: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1.5 },
-  quickBtn: { flex: 1, borderRadius: 10, overflow: 'hidden' },
-  quickGrad: { paddingVertical: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
-  quickText: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1.5 },
-  codeBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1, borderColor: '#ff009055', borderRadius: 10, paddingVertical: 13, backgroundColor: 'rgba(255,0,144,0.07)' },
-  codeBtnText: { color: '#ff0090', fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1 },
+  actionBtn: { flex: 1, borderRadius: 12, overflow: 'hidden' },
+  actionGrad: { paddingVertical: 14, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  actionLabel: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 10, letterSpacing: 1, textAlign: 'center', lineHeight: 14 },
   list: { paddingHorizontal: 16, paddingBottom: 20, gap: 12 },
   tableCard: { borderRadius: 14, borderWidth: 1, padding: 16, overflow: 'hidden' },
   tableHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 8 },
