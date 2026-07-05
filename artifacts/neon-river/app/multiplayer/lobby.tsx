@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
   tableCount: { marginLeft: 'auto', color: '#555', fontFamily: 'Orbitron_400Regular', fontSize: 10 },
   actionRow: { flexDirection: 'row', gap: 10, marginHorizontal: 16, marginBottom: 16 },
   actionBtn: { flex: 1, borderRadius: 12, overflow: 'hidden' },
-  actionGrad: { paddingVertical: 14, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  actionGrad: { paddingVertical: 10, alignItems: 'center', justifyContent: 'center', gap: 5 },
   actionLabel: { color: '#fff', fontFamily: 'Orbitron_700Bold', fontSize: 10, letterSpacing: 1, textAlign: 'center', lineHeight: 14 },
   list: { paddingHorizontal: 16, paddingBottom: 20, gap: 12 },
   tableCard: { borderRadius: 14, borderWidth: 1, padding: 16, overflow: 'hidden' },

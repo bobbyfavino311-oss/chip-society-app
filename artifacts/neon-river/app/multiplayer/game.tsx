@@ -9,6 +9,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMultiplayer } from '@/context/MultiplayerContext';
 import { useUser } from '@/context/UserContext';
+import { useSoundSettings } from '@/context/SoundContext';
 import { useInGameChat, GameChatPanel } from '@/components/InGameChat';
 import { formatChips } from '@/lib/multiplayerTypes';
 import type { SeatView, ClientGameState } from '@/lib/multiplayerTypes';
@@ -65,6 +66,7 @@ function toChromePlayer(s: SeatView, gs: ClientGameState) {
 export default function MultiplayerGame() {
   const { gameState, sendAction, leaveTable, tableId, buyIn, chatMessages, sendChat, setSitOut: emitSitOut } = useMultiplayer();
   const { addChips, updateProfile, profile } = useUser();
+  const { isMusicMuted, toggleMusicMute } = useSoundSettings();
   const { theme } = useTableTheme();
   const chat = useInGameChat();
   const [sitOutActive, setSitOutActive] = useState(false);
@@ -258,17 +260,30 @@ export default function MultiplayerGame() {
             <Text style={g.buyInTxt}>BUY-IN {formatChips(buyIn)}</Text>
           )}
         </View>
-        <TouchableOpacity
-          style={[chrome.iconBtn, sitOutActive && chrome.iconBtnOn]}
-          onPress={handleSitOut}
-          activeOpacity={0.75}
-        >
-          <Ionicons
-            name={sitOutActive ? 'pause-circle' : 'pause-circle-outline'}
-            size={18}
-            color={sitOutActive ? '#ff0090' : 'rgba(255,255,255,0.3)'}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <TouchableOpacity
+            style={[chrome.iconBtn, !isMusicMuted && chrome.iconBtnOn]}
+            onPress={toggleMusicMute}
+            activeOpacity={0.75}
+          >
+            <Ionicons
+              name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
+              size={16}
+              color={isMusicMuted ? 'rgba(255,255,255,0.3)' : '#00d4ff'}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[chrome.iconBtn, sitOutActive && chrome.iconBtnOn]}
+            onPress={handleSitOut}
+            activeOpacity={0.75}
+          >
+            <Ionicons
+              name={sitOutActive ? 'pause-circle' : 'pause-circle-outline'}
+              size={18}
+              color={sitOutActive ? '#ff0090' : 'rgba(255,255,255,0.3)'}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Opponents row — identical CompactAISeat used by practice.tsx */}

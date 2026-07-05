@@ -194,10 +194,14 @@ function TournamentHUD({ blindLevel, sb, bb, activePlayers, handsPlayed, totalPr
       </Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         <Text style={hud.handNum}>#{handsPlayed + 1}</Text>
-        <TouchableOpacity onPress={onToggleFx} style={hud.musicBtn} activeOpacity={0.75}>
+        <TouchableOpacity
+          onPress={onToggleFx}
+          style={[hud.iconBtn, fxEnabled && hud.iconBtnOn]}
+          activeOpacity={0.75}
+        >
           <Ionicons
             name={fxEnabled ? 'musical-notes' : 'musical-notes-outline'}
-            size={14}
+            size={16}
             color={fxEnabled ? '#00d4ff' : 'rgba(255,255,255,0.3)'}
           />
         </TouchableOpacity>
@@ -985,11 +989,13 @@ const hud = StyleSheet.create({
     fontWeight: '600', letterSpacing: 1, fontFamily: 'Orbitron_400Regular',
     minWidth: 32, textAlign: 'right',
   },
-  musicBtn: {
-    width: 24, height: 24, borderRadius: 12,
+  iconBtn: {
+    width: 28, height: 28, borderRadius: 8,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
+  iconBtnOn: { backgroundColor: 'rgba(0,212,255,0.07)', borderColor: 'rgba(0,212,255,0.18)' },
 });
 
 const tbl = StyleSheet.create({
