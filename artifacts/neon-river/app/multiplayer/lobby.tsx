@@ -103,7 +103,7 @@ export default function MultiplayerLobby() {
         { text: `Buy In — ${formatChips(buyIn)}`, onPress: () => {
           setJoining(table.id);
           removeChips(buyIn);
-          joinTable(table.id, userId, profile.username, profile.avatarIndex ?? 1, buyIn);
+          joinTable(table.id, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1, buyIn);
         }},
       ]
     );
@@ -130,7 +130,7 @@ export default function MultiplayerLobby() {
     const buyIn = Math.min(chips, minBuy * 5);
     setShowCreate(false);
     removeChips(buyIn);
-    createTable(selectedTier, maxPlayers, userId, profile.username, profile.avatarIndex ?? 1, buyIn, selectedVariant);
+    createTable(selectedTier, maxPlayers, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1, buyIn, selectedVariant);
   };
 
   const copyCode = (code: string) => {
@@ -153,7 +153,7 @@ export default function MultiplayerLobby() {
     const buyIn = Math.min(chips, minBuy * 5);
     setShowQuickJoin(false);
     removeChips(buyIn);
-    quickJoin(quickTier, userId, profile.username, profile.avatarIndex ?? 1);
+    quickJoin(quickTier, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1);
   };
 
   const handleSpectate = (item: LobbyTable) => {

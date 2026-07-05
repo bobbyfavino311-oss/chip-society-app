@@ -1,0 +1,153 @@
+SOCIAL FEED AVATAR BUG FIX
+
+Fix the avatar system across the entire social feed.
+
+Current bug:
+
+When a player creates a post, the post shows a random avatar instead of the player’s selected avatar.
+
+The selected avatar only appears correctly on the player’s profile, but not anywhere else.
+
+This must be fixed globally.
+
+⸻
+
+REQUIRED BEHAVIOR
+
+The player’s selected avatar must appear consistently everywhere the player is displayed.
+
+This includes:
+
+• Player profile
+• Social feed posts
+• Home screen Trending Now posts
+• Comments
+• Replies
+• Search results
+• Followers list
+• Following list
+• Inbox conversations
+• Notifications
+• Leaderboards
+• Tournament results
+• Multiplayer tables
+• Private tables
+
+If the player changes their avatar, all future displays must use the newly selected avatar.
+
+⸻
+
+SOURCE OF TRUTH
+
+The selected avatar must come from one server-side profile field.
+
+Example:
+
+selectedAvatarId
+
+or
+
+activeAvatarId
+
+Do not randomly assign avatars when rendering posts.
+
+Do not use fallback/random avatar unless the player has never selected one.
+
+⸻
+
+POST CREATION FIX
+
+When a player creates a social post:
+
+Save the post with:
+
+• userId
+• username
+• selectedAvatarId
+• timestamp
+• post content
+
+The avatar displayed on the post must match the player’s current selected avatar at the time of posting.
+
+⸻
+
+POST RENDERING FIX
+
+When rendering a post:
+
+Fetch avatar from:
+
+post.selectedAvatarId
+
+or from the player’s profile:
+
+user.selectedAvatarId
+
+Do not use randomAvatar()
+
+Do not use defaultAvatar()
+
+Do not use AI avatar assignment logic for real players.
+
+⸻
+
+REAL PLAYER VS AI PLAYER
+
+Separate avatar logic clearly.
+
+Real players:
+
+Use their selected avatar only.
+
+AI players:
+
+May use assigned AI avatars.
+
+Never apply AI avatar randomization to real player posts.
+
+⸻
+
+AVATAR CHANGE BEHAVIOR
+
+When player changes avatar:
+
+Update:
+
+selectedAvatarId
+
+server-side.
+
+Then refresh every place that uses player identity.
+
+Future posts must use the new avatar.
+
+Optional:
+
+Existing posts may either keep the avatar used at posting time or update to the current avatar, but the behavior must be consistent.
+
+Recommended:
+
+Existing posts update to the current selected avatar for simplicity.
+
+⸻
+
+FINAL TEST
+
+Test:
+
+1. Select avatar A.
+2. Create a social feed post.
+3. Confirm post shows avatar A.
+4. Open Home Trending Now.
+5. Confirm post shows avatar A.
+6. Comment on a post.
+7. Confirm comment shows avatar A.
+8. Search username.
+9. Confirm search result shows avatar A.
+10. Change to avatar B.
+11. Create another post.
+12. Confirm new post shows avatar B.
+13. Logout/login.
+14. Confirm avatar remains correct everywhere.
+
+No real player post should ever display a random avatar again.

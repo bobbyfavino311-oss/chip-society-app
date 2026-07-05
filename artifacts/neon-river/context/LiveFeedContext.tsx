@@ -108,7 +108,7 @@ export function LiveFeedProvider({ children }: { children: React.ReactNode }) {
     const post = await apiCreatePost(playerId, {
       ...data,
       authorUsername:    profile?.username,
-      authorAvatarIndex: profile?.avatarIndex,
+      authorAvatarIndex: profile?.symbolIndex ?? profile?.avatarIndex,
       authorRank:        profile?.rank,
     });
     if (post) {

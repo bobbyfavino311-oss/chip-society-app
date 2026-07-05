@@ -495,7 +495,7 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
     removeChips(buyIn);
 
     const userId = profile.playerId ?? profile.username;
-    quickJoin(stake.tier as any, userId, profile.username, profile.avatarIndex ?? 1);
+    quickJoin(stake.tier as any, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1);
   }, [connected, stake]);
 
   useEffect(() => {

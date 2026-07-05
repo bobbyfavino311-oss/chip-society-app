@@ -79,7 +79,7 @@ export default function AvatarSelectScreen() {
   async function handleEquip() {
     if (!unlocked) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    await updateProfile({ symbolIndex: previewId, profileImageType: 'symbol' });
+    await updateProfile({ symbolIndex: previewId, avatarIndex: previewId, profileImageType: 'symbol' });
     setJustEquipped(true);
     setTimeout(() => setJustEquipped(false), 1600);
   }

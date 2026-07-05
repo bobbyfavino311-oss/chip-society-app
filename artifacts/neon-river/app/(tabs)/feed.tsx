@@ -1045,7 +1045,7 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
       level: profile.level, chips: profile.chips,
       winRate: myWinRate, handsPlayed: profile.handsPlayed,
       biggestPot: 0, tournamentWins: 0,
-      avatarId: profile.avatarIndex, status: 'online' as const,
+      avatarId: profile.symbolIndex ?? profile.avatarIndex, status: 'online' as const,
       posts: [], isMock: false,
     };
 
