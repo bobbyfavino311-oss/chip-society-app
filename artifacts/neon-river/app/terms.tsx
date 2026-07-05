@@ -367,6 +367,26 @@ export default function TermsScreen() {
             </View>
           </TouchableOpacity>
 
+          {/* Community Guidelines link */}
+          <TouchableOpacity
+            style={[s.docBtn, { marginTop: 10, borderColor: 'rgba(0,232,135,0.25)', backgroundColor: 'rgba(0,232,135,0.04)' }]}
+            onPress={() => router.push('/community-guidelines')}
+            activeOpacity={0.8}
+          >
+            <View style={s.docBtnLeft}>
+              <View style={[s.docIcon, { backgroundColor: 'rgba(0,232,135,0.12)', borderColor: 'rgba(0,232,135,0.35)' }]}>
+                <Ionicons name="people" size={20} color="#00e887" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.docBtnTitle}>COMMUNITY GUIDELINES</Text>
+                <Text style={s.docBtnSub}>Fair play, conduct {'&'} platform rules</Text>
+              </View>
+            </View>
+            <View style={s.docBtnRight}>
+              <Ionicons name="open-outline" size={18} color="rgba(0,232,135,0.6)" />
+            </View>
+          </TouchableOpacity>
+
           {/* Progress hint */}
           {!bothSeen && (
             <Text style={s.hint}>

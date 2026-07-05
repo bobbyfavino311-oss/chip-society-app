@@ -720,6 +720,27 @@ export default function ProfileScreen() {
           <Ionicons name="chevron-forward" size={18} color="rgba(255,0,144,0.5)" />
         </TouchableOpacity>
 
+        {/* Community Guidelines */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={() => router.push('/community-guidelines')}
+        >
+          <LinearGradient
+            colors={['rgba(0,232,135,0.10)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={[achStyles.iconWrap, { backgroundColor: 'rgba(0,232,135,0.10)' }]}>
+            <Ionicons name="shield-checkmark-outline" size={20} color="rgba(0,232,135,0.85)" />
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>COMMUNITY GUIDELINES</Text>
+            <Text style={achStyles.achSub}>Fair play, conduct {'&'} platform rules</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(0,232,135,0.5)" />
+        </TouchableOpacity>
+
         {/* Report a Bug */}
         <TouchableOpacity
           style={achStyles.row}
