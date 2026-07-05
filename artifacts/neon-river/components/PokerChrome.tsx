@@ -141,7 +141,7 @@ export function ActionFeed({ message, isHandOver }: { message: string; isHandOve
 
 // ─── Circular countdown ring (replaces DotTimer for multiplayer avatar seats) ──
 
-function TimerRing({ timeoutAt, maxSeconds = 30, size = 44 }: {
+export function TimerRing({ timeoutAt, maxSeconds = 30, size = 44 }: {
   timeoutAt: number; maxSeconds?: number; size?: number;
 }) {
   const [progress, setProgress] = useState(1);

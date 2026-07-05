@@ -13,7 +13,6 @@ import { useInGameChat, GameChatPanel } from '@/components/InGameChat';
 import { formatChips } from '@/lib/multiplayerTypes';
 import type { SeatView, ClientGameState } from '@/lib/multiplayerTypes';
 import PlayingCard from '@/components/PlayingCard';
-import DotTimer from '@/components/DotTimer';
 import BettingPanel from '@/components/BettingPanel';
 import colors from '@/constants/colors';
 import { useTableTheme } from '@/context/TableThemeContext';
@@ -29,20 +28,8 @@ import CrimsonNoirBackground from '@/components/CrimsonNoirBackground';
 import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
 import VercettiBackground from '@/components/VercettiBackground';
 import VercettiCardFrame from '@/components/VercettiCardFrame';
-import { chrome, seat as seatStyles, table, CompactAISeat, CommunityCards, ActionFeed, PHASE_LABELS } from '@/components/PokerChrome';
+import { chrome, seat as seatStyles, table, CompactAISeat, CommunityCards, ActionFeed, PHASE_LABELS, TimerRing } from '@/components/PokerChrome';
 
-// ─── Compact dot timer driven by a timeoutAt timestamp ────────────────────────
-
-function SeatTimerDots({ timeoutAt }: { timeoutAt: number }) {
-  const [secondsLeft, setSecondsLeft] = useState(30);
-  useEffect(() => {
-    const update = () => setSecondsLeft(Math.max(0, Math.ceil((timeoutAt - Date.now()) / 1000)));
-    update();
-    const t = setInterval(update, 250);
-    return () => clearInterval(t);
-  }, [timeoutAt]);
-  return <DotTimer seconds={secondsLeft} maxSeconds={30} isActive size={3} gap={2} />;
-}
 
 function BotCountdown() {
   const [secs, setSecs] = useState(8);
@@ -387,11 +374,17 @@ export default function MultiplayerGame() {
           }
         </View>
         <View style={chrome.humanStrip}>
-          <View style={[
-            chrome.humanDot,
-            gs.isMyTurn && chrome.humanDotActive,
-            !!myWin && chrome.humanDotWinner,
-          ]} />
+          {/* Dot indicator — wraps a TimerRing when it's the human's turn */}
+          <View style={{ position: 'relative', width: 8, height: 8, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={[
+              chrome.humanDot,
+              gs.isMyTurn && chrome.humanDotActive,
+              !!myWin && chrome.humanDotWinner,
+            ]} />
+            {gs.isMyTurn && !!gs.turnTimeoutAt && (
+              <TimerRing timeoutAt={gs.turnTimeoutAt} maxSeconds={30} size={26} />
+            )}
+          </View>
           <Text style={[chrome.humanName, !!myWin && { color: '#ffd700' }]} numberOfLines={1}>
             {mySeat?.username ?? 'YOU'}
           </Text>
@@ -399,7 +392,6 @@ export default function MultiplayerGame() {
           {mySeat?.isDealer && (
             <View style={chrome.dealerBadge}><Text style={chrome.dealerBadgeText}>D</Text></View>
           )}
-          {gs.isMyTurn && gs.turnTimeoutAt && <SeatTimerDots timeoutAt={gs.turnTimeoutAt} />}
           {mySeat?.status === 'allin' && <Text style={chrome.allInBadge}>ALL IN</Text>}
           {!!myWin && <Text style={chrome.winBadge}>WIN</Text>}
         </View>
