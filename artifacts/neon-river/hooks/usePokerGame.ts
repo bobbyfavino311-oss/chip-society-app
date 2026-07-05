@@ -209,8 +209,7 @@ function computeSidePots(players: GamePlayer[]): SidePot[] {
     prevLevel = level;
   }
 
-  // Only meaningful if there are actually 2+ distinct pots
-  return pots.length > 1 ? pots : [];
+  return pots;
 }
 
 function makeWinnerLabel(players: GamePlayer[], winnerIds: string[]): string {
@@ -262,7 +261,7 @@ function doShowdown(state: GameState): GameState {
   // ── Compute side pots ──────────────────────────────────────────────────
   const sidePots = computeSidePots(s.players);
 
-  if (sidePots.length > 1) {
+  if (sidePots.length >= 1) {
     // Capture contributions before distributing wins
     const playerContribs = buildContribs(s.players);
 

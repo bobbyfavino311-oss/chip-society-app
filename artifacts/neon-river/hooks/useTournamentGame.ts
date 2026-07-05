@@ -136,7 +136,7 @@ function computeSidePots(players: GamePlayer[]): SidePot[] {
     if (amt > 0 && el.length > 0) pots.push({ amount: amt, eligiblePlayerIds: el });
     prev = level;
   }
-  return pots.length > 1 ? pots : [];
+  return pots;
 }
 
 function doShowdown(state: GameState): GameState {
@@ -160,7 +160,7 @@ function doShowdown(state: GameState): GameState {
 
   const sidePots = computeSidePots(s.players);
 
-  if (sidePots.length > 1) {
+  if (sidePots.length >= 1) {
     let players = s.players.map(p => ({ ...p }));
     const msgs: string[] = [];
     let mainWinnerIds: string[] = [];
