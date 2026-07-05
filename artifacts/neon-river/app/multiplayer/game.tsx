@@ -297,7 +297,8 @@ export default function MultiplayerGame() {
               player={toChromePlayer(opp, gs)}
               isCurrentTurn={opp.isTurn}
               isWinner={(gs.winners ?? []).some(w => w.seatIndex === opp.seatIndex)}
-              timer={opp.isTurn && gs.turnTimeoutAt ? Math.max(0, Math.ceil((gs.turnTimeoutAt - Date.now()) / 1000)) : 0}
+              timeoutAt={opp.isTurn && gs.turnTimeoutAt ? gs.turnTimeoutAt : undefined}
+              timer={0}
               showCards={isHandOver && !!opp.revealedCards?.length}
             />
           ))

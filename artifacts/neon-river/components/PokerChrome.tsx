@@ -144,13 +144,25 @@ export function ActionFeed({ message, isHandOver }: { message: string; isHandOve
 // { id, name, chips, avatarIndex, status, isDealer, isSmallBlind, isBigBlind, holeCards }
 
 export function CompactAISeat({
-  player, isCurrentTurn, isWinner, timer, showCards, bubble,
+  player, isCurrentTurn, isWinner, timer, timeoutAt, showCards, bubble,
 }: {
-  player: any; isCurrentTurn: boolean; isWinner: boolean; timer: number; showCards?: boolean;
-  bubble?: BubbleEntry;
+  player: any; isCurrentTurn: boolean; isWinner: boolean; timer?: number; timeoutAt?: number;
+  showCards?: boolean; bubble?: BubbleEntry;
 }) {
   const folded = player.status === 'folded';
   const avatarId = player.avatarIndex > 0 ? player.avatarIndex : 1;
+
+  // Live countdown when timeoutAt is provided (multiplayer); fall back to static timer (practice)
+  const [liveSeconds, setLiveSeconds] = useState(() =>
+    timeoutAt ? Math.max(0, Math.ceil((timeoutAt - Date.now()) / 1000)) : (timer ?? 30)
+  );
+  useEffect(() => {
+    if (!timeoutAt) { setLiveSeconds(timer ?? 30); return; }
+    const update = () => setLiveSeconds(Math.max(0, Math.ceil((timeoutAt - Date.now()) / 1000)));
+    update();
+    const id = setInterval(update, 250);
+    return () => clearInterval(id);
+  }, [timeoutAt, timer]);
 
   return (
     <View style={[seat.seat, folded && seat.seatFolded, { position: 'relative' }]}>
@@ -173,7 +185,7 @@ export function CompactAISeat({
           </View>
         )}
       </View>
-      {isCurrentTurn && !folded && <DotTimer seconds={timer} maxSeconds={30} isActive size={3} gap={2} />}
+      {isCurrentTurn && !folded && <DotTimer seconds={liveSeconds} maxSeconds={30} isActive size={3} gap={2} />}
       <Text style={[seat.seatName, isWinner && seat.seatNameWinner]} numberOfLines={1}>{player.name}</Text>
       <Text style={[seat.seatChips, folded && seat.dimText]}>{formatChips(player.chips)}</Text>
       {player.holeCards && player.holeCards.length > 0 && showCards && (
