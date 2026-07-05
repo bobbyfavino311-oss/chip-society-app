@@ -797,7 +797,7 @@ export class PokerRoom {
       callAmount,
       minRaise,
       maxRaise,
-      turnTimeoutAt: isMyTurn ? this.turnTimeoutAt : null,
+      turnTimeoutAt: this.turnTimeoutAt,
       messages: this.messages,
       winners: this.phase === 'showdown' ? this.winners : undefined,
       variant: this.config.variant,
