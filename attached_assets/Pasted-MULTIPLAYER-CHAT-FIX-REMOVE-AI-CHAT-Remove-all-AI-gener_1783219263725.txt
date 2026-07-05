@@ -1,0 +1,107 @@
+MULTIPLAYER CHAT FIX — REMOVE AI CHAT
+
+Remove all AI-generated in-game chat from poker tables.
+
+The purpose of table chat is for real live players in multiplayer mode only. AI opponents should not send messages, quick chats, reactions, or floating table chat bubbles.
+
+⸻
+
+REMOVE AI CHAT COMPLETELY
+
+Disable AI/bot chat in all poker variants.
+
+AI players should never send:
+
+• Quick chat messages
+• Custom chat messages
+• Floating table speech bubbles
+• Table reactions
+• Automated comments
+• Trash talk
+• “Nice hand” messages
+• “Should’ve folded” messages
+• Any simulated player conversation
+
+AI opponents should remain silent.
+
+⸻
+
+CHAT ONLY FOR REAL MULTIPLAYER
+
+The in-game table chat should only appear when real multiplayer is active.
+
+Enable chat only in:
+
+• Live Player tables
+• Private tables with real players
+• Future live tournaments with real players
+
+Do not enable chat in:
+
+• AI Practice
+• AI tournaments
+• You + 4 AI bots
+• Solo modes
+• Casino games
+
+⸻
+
+CHAT ICON VISIBILITY RULE
+
+If the table contains only the player and AI bots:
+
+Hide the chat icon completely.
+
+If the table contains at least one real player besides the user:
+
+Show the chat icon.
+
+This prevents the chat feature from feeling fake or pointless.
+
+⸻
+
+FLOATING CHAT BUBBLES
+
+Floating table chat bubbles should only appear for real player messages.
+
+Do not generate floating messages for AI players.
+
+⸻
+
+QUICK CHAT
+
+Quick chat messages remain available only for real multiplayer tables.
+
+Preset messages remain:
+
+• Nice hand!
+• Good luck!
+• Well played.
+• Nice bluff.
+• I should’ve folded.
+• Tough river.
+• All in!
+• GG!
+
+⸻
+
+CUSTOM CHAT
+
+Custom 50-character chat remains available only when real player chat is enabled.
+
+Do not allow custom chat in AI-only games.
+
+⸻
+
+FINAL VALIDATION
+
+Verify:
+
+✅ AI bots never send chat messages
+✅ AI bots never show floating chat bubbles
+✅ Chat icon is hidden in AI-only games
+✅ Chat icon appears in live multiplayer games
+✅ Chat works in private tables with real players
+✅ Chat does not appear in casino games
+✅ Chat does not appear in AI tournaments
+✅ Table chat now feels like a real multiplayer feature, not fake AI filler

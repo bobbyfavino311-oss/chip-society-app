@@ -43,8 +43,6 @@ import CrimsonNoirBackground from '@/components/CrimsonNoirBackground';
 import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
 import VercettiBackground from '@/components/VercettiBackground';
 import VercettiCardFrame from '@/components/VercettiCardFrame';
-import { useInGameChat, ChatBubble, GameChatPanel, PlayerChatBubble, TableChatToast, QUICK_CHATS } from '@/components/InGameChat';
-import type { BubbleEntry } from '@/components/InGameChat';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -290,17 +288,15 @@ function ActionFeed({ message, isHandOver }: { message: string; isHandOver: bool
 }
 
 function CompactAISeat({
-  player, isCurrentTurn, isWinner, timer, showCards, bubble,
+  player, isCurrentTurn, isWinner, timer, showCards,
 }: {
   player: any; isCurrentTurn: boolean; isWinner: boolean; timer: number; showCards?: boolean;
-  bubble?: BubbleEntry;
 }) {
   const folded = player.status === 'folded';
   const avatarId = player.avatarIndex > 0 ? player.avatarIndex : 1;
 
   return (
     <View style={[g.seat, folded && g.seatFolded, { position: 'relative' }]}>
-      <ChatBubble bubble={bubble} />
       <View style={[
         g.avatarRing,
         isCurrentTurn && g.avatarRingActive,
@@ -385,8 +381,7 @@ export default function PracticeScreen() {
   const [fxEnabled, setFxEnabled]           = useState(true);
   const [showOmahaRules, setShowOmahaRules] = useState(false);
 
-  // ── In-game chat ──────────────────────────────────────────────────────────
-  const chat = useInGameChat();
+
 
   // ── Mounted guard — prevents async setState after router.back() ──────────
   const isMountedRef = useRef(true);
@@ -567,21 +562,6 @@ export default function PracticeScreen() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Bot chat — AI players occasionally send quick chat messages ───────────
-  const botChatRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    if (!gameStarted || state.phase === 'idle' || state.phase === 'handover') return;
-    const aiPlayerList = state.players.filter((p: any) => !p.isHuman && p.status !== 'folded');
-    if (aiPlayerList.length === 0) return;
-    const delay = 8000 + Math.random() * 20000; // 8-28 s
-    botChatRef.current = setTimeout(() => {
-      const sender = aiPlayerList[Math.floor(Math.random() * aiPlayerList.length)] as any;
-      const msg    = QUICK_CHATS[Math.floor(Math.random() * QUICK_CHATS.length)];
-      chat.receiveBotMessage(sender.id, sender.name, msg);
-    }, delay);
-    return () => { if (botChatRef.current) clearTimeout(botChatRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameStarted, state.phase]);
 
   // ── Setup screen (early return — hooks are all above this) ────────────────
   if (!gameStarted) {
@@ -834,7 +814,6 @@ export default function PracticeScreen() {
             isWinner={state.winnerIds.includes(player.id)}
             timer={state.timer}
             showCards={isHandOver && (gameVariant !== 'omaha_holdem' ? player.status !== 'folded' : state.winnerIds.includes(player.id))}
-            bubble={chat.bubbles[player.id]}
           />
         ))}
       </View>
@@ -931,8 +910,6 @@ export default function PracticeScreen() {
         {/* Action feed — fades automatically */}
         <ActionFeed message={state.message} isHandOver={isHandOver} />
 
-        {/* Table chat toast — recent message floats near community cards */}
-        <TableChatToast toast={chat.latestToast} />
 
         {/* All-in runout */}
         {(() => {
@@ -946,8 +923,6 @@ export default function PracticeScreen() {
       {/* Human player area */}
       {humanPlayer && (
         <View style={styles.humanArea}>
-          {/* Human player chat bubble — appears above their cards */}
-          <PlayerChatBubble bubble={chat.bubbles['me']} />
           {/* Hole cards */}
           <View style={styles.humanCards}>
             {humanPlayer.holeCards.length > 0
@@ -1254,22 +1229,6 @@ export default function PracticeScreen() {
         </View>
       )}
 
-      {/* In-game chat icon + slide-up panel */}
-      <GameChatPanel
-        messages={chat.messages}
-        panelOpen={chat.panelOpen}
-        slideAnim={chat.slideAnim}
-        unread={chat.unread}
-        muted={chat.muted}
-        setMuted={chat.setMuted}
-        presetsOnly={chat.presetsOnly}
-        setPresetsOnly={chat.setPresetsOnly}
-        input={chat.input}
-        setInput={chat.setInput}
-        sendMessage={chat.sendMessage}
-        onOpen={chat.openPanel}
-        onClose={chat.closePanel}
-      />
       {pendingShare && (
         <ShareToFeedModal
           visible={!!pendingShare}
