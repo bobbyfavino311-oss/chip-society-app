@@ -179,7 +179,7 @@ export function TimerRing({ timeoutAt, maxSeconds = 30, size = 44 }: {
   const color = progress > 0.6 ? '#00d4ff' : progress > 0.35 ? '#ffcc00' : progress > 0.15 ? '#ff8800' : '#ff2200';
 
   return (
-    <Animated.View style={{ position: 'absolute', top: -(size - 36) / 2, left: -(size - 36) / 2, transform: [{ scale: pulseAnim }] }}>
+    <Animated.View style={{ position: 'absolute', top: 0, left: 0, transform: [{ scale: pulseAnim }] }}>
       <Svg width={size} height={size}>
         <Circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(255,255,255,0.08)" strokeWidth={sw} fill="none" />
         <Circle
@@ -212,7 +212,8 @@ export function CompactAISeat({
   return (
     <View style={[seat.seat, folded && seat.seatFolded]}>
       <ChatBubble bubble={bubble} />
-      <View style={{ position: 'relative', width: 36, height: 36 }}>
+      {/* Ring container sized to the outer ring so the SVG is never clipped */}
+      <View style={{ position: 'relative', width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
         <View style={[
           seat.avatarRing,
           isCurrentTurn && seat.avatarRingActive,

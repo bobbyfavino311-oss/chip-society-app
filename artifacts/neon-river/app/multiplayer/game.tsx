@@ -374,8 +374,8 @@ export default function MultiplayerGame() {
           }
         </View>
         <View style={chrome.humanStrip}>
-          {/* Dot indicator — wraps a TimerRing when it's the human's turn */}
-          <View style={{ position: 'relative', width: 8, height: 8, alignItems: 'center', justifyContent: 'center' }}>
+          {/* Dot indicator — container matches ring size so SVG is never clipped */}
+          <View style={{ position: 'relative', width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
             <View style={[
               chrome.humanDot,
               gs.isMyTurn && chrome.humanDotActive,
