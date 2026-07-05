@@ -158,7 +158,7 @@ export default function BugReportModal({ visible, onClose }: Props) {
                       {active && (
                         <LinearGradient
                           colors={['rgba(255,0,144,0.18)', 'transparent']}
-                          style={StyleSheet.absoluteFill}
+                          style={[StyleSheet.absoluteFill, { borderRadius: 12 }]}
                         />
                       )}
                       <Text style={s.catIcon}>{c.icon}</Text>
@@ -215,7 +215,7 @@ export default function BugReportModal({ visible, onClose }: Props) {
               >
                 <LinearGradient
                   colors={['rgba(255,0,144,0.85)', 'rgba(191,0,100,0.85)']}
-                  style={StyleSheet.absoluteFill}
+                  style={[StyleSheet.absoluteFill, { borderRadius: 14 }]}
                   start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                 />
                 {loading
@@ -247,7 +247,7 @@ const s = StyleSheet.create({
   catBtn:       {
     width: '30.5%', borderRadius: 12, borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)', paddingVertical: 10,
-    alignItems: 'center', gap: 4, overflow: 'hidden',
+    alignItems: 'center', gap: 4,
   },
   catBtnActive: { borderColor: 'rgba(255,0,144,0.6)' },
   catIcon:      { fontSize: 18 },
@@ -270,7 +270,7 @@ const s = StyleSheet.create({
   errText:      { fontSize: 12, color: '#ff4466', textAlign: 'center' },
 
   submitBtn:    {
-    height: 48, borderRadius: 14, overflow: 'hidden',
+    height: 48, borderRadius: 14,
     alignItems: 'center', justifyContent: 'center', marginTop: 8,
   },
   submitText:   { fontSize: 13, fontFamily: 'Orbitron_700Bold', color: '#fff', letterSpacing: 2 },
