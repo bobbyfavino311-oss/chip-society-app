@@ -339,19 +339,16 @@ export default function RootLayout() {
 
   const fontsReady = fontsLoaded || fontError || fontTimeout;
 
-  const [assetsReady, setAssetsReady] = useState(false);
+  useEffect(() => {
+    if (fontsReady) SplashScreen.hideAsync();
+  }, [fontsReady]);
 
   useEffect(() => {
-    // Preload all avatar PNGs into the native image cache while the splash
-    // screen is still showing — first render of any NeonAvatar is instant.
-    Asset.loadAsync(Object.values(AVATAR_IMAGES))
-      .catch(() => { /* non-fatal — graceful fallback to on-demand decode */ })
-      .finally(() => setAssetsReady(true));
+    // Preload avatar PNGs into the native image cache in the background after
+    // the splash hides — first render of any NeonAvatar will still be instant
+    // on subsequent frames. Never blocks the splash screen.
+    Asset.loadAsync(Object.values(AVATAR_IMAGES)).catch(() => {});
   }, []);
-
-  useEffect(() => {
-    if (fontsReady && assetsReady) SplashScreen.hideAsync();
-  }, [fontsReady, assetsReady]);
 
   if (!fontsReady) return null;
 
