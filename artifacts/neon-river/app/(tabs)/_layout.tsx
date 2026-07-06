@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { BlurView } from 'expo-blur';
 import React from 'react';
@@ -109,7 +109,7 @@ export default function TabLayout() {
         options={{
           title: 'Play',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="card" size={size} color={color} />
+            <MaterialCommunityIcons name="cards-spade" size={size} color={color} />
           ),
         }}
       />
