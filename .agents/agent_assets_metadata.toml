@@ -678,8 +678,32 @@ uri = "file://artifacts/landing/src/assets/images/chips.png"
 type = "image"
 title = "neon glowing poker chips"
 
+[[generated]]
+id = "UnW9OXl36rv_sZxb2ALuf"
+uri = "file://attached_assets/chip_society_ad_portrait.png"
+type = "image"
+title = "chip society social ad portrait"
+
+[[generated]]
+id = "23jgvdev9dI08w0otqhPO"
+uri = "file://attached_assets/chip_society_ad_square.png"
+type = "image"
+title = "chip society social ad square"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
 type = "image"
 title = "All 30 Avatars — v8 (clean, no sprite-sheet)"
+
+[[outputs]]
+id = "mu7tlvr-iho1EKy3AY6SY"
+uri = "file://attached_assets/chip_society_ad_portrait.png"
+type = "image"
+title = "Portrait Ad (Stories / TikTok / Reels — 9:16)"
+
+[[outputs]]
+id = "9CuynAIGApGxT_gE9rZbD"
+uri = "file://attached_assets/chip_society_ad_square.png"
+type = "image"
+title = "Square Ad (Instagram / X Feed — 1:1)"
