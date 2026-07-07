@@ -690,6 +690,12 @@ uri = "file://attached_assets/chip_society_ad_square.png"
 type = "image"
 title = "chip society social ad square"
 
+[[generated]]
+id = "NHGE0naIl4EqWL5eau4Bg"
+uri = "file://attached_assets/casino-war-icon.png"
+type = "image"
+title = "casino war cannon icon"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
@@ -707,3 +713,9 @@ id = "9CuynAIGApGxT_gE9rZbD"
 uri = "file://attached_assets/chip_society_ad_square.png"
 type = "image"
 title = "Square Ad (Instagram / X Feed — 1:1)"
+
+[[outputs]]
+id = "KZ4eyL3eObnUq8bX8lntn"
+uri = "file://attached_assets/casino-war-icon.png"
+type = "image"
+title = "Casino War Icon"
