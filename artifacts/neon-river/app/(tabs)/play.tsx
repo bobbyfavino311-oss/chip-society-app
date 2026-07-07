@@ -62,23 +62,23 @@ function UltimateHoldemIcon({ size = 15, color = '#ffd700' }: { size?: number; c
 function CasinoWarIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
-      {/* Left card — rotated */}
-      <G transform="rotate(-30, 12, 14)">
-        <Rect x="7" y="4" width="10" height="14" rx="2"
-          fill={`${color}18`} stroke={color} strokeWidth="1.2" />
-        <SvgText x="8.5" y="14.5" fontSize="7" fontWeight="bold" fill={color}>A</SvgText>
-      </G>
-      {/* Right card — rotated opposite */}
-      <G transform="rotate(30, 12, 14)">
-        <Rect x="7" y="4" width="10" height="14" rx="2"
-          fill="#050010" stroke={color} strokeWidth="1.4" />
-        <SvgText x="8.5" y="14.5" fontSize="7" fontWeight="bold" fill={color}>K</SvgText>
-      </G>
-      {/* Lightning bolt — center overlay */}
+      {/* Cannon wheel — outer ring */}
+      <Circle cx="7" cy="18" r="4.5" stroke={color} strokeWidth="1.2" fill={`${color}10`} />
+      {/* Wheel hub */}
+      <Circle cx="7" cy="18" r="1.4" fill={color} />
+      {/* Six spokes: hub-edge → rim at 90/30/330/270/210/150 degrees */}
       <Path
-        d="M13.5 6 L10.5 12 L13 12 L10.5 18 L14.5 11 L12 11 Z"
-        fill={color} fillOpacity={0.9}
+        d="M7,16.6 L7,13.5 M8.2,17.3 L10.9,15.75 M8.2,18.7 L10.9,20.25 M7,19.4 L7,22.5 M5.8,18.7 L3.1,20.25 M5.8,17.3 L3.1,15.75"
+        stroke={color} strokeWidth="0.85" strokeLinecap="round"
       />
+      {/* Carriage arm — wheel to barrel */}
+      <Path d="M7,14 L11,11.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      {/* Cannon barrel */}
+      <Rect x="10" y="9.5" width="13" height="3.5" rx="1.8"
+        fill={`${color}15`} stroke={color} strokeWidth="1.3" />
+      {/* Muzzle reinforcement ring */}
+      <Rect x="20.5" y="8.7" width="2.5" height="5.1" rx="1.2"
+        fill={`${color}20`} stroke={color} strokeWidth="1.0" />
     </Svg>
   );
 }
