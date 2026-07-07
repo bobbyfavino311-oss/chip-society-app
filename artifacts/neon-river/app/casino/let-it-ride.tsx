@@ -14,12 +14,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
-import StakeSelectModal from '@/components/StakeSelectModal';
+import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
-import type { StakeTier } from '@/lib/stakeConfig';
+import type { CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   dealLetItRide, evaluateLetItRide, resolveLetItRide,
   getMainMult, getBonusMult, BONUS_PAYOUTS,
@@ -237,7 +237,7 @@ export default function LetItRideScreen() {
 
   // ── Game state ────────────────────────────────────────────────────────────
   const [phase,         setPhase]         = useState<LIRPhase>('stake');
-  const [stake,         setStake]         = useState<StakeTier | null>(null);
+  const [stake,         setStake]         = useState<CasinoTableLimit | null>(null);
   const [ante,          setAnte]          = useState(0);
   const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
   type BonusIdx = 0 | 1 | 2 | 3 | 4;
@@ -299,9 +299,9 @@ export default function LetItRideScreen() {
   useEffect(() => { MusicEngine.configure({ muted: isMusicMuted }); }, [isMusicMuted]);
 
   // ── Stake select ───────────────────────────────────────────────────────────
-  function handleStakeSelect(tier: StakeTier) {
+  function handleStakeSelect(tier: CasinoTableLimit) {
     setStake(tier);
-    setAnte(tier.ante);
+    setAnte(tier.minBet);
     setBonusMult(0);
     setTotalWagered(0);
     setBet1Active(true);      bet1ActiveRef.current = true;
@@ -460,7 +460,7 @@ export default function LetItRideScreen() {
   const bonusBet     = BONUS_STEPS[bonusMult];
   const totalBet     = 3 * ante + bonusBet;
   const canAfford    = profile.chips >= totalBet;
-  const isBusted     = profile.chips < (stake?.ante ?? 0);
+  const isBusted     = profile.chips < (stake?.minBet ?? 0);
   const activeBets   = 1 + (bet1Active ? 1 : 0) + (bet2Active ? 1 : 0);
   const inGame       = phase === 'decision1' || phase === 'decision2' || phase === 'showdown';
 
@@ -478,7 +478,7 @@ export default function LetItRideScreen() {
       />
 
       {/* Stake modal */}
-      <StakeSelectModal
+      <CasinoTableSelectModal
         visible={phase === 'stake'}
         chips={profile.chips}
         title="LET IT RIDE"

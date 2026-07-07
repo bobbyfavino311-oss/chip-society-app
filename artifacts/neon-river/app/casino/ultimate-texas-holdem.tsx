@@ -9,13 +9,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
-import StakeSelectModal from '@/components/StakeSelectModal';
+import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
-import { STAKE_TIERS, type StakeTier } from '@/lib/stakeConfig';
+import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   createUTHDeck, shuffleUTHDeck, dealUTHHands,
   resolveUTH, getLiveHandName,
@@ -304,7 +304,7 @@ export default function UltimateTexasHoldemScreen() {
   }, [isMusicMuted]);
 
   // ── Core state ──────────────────────────────────────────────────────────────
-  const [selectedTier,   setSelectedTier]   = useState<StakeTier | null>(null);
+  const [selectedTier,   setSelectedTier]   = useState<CasinoTableLimit | null>(null);
   const [phase,          setPhase]          = useState<Phase>('stake');
   const [deal,           setDeal]           = useState<UTHDeal | null>(null);
   const [communityCount, setCommunityCount] = useState(0);
@@ -319,7 +319,7 @@ export default function UltimateTexasHoldemScreen() {
   const [handHistogram, setHandHistogram]   = useState({ handsPlayed: 0, wins: 0, netProfit: 0 });
 
   // ── Derived values ──────────────────────────────────────────────────────────
-  const ante       = selectedTier?.ante ?? 0;
+  const ante       = selectedTier?.minBet ?? 0;
   const tripsBet   = BONUS_STEPS[tripsMult];
   const totalCost  = ante + ante + tripsBet; // ante + blind + trips upfront
   const canDeal    = ante > 0 && profile.chips >= totalCost && !busy;
@@ -497,7 +497,7 @@ export default function UltimateTexasHoldemScreen() {
   }, [resultAnim]);
 
   // ── STAKE SELECT ──────────────────────────────────────────────────────────────
-  function handleSelectTier(tier: StakeTier) {
+  function handleSelectTier(tier: CasinoTableLimit) {
     setSelectedTier(tier);
     setPhase('betting');
   }
@@ -537,7 +537,7 @@ export default function UltimateTexasHoldemScreen() {
         <View style={s.headerCenter}>
           <Text style={[s.headerTitle, { color: accent }]}>ULTIMATE HOLD'EM</Text>
           {selectedTier && (
-            <Text style={s.headerSub}>{selectedTier.label} · ANTE {fmt(ante)}</Text>
+            <Text style={s.headerSub}>{selectedTier.label} · MIN BET {fmt(ante)}</Text>
           )}
         </View>
 
@@ -802,7 +802,7 @@ export default function UltimateTexasHoldemScreen() {
       <PaytableModal visible={showPT} onClose={() => setShowPT(false)} />
 
       {/* Stake select */}
-      <StakeSelectModal
+      <CasinoTableSelectModal
         visible={phase === 'stake'}
         chips={profile.chips}
         title="ULTIMATE HOLD'EM"

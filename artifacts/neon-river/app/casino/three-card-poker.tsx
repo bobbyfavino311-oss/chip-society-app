@@ -9,12 +9,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
-import StakeSelectModal from '@/components/StakeSelectModal';
+import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
-import { STAKE_TIERS, type StakeTier } from '@/lib/stakeConfig';
+import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   createTCPDeck, shuffleTCPDeck, dealBiasedHands,
   evaluateThreeCardHand, tcpDealerQualifies, compareThreeCardHands,
@@ -260,7 +260,7 @@ export default function ThreeCardPokerScreen() {
     MusicEngine.configure({ muted: isMusicMuted });
   }, [isMusicMuted]);
 
-  const [selectedTier,   setSelectedTier]   = useState<StakeTier | null>(null);
+  const [selectedTier,   setSelectedTier]   = useState<CasinoTableLimit | null>(null);
 
   const [phase,          setPhase]          = useState<Phase>('betting');
   const [ppMult,         setPpMult]         = useState<BonusIdx>(0);
@@ -279,7 +279,7 @@ export default function ThreeCardPokerScreen() {
   const [played,         setPlayed]         = useState(false);
 
   // Ante is always derived from the selected stake tier
-  const anteBet = selectedTier?.ante ?? 0;
+  const anteBet = selectedTier?.minBet ?? 0;
 
   const ppBet         = BONUS_STEPS[ppMult];
   const scBet         = BONUS_STEPS[scMult];
@@ -762,7 +762,7 @@ export default function ThreeCardPokerScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={[gs.tableTierName, { color: selectedTier.color }]}>{selectedTier.label} TABLE</Text>
                 <Text style={gs.tableAnteInfo}>
-                  ANTE {fmt(anteBet)} · PAIR+ up to 1M · 6CB up to 1M
+                  MIN BET {fmt(anteBet)} · PAIR+ up to 1M · 6CB up to 1M
                 </Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedTier(null)} style={gs.changeTableBtn} activeOpacity={0.75}>
@@ -857,7 +857,7 @@ export default function ThreeCardPokerScreen() {
 
       <PaytableModal visible={showPT} onClose={() => setShowPT(false)} />
 
-      <StakeSelectModal
+      <CasinoTableSelectModal
         visible={selectedTier === null}
         chips={profile.chips}
         onSelect={(tier) => setSelectedTier(tier)}

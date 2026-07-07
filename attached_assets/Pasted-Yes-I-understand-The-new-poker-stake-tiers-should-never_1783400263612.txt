@@ -1,0 +1,149 @@
+Yes, I understand. The new poker stake tiers should never apply to casino games. Casino games need their own separate Table Limits system.
+
+# MASTER BUG FIX — SEPARATE POKER STAKES FROM CASINO TABLE LIMITS
+Critical bug:
+The new poker stake system is incorrectly carrying over into Casino Games.
+This is wrong.
+Poker variants and Casino Games must use completely separate economy systems.
+━━━━━━━━━━━━━━━━━━━━━━
+# 1. POKER STAKES ONLY APPLY TO POKER VARIANTS
+The poker stake tiers apply ONLY to:
+• Traditional Hold'em
+• Short Deck Hold'em
+• Omaha Hold'em
+• Joker Hold'em
+• Multiplayer poker tables
+• Private poker tables
+• AI poker tables
+These poker tiers use:
+• Buy-in range
+• Small blind
+• Big blind
+Do NOT apply these to casino games.
+━━━━━━━━━━━━━━━━━━━━━━
+# 2. CASINO GAMES USE TABLE LIMITS
+Casino Games should use a separate Table Limits system.
+Casino Games do NOT use poker blinds.
+Casino Games should display:
+• Buy-In Range
+• Minimum Bet
+• Maximum Bet
+Never display:
+• Small Blind
+• Big Blind
+• Poker stake tier blinds
+━━━━━━━━━━━━━━━━━━━━━━
+# 3. CASINO TABLE LIMIT STRUCTURE
+Create casino-specific limits like this:
+## Starter Casino
+Buy-In: 25K–100K
+Min Bet: 1K
+Max Bet: 10K
+## Casual Casino
+Buy-In: 100K–500K
+Min Bet: 5K
+Max Bet: 50K
+## Standard Casino
+Buy-In: 500K–2M
+Min Bet: 10K
+Max Bet: 100K
+## High Roller Casino
+Buy-In: 2M–10M
+Min Bet: 50K
+Max Bet: 500K
+## VIP Casino
+Buy-In: 10M–50M
+Min Bet: 100K
+Max Bet: 1M
+## Elite Casino
+Buy-In: 50M–100M
+Min Bet: 250K
+Max Bet: 2.5M
+━━━━━━━━━━━━━━━━━━━━━━
+# 4. APPLY TO ALL CASINO GAMES
+This applies to every Casino Game:
+• Blackjack
+• Three Card Poker
+• Ultimate Texas Hold'em
+• Mississippi Stud
+• High Card Flush
+• Casino War
+• Let It Ride
+• Face Up Pai Gow Poker
+• Roulette
+• Any future casino game
+Each casino game must read from casinoTableLimits, not pokerStakeTiers.
+━━━━━━━━━━━━━━━━━━━━━━
+# 5. BLACKJACK STYLE TABLE LIMIT UI
+Casino game selection should feel like a table-limit lobby.
+For each casino table, show:
+• Table Limit Name
+• Buy-In Range
+• Min Bet
+• Max Bet
+• Game Type
+• Play Button
+Example:
+HIGH ROLLER BLACKJACK
+Buy-In: 2M–10M
+Min Bet: 50K
+Max Bet: 500K
+PLAY
+━━━━━━━━━━━━━━━━━━━━━━
+# 6. BETTING CONTROLS
+Casino betting controls should respect:
+• Minimum bet
+• Maximum bet
+• Player balance
+• Side bet limits
+• Bonus bet limits
+Do not let a player bet below the minimum or above the maximum.
+Do not use blind amounts.
+━━━━━━━━━━━━━━━━━━━━━━
+# 7. SIDE BETS / BONUS BETS
+Casino side bets should scale from the same casino table limits.
+Example:
+If table Min Bet is 50K and Max Bet is 500K:
+Main wager range:
+50K–500K
+Bonus wager range:
+50K–500K unless that game has a specific bonus cap.
+Do not use poker blind tiers for bonus bets.
+━━━━━━━━━━━━━━━━━━━━━━
+# 8. FIX CURRENT BUG
+Remove poker blind values from all casino games.
+If any casino game currently shows values like:
+• 1K / 2K
+• 5K / 10K
+• 50K / 100K
+• 500K / 1M
+as blinds, remove them.
+Casino games should only show:
+• Buy-In
+• Min Bet
+• Max Bet
+━━━━━━━━━━━━━━━━━━━━━━
+# 9. SEPARATE CONFIG FILES
+Create two separate config systems:
+pokerStakeTiers
+Used only by poker variants.
+casinoTableLimits
+Used only by casino games.
+Never share one config between both systems.
+━━━━━━━━━━━━━━━━━━━━━━
+# 10. FINAL VALIDATION
+Verify:
+✅ Poker variants still use small blind / big blind.
+✅ Casino games do not use blinds.
+✅ Casino games use buy-in + min/max bet.
+✅ Blackjack uses casino table limits.
+✅ Three Card Poker uses casino table limits.
+✅ Ultimate Texas Hold'em uses casino table limits.
+✅ High Card Flush uses casino table limits.
+✅ Casino War uses casino table limits.
+✅ Roulette uses casino table limits.
+✅ No casino game inherits poker stake tiers.
+✅ Poker and Casino economies are fully separated.
+Final goal:
+Poker tables should feel like poker rooms with blinds and buy-ins.
+Casino games should feel like casino table games with table limits, minimum bets, maximum bets, and buy-in ranges.

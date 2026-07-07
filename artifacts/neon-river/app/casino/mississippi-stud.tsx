@@ -14,12 +14,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
-import StakeSelectModal from '@/components/StakeSelectModal';
+import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
-import type { StakeTier } from '@/lib/stakeConfig';
+import type { CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   dealMississippiStud, resolveMississippiStud,
   MS_PAYOUTS, TCB_PAYOUTS,
@@ -206,7 +206,7 @@ export default function MississippiStudScreen() {
 
   // ── Game state ────────────────────────────────────────────────────────────
   const [phase,         setPhase]         = useState<MSPhase>('stake');
-  const [stake,         setStake]         = useState<StakeTier | null>(null);
+  const [stake,         setStake]         = useState<CasinoTableLimit | null>(null);
   const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
   type BonusIdx = 0 | 1 | 2 | 3 | 4;
   const [ante,           setAnte]          = useState(0);
@@ -276,9 +276,9 @@ export default function MississippiStudScreen() {
   useEffect(() => { MusicEngine.configure({ muted: isMusicMuted }); }, [isMusicMuted]);
 
   // ── Stake select ───────────────────────────────────────────────────────────
-  function handleStakeSelect(tier: StakeTier) {
+  function handleStakeSelect(tier: CasinoTableLimit) {
     setStake(tier);
-    setAnte(tier.ante);              anteRef.current = tier.ante;
+    setAnte(tier.minBet);              anteRef.current = tier.minBet;
     setThreeCardIdx(0); setThreeCardBet(0);   threeCardRef.current = 0;
     setStreet3Bet(0);  setStreet4Bet(0);  setStreet5Bet(0);
     street3Ref.current = 0; street4Ref.current = 0; street5Ref.current = 0;
@@ -439,10 +439,10 @@ export default function MississippiStudScreen() {
   }
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  const anteAmt     = stake?.ante ?? 0;
+  const anteAmt     = stake?.minBet ?? 0;
   const dealCost    = anteAmt + threeCardBet;
   const canDeal     = profile.chips >= dealCost;
-  const isBusted    = profile.chips < (stake?.ante ?? 0);
+  const isBusted    = profile.chips < (stake?.minBet ?? 0);
   const showCards   = phase !== 'betting' && phase !== 'stake';
   const streetLabel = phase === 'street3' ? '3RD STREET' : phase === 'street4' ? '4TH STREET' : '5TH STREET';
   const currentStreetNum: 3|4|5 = phase === 'street3' ? 3 : phase === 'street4' ? 4 : 5;
@@ -456,7 +456,7 @@ export default function MississippiStudScreen() {
         start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }}
       />
 
-      <StakeSelectModal
+      <CasinoTableSelectModal
         visible={phase === 'stake'}
         chips={profile.chips}
         title="MISSISSIPPI STUD"

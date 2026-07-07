@@ -13,12 +13,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
-import StakeSelectModal from '@/components/StakeSelectModal';
+import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
-import { STAKE_TIERS, type StakeTier } from '@/lib/stakeConfig';
+import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   dealCasinoWar, dealWarCards, resolveCasinoWar,
   type CWCard, type CWOutcome, type CWWarOutcome, type CWResult,
@@ -216,7 +216,7 @@ export default function CasinoWarScreen() {
 
   // ── Phase / game state ───────────────────────────────────────────────────────
   const [phase,         setPhase]         = useState<Phase>('stake');
-  const [stake,         setStake]         = useState<StakeTier | null>(null);
+  const [stake,         setStake]         = useState<CasinoTableLimit | null>(null);
   const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
   type TieBetIdx = 0 | 1 | 2 | 3 | 4;
   const [ante,          setAnte]          = useState(0);
@@ -300,9 +300,9 @@ export default function CasinoWarScreen() {
   }
 
   // ── Stake selection ──────────────────────────────────────────────────────────
-  function handleStakeSelect(tier: StakeTier) {
+  function handleStakeSelect(tier: CasinoTableLimit) {
     setStake(tier);
-    setAnte(tier.ante);
+    setAnte(tier.minBet);
     setTieBetMult(0);
     setTotalWagered(0);
     setPhase('betting');
@@ -431,7 +431,7 @@ export default function CasinoWarScreen() {
   const tieBet      = BONUS_STEPS[tieBetMult];
   const totalBet    = ante + tieBet;
   const canAfford   = profile.chips >= totalBet;
-  const isBusted    = profile.chips < (stake?.ante ?? 0);
+  const isBusted    = profile.chips < (stake?.minBet ?? 0);
   const isDealing   = phase === 'dealing' || phase === 'war_dealing';
   const isResult    = phase === 'result' || phase === 'war_result';
   const isWarChoice = phase === 'war_choice';
@@ -447,7 +447,7 @@ export default function CasinoWarScreen() {
       />
 
       {/* Stake Modal */}
-      <StakeSelectModal
+      <CasinoTableSelectModal
         visible={phase === 'stake'}
         chips={profile.chips}
         title="CASINO WAR"
@@ -467,7 +467,7 @@ export default function CasinoWarScreen() {
         <View style={s.headerCenter}>
           <Text style={[s.headerTitle, { color: accent }]}>CASINO WAR</Text>
           {stake && (
-            <Text style={s.headerSub}>{stake.label} · ANTE {fmt(stake.ante)}</Text>
+            <Text style={s.headerSub}>{stake.label} · MIN BET {fmt(stake.minBet)}</Text>
           )}
         </View>
 

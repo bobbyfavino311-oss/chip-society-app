@@ -13,12 +13,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
-import StakeSelectModal from '@/components/StakeSelectModal';
+import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
-import type { StakeTier } from '@/lib/stakeConfig';
+import type { CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   dealHighCardFlush, getBestFlush, getRaiseMultiplier,
   resolveHighCardFlush,
@@ -247,7 +247,7 @@ export default function HighCardFlushScreen() {
   const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
   type BonusIdx = 0 | 1 | 2 | 3 | 4;
   const [phase,           setPhase]           = useState<HCFPhase>('stake');
-  const [stake,           setStake]           = useState<StakeTier | null>(null);
+  const [stake,           setStake]           = useState<CasinoTableLimit | null>(null);
   const [ante,            setAnte]            = useState(0);
   const [flushBonusIdx,   setFlushBonusIdx]   = useState<BonusIdx>(0);
   const [sfBonusIdx,      setSfBonusIdx]      = useState<BonusIdx>(0);
@@ -311,9 +311,9 @@ export default function HighCardFlushScreen() {
   useEffect(() => { MusicEngine.configure({ muted: isMusicMuted }); }, [isMusicMuted]);
 
   // ── Stake select ───────────────────────────────────────────────────────────
-  function handleStakeSelect(tier: StakeTier) {
+  function handleStakeSelect(tier: CasinoTableLimit) {
     setStake(tier);
-    setAnte(tier.ante);            anteRef.current = tier.ante;
+    setAnte(tier.minBet);            anteRef.current = tier.minBet;
     setFlushBonusIdx(0); setFlushBonusBet(0); flushBonusBetRef.current = 0;
     setSfBonusIdx(0);    setSfBonusBet(0);    sfBonusBetRef.current = 0;
     setTotalWagered(0);            totalWageredRef.current = 0;
@@ -447,11 +447,11 @@ export default function HighCardFlushScreen() {
   const playerFlush   = playerCards.length > 0 ? getBestFlush(playerCards) : null;
   const flushLen      = playerFlush?.length ?? 0;
   const curRaiseMult  = flushLen > 0 ? getRaiseMultiplier(flushLen) : 1;
-  const anteAmt       = stake?.ante ?? 0;
+  const anteAmt       = stake?.minBet ?? 0;
   const dealCost      = anteAmt + flushBonusBet + sfBonusBet;
   const canAffordDeal = profile.chips >= dealCost;
   const canAffordRaise = profile.chips >= curRaiseMult * anteAmt;
-  const isBusted      = profile.chips < (stake?.ante ?? 0);
+  const isBusted      = profile.chips < (stake?.minBet ?? 0);
   const inGame        = phase === 'decision' || phase === 'reveal';
   const showCards     = inGame || phase === 'result';
 
@@ -464,7 +464,7 @@ export default function HighCardFlushScreen() {
         start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }}
       />
 
-      <StakeSelectModal
+      <CasinoTableSelectModal
         visible={phase === 'stake'}
         chips={profile.chips}
         title="HIGH CARD FLUSH"

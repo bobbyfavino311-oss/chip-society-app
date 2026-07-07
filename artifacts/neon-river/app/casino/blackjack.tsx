@@ -9,7 +9,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
-import StakeSelectModal from '@/components/StakeSelectModal';
+import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
@@ -19,7 +19,7 @@ import {
   createShoe, handTotal,
   isBlackjack, isBust, dealerShouldHit, canSplit, fmt,
 } from '@/lib/blackjackEngine';
-import { type StakeTier } from '@/lib/stakeConfig';
+import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
 
 // ─── Testing mode ─────────────────────────────────────────────────────────────
 // Flip TESTING_MODE to false to restore six-deck production shoe.
@@ -424,13 +424,13 @@ export default function BlackjackScreen() {
   const [exitConfirm,  setExitConfirm]  = useState(false);
 
   // ── Stake tier ───────────────────────────────────────────────────────────────
-  const [selectedTier, setSelectedTier] = useState<StakeTier | null>(null);
+  const [selectedTier, setSelectedTier] = useState<CasinoTableLimit | null>(null);
 
   // Tier-specific bet bounds (fallback to module constants before selection)
-  const tierMinBet    = selectedTier?.ante ?? MIN_BET;
-  const tierMaxBet    = selectedTier ? selectedTier.ante * 5 : MAX_BET;
+  const tierMinBet    = selectedTier?.minBet ?? MIN_BET;
+  const tierMaxBet    = selectedTier ? selectedTier.maxBet : MAX_BET;
   const tierQuickBets = selectedTier
-    ? [selectedTier.ante, selectedTier.ante * 2, selectedTier.ante * 3, selectedTier.ante * 5]
+    ? [selectedTier.minBet, selectedTier.minBet * 2, selectedTier.minBet * 5, selectedTier.maxBet]
     : QUICK_BETS;
 
   // ── Betting state ────────────────────────────────────────────────────────────
@@ -440,7 +440,7 @@ export default function BlackjackScreen() {
   // Sync bet when tier is selected or chips hydrate from AsyncStorage
   useEffect(() => {
     if (selectedTier) {
-      setBet(Math.min(selectedTier.ante, profile.chips > 0 ? profile.chips : selectedTier.ante));
+      setBet(Math.min(selectedTier.minBet, profile.chips > 0 ? profile.chips : selectedTier.minBet));
     }
   }, [selectedTier?.key]);
 
@@ -991,7 +991,7 @@ export default function BlackjackScreen() {
         )}
       </View>
 
-      <StakeSelectModal
+      <CasinoTableSelectModal
         visible={selectedTier === null}
         chips={profile.chips}
         onSelect={(tier) => setSelectedTier(tier)}
