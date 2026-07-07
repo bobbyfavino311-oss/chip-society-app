@@ -205,7 +205,7 @@ function BlackjackIcon({ size = 15, color = '#ffd700' }: { size?: number; color?
 
 // ─── Stake Tiers ──────────────────────────────────────────────────────────────
 
-type StakeTier = 'MICRO' | 'LOW' | 'STANDARD' | 'HIGH_ROLLER' | 'VIP' | 'ELITE';
+type StakeTier = 'STARTER' | 'MICRO' | 'LOW' | 'STANDARD' | 'HIGH_ROLLER' | 'VIP' | 'ELITE' | 'ELITE_PLUS';
 
 interface StakeDef {
   tier: StakeTier;
@@ -217,24 +217,26 @@ interface StakeDef {
 }
 
 const STAKES: StakeDef[] = [
-  { tier: 'MICRO',       label: 'MICRO',       blinds: '25 / 50',      minBuyIn: 1_000,    maxBuyIn: 5_000,     color: '#00e887' },
-  { tier: 'LOW',         label: 'LOW',         blinds: '100 / 200',    minBuyIn: 4_000,    maxBuyIn: 20_000,    color: '#00d4ff' },
-  { tier: 'STANDARD',   label: 'STANDARD',    blinds: '500 / 1K',     minBuyIn: 20_000,   maxBuyIn: 100_000,   color: '#00d4ff' },
-  { tier: 'HIGH_ROLLER', label: 'HIGH ROLLER', blinds: '2.5K / 5K',   minBuyIn: 100_000,  maxBuyIn: 500_000,   color: '#bf5fff' },
-  { tier: 'VIP',         label: 'VIP',         blinds: '10K / 20K',    minBuyIn: 400_000,  maxBuyIn: 2_000_000, color: '#ffd700' },
-  { tier: 'ELITE',       label: 'ELITE',       blinds: '50K / 100K',   minBuyIn: 2_000_000,maxBuyIn:10_000_000, color: '#ff0090' },
+  { tier: 'STARTER',    label: 'STARTER',     blinds: '1K / 2K',      minBuyIn:    25_000, maxBuyIn:    50_000, color: '#8899bb' },
+  { tier: 'MICRO',      label: 'MICRO',       blinds: '5K / 10K',     minBuyIn:   100_000, maxBuyIn:   250_000, color: '#00e887' },
+  { tier: 'LOW',        label: 'LOW STAKES',  blinds: '10K / 20K',    minBuyIn:   250_000, maxBuyIn:   500_000, color: '#00d4ff' },
+  { tier: 'STANDARD',   label: 'STANDARD',    blinds: '25K / 50K',    minBuyIn:   500_000, maxBuyIn: 1_000_000, color: '#00ff88' },
+  { tier: 'HIGH_ROLLER',label: 'HIGH ROLLER', blinds: '50K / 100K',   minBuyIn: 1_000_000, maxBuyIn: 2_000_000, color: '#ffd700' },
+  { tier: 'VIP',        label: 'VIP',         blinds: '100K / 200K',  minBuyIn: 2_000_000, maxBuyIn: 5_000_000, color: '#ff0090' },
+  { tier: 'ELITE',      label: 'ELITE',       blinds: '250K / 500K',  minBuyIn: 5_000_000, maxBuyIn:10_000_000, color: '#bf5fff' },
+  { tier: 'ELITE_PLUS', label: 'ELITE+',      blinds: '500K / 1M',    minBuyIn:10_000_000, maxBuyIn:20_000_000, color: '#ffd700' },
 ];
 
 // Maps StakeTier (QuickPlayModal) → practice.tsx STAKE_CONFIGS key
 const QP_TO_GAME: Record<StakeTier, string> = {
-  MICRO: 'beginner', LOW: 'casual', STANDARD: 'mid',
-  HIGH_ROLLER: 'highroller', VIP: 'highroller', ELITE: 'elite',
+  STARTER: 'starter', MICRO: 'micro', LOW: 'low', STANDARD: 'standard',
+  HIGH_ROLLER: 'highroller', VIP: 'vip', ELITE: 'elite', ELITE_PLUS: 'elite_plus',
 };
 
 // Maps stakeConfig.ts tier.key (StakeSelectModal) → practice.tsx STAKE_CONFIGS key
 const CONFIG_KEY_TO_GAME: Record<string, string> = {
-  micro: 'beginner', low: 'casual', standard: 'mid',
-  highroller: 'highroller', vip: 'highroller', elite: 'elite',
+  starter: 'starter', micro: 'micro', low: 'low', standard: 'standard',
+  highroller: 'highroller', vip: 'vip', elite: 'elite', elite_plus: 'elite_plus',
 };
 
 function formatChips(n: number): string {
@@ -244,12 +246,14 @@ function formatChips(n: number): string {
 }
 
 function getAutoTier(chips: number): StakeTier {
-  if (chips >= 2_000_000) return 'ELITE';
-  if (chips >= 400_000)   return 'VIP';
-  if (chips >= 100_000)   return 'HIGH_ROLLER';
-  if (chips >= 20_000)    return 'STANDARD';
-  if (chips >= 4_000)     return 'LOW';
-  return 'MICRO';
+  if (chips >= 10_000_000) return 'ELITE_PLUS';
+  if (chips >=  5_000_000) return 'ELITE';
+  if (chips >=  2_000_000) return 'VIP';
+  if (chips >=  1_000_000) return 'HIGH_ROLLER';
+  if (chips >=    500_000) return 'STANDARD';
+  if (chips >=    250_000) return 'LOW';
+  if (chips >=    100_000) return 'MICRO';
+  return 'STARTER';
 }
 
 // ─── Option row ───────────────────────────────────────────────────────────────

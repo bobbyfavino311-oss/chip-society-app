@@ -58,8 +58,8 @@ export default function StakeSelectModal({ visible, chips, onSelect, onBack, tit
             showsVerticalScrollIndicator={false}
           >
             {STAKE_TIERS.map((tier) => {
-              const locked = chips < tier.minBankroll;
-              const shortfall = tier.minBankroll - chips;
+              const locked = chips < tier.minBuyIn;
+              const shortfall = tier.minBuyIn - chips;
 
               return (
                 <TouchableOpacity
@@ -77,30 +77,34 @@ export default function StakeSelectModal({ visible, chips, onSelect, onBack, tit
                     />
                   )}
 
-                  {/* Left: name + sublabel */}
+                  {/* Left: name + description */}
                   <View style={s.tierLeft}>
-                    {locked
-                      ? <Ionicons name="lock-closed" size={13} color="rgba(255,255,255,0.18)" style={{ marginBottom: 2 }} />
-                      : null
-                    }
-                    <Text style={[s.tierName, locked ? s.tierNameLocked : { color: tier.color }]}>
-                      {tier.label}
-                    </Text>
-                    <Text style={s.tierSub}>{tier.sublabel}</Text>
-                  </View>
-
-                  {/* Right: amounts */}
-                  <View style={s.tierRight}>
-                    <View style={s.amtRow}>
-                      <Text style={s.amtLabel}>ANTE</Text>
-                      <Text style={[s.amtValue, locked ? s.amtValueLocked : { color: tier.color }]}>
-                        {fmtK(tier.ante)}
+                    <View style={s.tierNameRow}>
+                      {locked && (
+                        <Ionicons name="lock-closed" size={11} color="rgba(255,255,255,0.18)" style={{ marginRight: 4 }} />
+                      )}
+                      <Text style={[s.tierName, locked ? s.tierNameLocked : { color: tier.color }]}>
+                        {tier.label}
                       </Text>
                     </View>
-                    <View style={s.amtRow}>
-                      <Text style={s.amtLabel}>{locked ? 'NEED' : 'MIN'}</Text>
-                      <Text style={[s.amtValueSm, locked && s.needText]}>
-                        {locked ? fmtBankroll(shortfall) + ' MORE' : fmtBankroll(tier.minBankroll)}
+                    <Text style={s.tierDesc}>{tier.description}</Text>
+                  </View>
+
+                  {/* Right: blinds + buy-in */}
+                  <View style={s.tierRight}>
+                    <View style={s.statRow}>
+                      <Text style={s.statLabel}>BLINDS</Text>
+                      <Text style={[s.statValue, locked ? s.statValueLocked : { color: tier.color }]}>
+                        {fmtK(tier.smallBlind)}/{fmtK(tier.bigBlind)}
+                      </Text>
+                    </View>
+                    <View style={s.statRow}>
+                      <Text style={s.statLabel}>{locked ? 'NEED' : 'BUY-IN'}</Text>
+                      <Text style={[s.statValueSm, locked && s.needText]}>
+                        {locked
+                          ? fmtBankroll(shortfall) + ' MORE'
+                          : `${fmtK(tier.minBuyIn)}–${fmtK(tier.maxBuyIn)}`
+                        }
                       </Text>
                     </View>
                   </View>
@@ -148,17 +152,18 @@ const s = StyleSheet.create({
   },
   tierRowLocked:  { opacity: 0.42, backgroundColor: 'rgba(255,255,255,0.018)' },
 
-  tierLeft:       { flex: 1, gap: 2 },
+  tierLeft:       { flex: 1, gap: 3 },
+  tierNameRow:    { flexDirection: 'row', alignItems: 'center' },
   tierName:       { fontSize: 12, fontFamily: 'Orbitron_900Black', letterSpacing: 1 },
   tierNameLocked: { color: 'rgba(255,255,255,0.25)' },
-  tierSub:        { fontSize: 9, color: 'rgba(255,255,255,0.3)', fontFamily: 'Orbitron_400Regular', letterSpacing: 0.5 },
+  tierDesc:       { fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: 'Inter_400Regular', letterSpacing: 0.2 },
 
   tierRight:      { alignItems: 'flex-end', gap: 4 },
-  amtRow:         { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  amtLabel:       { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.25)', letterSpacing: 1 },
-  amtValue:       { fontSize: 16, fontFamily: 'Inter_700Bold' },
-  amtValueLocked: { color: 'rgba(255,255,255,0.22)' },
-  amtValueSm:     { fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.35)' },
+  statRow:        { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  statLabel:      { fontSize: 8, fontFamily: 'Orbitron_700Bold', color: 'rgba(255,255,255,0.25)', letterSpacing: 1 },
+  statValue:      { fontSize: 13, fontFamily: 'Inter_700Bold' },
+  statValueLocked:{ color: 'rgba(255,255,255,0.22)' },
+  statValueSm:    { fontSize: 10, fontFamily: 'Inter_700Bold', color: 'rgba(255,255,255,0.35)' },
   needText:       { color: '#ff5555' },
 
   note:           { fontSize: 9, color: 'rgba(255,255,255,0.22)', textAlign: 'center', lineHeight: 14, marginTop: 8 },

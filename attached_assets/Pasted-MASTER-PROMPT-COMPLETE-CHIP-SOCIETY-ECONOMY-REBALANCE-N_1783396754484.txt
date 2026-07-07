@@ -1,0 +1,386 @@
+MASTER PROMPT — COMPLETE CHIP SOCIETY ECONOMY REBALANCE & NEW PLAYER ONBOARDING
+
+This update completely rebalances the game’s cash game economy and new player experience. The goal is to ensure every new player can begin playing poker immediately while maintaining a smooth progression into higher stakes.
+
+This is now the official stake structure throughout the entire application.
+
+⸻
+
+1. NEW CASH GAME STAKE STRUCTURE
+
+Replace every previous stake level with the following:
+
+Stake	Buy-In Range	Small Blind	Big Blind
+Starter	25K – 50K	1K	2K
+Micro	100K – 250K	5K	10K
+Low Stakes	250K – 500K	10K	20K
+Standard	500K – 1M	25K	50K
+High Roller	1M – 2M	50K	100K
+VIP	2M – 5M	100K	200K
+Elite	5M – 10M	250K	500K
+Elite+	10M – 20M	500K	1M
+
+These values replace every previous stake configuration.
+
+⸻
+
+2. UPDATE THE STAKE SELECTION SCREEN
+
+Completely update the stake selection page.
+
+Every card should display:
+
+* Stake Name
+* Buy-In Range
+* Small Blind
+* Big Blind
+* Short description
+
+Example:
+
+Starter
+
+Buy-In
+
+25K–50K
+
+Blinds
+
+1K / 2K
+
+Perfect for new players building their bankroll.
+
+⸻
+
+Micro
+
+Buy-In
+
+100K–250K
+
+Blinds
+
+5K / 10K
+
+Beginner cash games.
+
+⸻
+
+Low Stakes
+
+Buy-In
+
+250K–500K
+
+Blinds
+
+10K / 20K
+
+Casual everyday action.
+
+⸻
+
+Standard
+
+Buy-In
+
+500K–1M
+
+Blinds
+
+25K / 50K
+
+Balanced gameplay.
+
+⸻
+
+High Roller
+
+Buy-In
+
+1M–2M
+
+Blinds
+
+50K / 100K
+
+Experienced players.
+
+⸻
+
+VIP
+
+Buy-In
+
+2M–5M
+
+Blinds
+
+100K / 200K
+
+Premium tables.
+
+⸻
+
+Elite
+
+Buy-In
+
+5M–10M
+
+Blinds
+
+250K / 500K
+
+High bankroll games.
+
+⸻
+
+Elite+
+
+Buy-In
+
+10M–20M
+
+Blinds
+
+500K / 1M
+
+Highest public stakes.
+
+⸻
+
+3. STAKE SELECTION MUST CONTROL THE ENTIRE TABLE
+
+The selected stake must become the single source of truth.
+
+Once selected, it configures:
+
+* Small Blind
+* Big Blind
+* Buy-In
+* Min Buy-In
+* Max Buy-In
+* Starting Stack
+* Pot calculations
+* Raise slider
+* Pot buttons
+* All-In calculations
+* Side pots
+* AI betting
+* Hand history
+* Table header
+* Matchmaking
+* Multiplayer
+* AI Practice
+* Quick Play
+* Private Tables
+* Every Hold’em variant
+
+Nothing may continue using beginner values.
+
+⸻
+
+4. BUY-IN SELECTION
+
+Players should no longer automatically sit with a fixed amount.
+
+Instead:
+
+After selecting a stake:
+
+Show a Buy-In selector.
+
+Example:
+
+Elite+
+
+Buy-In
+
+10M
+────────────●────────────
+20M
+
+Allow the player to choose any buy-in within the permitted range before joining.
+
+AI players should also spawn with realistic stack sizes within that same range.
+
+⸻
+
+5. NEW PLAYER STARTING CHIPS
+
+Increase every new account’s starting bankroll.
+
+OLD
+
+❌ Too low.
+
+NEW
+
+Every brand-new account begins with:
+
+100,000 Chips
+
+This allows players to:
+
+* Play poker immediately
+* Try different Hold’em variants
+* Experience multiple hands before running low
+* Learn the game naturally
+
+The player should never feel forced into bonus features before playing poker.
+
+⸻
+
+6. STARTER TABLES
+
+The new Starter stake exists specifically for new users.
+
+Purpose:
+
+* Learn poker
+* Build bankroll
+* Lowest risk games
+
+Description:
+
+“Perfect for new players building their bankroll.”
+
+These tables should feel welcoming rather than “cheap.”
+
+⸻
+
+7. BANKROLL PROTECTION SYSTEM
+
+Players should never become permanently locked out of poker.
+
+If a player’s bankroll falls below:
+
+25K
+
+Automatically unlock:
+
+Claim Starter Stack
+
+Reward:
+
+25K Chips
+
+Rules:
+
+* Only available when bankroll is below 25K.
+* Once every 24 hours.
+* Does not stack.
+* Does not replace Daily Spin.
+* Does not replace Daily Streak.
+* Exists solely to ensure every player can always return to poker.
+
+⸻
+
+8. NEW ACCOUNT EXPERIENCE
+
+Every new account should immediately receive:
+
+* 100K Starting Chips
+* Daily Spin unlocked
+* Daily Streak unlocked
+* Starter Tables unlocked
+* Fortune Cookies unlocked
+
+No additional requirements.
+
+The player should be playing poker within their first minute.
+
+⸻
+
+9. UPDATE ALL GAME MODES
+
+Every mode must use this new economy.
+
+Includes:
+
+* Traditional Hold’em
+* Short Deck Hold’em
+* Omaha Hold’em
+* Joker Hold’em
+* AI Practice
+* Multiplayer
+* Quick Play
+* Private Tables
+* Tournament warm-up games (where applicable)
+
+No exceptions.
+
+⸻
+
+10. AI TABLES
+
+AI bankrolls should reflect the selected stake.
+
+Example:
+
+Starter
+
+25K–50K
+
+Micro
+
+100K–250K
+
+High Roller
+
+1M–2M
+
+Elite+
+
+10M–20M
+
+No AI should ever spawn with beginner chip stacks at Elite tables.
+
+⸻
+
+11. VERIFY EVERYTHING
+
+Before marking this update complete, verify:
+
+✅ Every stake displays the correct Buy-In range.
+
+✅ Every stake displays the correct blinds.
+
+✅ Buy-In selector works correctly.
+
+✅ Selected buy-in becomes the player’s starting stack.
+
+✅ AI uses correct stack sizes.
+
+✅ Raise slider scales correctly.
+
+✅ Pot buttons scale correctly.
+
+✅ Pot values scale correctly.
+
+✅ Side pots calculate correctly.
+
+✅ Table headers display correct stakes.
+
+✅ Matchmaking joins the correct stake.
+
+✅ Multiplayer uses correct stakes.
+
+✅ AI Practice uses correct stakes.
+
+✅ Quick Play uses correct stakes.
+
+✅ New accounts begin with exactly 100,000 chips.
+
+✅ New accounts can immediately play the Starter tables.
+
+✅ Players with less than 25,000 chips receive the Claim Starter Stack (25K) option once every 24 hours.
+
+✅ No player is ever locked out of poker because they have insufficient chips.
+
+⸻
+
+Design Goal
+
+The economy should feel rewarding and approachable. A new player should be able to install the game and begin playing poker immediately, while experienced players still have a satisfying progression through increasingly prestigious stake levels. Every blind level, buy-in, AI stack, and table configuration must be internally consistent so that the game’s economy feels polished, fair, and scalable over the long term.

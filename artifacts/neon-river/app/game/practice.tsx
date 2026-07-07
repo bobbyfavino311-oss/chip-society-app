@@ -72,11 +72,14 @@ const PHASE_LABELS: Record<string, string> = {
 
 // ─── Stake tier → table config ────────────────────────────────────────────────
 const STAKE_CONFIGS: Record<string, TableConfig> = {
-  beginner:   { smallBlind:    25, bigBlind:    50, minBuyIn:     2_000 },
-  casual:     { smallBlind:    50, bigBlind:   100, minBuyIn:     5_000 },
-  mid:        { smallBlind:   250, bigBlind:   500, minBuyIn:    25_000 },
-  highroller: { smallBlind: 2_500, bigBlind: 5_000, minBuyIn:   250_000 },
-  elite:      { smallBlind:25_000, bigBlind:50_000, minBuyIn: 2_500_000 },
+  starter:    { smallBlind:   1_000, bigBlind:   2_000, minBuyIn:    25_000 },
+  micro:      { smallBlind:   5_000, bigBlind:  10_000, minBuyIn:   100_000 },
+  low:        { smallBlind:  10_000, bigBlind:  20_000, minBuyIn:   250_000 },
+  standard:   { smallBlind:  25_000, bigBlind:  50_000, minBuyIn:   500_000 },
+  highroller: { smallBlind:  50_000, bigBlind: 100_000, minBuyIn: 1_000_000 },
+  vip:        { smallBlind: 100_000, bigBlind: 200_000, minBuyIn: 2_000_000 },
+  elite:      { smallBlind: 250_000, bigBlind: 500_000, minBuyIn: 5_000_000 },
+  elite_plus: { smallBlind: 500_000, bigBlind:1_000_000,minBuyIn:10_000_000 },
 };
 
 function getDiffDesc(d: AIDifficulty): string {

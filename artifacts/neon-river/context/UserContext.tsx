@@ -120,9 +120,9 @@ const DAILY_REWARDS: Record<number, number> = {
 const DEFAULT_DAILY_REWARD  = 35_000;
 const HOURLY_BONUS          = 5_000;
 const HOURLY_INTERVAL_MS    = 24 * 60 * 60 * 1000;
-const COMEBACK_THRESHOLD    = 500;
-const COMEBACK_BONUS        = 20_000;
-const REGISTERED_CHIPS      = 50_000;
+const COMEBACK_THRESHOLD    = 25_000;
+const COMEBACK_BONUS        = 25_000;
+const REGISTERED_CHIPS      = 100_000;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

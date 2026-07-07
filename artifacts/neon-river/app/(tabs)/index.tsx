@@ -245,19 +245,25 @@ const QP_VARIANTS: QpVariantDef[] = [
 
 /** Maps a chip count to the matching practice stake-tier key. */
 function getAutoTierKey(chips: number): string {
-  if (chips >= 2_500_000) return 'elite';
-  if (chips >= 250_000)   return 'highroller';
-  if (chips >= 25_000)    return 'mid';
-  if (chips >= 5_000)     return 'casual';
-  return 'beginner';
+  if (chips >= 10_000_000) return 'elite_plus';
+  if (chips >=  5_000_000) return 'elite';
+  if (chips >=  2_000_000) return 'vip';
+  if (chips >=  1_000_000) return 'highroller';
+  if (chips >=    500_000) return 'standard';
+  if (chips >=    250_000) return 'low';
+  if (chips >=    100_000) return 'micro';
+  return 'starter';
 }
 
 const TIER_BLIND_LABELS: Record<string, string> = {
-  beginner:   '25 / 50',
-  casual:     '50 / 100',
-  mid:        '250 / 500',
-  highroller: '2.5K / 5K',
-  elite:      '25K / 50K',
+  starter:    '1K / 2K',
+  micro:      '5K / 10K',
+  low:        '10K / 20K',
+  standard:   '25K / 50K',
+  highroller: '50K / 100K',
+  vip:        '100K / 200K',
+  elite:      '250K / 500K',
+  elite_plus: '500K / 1M',
 };
 
 function QuickPlayCard() {
