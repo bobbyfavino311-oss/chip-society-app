@@ -14,6 +14,7 @@ import { useSoundSettings } from '@/context/SoundContext';
 import { useInGameChat, GameChatPanel } from '@/components/InGameChat';
 import { formatChips } from '@/lib/multiplayerTypes';
 import type { SeatView, ClientGameState } from '@/lib/multiplayerTypes';
+import { VARIANT_CONFIGS } from '@/constants/gameVariants';
 import PlayingCard from '@/components/PlayingCard';
 import BettingPanel from '@/components/BettingPanel';
 import colors from '@/constants/colors';
@@ -56,6 +57,7 @@ function toChromePlayer(s: SeatView, gs: ClientGameState) {
     name: s.username,
     chips: s.chips,
     avatarIndex: s.avatarId,
+    cardCount: s.cardCount,   // hole-card count for face-down display during hand
     status: s.status === 'allin' ? 'allIn' : s.status === 'sitting_out' ? 'folded' : s.status,
     isDealer: s.isDealer,
     isSmallBlind: false,
@@ -267,6 +269,11 @@ export default function MultiplayerGame() {
             {PHASE_LABELS[gs.phase] ?? gs.phase.toUpperCase()}
             {'  ·  #'}{roomCode}
           </Text>
+          {gs.variant !== 'texas_holdem' && (
+            <Text style={[g.variantBadge, { color: VARIANT_CONFIGS[gs.variant].color }]}>
+              {VARIANT_CONFIGS[gs.variant].shortLabel.toUpperCase()}
+            </Text>
+          )}
           {buyIn != null && (
             <Text style={g.buyInTxt}>BUY-IN {formatChips(buyIn)}</Text>
           )}
@@ -312,6 +319,7 @@ export default function MultiplayerGame() {
               isWinner={(gs.winners ?? []).some(w => w.seatIndex === opp.seatIndex)}
               timeoutAt={opp.isTurn && gs.turnTimeoutAt ? gs.turnTimeoutAt : undefined}
               timer={0}
+              cardCount={opp.cardCount}
               showCards={isHandOver && !!opp.revealedCards?.length}
             />
           ))
@@ -468,7 +476,8 @@ export default function MultiplayerGame() {
 
 const g = StyleSheet.create({
   joiningTxt: { color: 'rgba(255,255,255,0.3)', fontFamily: 'Orbitron_400Regular', fontSize: 14, letterSpacing: 1 },
-  buyInTxt:   { color: 'rgba(0,255,136,0.4)', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1, marginTop: 1, textAlign: 'center' },
+  buyInTxt:      { color: 'rgba(0,255,136,0.4)', fontFamily: 'Orbitron_400Regular', fontSize: 8, letterSpacing: 1, marginTop: 1, textAlign: 'center' },
+  variantBadge:  { fontFamily: 'Orbitron_700Bold', fontSize: 8, letterSpacing: 1.5, marginTop: 1, opacity: 0.9, textAlign: 'center' },
 
   emptySeats: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   emptyTxt:   { color: 'rgba(255,255,255,0.15)', fontFamily: 'Orbitron_400Regular', fontSize: 11 },

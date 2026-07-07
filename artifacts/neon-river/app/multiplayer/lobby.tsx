@@ -48,6 +48,7 @@ export default function MultiplayerLobby() {
   const [showQuickJoin, setShowQuickJoin] = useState(false);
   const [selectedTier, setSelectedTier]   = useState<StakeTier>('MICRO');
   const [quickTier, setQuickTier]         = useState<StakeTier>('MICRO');
+  const [quickVariant, setQuickVariant]   = useState<MultiplayerGameVariant>('texas_holdem');
   const [maxPlayers, setMaxPlayers]       = useState(5);
   const [selectedVariant, setSelectedVariant] = useState<MultiplayerGameVariant>('texas_holdem');
   const [joining, setJoining]             = useState<string | null>(null);
@@ -153,7 +154,7 @@ export default function MultiplayerLobby() {
     const buyIn = Math.min(chips, minBuy * 5);
     setShowQuickJoin(false);
     removeChips(buyIn);
-    quickJoin(quickTier, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1);
+    quickJoin(quickTier, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1, quickVariant);
   };
 
   const handleSpectate = (item: LobbyTable) => {
@@ -425,6 +426,28 @@ export default function MultiplayerLobby() {
                         {STAKE_LABELS[tier]}
                       </Text>
                       <Text style={styles.tierChipBlinds}>{TIER_BLINDS[tier]}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+
+              <Text style={styles.sectionLabel}>GAME VARIANT</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tierRow}>
+                {VARIANTS.map(v => {
+                  const cfg = VARIANT_CONFIGS[v];
+                  const active = quickVariant === v;
+                  return (
+                    <TouchableOpacity
+                      key={v}
+                      style={[styles.tierChip,
+                        { borderColor: active ? cfg.color : '#333',
+                          backgroundColor: active ? cfg.color + '25' : 'transparent' }]}
+                      onPress={() => setQuickVariant(v)}
+                    >
+                      <Text style={[styles.tierChipText, { color: active ? cfg.color : '#888' }]}>
+                        {cfg.shortLabel}
+                      </Text>
+                      <Text style={styles.tierChipBlinds}>{cfg.deckLabel}</Text>
                     </TouchableOpacity>
                   );
                 })}

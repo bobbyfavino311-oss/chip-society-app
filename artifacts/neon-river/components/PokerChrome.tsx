@@ -198,16 +198,22 @@ export function TimerRing({ timeoutAt, maxSeconds = 30, size = 44 }: {
 // ─── Compact seat (top row) ────────────────────────────────────────────────────
 // `player` is a normalized shape shared by AI bots and multiplayer opponents:
 // { id, name, chips, avatarIndex, status, isDealer, isSmallBlind, isBigBlind, holeCards }
+// `cardCount` — how many hole cards this seat holds (2 for most variants, 4 for Omaha).
+// When provided and showCards is false, renders face-down placeholder cards so the
+// player can see that an opponent is actively holding cards during the hand.
 
 export function CompactAISeat({
-  player, isCurrentTurn, isWinner, timer, timeoutAt, showCards, bubble,
+  player, isCurrentTurn, isWinner, timer, timeoutAt, showCards, bubble, cardCount,
 }: {
   player: any; isCurrentTurn: boolean; isWinner: boolean; timer?: number; timeoutAt?: number;
-  showCards?: boolean; bubble?: BubbleEntry;
+  showCards?: boolean; bubble?: BubbleEntry; cardCount?: number;
 }) {
   const folded = player.status === 'folded';
   const avatarId = player.avatarIndex > 0 ? player.avatarIndex : 1;
   const showRing = isCurrentTurn && !folded && !!timeoutAt;
+  // Use cardCount from prop; fall back to holeCards length if available
+  const numCards = cardCount ?? (player.holeCards?.length ?? 0);
+  const tightGap = numCards > 2; // 4-card Omaha hands use a tighter gap
 
   return (
     <View style={[seat.seat, folded && seat.seatFolded]}>
@@ -236,8 +242,19 @@ export function CompactAISeat({
       </View>
       <Text style={[seat.seatName, isWinner && seat.seatNameWinner]} numberOfLines={1}>{player.name}</Text>
       <Text style={[seat.seatChips, folded && seat.dimText]}>{formatChips(player.chips)}</Text>
-      {player.holeCards && player.holeCards.length > 0 && showCards && (
-        <View style={seat.holeCardRow}>
+
+      {/* Face-down cards during active hand */}
+      {!showCards && !folded && numCards > 0 && (
+        <View style={[seat.holeCardRow, tightGap && { gap: 1 }]}>
+          {Array.from({ length: numCards }).map((_, i) => (
+            <PlayingCard key={i} faceDown size="sm" animated={false} />
+          ))}
+        </View>
+      )}
+
+      {/* Revealed cards at showdown */}
+      {showCards && player.holeCards && player.holeCards.length > 0 && (
+        <View style={[seat.holeCardRow, tightGap && { gap: 1 }]}>
           {player.holeCards.map((card: any, i: number) => (
             <PlayingCard key={i} card={card} faceDown={false} size="sm" animated={false} />
           ))}
