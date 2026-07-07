@@ -206,6 +206,7 @@ export function setupSocketIO(httpServer: HttpServer): void {
       userId: string;
       username: string;
       avatarId: number;
+      chips?: number;
     }) => {
       try {
         const existing = manager.getRoomForSocket(socket.id);
@@ -214,18 +215,16 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
+        // Fall back to client-supplied chips for guest accounts (same as create_table/join_table)
         const dbChips = await loadPlayerChips(payload.userId);
-        if (dbChips === null) {
-          socket.emit('error', { message: 'Account not found. Please log in again.' });
-          return;
-        }
+        const chips = dbChips !== null ? dbChips : (payload.chips ?? 500_000);
 
         const tier = payload.stakeTier as StakeTier;
         const variant = resolveVariant(payload.variant);
         const room = manager.findOrCreateRoom(tier, 5, variant);
         const ok = manager.joinRoom(
           socket.id, room.id,
-          payload.userId, payload.username, payload.avatarId, dbChips,
+          payload.userId, payload.username, payload.avatarId, chips,
         );
         if (!ok) {
           socket.emit('error', { message: 'Could not find a suitable table. Try a different stake level.' });

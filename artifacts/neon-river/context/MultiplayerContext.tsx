@@ -52,7 +52,7 @@ interface MultiplayerContextValue {
   getLobby: () => void;
   createTable: (stakeTier: StakeTier, maxPlayers: number, userId: string, username: string, avatarId: number, chips: number, variant?: MultiplayerGameVariant) => void;
   joinTable: (tableId: string, userId: string, username: string, avatarId: number, chips: number) => void;
-  quickJoin: (stakeTier: StakeTier, userId: string, username: string, avatarId: number, variant?: MultiplayerGameVariant) => void;
+  quickJoin: (stakeTier: StakeTier, userId: string, username: string, avatarId: number, variant?: MultiplayerGameVariant, chips?: number) => void;
   leaveTable: () => void;
   sendAction: (type: 'fold' | 'check' | 'call' | 'raise' | 'allin', amount?: number) => void;
   sendChat: (text: string) => void;
@@ -231,9 +231,10 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
   const quickJoin = useCallback((
     stakeTier: StakeTier, userId: string, username: string, avatarId: number,
     variant: MultiplayerGameVariant = 'texas_holdem',
+    chips?: number,
   ) => {
     userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
-    socketRef.current?.emit('quick_join', { stakeTier, variant, userId, username, avatarId });
+    socketRef.current?.emit('quick_join', { stakeTier, variant, userId, username, avatarId, chips });
   }, []);
 
   const leaveTable = useCallback(() => {

@@ -776,6 +776,7 @@ export default function PlayScreen() {
       tier as any, userId, profile.username,
       profile.symbolIndex ?? profile.avatarIndex ?? 1,
       liveVariantRef.current as any,
+      profile.chips ?? 0,
     );
   }, [connected]);
 
@@ -822,6 +823,7 @@ export default function PlayScreen() {
       liveVariantRef.current  = variant;
       setLiveColor(stakeData?.color ?? '#00d4ff');
       removeChips(buyIn);
+      clearError();
       setLiveState('searching');
       if (connected) {
         const userId = profile.playerId ?? profile.username;
@@ -829,6 +831,7 @@ export default function PlayScreen() {
           stakeKey as any, userId, profile.username,
           profile.symbolIndex ?? profile.avatarIndex ?? 1,
           variant as any,
+          profile.chips ?? 0,
         );
       } else {
         livePendingTierRef.current = stakeKey;
