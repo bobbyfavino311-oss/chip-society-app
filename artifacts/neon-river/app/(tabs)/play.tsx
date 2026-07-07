@@ -429,9 +429,9 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
   const pendingJoinRef  = useRef(false);
   const celebratedRef   = useRef(false);
 
-  // Multiplayer matchmaking only exists for standard No Limit Hold'em today —
-  // other variants stay AI-only until the server supports those rulesets.
-  const liveSupported = variant === 'texas_holdem';
+  // All four variants (Texas, Omaha, Short Deck, Joker) are fully supported
+  // by the server — live matchmaking is available for each of them.
+  const liveSupported = true;
   const availableStakes = STAKES.filter(s => chips >= s.minBuyIn);
 
   useEffect(() => {
@@ -499,7 +499,7 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
     removeChips(buyIn);
 
     const userId = profile.playerId ?? profile.username;
-    quickJoin(stake.tier as any, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1);
+    quickJoin(stake.tier as any, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1, variant as any);
   }, [connected, stake]);
 
   useEffect(() => {
@@ -575,14 +575,8 @@ function QuickPlayModal({ visible, variant, chips, onClose }: {
                 <Text style={qp.opponentEmoji}>🌎</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={[qp.opponentTitle, opponent === 'live' && { color: '#ff0090' }]}>LIVE PLAYERS</Text>
-                  {liveSupported ? (
-                    <>
-                      <Text style={qp.opponentSub}>Matched with real players first</Text>
-                      <Text style={qp.opponentSub}>Bots fill empty seats only as a last resort</Text>
-                    </>
-                  ) : (
-                    <Text style={qp.opponentSub}>Coming soon for this variant — AI only for now</Text>
-                  )}
+                    <Text style={qp.opponentSub}>Matched with real players first</Text>
+                  <Text style={qp.opponentSub}>Bots fill empty seats only as a last resort</Text>
                 </View>
                 {opponent === 'live' && <Ionicons name="checkmark-circle" size={20} color="#ff0090" />}
               </TouchableOpacity>
