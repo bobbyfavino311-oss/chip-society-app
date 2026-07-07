@@ -2,12 +2,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Animated, Modal, Platform, Pressable, ScrollView,
+  Alert, Animated, Modal, Platform, Pressable, ScrollView,
   StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Ellipse, G, Path, Rect, Text as SvgText } from 'react-native-svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '@/context/UserContext';
 import { useMultiplayer } from '@/context/MultiplayerContext';
 import StakeSelectModal from '@/components/StakeSelectModal';
@@ -403,379 +404,172 @@ const sc = StyleSheet.create({
   lockedSub:    { fontSize: 10, color: 'rgba(255,255,255,0.28)' },
 });
 
-// ─── Quick Play Modal ─────────────────────────────────────────────────────────
+// ─── Stake key → MultiplayerContext StakeTier ────────────────────────────────
+const STAKE_KEY_TO_TIER: Record<string, string> = {
+  starter: 'STARTER', micro: 'MICRO', low: 'LOW', standard: 'STANDARD',
+  highroller: 'HIGH_ROLLER', vip: 'VIP', elite: 'ELITE', elite_plus: 'ELITE_PLUS',
+};
 
-type QpStep = 'opponent' | 'stakes' | 'matching';
-type OpponentType = 'ai' | 'live';
+// ─── AI / LIVE segmented toggle ───────────────────────────────────────────────
+type PlayMode = 'ai' | 'live';
 
-function QuickPlayModal({ visible, variant, chips, onClose }: {
-  visible: boolean; variant: string; chips: number; onClose: () => void;
+function ModeToggle({ mode, onChange, accent }: { mode: PlayMode; onChange: (m: PlayMode) => void; accent: string }) {
+  return (
+    <View style={mt.track}>
+      {(['ai', 'live'] as PlayMode[]).map(m => {
+        const active = mode === m;
+        return (
+          <TouchableOpacity
+            key={m}
+            style={[mt.seg, active && { borderColor: `${accent}80` }]}
+            onPress={() => onChange(m)}
+            activeOpacity={0.8}
+          >
+            {active && <LinearGradient colors={[`${accent}30`, `${accent}10`]} style={StyleSheet.absoluteFill} />}
+            <Text style={mt.icon}>{m === 'ai' ? '🤖' : '🌐'}</Text>
+            <Text style={[mt.label, active && { color: accent }]}>{m === 'ai' ? 'AI' : 'LIVE'}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const mt = StyleSheet.create({
+  track: { flexDirection: 'row', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.03)', overflow: 'hidden' },
+  seg:   { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderWidth: 1, borderColor: 'transparent', borderRadius: 11, overflow: 'hidden' },
+  icon:  { fontSize: 16 },
+  label: { fontFamily: 'Orbitron_700Bold', fontSize: 11, letterSpacing: 1, color: 'rgba(255,255,255,0.3)' },
+});
+
+// ─── Variant Card ─────────────────────────────────────────────────────────────
+// One card per poker variant. The AI/LIVE toggle state is global (passed in).
+// Pressing PLAY opens stake selection; mode determines AI vs live path.
+
+function VariantCard({
+  section, accent, iconNode, title, lines, playMode, onModeChange, onPlay,
+}: {
+  section: string; accent: string; iconNode: React.ReactNode;
+  title: string; lines: string[];
+  playMode: PlayMode; onModeChange: (m: PlayMode) => void; onPlay: () => void;
 }) {
-  const { profile, removeChips, addChips } = useUser();
-  const {
-    connected, connecting, tableId, error,
-    connect, quickJoin, clearError,
-  } = useMultiplayer();
+  return (
+    <View style={vc.wrap}>
+      <Text style={vc.sectionLabel}>{section}</Text>
+      <View style={[vc.card, { borderColor: `${accent}38` }]}>
+        <LinearGradient colors={[`${accent}0d`, 'transparent']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+        <View style={[vc.topBar, { backgroundColor: accent }]} />
+        <View style={vc.header}>
+          <View style={[vc.iconWrap, { backgroundColor: `${accent}18`, borderColor: `${accent}45` }]}>
+            {iconNode}
+          </View>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={[vc.title, { color: accent }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{title}</Text>
+            {lines.map((l, i) => <Text key={i} style={vc.line}>{l}</Text>)}
+          </View>
+        </View>
+        <View style={vc.divider} />
+        <ModeToggle mode={playMode} onChange={onModeChange} accent={accent} />
+        <Text style={vc.modeText}>
+          {playMode === 'ai'
+            ? 'Playing against AI bots.'
+            : 'Matched with real players. Bots fill empty seats if needed.'}
+        </Text>
+        <TouchableOpacity style={[vc.playBtn, { borderColor: `${accent}55` }]} onPress={onPlay} activeOpacity={0.82}>
+          <LinearGradient colors={[`${accent}28`, `${accent}0a`]} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+          <Text style={[vc.playBtnText, { color: accent }]}>PLAY</Text>
+          <Ionicons name="arrow-forward" size={15} color={accent} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
 
-  const [step, setStep]          = useState<QpStep>('opponent');
-  const [opponent, setOpponent]  = useState<OpponentType>('ai');
-  const [stake, setStake]        = useState<StakeDef | null>(null);
-  const [dotCount, setDotCount]  = useState(0);
-  const [found, setFound]        = useState(false);
-  const [matchError, setMatchError] = useState<string | null>(null);
-  const scaleAnim = useRef(new Animated.Value(0.92)).current;
-  const glowAnim  = useRef(new Animated.Value(0)).current;
-  const joinedBuyInRef  = useRef(0);
-  const pendingJoinRef  = useRef(false);
-  const celebratedRef   = useRef(false);
+const vc = StyleSheet.create({
+  wrap:        { marginBottom: 6 },
+  sectionLabel:{ fontSize: 9, fontWeight: '700', fontFamily: 'Orbitron_700Bold', letterSpacing: 2.5, color: 'rgba(255,255,255,0.32)', marginBottom: 10, marginTop: 8 },
+  card:        { borderRadius: 18, borderWidth: 1, overflow: 'hidden', padding: 16, gap: 12 },
+  topBar:      { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  header:      { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  iconWrap:    { width: 42, height: 42, borderRadius: 11, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  title:       { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 0, flexShrink: 1 },
+  line:        { fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 2 },
+  divider:     { height: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
+  modeText:    { fontSize: 10, color: 'rgba(255,255,255,0.28)', textAlign: 'center', lineHeight: 15 },
+  playBtn:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 13, borderRadius: 13, borderWidth: 1.5, overflow: 'hidden' },
+  playBtnText: { fontFamily: 'Orbitron_900Black', fontSize: 13, letterSpacing: 2 },
+});
 
-  // All four variants (Texas, Omaha, Short Deck, Joker) are fully supported
-  // by the server — live matchmaking is available for each of them.
-  const liveSupported = true;
-  const availableStakes = STAKES.filter(s => chips >= s.minBuyIn);
+// ─── Live Matching Overlay ────────────────────────────────────────────────────
+// Minimal full-screen overlay shown while the multiplayer socket is finding a
+// table. Replaces the matching step that was buried inside QuickPlayModal.
+
+function LiveMatchingOverlay({
+  visible, found, color, onCancel,
+}: {
+  visible: boolean; found: boolean; color: string; onCancel: () => void;
+}) {
+  const [dotCount, setDotCount] = useState(0);
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!visible) {
-      setStep('opponent'); setOpponent('ai'); setStake(null);
-      setDotCount(0); setFound(false); setMatchError(null);
-      pendingJoinRef.current = false;
-      celebratedRef.current = false;
-      scaleAnim.setValue(0.92);
-      return;
-    }
-    Animated.spring(scaleAnim, { toValue: 1, friction: 6, tension: 100, useNativeDriver: true }).start();
-  }, [visible]);
+    if (!visible || found) return;
+    const t = setInterval(() => setDotCount(d => (d + 1) % 4), 500);
+    return () => clearInterval(t);
+  }, [visible, found]);
 
   useEffect(() => {
-    if (!liveSupported && opponent === 'live') setOpponent('ai');
-  }, [liveSupported]);
-
-  // Animated dot ticker while searching (both AI seating + live matchmaking).
-  useEffect(() => {
-    if (step !== 'matching' || found) return;
-    const dotTimer = setInterval(() => setDotCount(d => (d + 1) % 4), 500);
-    return () => clearInterval(dotTimer);
-  }, [step, found]);
-
-  const celebrate = () => {
-    setFound(true);
+    if (!found) { glowAnim.setValue(0); return; }
     Animated.loop(Animated.sequence([
       Animated.timing(glowAnim, { toValue: 1, duration: 420, useNativeDriver: true }),
       Animated.timing(glowAnim, { toValue: 0.3, duration: 420, useNativeDriver: true }),
     ])).start();
-  };
-
-  // ── AI path: instant offline seating, unchanged timing/feel ──
-  useEffect(() => {
-    if (step !== 'matching' || opponent !== 'ai') return;
-    const foundTimer = setTimeout(() => {
-      celebrate();
-      setTimeout(() => {
-        onClose();
-        router.push(`/game/practice?variant=${variant}&players=5&tier=${QP_TO_GAME[stake?.tier ?? 'STANDARD'] ?? 'mid'}` as any);
-      }, 1000);
-    }, 2400);
-    return () => clearTimeout(foundTimer);
-  }, [step, opponent]);
-
-  // ── Live path: real matchmaking via the multiplayer socket ──
-  // Joins/creates a real-player table first; the server only fills empty
-  // seats with bots as a last resort (after an 8s grace period with < 2
-  // real players seated) — see roomManager.scheduleBotFill.
-  useEffect(() => {
-    if (step !== 'matching' || opponent !== 'live' || !stake) return;
-    setMatchError(null);
-    pendingJoinRef.current = true;
-    if (!connected && !connecting) connect();
-    return () => { pendingJoinRef.current = false; };
-  }, [step, opponent, stake]);
-
-  useEffect(() => {
-    if (!pendingJoinRef.current || !connected || !stake) return;
-    pendingJoinRef.current = false;
-
-    const buyIn = Math.min(chips, stake.maxBuyIn);
-    joinedBuyInRef.current = buyIn;
-    removeChips(buyIn);
-
-    const userId = profile.playerId ?? profile.username;
-    quickJoin(stake.tier as any, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1, variant as any);
-  }, [connected, stake]);
-
-  useEffect(() => {
-    if (step !== 'matching' || opponent !== 'live' || !tableId) return;
-    if (celebratedRef.current) return;
-    celebratedRef.current = true;
-    celebrate();
-    const t = setTimeout(() => {
-      onClose();
-      router.replace('/multiplayer/game' as any);
-    }, 900);
-    return () => clearTimeout(t);
-    // `found` is intentionally excluded — celebrate() sets it, and including it
-    // here would re-run this effect (cancelling the just-scheduled navigation
-    // timer via cleanup) the instant it flips true. celebratedRef guards
-    // against double-firing instead.
-  }, [tableId, step, opponent]);
-
-  useEffect(() => {
-    if (step !== 'matching' || opponent !== 'live' || !error) return;
-    if (joinedBuyInRef.current > 0) {
-      addChips(joinedBuyInRef.current);
-      joinedBuyInRef.current = 0;
-    }
-    setMatchError(error);
-    clearError();
-  }, [error, step, opponent]);
+  }, [found]);
 
   if (!visible) return null;
-
-  const autoTier = getAutoTier(chips);
-  const color = stake?.color ?? STAKES.find(s => s.tier === autoTier)?.color ?? '#00d4ff';
   const dots = '.'.repeat(dotCount);
 
   return (
-    <Modal transparent visible animationType="fade" onRequestClose={onClose}>
-      <View style={qp.overlay}>
-        <Animated.View style={[qp.card, { transform: [{ scale: scaleAnim }] }]}>
+    <Modal transparent visible animationType="fade">
+      <View style={lm.overlay}>
+        <View style={[lm.card, { borderColor: `${color}30` }]}>
           <LinearGradient colors={['#14002e', '#07001a']} style={StyleSheet.absoluteFill} />
-          <View style={[qp.topBar, { backgroundColor: color }]} />
-
-          {/* ── Step 1: Opponent type ── */}
-          {step === 'opponent' && (
+          <View style={[lm.topBar, { backgroundColor: color }]} />
+          {found ? (
             <>
-              <Text style={qp.heading}>WHO DO YOU WANT{'\n'}TO PLAY AGAINST?</Text>
-
-              <TouchableOpacity
-                style={[qp.opponentCard, opponent === 'ai' && qp.opponentCardActive, { borderColor: opponent === 'ai' ? '#00d4ff' : '#222' }]}
-                onPress={() => setOpponent('ai')}
-                activeOpacity={0.8}
-              >
-                {opponent === 'ai' && <LinearGradient colors={['#00d4ff15', 'transparent']} style={StyleSheet.absoluteFill} />}
-                <Text style={qp.opponentEmoji}>🤖</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[qp.opponentTitle, opponent === 'ai' && { color: '#00d4ff' }]}>AI PLAYERS</Text>
-                  <Text style={qp.opponentSub}>Fastest Match · Instant Game</Text>
-                  <Text style={qp.opponentSub}>Fill remaining seats with bots</Text>
-                </View>
-                {opponent === 'ai' && <Ionicons name="checkmark-circle" size={20} color="#00d4ff" />}
+              <Animated.View style={[lm.iconWrap, { opacity: glowAnim }]}>
+                <Ionicons name="checkmark-circle" size={52} color={color} />
+              </Animated.View>
+              <Text style={[lm.title, { color }]}>MATCH FOUND!</Text>
+              <Text style={lm.desc}>Entering table{dots}</Text>
+            </>
+          ) : (
+            <>
+              <View style={lm.iconWrap}>
+                <Ionicons name="search" size={32} color={color} />
+              </View>
+              <Text style={[lm.title, { color }]}>FINDING GAME{dots}</Text>
+              <Text style={lm.desc}>Matched with real players first</Text>
+              <TouchableOpacity style={lm.cancelBtn} onPress={onCancel}>
+                <Text style={lm.cancelText}>Cancel</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  qp.opponentCard, opponent === 'live' && qp.opponentCardActive,
-                  { borderColor: opponent === 'live' ? '#ff0090' : '#222' },
-                  !liveSupported && qp.opponentCardDisabled,
-                ]}
-                onPress={() => liveSupported && setOpponent('live')}
-                activeOpacity={liveSupported ? 0.8 : 1}
-                disabled={!liveSupported}
-              >
-                {opponent === 'live' && <LinearGradient colors={['#ff009015', 'transparent']} style={StyleSheet.absoluteFill} />}
-                <Text style={qp.opponentEmoji}>🌎</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[qp.opponentTitle, opponent === 'live' && { color: '#ff0090' }]}>LIVE PLAYERS</Text>
-                    <Text style={qp.opponentSub}>Matched with real players first</Text>
-                  <Text style={qp.opponentSub}>Bots fill empty seats only as a last resort</Text>
-                </View>
-                {opponent === 'live' && <Ionicons name="checkmark-circle" size={20} color="#ff0090" />}
-              </TouchableOpacity>
-
-              <View style={qp.btnRow}>
-                <TouchableOpacity style={qp.cancelBtn} onPress={onClose}>
-                  <Text style={qp.cancelText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[qp.nextBtn, { backgroundColor: `${opponent === 'ai' ? '#00d4ff' : '#ff0090'}22`, borderColor: opponent === 'ai' ? '#00d4ff' : '#ff0090' }]}
-                  onPress={() => setStep('stakes')}
-                >
-                  <Text style={[qp.nextText, { color: opponent === 'ai' ? '#00d4ff' : '#ff0090' }]}>SELECT STAKES</Text>
-                  <Ionicons name="arrow-forward" size={14} color={opponent === 'ai' ? '#00d4ff' : '#ff0090'} />
-                </TouchableOpacity>
-              </View>
             </>
           )}
-
-          {/* ── Step 2: Stakes ── */}
-          {step === 'stakes' && (
-            <>
-              <View style={qp.stakeHeader}>
-                <Pressable onPress={() => setStep('opponent')} style={qp.backBtn}>
-                  <Ionicons name="chevron-back" size={18} color="rgba(255,255,255,0.5)" />
-                </Pressable>
-                <Text style={qp.heading2}>SELECT TABLE STAKES</Text>
-              </View>
-
-              <Text style={qp.subText}>Only tables you can afford are shown.</Text>
-
-              {availableStakes.length === 0 ? (
-                <View style={qp.noStakesBox}>
-                  <Text style={qp.noStakesText}>Not enough chips for any table.</Text>
-                  <Text style={qp.noStakesSub}>Win more chips in AI Practice first.</Text>
-                </View>
-              ) : (
-                <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
-                  {availableStakes.map(s => {
-                    const active = stake?.tier === s.tier;
-                    return (
-                      <TouchableOpacity
-                        key={s.tier}
-                        style={[qp.stakeRow, active && { borderColor: s.color, backgroundColor: `${s.color}12` }]}
-                        onPress={() => setStake(s)}
-                        activeOpacity={0.8}
-                      >
-                        <View style={[qp.stakeTierBadge, { backgroundColor: `${s.color}18`, borderColor: `${s.color}50` }]}>
-                          <Text style={[qp.stakeTierLabel, { color: s.color }]}>{s.label}</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={[qp.stakeBlinds, { color: active ? s.color : '#ccc' }]}>{s.blinds}</Text>
-                          <Text style={qp.stakeBuyIn}>Buy-in: {formatChips(s.minBuyIn)} – {formatChips(s.maxBuyIn)}</Text>
-                        </View>
-                        {active && <Ionicons name="checkmark-circle" size={18} color={s.color} />}
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              )}
-
-              <View style={qp.btnRow}>
-                <TouchableOpacity style={qp.cancelBtn} onPress={onClose}>
-                  <Text style={qp.cancelText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[qp.nextBtn, (!stake || availableStakes.length === 0) && qp.nextBtnDisabled]}
-                  onPress={() => stake && setStep('matching')}
-                  disabled={!stake}
-                >
-                  <Text style={qp.nextText}>FIND MATCH</Text>
-                  <Ionicons name="flash" size={14} color={stake?.color ?? '#00d4ff'} />
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-
-          {/* ── Step 3: Matching ── */}
-          {step === 'matching' && (
-            <>
-              {matchError ? (
-                <>
-                  <View style={[qp.searchIcon, { borderColor: 'rgba(255,80,80,0.3)' }]}>
-                    <Ionicons name="alert-circle" size={28} color="#ff5050" />
-                  </View>
-                  <Text style={[qp.matchTitle, { color: '#ff5050' }]}>MATCH FAILED</Text>
-                  <Text style={qp.matchDesc}>{matchError}</Text>
-                  <View style={qp.btnRow}>
-                    <TouchableOpacity style={qp.cancelBtn} onPress={onClose}>
-                      <Text style={qp.cancelText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[qp.nextBtn, { backgroundColor: `${color}22`, borderColor: color }]}
-                      onPress={() => { setMatchError(null); setStep('stakes'); }}
-                    >
-                      <Text style={[qp.nextText, { color }]}>TRY AGAIN</Text>
-                    </TouchableOpacity>
-                  </View>
-                </>
-              ) : !found ? (
-                <>
-                  <View style={qp.searchIcon}>
-                    <Ionicons name={opponent === 'ai' ? 'game-controller' : 'search'} size={28} color={color} />
-                  </View>
-                  <Text style={[qp.matchTitle, { color }]}>
-                    {opponent === 'ai' ? 'STARTING GAME' : 'FINDING MATCH'}{dots}
-                  </Text>
-                  <View style={[qp.matchBadge, { borderColor: `${color}50`, backgroundColor: `${color}12` }]}>
-                    <Ionicons name="layers" size={11} color={color} />
-                    <Text style={[qp.matchBadgeLabel, { color }]}>{stake?.label ?? autoTier}</Text>
-                    <Text style={qp.matchBadgeBlinds}>{stake?.blinds}</Text>
-                  </View>
-                  <Text style={qp.matchDesc}>
-                    {opponent === 'ai' ? 'Seating AI players...' : 'Searching for live players near your bankroll...'}
-                  </Text>
-                  <View style={qp.playerRow}>
-                    {[1,2,3,4,5].map(i => (
-                      <View key={i} style={qp.playerSlot}>
-                        <View style={[qp.playerDot, i === 3 && { backgroundColor: color }]} />
-                        <Text style={qp.playerLabel}>{i === 3 ? 'You' : '...'}</Text>
-                      </View>
-                    ))}
-                  </View>
-                  <TouchableOpacity style={qp.cancelBtn} onPress={onClose}>
-                    <Text style={qp.cancelText}>Cancel</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <>
-                  <Animated.View style={[qp.foundIcon, { opacity: glowAnim }]}>
-                    <Ionicons name="checkmark-circle" size={44} color={color} />
-                  </Animated.View>
-                  <Text style={[qp.matchTitle, { color }]}>
-                    {opponent === 'ai' ? 'GAME STARTING!' : 'MATCH FOUND!'}
-                  </Text>
-                  <Text style={qp.matchDesc}>Entering table{dots}</Text>
-                </>
-              )}
-            </>
-          )}
-        </Animated.View>
+        </View>
       </View>
     </Modal>
   );
 }
 
-const qp = StyleSheet.create({
-  overlay:    { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
-  card:       { width: '100%', borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', overflow: 'hidden', padding: 22, gap: 14 },
-  topBar:     { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-
-  heading:    { fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5, color: '#fff', textAlign: 'center', lineHeight: 22 },
-  heading2:   { fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5, color: '#fff', flex: 1 },
-  subText:    { fontSize: 11, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: -6 },
-
-  opponentCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    borderWidth: 1.5, borderRadius: 14, padding: 14,
-    overflow: 'hidden',
-  },
-  opponentCardActive: { },
-  opponentCardDisabled: { opacity: 0.4 },
-  opponentEmoji: { fontSize: 28 },
-  opponentTitle:{ fontSize: 13, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: '#fff', letterSpacing: 0.5 },
-  opponentSub:  { fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 },
-
-  stakeHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  backBtn:     { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
-  stakeRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    borderWidth: 1, borderRadius: 12, borderColor: 'rgba(255,255,255,0.1)',
-    padding: 12, marginBottom: 8,
-  },
-  stakeTierBadge:  { borderWidth: 1, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
-  stakeTierLabel:  { fontFamily: 'Orbitron_700Bold', fontSize: 9, letterSpacing: 1 },
-  stakeBlinds:     { fontFamily: 'Inter_700Bold', fontSize: 15 },
-  stakeBuyIn:      { fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 2 },
-  noStakesBox:     { paddingVertical: 20, alignItems: 'center', gap: 8 },
-  noStakesText:    { fontFamily: 'Orbitron_700Bold', fontSize: 13, color: 'rgba(255,255,255,0.4)' },
-  noStakesSub:     { fontSize: 11, color: 'rgba(255,255,255,0.25)' },
-
-  searchIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', alignSelf: 'center' },
-  foundIcon:  { width: 64, height: 64, alignItems: 'center', justifyContent: 'center', alignSelf: 'center' },
-  matchTitle: { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2, textAlign: 'center' },
-  matchBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, alignSelf: 'center' },
-  matchBadgeLabel: { fontSize: 11, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-  matchBadgeBlinds:{ color: 'rgba(255,255,255,0.35)', fontSize: 10 },
-  matchDesc:   { color: 'rgba(255,255,255,0.4)', fontSize: 12, textAlign: 'center' },
-  playerRow:   { flexDirection: 'row', gap: 10, alignItems: 'center', justifyContent: 'center' },
-  playerSlot:  { alignItems: 'center', gap: 4 },
-  playerDot:   { width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.15)' },
-  playerLabel: { color: 'rgba(255,255,255,0.3)', fontSize: 8, fontWeight: '600' },
-
-  btnRow:       { flexDirection: 'row', gap: 10, marginTop: 4 },
-  cancelBtn:    { flex: 1, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 12 },
-  cancelText:   { color: 'rgba(255,255,255,0.35)', fontSize: 12 },
-  nextBtn:      { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderWidth: 1, borderColor: '#00d4ff', borderRadius: 12, backgroundColor: 'rgba(0,212,255,0.1)' },
-  nextBtnDisabled: { borderColor: 'rgba(255,255,255,0.15)', backgroundColor: 'rgba(255,255,255,0.03)' },
-  nextText:     { fontFamily: 'Orbitron_700Bold', fontSize: 11, color: '#00d4ff', letterSpacing: 1 },
+const lm = StyleSheet.create({
+  overlay:   { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
+  card:      { width: '100%', borderRadius: 22, borderWidth: 1, overflow: 'hidden', padding: 28, gap: 16, alignItems: 'center' },
+  topBar:    { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  iconWrap:  { width: 80, height: 80, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 40, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  title:     { fontFamily: 'Orbitron_700Bold', fontSize: 15, letterSpacing: 2, textAlign: 'center' },
+  desc:      { color: 'rgba(255,255,255,0.4)', fontSize: 12, textAlign: 'center' },
+  cancelBtn: { paddingVertical: 10, paddingHorizontal: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 12, marginTop: 4 },
+  cancelText:{ color: 'rgba(255,255,255,0.35)', fontSize: 12 },
 });
 
 // ─── Private Table Modal ──────────────────────────────────────────────────────
@@ -936,19 +730,112 @@ const pt = StyleSheet.create({
 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
-  const { profile } = useUser();
-  const [qpVisible, setQpVisible]       = useState(false);
-  const [anteVariant, setAnteVariant]   = useState<string | null>(null);
-  const [qpVariant, setQpVariant]       = useState('texas_holdem');
-  const [ptVisible, setPtVisible]       = useState(false);
+  const { profile, removeChips, addChips } = useUser();
+  const {
+    connected, connecting, tableId, error,
+    connect, quickJoin, clearError,
+  } = useMultiplayer();
 
-  function openQuickPlay(variant: string) {
-    setQpVariant(variant);
-    setQpVisible(true);
-  }
+  // ── Persistent AI / LIVE mode (shared across all variant cards) ──────────
+  const [playMode, setPlayMode]     = useState<PlayMode>('ai');
+  const [anteVariant, setAnteVariant] = useState<string | null>(null);
+  const [ptVisible, setPtVisible]   = useState(false);
 
-  const autoTier = getAutoTier(profile.chips);
-  const autoStake = STAKES.find(s => s.tier === autoTier);
+  // ── Live matchmaking state ────────────────────────────────────────────────
+  const [liveState, setLiveState]   = useState<'idle' | 'searching' | 'found'>('idle');
+  const [liveColor, setLiveColor]   = useState('#00d4ff');
+  const livePendingTierRef          = useRef<string | null>(null);
+  const liveVariantRef              = useRef('texas_holdem');
+  const liveBuyInRef                = useRef(0);
+
+  // Load persisted mode on mount
+  useEffect(() => {
+    AsyncStorage.getItem('playMode').then(v => {
+      if (v === 'ai' || v === 'live') setPlayMode(v);
+    });
+  }, []);
+
+  const setAndPersistMode = (m: PlayMode) => {
+    setPlayMode(m);
+    AsyncStorage.setItem('playMode', m);
+  };
+
+  // Connect to server when a live search starts (if not already connected)
+  useEffect(() => {
+    if (liveState !== 'searching') return;
+    if (!connected && !connecting) connect();
+  }, [liveState]);
+
+  // As soon as we're connected and have a pending tier, fire quickJoin
+  useEffect(() => {
+    if (!connected || !livePendingTierRef.current) return;
+    const tier = livePendingTierRef.current;
+    livePendingTierRef.current = null;
+    const userId = profile.playerId ?? profile.username;
+    quickJoin(
+      tier as any, userId, profile.username,
+      profile.symbolIndex ?? profile.avatarIndex ?? 1,
+      liveVariantRef.current as any,
+    );
+  }, [connected]);
+
+  // Table found → navigate
+  useEffect(() => {
+    if (liveState !== 'searching' || !tableId) return;
+    setLiveState('found');
+    setTimeout(() => {
+      router.replace('/multiplayer/game' as any);
+      setLiveState('idle');
+    }, 900);
+  }, [tableId, liveState]);
+
+  // Match error → refund + alert
+  useEffect(() => {
+    if (liveState !== 'searching' || !error) return;
+    if (liveBuyInRef.current > 0) { addChips(liveBuyInRef.current); liveBuyInRef.current = 0; }
+    Alert.alert('Match failed', error);
+    clearError();
+    setLiveState('idle');
+  }, [error, liveState]);
+
+  const handleCancelLive = () => {
+    if (liveBuyInRef.current > 0) { addChips(liveBuyInRef.current); liveBuyInRef.current = 0; }
+    livePendingTierRef.current = null;
+    setLiveState('idle');
+  };
+
+  // Called by StakeSelectModal once the player picks a stake level
+  const handleStakeSelected = (tier: { key: string }) => {
+    const gameTier  = CONFIG_KEY_TO_GAME[tier.key] ?? 'casual';
+    const variant   = anteVariant ?? 'texas_holdem';
+    setAnteVariant(null);
+
+    if (playMode === 'ai') {
+      router.push(`/game/practice?variant=${variant}&players=5&tier=${gameTier}` as any);
+    } else {
+      // LIVE path: deduct buy-in → start matchmaking
+      const stakeKey  = STAKE_KEY_TO_TIER[tier.key] ?? 'MICRO';
+      const stakeData = STAKES.find(s => s.tier === stakeKey);
+      const chips     = profile.chips ?? 0;
+      const buyIn     = Math.min(chips, stakeData?.maxBuyIn ?? 250_000);
+      liveBuyInRef.current    = buyIn;
+      liveVariantRef.current  = variant;
+      setLiveColor(stakeData?.color ?? '#00d4ff');
+      removeChips(buyIn);
+      setLiveState('searching');
+      if (connected) {
+        const userId = profile.playerId ?? profile.username;
+        quickJoin(
+          stakeKey as any, userId, profile.username,
+          profile.symbolIndex ?? profile.avatarIndex ?? 1,
+          variant as any,
+        );
+      } else {
+        livePendingTierRef.current = stakeKey;
+        if (!connecting) connect();
+      }
+    }
+  };
 
   return (
     <View style={s.container}>
@@ -957,7 +844,6 @@ export default function PlayScreen() {
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
-
 
       <ScrollView
         contentContainerStyle={[s.scroll, {
@@ -970,97 +856,51 @@ export default function PlayScreen() {
         <Text style={s.pageSub}>Choose your game mode</Text>
 
         {/* ── TRADITIONAL HOLD'EM ─────────────────────────────────────── */}
-        <SectionCard
+        <VariantCard
           section="TRADITIONAL HOLD'EM"
           accent="#00d4ff"
-          icon="card-outline"
+          iconNode={<Ionicons name="card-outline" size={20} color="#00d4ff" />}
           title="NO LIMIT HOLD'EM"
-          lines={['52-card deck · Standard rankings', 'Full House beats Flush']}
-          options={[
-            {
-              label:   'AI PRACTICE',
-              icon:    'game-controller-outline',
-              sub:     'vs AI bots — fully offline',
-              onPress: () => setAnteVariant('texas_holdem'),
-            },
-            {
-              label:   'QUICK PLAY',
-              icon:    'flash-outline',
-              sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'} · ${autoStake?.blinds ?? ''}`,
-              onPress: () => openQuickPlay('texas_holdem'),
-            },
-          ]}
+          lines={["52-card deck · Standard rankings", "Full House beats Flush"]}
+          playMode={playMode}
+          onModeChange={setAndPersistMode}
+          onPlay={() => setAnteVariant('texas_holdem')}
         />
 
         {/* ── SHORT DECK HOLD'EM ──────────────────────────────────────── */}
-        <SectionCard
+        <VariantCard
           section="SHORT DECK HOLD'EM"
           accent="#ff0090"
-          icon="layers-outline"
+          iconNode={<Ionicons name="layers-outline" size={20} color="#ff0090" />}
           title="SHORT DECK HOLD'EM"
-          lines={['36-card deck · 6 through Ace only', 'Flush beats Full House']}
-          options={[
-            {
-              label:   'AI PRACTICE',
-              icon:    'game-controller-outline',
-              sub:     'vs AI bots — fully offline',
-              onPress: () => setAnteVariant('short_deck_holdem'),
-            },
-            {
-              label:   'QUICK PLAY',
-              icon:    'flash-outline',
-              sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'} · ${autoStake?.blinds ?? ''}`,
-              onPress: () => openQuickPlay('short_deck_holdem'),
-            },
-          ]}
+          lines={["36-card deck · 6 through Ace only", "Flush beats Full House"]}
+          playMode={playMode}
+          onModeChange={setAndPersistMode}
+          onPlay={() => setAnteVariant('short_deck_holdem')}
         />
 
         {/* ── JOKER HOLD'EM ───────────────────────────────────────────── */}
-        <SectionCard
+        <VariantCard
           section="JOKER HOLD'EM"
           accent="#ffd700"
-          icon="sparkles-outline"
+          iconNode={<JokerHoldemIcon size={20} color="#ffd700" />}
           title="JOKER HOLD'EM"
           lines={["54-card deck · Two Wild Jokers", "Five of a Kind beats Royal Flush"]}
-          options={[
-            {
-              label:    'AI PRACTICE',
-              icon:     'game-controller-outline',
-              iconNode: <JokerHoldemIcon size={15} color="#ffd700" />,
-              sub:      'Wild Jokers · vs AI bots · fully offline',
-              onPress:  () => setAnteVariant('joker_holdem'),
-            },
-            {
-              label:   'QUICK PLAY',
-              icon:    'flash-outline',
-              sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'}`,
-              onPress: () => openQuickPlay('joker_holdem'),
-            },
-          ]}
+          playMode={playMode}
+          onModeChange={setAndPersistMode}
+          onPlay={() => setAnteVariant('joker_holdem')}
         />
 
         {/* ── OMAHA HOLD'EM ───────────────────────────────────────────── */}
-        <SectionCard
+        <VariantCard
           section="OMAHA HOLD'EM"
           accent="#00ff88"
-          icon="grid-outline"
+          iconNode={<OmahaIcon size={20} color="#00ff88" />}
           title="OMAHA HOLD'EM"
-          lines={["52-card deck · 4 hole cards per player", "Must use exactly 2 hole + 3 board cards"]}
-          options={[
-            {
-              label:    'AI PRACTICE',
-              icon:     'game-controller-outline',
-              iconNode: <OmahaIcon size={15} color="#00ff88" />,
-              sub:      '4 hole cards · vs AI bots · fully offline',
-              onPress:  () => setAnteVariant('omaha_holdem'),
-            },
-            {
-              label:   'QUICK PLAY',
-              icon:    'flash-outline',
-              sub:     `Auto-matched to ${autoStake?.label ?? 'your bracket'} · ${autoStake?.blinds ?? ''}`,
-              onPress: () => openQuickPlay('omaha_holdem'),
-            },
-          ]}
+          lines={["52-card deck · 4 hole cards per player", "Use exactly 2 hole + 3 board cards"]}
+          playMode={playMode}
+          onModeChange={setAndPersistMode}
+          onPlay={() => setAnteVariant('omaha_holdem')}
         />
 
         {/* ── CASINO ──────────────────────────────────────────────────── */}
@@ -1071,55 +911,13 @@ export default function PlayScreen() {
           title="CASINO GAMES"
           lines={['House games · Win chips against the dealer']}
           options={[
-            {
-              label:    'THREE CARD POKER',
-              icon:     'card-outline',
-              iconNode: <ThreeCardPokerIcon size={15} color="#ffd700" />,
-              sub:      'Ante · Pair Plus · 6 Card Bonus',
-              onPress:  () => router.push('/casino/three-card-poker' as any),
-            },
-            {
-              label:    'BLACKJACK',
-              icon:     'card-outline',
-              iconNode: <BlackjackIcon size={15} color="#ffd700" />,
-              sub:      'Six Deck · Beat the dealer',
-              onPress:  () => router.push('/casino/blackjack' as any),
-            },
-            {
-              label:    'ULTIMATE TEXAS HOLD\'EM',
-              icon:     'card-outline',
-              iconNode: <UltimateHoldemIcon size={15} color="#ffd700" />,
-              sub:      'Ante · Blind · Trips Bonus · Play up to 4×',
-              onPress:  () => router.push('/casino/ultimate-texas-holdem' as any),
-            },
-            {
-              label:    'CASINO WAR',
-              icon:     'flash-outline',
-              iconNode: <CasinoWarIcon size={15} color="#ffd700" />,
-              sub:      'Instant action · Tie pays 10:1 · Go to War',
-              onPress:  () => router.push('/casino/casino-war' as any),
-            },
-            {
-              label:    'HIGH CARD FLUSH',
-              icon:     'layers-outline',
-              iconNode: <HighCardFlushIcon size={15} color="#ffd700" />,
-              sub:      '7 cards · Longest flush wins · Ante + optional bonuses',
-              onPress:  () => router.push('/casino/high-card-flush' as any),
-            },
-            {
-              label:    'LET IT RIDE',
-              icon:     'card-outline',
-              iconNode: <LetItRideIcon size={15} color="#ffd700" />,
-              sub:      'Three bets · Pull back two · Pair of 10s to win',
-              onPress:  () => router.push('/casino/let-it-ride' as any),
-            },
-            {
-              label:    'MISSISSIPPI STUD',
-              icon:     'layers-outline',
-              iconNode: <MississippiStudIcon size={15} color="#ffd700" />,
-              sub:      '2 hole cards + 3 community · 3 street bets · Jacks or better wins',
-              onPress:  () => router.push('/casino/mississippi-stud' as any),
-            },
+            { label: 'THREE CARD POKER', icon: 'card-outline', iconNode: <ThreeCardPokerIcon size={15} color="#ffd700" />, sub: 'Ante · Pair Plus · 6 Card Bonus', onPress: () => router.push('/casino/three-card-poker' as any) },
+            { label: 'BLACKJACK', icon: 'card-outline', iconNode: <BlackjackIcon size={15} color="#ffd700" />, sub: 'Six Deck · Beat the dealer', onPress: () => router.push('/casino/blackjack' as any) },
+            { label: "ULTIMATE TEXAS HOLD'EM", icon: 'card-outline', iconNode: <UltimateHoldemIcon size={15} color="#ffd700" />, sub: 'Ante · Blind · Trips Bonus · Play up to 4×', onPress: () => router.push('/casino/ultimate-texas-holdem' as any) },
+            { label: 'CASINO WAR', icon: 'flash-outline', iconNode: <CasinoWarIcon size={15} color="#ffd700" />, sub: 'Instant action · Tie pays 10:1 · Go to War', onPress: () => router.push('/casino/casino-war' as any) },
+            { label: 'HIGH CARD FLUSH', icon: 'layers-outline', iconNode: <HighCardFlushIcon size={15} color="#ffd700" />, sub: '7 cards · Longest flush wins · Ante + optional bonuses', onPress: () => router.push('/casino/high-card-flush' as any) },
+            { label: 'LET IT RIDE', icon: 'card-outline', iconNode: <LetItRideIcon size={15} color="#ffd700" />, sub: 'Three bets · Pull back two · Pair of 10s to win', onPress: () => router.push('/casino/let-it-ride' as any) },
+            { label: 'MISSISSIPPI STUD', icon: 'layers-outline', iconNode: <MississippiStudIcon size={15} color="#ffd700" />, sub: '2 hole cards + 3 community · 3 street bets · Jacks or better wins', onPress: () => router.push('/casino/mississippi-stud' as any) },
           ]}
         />
 
@@ -1131,52 +929,29 @@ export default function PlayScreen() {
           title="PRIVATE TABLE"
           lines={['Host or join a game with friends', 'Custom stakes · Room codes']}
           options={[
-            {
-              label:   'CREATE TABLE',
-              icon:    'add-circle-outline',
-              sub:     'Set stakes + get a shareable room code',
-              onPress: () => setPtVisible(true),
-            },
-            {
-              label:   'JOIN TABLE',
-              icon:    'enter-outline',
-              sub:     'Enter a room code to join a friend\'s table',
-              onPress: () => setPtVisible(true),
-            },
-            {
-              label:   'OPEN LOBBY',
-              icon:    'globe-outline',
-              sub:     'Browse all public tables',
-              onPress: () => router.push('/multiplayer/lobby' as any),
-            },
+            { label: 'CREATE TABLE', icon: 'add-circle-outline', sub: 'Set stakes + get a shareable room code', onPress: () => setPtVisible(true) },
+            { label: 'JOIN TABLE', icon: 'enter-outline', sub: "Enter a room code to join a friend's table", onPress: () => setPtVisible(true) },
+            { label: 'OPEN LOBBY', icon: 'globe-outline', sub: 'Browse all public tables', onPress: () => router.push('/multiplayer/lobby' as any) },
           ]}
         />
 
       </ScrollView>
 
-      <QuickPlayModal
-        visible={qpVisible}
-        variant={qpVariant}
-        chips={profile.chips}
-        onClose={() => setQpVisible(false)}
-      />
-
-      <PrivateTableModal
-        visible={ptVisible}
-        onClose={() => setPtVisible(false)}
-      />
+      <PrivateTableModal visible={ptVisible} onClose={() => setPtVisible(false)} />
 
       <StakeSelectModal
         visible={anteVariant !== null}
         chips={profile.chips}
         title="CHOOSE YOUR STAKES"
         onBack={() => setAnteVariant(null)}
-        onSelect={tier => {
-          const gameTier = CONFIG_KEY_TO_GAME[tier.key] ?? 'casual';
-          const variant  = anteVariant ?? 'texas_holdem';
-          setAnteVariant(null);
-          router.push(`/game/practice?variant=${variant}&players=5&tier=${gameTier}` as any);
-        }}
+        onSelect={handleStakeSelected}
+      />
+
+      <LiveMatchingOverlay
+        visible={liveState !== 'idle'}
+        found={liveState === 'found'}
+        color={liveColor}
+        onCancel={handleCancelLive}
       />
     </View>
   );

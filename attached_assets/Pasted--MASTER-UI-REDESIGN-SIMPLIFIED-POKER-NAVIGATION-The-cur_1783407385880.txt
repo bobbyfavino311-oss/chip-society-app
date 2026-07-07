@@ -1,0 +1,385 @@
+# MASTER UI REDESIGN — SIMPLIFIED POKER NAVIGATION
+
+The current navigation for poker variants requires too many unnecessary decisions.
+
+Currently the flow is:
+
+Variant
+↓
+
+AI Practice or Quick Play
+↓
+
+Quick Play opens another popup asking:
+
+Who do you want to play against?
+
+↓
+
+AI or Live
+
+↓
+
+Stake Selection
+
+This is confusing, repetitive, and adds unnecessary taps.
+
+The backend already correctly supports AI and Live matchmaking.
+
+This update is ONLY a navigation redesign.
+
+Do NOT rewrite matchmaking or networking.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# OBJECTIVE
+
+Redesign the poker navigation to make starting a game feel immediate, modern, and intuitive.
+
+Players should instantly understand whether they are playing:
+
+• AI
+or
+• Live Players
+
+without unnecessary popups.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REMOVE THE CURRENT LAYOUT
+
+Delete the following from every poker variant:
+
+• AI Practice
+• Quick Play
+
+Do not replace them with more buttons.
+
+The current popup asking:
+
+"Who do you want to play against?"
+
+must also be removed completely.
+
+Delete:
+
+• AI Players popup option
+• Live Players popup option
+• Select Stakes popup button
+• Cancel button
+
+This entire screen should no longer exist.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# NEW VARIANT LAYOUT
+
+Each poker variant should have exactly the following structure:
+
+Variant Icon
+
+Variant Name
+
+Short Description
+
+AI / LIVE Mode Toggle
+
+PLAY Button
+
+Nothing else.
+
+Example:
+
+NO LIMIT HOLD'EM
+
+52-card deck
+
+Standard hand rankings
+
+[ AI ]      [ LIVE ]
+
+PLAY →
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# AI / LIVE TOGGLE
+
+Replace the old buttons with a segmented control.
+
+Example:
+
+[ 🤖 AI ]    [ 🌐 LIVE ]
+
+Only one option may be selected.
+
+The selected option should glow using the variant's accent color.
+
+This selector should remain visible at all times.
+
+The player always knows what mode they're entering.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REMEMBER PLAYER CHOICE
+
+The selected mode should persist.
+
+If the player selects:
+
+LIVE
+
+Every poker variant should remember LIVE until the player changes it.
+
+If they later switch to AI:
+
+All poker variants now default to AI.
+
+Do not ask every time.
+
+Store this preference locally.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# SINGLE PLAY BUTTON
+
+Each poker variant should only have ONE Play button.
+
+Example:
+
+PLAY →
+
+No additional prompts.
+
+No extra confirmation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PLAY BUTTON BEHAVIOR
+
+If AI mode is selected:
+
+PLAY
+
+↓
+
+Stake Selection
+
+↓
+
+Launch AI game immediately.
+
+No matchmaking.
+
+No popup.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+If LIVE mode is selected:
+
+PLAY
+
+↓
+
+Stake Selection
+
+↓
+
+Matchmaking
+
+↓
+
+Join multiplayer table
+
+↓
+
+Fill remaining seats with AI if necessary.
+
+No popup.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# STAKE SELECTION
+
+The stake selection screen remains exactly as it currently works.
+
+The only change:
+
+It opens directly after pressing PLAY.
+
+Do not ask the player who they want to play against first.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# MODE STATUS TEXT
+
+Directly underneath the AI / LIVE selector display one line of subtle helper text.
+
+If AI selected:
+
+Playing against AI bots.
+
+If LIVE selected:
+
+Matched with real players.
+
+Bots fill empty seats if needed.
+
+Small font.
+
+Low opacity.
+
+Informative only.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# VARIANT CARDS
+
+Apply this identical layout to every poker variant.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+NO LIMIT HOLD'EM
+
+52-card deck
+
+Standard hand rankings
+
+[ AI ] [ LIVE ]
+
+PLAY →
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+SHORT DECK HOLD'EM
+
+36-card deck
+
+Flush beats Full House
+
+[ AI ] [ LIVE ]
+
+PLAY →
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+OMAHA HOLD'EM
+
+Four hole cards
+
+Use exactly two hole cards
+
+[ AI ] [ LIVE ]
+
+PLAY →
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+JOKER HOLD'EM
+
+Wild Joker
+
+Five of a Kind enabled
+
+[ AI ] [ LIVE ]
+
+PLAY →
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# ICONS
+
+Replace confusing icons.
+
+Use:
+
+🤖
+
+for AI
+
+🌐
+
+for LIVE
+
+The distinction should be obvious at first glance.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BACKEND WIRING
+
+Do NOT rewrite backend logic.
+
+Simply wire:
+
+AI Toggle
+
+↓
+
+AI Matchmaking
+
+LIVE Toggle
+
+↓
+
+Live Matchmaking
+
+Everything behind the scenes already exists.
+
+This update only changes navigation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# USER EXPERIENCE
+
+The player flow should now be:
+
+Choose Poker Variant
+
+↓
+
+Select AI or LIVE (persistent)
+
+↓
+
+Press PLAY
+
+↓
+
+Select Stakes
+
+↓
+
+Game Starts
+
+There should never again be an additional popup asking:
+
+"Who do you want to play against?"
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ AI Practice button removed.
+
+✅ Quick Play button removed.
+
+✅ "Who do you want to play against?" popup removed.
+
+✅ Every poker variant has one AI/LIVE toggle.
+
+✅ Every poker variant has one PLAY button.
+
+✅ Player preference persists across app sessions.
+
+✅ AI launches AI backend.
+
+✅ LIVE launches multiplayer backend.
+
+✅ Stake selection opens directly after PLAY.
+
+✅ No matchmaking logic is changed.
+
+✅ No networking code is changed.
+
+The result should be a cleaner, faster, and more intuitive poker navigation system that reduces taps, eliminates redundant decisions, and clearly communicates whether the player is entering an AI game or a live multiplayer game.
