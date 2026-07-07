@@ -9,6 +9,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMultiplayer } from '@/context/MultiplayerContext';
 import { useUser } from '@/context/UserContext';
+import { useAchievements } from '@/context/AchievementContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useInGameChat, GameChatPanel } from '@/components/InGameChat';
 import { formatChips } from '@/lib/multiplayerTypes';
@@ -66,6 +67,7 @@ function toChromePlayer(s: SeatView, gs: ClientGameState) {
 export default function MultiplayerGame() {
   const { gameState, sendAction, leaveTable, tableId, buyIn, chatMessages, sendChat, setSitOut: emitSitOut } = useMultiplayer();
   const { addChips, updateProfile, profile } = useUser();
+  const { recordGameWin, recordGameLoss, recordOmahaHand, onChipBalance } = useAchievements();
   const { isMusicMuted, toggleMusicMute } = useSoundSettings();
   const { theme } = useTableTheme();
   const chat = useInGameChat();
@@ -107,10 +109,19 @@ export default function MultiplayerGame() {
     if (iWon && myWinEntry) {
       handsWonRef.current++;
       xpEarnedRef.current += 500 + Math.min(500, Math.floor(myWinEntry.amount / 200));
+      // Award achievement progress — handRank is the base hand name from the server
+      const handDesc = myWinEntry.handRank ?? '';
+      const myChips  = gs.mySeat !== -1 ? (gs.seats[gs.mySeat]?.chips ?? 0) : 0;
+      recordGameWin(handDesc, false, myWinEntry.amount, gs.variant);
+      onChipBalance(myChips);
+      if (gs.variant === 'omaha_holdem') recordOmahaHand();
     } else if (gs.mySeat !== -1) {
       handsLostRef.current++;
       xpEarnedRef.current += 150;
+      recordGameLoss();
+      if (gs.variant === 'omaha_holdem') recordOmahaHand();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gs?.winners, gs?.phase]);
 
   useEffect(() => {

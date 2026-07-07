@@ -13,6 +13,7 @@ import {
   ALL_ACHIEVEMENTS,
   HAND_TO_ACHIEVEMENT,
   OMAHA_HAND_TO_ACHIEVEMENT,
+  normalizeHandName,
 } from '@/lib/achievements';
 import { useUser } from '@/context/UserContext';
 import { SoundEngine } from '@/lib/soundEngine';
@@ -183,7 +184,9 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     setLastHandLost(false);
 
     // Hand type achievement — count-based (10 wins required, except Royal Flush = 1)
-    const handAchId = HAND_TO_ACHIEVEMENT[handDesc];
+    // normalizeHandName strips rank detail from describeHand() output so the
+    // lookup works for every variant (e.g. "Pair of Aces" → "One Pair").
+    const handAchId = HAND_TO_ACHIEVEMENT[normalizeHandName(handDesc)];
     if (handAchId && !unlockedRef.current.has(handAchId)) {
       const ach = ACHIEVEMENT_MAP[handAchId];
       const target = ach?.target ?? 10;
@@ -218,7 +221,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
       handCountsRef.current = withWins;
       setHandCounts(withWins);
       if (omahaWins === 1) unlock('omaha_first_win');
-      const omahaHandAchId = OMAHA_HAND_TO_ACHIEVEMENT[handDesc];
+      const omahaHandAchId = OMAHA_HAND_TO_ACHIEVEMENT[normalizeHandName(handDesc)];
       if (omahaHandAchId) unlock(omahaHandAchId);
     }
 

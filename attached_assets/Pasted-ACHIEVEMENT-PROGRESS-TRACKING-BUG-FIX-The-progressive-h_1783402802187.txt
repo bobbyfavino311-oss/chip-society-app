@@ -1,0 +1,267 @@
+ACHIEVEMENT PROGRESS TRACKING BUG FIX
+
+The progressive hand achievements are not tracking correctly.
+
+Current issue:
+
+Achievements that require repeated wins, such as:
+
+* Win 10 hands with One Pair
+* Win 10 hands with Two Pair
+* Win 10 hands with Three of a Kind
+* Win 10 hands with a Straight
+* Win 10 hands with a Flush
+* Win 10 hands with a Full House
+* Win 10 hands with Four of a Kind
+
+are staying stuck at:
+
+0 / 10
+
+They should increase every time the player wins a qualifying hand.
+
+⸻
+
+REQUIRED BEHAVIOR
+
+If a player wins a hand with One Pair:
+
+Pocket Rockets should update:
+
+1 / 10
+
+If they win another hand with One Pair:
+
+2 / 10
+
+Continue until:
+
+10 / 10
+
+Then unlock the achievement and award the rewards.
+
+The same logic applies to every other hand-based achievement.
+
+⸻
+
+TRACKING RULE
+
+Only count hands that the player wins.
+
+Do not count hands where the player folds.
+
+Do not count hands where the player loses at showdown.
+
+Do not count hands where the hand type appears on the board but the player does not win.
+
+⸻
+
+ACHIEVEMENT COUNTERS
+
+Each achievement needs its own persistent counter.
+
+Examples:
+
+onePairWins
+
+twoPairWins
+
+threeOfKindWins
+
+straightWins
+
+flushWins
+
+fullHouseWins
+
+fourOfKindWins
+
+straightFlushWins
+
+royalFlushWins
+
+fiveOfKindWins
+
+These counters must be saved server-side.
+
+They must persist after logout, app restart, and device switch.
+
+⸻
+
+HAND RESULT HOOK
+
+After every completed hand, the game should run:
+
+1. Determine winner.
+2. Determine winning hand type.
+3. If the human player won, increment the matching achievement counter.
+4. Save counter to backend.
+5. Update achievement progress immediately.
+6. If progress reaches requirement, unlock achievement.
+7. Award chips / XP / item reward.
+8. Show achievement popup.
+
+⸻
+
+REQUIRED EXAMPLES
+
+If the player wins with One Pair:
+
+Pocket Rockets:
+
++1 progress
+
+If player wins with Two Pair:
+
+Double Down:
+
++1 progress
+
+If player wins with Three of a Kind:
+
+Set the Table:
+
++1 progress
+
+If player wins with Straight:
+
+Straight Shooter:
+
++1 progress
+
+If player wins with Flush:
+
+Suited Up:
+
++1 progress
+
+If player wins with Full House:
+
+Full House:
+
++1 progress
+
+If player wins with Four of a Kind:
+
+Quad Squad:
+
++1 progress
+
+⸻
+
+APPLY TO ALL POKER MODES
+
+This must work in:
+
+* Traditional Hold’em
+* Short Deck Hold’em
+* Omaha Hold’em
+* Joker Hold’em
+* AI Practice
+* Real Multiplayer
+* Private Tables
+* Tournaments
+
+Do not only fix one mode.
+
+Use one shared achievement tracking function across all poker variants.
+
+⸻
+
+JOKER HOLD’EM SPECIAL CASE
+
+Joker Hold’em must correctly track:
+
+* One Pair
+* Two Pair
+* Three of a Kind
+* Straight
+* Flush
+* Full House
+* Four of a Kind
+* Five of a Kind
+
+If Joker creates the winning hand, it still counts.
+
+Example:
+
+Joker + pair on board = Three of a Kind win.
+
+Increment:
+
+threeOfKindWins
+
+⸻
+
+OMAHA SPECIAL CASE
+
+Omaha must use the final valid Omaha hand.
+
+Exactly 2 hole cards + exactly 3 board cards.
+
+The achievement must count the actual winning Omaha hand, not an invalid Hold’em-style hand.
+
+⸻
+
+SHORT DECK SPECIAL CASE
+
+Short Deck must follow Short Deck hand rankings.
+
+Whatever the winning hand is under Short Deck rules should be the hand type that progresses the achievement.
+
+⸻
+
+UI UPDATE
+
+After each qualifying win:
+
+The achievement page should immediately reflect the new progress.
+
+Example:
+
+0 / 10
+
+becomes
+
+1 / 10
+
+without requiring logout, restart, or refresh.
+
+⸻
+
+ACHIEVEMENT UNLOCK
+
+When progress reaches 10 / 10:
+
+Unlock the achievement.
+
+Award the listed reward.
+
+Example:
+
+Pocket Rockets:
+
+200 chips + 30 XP
+
+Then mark as complete.
+
+Completed achievements should no longer show as locked.
+
+⸻
+
+FINAL VALIDATION
+
+Test:
+
+1. Win with One Pair.
+2. Verify Pocket Rockets becomes 1 / 10.
+3. Win another One Pair hand.
+4. Verify it becomes 2 / 10.
+5. Repeat until 10 / 10.
+6. Verify achievement unlocks.
+7. Verify reward is awarded.
+8. Repeat for Two Pair, Trips, Straight, Flush, Full House, Quads.
+9. Logout and log back in.
+10. Verify progress is still saved.
+
+No achievement requiring repeated winning hands should ever remain stuck at 0 / 10 after qualifying wins.

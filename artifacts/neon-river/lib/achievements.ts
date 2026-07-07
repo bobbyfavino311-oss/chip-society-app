@@ -330,6 +330,29 @@ export const HAND_TO_ACHIEVEMENT: Record<string, string> = {
   'Royal Flush':     'hand_royal_flush',
 };
 
+/**
+ * Converts a detailed describeHand() string (e.g. "Pair of Aces",
+ * "Two Pair — Kings & Jacks", "Straight — A high") back to the base
+ * hand name used as keys in HAND_TO_ACHIEVEMENT.
+ *
+ * describeHand() embeds rank detail for display; this strips it so
+ * achievement lookups always work regardless of variant or kicker info.
+ */
+export function normalizeHandName(desc: string): string {
+  if (desc === 'Royal Flush')              return 'Royal Flush';
+  if (desc.startsWith('Five of a Kind'))   return 'Five of a Kind';
+  if (desc.startsWith('Straight Flush'))   return 'Straight Flush';
+  if (desc.startsWith('Four of a Kind'))   return 'Four of a Kind';
+  if (desc.startsWith('Full House'))       return 'Full House';
+  if (desc.startsWith('Flush'))            return 'Flush';
+  if (desc.startsWith('Straight'))         return 'Straight';
+  if (desc.startsWith('Three of a Kind'))  return 'Three of a Kind';
+  if (desc.startsWith('Two Pair'))         return 'Two Pair';
+  // "Pair of Aces", "Pair of Kings", etc.
+  if (desc.startsWith('Pair of'))          return 'One Pair';
+  return desc;
+}
+
 export const OMAHA_HAND_TO_ACHIEVEMENT: Record<string, string> = {
   'Full House':      'omaha_full_house',
   'Flush':           'omaha_flush',
