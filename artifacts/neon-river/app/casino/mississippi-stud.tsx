@@ -15,9 +15,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
 import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
+import CasinoBetAdjuster from '@/components/CasinoBetAdjuster';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { useSoundSettings } from '@/context/SoundContext';
+import { buildBonusSteps } from '@/lib/casinoTableLimits';
 import { MusicEngine } from '@/lib/musicEngine';
 import type { CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
@@ -207,7 +209,9 @@ export default function MississippiStudScreen() {
   // ── Game state ────────────────────────────────────────────────────────────
   const [phase,         setPhase]         = useState<MSPhase>('stake');
   const [stake,         setStake]         = useState<CasinoTableLimit | null>(null);
-  const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+  const BONUS_STEPS: [0, number, number, number, number] = stake
+    ? buildBonusSteps(stake)
+    : [0, 250_000, 500_000, 750_000, 1_000_000];
   type BonusIdx = 0 | 1 | 2 | 3 | 4;
   const [ante,           setAnte]          = useState(0);
   const [threeCardIdx,   setThreeCardIdx]  = useState<BonusIdx>(0);
@@ -439,7 +443,7 @@ export default function MississippiStudScreen() {
   }
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  const anteAmt     = stake?.minBet ?? 0;
+  const anteAmt     = ante;
   const dealCost    = anteAmt + threeCardBet;
   const canDeal     = profile.chips >= dealCost;
   const isBusted    = profile.chips < (stake?.minBet ?? 0);
@@ -629,6 +633,15 @@ export default function MississippiStudScreen() {
         {/* BETTING phase */}
         {phase === 'betting' && (
           <>
+            {stake && (
+              <CasinoBetAdjuster
+                value={ante}
+                limit={stake}
+                onChange={(v) => { setAnte(v); anteRef.current = v; }}
+                label="ANTE"
+                accent={accent}
+              />
+            )}
             <TouchableOpacity
               onPress={() => {
                 const nextIdx = ((threeCardIdx + 1) % 5) as BonusIdx;

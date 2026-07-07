@@ -14,10 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
 import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
+import CasinoBetAdjuster from '@/components/CasinoBetAdjuster';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
+import { buildBonusSteps } from '@/lib/casinoTableLimits';
 import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   dealCasinoWar, dealWarCards, resolveCasinoWar,
@@ -217,7 +219,9 @@ export default function CasinoWarScreen() {
   // ── Phase / game state ───────────────────────────────────────────────────────
   const [phase,         setPhase]         = useState<Phase>('stake');
   const [stake,         setStake]         = useState<CasinoTableLimit | null>(null);
-  const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+  const BONUS_STEPS: [0, number, number, number, number] = stake
+    ? buildBonusSteps(stake)
+    : [0, 250_000, 500_000, 750_000, 1_000_000];
   type TieBetIdx = 0 | 1 | 2 | 3 | 4;
   const [ante,          setAnte]          = useState(0);
   const [tieBetMult,    setTieBetMult]    = useState<TieBetIdx>(0);
@@ -636,6 +640,16 @@ export default function CasinoWarScreen() {
 
         {/* Deal button */}
         {phase === 'betting' && (
+          <>
+            {stake && (
+              <CasinoBetAdjuster
+                value={ante}
+                limit={stake}
+                onChange={setAnte}
+                label="ANTE"
+                accent="#ffd700"
+              />
+            )}
           <View style={s.btnRow}>
             <ActionBtn
               label="DEAL"
@@ -646,6 +660,7 @@ export default function CasinoWarScreen() {
               fill
             />
           </View>
+          </>
         )}
 
         {/* War options */}

@@ -14,7 +14,8 @@ import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
-import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
+import { type CasinoTableLimit, buildBonusSteps } from '@/lib/casinoTableLimits';
+import CasinoBetAdjuster from '@/components/CasinoBetAdjuster';
 import {
   createTCPDeck, shuffleTCPDeck, dealBiasedHands,
   evaluateThreeCardHand, tcpDealerQualifies, compareThreeCardHands,
@@ -26,7 +27,7 @@ import type { Card } from '@/lib/pokerEngine';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase   = 'betting' | 'action' | 'result';
-const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+const _BONUS_STEPS_FALLBACK: [0, number, number, number, number] = [0, 250_000, 500_000, 750_000, 1_000_000];
 type BonusIdx = 0 | 1 | 2 | 3 | 4;
 
 interface TCPResult {
@@ -261,6 +262,10 @@ export default function ThreeCardPokerScreen() {
   }, [isMusicMuted]);
 
   const [selectedTier,   setSelectedTier]   = useState<CasinoTableLimit | null>(null);
+  const [anteBet,        setAnteBet]        = useState(0);
+  const BONUS_STEPS: [0, number, number, number, number] = selectedTier
+    ? buildBonusSteps(selectedTier)
+    : _BONUS_STEPS_FALLBACK;
 
   const [phase,          setPhase]          = useState<Phase>('betting');
   const [ppMult,         setPpMult]         = useState<BonusIdx>(0);
@@ -277,9 +282,6 @@ export default function ThreeCardPokerScreen() {
   const [busy,           setBusy]           = useState(false);
   const [showPT,         setShowPT]         = useState(false);
   const [played,         setPlayed]         = useState(false);
-
-  // Ante is always derived from the selected stake tier
-  const anteBet = selectedTier?.minBet ?? 0;
 
   const ppBet         = BONUS_STEPS[ppMult];
   const scBet         = BONUS_STEPS[scMult];
@@ -762,7 +764,7 @@ export default function ThreeCardPokerScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={[gs.tableTierName, { color: selectedTier.color }]}>{selectedTier.label} TABLE</Text>
                 <Text style={gs.tableAnteInfo}>
-                  MIN BET {fmt(anteBet)} · PAIR+ up to 1M · 6CB up to 1M
+                  BET {fmt(selectedTier.minBet)}–{fmt(selectedTier.maxBet)} · SIDE BETS UP TO {fmt(selectedTier.maxBet)}
                 </Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedTier(null)} style={gs.changeTableBtn} activeOpacity={0.75}>
@@ -770,6 +772,15 @@ export default function ThreeCardPokerScreen() {
               </TouchableOpacity>
             </View>
 
+            {selectedTier && (
+              <CasinoBetAdjuster
+                value={anteBet}
+                limit={selectedTier}
+                onChange={setAnteBet}
+                label="ANTE"
+                accent="#ffd700"
+              />
+            )}
             <Text style={gs.controlHint}>
               Tap PAIR PLUS or 6 CARD BONUS to add side bets · {fmt(anteBet)} reserved for Play
             </Text>
@@ -860,7 +871,7 @@ export default function ThreeCardPokerScreen() {
       <CasinoTableSelectModal
         visible={selectedTier === null}
         chips={profile.chips}
-        onSelect={(tier) => setSelectedTier(tier)}
+        onSelect={(tier) => { setSelectedTier(tier); setAnteBet(tier.minBet); }}
         onBack={() => router.back()}
         title="SELECT YOUR TABLE"
       />

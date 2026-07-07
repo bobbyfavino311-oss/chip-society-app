@@ -15,7 +15,8 @@ import { useSoundSettings } from '@/context/SoundContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
-import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
+import { type CasinoTableLimit, buildBonusSteps } from '@/lib/casinoTableLimits';
+import CasinoBetAdjuster from '@/components/CasinoBetAdjuster';
 import {
   createUTHDeck, shuffleUTHDeck, dealUTHHands,
   resolveUTH, getLiveHandName,
@@ -26,7 +27,7 @@ import type { Card } from '@/lib/pokerEngine';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase = 'stake' | 'betting' | 'preflop' | 'flop' | 'turn_river' | 'showdown' | 'result';
-const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+const _BONUS_STEPS_FALLBACK: [0, number, number, number, number] = [0, 250_000, 500_000, 750_000, 1_000_000];
 type TripsMult = 0 | 1 | 2 | 3 | 4;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -305,6 +306,10 @@ export default function UltimateTexasHoldemScreen() {
 
   // ── Core state ──────────────────────────────────────────────────────────────
   const [selectedTier,   setSelectedTier]   = useState<CasinoTableLimit | null>(null);
+  const [ante,           setAnte]           = useState(0);
+  const BONUS_STEPS: [0, number, number, number, number] = selectedTier
+    ? buildBonusSteps(selectedTier)
+    : _BONUS_STEPS_FALLBACK;
   const [phase,          setPhase]          = useState<Phase>('stake');
   const [deal,           setDeal]           = useState<UTHDeal | null>(null);
   const [communityCount, setCommunityCount] = useState(0);
@@ -319,7 +324,6 @@ export default function UltimateTexasHoldemScreen() {
   const [handHistogram, setHandHistogram]   = useState({ handsPlayed: 0, wins: 0, netProfit: 0 });
 
   // ── Derived values ──────────────────────────────────────────────────────────
-  const ante       = selectedTier?.minBet ?? 0;
   const tripsBet   = BONUS_STEPS[tripsMult];
   const totalCost  = ante + ante + tripsBet; // ante + blind + trips upfront
   const canDeal    = ante > 0 && profile.chips >= totalCost && !busy;
@@ -499,6 +503,7 @@ export default function UltimateTexasHoldemScreen() {
   // ── STAKE SELECT ──────────────────────────────────────────────────────────────
   function handleSelectTier(tier: CasinoTableLimit) {
     setSelectedTier(tier);
+    setAnte(tier.minBet);
     setPhase('betting');
   }
 
@@ -656,6 +661,16 @@ export default function UltimateTexasHoldemScreen() {
 
         {/* BETTING phase — DEAL button */}
         {phase === 'betting' && (
+          <>
+            {selectedTier && (
+              <CasinoBetAdjuster
+                value={ante}
+                limit={selectedTier}
+                onChange={setAnte}
+                label="ANTE + BLIND"
+                accent={accent}
+              />
+            )}
           <View style={s.btnRow}>
             <TouchableOpacity
               style={[s.dealBtn, !canDeal && { opacity: 0.4 }, { borderColor: `${accent}80`, backgroundColor: `${accent}14` }]}
@@ -672,6 +687,7 @@ export default function UltimateTexasHoldemScreen() {
               )}
             </TouchableOpacity>
           </View>
+          </>
         )}
 
         {/* PRE-FLOP decision */}

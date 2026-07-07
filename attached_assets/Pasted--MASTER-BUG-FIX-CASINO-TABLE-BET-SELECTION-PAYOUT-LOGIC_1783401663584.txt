@@ -1,0 +1,273 @@
+# MASTER BUG FIX — CASINO TABLE BET SELECTION + PAYOUT LOGIC
+
+There is still a major bug in Casino Table Games.
+
+The casino table limit system is not allowing players to choose valid bet amounts inside the selected table range.
+
+This must be fixed globally across every casino game.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 1. CASINO TABLE LIMITS ARE NOT POKER BLINDS
+
+Casino games do not use poker blind logic.
+
+Casino games use:
+
+• Buy-In Range
+• Minimum Bet
+• Maximum Bet
+• Side Bet Range
+
+Do not use small blind / big blind logic anywhere in casino games.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 2. MAIN ANTE / BASE BET SELECTION
+
+If the casino table allows a main wager range of:
+
+1K–10K
+
+Then the player must be able to choose:
+
+1K
+2K
+3K
+4K
+5K
+6K
+7K
+8K
+9K
+10K
+
+Do not lock the player to only the minimum bet.
+
+The bet selector must allow every valid increment between the minimum and maximum.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 3. BET INCREMENTS
+
+Use clean increments based on table size.
+
+Example:
+
+1K–10K table:
+
+Increment = 1K
+
+Valid bets:
+
+1K through 10K.
+
+For larger tables, use sensible increments:
+
+10K–100K table:
+
+10K increments.
+
+50K–500K table:
+
+50K increments.
+
+100K–1M table:
+
+100K increments.
+
+Do not allow random uneven values.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 4. PLAY BET MUST MATCH ANTE WHEN REQUIRED
+
+For games where the Play bet must equal the Ante:
+
+The Play bet must always equal the selected Ante.
+
+Example:
+
+Ante selected:
+
+7K
+
+Play bet:
+
+7K
+
+Do not allow Play to remain at 1K if Ante is 7K.
+
+Do not allow Play to exceed Ante unless that specific game rule requires multipliers.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 5. SIDE BET SELECTION
+
+Side bets must be selectable independently from the main Ante.
+
+Side bet range:
+
+Minimum side bet = table minimum bet.
+
+Maximum side bet = highest end of the table buy-in requirement / configured side bet cap.
+
+Example:
+
+If selected table is:
+
+Buy-In: 1K–100K
+
+Main Ante Range: 1K–10K
+
+Then side bets should allow:
+
+1K through 100K
+
+using valid increments.
+
+The side bet should not be locked to the Ante amount.
+
+The side bet should not be locked to the minimum.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 6. APPLY TO ALL CASINO GAMES
+
+This rule applies to every casino table game:
+
+• Blackjack
+• Three Card Poker
+• Ultimate Texas Hold'em
+• Mississippi Stud
+• High Card Flush
+• Casino War
+• Let It Ride
+• Face Up Pai Gow Poker
+• Roulette
+• Future casino table games
+
+Each game must use its own rules, but the table limit logic must be consistent.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 7. GAME-SPECIFIC RULES STILL APPLY
+
+Respect each game's required bet relationships.
+
+Examples:
+
+Three Card Poker:
+
+• Ante selectable within main bet range.
+• Play bet equals Ante.
+• Pair Plus / Six Card Bonus side bets selectable independently.
+• Side bets remain active even if player folds Ante.
+
+Ultimate Texas Hold'em:
+
+• Ante and Blind must be equal.
+• Trips Bonus selectable independently.
+• Play bet follows game multiplier rules: 4x, 3x, 2x, or 1x Ante depending on street.
+
+Let It Ride:
+
+• Three equal base bets.
+• Each base bet follows selected wager amount.
+• Bonus bet selectable independently if available.
+
+Casino War:
+
+• Ante selectable within main range.
+• Tie Bet selectable independently.
+• War wager matches required rule when going to war.
+
+High Card Flush:
+
+• Ante selectable within main range.
+• Raise follows suited-card rule.
+• Flush Bonus and Straight Flush Bonus selectable independently.
+
+Blackjack:
+
+• Main wager selectable within main range.
+• Side bets selectable independently if offered.
+• Split / Double must follow Blackjack rules.
+
+Roulette:
+
+• Chip denomination and wager limits must respect table min/max.
+• Total bet cannot exceed table maximum unless game rules define separate layout limits.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 8. PAYTABLES MUST USE ACTUAL BET AMOUNTS
+
+All payouts must calculate from the actual selected wager.
+
+Do not calculate payouts using the minimum bet by default.
+
+Examples:
+
+Player bets 8K on Ante.
+
+Even-money win pays:
+
+8K profit.
+
+Player bets 75K on side bet with 10:1 payout.
+
+Reward:
+
+750K profit plus original bet if game returns stake.
+
+Paytables must honor the real wager amount.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 9. UI REQUIREMENTS
+
+Every casino game betting UI must clearly show:
+
+• Selected Ante / Main Bet
+• Selected Side Bet(s)
+• Minimum allowed
+• Maximum allowed
+• Current table limit
+• Total amount at risk before dealing
+
+Players should always understand how much they are betting.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 10. VALIDATION TEST
+
+Test case:
+
+Table:
+
+Buy-In: 1K–100K
+
+Ante Range: 1K–10K
+
+Side Bet Range: 1K–100K
+
+Verify:
+
+✅ Ante can be set to 1K, 2K, 3K, 4K, 5K, 6K, 7K, 8K, 9K, 10K.
+
+✅ Play bet equals selected Ante when the game requires it.
+
+✅ Side bet can be set anywhere from 1K to 100K.
+
+✅ Payouts calculate from the actual chosen bet.
+
+✅ Folding Ante does not cancel independent side bets.
+
+✅ No casino game is locked to only the minimum bet.
+
+✅ No casino game uses poker blind logic.
+
+Final goal:
+
+Casino table games must behave like real table games. Players choose valid wager amounts within the table limits, side bets are independent, required linked bets stay linked, and every payout uses the actual wager placed.

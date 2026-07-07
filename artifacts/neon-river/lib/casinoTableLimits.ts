@@ -65,3 +65,13 @@ export function fmtCasino(n: number): string {
   if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
   return String(n);
 }
+
+/**
+ * Returns 5 bonus-bet steps scaled to this table's limits.
+ * [0, 1×min, 2×min, 5×min, max]
+ * Keeps side-bet options proportional to the chosen table size.
+ */
+export function buildBonusSteps(limit: CasinoTableLimit): [0, number, number, number, number] {
+  const { minBet, maxBet } = limit;
+  return [0, minBet, minBet * 2, minBet * 5, maxBet];
+}

@@ -15,10 +15,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import PlayingCard from '@/components/PlayingCard';
 import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
+import CasinoBetAdjuster from '@/components/CasinoBetAdjuster';
 import { useUser } from '@/context/UserContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
+import { buildBonusSteps } from '@/lib/casinoTableLimits';
 import type { CasinoTableLimit } from '@/lib/casinoTableLimits';
 import {
   dealLetItRide, evaluateLetItRide, resolveLetItRide,
@@ -239,7 +241,9 @@ export default function LetItRideScreen() {
   const [phase,         setPhase]         = useState<LIRPhase>('stake');
   const [stake,         setStake]         = useState<CasinoTableLimit | null>(null);
   const [ante,          setAnte]          = useState(0);
-  const BONUS_STEPS = [0, 250_000, 500_000, 750_000, 1_000_000] as const;
+  const BONUS_STEPS: [0, number, number, number, number] = stake
+    ? buildBonusSteps(stake)
+    : [0, 250_000, 500_000, 750_000, 1_000_000];
   type BonusIdx = 0 | 1 | 2 | 3 | 4;
   const [bonusMult,     setBonusMult]     = useState<BonusIdx>(0);
   const [playerCards,   setPlayerCards]   = useState<LIRCard[]>([]);
@@ -613,6 +617,15 @@ export default function LetItRideScreen() {
         {/* BETTING phase — Bonus toggle + DEAL button */}
         {phase === 'betting' && (
           <>
+            {stake && (
+              <CasinoBetAdjuster
+                value={ante}
+                limit={stake}
+                onChange={setAnte}
+                label="BET (× 3)"
+                accent={accent}
+              />
+            )}
             <TouchableOpacity
               onPress={() => setBonusMult(m => ((m + 1) % 5) as BonusIdx)}
               style={[s.bonusToggle, bonusMult > 0 && { borderColor: `${accent2}80`, backgroundColor: `${accent2}12` }]}
