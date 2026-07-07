@@ -230,7 +230,7 @@ export default function StreakScreen() {
           <View style={st.vipHint}>
             <LinearGradient colors={['rgba(255,0,144,0.08)', 'transparent']} style={StyleSheet.absoluteFill} />
             <Ionicons name="diamond" size={16} color="#ff0090" />
-            <Text style={st.vipHintText}>VIP members earn +50% bonus chips on every daily reward</Text>
+            <Text style={st.vipHintText}>VIP members double their daily streaks, get an extra wheel spin every day, and earn Double XP</Text>
           </View>
         )}
       </ScrollView>

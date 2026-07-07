@@ -514,11 +514,11 @@ export default function StoreScreen() {
             </View>
             <View style={styles.vipBenefits}>
               {[
-                '50% daily bonus chips every day',
-                'Exclusive VIP table themes',
-                'VIP badge + avatar glow effect',
-                'Bonus XP on every hand played',
-                'Access to VIP Lounge tables',
+                'Daily streaks double',
+                '1 extra wheel spin per day',
+                '1 Mythic Fortune Cookie per month',
+                'Double XP on every hand',
+                'VIP Badge on your profile',
               ].map((b, i) => (
                 <View key={i} style={styles.vipBenefitRow}>
                   <Ionicons name="checkmark-circle" size={13} color="#bf5fff" />

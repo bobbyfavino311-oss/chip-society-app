@@ -213,7 +213,7 @@ export default function RewardsScreen() {
             <Text style={styles.vipTitle}>CHIP VIP</Text>
           </View>
           <Text style={styles.vipDesc}>
-            Daily chip bonuses • Exclusive table skins • Premium card backs • VIP tournaments
+            Double streaks • Extra wheel spin daily • Mythic Fortune Cookie monthly • Double XP • VIP Badge
           </Text>
           <TouchableOpacity style={styles.vipBtn}>
             <Text style={styles.vipBtnText}>COMING SOON</Text>
