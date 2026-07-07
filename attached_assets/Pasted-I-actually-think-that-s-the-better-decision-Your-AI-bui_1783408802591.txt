@@ -1,0 +1,158 @@
+I actually think that’s the better decision. Your AI builder has done well with card-based UIs so far, and a horizontal carousel is much easier to implement consistently than trying to fake a 3D casino floor. It’ll also keep the app feeling clean and cohesive.
+
+Here’s the simplified master prompt:
+
+# CASINO NAVIGATION REDESIGN
+Redesign the Casino Games section into a simple horizontal carousel.
+Do NOT redesign any game logic, betting, payouts, or backend systems.
+This is a UI/navigation update only.
+━━━━━━━━━━━━━━━━━━━━━━
+# REMOVE CURRENT LAYOUT
+Remove the current vertical list of casino games.
+Remove:
+• Small game rows
+• Tiny icons
+• Small play buttons
+The casino page should no longer be a scrolling menu.
+━━━━━━━━━━━━━━━━━━━━━━
+# NEW LAYOUT
+Replace the list with a horizontal swipeable carousel.
+Only one game card should be centered on screen at a time.
+Adjacent cards should slightly peek in from the left and right to indicate additional games.
+Players swipe horizontally between games.
+━━━━━━━━━━━━━━━━━━━━━━
+# GAME CARDS
+Each casino game should have one premium card.
+Card layout:
+━━━━━━━━━━━━━━━━━━━━━━
+[Large Game Icon]
+THREE CARD POKER
+Ante • Pair Plus • 6 Card Bonus
+PLAY →
+━━━━━━━━━━━━━━━━━━━━━━
+The icon should be larger than the current version.
+Do NOT use tiny list icons.
+Use clean, premium artwork that represents each game.
+━━━━━━━━━━━━━━━━━━━━━━
+# INCLUDED GAMES
+Create one card for each:
+• Three Card Poker
+• Blackjack
+• Ultimate Texas Hold'em
+• Casino War
+• High Card Flush
+• Let It Ride
+• Mississippi Stud
+Do not add Pai Gow.
+Do not add Roulette.
+━━━━━━━━━━━━━━━━━━━━━━
+# SUBTITLES
+Keep subtitles short.
+Three Card Poker
+Ante • Pair Plus • 6 Card Bonus
+━━━━━━━━━━━━━━━━━━━━━━
+Blackjack
+Beat the Dealer
+━━━━━━━━━━━━━━━━━━━━━━
+Ultimate Texas Hold'em
+Ante • Blind • Trips Bonus
+━━━━━━━━━━━━━━━━━━━━━━
+Casino War
+Go to War • Tie Bet
+━━━━━━━━━━━━━━━━━━━━━━
+High Card Flush
+Longest Flush Wins
+━━━━━━━━━━━━━━━━━━━━━━
+Let It Ride
+Three Bets • Pull Back Bets
+━━━━━━━━━━━━━━━━━━━━━━
+Mississippi Stud
+Three Street Betting
+━━━━━━━━━━━━━━━━━━━━━━
+Keep every subtitle to one line.
+━━━━━━━━━━━━━━━━━━━━━━
+# PLAY BUTTON
+Each card has one large PLAY button centered at the bottom.
+Remove the tiny arrow play buttons.
+The PLAY button should be the primary call-to-action.
+━━━━━━━━━━━━━━━━━━━━━━
+# NAVIGATION FLOW
+Player selects a game card.
+↓
+Presses PLAY.
+↓
+Existing Table Limits screen opens.
+↓
+Player chooses table limits.
+↓
+Game begins.
+Do NOT bypass the Table Limits screen.
+━━━━━━━━━━━━━━━━━━━━━━
+# CARD DESIGN
+Each card should feel premium.
+Use:
+• Rounded corners
+• Soft glow
+• Thin colored outline
+• Subtle shadows
+• Minimal gradients
+Do not overcrowd the cards.
+Keep them clean.
+━━━━━━━━━━━━━━━━━━━━━━
+# COLOR IDENTITY
+Each game should have its own accent color.
+Three Card Poker
+Royal Blue
+Blackjack
+Emerald Green
+Ultimate Texas Hold'em
+Crimson
+Casino War
+Steel Blue
+High Card Flush
+Purple
+Let It Ride
+Amber Gold
+Mississippi Stud
+Deep Burgundy
+━━━━━━━━━━━━━━━━━━━━━━
+# CAROUSEL
+Allow swipe gestures.
+Also allow tapping partially visible neighboring cards.
+Add page indicators below the carousel.
+Example:
+● ○ ○ ○ ○ ○ ○
+The current game should always be highlighted.
+━━━━━━━━━━━━━━━━━━━━━━
+# KEEP EVERYTHING ELSE
+Do NOT modify:
+• Betting system
+• Buy-ins
+• Min/Max bets
+• Table limits
+• Paytables
+• Backend
+• Rules
+• Statistics
+• Progression
+Only redesign navigation.
+━━━━━━━━━━━━━━━━━━━━━━
+# FINAL CHECKLIST
+✅ Vertical list removed.
+✅ Horizontal carousel implemented.
+✅ Seven casino games included.
+✅ One premium card per game.
+✅ Large game artwork.
+✅ Large PLAY button.
+✅ Swipe navigation works.
+✅ Page indicators work.
+✅ PLAY opens the existing Table Limits screen.
+✅ No backend systems modified.
+The finished result should feel modern, premium, and effortless to browse. Players should be able to swipe through the casino games in just a few seconds, immediately recognize each game, and start playing without navigating through a long scrolling list.
+
+I would make one additional improvement: mirror the poker navigation. Since you’re simplifying the Play tab, both Poker and Casino should follow the same mental model:
+
+* Poker → Swipe between Hold’em, Short Deck, Omaha, Joker → Choose AI or Live → Choose stakes.
+* Casino → Swipe between Three Card, Blackjack, Ultimate, etc. → Press Play → Choose table limits.
+
+That consistency will make the entire Play section feel much more polished and intuitive.

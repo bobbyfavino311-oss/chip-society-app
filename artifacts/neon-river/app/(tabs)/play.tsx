@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Alert, Animated, Modal, Platform, Pressable, ScrollView,
+  Alert, Animated, Dimensions, FlatList, Modal, Platform, Pressable, ScrollView,
   StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -203,6 +203,130 @@ function BlackjackIcon({ size = 15, color = '#ffd700' }: { size?: number; color?
     </Svg>
   );
 }
+
+// ─── Casino Carousel ──────────────────────────────────────────────────────────
+
+const { width: SCREEN_W } = Dimensions.get('window');
+const CC_CARD_W = SCREEN_W - 72;
+const CC_GAP    = 12;
+const CC_INSET  = (SCREEN_W - CC_CARD_W) / 2;
+
+interface CasinoGameDef {
+  key: string;
+  label: string;
+  sub: string;
+  accent: string;
+  route: string;
+  renderIcon: () => React.ReactNode;
+}
+
+const CASINO_GAMES: CasinoGameDef[] = [
+  { key: 'three-card-poker',     label: 'THREE CARD POKER',     sub: 'Ante • Pair Plus • 6 Card Bonus', accent: '#4169e1', route: '/casino/three-card-poker',     renderIcon: () => <ThreeCardPokerIcon  size={52} color="#4169e1" /> },
+  { key: 'blackjack',            label: 'BLACKJACK',            sub: 'Beat the Dealer',                 accent: '#00a86b', route: '/casino/blackjack',            renderIcon: () => <BlackjackIcon       size={52} color="#00a86b" /> },
+  { key: 'ultimate-texas-holdem',label: "ULTIMATE TEXAS HOLD'EM",sub:'Ante • Blind • Trips Bonus',      accent: '#DC143C', route: '/casino/ultimate-texas-holdem', renderIcon: () => <UltimateHoldemIcon  size={52} color="#DC143C" /> },
+  { key: 'casino-war',           label: 'CASINO WAR',           sub: 'Go to War • Tie Bet',             accent: '#4682B4', route: '/casino/casino-war',           renderIcon: () => <CasinoWarIcon       size={52} color="#4682B4" /> },
+  { key: 'high-card-flush',      label: 'HIGH CARD FLUSH',      sub: 'Longest Flush Wins',              accent: '#bf5fff', route: '/casino/high-card-flush',      renderIcon: () => <HighCardFlushIcon   size={52} color="#bf5fff" /> },
+  { key: 'let-it-ride',          label: 'LET IT RIDE',          sub: 'Three Bets • Pull Back Bets',     accent: '#FFB300', route: '/casino/let-it-ride',          renderIcon: () => <LetItRideIcon       size={52} color="#FFB300" /> },
+  { key: 'mississippi-stud',     label: 'MISSISSIPPI STUD',     sub: 'Three Street Betting',            accent: '#c0392b', route: '/casino/mississippi-stud',     renderIcon: () => <MississippiStudIcon size={52} color="#c0392b" /> },
+];
+
+function CasinoCard({ game }: { game: CasinoGameDef }) {
+  return (
+    <TouchableOpacity
+      style={[cc.card, { width: CC_CARD_W, borderColor: `${game.accent}40` }]}
+      onPress={() => router.push(game.route as any)}
+      activeOpacity={0.88}
+    >
+      <LinearGradient
+        colors={[`${game.accent}20`, `${game.accent}08`, 'transparent']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
+      />
+      <View style={[cc.topBar, { backgroundColor: game.accent }]} />
+      <View style={[cc.iconWrap, { borderColor: `${game.accent}35`, backgroundColor: `${game.accent}12` }]}>
+        {game.renderIcon()}
+      </View>
+      <Text style={cc.cardLabel} numberOfLines={1} adjustsFontSizeToFit>{game.label}</Text>
+      <Text style={cc.cardSub}   numberOfLines={1}>{game.sub}</Text>
+      <TouchableOpacity
+        style={[cc.playBtn, { borderColor: `${game.accent}70`, backgroundColor: `${game.accent}18` }]}
+        onPress={() => router.push(game.route as any)}
+        activeOpacity={0.85}
+      >
+        <Text style={[cc.playText, { color: game.accent }]}>PLAY</Text>
+        <Ionicons name="play" size={12} color={game.accent} />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+}
+
+function CasinoCarousel() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const flatRef = useRef<FlatList<CasinoGameDef> | null>(null);
+  const SNAP = CC_CARD_W + CC_GAP;
+
+  return (
+    <View>
+      <View style={cc.header}>
+        <Ionicons name="diamond-outline" size={13} color="#bf5fff" />
+        <Text style={cc.headerLabel}>CASINO</Text>
+        <Text style={cc.headerSub}> · House games · Win chips against the dealer</Text>
+      </View>
+
+      <FlatList
+        ref={flatRef}
+        data={CASINO_GAMES}
+        horizontal
+        keyExtractor={g => g.key}
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={SNAP}
+        decelerationRate="fast"
+        contentContainerStyle={{ paddingHorizontal: CC_INSET }}
+        ItemSeparatorComponent={() => <View style={{ width: CC_GAP }} />}
+        onScroll={e => {
+          const idx = Math.round(e.nativeEvent.contentOffset.x / SNAP);
+          setActiveIdx(Math.max(0, Math.min(idx, CASINO_GAMES.length - 1)));
+        }}
+        scrollEventThrottle={16}
+        renderItem={({ item }) => <CasinoCard game={item} />}
+      />
+
+      <View style={cc.dots}>
+        {CASINO_GAMES.map((g, i) => (
+          <TouchableOpacity
+            key={g.key}
+            onPress={() => {
+              flatRef.current?.scrollToIndex({ index: i, animated: true });
+              setActiveIdx(i);
+            }}
+          >
+            <View style={[cc.dot, i === activeIdx && cc.dotActive]} />
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const cc = StyleSheet.create({
+  header:      { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, paddingHorizontal: 4 },
+  headerLabel: { fontFamily: 'Orbitron_700Bold', fontSize: 10, letterSpacing: 2, color: '#bf5fff' },
+  headerSub:   { fontSize: 10, color: 'rgba(255,255,255,0.35)', flex: 1 },
+
+  card:    { borderRadius: 22, borderWidth: 1, overflow: 'hidden', padding: 22, gap: 12, alignItems: 'center' },
+  topBar:  { position: 'absolute', top: 0, left: 0, right: 0, height: 2.5 },
+  iconWrap:{ width: 84, height: 84, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+
+  cardLabel: { fontFamily: 'Orbitron_700Bold', fontSize: 12, letterSpacing: 1.5, color: '#fff', textAlign: 'center' },
+  cardSub:   { fontSize: 11, color: 'rgba(255,255,255,0.4)', textAlign: 'center' },
+
+  playBtn:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', paddingVertical: 13, borderRadius: 14, borderWidth: 1, marginTop: 4 },
+  playText: { fontFamily: 'Orbitron_700Bold', fontSize: 13, letterSpacing: 2 },
+
+  dots:     { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 7, marginTop: 14, marginBottom: 4 },
+  dot:      { width: 7, height: 7, borderRadius: 3.5, backgroundColor: 'rgba(255,255,255,0.18)' },
+  dotActive:{ width: 20, backgroundColor: '#bf5fff' },
+});
 
 // ─── Stake Tiers ──────────────────────────────────────────────────────────────
 
@@ -907,22 +1031,7 @@ export default function PlayScreen() {
         />
 
         {/* ── CASINO ──────────────────────────────────────────────────── */}
-        <SectionCard
-          section="CASINO"
-          accent="#bf5fff"
-          icon="diamond-outline"
-          title="CASINO GAMES"
-          lines={['House games · Win chips against the dealer']}
-          options={[
-            { label: 'THREE CARD POKER', icon: 'card-outline', iconNode: <ThreeCardPokerIcon size={15} color="#ffd700" />, sub: 'Ante · Pair Plus · 6 Card Bonus', onPress: () => router.push('/casino/three-card-poker' as any) },
-            { label: 'BLACKJACK', icon: 'card-outline', iconNode: <BlackjackIcon size={15} color="#ffd700" />, sub: 'Six Deck · Beat the dealer', onPress: () => router.push('/casino/blackjack' as any) },
-            { label: "ULTIMATE TEXAS HOLD'EM", icon: 'card-outline', iconNode: <UltimateHoldemIcon size={15} color="#ffd700" />, sub: 'Ante · Blind · Trips Bonus · Play up to 4×', onPress: () => router.push('/casino/ultimate-texas-holdem' as any) },
-            { label: 'CASINO WAR', icon: 'flash-outline', iconNode: <CasinoWarIcon size={15} color="#ffd700" />, sub: 'Instant action · Tie pays 10:1 · Go to War', onPress: () => router.push('/casino/casino-war' as any) },
-            { label: 'HIGH CARD FLUSH', icon: 'layers-outline', iconNode: <HighCardFlushIcon size={15} color="#ffd700" />, sub: '7 cards · Longest flush wins · Ante + optional bonuses', onPress: () => router.push('/casino/high-card-flush' as any) },
-            { label: 'LET IT RIDE', icon: 'card-outline', iconNode: <LetItRideIcon size={15} color="#ffd700" />, sub: 'Three bets · Pull back two · Pair of 10s to win', onPress: () => router.push('/casino/let-it-ride' as any) },
-            { label: 'MISSISSIPPI STUD', icon: 'layers-outline', iconNode: <MississippiStudIcon size={15} color="#ffd700" />, sub: '2 hole cards + 3 community · 3 street bets · Jacks or better wins', onPress: () => router.push('/casino/mississippi-stud' as any) },
-          ]}
-        />
+        <CasinoCarousel />
 
         {/* ── PRIVATE TABLE ────────────────────────────────────────────── */}
         <SectionCard
