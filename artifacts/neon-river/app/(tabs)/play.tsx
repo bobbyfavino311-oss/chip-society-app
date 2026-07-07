@@ -195,9 +195,9 @@ function BlackjackIcon({ size = 15, color = '#ffd700' }: { size?: number; color?
 // ─── Casino Carousel ──────────────────────────────────────────────────────────
 
 const { width: SCREEN_W } = Dimensions.get('window');
-const CC_CARD_W = SCREEN_W - 72;
+const CC_CARD_W = SCREEN_W - 128;   // inset=64 each side → ~52 px peek ≈ 20 % of card
 const CC_GAP    = 12;
-const CC_INSET  = (SCREEN_W - CC_CARD_W) / 2;
+const CC_INSET  = (SCREEN_W - CC_CARD_W) / 2;  // = 64
 
 interface CasinoGameDef {
   key: string;
