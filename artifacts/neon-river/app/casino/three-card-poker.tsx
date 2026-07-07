@@ -720,20 +720,17 @@ export default function ThreeCardPokerScreen() {
               )}
 
               {/* 6 CARD BONUS — only if bet was placed */}
+              {/* Resolves independently of fold — use sixCardWin directly */}
               {lastScBet > 0 && (
                 <ResultRow
                   label="6 CARD BONUS"
                   outcome={
-                    result.comparison === 'fold' ? 'loss'
-                    : result.sixCardWin > 0 ? 'win'
-                    : 'loss'
+                    result.sixCardWin > 0 ? 'win'
+                    : result.sixCardWin < 0 ? 'loss'
+                    : 'push'
                   }
-                  amount={
-                    result.comparison === 'fold'
-                      ? lastScBet
-                      : Math.abs(result.sixCardWin) || lastScBet
-                  }
-                  sub={result.comparison !== 'fold' ? (result.sixCardEval?.label ?? undefined) : undefined}
+                  amount={Math.abs(result.sixCardWin) || lastScBet}
+                  sub={result.sixCardEval?.label ?? undefined}
                   accent={result.sixCardWin > 0 ? '#bf5fff' : undefined}
                 />
               )}
