@@ -145,23 +145,11 @@ function MississippiStudIcon({ size = 15, color = '#ffd700' }: { size?: number; 
 function HighCardFlushIcon({ size = 15, color = '#ffd700' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
-      {/* 4 suited cards fanned — hearts highlighted */}
-      <G transform="rotate(-25, 12, 16)">
-        <Rect x="4" y="5" width="8" height="12" rx="1.5" fill={`${color}10`} stroke={color} strokeWidth="1.0" />
-        <SvgText x="5" y="13" fontSize="5" fontWeight="bold" fill={color}>♠</SvgText>
-      </G>
-      <G transform="rotate(-8, 12, 16)">
-        <Rect x="6" y="5" width="8" height="12" rx="1.5" fill={`${color}10`} stroke={color} strokeWidth="1.0" />
-        <SvgText x="7" y="13" fontSize="5" fontWeight="bold" fill={color}>♦</SvgText>
-      </G>
-      <G transform="rotate(8, 12, 16)">
-        <Rect x="8" y="5" width="8" height="12" rx="1.5" fill="#050010" stroke={color} strokeWidth="1.2" />
-        <SvgText x="9" y="13" fontSize="5" fontWeight="bold" fill={color}>♥</SvgText>
-      </G>
-      <G transform="rotate(25, 12, 16)">
-        <Rect x="10" y="5" width="8" height="12" rx="1.5" fill={`${color}10`} stroke={color} strokeWidth="1.0" />
-        <SvgText x="11" y="13" fontSize="5" fontWeight="bold" fill={color}>♣</SvgText>
-      </G>
+      {/* Simple heart */}
+      <Path
+        d="M12 20 C12 20 3 13.5 3 8 C3 5.2 5.2 3 8 3 C9.8 3 11.4 3.9 12 5.2 C12.6 3.9 14.2 3 16 3 C18.8 3 21 5.2 21 8 C21 13.5 12 20 12 20 Z"
+        fill={`${color}25`} stroke={color} strokeWidth="1.4" strokeLinejoin="round"
+      />
     </Svg>
   );
 }
