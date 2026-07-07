@@ -15,18 +15,17 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
+import { STAKE_TIERS, StakeTierKey } from '@/lib/stakeConfig';
 
 type Tab = 'create' | 'join';
-type BlindLevel = 'beginner' | 'casual' | 'mid' | 'highroller';
-
-const BLIND_LEVELS = [
-  { id: 'beginner' as BlindLevel,   label: 'Beginner',    blinds: '25 / 50',        color: '#00d4aa' },
-  { id: 'casual' as BlindLevel,     label: 'Casual',      blinds: '100 / 200',      color: '#00d4ff' },
-  { id: 'mid' as BlindLevel,        label: 'Mid Stakes',  blinds: '500 / 1,000',    color: '#ffd700' },
-  { id: 'highroller' as BlindLevel, label: 'High Roller', blinds: '5K / 10K',       color: '#ff8800' },
-];
 
 const WORDS = ['VICE', 'ROOK', 'ECHO', 'FLUX', 'NOVA', 'HAZE', 'GRID', 'VOLT', 'APEX', 'CYAN', 'DUSK', 'GLOW'];
+
+function fmt(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}K`;
+  return n.toLocaleString();
+}
 
 function generateCode(): string {
   const word = WORDS[Math.floor(Math.random() * WORDS.length)];
@@ -37,12 +36,14 @@ function generateCode(): string {
 export default function PrivateTableScreen() {
   const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<Tab>('create');
-  const [blind, setBlind] = useState<BlindLevel>('casual');
+  const [stakeKey, setStakeKey] = useState<StakeTierKey>('micro');
   const [bots, setBots] = useState(4);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [joinCode, setJoinCode] = useState('');
   const [copied, setCopied] = useState(false);
   const codePulse = useRef(new Animated.Value(1)).current;
+
+  const selectedTier = STAKE_TIERS.find(t => t.key === stakeKey) ?? STAKE_TIERS[1];
 
   const handleCreate = () => {
     const code = generateCode();
@@ -70,7 +71,6 @@ export default function PrivateTableScreen() {
       Alert.alert('Invalid Code', 'Please enter a valid table code like VICE-742.');
       return;
     }
-    // Validate format loosely (WORD-NNN)
     if (!/^[A-Z]{3,6}-\d{3}$/.test(code)) {
       Alert.alert('Invalid Code', 'Code format should be like VICE-742. Check the code and try again.');
       return;
@@ -109,22 +109,58 @@ export default function PrivateTableScreen() {
 
         {tab === 'create' && (
           <>
-            {/* Blind level */}
-            <Text style={p.sectionLabel}>BLIND LEVEL</Text>
-            <View style={p.blindGrid}>
-              {BLIND_LEVELS.map(b => (
-                <TouchableOpacity
-                  key={b.id}
-                  style={[p.blindCard, { borderColor: blind === b.id ? `${b.color}88` : colors.border }]}
-                  onPress={() => setBlind(b.id)}
-                  activeOpacity={0.8}
-                >
-                  {blind === b.id && <LinearGradient colors={[`${b.color}22`, 'transparent']} style={StyleSheet.absoluteFill} />}
-                  <View style={[p.blindDot, { backgroundColor: b.color }]} />
-                  <Text style={[p.blindLabel, { color: blind === b.id ? b.color : colors.text }]}>{b.label}</Text>
-                  <Text style={[p.blindBlinds, { color: blind === b.id ? b.color : colors.textDim }]}>{b.blinds}</Text>
-                </TouchableOpacity>
-              ))}
+            {/* Stake tier selection */}
+            <Text style={p.sectionLabel}>STAKE TIER</Text>
+            <View style={p.stakeList}>
+              {STAKE_TIERS.map(tier => {
+                const active = stakeKey === tier.key;
+                return (
+                  <TouchableOpacity
+                    key={tier.key}
+                    style={[p.stakeRow, { borderColor: active ? `${tier.color}88` : colors.border }]}
+                    onPress={() => { setStakeKey(tier.key); setRoomCode(null); }}
+                    activeOpacity={0.8}
+                  >
+                    {active && <LinearGradient colors={[`${tier.color}20`, 'transparent']} style={StyleSheet.absoluteFill} />}
+                    <View style={[p.stakeDot, { backgroundColor: tier.color }]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[p.stakeLabel, { color: active ? tier.color : colors.text }]}>{tier.label}</Text>
+                      <Text style={[p.stakeBlinds, { color: active ? tier.color : colors.textDim }]}>
+                        Blinds: {fmt(tier.smallBlind)} / {fmt(tier.bigBlind)}
+                      </Text>
+                    </View>
+                    <View style={p.stakeBuyIn}>
+                      <Text style={[p.stakeBuyInText, { color: active ? tier.color : colors.textMuted }]}>
+                        {fmt(tier.minBuyIn)}–{fmt(tier.maxBuyIn)}
+                      </Text>
+                      <Text style={p.stakeBuyInLabel}>buy-in</Text>
+                    </View>
+                    {active && <Ionicons name="checkmark-circle" size={18} color={tier.color} style={{ marginLeft: 8 }} />}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Selected stake summary */}
+            <View style={[p.summaryBox, { borderColor: `${selectedTier.color}44` }]}>
+              <LinearGradient colors={[`${selectedTier.color}12`, 'transparent']} style={StyleSheet.absoluteFill} />
+              <Text style={[p.summaryTitle, { color: selectedTier.color }]}>{selectedTier.label}</Text>
+              <View style={p.summaryRow}>
+                <View style={p.summaryItem}>
+                  <Text style={p.summaryVal}>{fmt(selectedTier.smallBlind)} / {fmt(selectedTier.bigBlind)}</Text>
+                  <Text style={p.summaryKey}>BLINDS</Text>
+                </View>
+                <View style={p.summaryDivider} />
+                <View style={p.summaryItem}>
+                  <Text style={p.summaryVal}>{fmt(selectedTier.minBuyIn)}</Text>
+                  <Text style={p.summaryKey}>MIN BUY-IN</Text>
+                </View>
+                <View style={p.summaryDivider} />
+                <View style={p.summaryItem}>
+                  <Text style={p.summaryVal}>{fmt(selectedTier.maxBuyIn)}</Text>
+                  <Text style={p.summaryKey}>MAX BUY-IN</Text>
+                </View>
+              </View>
             </View>
 
             {/* Bot count */}
@@ -207,7 +243,7 @@ export default function PrivateTableScreen() {
             <View style={p.infoBox}>
               <Ionicons name="information-circle-outline" size={16} color={colors.primary} />
               <Text style={p.infoText}>
-                Private tables are invite-only. Only players with the code can join. AI bots fill any empty seats.
+                Private tables are invite-only. Stake tier and buy-in are set by the host. AI bots fill any empty seats.
               </Text>
             </View>
           </>
@@ -230,11 +266,21 @@ const p = StyleSheet.create({
   tabTextActive: { color: '#ff0090' },
   scroll: { paddingHorizontal: 16, paddingTop: 12, gap: 14 },
   sectionLabel: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
-  blindGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  blindCard: { width: '47%', borderRadius: 12, borderWidth: 1, padding: 12, gap: 4, overflow: 'hidden' },
-  blindDot: { width: 8, height: 8, borderRadius: 4, marginBottom: 2 },
-  blindLabel: { fontSize: 12, fontWeight: '700' },
-  blindBlinds: { fontSize: 10 },
+  stakeList: { gap: 8 },
+  stakeRow: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, borderWidth: 1, padding: 12, gap: 10, overflow: 'hidden' },
+  stakeDot: { width: 8, height: 8, borderRadius: 4, flexShrink: 0 },
+  stakeLabel: { fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  stakeBlinds: { fontSize: 10, marginTop: 1 },
+  stakeBuyIn: { alignItems: 'flex-end' },
+  stakeBuyInText: { fontSize: 11, fontWeight: '700' },
+  stakeBuyInLabel: { fontSize: 9, color: colors.textMuted, letterSpacing: 1 },
+  summaryBox: { borderRadius: 14, borderWidth: 1, padding: 16, overflow: 'hidden' },
+  summaryTitle: { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 2, marginBottom: 12, textAlign: 'center' },
+  summaryRow: { flexDirection: 'row', alignItems: 'center' },
+  summaryItem: { flex: 1, alignItems: 'center', gap: 2 },
+  summaryVal: { color: colors.text, fontSize: 13, fontWeight: '800' },
+  summaryKey: { color: colors.textMuted, fontSize: 8, letterSpacing: 1 },
+  summaryDivider: { width: 1, height: 32, backgroundColor: colors.border },
   botRow: { flexDirection: 'row', gap: 10 },
   botBtn: { flex: 1, borderRadius: 10, borderWidth: 1, borderColor: colors.border, padding: 12, alignItems: 'center', gap: 2 },
   botNum: { color: colors.text, fontSize: 20, fontWeight: '900' },

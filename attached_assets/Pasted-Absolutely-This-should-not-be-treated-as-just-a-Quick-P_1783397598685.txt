@@ -1,0 +1,148 @@
+Absolutely. This should not be treated as just a Quick Play change. The stake economy needs to become a global system used everywhere poker is played. I’d append the following section to the master prompt:
+
+⸻
+
+12. APPLY THE NEW STAKE SYSTEM TO ALL MULTIPLAYER MODES
+
+The new stake structure is now the universal economy for Chip Society.
+
+It must be reflected consistently across every multiplayer experience, not just AI Practice or Quick Play.
+
+This includes:
+
+* Public Multiplayer Matchmaking
+* Private Tables
+* Friends Tables
+* Create Table
+* Join Table
+* Club Tables (future)
+* Every Hold’em variant (Traditional, Short Deck, Omaha, Joker)
+
+No multiplayer mode may use legacy blind structures.
+
+⸻
+
+13. CREATE TABLE
+
+The Create Table screen must use the new stake tiers.
+
+When creating a table, the host first selects:
+
+* Starter
+* Micro
+* Low Stakes
+* Standard
+* High Roller
+* VIP
+* Elite
+* Elite+
+
+After selecting a stake, automatically apply:
+
+* Buy-In Range
+* Small Blind
+* Big Blind
+* Minimum Buy-In
+* Maximum Buy-In
+
+The host should not manually enter blind values. Selecting the stake configures the table automatically.
+
+Example:
+
+High Roller
+
+* Buy-In: 1M–2M
+* Blinds: 50K / 100K
+
+Everything is preconfigured.
+
+⸻
+
+14. JOIN TABLE
+
+When browsing available multiplayer tables, each table card should clearly display:
+
+* Stake Name
+* Small Blind / Big Blind
+* Buy-In Range
+* Current Players
+* Variant
+* Theme (optional)
+
+Example:
+
+HIGH ROLLER
+
+Traditional Hold’em
+
+Blinds: 50K / 100K
+
+Buy-In: 1M–2M
+
+3 / 5 Players
+
+This lets players instantly identify the game they’re joining.
+
+⸻
+
+15. PRIVATE TABLES
+
+Private tables must also use the official stake tiers.
+
+Hosts choose a stake tier, and the game automatically applies:
+
+* Blinds
+* Buy-In limits
+* Starting stack rules
+* Betting limits
+
+Custom blind amounts should not be available at launch. Keeping everyone on the official tiers ensures a consistent economy and simplifies matchmaking.
+
+⸻
+
+16. MATCHMAKING
+
+Public matchmaking should only pair players who selected the same stake tier.
+
+For example:
+
+* A player searching for a Standard table only joins other Standard tables.
+* A player searching for Elite+ only joins Elite+ tables.
+
+No cross-tier matchmaking.
+
+⸻
+
+17. MULTIPLAYER LOBBY
+
+Update all multiplayer lobby screens to display the new stake information.
+
+Every table listing should show:
+
+* Stake Tier
+* Buy-In Range
+* Small Blind / Big Blind
+* Table Variant
+* Players Seated
+
+This should be the primary information players use when choosing a table.
+
+⸻
+
+18. UNIVERSAL ECONOMY VALIDATION
+
+Before marking this update complete, verify that the new stake system is active everywhere:
+
+* ✅ AI Practice
+* ✅ Quick Play
+* ✅ Public Multiplayer
+* ✅ Private Tables
+* ✅ Create Table
+* ✅ Join Table
+* ✅ Friends Tables
+* ✅ Traditional Hold’em
+* ✅ Short Deck Hold’em
+* ✅ Omaha Hold’em
+* ✅ Joker Hold’em
+
+Every poker game in Chip Society must reference the exact same stake definitions. There should be one centralized stake configuration used by the entire application so that changing a stake in the future automatically updates every mode, screen, and table without requiring separate edits. This keeps the economy consistent, easier to maintain, and prevents discrepancies between AI games, multiplayer, and private tables.
