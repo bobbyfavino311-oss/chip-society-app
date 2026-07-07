@@ -298,8 +298,12 @@ function LivePostCard({ post }: { post: FeedPost }) {
 
   return (
     <View style={cd.wrap}>
-      <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, backgroundColor: colors.primary, opacity: 0.45 }} />
+      <LinearGradient
+        colors={['rgba(22,8,44,0.97)', 'rgba(7,3,18,0.98)']}
+        style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      />
+      <View style={[cd.accentStripe, { backgroundColor: typeColor, opacity: 0.5 }]} />
+      <View style={cd.topHighlight} />
 
       {/* Header */}
       <View style={cd.header}>
@@ -495,7 +499,12 @@ function PostCard({ post }: { post: SocialPost }) {
 
   return (
     <View style={cd.wrap}>
-      <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+      <LinearGradient
+        colors={['rgba(22,8,44,0.97)', 'rgba(7,3,18,0.98)']}
+        style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      />
+      <View style={[cd.accentStripe, { backgroundColor: typeColor, opacity: 0.5 }]} />
+      <View style={cd.topHighlight} />
 
       {/* Header */}
       <View style={cd.header}>
@@ -703,52 +712,66 @@ function PostCard({ post }: { post: SocialPost }) {
 }
 
 const cd = StyleSheet.create({
+  // ── Glass card shell ──────────────────────────────────────────────────────
   wrap: {
-    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
-    overflow: 'hidden', padding: 14, gap: 10,
+    borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)',
+    overflow: 'hidden', padding: 16, gap: 12,
   },
-  header:          { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  avatarWrap:      { position: 'relative' },
+  accentStripe: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  topHighlight: { position: 'absolute', top: 2, left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.05)' },
+
+  // ── Header ────────────────────────────────────────────────────────────────
+  header:      { flexDirection: 'row', alignItems: 'center', gap: 9 },
+  avatarWrap:  { position: 'relative' },
   onlineDot: {
     position: 'absolute', bottom: 0, right: 0,
     width: 10, height: 10, borderRadius: 5,
-    backgroundColor: '#00ff88', borderWidth: 1.5, borderColor: '#080018',
+    backgroundColor: '#00ff88', borderWidth: 1.5, borderColor: '#070016',
   },
-  usernameRow:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  username:        { color: colors.text, fontSize: 13, fontWeight: '700' },
-  badgeIcon:       { fontSize: 12 },
-  handle:          { color: colors.textDim, fontSize: 10, marginTop: 1 },
-  typeBadge:       { borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 3, flexDirection: 'row', alignItems: 'center', gap: 3 },
-  typeText:        { fontSize: 8, fontWeight: '800', letterSpacing: 0.3 },
-  followBtn:       { borderWidth: 1, borderColor: colors.primary, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 5 },
-  followBtnActive: { backgroundColor: `${colors.primary}20`, borderColor: `${colors.primary}60` },
-  followText:      { color: colors.primary, fontSize: 10, fontWeight: '700' },
-  followTextActive:{ color: `${colors.primary}90` },
-  moreBtn:         { padding: 2 },
-  content:         { color: colors.textMuted, fontSize: 13, lineHeight: 20 },
-  statsRow:        { flexDirection: 'row', gap: 8 },
+  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  username:    { color: '#ffffff', fontSize: 14, fontWeight: '800' },
+  badgeIcon:   { fontSize: 12 },
+  handle:      { color: 'rgba(255,255,255,0.32)', fontSize: 10, marginTop: 1 },
+
+  // ── Type badge (WIN / BLUFF / etc.) ───────────────────────────────────────
+  typeBadge: { borderRadius: 8, borderWidth: 1, paddingHorizontal: 7, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 3 },
+  typeText:  { fontSize: 8, fontWeight: '800', letterSpacing: 0.5, fontFamily: 'Orbitron_700Bold' },
+
+  // ── Follow button ─────────────────────────────────────────────────────────
+  followBtn:        { borderWidth: 1, borderColor: 'rgba(0,212,255,0.55)', borderRadius: 14, paddingHorizontal: 10, paddingVertical: 5 },
+  followBtnActive:  { backgroundColor: 'rgba(0,212,255,0.15)', borderColor: 'rgba(0,212,255,0.3)' },
+  followText:       { color: '#00d4ff', fontSize: 10, fontWeight: '700' },
+  followTextActive: { color: 'rgba(0,212,255,0.55)' },
+  moreBtn:          { padding: 2 },
+
+  // ── Body ──────────────────────────────────────────────────────────────────
+  content:  { color: 'rgba(255,255,255,0.62)', fontSize: 13, lineHeight: 20 },
+  statsRow: { flexDirection: 'row', gap: 8 },
   statChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: colors.surface, borderRadius: 6, borderWidth: 1,
-    borderColor: colors.border, paddingHorizontal: 8, paddingVertical: 4,
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: 8, borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 10, paddingVertical: 5,
   },
-  statText:     { color: colors.textMuted, fontSize: 11 },
+  statText: { color: 'rgba(255,255,255,0.48)', fontSize: 11 },
+
+  // ── Reactions ─────────────────────────────────────────────────────────────
   reactionsRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   reactionBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
     borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
   },
   reactionEmoji: { fontSize: 13 },
-  reactionCount: { color: colors.textMuted, fontSize: 11, fontWeight: '600' },
-  actions: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    paddingTop: 6, borderTopWidth: 1, borderTopColor: colors.border,
-  },
-  actionBtn:    { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  actionCount:  { color: colors.textMuted, fontSize: 12 },
+  reactionCount: { color: 'rgba(255,255,255,0.38)', fontSize: 11, fontWeight: '600' },
 
-  commentsSection: { gap: 10, paddingTop: 4, borderTopWidth: 1, borderTopColor: colors.border },
+  // ── Action bar ────────────────────────────────────────────────────────────
+  actions:     { flexDirection: 'row', alignItems: 'center', gap: 18, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  actionBtn:   { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  actionCount: { color: 'rgba(255,255,255,0.36)', fontSize: 12 },
+
+  // ── Comments ──────────────────────────────────────────────────────────────
+  commentsSection: { gap: 10, paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
   commentRow:      { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   meAvatar: {
     width: 28, height: 28, borderRadius: 14,
@@ -757,15 +780,15 @@ const cd = StyleSheet.create({
   },
   meAvatarText:  { color: colors.accent, fontSize: 8, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
   commentBubble: {
-    flex: 1, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10,
-    borderWidth: 1, borderColor: colors.border, padding: 8, gap: 2,
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', borderRadius: 10,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', padding: 8, gap: 2,
   },
-  commentName:   { color: colors.primary, fontSize: 11, fontWeight: '700' },
-  commentText:   { color: colors.textMuted, fontSize: 12, lineHeight: 17 },
+  commentName:    { color: colors.primary, fontSize: 11, fontWeight: '700' },
+  commentText:    { color: 'rgba(255,255,255,0.52)', fontSize: 12, lineHeight: 17 },
   commentCompose: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 20,
-    borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 6,
+    backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 20,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 12, paddingVertical: 7,
   },
   commentInput: { flex: 1, color: colors.text, fontSize: 13, padding: 0 },
 });
@@ -1684,7 +1707,8 @@ function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts:
           const isOwnPost = subTab === 'posts';
           return (
             <View key={post.id} style={me.postCard}>
-              <LinearGradient colors={['#120025', '#080018']} style={StyleSheet.absoluteFill} />
+              <LinearGradient colors={['rgba(22,8,44,0.97)', 'rgba(7,3,18,0.98)']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />
+              <View style={[cd.accentStripe, { backgroundColor: POST_TAG_COLORS[post.tag] ?? colors.primary, opacity: 0.45 }]} />
               {isRepost && post.repostedFrom && (
                 <View style={me.repostBanner}>
                   <Ionicons name={subTab === 'likes' ? 'heart' : 'repeat'} size={10} color={subTab === 'likes' ? colors.secondary : colors.success} />
@@ -1752,10 +1776,10 @@ const me = StyleSheet.create({
   indicator: { position: 'absolute', bottom: 0, left: '15%', right: '15%', height: 2, backgroundColor: colors.primary, borderRadius: 1 },
   repostBanner: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingBottom: 5 },
   repostLabel: { fontSize: 10, fontWeight: '600' },
-  postCard: { borderRadius: 14, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', padding: 12, gap: 8 },
+  postCard: { borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', overflow: 'hidden', padding: 14, gap: 8 },
   postAvatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.surface, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  postUser: { color: colors.text, fontSize: 12, fontWeight: '700' },
-  postTime: { color: colors.textDim, fontSize: 10 },
+  postUser: { color: '#ffffff', fontSize: 13, fontWeight: '800' },
+  postTime: { color: 'rgba(255,255,255,0.32)', fontSize: 10 },
   empty: { alignItems: 'center', paddingVertical: 44, gap: 10 },
   emptyText: { color: colors.textDim, fontSize: 13 },
   deleteBtn: { padding: 3 },
@@ -2085,7 +2109,7 @@ export default function FeedScreen() {
               </View>
             ) : null
           }
-          contentContainerStyle={{ paddingTop: 4, paddingBottom: insets.bottom + 90, gap: 12 }}
+          contentContainerStyle={{ paddingTop: 6, paddingBottom: insets.bottom + 90, gap: 14, paddingHorizontal: 14 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
