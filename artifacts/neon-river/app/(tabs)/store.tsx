@@ -515,7 +515,7 @@ export default function StoreScreen() {
             <View style={styles.vipBenefits}>
               {[
                 '50% daily bonus chips every day',
-                'Exclusive VIP neon table themes',
+                'Exclusive VIP table themes',
                 'VIP badge + avatar glow effect',
                 'Bonus XP on every hand played',
                 'Access to VIP Lounge tables',
@@ -527,8 +527,8 @@ export default function StoreScreen() {
               ))}
             </View>
             <View style={styles.vipCta}>
-              <Text style={styles.vipCtaText}>UNLOCK VIP ACCESS</Text>
-              <Ionicons name="chevron-forward" size={14} color="#bf5fff" />
+              <Ionicons name="time-outline" size={14} color="#bf5fff" />
+              <Text style={styles.vipCtaText}>COMING SOON</Text>
             </View>
           </View>
         </TouchableOpacity>

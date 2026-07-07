@@ -258,7 +258,7 @@ export default function SignupScreen() {
                 <View style={s.stepContent}>
                   <Text style={s.stepLabel}>STEP 1 OF 3</Text>
                   <Text style={s.stepTitle}>Choose Your{'\n'}Username</Text>
-                  <Text style={s.stepDesc}>Your unique identity at the neon table. Choose wisely.</Text>
+                  <Text style={s.stepDesc}>Your unique identity at the table. Choose wisely.</Text>
 
                   {/* Server status pill — informational only, never blocks flow */}
                   <View style={s.serverPill}>
@@ -439,7 +439,7 @@ export default function SignupScreen() {
                     </View>
                   </View>
                   <Text style={s.welcomeTitle}>WELCOME,{'\n'}{username.toUpperCase()}</Text>
-                  <Text style={s.stepDesc}>Your account is ready. You're about to enter the neon table.</Text>
+                  <Text style={s.stepDesc}>Your account is ready. You're about to enter the table.</Text>
 
                   <View style={s.chipsCard}>
                     <Text style={s.chipsLabel}>STARTING BALANCE</Text>

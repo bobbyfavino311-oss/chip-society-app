@@ -226,11 +226,11 @@ function VercettiBanner() {
 
 // ─── Short descriptions (one line each) ───────────────────────────────────────
 const SHORT_DESC: Record<string, string> = {
-  neon_default:     'Classic neon-synthwave table.',
+  neon_default:     'Classic synthwave table.',
   dragon_fortune:   'Ancient crimson and gold VIP table.',
   royal_masquerade: 'Elegant Venetian casino theme.',
   sakura_garden:    'Minimal Japanese-inspired table.',
-  frozen_neon:      'Arctic luxury neon casino table.',
+  frozen_neon:      'Arctic luxury casino table.',
   crimson_noir:     'Underground invitation-only noir room.',
   vercetti:         'Minimal tropical retro table.',
 };
