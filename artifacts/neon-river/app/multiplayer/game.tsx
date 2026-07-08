@@ -67,7 +67,7 @@ function toChromePlayer(s: SeatView, gs: ClientGameState) {
 }
 
 export default function MultiplayerGame() {
-  const { gameState, sendAction, leaveTable, tableId, buyIn, chatMessages, sendChat, setSitOut: emitSitOut } = useMultiplayer();
+  const { connected, gameState, sendAction, leaveTable, tableId, buyIn, chatMessages, sendChat, setSitOut: emitSitOut } = useMultiplayer();
   const { addChips, updateProfile, profile } = useUser();
   const { recordGameWin, recordGameLoss, recordOmahaHand, onChipBalance } = useAchievements();
   const { isMusicMuted, toggleMusicMute } = useSoundSettings();
@@ -468,6 +468,17 @@ export default function MultiplayerGame() {
         onClose={chat.closePanel}
         onOpen={chat.openPanel}
       />
+
+      {/* Reconnecting overlay — socket dropped, seat held on server for 60 s */}
+      {!connected && !!tableId && !!gs && (
+        <View style={g.reconnectOverlay}>
+          <View style={g.reconnectBox}>
+            <Text style={g.reconnectDot}>◈</Text>
+            <Text style={g.reconnectTitle}>RECONNECTING</Text>
+            <Text style={g.reconnectSub}>Your seat is held for 60 seconds</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -498,5 +509,32 @@ const g = StyleSheet.create({
     backgroundColor: 'rgba(5,0,16,0.92)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.06)',
+  },
+
+  reconnectOverlay: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(5,0,16,0.82)',
+    alignItems: 'center', justifyContent: 'center',
+    zIndex: 999,
+  },
+  reconnectBox: {
+    alignItems: 'center', gap: 10,
+    paddingVertical: 28, paddingHorizontal: 36,
+    borderRadius: 18, borderWidth: 1,
+    borderColor: 'rgba(0,212,255,0.28)',
+    backgroundColor: 'rgba(0,212,255,0.05)',
+  },
+  reconnectDot: {
+    color: '#00d4ff', fontSize: 22, opacity: 0.7,
+  },
+  reconnectTitle: {
+    color: '#00d4ff',
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 15, letterSpacing: 2.5,
+  },
+  reconnectSub: {
+    color: 'rgba(255,255,255,0.45)',
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12, textAlign: 'center',
   },
 });
