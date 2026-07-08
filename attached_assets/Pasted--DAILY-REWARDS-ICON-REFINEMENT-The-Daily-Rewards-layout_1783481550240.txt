@@ -1,0 +1,139 @@
+# DAILY REWARDS ICON REFINEMENT
+
+The Daily Rewards layout is correct.
+
+The icons are not.
+
+This update is focused entirely on refining the Daily Spin and Streak icons so they feel handcrafted, premium, and consistent with the rest of Chip Society.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REMOVE THE DARK CIRCLES
+
+Remove the large dark circular backgrounds behind both icons.
+
+Do not replace them with another visible container.
+
+The icons should float directly in the center of the progress arc.
+
+If separation is needed, use only an extremely subtle radial glow behind the icon.
+
+There should be no visible circle or badge.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DAILY SPIN ICON
+
+Redesign the prize wheel.
+
+Current issues:
+
+• Looks like a target.
+• Pointer is incorrect.
+• Wheel appears empty.
+
+Requirements:
+
+• Eight equal wedges.
+• Wedges should be filled using alternating shades of purple.
+• Thin divider lines between wedges.
+• Small center hub.
+• Wheel approximately 10–15% larger.
+
+The wheel should instantly read as a Wheel of Fortune.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+WHEEL POINTER
+
+Move the pointer above the wheel.
+
+The pointer should point DOWN toward the wheel.
+
+Use a small triangle or diamond shape.
+
+The pointer should be clearly visible without dominating the icon.
+
+The pointer should never point upward.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STREAK ICON
+
+Replace the current flame.
+
+Requirements:
+
+• Remove the inner flame shape.
+• Use one clean flame silhouette.
+• Smooth outer curves.
+• Filled icon rather than outlined.
+• Modern, minimal styling.
+• Slightly thicker than the current version.
+
+The flame should instantly communicate momentum and streaks.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ICON STYLE
+
+Both icons should belong to the same design family.
+
+Use:
+
+• Rounded geometry.
+• Consistent stroke weight where applicable.
+• Clean proportions.
+• Minimal detail.
+
+Avoid clip-art styling.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PROGRESS ARC
+
+Refine the arc.
+
+• Reduce thickness slightly.
+• Increase spacing between the arc and the icon.
+• Lower opacity of the inactive section.
+• Soften the glow.
+
+The progress arc should support the icon rather than compete with it.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL HIERARCHY
+
+The focus should be:
+
+Progress Arc
+
+↓
+
+Floating Icon
+
+↓
+
+Label
+
+↓
+
+Timer
+
+No additional shapes or containers should distract from this hierarchy.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VALIDATION
+
+✓ Remove the dark circular backgrounds.
+✓ Icons float directly on the card.
+✓ Wheel has eight filled wedges.
+✓ Wheel pointer sits above the wheel and points downward.
+✓ Wheel no longer resembles a target.
+✓ Flame is a single clean silhouette.
+✓ Inner flame removed.
+✓ Progress arc refined and softened.
+✓ Icons are larger and easier to read.
+✓ Overall appearance feels premium, clean, and seamlessly integrated with the Chip Society design language.

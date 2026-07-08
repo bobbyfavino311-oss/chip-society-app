@@ -467,41 +467,50 @@ interface TrendPost {
 
 // ─── Prize Wheel + Flame SVG icons ───────────────────────────────────────────
 
-const RING_R    = 31;
-const RING_W    = 0.9;
+const RING_R    = 33;
+const RING_W    = 0.8;
 const RING_CIRC = 2 * Math.PI * RING_R;
 const ARC_270   = RING_CIRC * 0.75;
 const GAP_90    = RING_CIRC * 0.25;
 
-function PrizeWheelIcon({ color, size = 34 }: { color: string; size?: number }) {
+function PrizeWheelIcon({ color, size = 36 }: { color: string; size?: number }) {
+  const wedges = [
+    { d: 'M 12 12 L 12 2.8 A 9.2 9.2 0 0 1 18.5 5.5 Z',   dim: false },
+    { d: 'M 12 12 L 18.5 5.5 A 9.2 9.2 0 0 1 21.2 12 Z',   dim: true  },
+    { d: 'M 12 12 L 21.2 12 A 9.2 9.2 0 0 1 18.5 18.5 Z',  dim: false },
+    { d: 'M 12 12 L 18.5 18.5 A 9.2 9.2 0 0 1 12 21.2 Z',  dim: true  },
+    { d: 'M 12 12 L 12 21.2 A 9.2 9.2 0 0 1 5.5 18.5 Z',   dim: false },
+    { d: 'M 12 12 L 5.5 18.5 A 9.2 9.2 0 0 1 2.8 12 Z',    dim: true  },
+    { d: 'M 12 12 L 2.8 12 A 9.2 9.2 0 0 1 5.5 5.5 Z',     dim: false },
+    { d: 'M 12 12 L 5.5 5.5 A 9.2 9.2 0 0 1 12 2.8 Z',     dim: true  },
+  ];
+  const dividers: Array<[number, number]> = [
+    [12, 2.8], [18.5, 5.5], [21.2, 12], [18.5, 18.5],
+    [12, 21.2], [5.5, 18.5], [2.8, 12], [5.5, 5.5],
+  ];
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
-      {/* Outer ring */}
-      <Circle cx="12" cy="12" r="9.5" stroke={color} strokeWidth="1.4" fill="none" />
-      {/* 8 wheel spokes */}
-      {([0, 45, 90, 135, 180, 225, 270, 315] as const).map(a => (
-        <G key={a} rotation={a} originX={12} originY={12}>
-          <Line x1="12" y1="3.2" x2="12" y2="10.2" stroke={color} strokeWidth="0.9" strokeLinecap="round" />
-        </G>
+      {wedges.map((w, i) => (
+        <Path key={i} d={w.d} fill={color} opacity={w.dim ? 0.38 : 0.85} />
       ))}
-      {/* Center hub */}
-      <Circle cx="12" cy="12" r="1.8" fill={color} />
-      {/* Indicator pointer at top */}
-      <Path d="M12 0.2 L10.8 2.4 L13.2 2.4 Z" fill={color} />
+      {dividers.map(([x, y], i) => (
+        <Line key={i} x1={12} y1={12} x2={x} y2={y} stroke="rgba(5,1,14,0.5)" strokeWidth="0.5" />
+      ))}
+      <Circle cx="12" cy="12" r={9.2} stroke={color} strokeWidth="0.5" fill="none" opacity={0.55} />
+      <Circle cx="12" cy="12" r="2.2" fill="rgba(5,1,14,0.8)" />
+      <Circle cx="12" cy="12" r="1.3" fill={color} />
+      <Path d="M 12 2.8 L 10.8 0.8 L 13.2 0.8 Z" fill={color} />
     </Svg>
   );
 }
 
-function FlameIcon({ color, size = 34 }: { color: string; size?: number }) {
+function FlameIcon({ color, size = 36 }: { color: string; size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path
-        d="M12 21 C8 21 5.5 18 5.5 14.5 C5.5 11 7.5 9 9 7.5 C9 9.5 10 10.5 11 10.5 C11 7.5 12 4.5 14 2 C14 6 13 9.5 15.5 11 C16 9 16.5 7.5 17 7 C17.5 10.5 19.5 12.5 19.5 16 C19.5 19.5 16 21 12 21 Z"
-        stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round"
-      />
-      <Path
-        d="M12 18.5 C10 18.5 9 17 9 15 C9 13.5 10 12.5 11 11.5 C11 13 12 13.5 13 13.5 C13 12.5 13.5 11.5 14.5 11 C14.5 13.5 13.5 14.5 14.5 16 C14.5 17.5 13.5 18.5 12 18.5 Z"
-        fill={color} opacity={0.4}
+        d="M12 21.5 C8 21.5 5 18.5 5 14.5 C5 10.5 7.5 8.5 9 7 C9 9 10 10 11 10.5 C11 8 12 5 14 2.5 C14 7 12.5 9.5 15.5 11.5 C16 9.5 16.5 7.5 17 7 C17.5 10.5 19.5 12.5 19.5 16 C19.5 19.5 16.5 21.5 12 21.5 Z"
+        fill={color}
+        opacity={0.88}
       />
     </Svg>
   );
@@ -524,7 +533,7 @@ function RewardRow() {
       route: '/rewards/wheel',
       progress: canClaimWheel ? 1 : Math.max(0, (1440 - nextWheelIn) / 1440),
       pressAnim: spinPress,
-      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={34} />,
+      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={36} />,
     },
     {
       key: 'streak', label: 'STREAK', canClaim: canClaimDaily,
@@ -533,7 +542,7 @@ function RewardRow() {
       route: '/rewards/streak',
       progress: Math.min(1, ((profile.streakDays || 0) % 7) / 7),
       pressAnim: streakPress,
-      renderIcon: (c: string) => <FlameIcon color={c} size={34} />,
+      renderIcon: (c: string) => <FlameIcon color={c} size={36} />,
     },
   ];
 
@@ -562,13 +571,11 @@ function RewardRow() {
 
               {/* 270° arc + glass icon badge */}
               <View style={rr.ringWrap}>
-                {/* Ambient glow */}
-                <View style={{ position: 'absolute', width: 60, height: 60, borderRadius: 30, shadowColor: b.color, shadowOpacity: 0.18, shadowRadius: 22, shadowOffset: { width: 0, height: 0 } }} />
                 <Svg width={76} height={76} style={{ position: 'absolute', top: 1, left: 1 }}>
                   {/* Dim track arc */}
                   <Circle
                     cx="38" cy="38" r={RING_R}
-                    stroke={`${b.color}10`} strokeWidth={RING_W}
+                    stroke={`${b.color}0e`} strokeWidth={RING_W}
                     fill="none" strokeLinecap="round"
                     strokeDasharray={[ARC_270, GAP_90]}
                     rotation={135} originX={38} originY={38}
@@ -576,9 +583,9 @@ function RewardRow() {
                   {/* Progress arc soft glow */}
                   <Circle
                     cx="38" cy="38" r={RING_R}
-                    stroke={b.color} strokeWidth={RING_W * 3.5}
+                    stroke={b.color} strokeWidth={RING_W * 3}
                     fill="none" strokeLinecap="round"
-                    opacity={0.14}
+                    opacity={0.1}
                     strokeDasharray={[ARC_270 * b.progress, RING_CIRC - ARC_270 * b.progress]}
                     rotation={135} originX={38} originY={38}
                   />
@@ -591,15 +598,15 @@ function RewardRow() {
                     rotation={135} originX={38} originY={38}
                   />
                 </Svg>
-                {/* Floating icon — no badge container */}
+                {/* Floating icon */}
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <View style={{
-                    position: 'absolute', width: 48, height: 48, borderRadius: 24,
+                    position: 'absolute', width: 44, height: 44, borderRadius: 22,
                     shadowColor: b.color,
-                    shadowOpacity: b.canClaim ? 0.42 : 0.14,
-                    shadowRadius: 16, shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: b.canClaim ? 0.28 : 0.08,
+                    shadowRadius: 14, shadowOffset: { width: 0, height: 4 },
                   }} />
-                  {b.renderIcon(b.canClaim ? b.iconColor : `${b.color}65`)}
+                  {b.renderIcon(b.canClaim ? b.iconColor : `${b.color}60`)}
                 </View>
               </View>
 
