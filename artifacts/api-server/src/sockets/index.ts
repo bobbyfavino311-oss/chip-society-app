@@ -5,6 +5,8 @@ import { db, playersTable } from '@workspace/db';
 import { RoomManager } from '../poker/roomManager.js';
 import { logger } from '../lib/logger.js';
 import type { StakeTier, GameVariant } from '../poker/types.js';
+import { createAdapter } from '@socket.io/redis-adapter';
+import Redis from 'ioredis';
 
 const VALID_VARIANTS: ReadonlySet<string> = new Set([
   'texas_holdem', 'short_deck_holdem', 'joker_holdem', 'omaha_holdem',
@@ -71,6 +73,33 @@ export function setupSocketIO(httpServer: HttpServer): void {
     cors: { origin: '*', methods: ['GET', 'POST'] },
     transports: ['websocket', 'polling'],
   });
+
+  // ── Redis adapter (horizontal scaling) ────────────────────────────────────
+  // When REDIS_URL is set (Railway Redis plugin or Upstash), Socket.IO will
+  // fan out all broadcasts (lobby_state, game_state, etc.) across every node
+  // instance via Redis pub/sub. Without it the server runs single-process with
+  // the default in-memory adapter — safe for dev and low traffic.
+  const redisUrl = process.env.REDIS_URL;
+  if (redisUrl) {
+    try {
+      const pubClient = new Redis(redisUrl, {
+        maxRetriesPerRequest: null,   // required by @socket.io/redis-adapter
+        enableReadyCheck: false,
+        lazyConnect: false,
+      });
+      const subClient = pubClient.duplicate();
+
+      pubClient.on('error', (err) => logger.error({ err }, 'Redis pub client error'));
+      subClient.on('error', (err) => logger.error({ err }, 'Redis sub client error'));
+
+      io.adapter(createAdapter(pubClient, subClient));
+      logger.info({ redisUrl: redisUrl.replace(/:\/\/.*@/, '://***@') }, 'Socket.IO Redis adapter attached');
+    } catch (err) {
+      logger.error({ err }, 'Failed to attach Redis adapter — falling back to in-memory');
+    }
+  } else {
+    logger.warn('REDIS_URL not set — Socket.IO running with single-process in-memory adapter');
+  }
 
   _io = io;
 
