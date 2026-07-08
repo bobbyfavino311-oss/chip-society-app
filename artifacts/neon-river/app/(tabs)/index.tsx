@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Pressable,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -204,9 +205,11 @@ const infoModal = StyleSheet.create({
 const eaBanner = StyleSheet.create({
   wrap: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 10,
-    borderRadius: 14, borderWidth: 1, borderColor: 'rgba(0,212,255,0.30)',
+    borderRadius: 20, borderWidth: 1, borderColor: 'rgba(0,212,255,0.18)',
     paddingHorizontal: 14, paddingVertical: 12, overflow: 'hidden',
     minHeight: 74,
+    shadowColor: '#00d4ff', shadowOpacity: 0.1, shadowRadius: 14,
+    shadowOffset: { width: 0, height: 4 }, elevation: 5,
   },
   iconWrap: {
     width: 32, height: 32, borderRadius: 16, marginTop: 1,
@@ -294,9 +297,9 @@ function QuickPlayCard() {
   return (
     <View style={qp.card}>
       <LinearGradient
-        colors={['#120022', '#08001a', '#050010']}
+        colors={['rgba(16,5,34,0.97)', 'rgba(8,1,26,0.98)', 'rgba(5,1,14,0.99)']}
         style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       />
       <LinearGradient
         colors={[`${accentColor}14`, 'transparent']}
@@ -434,6 +437,7 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
+      <View style={logo.glowBg} />
       <Animated.Image
         source={LOGO_IMG}
         style={[logo.img, { opacity: brightness }]}
@@ -465,23 +469,38 @@ interface TrendPost {
 function RewardRow() {
   const { canClaimWheel, nextWheelIn, canClaimDaily, profile } = useUser();
   const c = useColors();
+  const spinAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(spinAnim, { toValue: 1, duration: 3000, useNativeDriver: true }),
+        Animated.timing(spinAnim, { toValue: 0, duration: 3000, useNativeDriver: true }),
+      ])
+    ).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.18, duration: 1400, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1.0,  duration: 1400, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
+
+  const wheelRotate = spinAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: ['-10deg', '10deg', '-10deg'] });
 
   const buttons = [
     {
-      icon: '🎡',
-      label: 'DAILY SPIN',
+      icon: '🎡', label: 'DAILY SPIN',
       badge: canClaimWheel ? 'READY' : `${Math.floor(nextWheelIn / 60)}h ${nextWheelIn % 60}m`,
-      badgeActive: canClaimWheel,
-      color: '#bf5fff',
-      route: '/rewards/wheel',
+      badgeActive: canClaimWheel, color: '#bf5fff', route: '/rewards/wheel',
+      iconAnim: { transform: [{ rotate: wheelRotate }] } as object,
     },
     {
-      icon: '🔥',
-      label: 'STREAK',
+      icon: '🔥', label: 'STREAK',
       badge: canClaimDaily ? 'CLAIM' : `DAY ${profile.streakDays || 1}`,
-      badgeActive: canClaimDaily,
-      color: '#ffd700',
-      route: '/rewards/streak',
+      badgeActive: canClaimDaily, color: '#ffd700', route: '/rewards/streak',
+      iconAnim: { transform: [{ scale: pulseAnim }] } as object,
     },
   ];
 
@@ -490,26 +509,28 @@ function RewardRow() {
       {buttons.map((b) => (
         <TouchableOpacity
           key={b.label}
-          style={[
-            {
-              flex: 1, borderRadius: 14, borderWidth: 1, overflow: 'hidden',
-              paddingVertical: 12, paddingHorizontal: 8,
-              alignItems: 'center', gap: 5,
-              backgroundColor: c.surface,
-              borderColor: b.badgeActive ? `${b.color}55` : c.border,
-            },
-          ]}
+          style={[{
+            flex: 1, borderRadius: 20, borderWidth: 1, overflow: 'hidden',
+            paddingVertical: 14, paddingHorizontal: 10,
+            alignItems: 'center', gap: 6,
+            backgroundColor: 'rgba(5,1,14,0.92)',
+            borderColor: b.badgeActive ? `${b.color}60` : 'rgba(255,255,255,0.09)',
+            shadowColor: b.badgeActive ? b.color : '#000',
+            shadowOpacity: b.badgeActive ? 0.18 : 0.12,
+            shadowRadius: 14, shadowOffset: { width: 0, height: 4 },
+            elevation: 5,
+          }]}
           onPress={() => router.push(b.route as any)}
           activeOpacity={0.8}
         >
           {b.badgeActive && (
-            <LinearGradient colors={[`${b.color}22`, 'transparent']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={[`${b.color}20`, 'transparent']} style={StyleSheet.absoluteFill} />
           )}
-          <Text style={{ fontSize: 24 }}>{b.icon}</Text>
+          <Animated.Text style={[{ fontSize: 24 }, b.iconAnim as any]}>{b.icon}</Animated.Text>
           <Text style={{ fontSize: 8, fontWeight: '800', letterSpacing: 0.8, color: b.badgeActive ? b.color : c.textMuted }}>
             {b.label}
           </Text>
-          <View style={{ borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3, backgroundColor: b.badgeActive ? b.color : c.surfaceElevated }}>
+          <View style={{ borderRadius: 14, paddingHorizontal: 9, paddingVertical: 4, backgroundColor: b.badgeActive ? b.color : 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: b.badgeActive ? 'transparent' : 'rgba(255,255,255,0.08)' }}>
             <Text style={{ fontSize: 8, fontWeight: '900', letterSpacing: 0.5, color: b.badgeActive ? '#050010' : c.textMuted }}>
               {b.badge}
             </Text>
@@ -522,14 +543,22 @@ function RewardRow() {
 
 function TrendCard({ post }: { post: TrendPost }) {
   const [liked, setLiked] = useState(false);
+  const pressAnim = useRef(new Animated.Value(0)).current;
+  function onPressIn() { Animated.spring(pressAnim, { toValue: 1, useNativeDriver: true, tension: 400, friction: 22 }).start(); }
+  function onPressOut() { Animated.spring(pressAnim, { toValue: 0, useNativeDriver: true, tension: 250, friction: 22 }).start(); }
+  const cardScale = pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.013] });
+
   return (
-    <View style={trend.card}>
+    <Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
+      <Animated.View style={[trend.cardOuter, { transform: [{ scale: cardScale }] }]}>
+      <View style={trend.card}>
       <LinearGradient
-        colors={['#1a0035', '#0d0020']}
+        colors={['rgba(16,5,34,0.97)', 'rgba(5,2,14,0.99)']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 0, y: 1 }}
       />
+      <View style={[trend.accentTop, { backgroundColor: post.typeColor }]} />
       <View style={trend.header}>
         <NeonAvatar avatarId={post.avatarId ?? 1} size={40} />
         <View style={{ flex: 1 }}>
@@ -556,6 +585,8 @@ function TrendCard({ post }: { post: TrendPost }) {
         <Text style={trend.timeAgo}>{post.timeAgo ?? 'just now'}</Text>
       </View>
     </View>
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -784,6 +815,18 @@ export default function HomeScreen() {
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingTop: 0, paddingBottom: 14 },
+  glowBg: {
+    position: 'absolute',
+    width: LOGO_IMG_W * 0.85,
+    height: LOGO_IMG_H,
+    top: LOGO_IMG_H * 0.1,
+    borderRadius: LOGO_IMG_W * 0.3,
+    backgroundColor: 'rgba(0,212,255,0.04)',
+    shadowColor: '#00d4ff',
+    shadowOpacity: 0.28,
+    shadowRadius: 30,
+    shadowOffset: { width: 0, height: 0 },
+  },
   img: {
     width: LOGO_IMG_W,
     height: LOGO_IMG_H,
@@ -801,15 +844,23 @@ const logo = StyleSheet.create({
 });
 
 const trend = StyleSheet.create({
+  cardOuter: {
+    shadowColor: '#00d4ff',
+    shadowOpacity: 0.13,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 7,
+  },
   card: {
     width: width * 0.72,
-    borderRadius: colors.radiusLg,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(0,212,255,0.15)',
     padding: 14,
     overflow: 'hidden',
     gap: 8,
   },
+  accentTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 3 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: {
     width: 36, height: 36, borderRadius: 18,
@@ -826,7 +877,7 @@ const trend = StyleSheet.create({
   potBadge: { alignItems: 'center' },
   potLabel: { color: colors.textDim, fontSize: 8, letterSpacing: 1 },
   potAmt: { color: colors.gold, fontSize: 15, fontWeight: '800', fontFamily: 'Inter_700Bold' },
-  content: { color: colors.textMuted, fontSize: 12, lineHeight: 18 },
+  content: { color: 'rgba(255,255,255,0.65)', fontSize: 12, lineHeight: 18 },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   likeBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   likeCount: { color: colors.textMuted, fontSize: 12 },
@@ -836,8 +887,10 @@ const trend = StyleSheet.create({
 
 const qp = StyleSheet.create({
   card: {
-    borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,212,255,0.15)',
     overflow: 'hidden', padding: 18, gap: 14,
+    shadowColor: '#00d4ff', shadowOpacity: 0.12, shadowRadius: 20,
+    shadowOffset: { width: 0, height: 5 }, elevation: 7,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   title: {
@@ -905,6 +958,8 @@ const styles = StyleSheet.create({
   topIconBtn: {
     width: 40, height: 40, borderRadius: 20,
     borderWidth: 1.5, alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#00d4ff', shadowOpacity: 0.14, shadowRadius: 12,
+    shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
   notifBadge: {
     position: 'absolute', top: -2, right: -2,
@@ -924,8 +979,11 @@ const styles = StyleSheet.create({
   activeCount: { color: '#ff4455', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
   statsRow: { flexDirection: 'row', gap: 10 },
   statCard: {
-    flex: 1, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border,
-    backgroundColor: colors.surface, padding: 12, alignItems: 'center',
+    flex: 1, borderRadius: 18, borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+    backgroundColor: 'rgba(5,1,14,0.88)', padding: 12, alignItems: 'center',
+    shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 }, elevation: 4,
   },
   statVal: { fontSize: 20, fontWeight: '800', fontFamily: 'Inter_700Bold' },
   statLbl: { color: colors.textMuted, fontSize: 9, letterSpacing: 1.5, marginTop: 3, fontFamily: 'Orbitron_400Regular' },
