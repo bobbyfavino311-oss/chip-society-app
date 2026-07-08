@@ -1,0 +1,162 @@
+# SOCIAL FEED HEADER POLISH — FLOATING FILTER BAR
+
+Redesign the filter section at the top of the Social Feed to better match the premium floating glass aesthetic used throughout Chip Society.
+
+Do NOT change any backend functionality. This is a visual/UI refinement only.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REMOVE DIVIDER LINES
+
+Remove the horizontal purple divider line above the filter pills.
+
+Remove the horizontal purple divider line below the filter pills.
+
+The filter row should no longer feel boxed in.
+
+Instead, it should breathe naturally between the header and the feed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CREATE A FLOATING FILTER BAR
+
+Instead of three separate pills floating on the page, place them inside one shared floating glass container.
+
+Current:
+
+Announcements     Leaderboard     Me
+
+New Layout:
+
+╭────────────────────────────────────────────╮
+│  Announcements   Leaderboard   Me          │
+╰────────────────────────────────────────────╯
+
+This container should feel like a premium floating control panel.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# GLASS PANEL STYLE
+
+The filter container should use:
+
+• 95% opacity smoked glass
+• Soft vertical gradient
+• Very subtle background blur
+• Thin glass border
+• Rounded corners (22–24px)
+• Soft shadow underneath
+• Gentle cyan/purple edge lighting
+
+It should appear suspended above the background, matching the floating feed cards.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FILTER PILL STYLING
+
+Keep the existing three filters:
+
+• Announcements
+• Leaderboard
+• Me
+
+Each pill should be cleaner and more minimal.
+
+Selected pill:
+
+• Slightly brighter glass fill
+• Cyan glow
+• White text
+• Smooth illuminated border
+
+Unselected pills:
+
+• Transparent glass
+• Thin gray outline
+• Muted gray text
+• No glow
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# ANIMATIONS
+
+When switching filters:
+
+Animate over approximately 200–250ms.
+
+The selected pill should:
+
+• Brighten smoothly
+• Fade in its glow
+• Slightly increase opacity
+
+Avoid hard cuts or instant color changes.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# SPACING
+
+Increase whitespace around the floating filter bar.
+
+Add approximately:
+
+• 12–16px below the Feed header
+• 16px above the Trending carousel
+
+The page should feel open and uncluttered.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# VISUAL HIERARCHY
+
+Top of page should now flow naturally:
+
+FEED Header
+
+↓
+
+Floating Glass Filter Bar
+
+↓
+
+Trending Carousel
+
+↓
+
+Feed Posts
+
+There should be no unnecessary divider lines separating these sections.
+
+Whitespace and floating layers should provide the visual separation instead.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CONSISTENCY
+
+The floating filter bar should visually match:
+
+• Feed cards
+• Trending carousel
+• Floating header
+• Create Post button
+
+All should share the same glass design language.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ Both purple divider lines are removed.
+✅ The filter pills sit inside one floating glass container.
+✅ Increased spacing makes the layout feel lighter.
+✅ Selected pill has a subtle cyan glow and brighter glass fill.
+✅ Unselected pills remain understated.
+✅ Smooth animations when switching filters.
+✅ Header, filter bar, carousel, and feed cards all feel like separate floating layers.
+✅ No functionality changes—only a cleaner, more premium UI.
+
+DESIGN GOAL
+
+The top portion of the Social Feed should feel open, elegant, and premium. Rather than using divider lines to separate sections, use whitespace, floating glass panels, and subtle depth to create hierarchy. The result should resemble a luxury gaming dashboard rather than a traditional social media feed.

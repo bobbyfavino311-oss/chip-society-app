@@ -1,0 +1,718 @@
+# SOCIAL FEED V2 — PREMIUM FLOATING GLASS REDESIGN
+
+This update is a visual polish pass for the Social Feed.
+
+Do NOT redesign the functionality.
+
+Do NOT change:
+
+• Feed logic
+• Post creation
+• Likes
+• Comments
+• Followers
+• Following
+• Backend
+• Database
+• Statistics
+
+This update is strictly focused on making the Social Feed feel lighter, smoother, more premium, and visually "floating."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DESIGN GOAL
+
+The Social Feed should no longer feel like stacked purple rectangles.
+
+Instead...
+
+It should feel like premium floating smoked-glass panels suspended above the background.
+
+Everything should have more depth.
+
+More breathing room.
+
+Smoother animations.
+
+Better visual hierarchy.
+
+Think:
+
+Luxury casino app.
+
+Premium gaming dashboard.
+
+Modern UI.
+
+NOT social media.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# GLASS PANEL DESIGN
+
+Every feed card becomes a premium glass panel.
+
+Each card should include:
+
+• 95% opacity dark smoked glass
+• Soft vertical gradient
+• Thin glowing outline
+• Soft inner highlight
+• Slight edge lighting
+• Soft shadow underneath
+
+The card should appear elevated above the background.
+
+Never completely flat.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FLOATING CARD EFFECT
+
+Every post card should appear to float.
+
+Add:
+
+Soft shadow
+
+Very slight elevation
+
+Subtle edge glow
+
+Gentle top highlight
+
+The card should visually separate itself from the background.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CARD HEIGHT
+
+Keep the existing card size.
+
+Do NOT compress content.
+
+Instead...
+
+Increase whitespace inside the card.
+
+More breathing room.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# SPACING
+
+Increase spacing between:
+
+Avatar
+
+↓
+
+Username
+
+↓
+
+Post Text
+
+↓
+
+Tags
+
+↓
+
+Reaction Bar
+
+Approximately 6px each.
+
+Nothing should feel cramped.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# LAYERED DEPTH
+
+Everything should exist on separate visual layers.
+
+Background
+
+↓
+
+Floating Cards
+
+↓
+
+Avatar
+
+↓
+
+Buttons
+
+↓
+
+Badges
+
+↓
+
+Header
+
+Nothing should appear flat.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FLOATING HEADER
+
+Redesign the Feed header.
+
+The top navigation becomes its own floating glass panel.
+
+Include:
+
+FEED
+
+Search
+
+Notifications
+
+Messages
+
+Create Post
+
+The header remains pinned while scrolling.
+
+Feed cards scroll underneath.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# HEADER STYLE
+
+Glass background
+
+95% opacity
+
+Soft blur
+
+Soft shadow
+
+Thin glowing border
+
+Rounded corners
+
+No harsh divider line.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# SCROLL PHYSICS
+
+Improve scroll behavior.
+
+Use:
+
+Soft momentum
+
+Gentle easing
+
+Natural deceleration
+
+Subtle bounce
+
+Scrolling should feel effortless.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CARD INTERACTION
+
+When a user presses a post:
+
+Raise card approximately 4px.
+
+Increase glow slightly.
+
+Increase shadow slightly.
+
+Scale to approximately 101%.
+
+Release:
+
+Smoothly return.
+
+Never snap.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# AVATAR DEPTH
+
+Keep current avatar rings.
+
+Add:
+
+Very soft ambient glow.
+
+Very soft shadow.
+
+Do not increase ring thickness.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# USERNAME HIERARCHY
+
+Player Name
+
+Bright white.
+
+Username
+
+Muted gray.
+
+Timestamp
+
+Muted gray.
+
+This improves readability immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# POST TEXT
+
+Use a softer light gray.
+
+Do not use bright white.
+
+The player name should remain the strongest visual element.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BADGES
+
+Win
+
+Bluff
+
+Royal Flush
+
+Tournament Winner
+
+Bad Beat
+
+Etc.
+
+Keep existing badges.
+
+Improve quality by adding:
+
+Soft gloss
+
+Soft glow
+
+Better contrast
+
+Do not enlarge them.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FOLLOW BUTTON
+
+Current Follow button is visually heavy.
+
+Replace with:
+
+Transparent glass fill
+
+Thin cyan outline
+
+White text
+
+When following:
+
+Filled cyan
+
+White checkmark
+
+Following
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# POST TAGS
+
+Current tags:
+
+Pot
+
+Royal Flush
+
+Bluff
+
+Etc.
+
+Keep them.
+
+Redesign them as premium glass capsules.
+
+Dark glass fill.
+
+Thin colored outline.
+
+Soft glow.
+
+Rounded corners.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REACTION BAR
+
+Keep existing functionality.
+
+Improve spacing.
+
+Icons should breathe.
+
+Color hierarchy:
+
+Like
+
+Soft pink
+
+Comment
+
+Soft gray
+
+React
+
+Warm orange
+
+Share
+
+Soft gray
+
+Do not overpower the post.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REMOVE HARSH DIVIDERS
+
+Do not use thick separator lines.
+
+Use whitespace instead.
+
+If needed:
+
+Extremely subtle glass divider.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CARD CORNERS
+
+Increase corner radius.
+
+Approximately 24px.
+
+Everything should match the rest of Chip Society.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# GLASS LIGHTING
+
+Each card should subtly catch light.
+
+Top edge:
+
+Very slight highlight.
+
+Bottom edge:
+
+Slightly darker.
+
+No reflective animation.
+
+No flashy effects.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BACKGROUND
+
+Keep the current page background.
+
+Enhance it with:
+
+Very subtle radial lighting.
+
+Extremely faint texture.
+
+Very low-opacity gradient.
+
+The background should remain secondary.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FEATURED POSTS
+
+Special posts should automatically stand out.
+
+Examples:
+
+Royal Flush
+
+Straight Flush
+
+Tournament Winner
+
+Jackpot
+
+Achievement
+
+These posts should receive:
+
+Slightly brighter edge glow.
+
+Slightly stronger shadow.
+
+Very subtle colored top accent.
+
+Do NOT change layout.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# TOP ACCENT LINE
+
+Every post receives a thin accent line across the top.
+
+Examples:
+
+Tournament Win
+
+Emerald
+
+Royal Flush
+
+Gold
+
+Bluff
+
+Purple
+
+Bad Beat
+
+Crimson
+
+Achievement
+
+Cyan
+
+Keep it subtle.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CAROUSEL CARD
+
+The Trending carousel should receive the same glass treatment.
+
+Floating cards.
+
+Glass backgrounds.
+
+Improved shadows.
+
+Rounded corners.
+
+Better spacing.
+
+Consistent design language.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# GLASS FILTER CHIPS
+
+Announcements
+
+Leaderboard
+
+Me
+
+Become floating glass pills.
+
+Transparent.
+
+Soft border.
+
+Soft shadow.
+
+Soft glow.
+
+Improve spacing between them.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CREATE POST BUTTON
+
+The + Post button becomes a floating glass pill.
+
+Glass background.
+
+Thin cyan outline.
+
+Soft glow.
+
+Remain pinned inside the floating header.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# NEW POST ANIMATION
+
+When a new post appears:
+
+Fade in.
+
+Slide down slightly.
+
+Duration:
+
+Approximately 250ms.
+
+Smooth easing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BADGE ANIMATIONS
+
+Only premium badges animate.
+
+Examples:
+
+Royal Flush
+
+Tournament Winner
+
+Jackpot
+
+Legend
+
+Straight Flush
+
+Animation:
+
+Very subtle pulse every 8–10 seconds.
+
+No constant flashing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# MICRO INTERACTIONS
+
+Buttons
+
+Slight scale on press.
+
+Cards
+
+Slight lift on press.
+
+Badges
+
+Soft hover glow.
+
+Follow button
+
+Smooth color transition.
+
+Everything should feel responsive.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FLOATING DEPTH SYSTEM
+
+Create clear depth hierarchy.
+
+Layer 1
+
+Background
+
+Layer 2
+
+Floating feed cards
+
+Layer 3
+
+Avatars
+
+Layer 4
+
+Buttons
+
+Layer 5
+
+Badges
+
+Layer 6
+
+Floating header
+
+Nothing should visually merge together.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PARALLAX SCROLL
+
+Implement subtle layered scrolling.
+
+Background moves slightly slower.
+
+Cards move naturally.
+
+Header remains fixed.
+
+This should create a barely noticeable depth effect.
+
+Do NOT exaggerate.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PERFORMANCE
+
+Maintain 60 FPS.
+
+Avoid expensive blur effects.
+
+Optimize shadows and transparency.
+
+Glass effects must remain lightweight.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ Feed cards feel like floating smoked-glass panels.
+
+✅ Header floats independently.
+
+✅ Better spacing throughout.
+
+✅ Softer typography hierarchy.
+
+✅ Better depth.
+
+✅ Improved shadows.
+
+✅ Rounded corners increased.
+
+✅ Follow button redesigned.
+
+✅ Tags redesigned.
+
+✅ Reaction row polished.
+
+✅ Trending carousel matches new style.
+
+✅ Featured posts receive premium accent lighting.
+
+✅ Scroll physics feel smooth.
+
+✅ Cards lift on press.
+
+✅ New posts animate into the feed.
+
+✅ Premium badges pulse subtly.
+
+✅ All functionality remains exactly the same.
+
+FINAL GOAL
+
+The Social Feed should feel less like a traditional social media feed and more like a premium casino lounge. Every post should appear to float effortlessly above the background with subtle glass effects, elegant spacing, layered depth, and smooth interactions. The redesign should make the feed one of the most polished and visually satisfying experiences in the entire Chip Society app while preserving its simplicity and performance.

@@ -16,6 +16,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Pressable,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -317,13 +318,20 @@ function LivePostCard({ post }: { post: FeedPost }) {
     if (c) setLiveComments(prev => [c, ...prev]);
   }
 
+  const pressAnim = useRef(new Animated.Value(0)).current;
+  function onPressIn() { Animated.spring(pressAnim, { toValue: 1, useNativeDriver: true, tension: 400, friction: 22 }).start(); }
+  function onPressOut() { Animated.spring(pressAnim, { toValue: 0, useNativeDriver: true, tension: 250, friction: 22 }).start(); }
+  const cardScale = pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.013] });
+
   return (
-    <View style={cd.wrap}>
+    <Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
+      <Animated.View style={[cd.cardOuter, { transform: [{ scale: cardScale }] }]}>
+      <View style={cd.wrap}>
       <LinearGradient
-        colors={['rgba(22,8,44,0.97)', 'rgba(7,3,18,0.98)']}
+        colors={['rgba(16,5,34,0.97)', 'rgba(5,2,14,0.99)']}
         style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       />
-      <View style={[cd.accentStripe, { backgroundColor: typeColor, opacity: 0.5 }]} />
+      <View style={[cd.accentStripe, { backgroundColor: typeColor }]} />
       <View style={cd.topHighlight} />
 
       {/* Header */}
@@ -346,6 +354,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
             style={[cd.followBtn, following && cd.followBtnActive]}
             onPress={() => following ? unfollow(post.authorId) : follow(post.authorId, post.authorUsername, post.authorAvatarIndex, post.authorRank ?? '')}
           >
+            {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
             <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
           </TouchableOpacity>
         )}
@@ -454,6 +463,8 @@ function LivePostCard({ post }: { post: FeedPost }) {
         </TouchableOpacity>
       </Modal>
     </View>
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -523,13 +534,20 @@ function PostCard({ post }: { post: SocialPost }) {
     setMyComment('');
   }
 
+  const pressAnim = useRef(new Animated.Value(0)).current;
+  function onPressIn() { Animated.spring(pressAnim, { toValue: 1, useNativeDriver: true, tension: 400, friction: 22 }).start(); }
+  function onPressOut() { Animated.spring(pressAnim, { toValue: 0, useNativeDriver: true, tension: 250, friction: 22 }).start(); }
+  const cardScale = pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.013] });
+
   return (
-    <View style={cd.wrap}>
+    <Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
+      <Animated.View style={[cd.cardOuter, { transform: [{ scale: cardScale }] }]}>
+      <View style={cd.wrap}>
       <LinearGradient
-        colors={['rgba(22,8,44,0.97)', 'rgba(7,3,18,0.98)']}
+        colors={['rgba(16,5,34,0.97)', 'rgba(5,2,14,0.99)']}
         style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       />
-      <View style={[cd.accentStripe, { backgroundColor: typeColor, opacity: 0.5 }]} />
+      <View style={[cd.accentStripe, { backgroundColor: typeColor }]} />
       <View style={cd.topHighlight} />
 
       {/* Header */}
@@ -562,6 +580,7 @@ function PostCard({ post }: { post: SocialPost }) {
         </View>
 
         <TouchableOpacity style={[cd.followBtn, following && cd.followBtnActive]} onPress={handleFollow}>
+          {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
           <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
         </TouchableOpacity>
 
@@ -734,20 +753,31 @@ function PostCard({ post }: { post: SocialPost }) {
         </TouchableOpacity>
       </Modal>
     </View>
+      </Animated.View>
+    </Pressable>
   );
 }
 
 const cd = StyleSheet.create({
+  // ── Outer shadow container (shadow cannot share view with overflow:hidden) ──
+  cardOuter: {
+    shadowColor: '#00d4ff',
+    shadowOpacity: 0.14,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+
   // ── Glass card shell ──────────────────────────────────────────────────────
   wrap: {
-    borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)',
-    overflow: 'hidden', padding: 16, gap: 12,
+    borderRadius: 24, borderWidth: 1, borderColor: 'rgba(0,212,255,0.15)',
+    overflow: 'hidden', padding: 18, gap: 12,
   },
-  accentStripe: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  topHighlight: { position: 'absolute', top: 2, left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.05)' },
+  accentStripe: { position: 'absolute', top: 0, left: 0, right: 0, height: 3 },
+  topHighlight: { position: 'absolute', top: 3, left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
 
   // ── Header ────────────────────────────────────────────────────────────────
-  header:      { flexDirection: 'row', alignItems: 'center', gap: 9 },
+  header:      { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatarWrap:  { position: 'relative' },
   onlineDot: {
     position: 'absolute', bottom: 0, right: 0,
@@ -757,47 +787,52 @@ const cd = StyleSheet.create({
   usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   username:    { color: '#ffffff', fontSize: 14, fontWeight: '800' },
   badgeIcon:   { fontSize: 12 },
-  handle:      { color: 'rgba(255,255,255,0.32)', fontSize: 10, marginTop: 1 },
+  handle:      { color: 'rgba(255,255,255,0.38)', fontSize: 10, marginTop: 2 },
 
   // ── Type badge (WIN / BLUFF / etc.) ───────────────────────────────────────
-  typeBadge: { borderRadius: 8, borderWidth: 1, paddingHorizontal: 7, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 3 },
+  typeBadge: { borderRadius: 10, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 3 },
   typeText:  { fontSize: 8, fontWeight: '800', letterSpacing: 0.5, fontFamily: 'Orbitron_700Bold' },
 
   // ── Follow button ─────────────────────────────────────────────────────────
-  followBtn:        { borderWidth: 1, borderColor: 'rgba(0,212,255,0.55)', borderRadius: 14, paddingHorizontal: 10, paddingVertical: 5 },
-  followBtnActive:  { backgroundColor: 'rgba(0,212,255,0.15)', borderColor: 'rgba(0,212,255,0.3)' },
+  followBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    borderWidth: 1, borderColor: 'rgba(0,212,255,0.65)',
+    borderRadius: 14, paddingHorizontal: 11, paddingVertical: 5,
+    backgroundColor: 'transparent',
+  },
+  followBtnActive:  { backgroundColor: '#00d4ff', borderColor: '#00d4ff' },
   followText:       { color: '#00d4ff', fontSize: 10, fontWeight: '700' },
-  followTextActive: { color: 'rgba(0,212,255,0.55)' },
+  followTextActive: { color: '#000f22', fontWeight: '800' },
   moreBtn:          { padding: 2 },
 
   // ── Body ──────────────────────────────────────────────────────────────────
-  content:  { color: 'rgba(255,255,255,0.62)', fontSize: 13, lineHeight: 20 },
+  content:  { color: 'rgba(255,255,255,0.76)', fontSize: 13, lineHeight: 21 },
   statsRow: { flexDirection: 'row', gap: 8 },
   statChip: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
-    backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: 8, borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 10, paddingVertical: 5,
+    backgroundColor: 'rgba(0,0,0,0.42)', borderRadius: 20, borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.11)', paddingHorizontal: 12, paddingVertical: 6,
   },
-  statText: { color: 'rgba(255,255,255,0.48)', fontSize: 11 },
+  statText: { color: 'rgba(255,255,255,0.55)', fontSize: 11 },
 
   // ── Reactions ─────────────────────────────────────────────────────────────
-  reactionsRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  reactionsRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   reactionBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: 'rgba(0,0,0,0.38)', borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+    borderRadius: 20, paddingHorizontal: 11, paddingVertical: 6,
   },
   reactionEmoji: { fontSize: 13 },
-  reactionCount: { color: 'rgba(255,255,255,0.38)', fontSize: 11, fontWeight: '600' },
+  reactionCount: { color: 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: '600' },
 
   // ── Action bar ────────────────────────────────────────────────────────────
-  actions:     { flexDirection: 'row', alignItems: 'center', gap: 18, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
-  actionBtn:   { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  actionCount: { color: 'rgba(255,255,255,0.36)', fontSize: 12 },
+  actions:     { flexDirection: 'row', alignItems: 'center', gap: 20, paddingTop: 10 },
+  actionBtn:   { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  actionCount: { color: 'rgba(255,255,255,0.42)', fontSize: 12 },
 
   // ── Comments ──────────────────────────────────────────────────────────────
-  commentsSection: { gap: 10, paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  commentsSection: { gap: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)' },
   commentRow:      { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   meAvatar: {
     width: 28, height: 28, borderRadius: 14,
@@ -1831,9 +1866,9 @@ function AIPostMiniCard({ post }: { post: AIPost }) {
   return (
     <View style={aiCardStyle.card}>
       <LinearGradient
-        colors={['#120028', '#080018']}
+        colors={['rgba(16,5,34,0.97)', 'rgba(5,2,14,0.99)']}
         style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       />
       <View style={[aiCardStyle.accentLine, { backgroundColor: post.tagColor }]} />
       {/* Header row */}
@@ -1866,9 +1901,11 @@ function AIPostMiniCard({ post }: { post: AIPost }) {
 
 const aiCardStyle = StyleSheet.create({
   card: {
-    width: 220, borderRadius: 14, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
-    padding: 12, gap: 8,
+    width: 220, borderRadius: 16, overflow: 'hidden',
+    borderWidth: 1, borderColor: 'rgba(0,212,255,0.14)',
+    padding: 14, gap: 8,
+    shadowColor: '#00d4ff', shadowOpacity: 0.1, shadowRadius: 14,
+    shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
   accentLine: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -2050,6 +2087,10 @@ export default function FeedScreen() {
 
       {/* Header */}
       <View style={[ss.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
+        <LinearGradient
+          colors={['rgba(14,3,28,0.96)', 'rgba(6,1,15,0.98)']}
+          style={StyleSheet.absoluteFill}
+        />
         <Text style={ss.headerTitle}>FEED</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TouchableOpacity style={hdrStyle.bell} onPress={() => setActiveTab('search')}>
@@ -2185,16 +2226,28 @@ const ss = StyleSheet.create({
   container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingBottom: 12,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+    paddingHorizontal: 16, paddingBottom: 14,
+    backgroundColor: 'rgba(6,1,16,0.94)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,212,255,0.11)',
+    shadowColor: '#00d4ff',
+    shadowOpacity: 0.09,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 12,
   },
   headerTitle: { color: colors.primary, fontSize: 20, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 3 },
-  newPostBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 11, paddingVertical: 6 },
+  newPostBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderWidth: 1, borderColor: 'rgba(0,212,255,0.6)',
+    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
+    backgroundColor: 'rgba(0,212,255,0.07)',
+  },
   newPostText: { color: colors.primary, fontSize: 11, fontWeight: '700' },
   tabBarOuter: {
+    backgroundColor: 'rgba(5,1,13,0.93)',
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderBottomColor: 'rgba(0,212,255,0.08)',
   },
   tabBarScroll: { flexGrow: 0 },
   tabBarContent: {
@@ -2208,14 +2261,14 @@ const ss = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 9,
     borderRadius: 50,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
     position: 'relative',
-    minWidth: 70,
+    minWidth: 72,
     justifyContent: 'center',
   },
   tabDot: {

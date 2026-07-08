@@ -1,0 +1,373 @@
+# HOME PAGE VISUAL POLISH — PREMIUM FLOATING GLASS UPDATE
+
+Do NOT redesign the Home page layout.
+
+Do NOT move, resize, or rearrange any sections.
+
+Keep the exact same navigation, spacing, ordering, and functionality.
+
+This update is strictly a visual polish pass to make the Home screen feel more premium, smoother, and more modern.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DESIGN GOAL
+
+The Home page should feel like multiple floating glass panels resting above a luxurious dark background.
+
+Nothing should feel flat.
+
+Everything should have subtle depth, lighting, and smooth animations.
+
+The visual style should match the redesigned Social Feed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FLOATING GLASS PANELS
+
+Apply the premium glass treatment to every major card on the Home page.
+
+Including:
+
+• Daily Spin
+• Streak
+• Trending Now cards
+• Quick Play
+• Tournament cards
+• Every featured content card
+
+Each card should use:
+
+• 95% opacity smoked glass
+• Soft vertical gradient
+• Very subtle background blur
+• Thin illuminated border
+• Soft cyan/purple edge lighting
+• Rounded corners (22–26px)
+• Soft shadow underneath
+
+Every card should appear to float slightly above the background.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DEPTH
+
+Nothing should sit directly on the background.
+
+Every major component should have:
+
+• Soft elevation
+• Ambient shadow
+• Gentle glow
+• Slight separation from surrounding content
+
+The page should have obvious visual layers without changing the layout.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# GLASS LIGHTING
+
+Each floating panel should receive:
+
+• Soft top highlight
+• Slightly darker lower edge
+• Gentle side lighting
+• Very subtle glass reflection
+
+Do NOT use bright reflections.
+
+Keep everything understated.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CARD SHADOWS
+
+Replace harsh shadows with:
+
+Large-radius
+
+Low-opacity
+
+Very soft ambient shadows.
+
+Cards should appear suspended rather than dropped.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# ROUNDED CORNERS
+
+Increase corner radius consistently.
+
+Major cards:
+
+22–26px
+
+Buttons:
+
+18–22px
+
+Small capsules:
+
+16–18px
+
+Maintain consistency throughout the Home page.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BUTTON POLISH
+
+Buttons should become premium floating glass buttons.
+
+Apply to:
+
+• Play buttons
+• See All
+• Music
+• Notification
+• Tournament buttons
+
+Use:
+
+• Glass fill
+• Thin illuminated outline
+• Soft glow
+• Smooth shadow
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# ICON DEPTH
+
+Every icon should receive:
+
+• Soft glow
+• Tiny shadow
+• Better contrast
+
+Examples:
+
+Music
+
+Notifications
+
+Daily Spin
+
+Streak
+
+Tournament icons
+
+Quick Play icon
+
+Do NOT increase their size.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# TYPOGRAPHY
+
+Improve hierarchy.
+
+Primary text:
+
+Bright white.
+
+Secondary text:
+
+Soft gray.
+
+Labels:
+
+Slightly brighter than current.
+
+Keep existing fonts.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# SECTION TITLES
+
+Keep all titles exactly where they are.
+
+Simply improve them with:
+
+• Slightly brighter color
+• Improved letter spacing
+• Better contrast
+
+No layout changes.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CARD INTERACTIONS
+
+When tapping any card:
+
+Lift approximately 4px.
+
+Increase shadow slightly.
+
+Increase border glow slightly.
+
+Scale to approximately 101%.
+
+Return smoothly when released.
+
+Animation:
+
+200ms.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BUTTON INTERACTIONS
+
+Buttons should animate smoothly.
+
+On press:
+
+Tiny scale
+
+Soft glow increase
+
+Smooth easing
+
+No harsh flashing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# LOGO POLISH
+
+Do NOT move the Chip Society logo.
+
+Simply enhance it.
+
+Add:
+
+• Soft glow behind lettering
+• Gentle bloom
+• Very subtle shadow
+
+No animation.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DAILY REWARD CARDS
+
+Keep their exact layout.
+
+Apply:
+
+Premium glass
+
+Soft shadows
+
+Rounded corners
+
+Subtle edge lighting
+
+The Ferris Wheel and Streak icons should feel like they're resting on glass.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# TRENDING CARDS
+
+Apply the same floating glass style used in the redesigned Social Feed.
+
+Cards should visually match.
+
+Use:
+
+• Floating shadows
+• Glass border
+• Soft glow
+• Better depth
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# QUICK PLAY
+
+Keep the exact layout.
+
+Only enhance:
+
+Glass material
+
+Lighting
+
+Depth
+
+Rounded corners
+
+Shadow
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BACKGROUND
+
+Keep the existing dark background.
+
+Enhance it with:
+
+Extremely subtle radial lighting.
+
+Very soft gradient transitions.
+
+No noticeable textures.
+
+No additional artwork.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# MICRO ANIMATIONS
+
+Introduce subtle ambient animations.
+
+Examples:
+
+• Daily Spin icon gently rotates a few degrees every several seconds.
+• Streak icon softly pulses.
+• Notification icon subtly brightens when unread.
+• Buttons smoothly fade between states.
+
+Animations should be slow, elegant, and never distracting.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CONSISTENCY
+
+Every Home page component should match the visual language of:
+
+• Social Feed
+• Feed cards
+• Floating filter bars
+• Bottom navigation
+• Profile cards
+
+Everything should feel like one unified design system.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PERFORMANCE
+
+Maintain a smooth 60 FPS.
+
+Optimize all shadows, blurs, and transparency.
+
+Avoid expensive rendering effects.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ Layout remains completely unchanged.
+✅ No sections are moved or resized.
+✅ Every card uses premium floating glass styling.
+✅ Shadows are softer and deeper.
+✅ Rounded corners are consistent.
+✅ Buttons feel elevated.
+✅ Icons have subtle depth.
+✅ Typography has better hierarchy.
+✅ Logo has a soft premium glow.
+✅ Trending cards match the new Feed styling.
+✅ The Home page feels lighter, smoother, and more luxurious without changing how users navigate it.
+
+FINAL GOAL
+
+The Home page should feel like it is built from floating smoked-glass panels suspended above a premium dark surface. The experience should be elegant, refined, and highly polished while preserving the exact layout users already know.
