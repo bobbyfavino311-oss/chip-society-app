@@ -367,6 +367,7 @@ export default function UltimateTexasHoldemScreen() {
   // ── PRE-FLOP DECISION ────────────────────────────────────────────────────────
   const handlePreflop = useCallback(async (mult: 0 | 3 | 4) => {
     if (busy || !deal) return;
+    if (mult > 0 && profile.chips < ante * mult) return; // balance guard
     setBusy(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
@@ -395,11 +396,12 @@ export default function UltimateTexasHoldemScreen() {
       setPhase('flop');
       setBusy(false);
     }
-  }, [busy, deal, ante, removeChips]);
+  }, [busy, deal, ante, profile.chips, removeChips]);
 
   // ── FLOP DECISION ────────────────────────────────────────────────────────────
   const handleFlop = useCallback(async (mult: 0 | 2) => {
     if (busy || !deal) return;
+    if (mult > 0 && profile.chips < ante * mult) return; // balance guard
     setBusy(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
@@ -422,11 +424,12 @@ export default function UltimateTexasHoldemScreen() {
       setPhase('turn_river');
       setBusy(false);
     }
-  }, [busy, deal, ante, removeChips]);
+  }, [busy, deal, ante, profile.chips, removeChips]);
 
   // ── RIVER DECISION ───────────────────────────────────────────────────────────
   const handleRiver = useCallback(async (mult: 0 | 1, fold: boolean) => {
     if (busy || !deal) return;
+    if (!fold && mult > 0 && profile.chips < ante * mult) return; // balance guard
     setBusy(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
@@ -438,7 +441,7 @@ export default function UltimateTexasHoldemScreen() {
       await removeChips(ante * mult);
       await doShowdown(deal, mult, false);
     }
-  }, [busy, deal, ante, removeChips]);
+  }, [busy, deal, ante, profile.chips, removeChips]);
 
   // ── SHOWDOWN ──────────────────────────────────────────────────────────────────
   const doShowdown = useCallback(async (
@@ -520,6 +523,11 @@ export default function UltimateTexasHoldemScreen() {
   const showFlopBtns      = phase === 'flop'       && !busy && playMult === 0;
   const showRiverBtns     = phase === 'turn_river' && !busy && playMult === 0 && !folded;
   const inGame            = ['preflop','flop','turn_river','showdown','result'].includes(phase);
+
+  // ── Affordability guards (chips already deducted for ante+blind+trips) ────────
+  const canAfford = (mult: number) => profile.chips >= ante * mult;
+  const playSubLabel = (mult: number) =>
+    canAfford(mult) ? fmt(ante * mult) : 'INSUFFICIENT';
 
   // ── RESULT net calc for display ───────────────────────────────────────────────
   let totalNet = 0;
@@ -695,9 +703,9 @@ export default function UltimateTexasHoldemScreen() {
           <>
             <Text style={s.decisionLabel}>PRE-FLOP DECISION</Text>
             <View style={s.btnRow}>
-              <ActionBtn label="CHECK"  onPress={() => handlePreflop(0)} accent="rgba(255,255,255,0.45)" />
-              <ActionBtn label="PLAY 3×" sub={`${fmt(ante * 3)}`} onPress={() => handlePreflop(3)} accent={accent} fill />
-              <ActionBtn label="PLAY 4×" sub={`${fmt(ante * 4)}`} onPress={() => handlePreflop(4)} accent="#00ff88" fill />
+              <ActionBtn label="CHECK"   onPress={() => handlePreflop(0)} accent="rgba(255,255,255,0.45)" />
+              <ActionBtn label="PLAY 3×" sub={playSubLabel(3)} onPress={() => handlePreflop(3)} accent={accent}   fill disabled={!canAfford(3)} />
+              <ActionBtn label="PLAY 4×" sub={playSubLabel(4)} onPress={() => handlePreflop(4)} accent="#00ff88" fill disabled={!canAfford(4)} />
             </View>
           </>
         )}
@@ -707,8 +715,8 @@ export default function UltimateTexasHoldemScreen() {
           <>
             <Text style={s.decisionLabel}>FLOP DECISION</Text>
             <View style={s.btnRow}>
-              <ActionBtn label="CHECK"  onPress={() => handleFlop(0)} accent="rgba(255,255,255,0.45)" />
-              <ActionBtn label="PLAY 2×" sub={`${fmt(ante * 2)}`} onPress={() => handleFlop(2)} accent={accent} fill />
+              <ActionBtn label="CHECK"   onPress={() => handleFlop(0)} accent="rgba(255,255,255,0.45)" />
+              <ActionBtn label="PLAY 2×" sub={playSubLabel(2)} onPress={() => handleFlop(2)} accent={accent} fill disabled={!canAfford(2)} />
             </View>
           </>
         )}
@@ -718,8 +726,8 @@ export default function UltimateTexasHoldemScreen() {
           <>
             <Text style={s.decisionLabel}>RIVER — FINAL DECISION</Text>
             <View style={s.btnRow}>
-              <ActionBtn label="FOLD"   sub="Lose Ante + Blind" onPress={() => handleRiver(0, true)} accent="#ff4444" />
-              <ActionBtn label="PLAY 1×" sub={`${fmt(ante)}`}   onPress={() => handleRiver(1, false)} accent={accent} fill />
+              <ActionBtn label="FOLD"    sub="Lose Ante + Blind" onPress={() => handleRiver(0, true)}  accent="#ff4444" />
+              <ActionBtn label="PLAY 1×" sub={playSubLabel(1)}   onPress={() => handleRiver(1, false)} accent={accent}  fill disabled={!canAfford(1)} />
             </View>
           </>
         )}

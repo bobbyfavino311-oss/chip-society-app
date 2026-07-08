@@ -1,0 +1,162 @@
+# ULTIMATE TEXAS HOLD'EM — PLAY BET BALANCE VALIDATION BUG
+
+There is a critical betting bug in Ultimate Texas Hold'em.
+
+The game is allowing the player to place a Play bet multiplier even when they do not have enough chips remaining to cover that wager.
+
+This must be fixed immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# EXAMPLE BUG
+
+Player bankroll:
+
+3M chips
+
+Player places:
+
+Ante: 500K  
+Blind: 500K  
+Trips Bonus: 500K  
+
+Total already committed:
+
+1.5M
+
+Remaining chips:
+
+1.5M
+
+Now the player reaches the pre-flop Play decision.
+
+Valid options:
+
+3x Play Bet = 1.5M
+
+4x Play Bet = 2M
+
+The player only has 1.5M remaining.
+
+Therefore:
+
+3x should be allowed.
+
+4x should be disabled.
+
+Current bug:
+
+The game still allows 4x.
+
+This is wrong.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REQUIRED RULE
+
+Before showing any Play multiplier button, validate the player's remaining available chip balance.
+
+Formula:
+
+Available Chips = Current Balance - Already Committed Bets
+
+Play Bet Cost = Ante × Multiplier
+
+Only enable a Play multiplier if:
+
+Available Chips >= Play Bet Cost
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BUTTON BEHAVIOR
+
+If the player cannot afford a multiplier:
+
+Disable that button.
+
+Show it dimmed.
+
+Do not allow tap.
+
+Optional small label:
+
+INSUFFICIENT CHIPS
+
+Do not allow the player to go negative.
+
+Do not allow hidden credit.
+
+Do not allow the bet to be placed and corrected later.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# APPLY TO ALL PLAY BET STAGES
+
+This validation must apply to every Ultimate Texas Hold'em Play decision:
+
+Pre-Flop:
+
+3x  
+4x  
+
+After Flop:
+
+2x  
+
+River:
+
+1x  
+
+Every stage must check available chips before enabling the action.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REQUIRED TEST
+
+Starting chips:
+
+3M
+
+Ante:
+
+500K
+
+Blind:
+
+500K
+
+Trips:
+
+500K
+
+Remaining:
+
+1.5M
+
+Expected:
+
+3x button enabled
+
+4x button disabled
+
+If the game allows 4x, the bug is not fixed.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ Player cannot place a Play bet larger than remaining chips.
+
+✅ 4x disables when unaffordable.
+
+✅ 3x remains enabled if affordable.
+
+✅ 2x validates correctly after flop.
+
+✅ 1x validates correctly on river.
+
+✅ Player balance never becomes negative.
+
+✅ Ultimate Texas Hold'em payout logic still calculates from actual committed bets only.
