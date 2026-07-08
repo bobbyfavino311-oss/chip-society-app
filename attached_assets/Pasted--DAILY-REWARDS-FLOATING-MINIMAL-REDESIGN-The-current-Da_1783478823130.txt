@@ -1,0 +1,149 @@
+# DAILY REWARDS — FLOATING MINIMAL REDESIGN
+
+The current Daily Rewards redesign feels too heavy.
+
+The rounded square behind the icons makes the cards feel cluttered and introduces an unnecessary layer.
+
+The goal is to make the Daily Rewards section feel effortless, premium, and seamless.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+REMOVE THE INNER BOXES
+
+Delete the rounded square glass container behind both icons.
+
+Do not replace it with another shape.
+
+The icons should float directly on the card.
+
+The card itself is the only container.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+PROGRESS ARC
+
+Keep the progress indicator, but refine it.
+
+• Remove the full circular appearance.
+• Use a thin 270° progress arc.
+• Reduce thickness by approximately 30%.
+• Make the inactive portion very subtle.
+• Apply only a soft glow to the active portion.
+
+The arc should frame the icon, not dominate it.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+DAILY SPIN ICON
+
+Replace the current target-like symbol.
+
+Use a minimalist prize wheel icon.
+
+Requirements:
+
+• Clearly recognizable as a Wheel of Fortune.
+• 8–10 wheel segments.
+• Small center hub.
+• Tiny indicator pointer at the top.
+• Simple geometric design.
+• Consistent line thickness with the rest of the app.
+
+It should immediately communicate "spin."
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+STREAK ICON
+
+Remove the trophy.
+
+Replace it with a clean custom flame icon.
+
+Requirements:
+
+• Minimal design.
+• Modern geometry.
+• No emoji styling.
+• No excessive detail.
+• Slightly rounded edges.
+
+The flame should immediately communicate momentum and consistency.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FLOATING EFFECT
+
+The icons should appear suspended above the card.
+
+Do NOT place them inside a visible badge.
+
+Instead, create the illusion of depth using:
+
+• Very subtle radial glow.
+• Soft ambient lighting.
+• Slight shadow beneath the icon.
+
+There should be no visible circle or square behind the icon.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+ICON SCALE
+
+Increase icon size by approximately 15–20%.
+
+Since the container is removed, the icons should occupy more visual space.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+CARD MATERIAL
+
+Keep the premium smoked-glass cards.
+
+Maintain:
+
+• Soft vertical gradient.
+• Soft edge lighting.
+• Very subtle border.
+• Premium shadow.
+
+Do not introduce additional containers or layers.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+VISUAL GOAL
+
+The Daily Rewards cards should feel open, elegant, and lightweight.
+
+The eye should see:
+
+Progress Arc
+
+↓
+
+Floating Icon
+
+↓
+
+Label
+
+↓
+
+Timer
+
+Nothing should feel boxed in or crowded.
+
+The design should resemble a premium automotive dashboard or luxury watch interface rather than stacked UI components.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VALIDATION
+
+✅ Remove inner rounded square containers.
+✅ Icons float directly on the card.
+✅ Replace the target-like icon with a proper prize wheel.
+✅ Replace the trophy with a minimalist flame.
+✅ Thin the progress arc.
+✅ Reduce inactive arc opacity.
+✅ Increase icon size slightly.
+✅ Add only subtle ambient glow behind the icons.
+✅ Maintain the clean, premium Chip Society aesthetic.
