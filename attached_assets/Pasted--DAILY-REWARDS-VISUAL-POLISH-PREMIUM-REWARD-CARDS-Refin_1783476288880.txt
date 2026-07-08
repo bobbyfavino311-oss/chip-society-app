@@ -1,0 +1,284 @@
+# DAILY REWARDS VISUAL POLISH — PREMIUM REWARD CARDS
+
+Refine the "Daily Rewards" section of the Home page.
+
+Do NOT change the layout.
+
+Do NOT resize the cards.
+
+Do NOT move the cards.
+
+Do NOT add any new functionality.
+
+This update is strictly a visual polish pass to make the Daily Spin and Streak cards feel more premium while maintaining their clean, minimalist design.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DESIGN GOAL
+
+The Daily Rewards cards should feel like premium collectible reward cards.
+
+Think:
+
+• Luxury casino rewards
+• Premium gaming dashboard
+• Modern glass UI
+
+The cards should look polished and valuable without becoming flashy or distracting.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# KEEP THE LAYOUT
+
+Keep exactly:
+
+• Card size
+• Card spacing
+• Card placement
+• Daily Rewards title
+• Timer location
+• Day counter location
+
+Do not rearrange anything.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# ICON CONTAINERS
+
+Instead of letting the icons float on the card background, place each icon inside a premium floating glass badge.
+
+Each badge should include:
+
+• Rounded square shape
+• Smoked glass background
+• Thin illuminated border
+• Soft inner glow
+• Small ambient shadow
+
+The badge should feel like it is resting above the reward card.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CUSTOM ICONS
+
+Replace the current emoji-style graphics with premium custom icons that match the rest of Chip Society.
+
+Daily Spin:
+
+Replace the Ferris wheel emoji with a custom prize wheel / lucky wheel line-art icon.
+
+Streak:
+
+Replace the fire emoji with a custom stylized flame icon.
+
+Both icons should use the same line thickness and design language as the rest of the app's icons.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# COUNTDOWN CAPSULE
+
+Redesign the timer capsule.
+
+Current:
+
+Flat rounded capsule.
+
+New:
+
+• Glass capsule
+• Soft vertical gradient
+• Thin cyan outline
+• Very subtle inner shadow
+• Slight glass reflection
+• Rounded corners
+
+The timer should immediately stand out as the most important information on the card.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# STREAK CAPSULE
+
+Apply the same premium glass styling to the "Day X" capsule.
+
+Keep the existing layout.
+
+Simply improve the material and depth.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CARD DEPTH
+
+Increase the floating effect slightly.
+
+Each reward card should receive:
+
+• Softer shadow
+• Slightly brighter edge lighting
+• More noticeable separation from the background
+
+The cards should appear suspended above the page.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# GLASS LIGHTING
+
+Apply premium glass lighting.
+
+Each card should have:
+
+• Soft top highlight
+• Slightly darker lower edge
+• Gentle side lighting
+• Extremely subtle glass reflection
+
+Nothing should appear flat.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# COLOR DIFFERENTIATION
+
+Differentiate the two reward cards using subtle ambient lighting only.
+
+Daily Spin:
+
+Soft cyan edge glow.
+
+Streak:
+
+Soft gold/orange edge glow.
+
+Do NOT change the card backgrounds.
+
+Do NOT introduce bright colors.
+
+Keep the effect understated.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# TYPOGRAPHY
+
+Improve text hierarchy.
+
+Card titles:
+
+Slightly brighter.
+
+Timer and Day capsules:
+
+Highest visual emphasis.
+
+Keep existing fonts.
+
+Do not increase font size significantly.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# INTERACTION
+
+When a reward card is pressed:
+
+• Lift approximately 3px.
+• Increase shadow slightly.
+• Increase border glow slightly.
+• Scale to approximately 101%.
+
+Animation:
+
+200ms.
+
+Very smooth.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CLAIM STATE
+
+When a reward becomes available:
+
+Replace the countdown timer with a premium glass "CLAIM" button.
+
+Do NOT flash.
+
+Do NOT pulse.
+
+Do NOT animate continuously.
+
+The button should simply appear ready to be tapped.
+
+Use:
+
+• Cyan accent
+• White text
+• Glass material
+• Thin illuminated outline
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PROGRESS RINGS
+
+Add a subtle circular progress ring around each icon.
+
+Daily Spin:
+
+Display the cooldown progress as a ring slowly completing around the prize wheel icon.
+
+Streak:
+
+Display progress toward the next streak milestone around the flame icon.
+
+The rings should be:
+
+• Thin
+• Elegant
+• Smooth
+• Non-distracting
+
+They should enhance the card without adding clutter.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# MICRO DETAILS
+
+Improve the premium feel by adding:
+
+• Soft ambient glow around icons
+• Slight shadow beneath icon badges
+• Better contrast between icon, title, and timer
+• Higher quality glass reflections
+
+Keep all effects subtle.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PERFORMANCE
+
+Maintain 60 FPS.
+
+Keep all effects lightweight.
+
+No expensive animations.
+
+No continuous motion.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ Layout remains exactly the same.
+✅ Card positions do not change.
+✅ Card sizes remain the same.
+✅ Premium glass icon badges added.
+✅ Custom prize wheel and flame icons replace emoji-style graphics.
+✅ Timer and Day capsules redesigned with glass styling.
+✅ Cards have more depth and softer shadows.
+✅ Daily Spin uses subtle cyan ambient lighting.
+✅ Streak uses subtle gold/orange ambient lighting.
+✅ Circular progress rings added around both icons.
+✅ Cards gently lift on press.
+✅ "CLAIM" replaces the timer when a reward is available.
+✅ No spinning, pulsing, or idle animations remain.
+
+FINAL GOAL
+
+The Daily Rewards section should feel like a premium reward center. Players should instantly recognize these as valuable collectibles rather than simple menu buttons. The redesign should add depth, polish, and luxury while remaining clean, minimal, and perfectly consistent with the rest of the Chip Society interface.

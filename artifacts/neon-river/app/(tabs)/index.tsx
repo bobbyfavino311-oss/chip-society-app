@@ -17,6 +17,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Svg, { Circle, G, Line, Path } from 'react-native-svg';
 import colors from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
@@ -464,57 +465,130 @@ interface TrendPost {
 }
 
 
-// ─── Reward quick-access row (Spin + Streak only — Scratch is in Store) ───────
+// ─── Prize Wheel + Flame SVG icons ───────────────────────────────────────────
+
+const RING_R    = 33;
+const RING_CIRC = 2 * Math.PI * RING_R;
+
+function PrizeWheelIcon({ color, size = 26 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx="12" cy="12" r="9.5" stroke={color} strokeWidth="1.5" fill="none" />
+      {([0, 60, 120, 180, 240, 300] as const).map(a => (
+        <G key={a} rotation={a} originX={12} originY={12}>
+          <Line x1="12" y1="2.5" x2="12" y2="9.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+        </G>
+      ))}
+      <Circle cx="12" cy="12" r="2.2" fill={color} />
+      <Path d="M11.2 0.5 L12 3.2 L12.8 0.5 Z" fill={color} />
+    </Svg>
+  );
+}
+
+function FlameIcon({ color, size = 26 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M12 22 C7.5 22 5 18.5 5 14.5 C5 11 7 9 9 7.5 C9 9.5 10 10.5 11 10.5 C11 7.5 12 4.5 14 2 C14 6 13 9.5 15.5 11 C16 9 16 7.5 17 7 C17.5 10.5 20 12.5 20 16 C20 19.5 16.5 22 12 22 Z"
+        stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round"
+      />
+      <Path
+        d="M12 19 C10.5 19 9.5 18 9.5 16 C9.5 14.5 10.5 13.5 11.5 12.5 C11.5 14 12.5 14.5 13 14.5 C13 13.5 13.5 12.5 14.5 11.5 C14.5 13.5 13.5 15 14.5 16.5 C14.5 18 13.5 19 12 19 Z"
+        fill={color} opacity={0.35}
+      />
+    </Svg>
+  );
+}
+
+// ─── Reward quick-access row ───────────────────────────────────────────────────
 function RewardRow() {
   const { canClaimWheel, nextWheelIn, canClaimDaily, profile } = useUser();
-  const c = useColors();
+  const spinPress   = useRef(new Animated.Value(0)).current;
+  const streakPress = useRef(new Animated.Value(0)).current;
 
-  const buttons = [
+  function pressIn(anim: Animated.Value)  { Animated.spring(anim, { toValue: 1, useNativeDriver: true, tension: 380, friction: 20 }).start(); }
+  function pressOut(anim: Animated.Value) { Animated.spring(anim, { toValue: 0, useNativeDriver: true, tension: 250, friction: 22 }).start(); }
+
+  const cards = [
     {
-      icon: '🎡', label: 'DAILY SPIN',
-      badge: canClaimWheel ? 'READY' : `${Math.floor(nextWheelIn / 60)}h ${nextWheelIn % 60}m`,
-      badgeActive: canClaimWheel, color: '#bf5fff', route: '/rewards/wheel',
+      key: 'spin', label: 'DAILY SPIN', canClaim: canClaimWheel,
+      badgeText: `${Math.floor(nextWheelIn / 60)}h ${nextWheelIn % 60}m`,
+      color: '#bf5fff', route: '/rewards/wheel',
+      progress: canClaimWheel ? 1 : Math.max(0, (1440 - nextWheelIn) / 1440),
+      pressAnim: spinPress,
+      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={26} />,
     },
     {
-      icon: '🔥', label: 'STREAK',
-      badge: canClaimDaily ? 'CLAIM' : `DAY ${profile.streakDays || 1}`,
-      badgeActive: canClaimDaily, color: '#ffd700', route: '/rewards/streak',
+      key: 'streak', label: 'STREAK', canClaim: canClaimDaily,
+      badgeText: `DAY ${profile.streakDays || 1}`,
+      color: '#ffd700', route: '/rewards/streak',
+      progress: Math.min(1, ((profile.streakDays || 0) % 7) / 7),
+      pressAnim: streakPress,
+      renderIcon: (c: string) => <FlameIcon color={c} size={26} />,
     },
   ];
 
   return (
     <View style={{ flexDirection: 'row', gap: 10 }}>
-      {buttons.map((b) => (
-        <TouchableOpacity
-          key={b.label}
-          style={[{
-            flex: 1, borderRadius: 20, borderWidth: 1, overflow: 'hidden',
-            paddingVertical: 14, paddingHorizontal: 10,
-            alignItems: 'center', gap: 6,
-            backgroundColor: 'rgba(5,1,14,0.92)',
-            borderColor: b.badgeActive ? `${b.color}60` : 'rgba(255,255,255,0.09)',
-            shadowColor: b.badgeActive ? b.color : '#000',
-            shadowOpacity: b.badgeActive ? 0.18 : 0.12,
-            shadowRadius: 14, shadowOffset: { width: 0, height: 4 },
-            elevation: 5,
-          }]}
-          onPress={() => router.push(b.route as any)}
-          activeOpacity={0.8}
-        >
-          {b.badgeActive && (
-            <LinearGradient colors={[`${b.color}20`, 'transparent']} style={StyleSheet.absoluteFill} />
-          )}
-          <Text style={{ fontSize: 24 }}>{b.icon}</Text>
-          <Text style={{ fontSize: 8, fontWeight: '800', letterSpacing: 0.8, color: b.badgeActive ? b.color : c.textMuted }}>
-            {b.label}
-          </Text>
-          <View style={{ borderRadius: 14, paddingHorizontal: 9, paddingVertical: 4, backgroundColor: b.badgeActive ? b.color : 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: b.badgeActive ? 'transparent' : 'rgba(255,255,255,0.08)' }}>
-            <Text style={{ fontSize: 8, fontWeight: '900', letterSpacing: 0.5, color: b.badgeActive ? '#050010' : c.textMuted }}>
-              {b.badge}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ))}
+      {cards.map(b => {
+        const cardScale = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.015] });
+        const cardLift  = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -3] });
+        return (
+          <Pressable
+            key={b.key} style={{ flex: 1 }}
+            onPressIn={() => pressIn(b.pressAnim)}
+            onPressOut={() => pressOut(b.pressAnim)}
+            onPress={() => router.push(b.route as any)}
+          >
+            <Animated.View style={[
+              rr.card,
+              { borderColor: b.canClaim ? `${b.color}70` : `${b.color}28`, shadowColor: b.color },
+              { transform: [{ scale: cardScale }, { translateY: cardLift }] },
+            ]}>
+              <LinearGradient colors={['rgba(12,4,26,0.96)', 'rgba(5,1,14,0.98)']} style={StyleSheet.absoluteFill} />
+              {b.canClaim && <LinearGradient colors={[`${b.color}14`, 'transparent']} style={StyleSheet.absoluteFill} />}
+              <View style={rr.topHighlight} />
+
+              {/* Progress ring + glass icon badge */}
+              <View style={rr.ringWrap}>
+                <Svg width={72} height={72} style={{ position: 'absolute', top: 0, left: 0 }}>
+                  <Circle cx="36" cy="36" r={RING_R} stroke={`${b.color}1a`} strokeWidth="2.5" fill="none" />
+                  <Circle
+                    cx="36" cy="36" r={RING_R}
+                    stroke={b.color} strokeWidth="2.5" fill="none"
+                    strokeDasharray={[RING_CIRC, RING_CIRC]}
+                    strokeDashoffset={RING_CIRC * (1 - b.progress)}
+                    strokeLinecap="round"
+                    rotation={-90} originX={36} originY={36}
+                  />
+                </Svg>
+                <View style={[rr.iconBadge, { borderColor: `${b.color}50`, shadowColor: b.color }]}>
+                  <LinearGradient colors={[`${b.color}1a`, `${b.color}08`]} style={StyleSheet.absoluteFill} />
+                  {b.renderIcon(b.canClaim ? b.color : `${b.color}88`)}
+                </View>
+              </View>
+
+              {/* Label */}
+              <Text style={[rr.label, { color: b.canClaim ? b.color : 'rgba(255,255,255,0.55)' }]}>
+                {b.label}
+              </Text>
+
+              {/* Claim button OR timer capsule */}
+              {b.canClaim ? (
+                <View style={[rr.claimBtn, { borderColor: `${b.color}80` }]}>
+                  <LinearGradient colors={[`${b.color}2a`, `${b.color}10`]} style={StyleSheet.absoluteFill} />
+                  <Text style={[rr.claimText, { color: b.color }]}>CLAIM</Text>
+                </View>
+              ) : (
+                <View style={rr.timerCapsule}>
+                  <LinearGradient colors={['rgba(0,212,255,0.05)', 'rgba(0,0,0,0.22)']} style={StyleSheet.absoluteFill} />
+                  <Text style={rr.timerText}>{b.badgeText}</Text>
+                </View>
+              )}
+            </Animated.View>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -910,6 +984,52 @@ const qp = StyleSheet.create({
   startText: {
     color: '#050010', fontSize: 14, fontWeight: '900',
     letterSpacing: 1.5, fontFamily: 'Orbitron_700Bold',
+  },
+});
+
+const rr = StyleSheet.create({
+  card: {
+    borderRadius: 20, borderWidth: 1, overflow: 'hidden',
+    paddingTop: 16, paddingBottom: 14, paddingHorizontal: 10,
+    alignItems: 'center', gap: 8,
+    shadowOpacity: 0.15, shadowRadius: 18,
+    shadowOffset: { width: 0, height: 5 }, elevation: 7,
+  },
+  topHighlight: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+  },
+  ringWrap: {
+    width: 72, height: 72, alignItems: 'center', justifyContent: 'center',
+  },
+  iconBadge: {
+    width: 50, height: 50, borderRadius: 14, borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+    backgroundColor: 'rgba(5,1,14,0.88)',
+    shadowOpacity: 0.24, shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 }, elevation: 4,
+  },
+  label: {
+    fontSize: 8, fontWeight: '800', letterSpacing: 0.8,
+    fontFamily: 'Orbitron_400Regular',
+  },
+  timerCapsule: {
+    borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5,
+    borderWidth: 1, borderColor: 'rgba(0,212,255,0.3)',
+    overflow: 'hidden', minWidth: 72, alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  timerText: {
+    fontSize: 9, fontWeight: '900', letterSpacing: 0.5,
+    color: 'rgba(255,255,255,0.75)', fontFamily: 'Inter_700Bold',
+  },
+  claimBtn: {
+    borderRadius: 12, paddingHorizontal: 18, paddingVertical: 7,
+    borderWidth: 1, overflow: 'hidden', alignItems: 'center', minWidth: 72,
+  },
+  claimText: {
+    fontSize: 10, fontWeight: '900', letterSpacing: 1.5,
+    fontFamily: 'Orbitron_700Bold',
   },
 });
 
