@@ -467,10 +467,13 @@ interface TrendPost {
 
 // ─── Prize Wheel + Flame SVG icons ───────────────────────────────────────────
 
-const RING_R    = 33;
+const RING_R    = 36;
+const RING_W    = 1.5;
 const RING_CIRC = 2 * Math.PI * RING_R;
+const ARC_270   = RING_CIRC * 0.75;
+const GAP_90    = RING_CIRC * 0.25;
 
-function PrizeWheelIcon({ color, size = 26 }: { color: string; size?: number }) {
+function PrizeWheelIcon({ color, size = 24 }: { color: string; size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Circle cx="12" cy="12" r="9.5" stroke={color} strokeWidth="1.5" fill="none" />
@@ -485,7 +488,7 @@ function PrizeWheelIcon({ color, size = 26 }: { color: string; size?: number }) 
   );
 }
 
-function FlameIcon({ color, size = 26 }: { color: string; size?: number }) {
+function FlameIcon({ color, size = 24 }: { color: string; size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path
@@ -513,18 +516,20 @@ function RewardRow() {
     {
       key: 'spin', label: 'DAILY SPIN', canClaim: canClaimWheel,
       badgeText: `${Math.floor(nextWheelIn / 60)}h ${nextWheelIn % 60}m`,
-      color: '#bf5fff', route: '/rewards/wheel',
+      color: '#9955ee', iconColor: '#c890ff', cardTint: 'rgba(80,20,140,0.07)',
+      route: '/rewards/wheel',
       progress: canClaimWheel ? 1 : Math.max(0, (1440 - nextWheelIn) / 1440),
       pressAnim: spinPress,
-      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={26} />,
+      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={24} />,
     },
     {
       key: 'streak', label: 'STREAK', canClaim: canClaimDaily,
       badgeText: `DAY ${profile.streakDays || 1}`,
-      color: '#ffd700', route: '/rewards/streak',
+      color: '#ffaa00', iconColor: '#ffbc40', cardTint: 'rgba(120,70,0,0.05)',
+      route: '/rewards/streak',
       progress: Math.min(1, ((profile.streakDays || 0) % 7) / 7),
       pressAnim: streakPress,
-      renderIcon: (c: string) => <FlameIcon color={c} size={26} />,
+      renderIcon: (c: string) => <FlameIcon color={c} size={24} />,
     },
   ];
 
@@ -542,46 +547,58 @@ function RewardRow() {
           >
             <Animated.View style={[
               rr.card,
-              { borderColor: b.canClaim ? `${b.color}70` : `${b.color}28`, shadowColor: b.color },
+              { borderColor: b.canClaim ? `${b.color}55` : `${b.color}1e`, shadowColor: b.color },
               { transform: [{ scale: cardScale }, { translateY: cardLift }] },
             ]}>
-              <LinearGradient colors={['rgba(12,4,26,0.96)', 'rgba(5,1,14,0.98)']} style={StyleSheet.absoluteFill} />
-              {b.canClaim && <LinearGradient colors={[`${b.color}14`, 'transparent']} style={StyleSheet.absoluteFill} />}
+              {/* Base gradient + per-card tint */}
+              <LinearGradient colors={['rgba(10,4,22,0.97)', 'rgba(5,1,14,0.99)']} style={StyleSheet.absoluteFill} />
+              <LinearGradient colors={[b.cardTint, 'transparent']} style={StyleSheet.absoluteFill} />
+              {b.canClaim && <LinearGradient colors={[`${b.color}12`, 'transparent']} style={StyleSheet.absoluteFill} />}
               <View style={rr.topHighlight} />
 
-              {/* Progress ring + glass icon badge */}
+              {/* 270° arc + glass icon badge */}
               <View style={rr.ringWrap}>
-                <Svg width={72} height={72} style={{ position: 'absolute', top: 0, left: 0 }}>
-                  <Circle cx="36" cy="36" r={RING_R} stroke={`${b.color}1a`} strokeWidth="2.5" fill="none" />
+                {/* Ambient glow */}
+                <View style={{ position: 'absolute', width: 60, height: 60, borderRadius: 30, shadowColor: b.color, shadowOpacity: 0.18, shadowRadius: 22, shadowOffset: { width: 0, height: 0 } }} />
+                <Svg width={78} height={78} style={{ position: 'absolute', top: 0, left: 0 }}>
+                  {/* 270° track */}
                   <Circle
-                    cx="36" cy="36" r={RING_R}
-                    stroke={b.color} strokeWidth="2.5" fill="none"
-                    strokeDasharray={[RING_CIRC, RING_CIRC]}
-                    strokeDashoffset={RING_CIRC * (1 - b.progress)}
-                    strokeLinecap="round"
-                    rotation={-90} originX={36} originY={36}
+                    cx="39" cy="39" r={RING_R}
+                    stroke={`${b.color}20`} strokeWidth={RING_W}
+                    fill="none" strokeLinecap="round"
+                    strokeDasharray={[ARC_270, GAP_90]}
+                    rotation={135} originX={39} originY={39}
+                  />
+                  {/* 270° progress arc */}
+                  <Circle
+                    cx="39" cy="39" r={RING_R}
+                    stroke={b.color} strokeWidth={RING_W}
+                    fill="none" strokeLinecap="round"
+                    strokeDasharray={[ARC_270 * b.progress, RING_CIRC - ARC_270 * b.progress]}
+                    rotation={135} originX={39} originY={39}
                   />
                 </Svg>
-                <View style={[rr.iconBadge, { borderColor: `${b.color}50`, shadowColor: b.color }]}>
-                  <LinearGradient colors={[`${b.color}1a`, `${b.color}08`]} style={StyleSheet.absoluteFill} />
-                  {b.renderIcon(b.canClaim ? b.color : `${b.color}88`)}
+                <View style={[rr.iconBadge, { borderColor: `${b.color}44`, shadowColor: b.color }]}>
+                  <LinearGradient colors={[`${b.color}1a`, `${b.color}06`]} style={StyleSheet.absoluteFill} />
+                  <View style={rr.badgeHighlight} />
+                  {b.renderIcon(b.canClaim ? b.iconColor : `${b.color}70`)}
                 </View>
               </View>
 
               {/* Label */}
-              <Text style={[rr.label, { color: b.canClaim ? b.color : 'rgba(255,255,255,0.55)' }]}>
+              <Text style={[rr.label, { color: b.canClaim ? b.iconColor : 'rgba(255,255,255,0.5)' }]}>
                 {b.label}
               </Text>
 
-              {/* Claim button OR timer capsule */}
+              {/* Claim button OR glass timer capsule */}
               {b.canClaim ? (
-                <View style={[rr.claimBtn, { borderColor: `${b.color}80` }]}>
-                  <LinearGradient colors={[`${b.color}2a`, `${b.color}10`]} style={StyleSheet.absoluteFill} />
-                  <Text style={[rr.claimText, { color: b.color }]}>CLAIM</Text>
+                <View style={[rr.claimBtn, { borderColor: `${b.color}70` }]}>
+                  <LinearGradient colors={[`${b.color}2a`, `${b.color}0e`]} style={StyleSheet.absoluteFill} />
+                  <Text style={[rr.claimText, { color: b.iconColor }]}>CLAIM</Text>
                 </View>
               ) : (
                 <View style={rr.timerCapsule}>
-                  <LinearGradient colors={['rgba(0,212,255,0.05)', 'rgba(0,0,0,0.22)']} style={StyleSheet.absoluteFill} />
+                  <LinearGradient colors={['rgba(255,255,255,0.04)', 'rgba(0,0,0,0.22)']} style={StyleSheet.absoluteFill} />
                   <Text style={rr.timerText}>{b.badgeText}</Text>
                 </View>
               )}
@@ -797,7 +814,7 @@ export default function HomeScreen() {
 
         {/* 1 ─── Daily Rewards ─── */}
         <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>DAILY REWARDS</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>◈  DAILY REWARDS</Text>
         </View>
         <RewardRow />
 
@@ -990,42 +1007,47 @@ const qp = StyleSheet.create({
 const rr = StyleSheet.create({
   card: {
     borderRadius: 20, borderWidth: 1, overflow: 'hidden',
-    paddingTop: 16, paddingBottom: 14, paddingHorizontal: 10,
-    alignItems: 'center', gap: 8,
-    shadowOpacity: 0.15, shadowRadius: 18,
-    shadowOffset: { width: 0, height: 5 }, elevation: 7,
+    paddingTop: 18, paddingBottom: 16, paddingHorizontal: 10,
+    alignItems: 'center', gap: 12,
+    shadowOpacity: 0.13, shadowRadius: 22,
+    shadowOffset: { width: 0, height: 6 }, elevation: 8,
   },
   topHighlight: {
     position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   ringWrap: {
-    width: 72, height: 72, alignItems: 'center', justifyContent: 'center',
+    width: 78, height: 78, alignItems: 'center', justifyContent: 'center',
   },
   iconBadge: {
-    width: 50, height: 50, borderRadius: 14, borderWidth: 1,
+    width: 56, height: 56, borderRadius: 16, borderWidth: 1,
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-    backgroundColor: 'rgba(5,1,14,0.88)',
-    shadowOpacity: 0.24, shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 }, elevation: 4,
+    backgroundColor: 'rgba(5,1,14,0.90)',
+    shadowOpacity: 0.26, shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 }, elevation: 5,
+  },
+  badgeHighlight: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 22,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderTopLeftRadius: 15, borderTopRightRadius: 15,
   },
   label: {
     fontSize: 8, fontWeight: '800', letterSpacing: 0.8,
     fontFamily: 'Orbitron_400Regular',
   },
   timerCapsule: {
-    borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5,
-    borderWidth: 1, borderColor: 'rgba(0,212,255,0.3)',
-    overflow: 'hidden', minWidth: 72, alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderRadius: 12, paddingHorizontal: 14, paddingVertical: 7,
+    borderWidth: 1, borderColor: 'rgba(0,212,255,0.22)',
+    overflow: 'hidden', minWidth: 76, alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.28)',
   },
   timerText: {
     fontSize: 9, fontWeight: '900', letterSpacing: 0.5,
-    color: 'rgba(255,255,255,0.75)', fontFamily: 'Inter_700Bold',
+    color: 'rgba(255,255,255,0.78)', fontFamily: 'Inter_700Bold',
   },
   claimBtn: {
-    borderRadius: 12, paddingHorizontal: 18, paddingVertical: 7,
-    borderWidth: 1, overflow: 'hidden', alignItems: 'center', minWidth: 72,
+    borderRadius: 12, paddingHorizontal: 18, paddingVertical: 8,
+    borderWidth: 1, overflow: 'hidden', alignItems: 'center', minWidth: 76,
   },
   claimText: {
     fontSize: 10, fontWeight: '900', letterSpacing: 1.5,

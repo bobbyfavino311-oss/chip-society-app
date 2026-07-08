@@ -1,0 +1,373 @@
+# DAILY REWARDS V2 — PREMIUM POLISH PASS
+
+The Daily Rewards redesign is a major improvement, but it still feels slightly "UI generated." This update is a refinement pass only.
+
+Do NOT redesign the layout.
+
+Do NOT move the cards.
+
+Do NOT change functionality.
+
+Everything below is strictly visual refinement.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DESIGN GOAL
+
+The Daily Rewards cards should feel like premium luxury reward cards.
+
+The visual language should communicate:
+
+• Depth
+• Precision
+• Premium materials
+• Elegant restraint
+
+The section should feel like it belongs inside a AAA mobile game.
+
+Think:
+
+Luxury watch.
+
+Premium automotive dashboard.
+
+Apple-quality material design.
+
+Not flashy.
+
+Not cartoonish.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# THIN THE PROGRESS RINGS
+
+The current progress rings are visually too heavy.
+
+Reduce ring thickness by approximately 35–40%.
+
+Increase the ring diameter slightly.
+
+Reduce the opacity of the inactive portion.
+
+Only the completed progress should be bright.
+
+The ring should become a subtle accent rather than the main focal point.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CHANGE TO A 270° PROGRESS ARC
+
+Replace the full circular progress ring with a premium 270° progress arc.
+
+Leave the bottom portion of the circle open.
+
+The arc should wrap around the top and sides only.
+
+This immediately creates a cleaner, more premium look similar to a luxury watch complication.
+
+The arc should fill smoothly as progress increases.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# ENLARGE THE GLASS BADGE
+
+Increase the glass badge behind the icon by approximately 10–15%.
+
+This gives the custom icons more visual presence without increasing clutter.
+
+The badge should remain centered inside the progress arc.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# IMPROVE THE GLASS MATERIAL
+
+The icon badge should feel like polished smoked glass.
+
+Add:
+
+• Soft top highlight
+• Gentle inner shadow
+• Slightly darker lower edge
+• Very subtle cyan reflection
+• Better glass depth
+
+The badge should resemble a premium acrylic button.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# STRONGER ICON HIERARCHY
+
+Keep the custom icons.
+
+Do NOT enlarge them dramatically.
+
+Simply increase contrast.
+
+Daily Spin:
+
+Prize wheel icon should be slightly brighter than the surrounding badge.
+
+Streak:
+
+Flame icon should have richer gold coloring.
+
+Icons should remain clean line-art.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BETTER CARD MATERIAL
+
+The reward cards currently appear almost flat.
+
+Introduce a very subtle vertical gradient.
+
+Top:
+
+Slightly lighter.
+
+Bottom:
+
+Slightly darker.
+
+The transition should be nearly invisible.
+
+The card should feel more dimensional.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# IMPROVE CARD DEPTH
+
+Increase depth slightly.
+
+Use:
+
+• Softer ambient shadow
+• Slightly brighter edge lighting
+• Better separation from the background
+
+Avoid thick borders.
+
+The shadow should define the card more than the outline.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REDUCE BORDER VISIBILITY
+
+Current borders are too noticeable.
+
+Reduce border opacity by approximately 20%.
+
+Let lighting and shadow define the card edges.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# TIMER CAPSULE REDESIGN
+
+Redesign the timer capsule.
+
+Current:
+
+Feels disconnected.
+
+New:
+
+Premium glass capsule.
+
+Slightly taller.
+
+More horizontal padding.
+
+Soft vertical gradient.
+
+Very subtle inner shadow.
+
+Thin illuminated cyan outline.
+
+Soft glass reflection.
+
+The capsule should feel integrated into the card.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# STREAK CAPSULE
+
+Apply the same premium treatment to the Day capsule.
+
+Maintain consistency with the timer capsule.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BETTER SPACING
+
+Increase vertical spacing slightly.
+
+Icon Badge
+
+↓
+
+Card Title
+
+↓
+
+Timer Capsule
+
+Approximately 6–8px more spacing between each element.
+
+This gives the card room to breathe.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# AMBIENT GLOW
+
+Instead of only glowing around the ring...
+
+Add an extremely subtle ambient glow behind the entire glass badge.
+
+The glow should softly illuminate the surrounding card.
+
+Do not create a visible halo.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# COLOR HIERARCHY
+
+Separate the materials slightly.
+
+Daily Spin
+
+Card:
+
+Dark smoked purple.
+
+Progress Arc:
+
+Soft violet.
+
+Icon:
+
+Brighter cyan-violet.
+
+Streak
+
+Card:
+
+Dark smoked charcoal.
+
+Progress Arc:
+
+Warm gold.
+
+Icon:
+
+Rich amber.
+
+This creates better visual hierarchy while keeping the cards cohesive.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DAILY REWARDS HEADER
+
+Keep the current typography.
+
+Add a very small premium reward glyph to the left.
+
+Examples:
+
+◈
+
+◇
+
+Small trophy
+
+Small reward badge
+
+Keep it subtle.
+
+Do not overpower the heading.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# MICRO INTERACTIONS
+
+When pressing a reward card:
+
+Lift approximately 3px.
+
+Increase ambient shadow slightly.
+
+Increase glass reflection slightly.
+
+Increase edge glow slightly.
+
+Scale to approximately 101%.
+
+Animation:
+
+200ms.
+
+Smooth easing.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CLAIM STATE
+
+When a reward becomes available:
+
+Replace the timer capsule with:
+
+CLAIM
+
+Maintain:
+
+Glass capsule.
+
+Premium styling.
+
+No flashing.
+
+No pulsing.
+
+No idle animation.
+
+Simply become available to tap.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PERFORMANCE
+
+Maintain 60 FPS.
+
+Optimize all glass effects.
+
+Avoid expensive blur rendering.
+
+Keep everything lightweight.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ Layout remains unchanged.
+✅ Card size remains unchanged.
+✅ Progress rings replaced with premium 270° progress arcs.
+✅ Progress arcs are thinner and more refined.
+✅ Glass badge enlarged slightly.
+✅ Glass badge has better material depth.
+✅ Card gradient improved.
+✅ Borders softened.
+✅ Shadows refined.
+✅ Timer capsule redesigned.
+✅ Day capsule redesigned.
+✅ Better spacing throughout.
+✅ Ambient glow added behind icon badge.
+✅ Daily Spin and Streak have distinct but subtle color hierarchy.
+✅ Reward heading receives a small premium glyph.
+✅ Cards gently lift on press.
+✅ CLAIM button replaces timer when available.
+✅ No idle animations.
+
+FINAL GOAL
+
+The Daily Rewards section should feel handcrafted rather than autogenerated. Every element should communicate premium quality through subtle material design, depth, spacing, and restraint. The cards should look like collectible reward tokens integrated seamlessly into the overall Chip Society design system.
