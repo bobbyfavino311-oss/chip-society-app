@@ -1,0 +1,201 @@
+I think you’ve identified the real issue.
+
+It’s not the icons anymore—they’re much better.
+
+It’s the fact that they’re still inside cards. The cards are acting like giant buttons, but visually they don’t need to.
+
+What I’d do instead (this is how Apple and high-end mobile games often handle it):
+
+Turn the entire reward into a floating touch target, not a boxed card.
+
+Imagine this:
+
+        ◜──────────◝
+          🎡
+      (progress arc)
+      DAILY SPIN
+    ╭──────────────╮
+      18h 05m
+    ╰──────────────╯
+
+No visible card.
+
+No border.
+
+No rectangle.
+
+The player still taps anywhere in that area, but the touch target is invisible.
+
+⸻
+
+Invisible Touch Area
+
+Instead of showing a box:
+
+* Keep a large hit area (about 180×200 px).
+* The entire region is tappable.
+* The UI doesn’t reveal that hit area until interaction.
+
+This is a common pattern in premium apps: large invisible touch targets with minimal visual chrome.
+
+⸻
+
+Press Animation
+
+When the user taps anywhere in the reward area:
+
+* The icon lifts 4 px.
+* The progress arc brightens.
+* The timer pill lifts slightly.
+* A soft glass highlight fades in behind the icon for 150–200 ms.
+* Then everything returns to normal.
+
+This gives the feeling that the reward “comes alive” only when touched, instead of constantly sitting inside a box.
+
+⸻
+
+Remove the Card Border Entirely
+
+Delete:
+
+* Outer border
+* Outer shadow
+* Card outline
+
+Keep only:
+
+* Floating icon + progress arc
+* Label
+* Timer pill
+
+The negative space itself becomes the design.
+
+⸻
+
+Keep the Pill
+
+I actually like the timer pill.
+
+I’d even make it feel more detached.
+
+Instead of looking attached to a card, let it float underneath the icon with a little more vertical spacing.
+
+⸻
+
+Add a Soft Spotlight
+
+Instead of a card:
+
+Add an extremely subtle radial light behind the icon.
+
+Almost like a spotlight on a stage.
+
+Very low opacity.
+
+It gives the icon presence without introducing another shape.
+
+⸻
+
+The Result
+
+The hierarchy becomes:
+
+      🎡
+(progress arc)
+DAILY SPIN
+[18h 05m]
+
+Nothing else.
+
+Very elegant.
+
+Very premium.
+
+Very “Apple.”
+
+⸻
+
+Master Prompt
+
+# DAILY REWARDS — FLOATING LAYOUT REFINEMENT
+The Daily Rewards cards currently feel too boxed-in.
+The icons have improved significantly, but the large rectangular cards still make the section feel heavier than the rest of the Chip Society interface.
+This update should make the rewards feel like floating premium controls rather than boxed menu items.
+━━━━━━━━━━━━━━━━━━━━━━
+REMOVE THE VISIBLE CARDS
+Remove the visible reward card containers.
+Delete:
+• Outer border
+• Outer shadow
+• Card outline
+• Visible rectangular background
+The Daily Spin and Streak rewards should no longer appear inside cards.
+━━━━━━━━━━━━━━━━━━━━━━
+KEEP A LARGE TOUCH TARGET
+Even though the cards are visually removed, keep the interaction area.
+Each reward should have an invisible tap target approximately the same size as the current card.
+Players should still be able to tap anywhere in the reward area comfortably.
+Do not reduce usability.
+━━━━━━━━━━━━━━━━━━━━━━
+FLOATING LAYOUT
+Each reward should visually contain only:
+• Floating progress arc
+• Floating icon
+• Label
+• Timer/Day pill
+Nothing else.
+Let negative space become part of the design.
+━━━━━━━━━━━━━━━━━━━━━━
+SOFT SPOTLIGHT
+Behind each icon, add an extremely subtle radial spotlight.
+The spotlight should:
+• Fade smoothly into the background.
+• Be very low opacity.
+• Add depth without becoming a visible shape.
+Do not create another circle or badge.
+━━━━━━━━━━━━━━━━━━━━━━
+TIMER PILL
+Keep the timer pill exactly as it is.
+Increase the vertical spacing slightly so it feels visually detached from the icon.
+The pill should feel like its own floating element.
+━━━━━━━━━━━━━━━━━━━━━━
+PRESS ANIMATION
+When the user taps anywhere within the invisible reward area:
+• Icon lifts approximately 4px.
+• Progress arc brightens slightly.
+• Timer pill lifts slightly.
+• Soft highlight appears behind the icon.
+• Animation lasts approximately 180–200ms.
+• Smooth easing.
+No bounce.
+No excessive scaling.
+━━━━━━━━━━━━━━━━━━━━━━
+VISUAL GOAL
+The Daily Rewards section should feel open, effortless, and premium.
+The player should perceive:
+Floating Icon
+↓
+Progress Arc
+↓
+Reward Title
+↓
+Floating Timer Pill
+Instead of:
+Card
+↓
+Icon
+↓
+Text
+The interface should rely on spacing, lighting, and subtle depth rather than borders and containers.
+━━━━━━━━━━━━━━━━━━━━━━
+FINAL VALIDATION
+✓ Remove visible reward cards.
+✓ Preserve large invisible touch targets.
+✓ Keep only the icon, progress arc, label, and pill visible.
+✓ Add a subtle spotlight behind each icon.
+✓ Increase spacing between the icon and pill.
+✓ Add a premium lift animation on press.
+✓ Maintain accessibility and ease of tapping.
+✓ Preserve the clean, minimalist Chip Society design language.
+
+One final thought: I would actually keep the “Daily Rewards” section title exactly as it is. The typography is one of the strongest parts of your design. Let the rewards feel like they’re floating beneath the heading rather than being trapped inside two separate panels. That will make the entire Home screen feel lighter and more sophisticated.

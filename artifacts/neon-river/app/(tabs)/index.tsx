@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Easing,
   Dimensions,
   Image,
   Modal,
@@ -522,8 +523,8 @@ function RewardRow() {
   const spinPress   = useRef(new Animated.Value(0)).current;
   const streakPress = useRef(new Animated.Value(0)).current;
 
-  function pressIn(anim: Animated.Value)  { Animated.spring(anim, { toValue: 1, useNativeDriver: true, tension: 380, friction: 20 }).start(); }
-  function pressOut(anim: Animated.Value) { Animated.spring(anim, { toValue: 0, useNativeDriver: true, tension: 250, friction: 22 }).start(); }
+  function pressIn(anim: Animated.Value)  { Animated.timing(anim, { toValue: 1, useNativeDriver: true, duration: 140, easing: Easing.out(Easing.quad) }).start(); }
+  function pressOut(anim: Animated.Value) { Animated.timing(anim, { toValue: 0, useNativeDriver: true, duration: 200, easing: Easing.out(Easing.ease) }).start(); }
 
   const cards = [
     {
@@ -547,10 +548,14 @@ function RewardRow() {
   ];
 
   return (
-    <View style={{ flexDirection: 'row', gap: 10 }}>
+    <View style={{ flexDirection: 'row' }}>
       {cards.map(b => {
-        const cardScale = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.015] });
-        const cardLift  = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -3] });
+        const iconLift  = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -4] });
+        const pillLift  = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -2] });
+        const spotLight = b.pressAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [b.canClaim ? 0.06 : 0.03, b.canClaim ? 0.12 : 0.07],
+        });
         return (
           <Pressable
             key={b.key} style={{ flex: 1 }}
@@ -558,21 +563,15 @@ function RewardRow() {
             onPressOut={() => pressOut(b.pressAnim)}
             onPress={() => router.push(b.route as any)}
           >
-            <Animated.View style={[
-              rr.card,
-              { borderColor: b.canClaim ? `${b.color}55` : `${b.color}1e`, shadowColor: b.color },
-              { transform: [{ scale: cardScale }, { translateY: cardLift }] },
-            ]}>
-              {/* Base gradient + per-card tint */}
-              <LinearGradient colors={['rgba(10,4,22,0.97)', 'rgba(5,1,14,0.99)']} style={StyleSheet.absoluteFill} />
-              <LinearGradient colors={[b.cardTint, 'transparent']} style={StyleSheet.absoluteFill} />
-              {b.canClaim && <LinearGradient colors={[`${b.color}12`, 'transparent']} style={StyleSheet.absoluteFill} />}
-              <View style={rr.topHighlight} />
+            <View style={rr.floatArea}>
 
-              {/* 270° arc + glass icon badge */}
-              <View style={rr.ringWrap}>
+              {/* Arc + icon — lifts 4 px on press */}
+              <Animated.View style={[rr.ringWrap, { transform: [{ translateY: iconLift }] }]}>
+                {/* Soft spotlight — barely-visible accent disc, brightens on press */}
+                <Animated.View style={[rr.spotlight, { backgroundColor: b.color, opacity: spotLight }]} />
+
+                {/* 270° progress arc */}
                 <Svg width={76} height={76} style={{ position: 'absolute', top: 1, left: 1 }}>
-                  {/* Dim track arc */}
                   <Circle
                     cx="38" cy="38" r={RING_R}
                     stroke={`${b.color}0e`} strokeWidth={RING_W}
@@ -580,7 +579,6 @@ function RewardRow() {
                     strokeDasharray={[ARC_270, GAP_90]}
                     rotation={135} originX={38} originY={38}
                   />
-                  {/* Progress arc soft glow */}
                   <Circle
                     cx="38" cy="38" r={RING_R}
                     stroke={b.color} strokeWidth={RING_W * 3}
@@ -589,7 +587,6 @@ function RewardRow() {
                     strokeDasharray={[ARC_270 * b.progress, RING_CIRC - ARC_270 * b.progress]}
                     rotation={135} originX={38} originY={38}
                   />
-                  {/* Progress arc */}
                   <Circle
                     cx="38" cy="38" r={RING_R}
                     stroke={b.color} strokeWidth={RING_W}
@@ -598,36 +595,34 @@ function RewardRow() {
                     rotation={135} originX={38} originY={38}
                   />
                 </Svg>
+
                 {/* Floating icon */}
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <View style={{
-                    position: 'absolute', width: 44, height: 44, borderRadius: 22,
-                    shadowColor: b.color,
-                    shadowOpacity: b.canClaim ? 0.28 : 0.08,
-                    shadowRadius: 14, shadowOffset: { width: 0, height: 4 },
-                  }} />
                   {b.renderIcon(b.canClaim ? b.iconColor : `${b.color}60`)}
                 </View>
-              </View>
+              </Animated.View>
 
               {/* Label */}
               <Text style={[rr.label, { color: b.canClaim ? b.iconColor : 'rgba(255,255,255,0.5)' }]}>
                 {b.label}
               </Text>
 
-              {/* Claim button OR glass timer capsule */}
-              {b.canClaim ? (
-                <View style={[rr.claimBtn, { borderColor: `${b.color}70` }]}>
-                  <LinearGradient colors={[`${b.color}2a`, `${b.color}0e`]} style={StyleSheet.absoluteFill} />
-                  <Text style={[rr.claimText, { color: b.iconColor }]}>CLAIM</Text>
-                </View>
-              ) : (
-                <View style={rr.timerCapsule}>
-                  <LinearGradient colors={['rgba(255,255,255,0.04)', 'rgba(0,0,0,0.22)']} style={StyleSheet.absoluteFill} />
-                  <Text style={rr.timerText}>{b.badgeText}</Text>
-                </View>
-              )}
-            </Animated.View>
+              {/* Pill — lifts 2 px on press */}
+              <Animated.View style={{ transform: [{ translateY: pillLift }] }}>
+                {b.canClaim ? (
+                  <View style={[rr.claimBtn, { borderColor: `${b.color}70` }]}>
+                    <LinearGradient colors={[`${b.color}2a`, `${b.color}0e`]} style={StyleSheet.absoluteFill} />
+                    <Text style={[rr.claimText, { color: b.iconColor }]}>CLAIM</Text>
+                  </View>
+                ) : (
+                  <View style={rr.timerCapsule}>
+                    <LinearGradient colors={['rgba(255,255,255,0.04)', 'rgba(0,0,0,0.22)']} style={StyleSheet.absoluteFill} />
+                    <Text style={rr.timerText}>{b.badgeText}</Text>
+                  </View>
+                )}
+              </Animated.View>
+
+            </View>
           </Pressable>
         );
       })}
@@ -1030,31 +1025,15 @@ const qp = StyleSheet.create({
 });
 
 const rr = StyleSheet.create({
-  card: {
-    borderRadius: 20, borderWidth: 1, overflow: 'hidden',
-    paddingTop: 18, paddingBottom: 16, paddingHorizontal: 10,
-    alignItems: 'center', gap: 12,
-    shadowOpacity: 0.13, shadowRadius: 22,
-    shadowOffset: { width: 0, height: 6 }, elevation: 8,
+  floatArea: {
+    alignItems: 'center', gap: 16,
+    paddingTop: 10, paddingBottom: 6, paddingHorizontal: 4,
   },
-  topHighlight: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+  spotlight: {
+    position: 'absolute', width: 72, height: 72, borderRadius: 36,
   },
   ringWrap: {
     width: 78, height: 78, alignItems: 'center', justifyContent: 'center',
-  },
-  iconBadge: {
-    width: 56, height: 56, borderRadius: 18, borderWidth: 1,
-    alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-    backgroundColor: 'rgba(5,1,14,0.90)',
-    shadowOpacity: 0.26, shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 }, elevation: 5,
-  },
-  badgeHighlight: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 22,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderTopLeftRadius: 15, borderTopRightRadius: 15,
   },
   label: {
     fontSize: 8, fontWeight: '800', letterSpacing: 0.8,
