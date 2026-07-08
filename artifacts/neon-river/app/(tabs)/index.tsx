@@ -437,7 +437,6 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
-      <View style={logo.glowBg} />
       <Animated.Image
         source={LOGO_IMG}
         style={[logo.img, { opacity: brightness }]}
@@ -469,38 +468,17 @@ interface TrendPost {
 function RewardRow() {
   const { canClaimWheel, nextWheelIn, canClaimDaily, profile } = useUser();
   const c = useColors();
-  const spinAnim = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(spinAnim, { toValue: 1, duration: 3000, useNativeDriver: true }),
-        Animated.timing(spinAnim, { toValue: 0, duration: 3000, useNativeDriver: true }),
-      ])
-    ).start();
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.18, duration: 1400, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1.0,  duration: 1400, useNativeDriver: true }),
-      ])
-    ).start();
-  }, []);
-
-  const wheelRotate = spinAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: ['-10deg', '10deg', '-10deg'] });
 
   const buttons = [
     {
       icon: '🎡', label: 'DAILY SPIN',
       badge: canClaimWheel ? 'READY' : `${Math.floor(nextWheelIn / 60)}h ${nextWheelIn % 60}m`,
       badgeActive: canClaimWheel, color: '#bf5fff', route: '/rewards/wheel',
-      iconAnim: { transform: [{ rotate: wheelRotate }] } as object,
     },
     {
       icon: '🔥', label: 'STREAK',
       badge: canClaimDaily ? 'CLAIM' : `DAY ${profile.streakDays || 1}`,
       badgeActive: canClaimDaily, color: '#ffd700', route: '/rewards/streak',
-      iconAnim: { transform: [{ scale: pulseAnim }] } as object,
     },
   ];
 
@@ -526,7 +504,7 @@ function RewardRow() {
           {b.badgeActive && (
             <LinearGradient colors={[`${b.color}20`, 'transparent']} style={StyleSheet.absoluteFill} />
           )}
-          <Animated.Text style={[{ fontSize: 24 }, b.iconAnim as any]}>{b.icon}</Animated.Text>
+          <Text style={{ fontSize: 24 }}>{b.icon}</Text>
           <Text style={{ fontSize: 8, fontWeight: '800', letterSpacing: 0.8, color: b.badgeActive ? b.color : c.textMuted }}>
             {b.label}
           </Text>
@@ -815,18 +793,6 @@ export default function HomeScreen() {
 
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingTop: 0, paddingBottom: 14 },
-  glowBg: {
-    position: 'absolute',
-    width: LOGO_IMG_W * 0.85,
-    height: LOGO_IMG_H,
-    top: LOGO_IMG_H * 0.1,
-    borderRadius: LOGO_IMG_W * 0.3,
-    backgroundColor: 'rgba(0,212,255,0.04)',
-    shadowColor: '#00d4ff',
-    shadowOpacity: 0.28,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: 0 },
-  },
   img: {
     width: LOGO_IMG_W,
     height: LOGO_IMG_H,
