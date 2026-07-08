@@ -213,4 +213,41 @@ export class RoomManager {
       if (room.isEmpty()) this.rooms.delete(id);
     }
   }
+
+  /**
+   * Reap rooms where every seat has been disconnected for longer than maxAgeMs.
+   * Called on a periodic interval (every 5 min) by the server process.
+   */
+  cleanupStale(maxAgeMs = 5 * 60_000): void {
+    const now = Date.now();
+    for (const [id, room] of this.rooms.entries()) {
+      if (room.isEmpty()) { this.rooms.delete(id); continue; }
+
+      const allStale = room.seats.every(seat => {
+        if (seat === null) return true;
+        if (!seat.isDisconnected || seat.disconnectedAt === undefined) return false;
+        return now - seat.disconnectedAt > maxAgeMs;
+      });
+
+      if (allStale) {
+        // Cancel any pending disconnect timers for this room's players
+        for (const seat of room.seats) {
+          if (!seat) continue;
+          const timer = this.disconnectTimers.get(seat.userId);
+          if (timer) { clearTimeout(timer); this.disconnectTimers.delete(seat.userId); }
+          this.userIdRoom.delete(seat.userId);
+        }
+        this.rooms.delete(id);
+      }
+    }
+  }
+
+  /** Live metrics for the /api/stats health endpoint. */
+  getStats(): { rooms: number; players: number } {
+    let players = 0;
+    for (const room of this.rooms.values()) {
+      players += room.seats.filter(s => s !== null && !s.isDisconnected).length;
+    }
+    return { rooms: this.rooms.size, players };
+  }
 }

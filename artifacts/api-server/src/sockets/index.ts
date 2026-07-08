@@ -7,6 +7,7 @@ import { logger } from '../lib/logger.js';
 import type { StakeTier, GameVariant } from '../poker/types.js';
 import { createAdapter } from '@socket.io/redis-adapter';
 import Redis from 'ioredis';
+import { serverStats } from '../lib/serverStats.js';
 
 const VALID_VARIANTS: ReadonlySet<string> = new Set([
   'texas_holdem', 'short_deck_holdem', 'joker_holdem', 'omaha_holdem',
@@ -19,6 +20,23 @@ function resolveVariant(v: unknown): GameVariant {
 // ── Player presence registry ───────────────────────────────────────────────────
 const playerSockets = new Map<string, string>(); // playerId → socketId
 const socketPlayers = new Map<string, string>(); // socketId → playerId
+
+// ── Exported manager reference (for health/stats and stale-room reaper) ───────
+let _manager: RoomManager | null = null;
+export function getManager(): RoomManager | null { return _manager; }
+
+// ── Socket rate limiter ────────────────────────────────────────────────────────
+// Max 30 new socket connections per real IP per 60 s. Protects against
+// connection-flood bots that would push the event loop to saturation.
+const _connTimes = new Map<string, number[]>();
+setInterval(() => {
+  const cutoff = Date.now() - 60_000;
+  for (const [ip, times] of _connTimes.entries()) {
+    const trimmed = times.filter(t => t > cutoff);
+    if (trimmed.length === 0) _connTimes.delete(ip);
+    else _connTimes.set(ip, trimmed);
+  }
+}, 60_000).unref(); // don't keep process alive just for cleanup
 
 // NOTE: Chip persistence is client-authoritative, exactly like AI Practice mode.
 // The client debits the buy-in via removeChips() before joining (see
@@ -112,8 +130,26 @@ export function setupSocketIO(httpServer: HttpServer): void {
   };
 
   const manager = new RoomManager(emit, broadcast);
+  _manager = manager;
 
   io.on('connection', (socket) => {
+    // ─── Connection rate limiting ────────────────────────────────────────
+    const realIp =
+      (socket.handshake.headers['x-forwarded-for'] as string | undefined)
+        ?.split(',')[0]?.trim() ?? socket.handshake.address;
+    const now = Date.now();
+    const times = _connTimes.get(realIp) ?? [];
+    const recent = times.filter(t => now - t < 60_000);
+    recent.push(now);
+    _connTimes.set(realIp, recent);
+    if (recent.length > 30) {
+      logger.warn({ ip: realIp, count: recent.length }, 'Socket rate limit: too many connections, disconnecting');
+      socket.emit('error', { message: 'Too many connections from your address. Please wait a moment.' });
+      socket.disconnect(true);
+      return;
+    }
+
+    serverStats.incConnections();
     logger.info({ socketId: socket.id, transport: socket.conn.transport.name }, 'Socket connected');
 
     socket.conn.on('upgrade', (transport) => {
@@ -121,6 +157,7 @@ export function setupSocketIO(httpServer: HttpServer): void {
     });
 
     socket.on('disconnect', (reason) => {
+      serverStats.decConnections();
       logger.info({ socketId: socket.id, reason, transport: socket.conn.transport.name }, 'Socket disconnected (reason)');
     });
 

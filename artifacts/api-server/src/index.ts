@@ -1,6 +1,6 @@
 import { createServer } from 'http';
 import app from './app.js';
-import { setupSocketIO } from './sockets/index.js';
+import { setupSocketIO, getManager } from './sockets/index.js';
 import { logger } from './lib/logger.js';
 import { pool } from '@workspace/db';
 
@@ -218,4 +218,39 @@ httpServer.on('error', (err) => {
 httpServer.listen(port, async () => {
   logger.info({ port }, 'Server listening');
   await runMigrations();
+
+  // ── Stale room reaper ─────────────────────────────────────────────────────
+  // Every 5 minutes, remove rooms where every seat has been disconnected for
+  // longer than 5 minutes (the 60 s reconnect window has already expired for
+  // all players). This prevents the rooms Map from growing indefinitely on a
+  // long-running multi-instance deployment.
+  setInterval(() => {
+    const manager = getManager();
+    if (!manager) return;
+    manager.cleanupStale();
+    logger.info({ rooms: manager.getStats().rooms }, 'Stale room reap complete');
+  }, 5 * 60_000).unref();
 });
+
+// ── Graceful shutdown ──────────────────────────────────────────────────────
+// Railway sends SIGTERM before every deploy / scale event. We stop accepting
+// new HTTP connections immediately, give active sockets up to 15 s to drain
+// (players in a hand get time to finish), then exit cleanly.
+// Without this, Railway's SIGKILL after the timeout kills mid-hand state.
+function gracefulShutdown(signal: string) {
+  logger.info({ signal }, 'Received shutdown signal — draining connections');
+
+  httpServer.close(() => {
+    logger.info('HTTP server closed — exiting');
+    process.exit(0);
+  });
+
+  // Force-exit if drain takes longer than 15 s
+  setTimeout(() => {
+    logger.warn('Graceful shutdown timeout — forcing exit');
+    process.exit(1);
+  }, 15_000).unref();
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT',  () => gracefulShutdown('SIGINT'));
