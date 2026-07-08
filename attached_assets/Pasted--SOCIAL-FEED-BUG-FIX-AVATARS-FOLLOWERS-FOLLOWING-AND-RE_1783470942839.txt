@@ -1,0 +1,259 @@
+# SOCIAL FEED BUG FIX — AVATARS, FOLLOWERS, FOLLOWING, AND REPOST STATE
+
+Fix the following Social Feed bugs immediately. These are core identity/profile issues and must be treated as high priority.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 1. PLAYER AVATAR MISMATCH BUG
+
+Current bug:
+
+When a player creates a post on the Social Feed, the avatar shown on the post does not match the avatar selected on the player's Profile tab.
+
+The selected profile avatar only appears correctly on the profile page, but not on:
+
+• Social posts
+• Comments
+• Trending carousel
+• Player search
+• Followers list
+• Following list
+• Reposts
+• Notifications
+
+This must be fixed globally.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REQUIRED AVATAR BEHAVIOR
+
+The player's selected avatar must be the single source of truth everywhere.
+
+Use one server-side field only:
+
+selectedAvatarId
+
+or
+
+activeAvatarId
+
+Every real player display must pull from that value.
+
+Do not randomly assign avatars to real players.
+
+Do not use AI bot avatar logic for real users.
+
+Do not use fallback avatars unless the player has never selected one.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# POST CREATION AVATAR FIX
+
+When a real player creates a post, save:
+
+• userId
+• username
+• selectedAvatarId
+• post content
+• timestamp
+
+The post must display the player's selected avatar.
+
+If the player later changes their avatar, update the displayed avatar everywhere consistently.
+
+Recommended behavior:
+
+Real player posts always render the player's current selected avatar from their profile.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 2. FOLLOWING / FOLLOWERS LIST BUG
+
+Current bug:
+
+Following and followers lists do not work on player profiles.
+
+Fix this completely.
+
+Player profiles must display:
+
+• Followers count
+• Following count
+
+Tapping Followers opens a list of users who follow that player.
+
+Tapping Following opens a list of users that player follows.
+
+Each list item must show:
+
+• Correct selected avatar
+• Username
+• Display name if available
+• Follow / Following button
+• Tap to open profile
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FOLLOW BUTTON LOGIC
+
+When Player A follows Player B:
+
+• Player B followers count +1
+• Player A following count +1
+• Player B appears in Player A's Following list
+• Player A appears in Player B's Followers list
+• Follow button changes to Following
+
+When Player A unfollows Player B:
+
+• Player B followers count -1
+• Player A following count -1
+• Remove both list references
+• Button changes back to Follow
+
+This must update immediately without requiring logout or app restart.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PROFILE CLICK BUG CHECK
+
+When selecting a player from followers, following, feed, search, comments, or notifications:
+
+The correct player profile must open.
+
+Do not show:
+
+Player profile not found
+
+unless the account truly no longer exists.
+
+Use userId as the profile lookup key, not username text.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 3. AI BOT REPOST BUG
+
+Current bug:
+
+Players automatically start off as if they have already reposted AI bot posts on their profile.
+
+These reposts appear on the player's profile without the player actually reposting them.
+
+They cannot be undone.
+
+This is wrong.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REQUIRED REPOST BEHAVIOR
+
+A player profile should only show reposts that the player manually chose to repost.
+
+New players should start with:
+
+• 0 reposts
+• 0 shared AI posts
+• 0 forced feed reposts
+
+Do not seed player profiles with AI bot reposts.
+
+Do not automatically attach AI posts to real player profiles.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REPOST STATE FIX
+
+Repost state must be user-specific.
+
+Each repost should be stored as:
+
+• repostId
+• originalPostId
+• userId who reposted
+• timestamp
+
+Only show reposts where:
+
+repost.userId == current profile userId
+
+Do not infer reposts from AI filler posts.
+
+Do not mark AI posts as reposted by default.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# UNDO REPOST
+
+If a player has reposted something manually, they must be able to undo it.
+
+Tapping repost again should remove the repost.
+
+Profile should update immediately.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CLEAN EXISTING BAD DATA
+
+For existing accounts:
+
+Remove any automatic AI bot reposts that were not manually created by the player.
+
+If there is no valid repost record created by the player, do not show it.
+
+Do not display AI posts on a real player's profile unless that player actually reposted them.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 4. REAL PLAYER VS AI BOT SEPARATION
+
+Separate real player identity from AI bot identity.
+
+Real players:
+
+• Use selectedAvatarId
+• Have followers/following
+• Can post
+• Can comment
+• Can repost manually
+
+AI bots:
+
+• Use assigned AI avatar
+• Do not have functional follower/following lists unless intentionally designed
+• Do not appear as reposted by real players by default
+• Do not overwrite real player avatar fields
+
+Never mix these systems.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Test the following:
+
+1. Select Avatar A in Profile.
+2. Create a social post.
+3. Confirm post shows Avatar A.
+4. Confirm Home Trending carousel shows Avatar A.
+5. Comment on a post.
+6. Confirm comment shows Avatar A.
+7. Change to Avatar B.
+8. Confirm feed, comments, profile, search, followers, and following all show Avatar B.
+9. Follow another player.
+10. Confirm following count increases.
+11. Confirm followers count increases on the other profile.
+12. Open Following list.
+13. Confirm correct players appear.
+14. Open Followers list.
+15. Confirm correct players appear.
+16. Unfollow player.
+17. Confirm both counts decrease.
+18. Create a new account.
+19. Confirm profile has zero reposted AI posts.
+20. Confirm no AI bot post appears on profile unless manually reposted.
+21. Manually repost a post.
+22. Confirm it appears on profile.
+23. Undo repost.
+24. Confirm it disappears.
+
+The Social Feed must use the player's real selected identity everywhere. No random avatars, broken follower lists, fake AI reposts, or profile lookup failures should remain.

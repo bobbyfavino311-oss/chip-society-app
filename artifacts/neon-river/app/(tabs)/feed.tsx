@@ -262,7 +262,7 @@ function timeSince(dt: string | Date): string {
 
 function LivePostCard({ post }: { post: FeedPost }) {
   const { likePost, commentOnPost, getPostComments, deletePost } = useLiveFeed();
-  const { follow, unfollow, isFollowing, mute, block } = useSocial();
+  const { follow, unfollow, isFollowing, mute, block, addRepost, removeRepost, isReposted } = useSocial();
   const { profile } = useUser();
   const [showComments, setShowComments] = useState(false);
   const [liveComments, setLiveComments]       = useState<FeedComment[]>([]);
@@ -272,8 +272,29 @@ function LivePostCard({ post }: { post: FeedPost }) {
 
   const isOwn      = post.authorId === profile.playerId;
   const following  = isFollowing(post.authorId);
+  const reposted   = isReposted(post.id);
   const typeColor  = POST_TAG_COLORS[post.tag as PostTag] ?? '#00d4ff';
   const typeIcon   = POST_TYPE_ICONS[post.tag as PostTag] ?? 'star-outline';
+
+  function handleRepost() {
+    if (reposted) {
+      removeRepost(post.id);
+    } else {
+      addRepost({
+        postId: post.id,
+        authorId: post.authorId,
+        authorUsername: post.authorUsername,
+        authorAvatarId: post.authorAvatarIndex,
+        tag: post.tag,
+        content: post.content,
+        pot: post.pot ?? undefined,
+        handRank: post.handRank ?? undefined,
+        likeCount: post.likeCount,
+        commentCount: post.commentCount,
+        repostedAt: Date.now(),
+      });
+    }
+  }
 
   async function loadComments() {
     setLoadingComments(true);
@@ -308,7 +329,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
       {/* Header */}
       <View style={cd.header}>
         <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-          <NeonAvatar avatarId={post.authorAvatarIndex} size={44} />
+          <NeonAvatar avatarId={isOwn && profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : post.authorAvatarIndex} size={44} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
@@ -323,7 +344,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
         {!isOwn && (
           <TouchableOpacity
             style={[cd.followBtn, following && cd.followBtnActive]}
-            onPress={() => following ? unfollow(post.authorId) : follow(post.authorId, post.authorUsername)}
+            onPress={() => following ? unfollow(post.authorId) : follow(post.authorId, post.authorUsername, post.authorAvatarIndex, post.authorRank ?? '')}
           >
             <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
           </TouchableOpacity>
@@ -364,6 +385,11 @@ function LivePostCard({ post }: { post: FeedPost }) {
           <Ionicons name={showComments ? 'chatbubble' : 'chatbubble-outline'} size={15} color={showComments ? colors.accent : colors.textMuted} />
           <Text style={[cd.actionCount, showComments && { color: colors.accent }]}>{post.commentCount}</Text>
         </TouchableOpacity>
+        {!isOwn && (
+          <TouchableOpacity style={cd.actionBtn} onPress={handleRepost}>
+            <Ionicons name={reposted ? 'repeat' : 'repeat-outline'} size={17} color={reposted ? colors.success : colors.textMuted} />
+          </TouchableOpacity>
+        )}
         {isOwn ? (
           <TouchableOpacity style={[cd.actionBtn, { marginLeft: 'auto' }]} onPress={() => deletePost(post.id)}>
             <Ionicons name="trash-outline" size={15} color="rgba(255,80,80,0.5)" />
@@ -1433,7 +1459,7 @@ const srch = StyleSheet.create({
 interface MePost {
   id: string; tag: PostTag; content: string;
   pot?: string; handRank?: string; likes: number; comments: number;
-  timeAgo: string; repostedFrom?: string;
+  timeAgo: string; repostedFrom?: string; repostedAvatarId?: number;
 }
 
 function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
@@ -1592,25 +1618,37 @@ const cmp = StyleSheet.create({
 
 // ─── Me Section ──────────────────────────────────────────────────────────────
 
-const MY_REPOSTS: MePost[] = [
-  { id: 'mr1', tag: 'WIN', content: 'Royal Flush on the river. The whole table went silent. 🃏🔥', pot: '42,400', handRank: 'Royal Flush', likes: 1240, comments: 87, timeAgo: '2h', repostedFrom: 'NightShark99' },
-  { id: 'mr2', tag: 'BLUFF', content: 'Check-raised the flop, barreled turn, went all-in river with air. They folded top pair. 😤', pot: '33,600', likes: 1109, comments: 177, timeAgo: '1d', repostedFrom: 'PokerPhantom' },
-];
-const MY_LIKES: MePost[] = [
-  { id: 'ml1', tag: 'BAD BEAT', content: 'Quad Aces cracked by a straight flush. The odds are 0.000000001%.', pot: '91,000', handRank: 'Quad Aces', likes: 2103, comments: 318, timeAgo: '6h', repostedFrom: 'AceHunter_' },
-  { id: 'ml2', tag: 'ALL-IN', content: 'Five-way all-in pre-flop. I had AA. Flopped a set. Turned quads.', pot: '62,500', handRank: 'Quad Aces', likes: 1876, comments: 204, timeAgo: '8h', repostedFrom: 'ShadowKing' },
-];
 const INITIAL_MY_POSTS: MePost[] = [];
 
 function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts: MePost[]; onDeletePost: (id: string) => void; bottomInset: number; onCompose?: () => void }) {
   const { profile, winRate } = useUser();
-  const { following, notifications } = useSocial();
+  const { following, notifications, myReposts: socialMyReposts } = useSocial();
+  const { allPosts: livePosts } = useLiveFeed();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
 
   const meAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
   const neonCol = getNeonAvatar(meAvatarId).color;
   const avatarType = profile.profileImageType ?? 'symbol';
-  const data = subTab === 'posts' ? myPosts : subTab === 'reposts' ? MY_REPOSTS : MY_LIKES;
+
+  const repostData: MePost[] = socialMyReposts.map(r => ({
+    id: r.postId, tag: r.tag as PostTag, content: r.content,
+    pot: r.pot, handRank: r.handRank,
+    likes: r.likeCount, comments: r.commentCount,
+    timeAgo: timeSince(new Date(r.repostedAt)),
+    repostedFrom: r.authorUsername, repostedAvatarId: r.authorAvatarId,
+  }));
+
+  const likeData: MePost[] = livePosts
+    .filter(p => p.likedByMe)
+    .map(p => ({
+      id: p.id, tag: p.tag as PostTag, content: p.content,
+      pot: p.pot ?? undefined, handRank: p.handRank ?? undefined,
+      likes: p.likeCount, comments: p.commentCount,
+      timeAgo: timeSince(p.createdAt),
+      repostedFrom: p.authorUsername, repostedAvatarId: p.authorAvatarIndex,
+    }));
+
+  const data: MePost[] = subTab === 'posts' ? myPosts : subTab === 'reposts' ? repostData : likeData;
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomInset + 90 }}>
@@ -1718,7 +1756,7 @@ function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts:
                 </View>
               )}
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <NeonAvatar avatarId={isRepost ? 4 : meAvatarId} size={28} />
+                <NeonAvatar avatarId={isRepost ? (post.repostedAvatarId ?? 1) : meAvatarId} size={28} />
                 <View style={{ flex: 1 }}>
                   <Text style={me.postUser}>{isRepost ? post.repostedFrom : profile.username}</Text>
                   <Text style={me.postTime}>{post.timeAgo}</Text>

@@ -5,6 +5,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { PostReactions } from '@/lib/socialData';
 import { useUser } from '@/context/UserContext';
 
+// ── Exported shared types ──────────────────────────────────────────────────────
+
+export interface FollowingUser {
+  id: string;
+  username: string;
+  avatarId: number;
+  rank: string;
+}
+
+export interface RepostItem {
+  postId: string;
+  authorId: string;
+  authorUsername: string;
+  authorAvatarId: number;
+  tag: string;
+  content: string;
+  pot?: string;
+  handRank?: string;
+  likeCount: number;
+  commentCount: number;
+  repostedAt: number; // ms timestamp
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface SocialNotification {
@@ -18,6 +41,8 @@ export interface SocialNotification {
 
 interface SocialState {
   following: Set<string>;
+  followingMeta: Record<string, FollowingUser>;
+  myReposts: RepostItem[];
   likedPosts: Set<string>;
   myReactions: Record<string, keyof PostReactions>;
   notifications: SocialNotification[];
@@ -28,8 +53,11 @@ interface SocialState {
 }
 
 interface SocialContextValue extends SocialState {
-  follow: (playerId: string, username: string) => void;
+  follow: (playerId: string, username: string, avatarId?: number, rank?: string) => void;
   unfollow: (playerId: string) => void;
+  addRepost: (item: RepostItem) => void;
+  removeRepost: (postId: string) => void;
+  isReposted: (postId: string) => boolean;
   isFollowing: (playerId: string) => boolean;
   toggleLike: (postId: string) => void;
   isLiked: (postId: string) => boolean;
@@ -52,10 +80,12 @@ const SocialContext = createContext<SocialContextValue | null>(null);
 // ── Per-user storage keys ──────────────────────────────────────────────────────
 // Keys are namespaced by playerId so switching accounts never leaks data.
 
-const BASE_FOLLOWING     = '@chipsociety_social_following_v1';
-const BASE_LIKED         = '@chipsociety_social_liked_v1';
-const BASE_REACTIONS     = '@chipsociety_social_reactions_v1';
-const BASE_NOTIFICATIONS = '@chipsociety_social_notifications_v1';
+const BASE_FOLLOWING      = '@chipsociety_social_following_v1';
+const BASE_FOLLOWING_META = '@chipsociety_social_followingmeta_v1';
+const BASE_MY_REPOSTS     = '@chipsociety_social_myreposts_v1';
+const BASE_LIKED          = '@chipsociety_social_liked_v1';
+const BASE_REACTIONS      = '@chipsociety_social_reactions_v1';
+const BASE_NOTIFICATIONS  = '@chipsociety_social_notifications_v1';
 
 function userKey(base: string, pid: string) {
   return pid ? `${base}_${pid}` : base;
@@ -69,13 +99,15 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
   const { profile } = useUser();
   const playerId = profile?.playerId ?? '';
 
-  const [following, setFollowing]         = useState<Set<string>>(new Set());
-  const [likedPosts, setLikedPosts]       = useState<Set<string>>(new Set());
-  const [myReactions, setMyReactions]     = useState<Record<string, keyof PostReactions>>({});
-  const [notifications, setNotifications] = useState<SocialNotification[]>(SEED_NOTIFICATIONS);
-  const [muted, setMuted]                 = useState<Set<string>>(new Set());
-  const [blocked, setBlocked]             = useState<Set<string>>(new Set());
-  const [reportedPosts, setReportedPosts] = useState<Set<string>>(new Set());
+  const [following, setFollowing]           = useState<Set<string>>(new Set());
+  const [followingMeta, setFollowingMeta]   = useState<Record<string, FollowingUser>>({});
+  const [myReposts, setMyReposts]           = useState<RepostItem[]>([]);
+  const [likedPosts, setLikedPosts]         = useState<Set<string>>(new Set());
+  const [myReactions, setMyReactions]       = useState<Record<string, keyof PostReactions>>({});
+  const [notifications, setNotifications]   = useState<SocialNotification[]>(SEED_NOTIFICATIONS);
+  const [muted, setMuted]                   = useState<Set<string>>(new Set());
+  const [blocked, setBlocked]               = useState<Set<string>>(new Set());
+  const [reportedPosts, setReportedPosts]   = useState<Set<string>>(new Set());
 
   const loaded       = useRef(false);
   const playerIdRef  = useRef(playerId);
@@ -87,6 +119,8 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
     // Sign-out: clear all social state
     if (!playerId) {
       setFollowing(new Set());
+      setFollowingMeta({});
+      setMyReposts([]);
       setLikedPosts(new Set());
       setMyReactions({});
       setNotifications(SEED_NOTIFICATIONS);
@@ -101,13 +135,17 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
     loaded.current = false;
     void (async () => {
       try {
-        const [fRaw, lRaw, rRaw, nRaw] = await Promise.all([
+        const [fRaw, fmRaw, rpRaw, lRaw, rRaw, nRaw] = await Promise.all([
           AsyncStorage.getItem(userKey(BASE_FOLLOWING, playerId)),
+          AsyncStorage.getItem(userKey(BASE_FOLLOWING_META, playerId)),
+          AsyncStorage.getItem(userKey(BASE_MY_REPOSTS, playerId)),
           AsyncStorage.getItem(userKey(BASE_LIKED, playerId)),
           AsyncStorage.getItem(userKey(BASE_REACTIONS, playerId)),
           AsyncStorage.getItem(userKey(BASE_NOTIFICATIONS, playerId)),
         ]);
         setFollowing(fRaw ? new Set(JSON.parse(fRaw) as string[]) : new Set());
+        setFollowingMeta(fmRaw ? JSON.parse(fmRaw) as Record<string, FollowingUser> : {});
+        setMyReposts(rpRaw ? JSON.parse(rpRaw) as RepostItem[] : []);
         setLikedPosts(lRaw ? new Set(JSON.parse(lRaw) as string[]) : new Set());
         setMyReactions(rRaw ? JSON.parse(rRaw) as Record<string, keyof PostReactions> : {});
         setNotifications(nRaw ? JSON.parse(nRaw) as SocialNotification[] : SEED_NOTIFICATIONS);
@@ -122,6 +160,16 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
     if (!loaded.current || !playerIdRef.current) return;
     void AsyncStorage.setItem(userKey(BASE_FOLLOWING, playerIdRef.current), JSON.stringify([...following]));
   }, [following]);
+
+  useEffect(() => {
+    if (!loaded.current || !playerIdRef.current) return;
+    void AsyncStorage.setItem(userKey(BASE_FOLLOWING_META, playerIdRef.current), JSON.stringify(followingMeta));
+  }, [followingMeta]);
+
+  useEffect(() => {
+    if (!loaded.current || !playerIdRef.current) return;
+    void AsyncStorage.setItem(userKey(BASE_MY_REPOSTS, playerIdRef.current), JSON.stringify(myReposts));
+  }, [myReposts]);
 
   useEffect(() => {
     if (!loaded.current || !playerIdRef.current) return;
@@ -150,14 +198,26 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
     setNotifications(prev => [notif, ...prev].slice(0, 50));
   }
 
-  const follow = useCallback((pid: string, username: string) => {
+  const follow = useCallback((pid: string, username: string, avatarId = 1, rank = '') => {
     setFollowing(prev => new Set([...prev, pid]));
+    setFollowingMeta(prev => ({ ...prev, [pid]: { id: pid, username, avatarId, rank } }));
     addNotif({ type: 'follow', fromUser: username, message: `You followed ${username}` });
   }, []);
 
   const unfollow = useCallback((pid: string) => {
     setFollowing(prev => { const s = new Set(prev); s.delete(pid); return s; });
+    setFollowingMeta(prev => { const m = { ...prev }; delete m[pid]; return m; });
   }, []);
+
+  const addRepost = useCallback((item: RepostItem) => {
+    setMyReposts(prev => [item, ...prev.filter(r => r.postId !== item.postId)]);
+  }, []);
+
+  const removeRepost = useCallback((postId: string) => {
+    setMyReposts(prev => prev.filter(r => r.postId !== postId));
+  }, []);
+
+  const isReposted = useCallback((postId: string) => myReposts.some(r => r.postId === postId), [myReposts]);
 
   const isFollowing = useCallback((pid: string) => following.has(pid), [following]);
 
@@ -231,9 +291,10 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <SocialContext.Provider value={{
-      following, likedPosts, myReactions, notifications, unreadCount,
+      following, followingMeta, myReposts, likedPosts, myReactions, notifications, unreadCount,
       muted, blocked, reportedPosts,
       follow, unfollow, isFollowing,
+      addRepost, removeRepost, isReposted,
       toggleLike, isLiked,
       setReaction, getReaction,
       markAllRead, addNotification,

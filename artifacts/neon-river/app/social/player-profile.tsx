@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -14,7 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
-import { useSocial } from '@/context/SocialContext';
+import { useSocial, type FollowingUser } from '@/context/SocialContext';
 import { useUser } from '@/context/UserContext';
 import NeonAvatar from '@/components/NeonAvatar';
 import {
@@ -205,6 +205,73 @@ const si = StyleSheet.create({
   label: { color: colors.textDim, fontSize: 8, letterSpacing: 1, fontWeight: '600' },
 });
 
+// ── Follow List Modal ─────────────────────────────────────────────────────────
+
+function FollowListModal({ visible, title, users, emptyText, onClose }: {
+  visible: boolean; title: string;
+  users: FollowingUser[]; emptyText: string; onClose: () => void;
+}) {
+  return (
+    <Modal transparent visible={visible} animationType="slide" onRequestClose={onClose}>
+      <View style={fl.overlay}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
+        <View style={fl.sheet}>
+          <LinearGradient colors={['#1a002e', '#0a0018']} style={StyleSheet.absoluteFill} />
+          <View style={fl.handle} />
+          <Text style={fl.title}>{title}</Text>
+          {users.length === 0 ? (
+            <Text style={fl.empty}>{emptyText}</Text>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 360 }}>
+              {users.map(u => (
+                <View key={u.id} style={fl.row}>
+                  <NeonAvatar avatarId={u.avatarId} size={36} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={fl.username}>{u.username}</Text>
+                    {!!u.rank && <Text style={fl.rank}>{u.rank}</Text>}
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+          <TouchableOpacity style={fl.closeBtn} onPress={onClose}>
+            <Text style={fl.closeTxt}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const fl = StyleSheet.create({
+  overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.6)' },
+  sheet: {
+    borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    padding: 20, overflow: 'hidden',
+  },
+  handle: {
+    width: 36, height: 4, borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.2)', alignSelf: 'center', marginBottom: 16,
+  },
+  title: {
+    color: '#fff', fontSize: 15, fontWeight: '800',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1.5,
+    marginBottom: 16, textAlign: 'center',
+  },
+  empty: { color: colors.textDim, fontSize: 13, textAlign: 'center', marginVertical: 24 },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  username: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  rank: { color: colors.textDim, fontSize: 11, marginTop: 2 },
+  closeBtn: {
+    marginTop: 16, padding: 14, borderRadius: 12,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center',
+  },
+  closeTxt: { color: colors.primary, fontSize: 14, fontWeight: '700' },
+});
+
 // ── Main screen ───────────────────────────────────────────────────────────────
 
 export default function PlayerProfileScreen() {
@@ -213,7 +280,7 @@ export default function PlayerProfileScreen() {
   }>();
   const { id } = params;
   const insets = useSafeAreaInsets();
-  const { isFollowing, follow, unfollow } = useSocial();
+  const { isFollowing, follow, unfollow, followingMeta } = useSocial();
   const { profile: myProfile } = useUser();
   const { allPosts: liveFeedPosts } = useLiveFeed();
 
@@ -250,7 +317,9 @@ export default function PlayerProfileScreen() {
   });
   const [loading, setLoading] = useState(!player);
   const [error, setError] = useState(false);
-  const [followerDelta, setFollowerDelta] = useState(0);
+  const [followerDelta, setFollowerDelta]   = useState(0);
+  const [showFollowList, setShowFollowList] = useState(false);
+  const [followListMode, setFollowListMode] = useState<'followers' | 'following'>('following');
 
   useEffect(() => {
     if (player || !id) return;
@@ -301,7 +370,7 @@ export default function PlayerProfileScreen() {
         unfollowPlayer(myProfile.playerId, player.id).catch(() => {});
       }
     } else {
-      follow(player.id, player.username);
+      follow(player.id, player.username, player.avatarId, player.rank);
       setFollowerDelta(d => d + 1);
       if (myProfile.playerId && !player.isMock) {
         followPlayer(myProfile.playerId, player.id).catch(() => {});
@@ -395,14 +464,14 @@ export default function PlayerProfileScreen() {
       >
         {/* Social counts */}
         <View style={s.socialRow}>
-          <TouchableOpacity style={s.socialStat} onPress={() => Alert.alert('Followers', 'Follower list coming in a future update.')}>
+          <TouchableOpacity style={s.socialStat} onPress={() => { setFollowListMode('followers'); setShowFollowList(true); }}>
             <Text style={s.socialVal}>
               {(player.followers + followerDelta) >= 1000 ? `${((player.followers + followerDelta) / 1000).toFixed(1)}K` : (player.followers + followerDelta)}
             </Text>
             <Text style={s.socialLabel}>Followers</Text>
           </TouchableOpacity>
           <View style={s.socialDiv} />
-          <TouchableOpacity style={s.socialStat} onPress={() => Alert.alert('Following', 'Following list coming in a future update.')}>
+          <TouchableOpacity style={s.socialStat} onPress={() => { setFollowListMode('following'); setShowFollowList(true); }}>
             <Text style={s.socialVal}>
               {player.following >= 1000 ? `${(player.following / 1000).toFixed(1)}K` : player.following}
             </Text>
@@ -523,6 +592,23 @@ export default function PlayerProfileScreen() {
           </View>
         )}
       </ScrollView>
+      <FollowListModal
+        visible={showFollowList}
+        title={followListMode === 'following' ? 'Following' : 'Followers'}
+        users={
+          followListMode === 'following' && isOwnProfile
+            ? Object.values(followingMeta)
+            : []
+        }
+        emptyText={
+          followListMode === 'followers'
+            ? 'Follower details sync from the server'
+            : isOwnProfile
+              ? "You're not following anyone yet"
+              : 'Following list not available'
+        }
+        onClose={() => setShowFollowList(false)}
+      />
     </View>
   );
 }
