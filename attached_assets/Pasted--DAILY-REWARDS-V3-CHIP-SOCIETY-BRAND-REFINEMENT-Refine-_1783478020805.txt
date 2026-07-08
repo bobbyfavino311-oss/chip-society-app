@@ -1,0 +1,301 @@
+# DAILY REWARDS V3 — CHIP SOCIETY BRAND REFINEMENT
+
+Refine the Daily Rewards section one final time.
+
+The current version is close, but the center icons and progress rings still feel generic. This update should make the Daily Rewards system feel like it belongs exclusively to Chip Society.
+
+Do NOT redesign the layout.
+
+Do NOT move any elements.
+
+Do NOT resize the cards.
+
+This is strictly a visual refinement.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DESIGN GOAL
+
+The Daily Rewards cards should feel like premium casino reward collectibles.
+
+The design language should match the rest of Chip Society.
+
+Everything should feel custom-made instead of using generic symbols or default iconography.
+
+Think:
+
+• Luxury casino membership cards
+• Premium rewards club
+• Apple-quality materials
+• AAA mobile game polish
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REMOVE THE CURRENT CENTER ICONS
+
+Remove the existing wheel icon and flame icon.
+
+Do NOT use emojis.
+
+Do NOT use emoji-style graphics.
+
+Do NOT use clip-art.
+
+Create premium custom symbols that become part of the Chip Society visual identity.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DAILY SPIN ICON
+
+Replace the wheel icon with a custom premium casino chip.
+
+Design:
+
+• Circular casino chip
+• Very minimal
+• Thick outer ring
+• Small center circle
+• Tiny embossed five-point star in the middle
+• Four or six subtle chip notches around the edge
+• Clean geometric proportions
+
+The icon should immediately communicate:
+
+Reward
+Casino
+Prize
+Premium
+
+Keep it monochromatic.
+
+Use the Daily Spin accent color.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# STREAK ICON
+
+Replace the flame with a premium trophy.
+
+Design:
+
+• Very simple trophy silhouette
+• Modern geometry
+• Thick, clean lines
+• No tiny details
+• No handles that become cluttered
+
+The trophy should symbolize:
+
+Achievement
+
+Consistency
+
+Progress
+
+Reward
+
+Use the Streak accent color.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# ICON STYLE
+
+Both icons must belong to the same icon family.
+
+Use:
+
+• Rounded corners
+• Consistent line thickness
+• Clean geometric proportions
+• Modern minimalist styling
+
+Think Apple SF Symbols mixed with luxury casino branding.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# PROGRESS RING REFINEMENT
+
+The current ring is still too large.
+
+Reduce the overall ring diameter by approximately 15%.
+
+Reduce ring thickness slightly.
+
+Increase spacing between the ring and the card edges.
+
+The ring should frame the icon instead of dominating it.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# INCREASE ICON SIZE
+
+Increase the icon size by approximately 20–25%.
+
+The icon should now become the focal point inside the progress ring.
+
+The ring becomes secondary.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# EMBED THE RING
+
+The progress ring should feel integrated into the card.
+
+Instead of floating,
+
+it should appear lightly engraved into the glass surface.
+
+Use:
+
+• Soft inner shadow
+• Gentle edge lighting
+• Very subtle inset appearance
+
+The ring should feel like part of the premium material.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# GLASS BADGE
+
+Improve the glass badge behind the icon.
+
+Add:
+
+• Softer smoked glass
+• Better top reflection
+• More rounded corners
+• Slight inner glow
+• Slight bottom shadow
+
+The badge should resemble polished black acrylic.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# RING COLORS
+
+Daily Spin
+
+• Soft violet progress
+• Dim inactive ring
+• Cyan-violet chip icon
+
+Streak
+
+• Warm gold progress
+• Dim inactive ring
+• Rich gold trophy icon
+
+Keep the colors elegant.
+
+No bright neon.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# DEPTH
+
+Increase perceived depth.
+
+The hierarchy should become:
+
+Card
+
+↓
+
+Engraved progress ring
+
+↓
+
+Floating glass badge
+
+↓
+
+Premium icon
+
+Each layer should feel physically separated.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# MICRO LIGHTING
+
+Add extremely subtle ambient lighting behind each badge.
+
+The light should softly illuminate the surrounding card.
+
+Do not create visible halos.
+
+It should simply make the badge appear elevated.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CARD MATERIAL
+
+Maintain the premium smoked-glass material.
+
+Very subtle vertical gradient.
+
+Very soft edge lighting.
+
+Very soft shadow.
+
+Reduce visible border opacity slightly.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# INTERACTION
+
+On tap:
+
+• Card lifts approximately 3px.
+• Badge lifts slightly more.
+• Ring brightens slightly.
+• Icon brightens slightly.
+• Shadow increases subtly.
+
+Animation:
+
+180–200ms
+
+Very smooth.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CONSISTENCY
+
+These new icons should become the official Chip Society reward icon family.
+
+The same casino chip reward icon and trophy icon should be reused throughout the app wherever appropriate, including:
+
+• Daily Rewards
+• Achievement rewards
+• Daily Missions
+• Reward popups
+• Event rewards
+• Seasonal reward screens
+
+This creates a consistent visual language across the entire application.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+Verify:
+
+✅ Wheel icon removed.
+✅ Flame icon removed.
+✅ No emojis used.
+✅ Daily Spin uses a custom casino chip icon with an embossed five-point star.
+✅ Streak uses a premium minimalist trophy icon.
+✅ Icons belong to the same visual family.
+✅ Progress ring reduced by approximately 15%.
+✅ Ring thickness reduced.
+✅ Icons increased by approximately 20–25%.
+✅ Ring feels engraved into the card.
+✅ Glass badge improved.
+✅ Better material depth.
+✅ Softer shadows.
+✅ Better lighting.
+✅ Premium interaction animations preserved.
+
+FINAL GOAL
+
+The Daily Rewards section should feel like a premium casino rewards club. The center icons should become signature Chip Society brand assets rather than generic UI symbols, while the refined progress ring and improved visual hierarchy create a cleaner, more luxurious, and more memorable experience.

@@ -467,38 +467,49 @@ interface TrendPost {
 
 // ─── Prize Wheel + Flame SVG icons ───────────────────────────────────────────
 
-const RING_R    = 36;
-const RING_W    = 1.5;
+const RING_R    = 31;
+const RING_W    = 1.3;
 const RING_CIRC = 2 * Math.PI * RING_R;
 const ARC_270   = RING_CIRC * 0.75;
 const GAP_90    = RING_CIRC * 0.25;
 
-function PrizeWheelIcon({ color, size = 24 }: { color: string; size?: number }) {
+function ChipIcon({ color, size = 30 }: { color: string; size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
-      <Circle cx="12" cy="12" r="9.5" stroke={color} strokeWidth="1.5" fill="none" />
-      {([0, 60, 120, 180, 240, 300] as const).map(a => (
+      <Circle cx="12" cy="12" r="9.5" stroke={color} strokeWidth="1.8" fill="none" />
+      {([0, 90, 180, 270] as const).map(a => (
         <G key={a} rotation={a} originX={12} originY={12}>
-          <Line x1="12" y1="2.5" x2="12" y2="9.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+          <Line x1="10.8" y1="2.5" x2="13.2" y2="2.5" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
         </G>
       ))}
-      <Circle cx="12" cy="12" r="2.2" fill={color} />
-      <Path d="M11.2 0.5 L12 3.2 L12.8 0.5 Z" fill={color} />
+      <Circle cx="12" cy="12" r="5.5" stroke={color} strokeWidth="1.2" fill="none" />
+      <Circle cx="12" cy="12" r="2.3" fill={color} />
+      <Path
+        d="M12 10.1 L12.58 11.48 L14.08 11.59 L13.0 12.5 L13.35 14.0 L12 13.22 L10.65 14.0 L11.0 12.5 L9.92 11.59 L11.42 11.48 Z"
+        fill="rgba(5,1,14,0.5)"
+      />
     </Svg>
   );
 }
 
-function FlameIcon({ color, size = 24 }: { color: string; size?: number }) {
+function TrophyIcon({ color, size = 30 }: { color: string; size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path
-        d="M12 22 C7.5 22 5 18.5 5 14.5 C5 11 7 9 9 7.5 C9 9.5 10 10.5 11 10.5 C11 7.5 12 4.5 14 2 C14 6 13 9.5 15.5 11 C16 9 16 7.5 17 7 C17.5 10.5 20 12.5 20 16 C20 19.5 16.5 22 12 22 Z"
+        d="M 8 4 L 16 4 L 14.6 11.5 Q 12 14 9.4 11.5 Z"
         stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round"
       />
       <Path
-        d="M12 19 C10.5 19 9.5 18 9.5 16 C9.5 14.5 10.5 13.5 11.5 12.5 C11.5 14 12.5 14.5 13 14.5 C13 13.5 13.5 12.5 14.5 11.5 C14.5 13.5 13.5 15 14.5 16.5 C14.5 18 13.5 19 12 19 Z"
-        fill={color} opacity={0.35}
+        d="M 8 5.5 Q 5 5.5 5 8.5 Q 5 11.5 8.8 11.8"
+        stroke={color} strokeWidth="1.5" fill="none" strokeLinecap="round"
       />
+      <Path
+        d="M 16 5.5 Q 19 5.5 19 8.5 Q 19 11.5 15.2 11.8"
+        stroke={color} strokeWidth="1.5" fill="none" strokeLinecap="round"
+      />
+      <Line x1="12" y1="14" x2="12" y2="17" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <Line x1="9" y1="17" x2="15" y2="17" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <Line x1="8" y1="19.5" x2="16" y2="19.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
     </Svg>
   );
 }
@@ -520,7 +531,7 @@ function RewardRow() {
       route: '/rewards/wheel',
       progress: canClaimWheel ? 1 : Math.max(0, (1440 - nextWheelIn) / 1440),
       pressAnim: spinPress,
-      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={24} />,
+      renderIcon: (c: string) => <ChipIcon color={c} size={30} />,
     },
     {
       key: 'streak', label: 'STREAK', canClaim: canClaimDaily,
@@ -529,7 +540,7 @@ function RewardRow() {
       route: '/rewards/streak',
       progress: Math.min(1, ((profile.streakDays || 0) % 7) / 7),
       pressAnim: streakPress,
-      renderIcon: (c: string) => <FlameIcon color={c} size={24} />,
+      renderIcon: (c: string) => <TrophyIcon color={c} size={30} />,
     },
   ];
 
@@ -560,22 +571,30 @@ function RewardRow() {
               <View style={rr.ringWrap}>
                 {/* Ambient glow */}
                 <View style={{ position: 'absolute', width: 60, height: 60, borderRadius: 30, shadowColor: b.color, shadowOpacity: 0.18, shadowRadius: 22, shadowOffset: { width: 0, height: 0 } }} />
-                <Svg width={78} height={78} style={{ position: 'absolute', top: 0, left: 0 }}>
-                  {/* 270° track */}
+                <Svg width={76} height={76} style={{ position: 'absolute', top: 1, left: 1 }}>
+                  {/* Engraved groove (dark base for depth) */}
                   <Circle
-                    cx="39" cy="39" r={RING_R}
-                    stroke={`${b.color}20`} strokeWidth={RING_W}
+                    cx="38" cy="38" r={RING_R}
+                    stroke="rgba(0,0,0,0.38)" strokeWidth={RING_W + 0.7}
                     fill="none" strokeLinecap="round"
                     strokeDasharray={[ARC_270, GAP_90]}
-                    rotation={135} originX={39} originY={39}
+                    rotation={135} originX={38} originY={38}
                   />
-                  {/* 270° progress arc */}
+                  {/* Dim track arc */}
                   <Circle
-                    cx="39" cy="39" r={RING_R}
+                    cx="38" cy="38" r={RING_R}
+                    stroke={`${b.color}18`} strokeWidth={RING_W}
+                    fill="none" strokeLinecap="round"
+                    strokeDasharray={[ARC_270, GAP_90]}
+                    rotation={135} originX={38} originY={38}
+                  />
+                  {/* Progress arc */}
+                  <Circle
+                    cx="38" cy="38" r={RING_R}
                     stroke={b.color} strokeWidth={RING_W}
                     fill="none" strokeLinecap="round"
                     strokeDasharray={[ARC_270 * b.progress, RING_CIRC - ARC_270 * b.progress]}
-                    rotation={135} originX={39} originY={39}
+                    rotation={135} originX={38} originY={38}
                   />
                 </Svg>
                 <View style={[rr.iconBadge, { borderColor: `${b.color}44`, shadowColor: b.color }]}>
@@ -1020,7 +1039,7 @@ const rr = StyleSheet.create({
     width: 78, height: 78, alignItems: 'center', justifyContent: 'center',
   },
   iconBadge: {
-    width: 56, height: 56, borderRadius: 16, borderWidth: 1,
+    width: 56, height: 56, borderRadius: 18, borderWidth: 1,
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
     backgroundColor: 'rgba(5,1,14,0.90)',
     shadowOpacity: 0.26, shadowRadius: 10,
