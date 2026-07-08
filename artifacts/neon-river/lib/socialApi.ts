@@ -247,3 +247,53 @@ export async function addComment(
 export async function deleteFeedPost(playerId: string, postId: string): Promise<void> {
   await req<{ ok: boolean }>(`/social/posts/${postId}`, playerId, { method: 'DELETE' });
 }
+
+// ── Reposts ───────────────────────────────────────────────────────────────────
+
+export interface ServerRepost {
+  postId:            string;
+  repostedAt:        string;
+  authorId:          string;
+  authorUsername:    string;
+  authorAvatarIndex: number;
+  authorRank:        string;
+  content:           string;
+  tag:               string;
+  pot:               string | null;
+  handRank:          string | null;
+  likeCount:         number;
+  commentCount:      number;
+}
+
+export async function toggleRepost(
+  playerId: string,
+  postId: string,
+): Promise<{ ok: boolean; reposted: boolean }> {
+  return req<{ ok: boolean; reposted: boolean }>(
+    `/social/posts/${postId}/repost`, playerId, { method: 'POST' },
+  );
+}
+
+export async function getMyReposts(playerId: string): Promise<ServerRepost[]> {
+  const d = await req<{ reposts: ServerRepost[] }>('/social/reposts', playerId);
+  return d.reposts;
+}
+
+// ── Following / Followers (full profiles) ─────────────────────────────────────
+
+export interface FollowProfile {
+  id:       string;
+  username: string;
+  avatarId: number;
+  rank:     string;
+}
+
+export async function getFollowingList(playerId: string): Promise<FollowProfile[]> {
+  const d = await req<{ following: FollowProfile[] }>('/social/following-list', playerId);
+  return d.following;
+}
+
+export async function getFollowers(playerId: string): Promise<FollowProfile[]> {
+  const d = await req<{ followers: FollowProfile[] }>('/social/followers', playerId);
+  return d.followers;
+}

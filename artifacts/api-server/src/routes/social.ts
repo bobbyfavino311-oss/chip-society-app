@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable, playerNotificationsTable } from '@workspace/db';
+import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable, postRepostsTable, playerNotificationsTable } from '@workspace/db';
 import { eq, or, and, ilike, ne, desc, sql, lt, inArray } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { emitToPlayer, emitToAll } from '../sockets/index.js';
@@ -695,6 +695,145 @@ router.post('/social/posts/:id/comments', requirePlayer, async (req: any, res) =
   } catch (e) {
     req.log.error(e, 'add comment error');
     res.status(500).json({ error: 'Failed to add comment' });
+  }
+});
+
+// ── GET /api/social/following-list — full profiles of players you follow ───────
+
+router.get('/social/following-list', requirePlayer, async (req: any, res) => {
+  try {
+    const { playerId } = req;
+    const rows = await db
+      .select({
+        playerId:    playersTable.playerId,
+        username:    playersTable.username,
+        profileJson: playersTable.profileJson,
+      })
+      .from(followsTable)
+      .innerJoin(playersTable, eq(followsTable.followingId, playersTable.playerId))
+      .where(eq(followsTable.followerId, playerId));
+
+    const following = rows.map(r => ({
+      id:       r.playerId,
+      username: r.username,
+      avatarId: (r.profileJson as any)?.avatarIndex ?? 1,
+      rank:     (r.profileJson as any)?.rank ?? 'Player',
+    }));
+
+    res.json({ following });
+  } catch (e) {
+    req.log.error(e, 'following-list error');
+    res.status(500).json({ error: 'Failed' });
+  }
+});
+
+// ── GET /api/social/followers — full profiles of players who follow you ─────────
+
+router.get('/social/followers', requirePlayer, async (req: any, res) => {
+  try {
+    const { playerId } = req;
+    const rows = await db
+      .select({
+        playerId:    playersTable.playerId,
+        username:    playersTable.username,
+        profileJson: playersTable.profileJson,
+      })
+      .from(followsTable)
+      .innerJoin(playersTable, eq(followsTable.followerId, playersTable.playerId))
+      .where(eq(followsTable.followingId, playerId));
+
+    const followers = rows.map(r => ({
+      id:       r.playerId,
+      username: r.username,
+      avatarId: (r.profileJson as any)?.avatarIndex ?? 1,
+      rank:     (r.profileJson as any)?.rank ?? 'Player',
+    }));
+
+    res.json({ followers });
+  } catch (e) {
+    req.log.error(e, 'followers error');
+    res.status(500).json({ error: 'Failed' });
+  }
+});
+
+// ── POST /api/social/posts/:id/repost — toggle repost ──────────────────────────
+
+router.post('/social/posts/:id/repost', requirePlayer, async (req: any, res) => {
+  try {
+    const { playerId } = req;
+    const { id: postId } = req.params;
+
+    const post = await db.select({ id: feedPostsTable.id })
+      .from(feedPostsTable).where(eq(feedPostsTable.id, postId)).limit(1);
+    if (!post[0]) { res.status(404).json({ error: 'Post not found' }); return; }
+
+    const existing = await db
+      .select({ postId: postRepostsTable.postId })
+      .from(postRepostsTable)
+      .where(and(eq(postRepostsTable.postId, postId), eq(postRepostsTable.playerId, playerId)))
+      .limit(1);
+
+    if (existing[0]) {
+      await db.delete(postRepostsTable).where(
+        and(eq(postRepostsTable.postId, postId), eq(postRepostsTable.playerId, playerId))
+      );
+      res.json({ ok: true, reposted: false });
+    } else {
+      await db.insert(postRepostsTable).values({ postId, playerId });
+      res.json({ ok: true, reposted: true });
+    }
+  } catch (e) {
+    req.log.error(e, 'repost toggle error');
+    res.status(500).json({ error: 'Failed to toggle repost' });
+  }
+});
+
+// ── GET /api/social/reposts — my repost list ───────────────────────────────────
+
+router.get('/social/reposts', requirePlayer, async (req: any, res) => {
+  try {
+    const { playerId } = req;
+
+    const rows = await db
+      .select({
+        repostedAt:        postRepostsTable.createdAt,
+        postId:            feedPostsTable.id,
+        authorId:          feedPostsTable.authorId,
+        authorUsername:    feedPostsTable.authorUsername,
+        authorAvatarIndex: feedPostsTable.authorAvatarIndex,
+        authorRank:        feedPostsTable.authorRank,
+        content:           feedPostsTable.content,
+        tag:               feedPostsTable.tag,
+        pot:               feedPostsTable.pot,
+        handRank:          feedPostsTable.handRank,
+        likeCount:         feedPostsTable.likeCount,
+        commentCount:      feedPostsTable.commentCount,
+      })
+      .from(postRepostsTable)
+      .innerJoin(feedPostsTable, eq(postRepostsTable.postId, feedPostsTable.id))
+      .where(eq(postRepostsTable.playerId, playerId))
+      .orderBy(desc(postRepostsTable.createdAt))
+      .limit(50);
+
+    const reposts = rows.map(r => ({
+      postId:            r.postId,
+      repostedAt:        r.repostedAt,
+      authorId:          r.authorId,
+      authorUsername:    r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
+      authorAvatarIndex: r.authorAvatarIndex ?? 1,
+      authorRank:        r.authorRank ?? 'Player',
+      content:           r.content,
+      tag:               r.tag,
+      pot:               r.pot ?? null,
+      handRank:          r.handRank ?? null,
+      likeCount:         r.likeCount,
+      commentCount:      r.commentCount,
+    }));
+
+    res.json({ reposts });
+  } catch (e) {
+    req.log.error(e, 'reposts error');
+    res.status(500).json({ error: 'Failed to load reposts' });
   }
 });
 

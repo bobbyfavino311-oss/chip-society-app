@@ -126,6 +126,12 @@ export const postCommentsTable = pgTable('post_comments', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
+export const postRepostsTable = pgTable('post_reposts', {
+  postId:    text('post_id').notNull().references(() => feedPostsTable.id, { onDelete: 'cascade' }),
+  playerId:  text('player_id').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (t) => [primaryKey({ columns: [t.postId, t.playerId] })]);
+
 // ── Bug reports ───────────────────────────────────────────────────────────────
 
 export const bugReportsTable = pgTable('bug_reports', {
@@ -182,4 +188,5 @@ export type FeedPost              = typeof feedPostsTable.$inferSelect;
 export type NewFeedPost           = typeof feedPostsTable.$inferInsert;
 export type PostLike              = typeof postLikesTable.$inferSelect;
 export type PostComment           = typeof postCommentsTable.$inferSelect;
+export type PostRepost            = typeof postRepostsTable.$inferSelect;
 export type Announcement          = typeof announcementsTable.$inferSelect;

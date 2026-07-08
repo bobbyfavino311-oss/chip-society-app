@@ -21,7 +21,7 @@ import {
   MOCK_PLAYERS, SOCIAL_POSTS, POST_TAG_COLORS, POKER_REACTIONS,
   type MockPlayer, type SocialPost,
 } from '@/lib/socialData';
-import { getPlayerProfile, followPlayer, unfollowPlayer, startConversation, type PlayerProfile, type FeedPost } from '@/lib/socialApi';
+import { getPlayerProfile, followPlayer, unfollowPlayer, startConversation, getFollowers, type PlayerProfile, type FeedPost, type FollowProfile } from '@/lib/socialApi';
 import { useLiveFeed } from '@/context/LiveFeedContext';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -320,6 +320,8 @@ export default function PlayerProfileScreen() {
   const [followerDelta, setFollowerDelta]   = useState(0);
   const [showFollowList, setShowFollowList] = useState(false);
   const [followListMode, setFollowListMode] = useState<'followers' | 'following'>('following');
+  const [followersList, setFollowersList]   = useState<FollowingUser[]>([]);
+  const [loadingFollowers, setLoadingFollowers] = useState(false);
 
   useEffect(() => {
     if (player || !id) return;
@@ -341,15 +343,25 @@ export default function PlayerProfileScreen() {
     }).finally(() => setLoading(false));
   }, [id]);
 
+  const following = isFollowing(id ?? '');
+  const isOwnProfile = !!myProfile.playerId && player?.id === myProfile.playerId;
+
+  // Fetch real follower list from server when modal opens for followers mode
+  useEffect(() => {
+    if (!showFollowList || followListMode !== 'followers' || !isOwnProfile || !myProfile.playerId) return;
+    setLoadingFollowers(true);
+    getFollowers(myProfile.playerId)
+      .then(list => setFollowersList(list.map(u => ({ id: u.id, username: u.username, avatarId: u.avatarId, rank: u.rank }))))
+      .catch(() => {})
+      .finally(() => setLoadingFollowers(false));
+  }, [showFollowList, followListMode, isOwnProfile, myProfile.playerId]);
+
   const posts: SocialPost[] = player?.isMock
     ? SOCIAL_POSTS.filter(p => p.playerId === id)
     : [];
   const realPosts: FeedPost[] = player?.isMock
     ? []
     : liveFeedPosts.filter(p => p.authorId === id);
-
-  const following = isFollowing(id ?? '');
-  const isOwnProfile = !!myProfile.playerId && player?.id === myProfile.playerId;
 
   async function handleMessage() {
     if (!player || !myProfile.playerId) return;
@@ -598,14 +610,18 @@ export default function PlayerProfileScreen() {
         users={
           followListMode === 'following' && isOwnProfile
             ? Object.values(followingMeta)
-            : []
+            : followListMode === 'followers' && isOwnProfile
+              ? followersList
+              : []
         }
         emptyText={
-          followListMode === 'followers'
-            ? 'Follower details sync from the server'
-            : isOwnProfile
-              ? "You're not following anyone yet"
-              : 'Following list not available'
+          followListMode === 'followers' && loadingFollowers
+            ? 'Loading followers…'
+            : followListMode === 'followers'
+              ? 'No followers yet'
+              : isOwnProfile
+                ? "You're not following anyone yet"
+                : 'Following list not available'
         }
         onClose={() => setShowFollowList(false)}
       />

@@ -4,6 +4,7 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { PostReactions } from '@/lib/socialData';
 import { useUser } from '@/context/UserContext';
+import { toggleRepost, getFollowingList, getMyReposts } from '@/lib/socialApi';
 
 // ── Exported shared types ──────────────────────────────────────────────────────
 
@@ -151,6 +152,48 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
         setNotifications(nRaw ? JSON.parse(nRaw) as SocialNotification[] : SEED_NOTIFICATIONS);
       } catch {}
       loaded.current = true;
+
+      // Background server sync (runs after local data, server wins on conflicts)
+      void (async () => {
+        try {
+          const [serverFollowing, serverReposts] = await Promise.all([
+            getFollowingList(playerId),
+            getMyReposts(playerId),
+          ]);
+          // Merge following metadata from server
+          if (serverFollowing.length > 0 || true) {
+            setFollowingMeta(prev => {
+              const merged: Record<string, FollowingUser> = { ...prev };
+              for (const u of serverFollowing) {
+                merged[u.id] = { id: u.id, username: u.username, avatarId: u.avatarId, rank: u.rank };
+              }
+              return merged;
+            });
+            // Update following Set — keep locally-added mock player follows, add all server follows
+            const serverIds = new Set(serverFollowing.map(u => u.id));
+            setFollowing(prev => {
+              const localMock = [...prev].filter(id => !id.match(/^[0-9a-f]{8}-/));
+              return new Set([...serverIds, ...localMock]);
+            });
+          }
+          // Reposts: server is authoritative
+          setMyReposts(serverReposts.map(r => ({
+            postId:        r.postId,
+            authorId:      r.authorId,
+            authorUsername: r.authorUsername,
+            authorAvatarId: r.authorAvatarIndex,
+            tag:           r.tag,
+            content:       r.content,
+            pot:           r.pot ?? undefined,
+            handRank:      r.handRank ?? undefined,
+            likeCount:     r.likeCount,
+            commentCount:  r.commentCount,
+            repostedAt:    new Date(r.repostedAt).getTime(),
+          })));
+        } catch {
+          // Network unavailable — local cache is still loaded
+        }
+      })();
     })();
   }, [playerId]);
 
@@ -211,10 +254,16 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
 
   const addRepost = useCallback((item: RepostItem) => {
     setMyReposts(prev => [item, ...prev.filter(r => r.postId !== item.postId)]);
+    if (playerIdRef.current) {
+      toggleRepost(playerIdRef.current, item.postId).catch(() => {});
+    }
   }, []);
 
   const removeRepost = useCallback((postId: string) => {
     setMyReposts(prev => prev.filter(r => r.postId !== postId));
+    if (playerIdRef.current) {
+      toggleRepost(playerIdRef.current, postId).catch(() => {});
+    }
   }, []);
 
   const isReposted = useCallback((postId: string) => myReposts.some(r => r.postId === postId), [myReposts]);
