@@ -311,7 +311,7 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
     setGrandRewardClaimed(true);
     setPendingGrandReward(false);
     // Exactly 1 Legendary Fortune Cookie — hard-coded, bypasses all rarity rolls
-    await addFortuneCookies(0, 0, 0, 1, 0);
+    await addFortuneCookies(0, 0, 0, 1, 0, 'daily_missions_grand_reward');
   }, [addFortuneCookies]);
 
   const clearPendingGrandReward = useCallback(() => {

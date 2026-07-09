@@ -1,0 +1,159 @@
+# CRITICAL BUG FIX — RANDOM 22 COMMON COOKIES BEING AWARDED
+
+There is a serious reward bug where the game keeps awarding **22 Common Fortune Cookies**, even though no feature should grant that reward.
+
+This must be fixed immediately.
+
+---
+
+# CURRENT BUG
+
+Player is receiving:
+
+22 Common Cookies
+
+This reward should not exist.
+
+There is no valid mission, wheel prize, daily reward, achievement, cookie opening, or grand reward that should grant exactly 22 Common Fortune Cookies.
+
+---
+
+# REQUIRED INVESTIGATION
+
+Search the entire codebase for any hardcoded reward values related to cookies.
+
+Search for:
+
+22
+commonCookie
+common_cookie
+Common Fortune Cookie
+cookieReward
+missionReward
+grandReward
+dailyMissionReward
+dailyReward
+starterReward
+achievementReward
+wheelReward
+testReward
+debugReward
+seedReward
+mockReward
+
+Remove any debug/test reward that grants 22 Common Cookies.
+
+---
+
+# DAILY MISSIONS GRAND REWARD RULE
+
+The Daily Missions grand reward must grant ONLY:
+
+1 Legendary Fortune Cookie
+
+Not:
+
+22 Common Cookies  
+Common Cookies  
+Random Cookies  
+Epic Cookies  
+Mythic Cookies  
+Any other rarity  
+
+The reward must be hardcoded as:
+
+rarity: legendary  
+quantity: 1
+
+Do not route this reward through a random cookie generator.
+
+---
+
+# COOKIE REWARD VALIDATION
+
+All cookie rewards must explicitly define:
+
+cookieRarity  
+quantity  
+source  
+
+Example:
+
+{
+  source: "daily_missions_grand_reward",
+  cookieRarity: "legendary",
+  quantity: 1
+}
+
+Never allow cookie rewards to default to Common.
+
+---
+
+# REMOVE DEFAULT COMMON FALLBACK
+
+If a reward object is missing rarity, do NOT default to Common.
+
+Instead:
+
+- Block the reward.
+- Log an error.
+- Show no cookie reward until the reward config is corrected.
+
+Common should never be used as a fallback for invalid reward data.
+
+---
+
+# REWARD SOURCE AUDIT
+
+Audit every system that can grant cookies:
+
+- Daily Missions
+- Daily Missions Grand Reward
+- Fortune Cookie screen
+- Daily Wheel
+- Daily Streak
+- Achievements
+- Lottery Tickets
+- Admin rewards
+- Store bundles
+- Level-up rewards
+- Tournament rewards
+
+Verify no system grants 22 Common Cookies.
+
+---
+
+# INVENTORY TRANSACTION LOGGING
+
+Add reward transaction logging for cookies.
+
+Every time cookies are awarded, log:
+
+- userId
+- cookie rarity
+- quantity
+- reward source
+- timestamp
+- transactionId
+
+This will identify exactly where invalid cookie rewards are coming from.
+
+---
+
+# FINAL VALIDATION
+
+Test:
+
+1. Complete all 5 Daily Missions.
+2. Claim Grand Reward.
+3. Confirm inventory increases by exactly:
+   Legendary +1
+4. Confirm Common cookie count does not increase.
+5. Claim every normal mission reward.
+6. Confirm no mission awards 22 Common Cookies.
+7. Spin Daily Wheel.
+8. Confirm only configured wheel cookies appear.
+9. Restart app.
+10. Confirm no automatic 22 Common Cookie grant occurs.
+
+No player should ever receive 22 Common Cookies unless a real, intentional reward explicitly says so.

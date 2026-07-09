@@ -333,8 +333,8 @@ export default function WheelScreen() {
     const seg = SEGMENTS[winner];
     await claimWheelSpin(seg.chips, seg.ticket);
     if (seg.xp > 0)            await updateProfile({ xp: profile.xp + seg.xp });
-    if (seg.cookie > 0)        await addFortuneCookies(seg.cookie);
-    if (seg.mythicCookie > 0)  await addFortuneCookies(0, 0, 0, 0, seg.mythicCookie);
+    if (seg.cookie > 0)        await addFortuneCookies(seg.cookie, 0, 0, 0, 0, 'daily_wheel');
+    if (seg.mythicCookie > 0)  await addFortuneCookies(0, 0, 0, 0, seg.mythicCookie, 'daily_wheel_mythic');
     SoundEngine.prizeCollect();
   }, [winner, claimed, claimWheelSpin, updateProfile, profile.xp, addFortuneCookies]);
 

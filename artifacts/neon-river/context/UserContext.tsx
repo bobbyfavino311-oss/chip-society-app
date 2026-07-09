@@ -300,7 +300,7 @@ interface UserContextValue {
   addXP: (amount: number) => Promise<void>;
   consumeFortuneCookie: (tier: CookieTier) => Promise<boolean>;
   consumeFortuneCookieBulk: (tier: CookieTier, count: number) => Promise<number>;
-  addFortuneCookies: (common?: number, rare?: number, epic?: number, legendary?: number, mythic?: number) => Promise<void>;
+  addFortuneCookies: (common?: number, rare?: number, epic?: number, legendary?: number, mythic?: number, source?: string) => Promise<void>;
   claimFreeCookie: () => Promise<CookieTier | false>;
   pendingBonuses: PendingBonus[];
   dismissBonus: (notificationId: string) => void;
@@ -476,7 +476,8 @@ async function serverForgotPin(username: string, email: string, newPin: string):
 
 // ─── Profile backfill (merge saved fields onto defaults) ──────────────────────
 function backfillProfile(base: UserProfile, saved: Partial<UserProfile>): UserProfile {
-  return {
+  // Build the merged profile.
+  const result: UserProfile = {
     ...base,
     ...saved,
     chips: saved.chips ?? 0,
@@ -501,18 +502,39 @@ function backfillProfile(base: UserProfile, saved: Partial<UserProfile>): UserPr
     omahaTournamentWins: saved.omahaTournamentWins ?? 0,
     jokerTournamentWins: saved.jokerTournamentWins ?? 0,
     biggestPot: saved.biggestPot ?? 0,
-    // Uncommon cookies removed — migrate any existing to common
-    commonCookies:    (saved.commonCookies ?? (saved as any).fortuneCookies ?? 0) + ((saved as any).uncommonCookies ?? (saved as any).goldenCookies ?? 0),
+    // Cookie migration — idempotent: if commonCookies is already stored, use it as-is.
+    // Only run the one-time additive migration (fortuneCookies / uncommonCookies) when
+    // the profile predates the commonCookies field and has no stored value yet.
+    // Keeping this non-additive prevents legacy fields from being re-added on every
+    // backfill call (which was the source of the phantom 22-common-cookie bug).
+    commonCookies: saved.commonCookies != null
+      ? saved.commonCookies
+      : ((saved as any).fortuneCookies ?? 0) + ((saved as any).uncommonCookies ?? (saved as any).goldenCookies ?? 0),
     rareCookies:      saved.rareCookies      ?? (saved as any).dragonCookies  ?? 0,
     epicCookies:      saved.epicCookies      ?? 0,
     legendaryCookies: saved.legendaryCookies ?? 0,
     mythicCookies:    saved.mythicCookies    ?? 0,
-    commonCookiesOpened:    (saved.commonCookiesOpened ?? 0) + ((saved as any).uncommonCookiesOpened ?? 0),
+    // Same idempotent treatment for opened-count migration.
+    commonCookiesOpened: saved.commonCookiesOpened != null
+      ? saved.commonCookiesOpened
+      : ((saved as any).uncommonCookiesOpened ?? 0),
     rareCookiesOpened:      saved.rareCookiesOpened      ?? 0,
     epicCookiesOpened:      saved.epicCookiesOpened      ?? 0,
     legendaryCookiesOpened: saved.legendaryCookiesOpened ?? 0,
     mythicCookiesOpened:    saved.mythicCookiesOpened    ?? 0,
   };
+
+  // Strip stale legacy field names so they are never written back into AsyncStorage.
+  // The ...saved spread above may have injected them; removing them here ensures
+  // they can never accumulate across restarts.
+  for (const staleKey of [
+    'fortuneCookies', 'uncommonCookies', 'goldenCookies',
+    'dragonCookies', 'uncommonCookiesOpened',
+  ]) {
+    delete (result as any)[staleKey];
+  }
+
+  return result;
 }
 
 const PROFANITY_LIST = ['fuck', 'shit', 'ass', 'bitch', 'dick', 'cunt', 'nigger', 'faggot'];
@@ -789,7 +811,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const addFortuneCookies = useCallback(async (
     common = 0, rare = 0, epic = 0, legendary = 0, mythic = 0,
+    source = 'unknown',
   ) => {
+    // Validate: block any call that grants cookies without a known rarity
+    const total = common + rare + epic + legendary + mythic;
+    if (total <= 0) return;
+
+    // Transaction log — visible in Metro/Xcode console for audit
+    const txId = `cookie_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const grants: string[] = [];
+    if (common    > 0) grants.push(`common×${common}`);
+    if (rare      > 0) grants.push(`rare×${rare}`);
+    if (epic      > 0) grants.push(`epic×${epic}`);
+    if (legendary > 0) grants.push(`legendary×${legendary}`);
+    if (mythic    > 0) grants.push(`mythic×${mythic}`);
+    console.log(`[COOKIE_TX] id=${txId} source=${source} grants=${grants.join(',')} at=${new Date().toISOString()}`);
+
     await updateProfile({
       commonCookies:    profile.commonCookies    + common,
       rareCookies:      profile.rareCookies      + rare,
