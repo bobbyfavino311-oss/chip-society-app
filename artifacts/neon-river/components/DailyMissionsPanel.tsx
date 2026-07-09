@@ -42,6 +42,8 @@ const RARITY: Record<MissionRarity, { color: string; label: string; glow: string
   legendary: { color: '#ffd700', label: 'LEGENDARY', glow: 'rgba(255,215,0,0.18)' },
 };
 
+const GOLD = '#ffd700';
+
 // ── Chip amount formatter ──────────────────────────────────────────────────────
 
 function fmtChips(n: number): string {
@@ -136,11 +138,12 @@ function MissionCard({ mission, onClaim }: { mission: ActiveMission; onClaim: ()
           </View>
         ) : isComplete ? (
           <Animated.View style={{ transform: [{ scale: claimScale }] }}>
-            <TouchableOpacity style={[card.claimBtn, { borderColor: rar.color, backgroundColor: `${rar.color}22` }]} onPress={handleClaim} activeOpacity={0.8}>
-              <LinearGradient
-                colors={[`${rar.color}30`, 'transparent']}
-                style={StyleSheet.absoluteFill}
-              />
+            <TouchableOpacity
+              style={[card.claimBtn, { borderColor: rar.color, backgroundColor: `${rar.color}22` }]}
+              onPress={handleClaim}
+              activeOpacity={0.8}
+            >
+              <LinearGradient colors={[`${rar.color}30`, 'transparent']} style={StyleSheet.absoluteFill} />
               <Text style={[card.claimText, { color: rar.color }]}>CLAIM</Text>
             </TouchableOpacity>
           </Animated.View>
@@ -183,15 +186,205 @@ const card = StyleSheet.create({
   claimedText: { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8, opacity: 0.8 },
 });
 
+// ── Grand Reward card ──────────────────────────────────────────────────────────
+
+function GrandRewardCard({
+  available,
+  claimed,
+  onClaim,
+}: {
+  available: boolean;
+  claimed: boolean;
+  onClaim: () => void;
+}) {
+  const pulseAnim  = useRef(new Animated.Value(0)).current;
+  const claimScale = useRef(new Animated.Value(1)).current;
+  const pulseLoop  = useRef<Animated.CompositeAnimation | null>(null);
+
+  useEffect(() => {
+    if (available && !claimed) {
+      pulseLoop.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 0, duration: 1000, useNativeDriver: true }),
+        ])
+      );
+      pulseLoop.current.start();
+    } else {
+      pulseLoop.current?.stop();
+      pulseAnim.setValue(0);
+    }
+    return () => pulseLoop.current?.stop();
+  }, [available, claimed]);
+
+  const handleClaim = () => {
+    if (claimed) return;
+    Animated.sequence([
+      Animated.timing(claimScale, { toValue: 0.92, duration: 70, useNativeDriver: true }),
+      Animated.timing(claimScale, { toValue: 1,    duration: 120, useNativeDriver: true }),
+    ]).start(onClaim);
+  };
+
+  const borderOpacity = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.85] });
+  const glowOpacity   = pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.08, 0.22] });
+
+  return (
+    <View style={gr.outer}>
+      {/* Animated pulsing glow background */}
+      <Animated.View
+        style={[StyleSheet.absoluteFill, { borderRadius: 16, backgroundColor: GOLD, opacity: glowOpacity }]}
+        pointerEvents="none"
+      />
+
+      {/* Gold border (animated opacity) */}
+      <Animated.View
+        style={[gr.border, { borderColor: GOLD, opacity: borderOpacity }]}
+        pointerEvents="none"
+      />
+
+      {/* Card body */}
+      <View style={gr.inner}>
+        <LinearGradient
+          colors={['rgba(20,12,0,0.98)', 'rgba(10,6,0,0.99)']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        />
+        <LinearGradient
+          colors={[`${GOLD}20`, 'transparent']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        />
+        {/* Gold glow line at top */}
+        <View style={gr.topLine} />
+
+        <View style={gr.content}>
+          {/* Left: trophy + labels */}
+          <View style={gr.left}>
+            <View style={gr.trophyWrap}>
+              <Ionicons name="trophy" size={22} color={GOLD} />
+            </View>
+            <View style={{ gap: 3 }}>
+              <Text style={gr.heading}>DAILY GRAND REWARD</Text>
+              <Text style={gr.sub}>All 5 missions passed!</Text>
+              <View style={gr.cookieRow}>
+                <MaterialCommunityIcons name="cookie" size={13} color={GOLD} />
+                <Text style={gr.cookieText}>1× Legendary Fortune Cookie</Text>
+              </View>
+              <Text style={gr.guarantee}>Guaranteed · No RNG</Text>
+            </View>
+          </View>
+
+          {/* Right: claim / claimed */}
+          <View style={gr.right}>
+            {claimed ? (
+              <View style={gr.claimedWrap}>
+                <Ionicons name="checkmark-circle" size={16} color={GOLD} />
+                <Text style={gr.claimedLabel}>CLAIMED</Text>
+              </View>
+            ) : (
+              <Animated.View style={{ transform: [{ scale: claimScale }] }}>
+                <TouchableOpacity
+                  style={gr.claimBtn}
+                  onPress={handleClaim}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={[`${GOLD}50`, `${GOLD}20`]}
+                    style={StyleSheet.absoluteFill}
+                    start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                  />
+                  <Text style={gr.claimBtnText}>CLAIM</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const gr = StyleSheet.create({
+  outer: {
+    borderRadius: 16,
+    marginTop: 4,
+  },
+  border: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1.5,
+  },
+  inner: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    padding: 14,
+  },
+  topLine: {
+    position: 'absolute', top: 0, left: 0, right: 0,
+    height: 1.5, backgroundColor: GOLD, opacity: 0.55,
+  },
+  content: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+  },
+  left: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  trophyWrap: {
+    width: 44, height: 44, borderRadius: 13,
+    borderWidth: 1.5, borderColor: `${GOLD}55`,
+    backgroundColor: `${GOLD}15`,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  },
+  heading: {
+    color: GOLD, fontSize: 9.5, fontWeight: '900',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
+  },
+  sub: {
+    color: colors.text, fontSize: 11, fontWeight: '700',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 0.3,
+  },
+  cookieRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 1 },
+  cookieText: {
+    color: GOLD, fontSize: 10, fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+  },
+  guarantee: {
+    color: colors.textMuted, fontSize: 9,
+    fontFamily: 'Inter_400Regular', marginTop: 1,
+  },
+  right: { flexShrink: 0, alignItems: 'center' },
+  claimedWrap: { alignItems: 'center', gap: 3 },
+  claimedLabel: {
+    color: GOLD, fontSize: 8.5, fontWeight: '900',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8, opacity: 0.85,
+  },
+  claimBtn: {
+    borderRadius: 10, borderWidth: 1.5, borderColor: `${GOLD}88`,
+    overflow: 'hidden', paddingHorizontal: 16, paddingVertical: 9,
+  },
+  claimBtnText: {
+    color: GOLD, fontSize: 11, fontWeight: '900',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1.2,
+  },
+});
+
 // ── Main panel ─────────────────────────────────────────────────────────────────
 
 export default function DailyMissionsPanel() {
-  const { dailyMissions, completedCount, claimMission } = useMissions();
+  const {
+    dailyMissions,
+    completedCount,
+    claimMission,
+    grandRewardAvailable,
+    grandRewardClaimed,
+    claimGrandReward,
+  } = useMissions();
+
   const [expanded, setExpanded] = useState(false);
   const chevronAnim = useRef(new Animated.Value(0)).current;
-  const claimableCount = dailyMissions.filter(m => m.progress >= m.target && !m.claimed).length;
-  const totalCount = dailyMissions.length;
-  const overallRatio = totalCount > 0 ? completedCount / totalCount : 0;
+
+  const claimableCount    = dailyMissions.filter(m => m.progress >= m.target && !m.claimed).length;
+  const totalCount        = dailyMissions.length;
+  const allMissionsPassed = totalCount > 0 && dailyMissions.every(m => m.claimed);
+  const overallRatio      = totalCount > 0 ? completedCount / totalCount : 0;
 
   const toggle = () => {
     LayoutAnimation.configureNext({
@@ -212,6 +405,10 @@ export default function DailyMissionsPanel() {
   const handleClaim = useCallback((id: string) => {
     void claimMission(id);
   }, [claimMission]);
+
+  const handleClaimGrand = useCallback(() => {
+    void claimGrandReward();
+  }, [claimGrandReward]);
 
   const chevronRotate = chevronAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
 
@@ -239,16 +436,34 @@ export default function DailyMissionsPanel() {
             <Text style={panel.subtitle}>Resets at midnight</Text>
           </View>
         </View>
+
         <View style={panel.headerRight}>
-          {claimableCount > 0 && (
+          {/* Grand Reward Ready badge (highest priority) */}
+          {grandRewardAvailable && !grandRewardClaimed && (
+            <View style={panel.grandBadge}>
+              <Ionicons name="trophy" size={9} color={GOLD} />
+              <Text style={panel.grandBadgeText}>GRAND REWARD</Text>
+            </View>
+          )}
+          {/* Claimable missions badge (only when grand reward not pending) */}
+          {!grandRewardAvailable && claimableCount > 0 && (
             <View style={panel.claimableBadge}>
               <Text style={panel.claimableText}>{claimableCount} READY</Text>
             </View>
           )}
-          <Text style={panel.countText}>
-            <Text style={{ color: completedCount === totalCount ? '#00e887' : '#bf5fff' }}>{completedCount}</Text>
-            <Text style={{ color: colors.textMuted }}> / {totalCount}</Text>
-          </Text>
+
+          {/* Count / all-passed indicator */}
+          {allMissionsPassed && grandRewardClaimed ? (
+            <Text style={panel.allPassedText}>★★★★★</Text>
+          ) : (
+            <Text style={panel.countText}>
+              <Text style={{ color: completedCount === totalCount ? '#00e887' : '#bf5fff' }}>
+                {completedCount}
+              </Text>
+              <Text style={{ color: colors.textMuted }}> / {totalCount}</Text>
+            </Text>
+          )}
+
           <Animated.View style={{ transform: [{ rotate: chevronRotate }] }}>
             <Ionicons name="chevron-down" size={16} color={colors.textMuted} />
           </Animated.View>
@@ -273,11 +488,36 @@ export default function DailyMissionsPanel() {
               onClaim={() => handleClaim(m.id)}
             />
           ))}
-          {dailyMissions.every(m => m.claimed) && (
+
+          {/* Grand Reward card — shown once all 5 missions are claimed */}
+          {allMissionsPassed && (
+            <GrandRewardCard
+              available={grandRewardAvailable}
+              claimed={grandRewardClaimed}
+              onClaim={handleClaimGrand}
+            />
+          )}
+
+          {/* All-done footer */}
+          {allMissionsPassed && grandRewardClaimed && (
+            <View style={panel.allDone}>
+              <Ionicons name="trophy" size={22} color={GOLD} />
+              <Text style={panel.allPassedBig}>★★★★★ ALL MISSIONS PASSED ★★★★★</Text>
+              <Text style={panel.allDoneSub}>Legendary Cookie collected · New missions tomorrow</Text>
+            </View>
+          )}
+          {allMissionsPassed && !grandRewardClaimed && (
             <View style={panel.allDone}>
               <Ionicons name="checkmark-circle" size={22} color="#00e887" />
+              <Text style={panel.allDoneText}>ALL MISSIONS PASSED!</Text>
+              <Text style={panel.allDoneSub}>Claim your Grand Reward above</Text>
+            </View>
+          )}
+          {!allMissionsPassed && completedCount === totalCount && (
+            <View style={panel.allDone}>
+              <Ionicons name="checkmark-circle" size={20} color="#00e887" />
               <Text style={panel.allDoneText}>ALL MISSIONS COMPLETE</Text>
-              <Text style={panel.allDoneSub}>New missions tomorrow</Text>
+              <Text style={panel.allDoneSub}>Claim rewards to unlock Grand Reward</Text>
             </View>
           )}
         </View>
@@ -310,6 +550,18 @@ const panel = StyleSheet.create({
   },
   subtitle: { color: colors.textMuted, fontSize: 9.5, marginTop: 1 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+
+  // Grand Reward badge (gold)
+  grandBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3,
+    backgroundColor: 'rgba(255,215,0,0.12)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.40)',
+  },
+  grandBadgeText: {
+    color: GOLD, fontSize: 7.5, fontWeight: '900',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8,
+  },
+
   claimableBadge: {
     borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3,
     backgroundColor: 'rgba(0,232,135,0.15)', borderWidth: 1, borderColor: 'rgba(0,232,135,0.35)',
@@ -318,26 +570,29 @@ const panel = StyleSheet.create({
     color: '#00e887', fontSize: 8, fontWeight: '900',
     fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8,
   },
+
   countText: { fontSize: 12, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
+  allPassedText: { color: GOLD, fontSize: 11, letterSpacing: 2 },
+
   summaryBar: {
     height: 2, marginHorizontal: 14, marginBottom: 12,
     backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 1, overflow: 'hidden',
   },
-  summaryFill: {
-    height: '100%', borderRadius: 1,
-    backgroundColor: '#bf5fff',
-  },
+  summaryFill: { height: '100%', borderRadius: 1, backgroundColor: '#bf5fff' },
   summaryGlow: {
     position: 'absolute', top: 0, left: 0, right: 0, height: '100%',
     backgroundColor: '#00e887', opacity: 0.6,
   },
   content: { paddingHorizontal: 12, paddingBottom: 12, gap: 8 },
-  allDone: {
-    alignItems: 'center', paddingVertical: 18, gap: 6,
-  },
+
+  allDone: { alignItems: 'center', paddingVertical: 14, gap: 5 },
   allDoneText: {
-    color: '#00e887', fontSize: 13, fontWeight: '900',
+    color: '#00e887', fontSize: 12, fontWeight: '900',
     fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
   },
-  allDoneSub: { color: colors.textMuted, fontSize: 11 },
+  allPassedBig: {
+    color: GOLD, fontSize: 10, fontWeight: '900',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8, textAlign: 'center',
+  },
+  allDoneSub: { color: colors.textMuted, fontSize: 10.5, textAlign: 'center' },
 });

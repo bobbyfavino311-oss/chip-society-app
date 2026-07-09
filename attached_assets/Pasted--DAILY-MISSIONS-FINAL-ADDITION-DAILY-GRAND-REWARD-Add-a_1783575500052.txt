@@ -1,0 +1,178 @@
+# DAILY MISSIONS FINAL ADDITION — DAILY GRAND REWARD
+
+Add a Daily Grand Reward system to the Daily Missions feature.
+
+This reward is ONLY earned when the player successfully completes ALL FIVE Daily Missions within the same 24-hour Daily Mission cycle.
+
+This is intended to be the highest-value daily reward and should encourage players to complete every mission before the daily reset.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DAILY GRAND REWARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Requirement:
+
+Complete all 5 Daily Missions before the daily reset.
+
+Progress:
+
+5 / 5 Complete
+
+Once all five missions have been:
+
+• Completed
+• Rewards claimed
+
+Unlock the Daily Grand Reward.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GRAND REWARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Reward:
+
+🎉 1 Legendary Fortune Cookie
+
+NOT Random.
+
+NOT Weighted.
+
+NOT Common.
+
+NOT Uncommon.
+
+NOT Rare.
+
+NOT Epic.
+
+NOT Mythic.
+
+The reward MUST always grant exactly:
+
+ONE LEGENDARY FORTUNE COOKIE.
+
+Hard-code this reward.
+
+Do not route it through the normal random cookie generator.
+
+It should bypass all rarity rolls and directly add one Legendary Fortune Cookie to the player's inventory.
+
+There should never be any possibility of receiving another rarity.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NOTIFICATION
+
+Once the player completes all five Daily Missions:
+
+Display a premium glass banner at the top of the screen.
+
+Instead of:
+
+MISSION COMPLETE
+
+Change the wording everywhere in the Daily Mission system to:
+
+MISSION PASSED!
+
+Example:
+
+━━━━━━━━━━━━━━━━━━
+
+♠ MISSION PASSED!
+
+Win 3 Flushes
+
+Tap to Collect
+
+━━━━━━━━━━━━━━━━━━
+
+For the final mission:
+
+━━━━━━━━━━━━━━━━━━
+
+🏆 ALL DAILY MISSIONS PASSED!
+
+Legendary Fortune Cookie Unlocked
+
+Tap to Collect
+
+━━━━━━━━━━━━━━━━━━
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLAIM FLOW
+
+The Legendary Fortune Cookie should NOT be granted automatically.
+
+The player must manually claim it.
+
+When claimed:
+
+• Play premium reward animation
+• Display Legendary Cookie artwork
+• Show "Legendary Fortune Cookie Added"
+• Add exactly ONE Legendary Fortune Cookie to inventory
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HOME SCREEN
+
+When all five missions are complete:
+
+Replace:
+
+5 / 5 Complete
+
+With:
+
+★★★★★ ALL MISSIONS PASSED ★★★★★
+
+Display a glowing "Grand Reward Ready" indicator until the Legendary Cookie is claimed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESET LOGIC
+
+After the player claims the Legendary Fortune Cookie:
+
+The Daily Missions panel remains marked complete until the daily reset.
+
+At the next daily reset:
+
+• Generate five new random missions.
+• Reset progress.
+• Remove the previous Grand Reward state.
+• Create a brand-new Legendary Cookie opportunity.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BACKEND VALIDATION
+
+Verify:
+
+• Grand Reward unlocks ONLY after all five missions have been completed.
+• Legendary Cookie is ALWAYS awarded.
+• No RNG is used.
+• Reward bypasses the standard cookie rarity system.
+• Exactly one Legendary Fortune Cookie is added.
+• Reward can only be claimed once per daily cycle.
+• No duplicate claims are possible.
+• Daily reset correctly resets Grand Reward eligibility.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TEXT CHANGES
+
+Replace every occurrence of:
+
+"Mission Complete"
+
+with:
+
+"Mission Passed!"
+
+For the final daily reward, use:
+
+"ALL DAILY MISSIONS PASSED!"
+
+This wording better matches Chip Society's competitive tone and feels more satisfying than "Mission Complete."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL GOAL
+
+The Daily Missions system should culminate in a meaningful daily objective. Players who complete all five missions should always receive one guaranteed Legendary Fortune Cookie, making full completion feel rewarding and giving players a compelling reason to return every day and finish every challenge.

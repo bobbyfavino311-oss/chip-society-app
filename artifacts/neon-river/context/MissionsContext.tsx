@@ -164,14 +164,18 @@ function selectDailyMissions(): MissionDef[] {
 
 const STORAGE_PREFIX = '@missions_v1_';
 
-type StoredState = { progress: Record<string, number>; claimed: string[] };
+type StoredState = {
+  progress: Record<string, number>;
+  claimed: string[];
+  grandRewardClaimed?: boolean;
+};
 
 async function loadState(dateKey: string): Promise<StoredState> {
   try {
     const raw = await AsyncStorage.getItem(STORAGE_PREFIX + dateKey);
     if (raw) return JSON.parse(raw) as StoredState;
   } catch {}
-  return { progress: {}, claimed: [] };
+  return { progress: {}, claimed: [], grandRewardClaimed: false };
 }
 
 async function saveState(dateKey: string, state: StoredState): Promise<void> {
@@ -189,6 +193,12 @@ type MissionsContextType = {
   reportGameEvent: (event: MissionEvent) => void;
   pendingCompletions: string[];
   clearPendingCompletion: (id: string) => void;
+  // Grand Reward
+  grandRewardAvailable: boolean;
+  grandRewardClaimed: boolean;
+  pendingGrandReward: boolean;
+  claimGrandReward: () => Promise<void>;
+  clearPendingGrandReward: () => void;
 };
 
 const MissionsContext = createContext<MissionsContextType>({
@@ -198,33 +208,68 @@ const MissionsContext = createContext<MissionsContextType>({
   reportGameEvent: () => {},
   pendingCompletions: [],
   clearPendingCompletion: () => {},
+  grandRewardAvailable: false,
+  grandRewardClaimed: false,
+  pendingGrandReward: false,
+  claimGrandReward: async () => {},
+  clearPendingGrandReward: () => {},
 });
 
 export function MissionsProvider({ children }: { children: React.ReactNode }) {
-  const { addChips, addXP } = useUser();
+  const { addChips, addXP, addFortuneCookies } = useUser();
   const [dateKey] = useState(getTodayKey);
   const [missions] = useState<MissionDef[]>(selectDailyMissions);
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [claimed, setClaimed] = useState<string[]>([]);
   const [pendingCompletions, setPendingCompletions] = useState<string[]>([]);
+  const [grandRewardClaimed, setGrandRewardClaimed] = useState(false);
+  const [pendingGrandReward, setPendingGrandReward] = useState(false);
+
   const loadedRef = useRef(false);
   const claimedRef = useRef<string[]>([]);
   const progressRef = useRef<Record<string, number>>({});
+  const grandRewardClaimedRef = useRef(false);
+  // Prevent re-showing the grand reward banner after dismissal in the same session
+  const grandRewardBannerShownRef = useRef(false);
+
   claimedRef.current = claimed;
   progressRef.current = progress;
+  grandRewardClaimedRef.current = grandRewardClaimed;
+
+  // ── Load persisted state ───────────────────────────────────────────────────
 
   useEffect(() => {
     loadState(dateKey).then(state => {
       setProgress(state.progress);
       setClaimed(state.claimed);
+      setGrandRewardClaimed(state.grandRewardClaimed ?? false);
       loadedRef.current = true;
     });
   }, [dateKey]);
 
+  // ── Persist on every change ────────────────────────────────────────────────
+
   useEffect(() => {
     if (!loadedRef.current) return;
-    void saveState(dateKey, { progress, claimed });
-  }, [progress, claimed, dateKey]);
+    void saveState(dateKey, { progress, claimed, grandRewardClaimed });
+  }, [progress, claimed, grandRewardClaimed, dateKey]);
+
+  // ── Detect grand reward unlock ─────────────────────────────────────────────
+  // Fires whenever the claimed array grows — if all 5 are now claimed and the
+  // grand reward hasn't been claimed yet, queue the banner (once per session).
+
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    if (missions.length === 0) return;
+    if (grandRewardBannerShownRef.current) return;
+    const allClaimed = missions.every(m => claimed.includes(m.id));
+    if (allClaimed && !grandRewardClaimedRef.current) {
+      grandRewardBannerShownRef.current = true;
+      setPendingGrandReward(true);
+    }
+  }, [claimed, missions]);
+
+  // ── Event handler ──────────────────────────────────────────────────────────
 
   const reportGameEvent = useCallback((event: MissionEvent) => {
     setProgress(prev => {
@@ -246,6 +291,8 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
     });
   }, [missions]);
 
+  // ── Claim individual mission ───────────────────────────────────────────────
+
   const claimMission = useCallback(async (id: string) => {
     const m = missions.find(def => def.id === id);
     if (!m) return;
@@ -257,9 +304,25 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
     await addXP(m.xpReward);
   }, [missions, addChips, addXP]);
 
+  // ── Grand Reward ───────────────────────────────────────────────────────────
+
+  const claimGrandReward = useCallback(async () => {
+    if (grandRewardClaimedRef.current) return;
+    setGrandRewardClaimed(true);
+    setPendingGrandReward(false);
+    // Exactly 1 Legendary Fortune Cookie — hard-coded, bypasses all rarity rolls
+    await addFortuneCookies(0, 0, 0, 1, 0);
+  }, [addFortuneCookies]);
+
+  const clearPendingGrandReward = useCallback(() => {
+    setPendingGrandReward(false);
+  }, []);
+
   const clearPendingCompletion = useCallback((id: string) => {
     setPendingCompletions(prev => prev.filter(x => x !== id));
   }, []);
+
+  // ── Derived values ─────────────────────────────────────────────────────────
 
   const dailyMissions: ActiveMission[] = missions.map(m => ({
     id: m.id, category: m.category, title: m.title, description: m.description,
@@ -271,8 +334,26 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
 
   const completedCount = dailyMissions.filter(m => m.progress >= m.target).length;
 
+  // Grand reward is available when ALL 5 missions are claimed AND not yet granted
+  const grandRewardAvailable =
+    missions.length > 0 &&
+    missions.every(m => claimed.includes(m.id)) &&
+    !grandRewardClaimed;
+
   return (
-    <MissionsContext.Provider value={{ dailyMissions, completedCount, claimMission, reportGameEvent, pendingCompletions, clearPendingCompletion }}>
+    <MissionsContext.Provider value={{
+      dailyMissions,
+      completedCount,
+      claimMission,
+      reportGameEvent,
+      pendingCompletions,
+      clearPendingCompletion,
+      grandRewardAvailable,
+      grandRewardClaimed,
+      pendingGrandReward,
+      claimGrandReward,
+      clearPendingGrandReward,
+    }}>
       {children}
     </MissionsContext.Provider>
   );

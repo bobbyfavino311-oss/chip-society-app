@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { type ActiveMission, type MissionRarity, useMissions } from '@/context/MissionsContext';
 
@@ -27,15 +28,24 @@ const RARITY_COLORS: Record<MissionRarity, string> = {
   legendary: '#ffd700',
 };
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+const GOLD = '#ffd700';
 
-type Phase = 'banner' | 'icon';
+// ── Sentinel ID used when showing the grand reward banner ──────────────────────
+const GRAND_REWARD_ID = '__grand_reward__';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
+type Phase = 'banner' | 'icon';
+
 export default function MissionCompleteToast() {
   const insets = useSafeAreaInsets();
-  const { dailyMissions, pendingCompletions, clearPendingCompletion } = useMissions();
+  const {
+    dailyMissions,
+    pendingCompletions,
+    clearPendingCompletion,
+    pendingGrandReward,
+    clearPendingGrandReward,
+  } = useMissions();
 
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>('banner');
@@ -49,6 +59,8 @@ export default function MissionCompleteToast() {
   const timers     = useRef<ReturnType<typeof setTimeout>[]>([]);
   const pulseLoop  = useRef<Animated.CompositeAnimation | null>(null);
   const isTapping  = useRef(false);
+  // Track whether current notification is the grand reward
+  const isGrandRef = useRef(false);
 
   const clearTimers = () => {
     timers.current.forEach(clearTimeout);
@@ -65,11 +77,15 @@ export default function MissionCompleteToast() {
     bannerOpacity.setValue(0);
     iconOpacity.setValue(0);
     iconScale.setValue(1);
-    clearPendingCompletion(id);
+    if (isGrandRef.current) {
+      clearPendingGrandReward();
+    } else {
+      clearPendingCompletion(id);
+    }
     setCurrentId(null);
-  }, [clearPendingCompletion, bannerY, bannerOpacity, iconOpacity, iconScale]);
+  }, [clearPendingCompletion, clearPendingGrandReward, bannerY, bannerOpacity, iconOpacity, iconScale]);
 
-  // Tap: fast-exit then navigate home
+  // Tap: fast-exit then navigate home (claim happens on the home panel)
   const handleTap = useCallback(() => {
     if (!currentId || isTapping.current) return;
     isTapping.current = true;
@@ -80,20 +96,33 @@ export default function MissionCompleteToast() {
       Animated.timing(bannerOpacity, { toValue: 0, duration: 180, useNativeDriver: true }),
       Animated.timing(iconOpacity,   { toValue: 0, duration: 180, useNativeDriver: true }),
     ]).start(() => {
-      fullReset(id);
+      if (isGrandRef.current) {
+        clearPendingGrandReward();
+      } else {
+        clearPendingCompletion(id);
+      }
+      setCurrentId(null);
+      isTapping.current = false;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       router.push('/(tabs)/' as any);
     });
-  }, [currentId, bannerOpacity, iconOpacity, fullReset]);
+  }, [currentId, bannerOpacity, iconOpacity, clearPendingCompletion, clearPendingGrandReward]);
 
-  // Pick next pending mission (only when idle)
+  // Pick next: regular missions first, grand reward last
   useEffect(() => {
-    if (currentId !== null || pendingCompletions.length === 0) return;
-    setCurrentId(pendingCompletions[0]);
-    setPhase('banner');
-  }, [pendingCompletions, currentId]);
+    if (currentId !== null) return;
+    if (pendingCompletions.length > 0) {
+      isGrandRef.current = false;
+      setCurrentId(pendingCompletions[0]);
+      setPhase('banner');
+    } else if (pendingGrandReward) {
+      isGrandRef.current = true;
+      setCurrentId(GRAND_REWARD_ID);
+      setPhase('banner');
+    }
+  }, [pendingCompletions, pendingGrandReward, currentId]);
 
-  // Banner phase: slide in → hold 3 s → slide out → transition to icon
+  // Banner phase: slide in → hold 3.2 s → slide out → transition to icon
   useEffect(() => {
     if (phase !== 'banner' || !currentId) return;
     bannerY.setValue(-120);
@@ -117,7 +146,7 @@ export default function MissionCompleteToast() {
     return () => clearTimeout(t);
   }, [phase, currentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Icon phase: fade in → pulse → hold 2.5 s → fade out → done
+  // Icon phase: fade in → pulse → hold 2.6 s → fade out → done
   useEffect(() => {
     if (phase !== 'icon' || !currentId) return;
     const id = currentId;
@@ -150,9 +179,12 @@ export default function MissionCompleteToast() {
 
   if (!currentId) return null;
 
-  const mission: ActiveMission | undefined = dailyMissions.find(m => m.id === currentId);
-  const accent = mission ? RARITY_COLORS[mission.rarity] : '#bf5fff';
-  const top    = insets.top + 10;
+  const isGrand   = currentId === GRAND_REWARD_ID;
+  const mission: ActiveMission | undefined = isGrand
+    ? undefined
+    : dailyMissions.find(m => m.id === currentId);
+  const accent    = isGrand ? GOLD : (mission ? RARITY_COLORS[mission.rarity] : '#bf5fff');
+  const top       = insets.top + 10;
 
   return (
     <>
@@ -161,6 +193,7 @@ export default function MissionCompleteToast() {
         style={[
           s.bannerWrap,
           { top, opacity: bannerOpacity, transform: [{ translateY: bannerY }] },
+          isGrand && s.grandShadow,
         ]}
         pointerEvents={phase === 'banner' ? 'box-none' : 'none'}
       >
@@ -168,42 +201,48 @@ export default function MissionCompleteToast() {
           <View style={[s.bannerCard, { borderColor: `${accent}55` }]}>
             {/* Dark smoked background */}
             <LinearGradient
-              colors={['rgba(8,2,20,0.97)', 'rgba(3,0,10,0.99)']}
+              colors={isGrand
+                ? ['rgba(18,10,2,0.98)', 'rgba(8,4,0,0.99)']
+                : ['rgba(8,2,20,0.97)', 'rgba(3,0,10,0.99)']}
               style={StyleSheet.absoluteFill}
             />
             {/* Accent glow wash */}
             <LinearGradient
-              colors={[`${accent}1c`, 'transparent']}
+              colors={[`${accent}${isGrand ? '28' : '1c'}`, 'transparent']}
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             />
             {/* Top thin glow line */}
-            <View style={[s.topGlow, { backgroundColor: `${accent}88` }]} />
+            <View style={[s.topGlow, { backgroundColor: `${accent}99` }]} />
 
             <View style={s.bannerRow}>
-              {/* Spade icon pill */}
-              <View style={[s.iconPill, { borderColor: `${accent}50`, backgroundColor: `${accent}18` }]}>
-                <SpadeIcon color={accent} size={17} />
+              {/* Icon pill */}
+              <View style={[s.iconPill, { borderColor: `${accent}55`, backgroundColor: `${accent}18` }]}>
+                {isGrand
+                  ? <Ionicons name="trophy" size={18} color={GOLD} />
+                  : <SpadeIcon color={accent} size={17} />
+                }
               </View>
 
               {/* Text stack */}
               <View style={s.textStack}>
-                <Text style={[s.completedLabel, { color: accent }]}>MISSION COMPLETE</Text>
+                <Text style={[s.completedLabel, { color: accent }]}>
+                  {isGrand ? 'ALL DAILY MISSIONS PASSED!' : 'MISSION PASSED!'}
+                </Text>
                 <Text style={s.missionName} numberOfLines={1}>
-                  {mission?.title ?? ''}
+                  {isGrand ? 'Legendary Fortune Cookie Unlocked' : (mission?.title ?? '')}
                 </Text>
                 <Text style={s.tapHint}>Tap to Collect →</Text>
               </View>
 
-              {/* Rarity badge */}
-              {mission && (
-                <View style={[s.rarBadge, { borderColor: `${accent}44`, backgroundColor: `${accent}18` }]}>
-                  <Text style={[s.rarText, { color: accent }]}>
-                    {mission.rarity.toUpperCase()}
-                  </Text>
-                </View>
-              )}
+              {/* Badge — rarity for missions, ★ for grand reward */}
+              <View style={[s.rarBadge, { borderColor: `${accent}44`, backgroundColor: `${accent}18` }]}>
+                {isGrand
+                  ? <Text style={[s.rarText, { color: accent }]}>★</Text>
+                  : <Text style={[s.rarText, { color: accent }]}>{mission?.rarity.toUpperCase()}</Text>
+                }
+              </View>
             </View>
           </View>
         </Pressable>
@@ -223,7 +262,10 @@ export default function MissionCompleteToast() {
               colors={[`${accent}40`, 'transparent']}
               style={StyleSheet.absoluteFill}
             />
-            <SpadeIcon color={accent} size={20} />
+            {isGrand
+              ? <Ionicons name="trophy" size={20} color={GOLD} />
+              : <SpadeIcon color={accent} size={20} />
+            }
           </View>
         </Pressable>
       </Animated.View>
@@ -244,6 +286,11 @@ const s = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 22,
   },
+  grandShadow: {
+    shadowColor: '#ffd700',
+    shadowOpacity: 0.40,
+    shadowRadius: 28,
+  },
   pressable: { borderRadius: 18 },
   bannerCard: {
     borderRadius: 18,
@@ -254,7 +301,7 @@ const s = StyleSheet.create({
     position: 'absolute',
     top: 0, left: 0, right: 0,
     height: 1,
-    opacity: 0.7,
+    opacity: 0.8,
   },
   bannerRow: {
     flexDirection: 'row',
@@ -276,7 +323,7 @@ const s = StyleSheet.create({
     fontSize: 8,
     fontWeight: '900',
     fontFamily: 'Orbitron_700Bold',
-    letterSpacing: 1.4,
+    letterSpacing: 1.2,
     opacity: 0.95,
   },
   missionName: {
