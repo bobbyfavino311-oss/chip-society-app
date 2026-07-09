@@ -33,6 +33,7 @@ import { AISocialProvider } from '@/context/AISocialContext';
 import { LiveFeedProvider } from '@/context/LiveFeedContext';
 import { MultiplayerProvider } from '@/context/MultiplayerContext';
 import { MissionsProvider } from '@/context/MissionsContext';
+import MissionCompleteToast from '@/components/MissionCompleteToast';
 import { NotificationProvider, useNotifications } from '@/context/NotificationContext';
 import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
@@ -268,6 +269,7 @@ function RootLayoutNav() {
       <PushSetup />
       <GateController />
       <AchievementPopupRenderer />
+      <MissionCompleteToast />
       <BonusNotificationRenderer />
       <ModerationModalRenderer />
       <TutorialOverlay />
