@@ -9,9 +9,10 @@ interface AscendingBarsIconProps {
   style?: ViewStyle;
 }
 
-// Freestanding 4-bar ascending graph — no box, no tile, no background fill.
-// A faint radial ambient glow floats behind the bars; the bars themselves
-// are transparent/outline so the mark feels suspended, not boxed-in.
+// Freestanding 4-bar ascending graph — NO box, NO tile, NO background fill,
+// NO native View shadow (that renders as a rectangular blur = "black box").
+// All glow lives purely inside the SVG as a radial gradient, so the only
+// pixels drawn are the glow + the bars themselves. Fully transparent otherwise.
 const BAR_W = 3;
 const GAP = 1.9;
 const CORNER = 1.1;
@@ -24,22 +25,18 @@ export default function AscendingBarsIcon({ size = 32, color = '#00d4ff', glow =
   const startX = (24 - totalW) / 2;
 
   return (
-    <View
-      style={[
-        glow && { shadowColor: color, shadowOpacity: 0.3, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } },
-        styles.wrap,
-        style,
-      ]}
-    >
+    <View style={[styles.wrap, style]}>
       <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <Defs>
-          <RadialGradient id="ambientGlow" cx="50%" cy="62%" r="60%">
-            <Stop offset="0%" stopColor={color} stopOpacity={0.22} />
-            <Stop offset="55%" stopColor={color} stopOpacity={0.08} />
-            <Stop offset="100%" stopColor={color} stopOpacity={0} />
-          </RadialGradient>
-        </Defs>
-        <Circle cx={12} cy={12.5} r={11} fill="url(#ambientGlow)" />
+        {glow && (
+          <Defs>
+            <RadialGradient id="ambientGlow" cx="50%" cy="62%" r="65%">
+              <Stop offset="0%" stopColor={color} stopOpacity={0.3} />
+              <Stop offset="55%" stopColor={color} stopOpacity={0.1} />
+              <Stop offset="100%" stopColor={color} stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+        )}
+        {glow && <Circle cx={12} cy={12.5} r={11} fill="url(#ambientGlow)" />}
         {HEIGHTS.map((h, i) => {
           const x = startX + i * (BAR_W + GAP);
           const y = BASE_Y - h;
