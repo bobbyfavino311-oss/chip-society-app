@@ -333,11 +333,18 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
           </View>
 
           {/* ── Icon ── */}
-          <View style={[st.iconCircle, { borderColor: `${config.color}40`, backgroundColor: `${config.color}12` }]}>
+          <View
+            style={[
+              st.iconCircle,
+              config.type === 'beginner'
+                ? { borderColor: `${config.color}22`, borderWidth: StyleSheet.hairlineWidth, backgroundColor: `${config.color}07` }
+                : { borderColor: `${config.color}40`, backgroundColor: `${config.color}12` },
+            ]}
+          >
             {config.variant === 'omaha_holdem'
               ? <FourCardIcon size={40} color={config.color} />
               : config.type === 'beginner'
-              ? <AscendingBarsIcon size={40} color={config.color} />
+              ? <AscendingBarsIcon size={34} color={config.color} />
               : <Ionicons name={config.icon as any} size={40} color={config.color} />
             }
           </View>
