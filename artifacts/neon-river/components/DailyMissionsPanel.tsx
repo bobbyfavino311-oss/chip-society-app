@@ -186,6 +186,183 @@ const card = StyleSheet.create({
   claimedText: { fontSize: 9, fontWeight: '900', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8, opacity: 0.8 },
 });
 
+// ── Grand Reward reminder banner (always visible inside expanded panel) ────────
+
+function GrandRewardReminder({
+  completedCount,
+  totalCount,
+  available,
+  claimed,
+}: {
+  completedCount: number;
+  totalCount: number;
+  available: boolean;
+  claimed: boolean;
+}) {
+  // Brightness anim: brightens when reward becomes available, stays bright
+  const glowAnim = useRef(new Animated.Value(available ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(glowAnim, {
+      toValue: available ? 1 : 0,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, [available]);
+
+  const remaining = totalCount - completedCount;
+
+  let bodyText: string;
+  let bodyAccent: string | null = null;
+
+  if (claimed) {
+    bodyText = 'Legendary Fortune Cookie collected.';
+  } else if (available) {
+    bodyText = 'Legendary Fortune Cookie Ready to Claim!';
+    bodyAccent = bodyText;
+  } else if (remaining <= 2 && completedCount > 0) {
+    bodyText = `Only ${remaining} Mission${remaining === 1 ? '' : 's'} Remaining!`;
+  } else {
+    bodyText = 'Complete all 5 Daily Missions and earn 1 Guaranteed Legendary Fortune Cookie.';
+  }
+
+  const borderOpacity = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.28, 0.72] });
+  const glowLayerOpacity = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.05, 0.16] });
+  const iconGlow = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] });
+
+  return (
+    <View style={rmdr.outer}>
+      {/* Gold ambient glow layer */}
+      <Animated.View
+        style={[StyleSheet.absoluteFill, { borderRadius: 13, backgroundColor: GOLD, opacity: glowLayerOpacity }]}
+        pointerEvents="none"
+      />
+      {/* Animated gold border */}
+      <Animated.View
+        style={[rmdr.border, { borderColor: GOLD, opacity: borderOpacity }]}
+        pointerEvents="none"
+      />
+
+      <View style={rmdr.inner}>
+        {/* Smoked glass base */}
+        <LinearGradient
+          colors={['rgba(18,10,0,0.96)', 'rgba(10,6,0,0.98)']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        />
+        <LinearGradient
+          colors={[`${GOLD}14`, 'transparent']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0.6 }}
+        />
+        {/* Top gold line */}
+        <View style={rmdr.topLine} />
+
+        <View style={rmdr.row}>
+          {/* Trophy / check icon */}
+          <Animated.View style={[rmdr.iconWrap, { opacity: iconGlow }]}>
+            {claimed
+              ? <Ionicons name="checkmark-circle" size={20} color={GOLD} />
+              : <Ionicons name="trophy" size={20} color={GOLD} />
+            }
+          </Animated.View>
+
+          {/* Text column */}
+          <View style={rmdr.textCol}>
+            <Text style={rmdr.heading}>
+              {claimed ? '✓ GRAND REWARD CLAIMED' : 'GRAND DAILY REWARD'}
+            </Text>
+
+            {/* Progress counter (not shown when claimed) */}
+            {!claimed && (
+              <View style={rmdr.progressRow}>
+                {Array.from({ length: totalCount }).map((_, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      rmdr.pip,
+                      { backgroundColor: i < completedCount ? GOLD : 'rgba(255,215,0,0.18)' },
+                    ]}
+                  />
+                ))}
+                <Text style={rmdr.progressLabel}>
+                  {completedCount} / {totalCount} Complete
+                </Text>
+              </View>
+            )}
+
+            {/* Body text */}
+            <Text style={rmdr.body}>
+              {bodyAccent
+                ? <Text style={{ color: GOLD }}>{bodyAccent}</Text>
+                : bodyText
+              }
+            </Text>
+
+            {!claimed && (
+              <Text style={rmdr.footer}>Available once per daily reset.</Text>
+            )}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const rmdr = StyleSheet.create({
+  outer: { borderRadius: 13 },
+  border: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 13,
+    borderWidth: 1,
+  },
+  inner: {
+    borderRadius: 13,
+    overflow: 'hidden',
+    padding: 11,
+    paddingHorizontal: 12,
+  },
+  topLine: {
+    position: 'absolute', top: 0, left: 0, right: 0,
+    height: 1, backgroundColor: GOLD, opacity: 0.45,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  iconWrap: {
+    width: 36, height: 36, borderRadius: 10,
+    borderWidth: 1, borderColor: `${GOLD}44`,
+    backgroundColor: `${GOLD}12`,
+    alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0, marginTop: 1,
+  },
+  textCol: { flex: 1, gap: 4 },
+  heading: {
+    color: GOLD, fontSize: 9, fontWeight: '900',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1.1,
+  },
+  progressRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+  },
+  pip: {
+    width: 14, height: 4, borderRadius: 2,
+  },
+  progressLabel: {
+    color: colors.textMuted, fontSize: 9,
+    fontFamily: 'Inter_400Regular', marginLeft: 2,
+  },
+  body: {
+    color: colors.text, fontSize: 11,
+    lineHeight: 15,
+  },
+  footer: {
+    color: colors.textMuted, fontSize: 9,
+    fontFamily: 'Inter_400Regular',
+  },
+});
+
 // ── Grand Reward card ──────────────────────────────────────────────────────────
 
 function GrandRewardCard({
@@ -481,6 +658,14 @@ export default function DailyMissionsPanel() {
       {/* Expanded content */}
       {expanded && (
         <View style={panel.content}>
+          {/* Grand Reward reminder — always shown at top of list */}
+          <GrandRewardReminder
+            completedCount={completedCount}
+            totalCount={totalCount}
+            available={grandRewardAvailable}
+            claimed={grandRewardClaimed}
+          />
+
           {dailyMissions.map(m => (
             <MissionCard
               key={m.id}

@@ -1,0 +1,129 @@
+# DAILY MISSIONS UI ADDITION — GRAND REWARD REMINDER
+
+Add a permanent Grand Reward reminder to the Daily Missions dropdown.
+
+This reminder should encourage players to complete all five Daily Missions each day.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PLACEMENT
+
+Inside the expanded Daily Missions dropdown:
+
+Place the reminder directly below the "Daily Missions" header and above the list of the five missions.
+
+Layout:
+
+♠ Daily Missions
+2 / 5 Complete
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🏆 Complete all 5 Daily Missions to earn
+1 Guaranteed Legendary Fortune Cookie!
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Mission 1
+Mission 2
+Mission 3
+Mission 4
+Mission 5
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STYLING
+
+This should NOT look like another mission.
+
+Instead, create a premium information banner using the same floating glass design language as the rest of Chip Society.
+
+Use:
+
+• Smoked glass background
+• Thin gold illuminated border
+• Soft ambient gold glow
+• Rounded corners
+• Small Legendary Fortune Cookie icon on the left
+• White primary text
+• Gold accent text for "Legendary Fortune Cookie"
+
+Keep it compact so it doesn't take up excessive vertical space.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEXT
+
+Header:
+
+🏆 GRAND DAILY REWARD
+
+Body:
+
+Complete all 5 Daily Missions and earn 1 Guaranteed Legendary Fortune Cookie.
+
+Footer (smaller text):
+
+Available once per daily reset.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LIVE PROGRESS
+
+The banner should update dynamically.
+
+Examples:
+
+0 / 5 Complete
+
+Complete all 5 Daily Missions and earn your Legendary Fortune Cookie.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+3 / 5 Complete
+
+Only 2 Missions Remaining!
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+5 / 5 Complete (Before Claim)
+
+🏆 Legendary Fortune Cookie Ready to Claim!
+
+The banner should glow slightly to indicate the reward is available.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AFTER CLAIMING
+
+Once the Legendary Fortune Cookie has been claimed:
+
+Replace the banner with:
+
+✅ Grand Reward Claimed
+
+Legendary Fortune Cookie collected.
+
+This message remains until the next daily reset.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ANIMATION
+
+When the player completes their fifth mission:
+
+• The Grand Reward banner softly brightens.
+• The gold border becomes slightly more vibrant.
+• The Legendary Fortune Cookie icon emits a subtle glow.
+
+No flashing.
+
+No pulsing.
+
+Just a premium visual indication that the reward is ready.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL GOAL
+
+The Daily Missions dropdown should immediately communicate that there is a meaningful grand prize for completing all five challenges. Players should never have to discover this reward by accident—it should be visible from the moment they open the Daily Missions panel, creating a strong incentive to finish every mission each day.
