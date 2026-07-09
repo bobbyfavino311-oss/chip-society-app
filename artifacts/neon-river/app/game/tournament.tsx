@@ -24,6 +24,7 @@ import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType, getVariantBadge }
 import NeonAvatarSeat from '@/components/NeonAvatar';
 import ShareToFeedModal from '@/components/ShareToFeedModal';
 import FourCardIcon from '@/components/FourCardIcon';
+import AscendingBarsIcon from '@/components/AscendingBarsIcon';
 import type { PostTag } from '@/lib/socialData';
 
 
@@ -368,6 +369,8 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
         <View style={[lobby.typeHeader, { borderColor: `${tConfig.color}40` }]}>
           {tConfig.variant === 'omaha_holdem'
             ? <FourCardIcon size={28} color={tConfig.color} />
+            : tConfig.type === 'beginner'
+            ? <AscendingBarsIcon size={28} color={tConfig.color} />
             : <Ionicons name={tConfig.icon as any} size={28} color={tConfig.color} />
           }
           <Text style={[lobby.title, { color: tConfig.color }]}>{tConfig.name}</Text>
