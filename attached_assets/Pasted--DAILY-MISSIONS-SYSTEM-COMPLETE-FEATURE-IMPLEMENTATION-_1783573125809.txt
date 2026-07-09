@@ -1,0 +1,603 @@
+# DAILY MISSIONS SYSTEM — COMPLETE FEATURE IMPLEMENTATION
+
+Implement a brand-new Daily Missions system for Chip Society.
+
+This is NOT simply a UI feature.
+
+This is a fully functional gameplay system that is deeply integrated into every game mode, every poker variant, casino games, social features, and player progression.
+
+The system must be reliable, accurately track player progress, automatically detect mission completion, reward players correctly, and reset every 24 hours.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRIMARY DESIGN GOAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Daily Missions should become one of the primary reasons players return every day.
+
+The missions should encourage players to experience every part of the game instead of repeatedly playing only one mode.
+
+Players should constantly feel like they're making progress.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HOME SCREEN PLACEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Place the Daily Missions section:
+
+Below:
+• Trending Now Social Feed
+
+Above:
+• Quick Play
+
+Do NOT create another page.
+
+Daily Missions should live directly on the Home screen.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STYLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The Daily Missions section should match the premium glass design language used throughout Chip Society.
+
+Use:
+
+• Floating glass panel
+• Rounded corners
+• Soft smoked glass
+• Thin illuminated border
+• Soft ambient glow
+• Slight blur
+• Premium shadows
+
+The panel should look like it belongs naturally within the existing interface.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HEADER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Header:
+
+♠ Daily Missions
+
+Use a premium minimalist Spade icon.
+
+Not an emoji.
+
+Not clip art.
+
+Use the same icon style as the rest of the application.
+
+On the right side display:
+
+5 / 5 Complete
+
+or
+
+2 / 5 Complete
+
+depending on progress.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COLLAPSIBLE PANEL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The panel should collapse by default.
+
+Collapsed:
+
+Shows
+
+• Spade icon
+• Daily Missions
+• Progress bar
+• Current completion
+
+Tap expands.
+
+Expanded:
+
+Shows all five missions.
+
+Animate smoothly.
+
+Use premium easing.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MISSION CARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Each mission should contain:
+
+Mission icon
+
+Mission title
+
+Description
+
+Reward
+
+Progress bar
+
+Current progress
+
+Claim button when completed
+
+Example:
+
+━━━━━━━━━━━━━━━━━━
+
+Win 3 Flushes
+Traditional Hold'em
+
+1 / 3
+
+Reward:
+7,500 Chips
+75 XP
+
+━━━━━━━━━━━━━━━━━━
+
+Progress should update immediately after every hand.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MISSION TRACKING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This is critical.
+
+Every mission must be wired directly into gameplay.
+
+The backend should continuously track mission progress.
+
+Examples:
+
+Mission:
+
+Win 3 hands with a Flush in Traditional Hold'em
+
+Player wins with a Flush.
+
+Immediately update:
+
+1 / 3
+
+NOT after restarting.
+
+NOT after leaving the table.
+
+Instantly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMPLETION NOTIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+When a mission completes:
+
+Display a premium notification banner at the top of gameplay.
+
+Example:
+
+━━━━━━━━━━━━━━━━━━
+
+MISSION COMPLETE
+
+Win 3 Flushes
+
+Tap to Collect
+
+━━━━━━━━━━━━━━━━━━
+
+Do NOT interrupt gameplay.
+
+Do NOT force a popup.
+
+The notification should remain visible briefly and then minimize into a small glowing mission indicator until collected.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLAIMING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Rewards should never be granted automatically.
+
+Players must tap Claim.
+
+After claiming:
+
+Reward animation
+
+XP animation
+
+Chip animation
+
+Mission disappears or becomes marked complete.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MISSION RESET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Every 24 hours:
+
+Generate 5 completely new missions.
+
+Do NOT repeat yesterday's exact mission set.
+
+Shuffle randomly from the mission pool.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MISSION RANDOMIZATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create a very large mission pool.
+
+The game randomly selects five missions every day.
+
+Avoid duplicates.
+
+Avoid impossible combinations.
+
+Avoid selecting missions for unavailable content.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MISSION CATEGORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TRADITIONAL HOLD'EM
+
+Examples:
+
+Win 3 hands
+
+Win with One Pair
+
+Win with Two Pair
+
+Win with Trips
+
+Win with a Straight
+
+Win with a Flush
+
+Win with a Full House
+
+Win with Four of a Kind
+
+Win with a Straight Flush
+
+Win with a Royal Flush
+
+Win after going All-In
+
+Steal blinds 5 times
+
+Win without seeing a flop
+
+Knock out one opponent
+
+Play 25 hands
+
+Play 50 hands
+
+Reach showdown 10 times
+
+Win with Pocket Aces
+
+Win with Pocket Kings
+
+Win after calling an All-In
+
+Win with suited connectors
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SHORT DECK
+
+Win 3 hands
+
+Win with a Flush
+
+Win with a Full House
+
+Win with Trips
+
+Win after going All-In
+
+Win 5 Short Deck hands
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OMAHA
+
+Win 5 Omaha hands
+
+Win with a Flush
+
+Win with a Straight
+
+Win with a Full House
+
+Win using exactly two hole cards
+
+Win after river improvement
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JOKER HOLD'EM
+
+Win 3 Joker hands
+
+Win using the Joker
+
+Win with Five of a Kind
+
+Win with Joker Straight Flush
+
+Win with Joker Royal Flush
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLACKJACK
+
+Win after Double Down
+
+Win after Split
+
+Hit Blackjack
+
+Win five hands
+
+Win ten hands
+
+Bust the dealer
+
+Win with 21
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+THREE CARD POKER
+
+Win Pair Plus
+
+Win with Straight
+
+Win with Flush
+
+Win with Straight Flush
+
+Win Ante + Play
+
+Win Six Card Bonus Straight
+
+Win Six Card Bonus Flush
+
+Win Six Card Bonus Full House
+
+Win Six Card Bonus Four of a Kind
+
+Win Six Card Bonus Straight Flush
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ULTIMATE TEXAS HOLD'EM
+
+Win after 4x Raise
+
+Win after 3x Raise
+
+Win after Check-Check
+
+Win Trips Bonus
+
+Win Blind Bonus
+
+Win with Straight
+
+Win with Flush
+
+Win with Full House
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CASINO WAR
+
+Win Go To War
+
+Win without War
+
+Win 5 games
+
+Win Tie Bonus
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HIGH CARD FLUSH
+
+Win with Flush
+
+Win Straight Flush
+
+Win Royal Flush
+
+Win Bonus Bet
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LET IT RIDE
+
+Win after letting every bet ride
+
+Win Trips Bonus
+
+Win Straight
+
+Win Flush
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MISSISSIPPI STUD
+
+Win after 3x raise
+
+Win after checking
+
+Win Full House
+
+Win Straight
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FORTUNE COOKIES
+
+Open 5 Cookies
+
+Open 10 Cookies
+
+Find Rare Cookie
+
+Find Epic Cookie
+
+Find Legendary Cookie
+
+Find Mythic Cookie
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LOTTERY TICKETS
+
+Scratch 3 Tickets
+
+Scratch 5 Tickets
+
+Win over 100K
+
+Reveal Jackpot Symbol
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOCIAL
+
+Create one post
+
+Comment twice
+
+Like five posts
+
+Follow one player
+
+Receive five likes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GENERAL
+
+Claim Daily Spin
+
+Maintain login streak
+
+Earn 250K chips
+
+Earn 500K chips
+
+Earn 1M chips
+
+Level up
+
+Unlock one Achievement
+
+Unlock three Achievements
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REWARD BALANCING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Rewards should feel worthwhile without breaking the economy.
+
+Common
+
+5K–15K Chips
+
+40–75 XP
+
+Rare
+
+20K–50K Chips
+
+100–150 XP
+
+Epic
+
+75K–150K Chips
+
+200 XP
+
+Fortune Cookie
+
+Legendary
+
+250K Chips
+
+300 XP
+
+Lottery Ticket
+
+Epic Cookie
+
+Rewards should scale slightly with player level.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BACKEND VALIDATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Every mission must validate correctly.
+
+Examples:
+
+Mission:
+
+Win 3 Flushes in Traditional Hold'em
+
+ONLY Traditional Hold'em counts.
+
+Short Deck Flushes should NOT count.
+
+Joker Hold'em Flushes should NOT count.
+
+Mission:
+
+Win after Double Down.
+
+ONLY Blackjack counts.
+
+Mission:
+
+Win Six Card Bonus Straight.
+
+ONLY Three Card Poker Six Card Bonus counts.
+
+Every mission must verify:
+
+Correct game
+
+Correct variant
+
+Correct hand
+
+Correct action
+
+Correct outcome
+
+before incrementing progress.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL VALIDATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Verify:
+
+✅ Daily Missions appear on the Home screen below Trending Now and above Quick Play.
+✅ Panel is collapsible.
+✅ Premium floating glass styling matches the rest of the app.
+✅ Exactly 5 random missions generated each day.
+✅ Large randomized mission pool.
+✅ Progress updates instantly during gameplay.
+✅ Mission completion notification appears at the top during gameplay.
+✅ Players manually claim rewards.
+✅ Rewards correctly granted.
+✅ Missions reset every 24 hours.
+✅ Variant-specific missions only count in the correct game mode.
+✅ Progress bars animate smoothly.
+✅ No duplicate daily missions.
+✅ Entire system is fully wired to the backend.
+
+FINAL GOAL
+
+Daily Missions should become a core retention feature of Chip Society. The system should feel polished, rewarding, and seamlessly integrated into every gameplay mode. Players should naturally explore poker variants, casino games, social features, and reward systems through intelligently randomized challenges that are accurately tracked and satisfying to complete.

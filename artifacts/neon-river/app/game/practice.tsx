@@ -22,6 +22,7 @@ import DotTimer from '@/components/DotTimer';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useAchievements } from '@/context/AchievementContext';
+import { useMissions } from '@/context/MissionsContext';
 import { AIDifficulty } from '@/lib/aiBot';
 import { usePokerGame, TableConfig } from '@/hooks/usePokerGame';
 import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
@@ -537,6 +538,7 @@ export default function PracticeScreen() {
 
   // ── Achievement hooks (must be above every early return) ─────────────────
   const { recordGameWin, recordGameLoss, recordOmahaHand, onChipBalance } = useAchievements();
+  const { reportGameEvent } = useMissions();
 
   // ── Ambient music — start when game begins, stop when it ends ────────────
   React.useEffect(() => {
@@ -612,6 +614,20 @@ export default function PracticeScreen() {
       }
       const wasAllIn = human?.status === 'allIn' || isAllIn;
       recordGameWin(handDesc, wasAllIn, state.pot, gameVariant);
+      reportGameEvent({
+        game: gameVariant as import('@/context/MissionsContext').MissionGame,
+        action: 'win',
+        handDesc,
+        holeCards: human?.holeCards,
+        wasAllIn,
+      });
+      if (humanDelta >= 250000) {
+        reportGameEvent({
+          game: gameVariant as import('@/context/MissionsContext').MissionGame,
+          action: 'chip_earn',
+          chipsEarned: humanDelta,
+        });
+      }
       if (state.pot >= 2000) {
         const potK = state.pot >= 1000 ? `${Math.floor(state.pot / 1000)}K` : String(state.pot);
         setPendingShare({
@@ -628,6 +644,10 @@ export default function PracticeScreen() {
       await recordLoss();
       if (!isMountedRef.current) return;
       recordGameLoss();
+      reportGameEvent({
+        game: gameVariant as import('@/context/MissionsContext').MissionGame,
+        action: 'play',
+      });
     }
 
     // Omaha stat tracking — every hand regardless of outcome

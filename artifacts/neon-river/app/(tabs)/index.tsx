@@ -30,6 +30,7 @@ import { useAISocial } from '@/context/AISocialContext';
 import { useLiveFeed } from '@/context/LiveFeedContext';
 import { formatTimeAgo } from '@/lib/aiSocialEngine';
 import NeonAvatar from '@/components/NeonAvatar';
+import DailyMissionsPanel from '@/components/DailyMissionsPanel';
 
 const { width } = Dimensions.get('window');
 
@@ -857,7 +858,10 @@ export default function HomeScreen() {
           {trendingPosts.map(post => <TrendCard key={post.id} post={post} />)}
         </ScrollView>
 
-        {/* 3 ─── Quick Play ─── */}
+        {/* 3 ─── Daily Missions ─── */}
+        <DailyMissionsPanel />
+
+        {/* 4 ─── Quick Play ─── */}
         <QuickPlayCard />
 
         {/* 4 ─── Featured Tournaments ─── */}

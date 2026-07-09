@@ -32,6 +32,7 @@ import { SocialProvider } from '@/context/SocialContext';
 import { AISocialProvider } from '@/context/AISocialContext';
 import { LiveFeedProvider } from '@/context/LiveFeedContext';
 import { MultiplayerProvider } from '@/context/MultiplayerContext';
+import { MissionsProvider } from '@/context/MissionsContext';
 import { NotificationProvider, useNotifications } from '@/context/NotificationContext';
 import { TableThemeProvider } from '@/context/TableThemeContext';
 import AchievementUnlockPopup from '@/components/AchievementUnlockPopup';
@@ -367,6 +368,7 @@ export default function RootLayout() {
                     <SocialProvider>
                       <AISocialProvider>
                       <LiveFeedProvider>
+                      <MissionsProvider>
                       <MultiplayerProvider>
                       <NotificationBridge>
                         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -376,6 +378,7 @@ export default function RootLayout() {
                         </GestureHandlerRootView>
                       </NotificationBridge>
                       </MultiplayerProvider>
+                      </MissionsProvider>
                       </LiveFeedProvider>
                       </AISocialProvider>
                     </SocialProvider>

@@ -24,3 +24,4 @@
 - [Shared game chrome pattern](shared-poker-chrome.md) — practice.tsx and multiplayer/game.tsx render through one shared components/PokerChrome.tsx to guarantee visual parity.
 - [Chip Store / Buy Chips unification](chip-store-unification.md) — both entry points share one screen; catalog is RevenueCat-driven via CHIP_BUNDLE_MAP/TICKET_BUNDLE_MAP, never hardcoded.
 - [Sentry crash reporting](sentry-crash-reporting.md) — pin @sentry/react-native to expo's expected version; alias plain SENTRY_DSN secret to EXPO_PUBLIC_SENTRY_DSN at spawn time in both dev script and build.js.
+- [Daily Missions system](daily-missions.md) — MissionsContext with 60+ pool, seeded daily-5 selection, AsyncStorage persistence, reportGameEvent() wired into practice.tsx and blackjack.tsx; DailyMissionsPanel collapsible glass UI on Home screen.

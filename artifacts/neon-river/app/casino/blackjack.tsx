@@ -12,6 +12,7 @@ import PlayingCard from '@/components/PlayingCard';
 import CasinoTableSelectModal from '@/components/CasinoTableSelectModal';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
+import { useMissions } from '@/context/MissionsContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
 import type { Card, Suit } from '@/lib/pokerEngine';
@@ -362,6 +363,7 @@ const dll = StyleSheet.create({
 export default function BlackjackScreen() {
   const insets = useSafeAreaInsets();
   const { profile, addChips, removeChips, updateProfile } = useUser();
+  const { reportGameEvent } = useMissions();
   const { isMusicMuted, toggleMusicMute, musicVolume } = useSoundSettings();
 
   // ── Music ─────────────────────────────────────────────────────────────────────
@@ -534,9 +536,25 @@ export default function BlackjackScreen() {
     setResult({ handResults, totalNet, headline, dealerTotal, dealerBusts, dealerBJ });
     setPhase('result');
 
+    // Mission tracking — report each winning hand
+    const wasSplit = hands.length > 1;
+    for (const hr of handResults) {
+      if (hr.outcome === 'win' || hr.outcome === 'blackjack') {
+        reportGameEvent({
+          game: 'blackjack',
+          action: 'win',
+          isNaturalBlackjack: hr.outcome === 'blackjack',
+          dealerBusted: dealerBusts,
+          playerTotal: hr.playerTotal,
+          wasDoubleDown: hr.isDoubled,
+          wasSplit,
+        });
+      }
+    }
+
     if (totalNet > 0) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     else if (totalNet < 0) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-  }, [addChips, updateProfile, profile.handsPlayed, profile.wins, profile.losses]);
+  }, [addChips, updateProfile, reportGameEvent, profile.handsPlayed, profile.wins, profile.losses]);
 
   // ─── Dealer auto-play with log ────────────────────────────────────────────────
   function runDealerTurn(currentCards: Card[], hands: BJHand[]) {
