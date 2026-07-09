@@ -23,6 +23,7 @@ import { useTournamentGame, Standing, Prize } from '@/hooks/useTournamentGame';
 import { TOURNAMENT_CONFIGS, TournamentConfig, TournamentType, getVariantBadge } from '@/constants/tournaments';
 import NeonAvatarSeat from '@/components/NeonAvatar';
 import ShareToFeedModal from '@/components/ShareToFeedModal';
+import FourCardIcon from '@/components/FourCardIcon';
 import type { PostTag } from '@/lib/socialData';
 
 
@@ -365,11 +366,17 @@ function LobbyScreen({ tConfig, userChips, onStart, prizes }:
       </TouchableOpacity>
       <ScrollView contentContainerStyle={lobby.content} showsVerticalScrollIndicator={false}>
         <View style={[lobby.typeHeader, { borderColor: `${tConfig.color}40` }]}>
-          <Ionicons name={tConfig.icon as any} size={28} color={tConfig.color} />
+          {tConfig.variant === 'omaha_holdem'
+            ? <FourCardIcon size={28} color={tConfig.color} />
+            : <Ionicons name={tConfig.icon as any} size={28} color={tConfig.color} />
+          }
           <Text style={[lobby.title, { color: tConfig.color }]}>{tConfig.name}</Text>
         </View>
         <View style={[lobby.variantBadge, { borderColor: `${variantBadge.color}45`, backgroundColor: `${variantBadge.color}12` }]}>
-          <Ionicons name={variantBadge.icon as any} size={12} color={variantBadge.color} />
+          {tConfig.variant === 'omaha_holdem'
+            ? <FourCardIcon size={14} color={variantBadge.color} glow={false} />
+            : <Ionicons name={variantBadge.icon as any} size={12} color={variantBadge.color} />
+          }
           <Text style={[lobby.variantBadgeText, { color: variantBadge.color }]}>{variantBadge.label} VARIANT</Text>
         </View>
         <Text style={lobby.subtitle}>{tConfig.subtitle}</Text>

@@ -24,6 +24,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { TournamentConfig, getPrizePool, getVariantBadge } from '@/constants/tournaments';
+import FourCardIcon from '@/components/FourCardIcon';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -322,14 +323,20 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
               <Text style={[st.liveText, { color: config.color }]}>LIVE</Text>
             </View>
             <View style={[st.variantPill, { borderColor: `${variantBadge.color}40`, backgroundColor: `${variantBadge.color}12` }]}>
-              <Ionicons name={variantBadge.icon as any} size={10} color={variantBadge.color} />
+              {config.variant === 'omaha_holdem'
+                ? <FourCardIcon size={14} color={variantBadge.color} glow={false} />
+                : <Ionicons name={variantBadge.icon as any} size={10} color={variantBadge.color} />
+              }
               <Text style={[st.variantText, { color: variantBadge.color }]}>{variantBadge.label}</Text>
             </View>
           </View>
 
           {/* ── Icon ── */}
           <View style={[st.iconCircle, { borderColor: `${config.color}40`, backgroundColor: `${config.color}12` }]}>
-            <Ionicons name={config.icon as any} size={40} color={config.color} />
+            {config.variant === 'omaha_holdem'
+              ? <FourCardIcon size={40} color={config.color} />
+              : <Ionicons name={config.icon as any} size={40} color={config.color} />
+            }
           </View>
 
           {/* ── Name — never wraps, auto-shrinks on native ── */}
