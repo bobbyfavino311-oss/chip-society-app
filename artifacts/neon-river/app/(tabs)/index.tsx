@@ -679,6 +679,12 @@ function TrendCard({ post }: { post: TrendPost }) {
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 48 }}
         start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       />
+      {/* Bottom accent — makes rounded bottom corners visible */}
+      <LinearGradient
+        colors={['transparent', `${post.typeColor}55`]}
+        style={trend.accentBottom}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+      />
       <View style={trend.header}>
         <NeonAvatar avatarId={post.avatarId ?? 1} size={40} />
         <View style={{ flex: 1 }}>
@@ -1014,6 +1020,7 @@ const logo = StyleSheet.create({
 
 const trend = StyleSheet.create({
   cardOuter: {
+    borderRadius: 26,
     shadowColor: '#8833ff',
     shadowOpacity: 0.28,
     shadowRadius: 18,
@@ -1032,6 +1039,7 @@ const trend = StyleSheet.create({
     gap: 9,
   },
   accentTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  accentBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 2 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: {
     width: 36, height: 36, borderRadius: 18,
