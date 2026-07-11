@@ -1,0 +1,112 @@
+You’re right—the carousel itself is no longer cutting off the bottom, but it is still cropping the cards at the left and right edges. The current implementation is forcing the cards into a masked viewport instead of letting the full centered card display.
+
+Use this prompt:
+
+# CRITICAL FIX — TRENDING NOW CAROUSEL IS STILL CROPPING SOCIAL POSTS
+The Trending Now cards are still visibly cut off.
+This is not a card-design issue.
+Do NOT redesign the cards.
+Do NOT reduce their height.
+Do NOT shrink the text.
+Do NOT hide content.
+The carousel layout and masking must be corrected.
+━━━━━━━━━━━━━━━━━━━━━━
+# CURRENT PROBLEM
+The centered social post is being cropped by the carousel viewport.
+Visible problems:
+• The left edge of the first/previous card is cut off.
+• The neighboring card on the right is cut off too aggressively.
+• Parts of cards disappear behind solid rectangular masks.
+• The carousel looks like cards are sliding underneath black panels.
+• The glow and shadows are being clipped.
+• The centered card does not have enough horizontal breathing room.
+The dark vertical blocks around the cards must not exist.
+━━━━━━━━━━━━━━━━━━━━━━
+# REMOVE THE INTERNAL MASKS
+Remove every solid rectangular clipping layer behind or beside the cards.
+There should be:
+• No black side panels
+• No dark rectangular masks
+• No hidden overlay blocks
+• No square backgrounds behind carousel items
+• No visible clipping containers around each card
+The only visible shapes should be the social post cards themselves.
+━━━━━━━━━━━━━━━━━━━━━━
+# CENTERED CARD WIDTH
+The active centered card must fit fully inside the screen.
+Set the active card width to approximately:
+82–86% of the available screen width.
+Leave equal horizontal margins on both sides.
+The full card must show:
+• Both rounded side edges
+• Full top accent line
+• Entire shadow
+• Entire glow
+• All text
+• Likes and timestamp
+• Bottom rounded corners
+Nothing on the active card may be cropped.
+━━━━━━━━━━━━━━━━━━━━━━
+# NEIGHBOR CARD PEEK
+The previous and next cards may peek from the edges, but only slightly.
+Show approximately:
+8–12% of the neighboring card.
+Do not show half of a neighboring card.
+Do not let neighboring cards overlap the active card.
+Do not crop the active card in order to create the peek effect.
+The active card always has priority.
+━━━━━━━━━━━━━━━━━━━━━━
+# CAROUSEL PADDING
+Add horizontal padding to the carousel viewport.
+Use approximately:
+24px left padding
+24px right padding
+Also add item spacing of approximately:
+12–16px between cards.
+The first and last cards must also receive the same outer padding.
+━━━━━━━━━━━━━━━━━━━━━━
+# REMOVE VERTICAL CLIPPING
+The carousel must allow the cards' full height, glow, and shadow to remain visible.
+Do not clip vertically.
+If horizontal clipping is required for swiping, it must apply only outside the outer screen bounds—not inside the active card area.
+━━━━━━━━━━━━━━━━━━━━━━
+# CARD CONTAINER
+The social card wrapper must use:
+• Transparent background
+• No fixed black rectangle
+• No extra colored tile
+• No square shadow plate
+• No duplicated card background
+The rounded glass post card itself is the only card surface.
+━━━━━━━━━━━━━━━━━━━━━━
+# DYNAMIC SIZING
+The carousel height must be based on the tallest social card.
+Do not use a fixed height that can crop content.
+The active card should determine the required height.
+Add approximately 16px of space below the card for its glow and shadow.
+━━━━━━━━━━━━━━━━━━━━━━
+# CORRECT VISUAL RESULT
+The user should see:
+Small peek of previous card
+↓
+One complete centered post card
+↓
+Small peek of next card
+The centered card must be fully readable and completely visible.
+There should be no black blocks, square masks, clipped borders, or missing corners.
+━━━━━━━━━━━━━━━━━━━━━━
+# FINAL VALIDATION
+Confirm all of the following:
+✅ Active card is fully visible from left edge to right edge.
+✅ Rounded corners are visible on all four sides.
+✅ Top accent line is fully visible.
+✅ Bottom shadow and glow are visible.
+✅ No black rectangular masks remain.
+✅ Previous and next cards only peek 8–12%.
+✅ Text never runs under another card.
+✅ Likes and timestamp remain fully visible.
+✅ Horizontal swipe still works.
+✅ First and last carousel cards have proper outer padding.
+✅ The card itself is not resized or redesigned.
+FINAL GOAL:
+The Trending Now carousel should look like one complete premium floating glass card centered on screen, with only a subtle hint of adjacent cards. Nothing should appear chopped, masked, boxed, or hidden.

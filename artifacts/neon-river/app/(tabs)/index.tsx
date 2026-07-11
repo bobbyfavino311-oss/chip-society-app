@@ -740,7 +740,7 @@ export default function HomeScreen() {
   // Auto-scroll trending carousel every 3.5 s (dep on trendingPostCount — real posts + AI filler)
   const trendingPostCount = Math.min(8, livePosts.length + aiPosts.length);
   useEffect(() => {
-    const CARD_W = width * 0.72 + 12;
+    const CARD_W = width * 0.82 + 14;
     const timer = setInterval(() => {
       const postCount = trendingPostCount;
       if (!trendScrollRef.current || postCount < 2) return;
@@ -919,7 +919,10 @@ export default function HomeScreen() {
           ref={trendScrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingRight: 16, paddingTop: 8, paddingBottom: 32 }}
+          snapToInterval={width * 0.82 + 14}
+          decelerationRate="fast"
+          style={{ marginHorizontal: -16 }}
+          contentContainerStyle={{ paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 32, gap: 14 }}
         >
           {trendingPosts.map(post => <TrendCard key={post.id} post={post} />)}
         </ScrollView>
@@ -1018,7 +1021,7 @@ const trend = StyleSheet.create({
     elevation: 10,
   },
   card: {
-    width: width * 0.76,
+    width: width * 0.82,
     borderRadius: 26,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
