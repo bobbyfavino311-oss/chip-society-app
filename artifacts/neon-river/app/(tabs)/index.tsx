@@ -400,6 +400,7 @@ function QuickPlayCard() {
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
 const LOGO_IMG      = require('@/assets/images/chip-society-logo.png') as number;
+const SKYLINE_IMG   = require('@/assets/images/miami-skyline.png') as number;
 const LOGO_IMG_W    = width * 0.84;
 const LOGO_IMG_H    = LOGO_IMG_W * (576 / 1024); // native PNG aspect 1024×576
 
@@ -408,7 +409,6 @@ function ChipSocietyLogo() {
   const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    // Slow gentle breathe: 0.93 ↔ 1.0 over ~4 s
     Animated.loop(
       Animated.sequence([
         Animated.timing(brightness, { toValue: 0.93, duration: 2000, useNativeDriver: true }),
@@ -416,7 +416,6 @@ function ChipSocietyLogo() {
       ])
     ).start();
 
-    // Vintage neon-tube stutter — very infrequent, randomised 8–20 s
     function flicker() {
       Animated.sequence([
         Animated.timing(brightness, { toValue: 0.12, duration: 30,  useNativeDriver: true }),
@@ -428,10 +427,7 @@ function ChipSocietyLogo() {
 
     function scheduleNext() {
       const delay = 8000 + Math.random() * 12000;
-      timeoutRef.current = setTimeout(() => {
-        flicker();
-        scheduleNext();
-      }, delay);
+      timeoutRef.current = setTimeout(() => { flicker(); scheduleNext(); }, delay);
     }
     scheduleNext();
 
@@ -440,6 +436,17 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
+      {/* Cyan + pink bloom radiate behind the logo */}
+      <LinearGradient
+        colors={['rgba(0,212,255,0.14)', 'rgba(0,212,255,0.05)', 'transparent']}
+        style={logo.glowCyan}
+        start={{ x: 0.5, y: 0.3 }} end={{ x: 0.5, y: 1 }}
+      />
+      <LinearGradient
+        colors={['rgba(191,95,255,0.10)', 'transparent']}
+        style={logo.glowPurple}
+        start={{ x: 0.5, y: 0.2 }} end={{ x: 0.5, y: 1 }}
+      />
       <Animated.Image
         source={LOGO_IMG}
         style={[logo.img, { opacity: brightness }]}
@@ -773,6 +780,9 @@ export default function HomeScreen() {
     ...aiTrendPosts.slice(0, Math.max(0, 8 - realTrendPosts.length)),
   ];
 
+  // Hero height: covers status bar + logo section (logo image + subtitle + padding)
+  const HERO_H = insets.top + 8 + LOGO_IMG_H + 52;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
@@ -783,6 +793,36 @@ export default function HomeScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
+
+      {/* ── Miami skyline hero backdrop ─────────────────────────────────────── */}
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_H, zIndex: 0, overflow: 'hidden' }}>
+        {/* City image: cropped to just the skyline, blurred + dimmed */}
+        <Image
+          source={SKYLINE_IMG}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.30 }}
+          resizeMode="cover"
+          blurRadius={7}
+        />
+        {/* Dark navy/purple overlay — city behind frosted glass */}
+        <LinearGradient
+          colors={['rgba(5,0,22,0.82)', 'rgba(8,2,30,0.62)', 'rgba(5,0,16,0.28)']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        />
+        {/* Purple fog layer */}
+        <LinearGradient
+          colors={['rgba(55,8,110,0.22)', 'rgba(0,60,100,0.10)', 'transparent']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        />
+        {/* Bottom dissolve — skyline fades into background */}
+        <LinearGradient
+          colors={['transparent', 'rgba(5,0,16,0.40)', 'rgba(5,0,16,0.80)', '#050010']}
+          locations={[0.0, 0.50, 0.78, 1.0]}
+          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_H * 0.55 }}
+          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        />
+      </View>
 
       {/* Top-left: music toggle */}
       <TouchableOpacity
@@ -916,11 +956,30 @@ const logo = StyleSheet.create({
   sub: {
     fontFamily: 'Orbitron_400Regular',
     fontSize: 11,
-    color: colors.textMuted,
+    color: 'rgba(200,220,255,0.72)',
     letterSpacing: 7,
     marginTop: 4,
     width: LOGO_IMG_W,
     textAlign: 'center',
+    textShadowColor: 'rgba(0,212,255,0.45)',
+    textShadowRadius: 8,
+    textShadowOffset: { width: 0, height: 0 },
+  },
+  glowCyan: {
+    position: 'absolute',
+    width: LOGO_IMG_W,
+    height: LOGO_IMG_H * 1.1,
+    borderRadius: LOGO_IMG_W / 2,
+    top: 0,
+    left: 0,
+  },
+  glowPurple: {
+    position: 'absolute',
+    width: LOGO_IMG_W * 0.8,
+    height: LOGO_IMG_H,
+    borderRadius: LOGO_IMG_W * 0.4,
+    top: 0,
+    left: LOGO_IMG_W * 0.1,
   },
 });
 

@@ -1,0 +1,143 @@
+This is how I would instruct your AI. The key is to make it look like the city is part of the page, not like an image sitting behind it.
+
+⸻
+
+HOME SCREEN HEADER BACKDROP REDESIGN
+
+Use the provided Miami neon city background as the decorative backdrop only for the top header section of the Home screen.
+
+Placement
+
+* The city backdrop should begin directly underneath the status bar.
+* It should extend down only to just below the “SOCIAL POKER NETWORK” subtitle.
+* It should NOT continue behind Daily Rewards or any other sections.
+* Everything below Daily Rewards returns to the normal dark background.
+
+Think of it as a premium hero banner.
+
+⸻
+
+Image Treatment
+
+Do NOT simply place the image behind the UI.
+
+Instead:
+
+• Scale the skyline so the tallest buildings sit behind the Chip Society logo.
+
+• Lower the opacity to roughly 20–35%.
+
+• Add a very dark navy/purple overlay on top of the city so it blends naturally into the UI.
+
+• Apply a subtle blur (6–10px) so the skyline supports the interface instead of competing with it.
+
+• Increase the glow slightly around the neon buildings so they softly illuminate the background.
+
+The user should feel the city exists “behind glass.”
+
+⸻
+
+Fade Into Background
+
+This is critical.
+
+The bottom of the city image should gradually disappear.
+
+Use a vertical gradient mask:
+
+100% visible near the logo
+
+↓
+
+80%
+
+↓
+
+50%
+
+↓
+
+20%
+
+↓
+
+0%
+
+by the time Daily Rewards begins.
+
+There should never be a visible cutoff line.
+
+The skyline should dissolve naturally into the normal page background.
+
+⸻
+
+Logo Treatment
+
+Keep the existing Chip Society logo exactly where it is.
+
+Do NOT resize it.
+
+Instead:
+
+• Add a very subtle cyan/pink bloom behind the logo.
+
+• Add a soft radial glow behind the logo only.
+
+This makes it appear illuminated by the city lights.
+
+⸻
+
+Social Poker Network Text
+
+Leave the font unchanged.
+
+Reduce opacity slightly (about 90%).
+
+Add a very faint outer glow so it remains readable against the skyline.
+
+⸻
+
+Decorative Lighting
+
+Behind the skyline add:
+
+• faint purple fog
+
+• soft cyan haze
+
+• subtle neon bloom
+
+No particles.
+
+No animations.
+
+No moving lights.
+
+Everything remains static.
+
+⸻
+
+Daily Rewards Transition
+
+Daily Rewards should appear to sit on top of the fading skyline.
+
+Do NOT place the city behind Daily Rewards.
+
+The Daily Rewards section should sit on the standard Chip Society dark background.
+
+⸻
+
+Performance
+
+The city image should be:
+
+* Static (no animation or parallax)
+* Cached once at app launch
+* GPU-friendly
+* Cropped responsively for different screen sizes without stretching
+
+⸻
+
+Design Goal
+
+The effect should feel like standing on a balcony overlooking a neon Miami skyline at night. The skyline is part of the atmosphere, not the interface. It should add depth and luxury while allowing the Chip Society logo to remain the visual focal point. The transition into the rest of the Home screen should be so smooth that it feels like a single continuous design rather than an image placed behind the header.
