@@ -1,0 +1,177 @@
+HOME SCREEN POLISH PASS — FIX TRENDING CAROUSEL CLIPPING & ALIGN DAILY REWARDS
+
+The Home screen is very close to the final design. Do NOT redesign the UI. This update is strictly a layout and rendering polish pass to fix clipping, alignment, and spacing issues.
+
+⸻
+
+1. FIX TRENDING CAROUSEL CLIPPING (HIGH PRIORITY)
+
+This is currently a rendering bug, not a design issue.
+
+The Trending carousel is clipping the social cards vertically. The cards themselves are the correct size, but the carousel viewport/container is too short.
+
+As a result:
+
+* Bottom rounded corners are cut off.
+* Card shadows are clipped.
+* The floating effect is lost.
+* Cards appear chopped off.
+* The clipping line is perfectly horizontal.
+
+Required Fix
+
+DO NOT shrink the cards.
+
+The card proportions are correct.
+
+Instead:
+
+Increase the height of the entire Trending carousel container until the tallest possible post card—including its glow and shadow—is fully visible.
+
+The carousel viewport should always be 24–32px taller than the tallest rendered card.
+
+No portion of any card should ever be clipped.
+
+⸻
+
+2. ALLOW VERTICAL OVERFLOW
+
+The carousel currently behaves like it has a fixed clipping region.
+
+Update the carousel so that:
+
+* Vertical overflow is visible.
+* Shadows may extend outside the carousel.
+* Bottom glow remains visible.
+* Rounded corners remain fully visible.
+
+If clipping is necessary for horizontal scrolling, clip horizontally only.
+
+Never clip vertically.
+
+The floating shadow beneath each post is part of the visual design.
+
+⸻
+
+3. AUTO-SIZE THE CAROUSEL
+
+Do not hardcode the carousel height.
+
+The container should automatically size itself based on the tallest rendered post.
+
+Future posts may contain:
+
+* Longer text
+* Larger avatars
+* Different badges
+* More metadata
+
+The carousel should adapt automatically.
+
+⸻
+
+4. MAINTAIN HORIZONTAL PEEKING
+
+Keep the existing carousel behavior where the next post partially peeks into view from the right.
+
+This is a premium interaction and should remain.
+
+However:
+
+* Only crop the left and right edges.
+* Never crop the top or bottom.
+
+⸻
+
+5. ADD SAFE SPACE BELOW THE CAROUSEL
+
+Leave approximately 16–20px of breathing room beneath the carousel before the Daily Missions section begins.
+
+This allows the shadow beneath the cards to remain visible and preserves the floating effect.
+
+⸻
+
+6. ALIGN DAILY REWARDS CARDS
+
+The Daily Spin and Streak cards are currently different heights.
+
+This makes the section feel uneven.
+
+Both cards must be perfectly symmetrical.
+
+Match:
+
+* Height
+* Width
+* Padding
+* Corner radius
+* Top alignment
+* Bottom alignment
+
+The bottom edges of both cards must sit on the exact same baseline.
+
+Only the accent color and text should differ.
+
+⸻
+
+7. STANDARDIZE INTERNAL SPACING
+
+Inside both reward cards:
+
+Maintain identical spacing between:
+
+* Progress ring
+* Title
+* Status text (if present)
+* Claim button
+
+Everything should be vertically centered.
+
+Nothing should feel cramped or stretched.
+
+⸻
+
+8. REDUCE EXCESSIVE EMPTY SPACE
+
+Slightly reduce the spacing between:
+
+Daily Rewards
+
+↓
+
+Trending Now
+
+↓
+
+Daily Missions
+
+The page should feel continuous while maintaining generous breathing room.
+
+Avoid large dead spaces.
+
+⸻
+
+9. PRESERVE CURRENT VISUAL STYLE
+
+Do NOT modify:
+
+* Header
+* Miami skyline background
+* Chip Society logo
+* Color palette
+* Glass effects
+* Glow effects
+* Typography
+* Navigation bar
+* Trending card styling
+* Animations
+
+These elements are already very close to the intended final design.
+
+Only correct layout, sizing, spacing, and rendering.
+
+⸻
+
+FINAL DESIGN GOAL
+
+The Home screen should feel like a polished Apple-quality interface where every component floats naturally above the background. No cards should ever appear clipped, cropped, or constrained by their containers. The Trending carousel should feel spacious and premium, with fully visible shadows and rounded corners, while the Daily Rewards section should present two perfectly balanced glass widgets that align flawlessly. The final result should communicate precision, luxury, and refinement through clean proportions and impeccable spacing rather than redesigning the existing aesthetic.

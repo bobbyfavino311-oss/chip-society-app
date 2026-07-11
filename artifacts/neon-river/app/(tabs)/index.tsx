@@ -919,7 +919,7 @@ export default function HomeScreen() {
           ref={trendScrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingRight: 16, paddingVertical: 12 }}
+          contentContainerStyle={{ gap: 12, paddingRight: 16, paddingTop: 8, paddingBottom: 32 }}
         >
           {trendingPosts.map(post => <TrendCard key={post.id} post={post} />)}
         </ScrollView>
@@ -1012,10 +1012,10 @@ const logo = StyleSheet.create({
 const trend = StyleSheet.create({
   cardOuter: {
     shadowColor: '#8833ff',
-    shadowOpacity: 0.32,
-    shadowRadius: 32,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 12,
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
   },
   card: {
     width: width * 0.76,
@@ -1118,11 +1118,13 @@ const qp = StyleSheet.create({
 const rr = StyleSheet.create({
   glassCard: {
     borderRadius: 24, borderWidth: 1, overflow: 'hidden',
-    shadowOpacity: 0.18, shadowRadius: 20, shadowOffset: { width: 0, height: 5 }, elevation: 8,
+    height: '100%',
+    shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 5 }, elevation: 8,
   },
   floatArea: {
-    alignItems: 'center', gap: 9,
-    paddingTop: 13, paddingBottom: 12, paddingHorizontal: 8,
+    alignItems: 'center', flex: 1,
+    justifyContent: 'space-evenly',
+    paddingVertical: 10, paddingHorizontal: 8,
   },
   spotlight: {
     position: 'absolute', width: 62, height: 62, borderRadius: 31,
