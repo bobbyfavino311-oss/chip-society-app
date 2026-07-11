@@ -1,0 +1,560 @@
+This is the prompt I would give your AI. It’s written as a design specification rather than a suggestion, so the AI understands these are mandatory visual requirements.
+
+⸻
+
+CHIP SOCIETY — COMPLETE HOME SCREEN VISUAL REDESIGN
+
+DESIGN GOAL
+
+The Home screen should immediately feel like one of the highest-quality mobile interfaces on the App Store.
+
+Think:
+
+* Apple-quality polish
+* Luxury casino
+* Miami nightlife
+* Floating glass UI
+* Premium OLED experience
+* GTA Vice City meets Apple VisionOS
+
+This is NOT a redesign of functionality.
+
+This is purely a premium visual overhaul.
+
+Everything should feel alive through lighting and depth—not through excessive animation.
+
+⸻
+
+OVERALL VISUAL STYLE
+
+Every element should appear to float above the background.
+
+Nothing should look flat.
+
+Nothing should look boxed in.
+
+Nothing should use harsh outlines.
+
+Replace traditional cards with glass surfaces.
+
+Every object should have:
+
+• depth
+
+• subtle bloom
+
+• ambient glow
+
+• soft shadows
+
+• rounded corners
+
+• premium spacing
+
+The screen should feel layered.
+
+⸻
+
+GLASS SYSTEM
+
+Every card throughout the Home screen should use the exact same premium glass language.
+
+Use:
+
+Dark navy glass
+
+Very slight transparency (5–8%)
+
+Heavy background blur
+
+Large corner radius (28–34px)
+
+Very soft inner highlight
+
+Very subtle outer shadow
+
+Extremely faint cyan/purple rim lighting
+
+No visible 1px borders.
+
+Instead:
+
+Edges should appear illuminated through glow.
+
+⸻
+
+LIGHTING
+
+Lighting is what sells premium quality.
+
+Every interactive component should emit light instead of simply existing.
+
+Examples:
+
+Buttons
+
+Cards
+
+Progress bars
+
+Icons
+
+Navigation
+
+should all softly illuminate nearby pixels.
+
+No hard shadows.
+
+Only ambient bloom.
+
+⸻
+
+COLOR SYSTEM
+
+Background
+
+Deep navy
+
+Near black
+
+Purple undertones
+
+Accent colors
+
+Electric cyan
+
+Miami pink
+
+Purple
+
+Amber
+
+Orange
+
+Neon gradients only.
+
+Never flat colors.
+
+⸻
+
+TYPOGRAPHY
+
+Increase hierarchy.
+
+Titles
+
+Bright white
+
+Very slight glow
+
+Medium weight
+
+Subtitles
+
+Soft gray
+
+Reduced opacity
+
+Metadata
+
+Tiny
+
+Muted
+
+Highly readable
+
+Spacing between letters should remain premium.
+
+⸻
+
+DAILY REWARDS
+
+Keep functionality identical.
+
+Visually:
+
+Cards should float.
+
+Glass surfaces.
+
+Soft purple lighting.
+
+Icons should glow.
+
+Buttons should appear carved from illuminated glass.
+
+No thick borders.
+
+⸻
+
+TRENDING POSTS
+
+These should become the visual centerpiece.
+
+Each post should feel like a luxury social media card.
+
+Use:
+
+Large radius
+
+Glass
+
+Soft shadow
+
+Very subtle cyan/pink rim lighting
+
+Top edge receives a soft neon gradient highlight.
+
+Not a border.
+
+Just reflected light.
+
+⸻
+
+Each avatar should glow slightly.
+
+ALL-IN
+
+WIN
+
+BLUFF
+
+etc.
+
+Badges should become illuminated glass pills.
+
+⸻
+
+Statistics
+
+Likes
+
+Comments
+
+Time
+
+Should sit lighter than the body text.
+
+⸻
+
+Cards should lift slightly when pressed.
+
+⸻
+
+DAILY MISSIONS
+
+Mission cards should match Trending.
+
+No separate visual style.
+
+Glass.
+
+Floating.
+
+Minimal outlines.
+
+Progress bars should use:
+
+rounded cyan gradients
+
+soft glow
+
+thick fill
+
+The XP reward chip should glow cyan.
+
+READY badge
+
+Glass pill
+
+Dark navy
+
+Soft cyan edge
+
+No heavy border.
+
+⸻
+
+Mission cards should feel like expensive dashboard widgets.
+
+⸻
+
+QUICK PLAY
+
+The Quick Play section should become one of the strongest visual elements.
+
+Variant cards:
+
+Glass
+
+Floating
+
+Large radius
+
+Soft blue glow
+
+Selected card
+
+Bright cyan illumination
+
+Very slight scale increase
+
+Shadow underneath
+
+Inactive cards
+
+Remain darker
+
+No thick outlines.
+
+⸻
+
+Buttons
+
+Should appear machined.
+
+Rounded.
+
+Premium.
+
+Illuminated.
+
+⸻
+
+SECTION HEADERS
+
+Daily Rewards
+
+Trending
+
+Daily Missions
+
+Quick Play
+
+All follow identical styling.
+
+Small accent icon
+
+↓
+
+Header
+
+↓
+
+Soft divider spacing
+
+No horizontal divider lines.
+
+Spacing separates sections.
+
+⸻
+
+DIVIDERS
+
+Remove nearly every visible divider.
+
+Instead use:
+
+Whitespace
+
+Lighting
+
+Depth
+
+Cards
+
+to separate sections.
+
+The interface should breathe.
+
+⸻
+
+ICONOGRAPHY
+
+All icons should be:
+
+Minimal
+
+Consistent stroke width
+
+Slight bloom
+
+Perfect alignment
+
+No emoji styling.
+
+No cartoon icons.
+
+Premium system icons only.
+
+⸻
+
+BUTTONS
+
+Every button should look pressable.
+
+Dark glass
+
+Gradient fill
+
+Soft bloom
+
+Rounded
+
+No flat rectangles.
+
+Pressing should:
+
+Scale to 98%
+
+Glow slightly brighter
+
+Release smoothly
+
+⸻
+
+SCROLL EXPERIENCE
+
+Cards should glide.
+
+No snapping.
+
+Momentum should feel like iOS.
+
+Scrolling should feel effortless.
+
+⸻
+
+ANIMATIONS
+
+Animation philosophy:
+
+Luxury.
+
+Not flashy.
+
+Allowed:
+
+Glow pulse
+
+Hover lift
+
+Button press
+
+Progress fill
+
+Card elevation
+
+Very slow shimmer
+
+Not allowed:
+
+Bouncing
+
+Floating icons
+
+Spinning elements
+
+Moving backgrounds
+
+Particle effects
+
+⸻
+
+DEPTH
+
+The interface should feel built in layers.
+
+Background
+
+↓
+
+Hero header
+
+↓
+
+Glass cards
+
+↓
+
+Buttons
+
+↓
+
+Floating navigation
+
+Each layer casts subtle ambient lighting onto the next.
+
+⸻
+
+SPACING
+
+Increase breathing room everywhere.
+
+Nothing should feel crowded.
+
+Cards never touch.
+
+Margins remain consistent.
+
+Everything aligns perfectly.
+
+⸻
+
+NAVIGATION BAR
+
+Keep current layout.
+
+Improve visuals only.
+
+Use:
+
+Heavy blur
+
+Dark glass
+
+Soft purple tint
+
+Floating appearance
+
+No visible top border.
+
+Selected tab:
+
+Bright cyan
+
+Tiny glow
+
+Small magenta indicator
+
+Exactly like Apple’s floating dock.
+
+⸻
+
+PERFORMANCE
+
+All effects must remain GPU efficient.
+
+Use:
+
+Blur
+
+Glow
+
+Gradients
+
+Shadows
+
+Avoid expensive particle systems.
+
+⸻
+
+FINAL DESIGN OBJECTIVE
+
+The Home screen should feel like a $10 million flagship casino app, not a typical mobile game.
+
+When someone opens Chip Society, their first impression should be:
+
+“This feels like Apple designed a luxury Miami casino app.”
+
+Every surface should feel sculpted from illuminated glass. Every glow should feel intentional. Every card should appear suspended above the background. The interface should communicate sophistication, exclusivity, and premium craftsmanship without relying on excessive animations or visual clutter.

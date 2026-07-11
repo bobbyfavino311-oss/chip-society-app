@@ -556,7 +556,7 @@ function RewardRow() {
   ];
 
   return (
-    <View style={{ flexDirection: 'row' }}>
+    <View style={{ flexDirection: 'row', gap: 10 }}>
       {cards.map(b => {
         const iconLift  = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -4] });
         const pillLift  = b.pressAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -2] });
@@ -571,6 +571,9 @@ function RewardRow() {
             onPressOut={() => pressOut(b.pressAnim)}
             onPress={() => router.push(b.route as any)}
           >
+            <View style={[rr.glassCard, { shadowColor: b.color, borderColor: `${b.color}22` }]}>
+              <LinearGradient colors={['rgba(10,3,24,0.94)', 'rgba(7,2,18,0.96)']} style={StyleSheet.absoluteFill} />
+              <LinearGradient colors={[`${b.color}16`, 'transparent']} style={StyleSheet.absoluteFill} start={{x:0.5,y:0}} end={{x:0.5,y:0.55}} />
             <View style={rr.floatArea}>
 
               {/* Arc + icon — lifts 4 px on press */}
@@ -614,6 +617,16 @@ function RewardRow() {
               <Text style={[rr.label, { color: b.canClaim ? b.iconColor : 'rgba(255,255,255,0.5)' }]}>
                 {b.label}
               </Text>
+              {b.key === 'streak' && (
+                <View style={{ alignItems: 'center', marginTop: -4 }}>
+                  <Text style={{ color: b.iconColor, fontSize: 26, fontFamily: 'Inter_700Bold', lineHeight: 30 }}>
+                    {profile.streakDays ?? 1}
+                  </Text>
+                  <Text style={{ color: b.color, fontSize: 8, letterSpacing: 1.5, fontFamily: 'Orbitron_400Regular' }}>
+                    DAYS
+                  </Text>
+                </View>
+              )}
 
               {/* Pill — lifts 2 px on press */}
               <Animated.View style={{ transform: [{ translateY: pillLift }] }}>
@@ -630,6 +643,7 @@ function RewardRow() {
                 )}
               </Animated.View>
 
+            </View>
             </View>
           </Pressable>
         );
@@ -655,7 +669,16 @@ function TrendCard({ post }: { post: TrendPost }) {
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       />
-      <View style={[trend.accentTop, { backgroundColor: post.typeColor }]} />
+      <LinearGradient
+        colors={[`${post.typeColor}bb`, `${post.typeColor}44`, 'transparent']}
+        style={trend.accentTop}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+      />
+      <LinearGradient
+        colors={[`${post.typeColor}20`, 'transparent']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 48 }}
+        start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      />
       <View style={trend.header}>
         <NeonAvatar avatarId={post.avatarId ?? 1} size={40} />
         <View style={{ flex: 1 }}>
@@ -796,22 +819,22 @@ export default function HomeScreen() {
 
       {/* ── Miami skyline hero backdrop ─────────────────────────────────────── */}
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_H, zIndex: 0, overflow: 'hidden' }}>
-        {/* City image: exact Miami skyline provided — high opacity so buildings read clearly */}
+        {/* City image: exact Miami skyline — sharp and prominent */}
         <Image
           source={SKYLINE_IMG}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.78 }}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.92 }}
           resizeMode="cover"
-          blurRadius={4}
+          blurRadius={1}
         />
-        {/* Light dark tint — just enough to keep logo legible, not kill the city */}
+        {/* Barely-there dark tint — lets the city breathe, keeps logo readable */}
         <LinearGradient
-          colors={['rgba(4,0,18,0.44)', 'rgba(5,0,16,0.22)', 'rgba(5,0,16,0.05)']}
+          colors={['rgba(3,0,12,0.20)', 'rgba(4,0,12,0.08)', 'transparent']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         />
-        {/* Atmospheric purple/cyan haze — very subtle */}
+        {/* Miami purple/magenta haze — mirrors the neon city glow */}
         <LinearGradient
-          colors={['rgba(40,5,80,0.18)', 'rgba(0,50,90,0.08)', 'transparent']}
+          colors={['rgba(55,5,100,0.28)', 'rgba(0,35,70,0.12)', 'transparent']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         />
@@ -875,15 +898,18 @@ export default function HomeScreen() {
 
         {/* 1 ─── Daily Rewards ─── */}
         <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>◈  DAILY REWARDS</Text>
+          <View style={styles.activeBadge}>
+            <Ionicons name="diamond" size={11} color="rgba(160,130,255,0.90)" />
+            <Text style={[styles.sectionTitle, { color: 'rgba(200,185,255,0.88)' }]}>DAILY REWARDS</Text>
+          </View>
         </View>
         <RewardRow />
 
         {/* 2 ─── Trending Now ─── */}
         <View style={styles.sectionRow}>
           <View style={styles.activeBadge}>
-            <View style={[styles.activeDot, { backgroundColor: colors.secondary }]} />
-            <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>TRENDING NOW</Text>
+            <Ionicons name="flame" size={13} color="#ff6040" />
+            <Text style={[styles.sectionTitle, { color: 'rgba(255,215,205,0.88)' }]}>TRENDING NOW</Text>
           </View>
           <TouchableOpacity onPress={() => router.push('/(tabs)/feed')}>
             <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
@@ -985,22 +1011,22 @@ const logo = StyleSheet.create({
 
 const trend = StyleSheet.create({
   cardOuter: {
-    shadowColor: '#00d4ff',
-    shadowOpacity: 0.13,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 7,
+    shadowColor: '#8833ff',
+    shadowOpacity: 0.22,
+    shadowRadius: 26,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 9,
   },
   card: {
-    width: width * 0.72,
-    borderRadius: 22,
+    width: width * 0.76,
+    borderRadius: 26,
     borderWidth: 1,
-    borderColor: 'rgba(0,212,255,0.15)',
-    padding: 14,
+    borderColor: 'rgba(255,255,255,0.06)',
+    padding: 15,
     overflow: 'hidden',
-    gap: 8,
+    gap: 9,
   },
-  accentTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 3 },
+  accentTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: {
     width: 36, height: 36, borderRadius: 18,
@@ -1010,10 +1036,10 @@ const trend = StyleSheet.create({
   avatarText: { fontSize: 16, fontWeight: '700' },
   username: { color: colors.text, fontSize: 13, fontWeight: '700' },
   typeBadge: {
-    alignSelf: 'flex-start', borderRadius: 4, borderWidth: 1,
-    paddingHorizontal: 5, paddingVertical: 1, marginTop: 2,
+    alignSelf: 'flex-start', borderRadius: 8, borderWidth: 1,
+    paddingHorizontal: 7, paddingVertical: 2, marginTop: 3,
   },
-  typeText: { fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  typeText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.8, fontFamily: 'Orbitron_700Bold' },
   potBadge: { alignItems: 'center' },
   potLabel: { color: colors.textDim, fontSize: 8, letterSpacing: 1 },
   potAmt: { color: colors.gold, fontSize: 15, fontWeight: '800', fontFamily: 'Inter_700Bold' },
@@ -1088,9 +1114,13 @@ const qp = StyleSheet.create({
 });
 
 const rr = StyleSheet.create({
+  glassCard: {
+    borderRadius: 24, borderWidth: 1, overflow: 'hidden',
+    shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 6 }, elevation: 9,
+  },
   floatArea: {
-    alignItems: 'center', gap: 16,
-    paddingTop: 10, paddingBottom: 6, paddingHorizontal: 4,
+    alignItems: 'center', gap: 12,
+    paddingTop: 18, paddingBottom: 16, paddingHorizontal: 8,
   },
   spotlight: {
     position: 'absolute', width: 72, height: 72, borderRadius: 36,
@@ -1099,8 +1129,8 @@ const rr = StyleSheet.create({
     width: 78, height: 78, alignItems: 'center', justifyContent: 'center',
   },
   label: {
-    fontSize: 8, fontWeight: '800', letterSpacing: 0.8,
-    fontFamily: 'Orbitron_400Regular',
+    fontSize: 9, fontWeight: '800', letterSpacing: 1,
+    fontFamily: 'Orbitron_700Bold',
   },
   timerCapsule: {
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 7,
