@@ -796,30 +796,30 @@ export default function HomeScreen() {
 
       {/* ── Miami skyline hero backdrop ─────────────────────────────────────── */}
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_H, zIndex: 0, overflow: 'hidden' }}>
-        {/* City image: cropped to just the skyline, blurred + dimmed */}
+        {/* City image: exact Miami skyline provided — high opacity so buildings read clearly */}
         <Image
           source={SKYLINE_IMG}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.30 }}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.78 }}
           resizeMode="cover"
-          blurRadius={7}
+          blurRadius={4}
         />
-        {/* Dark navy/purple overlay — city behind frosted glass */}
+        {/* Light dark tint — just enough to keep logo legible, not kill the city */}
         <LinearGradient
-          colors={['rgba(5,0,22,0.82)', 'rgba(8,2,30,0.62)', 'rgba(5,0,16,0.28)']}
+          colors={['rgba(4,0,18,0.44)', 'rgba(5,0,16,0.22)', 'rgba(5,0,16,0.05)']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         />
-        {/* Purple fog layer */}
+        {/* Atmospheric purple/cyan haze — very subtle */}
         <LinearGradient
-          colors={['rgba(55,8,110,0.22)', 'rgba(0,60,100,0.10)', 'transparent']}
+          colors={['rgba(40,5,80,0.18)', 'rgba(0,50,90,0.08)', 'transparent']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         />
-        {/* Bottom dissolve — skyline fades into background */}
+        {/* Bottom dissolve — skyline fades cleanly into background */}
         <LinearGradient
-          colors={['transparent', 'rgba(5,0,16,0.40)', 'rgba(5,0,16,0.80)', '#050010']}
-          locations={[0.0, 0.50, 0.78, 1.0]}
-          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_H * 0.55 }}
+          colors={['transparent', 'rgba(5,0,16,0.55)', 'rgba(5,0,16,0.90)', '#050010']}
+          locations={[0.0, 0.46, 0.74, 1.0]}
+          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_H * 0.52 }}
           start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         />
       </View>
