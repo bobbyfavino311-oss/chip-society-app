@@ -679,9 +679,9 @@ function TrendCard({ post }: { post: TrendPost }) {
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 48 }}
         start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       />
-      {/* Bottom accent — makes rounded bottom corners visible */}
+      {/* Bottom accent — symmetric centre glow, even on both sides */}
       <LinearGradient
-        colors={['transparent', `${post.typeColor}55`]}
+        colors={['transparent', `${post.typeColor}66`, 'transparent']}
         style={trend.accentBottom}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
       />
