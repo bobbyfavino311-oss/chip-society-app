@@ -1,0 +1,237 @@
+# CRITICAL GAMEPLAY BUG — TRADITIONAL HOLD'EM HAND RANKING IS INCORRECT
+
+There is still a serious hand-evaluation bug in Traditional Texas Hold'em.
+
+In the reported hand:
+
+• Player had a King-high Straight.
+• Opponent had Two Pair: Jacks and Nines.
+• The game incorrectly awarded the pot to the Two Pair hand.
+
+This is wrong.
+
+A Straight always beats Two Pair in standard Texas Hold'em.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# CORRECT STANDARD HAND RANKING
+
+Traditional Hold'em must use this exact order from highest to lowest:
+
+1. Royal Flush
+2. Straight Flush
+3. Four of a Kind
+4. Full House
+5. Flush
+6. Straight
+7. Three of a Kind
+8. Two Pair
+9. One Pair
+10. High Card
+
+Therefore:
+
+King-high Straight
+
+beats
+
+Jacks and Nines, Two Pair
+
+every time.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REQUIRED FIX
+
+Audit and repair the Traditional Hold'em hand evaluator.
+
+The evaluator must:
+
+• Generate the best possible five-card hand from the player's two hole cards and five community cards.
+• Compare hand category first.
+• Only compare kickers or card values when both players have the same hand category.
+• Never compare a lower-ranked category as superior to a higher-ranked category.
+• Never allow Two Pair to beat a Straight.
+• Never reuse Short Deck ranking rules in Traditional Hold'em.
+• Never reuse Joker Hold'em wildcard logic in Traditional Hold'em.
+• Never apply Omaha's exact-two-hole-card rule in Traditional Hold'em.
+
+Traditional Hold'em must use its own standard 52-card evaluator.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# HAND-CATEGORY COMPARISON
+
+The comparison engine must first assign each hand a category score.
+
+Example:
+
+Straight = category 5
+Two Pair = category 3
+
+The higher category must win before any rank detail is compared.
+
+Do not compare:
+
+• Pair values
+• Kickers
+• Hole-card strength
+• Board contribution
+• Preflop hand strength
+
+until both hands are confirmed to be in the same category.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# STRAIGHT DETECTION
+
+Verify straight detection across all valid combinations.
+
+Examples:
+
+A-K-Q-J-10 = Ace-high Straight
+K-Q-J-10-9 = King-high Straight
+Q-J-10-9-8 = Queen-high Straight
+5-4-3-2-A = Five-high Straight
+
+A King-high Straight must be stored as:
+
+category: Straight
+highCard: King
+
+It must not be downgraded to:
+
+High Card
+One Pair
+Two Pair
+or any partial board combination.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# BEST FIVE-CARD HAND
+
+Traditional Hold'em must evaluate all 21 possible five-card combinations from the seven available cards.
+
+The winning hand must be the strongest valid five-card combination.
+
+Do not stop evaluating after detecting a pair or two pair.
+
+Example:
+
+If the seven cards contain:
+
+• Two Pair
+and
+• A Straight
+
+The final hand is the Straight.
+
+The evaluator must continue searching for the strongest category.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# SHARED BOARD HANDS
+
+If the Straight exists entirely on the board:
+
+• Both players may use it.
+• Compare whether either player can improve beyond it.
+• If neither improves, the hand is a split pot.
+
+Do not award the hand based only on hole cards when the board already makes a stronger five-card hand.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# VARIANT SEPARATION
+
+Use separate ranking configurations:
+
+Traditional Hold'em:
+Standard ranking — Full House beats Flush.
+
+Short Deck:
+Short Deck ranking — Flush may beat Full House according to the configured rules.
+
+Omaha:
+Standard ranking, but exactly two hole cards and exactly three board cards.
+
+Joker Hold'em:
+Standard ranking plus wildcard logic and Five of a Kind.
+
+Do not share one ranking override across all variants.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# POT SETTLEMENT
+
+Do not move chips until the final evaluator result is validated.
+
+Before awarding the pot:
+
+1. Evaluate every remaining player's best five-card hand.
+2. Store category and tie-break values.
+3. Compare categories.
+4. Compare tie-break values only when categories match.
+5. Detect ties.
+6. Award main and side pots correctly.
+7. Display the correct winning-hand label.
+
+The UI result, winner animation, chip transfer, statistics, achievements, and mission progress must all use the same final evaluator result.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REQUIRED TEST CASE
+
+Board and hole cards should be configured to produce:
+
+Player A:
+King-high Straight
+
+Player B:
+Two Pair, Jacks and Nines
+
+Expected result:
+
+Player A wins.
+
+Displayed result:
+
+KING-HIGH STRAIGHT
+
+Two Pair must lose.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# REGRESSION TESTS
+
+Test at minimum:
+
+• Straight beats Two Pair.
+• Flush beats Straight.
+• Full House beats Flush.
+• Four of a Kind beats Full House.
+• Two Pair beats One Pair.
+• One Pair beats High Card.
+• Higher Straight beats lower Straight.
+• Equal board Straight produces a split pot.
+• Wheel Straight is recognized.
+• Broadway Straight is recognized.
+• Best five-card hand is selected from all seven cards.
+• Side pots use the same correct hand rankings.
+• Traditional Hold'em does not use Short Deck rules.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL VALIDATION
+
+✅ King-high Straight beats Jacks and Nines.
+✅ Straight always outranks Two Pair.
+✅ Evaluator checks all five-card combinations.
+✅ Pot is not awarded until evaluation completes.
+✅ Winner label matches the actual winning hand.
+✅ Chips transfer to the correct player.
+✅ Hand history records the correct result.
+✅ Achievements and Daily Missions use the corrected hand result.
+✅ Each poker variant uses its own correct evaluator rules.
+
+This is a core poker-engine issue and must be fixed at the evaluator level, not patched only for this one hand.
