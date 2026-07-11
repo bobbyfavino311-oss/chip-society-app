@@ -734,7 +734,7 @@ const panel = StyleSheet.create({
     fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
   },
   subtitle: { color: colors.textMuted, fontSize: 9.5, marginTop: 1 },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 14 },
 
   // Grand Reward badge (gold)
   grandBadge: {

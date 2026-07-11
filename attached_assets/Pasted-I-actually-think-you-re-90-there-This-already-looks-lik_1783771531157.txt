@@ -1,0 +1,242 @@
+I actually think you’re 90% there. This already looks like a premium app. The problems now are mostly spacing and hierarchy—not the design language.
+
+Here’s the prompt I’d give the AI.
+
+⸻
+
+HOME SCREEN POLISH PASS — LAYOUT REFINEMENT (DO NOT REDESIGN)
+
+The Home screen visual style is now very close to the desired look.
+
+Do NOT redesign the page.
+
+This is strictly a layout polish pass to improve spacing, proportions, and visual hierarchy.
+
+⸻
+
+1. TRENDING POSTS ARE BEING CLIPPED
+
+This is currently the biggest issue.
+
+The bottom of the Trending post cards is being cut off because there isn’t enough vertical space allocated.
+
+Fix
+
+Increase the vertical height allocated to the Trending carousel by approximately 20–25%.
+
+The full post card—including:
+
+* avatar
+* username
+* badge
+* body text
+* likes
+* timestamp
+* rounded bottom corners
+* bottom shadow
+
+must always remain completely visible.
+
+Nothing should ever be clipped.
+
+The shadow beneath the card should also remain visible.
+
+The carousel should feel like it floats above the page instead of being cropped.
+
+⸻
+
+2. DAILY STREAK CARD IS TOO TALL
+
+The Daily Spin and Daily Streak cards currently dominate too much vertical space.
+
+They should feel like dashboard widgets, not feature cards.
+
+Reduce the height of BOTH reward cards by approximately 18–22%.
+
+Keep the width exactly the same.
+
+Only reduce height.
+
+⸻
+
+3. REBALANCE THE CONTENT INSIDE THE REWARD CARDS
+
+After shortening the cards:
+
+Slightly reduce
+
+• ring diameter (~8%)
+
+• icon size (~5%)
+
+• spacing above the title
+
+Everything should feel tighter.
+
+⸻
+
+The CLAIM button should move upward slightly.
+
+There is currently too much empty space underneath it.
+
+⸻
+
+4. BETTER VERTICAL RHYTHM
+
+Reduce the empty gap between
+
+Daily Rewards
+
+↓
+
+Trending Now
+
+by approximately 12–16 pixels.
+
+The sections currently feel disconnected.
+
+⸻
+
+Then reduce the gap between
+
+Trending
+
+↓
+
+Daily Missions
+
+slightly as well.
+
+The page should scroll naturally without large dead spaces.
+
+⸻
+
+5. TRENDING CARD PADDING
+
+Increase internal padding inside the Trending card.
+
+Current text sits slightly too close to the avatar.
+
+Increase left/right padding by approximately 6–8 pixels.
+
+Increase top padding by 4 pixels.
+
+Everything should breathe a little more.
+
+⸻
+
+6. SOCIAL CARD DEPTH
+
+Keep the current card style.
+
+Simply make them feel like they’re floating.
+
+Increase:
+
+soft shadow
+
+ambient glow
+
+subtle elevation
+
+Very slightly.
+
+Do NOT increase border brightness.
+
+The effect should come from depth, not outlines.
+
+⸻
+
+7. DAILY MISSIONS HEADER
+
+The Daily Missions header is excellent.
+
+However,
+
+the READY badge,
+
+progress counter,
+
+and chevron
+
+are slightly cramped.
+
+Increase spacing between them by approximately 8–12 pixels.
+
+Everything should align on a single baseline.
+
+⸻
+
+8. QUICK PLAY
+
+Move the Quick Play card upward slightly after reducing the Daily Mission height.
+
+The Home screen should feel continuous.
+
+Avoid large blank areas.
+
+⸻
+
+9. OVERALL DENSITY
+
+The page should feel about 10% denser.
+
+Not crowded.
+
+Just more efficient.
+
+The user should be able to see:
+
+Header
+
+↓
+
+Daily Rewards
+
+↓
+
+Trending
+
+↓
+
+Daily Missions
+
+↓
+
+top of Quick Play
+
+comfortably on one screen.
+
+⸻
+
+10. KEEP EVERYTHING ELSE
+
+Do NOT modify:
+
+• colors
+
+• glass styling
+
+• city background
+
+• navigation bar
+
+• fonts
+
+• lighting
+
+• glow
+
+• card styling
+
+• animations
+
+Those are all working well.
+
+Only refine spacing, sizing, and proportions.
+
+⸻
+
+Final Design Goal
+
+The Home screen should feel like a carefully balanced premium dashboard where every section flows naturally into the next. No content should ever be clipped, oversized, or cramped. The Daily Rewards widgets should read as compact status cards, while the Trending feed remains the visual focal point. The result should look intentionally composed, with consistent spacing, perfect proportions, and the same luxury glass aesthetic throughout.

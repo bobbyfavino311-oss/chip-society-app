@@ -542,7 +542,7 @@ function RewardRow() {
       route: '/rewards/wheel',
       progress: canClaimWheel ? 1 : Math.max(0, (1440 - nextWheelIn) / 1440),
       pressAnim: spinPress,
-      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={36} />,
+      renderIcon: (c: string) => <PrizeWheelIcon color={c} size={32} />,
     },
     {
       key: 'streak', label: 'STREAK', canClaim: canClaimDaily,
@@ -551,7 +551,7 @@ function RewardRow() {
       route: '/rewards/streak',
       progress: Math.min(1, ((profile.streakDays || 0) % 7) / 7),
       pressAnim: streakPress,
-      renderIcon: (c: string) => <FlameIcon color={c} size={36} />,
+      renderIcon: (c: string) => <FlameIcon color={c} size={32} />,
     },
   ];
 
@@ -582,7 +582,7 @@ function RewardRow() {
                 <Animated.View style={[rr.spotlight, { backgroundColor: b.color, opacity: spotLight }]} />
 
                 {/* 270° progress arc */}
-                <Svg width={76} height={76} style={{ position: 'absolute', top: 1, left: 1 }}>
+                <Svg width={68} height={68} viewBox="0 0 76 76" style={{ position: 'absolute', top: 1, left: 1 }}>
                   <Circle
                     cx="38" cy="38" r={RING_R}
                     stroke={`${b.color}0e`} strokeWidth={RING_W}
@@ -919,7 +919,7 @@ export default function HomeScreen() {
           ref={trendScrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12, paddingRight: 16 }}
+          contentContainerStyle={{ gap: 12, paddingRight: 16, paddingVertical: 12 }}
         >
           {trendingPosts.map(post => <TrendCard key={post.id} post={post} />)}
         </ScrollView>
@@ -1012,17 +1012,19 @@ const logo = StyleSheet.create({
 const trend = StyleSheet.create({
   cardOuter: {
     shadowColor: '#8833ff',
-    shadowOpacity: 0.22,
-    shadowRadius: 26,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 9,
+    shadowOpacity: 0.32,
+    shadowRadius: 32,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 12,
   },
   card: {
     width: width * 0.76,
     borderRadius: 26,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
-    padding: 15,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 14,
     overflow: 'hidden',
     gap: 9,
   },
@@ -1116,17 +1118,17 @@ const qp = StyleSheet.create({
 const rr = StyleSheet.create({
   glassCard: {
     borderRadius: 24, borderWidth: 1, overflow: 'hidden',
-    shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 6 }, elevation: 9,
+    shadowOpacity: 0.18, shadowRadius: 20, shadowOffset: { width: 0, height: 5 }, elevation: 8,
   },
   floatArea: {
-    alignItems: 'center', gap: 12,
-    paddingTop: 18, paddingBottom: 16, paddingHorizontal: 8,
+    alignItems: 'center', gap: 9,
+    paddingTop: 13, paddingBottom: 12, paddingHorizontal: 8,
   },
   spotlight: {
-    position: 'absolute', width: 72, height: 72, borderRadius: 36,
+    position: 'absolute', width: 62, height: 62, borderRadius: 31,
   },
   ringWrap: {
-    width: 78, height: 78, alignItems: 'center', justifyContent: 'center',
+    width: 70, height: 70, alignItems: 'center', justifyContent: 'center',
   },
   label: {
     fontSize: 9, fontWeight: '800', letterSpacing: 1,
@@ -1175,7 +1177,7 @@ const styles = StyleSheet.create({
   notifBadgeText: {
     color: '#fff', fontSize: 9, fontWeight: '900', lineHeight: 12,
   },
-  scroll: { paddingHorizontal: 16, gap: 16 },
+  scroll: { paddingHorizontal: 16, gap: 12 },
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionTitle: { color: colors.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 2, fontFamily: 'Orbitron_400Regular' },
   seeAll: { color: colors.primary, fontSize: 11, fontWeight: '600' },
