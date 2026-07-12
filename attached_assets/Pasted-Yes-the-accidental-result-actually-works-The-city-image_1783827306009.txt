@@ -1,0 +1,133 @@
+Yes—the accidental result actually works. The city image is being blurred and masked so heavily that it reads like a soft layered oval halo, and that gives the logo a much stronger focal area.
+
+The right move is not to remove it. Keep the actual cityscape asset in place, but intentionally treat it as an abstract header backdrop and center it properly.
+
+# HOME HEADER BACKDROP REFINEMENT — KEEP THE ACCIDENTAL OVAL HALO EFFECT
+The current header backdrop accidentally created a soft layered oval/circular shape behind the Chip Society logo.
+KEEP THIS GENERAL EFFECT.
+It makes the header feel more complete and gives the logo a stronger focal point.
+However, the oval backdrop is currently positioned too far to the left and feels uneven.
+This is a positioning and masking refinement only.
+Do NOT remove the backdrop.
+Do NOT replace the cityscape image.
+Do NOT restore the city details.
+Do NOT redesign the header.
+━━━━━━━━━━━━━━━━━━━━━━
+# IMPORTANT BACKGROUND CLARIFICATION
+The actual asset currently being used is still the cityscape background image.
+Continue using that exact image.
+The cityscape should remain heavily darkened, blurred, and masked so that it reads as a soft abstract oval glow rather than a clearly visible skyline.
+The finished result should preserve the accidental layered-circle appearance seen in the current mobile screenshot.
+━━━━━━━━━━━━━━━━━━━━━━
+# CENTER THE BACKDROP
+Reposition the backdrop so its visual center aligns exactly with:
+• The horizontal center of the phone screen
+• The center of the Chip Society logo
+• The center of the “Social Poker Network” subtitle
+The oval must not lean left or right.
+Use the device viewport center as the alignment reference—not the remaining space between the music and notification buttons.
+The backdrop center should remain at 50% of the screen width on every device.
+━━━━━━━━━━━━━━━━━━━━━━
+# BACKDROP SIZE
+Create one broad horizontal oval behind the logo.
+Recommended proportions:
+• Width: approximately 82–88% of the screen
+• Height: approximately 300–360px on standard iPhones
+• Centered behind the full Chip Society wordmark
+• Top edge begins slightly below the status bar
+• Bottom edge fades out above the Daily Rewards heading
+The oval should frame the logo comfortably without touching the screen edges.
+Do not make it a perfect circle.
+Use a wide, soft ellipse that follows the proportions of the logo.
+━━━━━━━━━━━━━━━━━━━━━━
+# LAYERED DEPTH EFFECT
+Preserve the subtle layered appearance currently visible.
+Use two overlapping soft elliptical masks made from the same cityscape image:
+Primary layer:
+• Centered exactly behind the logo
+• Larger
+• Dark navy/blue
+• Very soft edges
+• Low contrast
+Secondary layer:
+• Slightly smaller
+• Centered exactly on the same axis
+• Slightly brighter blue-purple tint
+• Even softer opacity
+Both layers must share the same center point.
+Do not offset either layer to the left.
+The result should resemble soft concentric glass lighting—not two obvious circles.
+━━━━━━━━━━━━━━━━━━━━━━
+# IMAGE TREATMENT
+Apply to the existing cityscape asset:
+• Strong blur
+• Heavy navy overlay
+• Reduced saturation
+• Low opacity
+• Soft radial masking
+• Slight cyan-blue center tint
+• Purple fade toward the outer edges
+The skyline itself should remain barely visible or completely abstracted.
+The goal is atmospheric depth, not a readable city image.
+━━━━━━━━━━━━━━━━━━━━━━
+# EDGE FALLOFF
+The backdrop must dissolve smoothly into the normal Home screen background.
+Use feathered edges with no visible boundary.
+No hard oval line.
+No rectangular crop.
+No visible image edge.
+No sudden color change.
+The transition must look like soft ambient lighting embedded into the page.
+━━━━━━━━━━━━━━━━━━━━━━
+# LOGO POSITION
+Keep the Chip Society logo centered above the backdrop.
+Do not move it left or right.
+The logo and oval must share the exact same center axis.
+Keep the logo’s existing cyan and pink glow.
+Do not add another large glow layer behind the text.
+The oval backdrop itself provides the depth.
+━━━━━━━━━━━━━━━━━━━━━━
+# HEADER BUTTONS
+Keep the music and notification buttons exactly where they are.
+They should sit outside the main logo focal area and should not influence the oval’s center position.
+Do not center the oval between those two buttons.
+Center it to the screen and logo only.
+━━━━━━━━━━━━━━━━━━━━━━
+# RESPONSIVE BEHAVIOR
+On every phone size:
+• Oval center remains at 50% screen width
+• Logo center remains at 50% screen width
+• Oval scales proportionally with viewport width
+• No horizontal drift
+• No left bias
+• No cropping on either side
+Use responsive percentage-based positioning, not fixed left offsets.
+Avoid absolute coordinates tied to one preview size.
+━━━━━━━━━━━━━━━━━━━━━━
+# DO NOT CHANGE
+Do not modify:
+• Current logo
+• Logo size
+• Logo typography
+• Subtitle
+• Music button
+• Notification button
+• Header height
+• Daily Rewards placement
+• Existing cityscape asset
+• Rest of Home screen styling
+This request only refines the accidental backdrop effect.
+━━━━━━━━━━━━━━━━━━━━━━
+# FINAL VALIDATION
+Confirm:
+✅ The existing cityscape image is still the source asset.
+✅ The cityscape remains blurred and abstract rather than clearly visible.
+✅ The soft oval/halo appearance is preserved.
+✅ The oval is perfectly centered behind the logo.
+✅ The logo and backdrop share the same vertical center axis.
+✅ The backdrop is no longer shifted left.
+✅ Both sides of the oval have equal spacing from the screen edges.
+✅ The oval fades naturally into the page.
+✅ No hard circle, rectangle, or image border is visible.
+FINAL RESULT:
+The header should feel intentionally designed around a centered, soft blue-purple elliptical atmosphere behind the Chip Society logo. It should retain the elegant accidental effect currently visible, but with perfect symmetry, smoother falloff, and precise responsive centering.

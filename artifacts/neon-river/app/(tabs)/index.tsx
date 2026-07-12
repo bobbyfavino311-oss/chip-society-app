@@ -823,28 +823,92 @@ export default function HomeScreen() {
         end={{ x: 1, y: 1 }}
       />
 
-      {/* ── Miami skyline hero backdrop ─────────────────────────────────────── */}
+      {/* ── Miami skyline hero backdrop — two centered ovals ─────────────────── */}
+      {/*   Both ovals share center = width/2; left = (width − ovalW) / 2         */}
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_H, zIndex: 0, overflow: 'hidden' }}>
-        {/* City image: exact Miami skyline — sharp and prominent */}
-        <Image
-          source={SKYLINE_IMG}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.92 }}
-          resizeMode="cover"
-          blurRadius={1}
-        />
-        {/* Barely-there dark tint — lets the city breathe, keeps logo readable */}
+
+        {/* ─ Oval 1: primary — wide soft ellipse ─ */}
+        <View style={{
+          position: 'absolute',
+          width: width * 0.86,
+          height: HERO_H,
+          left: width * 0.07,        // (1 − 0.86) / 2
+          top: 0,
+          borderRadius: HERO_H / 2,
+          overflow: 'hidden',
+          opacity: 0.92,
+        }}>
+          <Image
+            source={SKYLINE_IMG}
+            style={StyleSheet.absoluteFill}
+            resizeMode="cover"
+            blurRadius={10}
+          />
+          {/* Dark navy base */}
+          <LinearGradient
+            colors={['rgba(4,0,22,0.68)', 'rgba(6,1,26,0.52)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+          />
+          {/* Cyan-blue centre tint */}
+          <LinearGradient
+            colors={['rgba(0,20,70,0.12)', 'rgba(0,55,115,0.22)', 'rgba(0,20,70,0.12)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+        </View>
+
+        {/* ─ Oval 2: secondary — tighter, slightly brighter ─ */}
+        <View style={{
+          position: 'absolute',
+          width: width * 0.68,
+          height: HERO_H * 0.82,
+          left: width * 0.16,        // (1 − 0.68) / 2
+          top: HERO_H * 0.09,
+          borderRadius: HERO_H * 0.41,
+          overflow: 'hidden',
+          opacity: 0.52,
+        }}>
+          <Image
+            source={SKYLINE_IMG}
+            style={StyleSheet.absoluteFill}
+            resizeMode="cover"
+            blurRadius={16}
+          />
+          {/* Slightly brighter blue-purple tint */}
+          <LinearGradient
+            colors={['rgba(8,0,35,0.42)', 'rgba(4,18,58,0.32)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+          />
+          <LinearGradient
+            colors={['rgba(45,0,90,0.14)', 'rgba(0,45,110,0.26)', 'rgba(45,0,90,0.14)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+        </View>
+
+        {/* ─ Side wings — darken area outside ovals equally on both sides ─ */}
         <LinearGradient
-          colors={['rgba(3,0,12,0.20)', 'rgba(4,0,12,0.08)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+          colors={['rgba(5,0,16,0.96)', 'rgba(5,0,16,0.40)', 'transparent']}
+          locations={[0, 0.12, 0.30]}
+          style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: width * 0.28 }}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
         />
-        {/* Miami purple/magenta haze — mirrors the neon city glow */}
         <LinearGradient
-          colors={['rgba(55,5,100,0.28)', 'rgba(0,35,70,0.12)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+          colors={['transparent', 'rgba(5,0,16,0.40)', 'rgba(5,0,16,0.96)']}
+          locations={[0.70, 0.88, 1]}
+          style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: width * 0.28 }}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
         />
-        {/* Bottom dissolve — skyline fades cleanly into background */}
+        {/* Purple edge tint */}
+        <LinearGradient
+          colors={['rgba(60,0,110,0.42)', 'transparent', 'rgba(60,0,110,0.42)']}
+          locations={[0, 0.46, 1]}
+          style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+        />
+        {/* Bottom dissolve — ovals fade cleanly into page background */}
         <LinearGradient
           colors={['transparent', 'rgba(5,0,16,0.55)', 'rgba(5,0,16,0.90)', '#050010']}
           locations={[0.0, 0.46, 0.74, 1.0]}
