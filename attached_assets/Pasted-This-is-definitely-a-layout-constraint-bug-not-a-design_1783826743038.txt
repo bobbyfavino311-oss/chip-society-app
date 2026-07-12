@@ -1,0 +1,222 @@
+This is definitely a layout constraint bug, not a design issue.
+
+Looking at your screenshot, the Daily Rewards cards are stretching to fill all available vertical space, which usually means the AI accidentally used a layout like Expanded, Flexible, height: double.infinity, fillMaxHeight, or a Column that is forcing children to occupy the remaining viewport.
+
+Here’s the prompt I’d give the AI:
+
+⸻
+
+🚨 CRITICAL MOBILE LAYOUT BUG — HOME SCREEN IS UNUSABLE
+
+The latest Home screen update introduced a severe mobile layout bug.
+
+This is NOT a visual redesign request.
+
+It is a layout engine bug that must be fixed immediately.
+
+⸻
+
+CURRENT BUG
+
+On physical mobile devices, the Daily Rewards cards are stretching vertically to fill nearly the entire screen.
+
+Because of this:
+
+* The cards become extremely tall.
+* The Home page cannot scroll correctly.
+* Trending Now is pushed almost entirely off-screen.
+* Daily Missions disappear.
+* Quick Play disappears.
+* The page no longer behaves like a vertically scrolling dashboard.
+
+This behavior is incorrect.
+
+⸻
+
+ROOT CAUSE
+
+The Daily Rewards cards are being treated as flexible-height widgets.
+
+Somewhere in the layout they are likely using one or more of:
+
+* Expanded
+* Flexible
+* fillMaxHeight
+* double.infinity
+* matchParentHeight
+* height: 100%
+* stretch alignment
+* unconstrained Column behavior
+
+This is incorrect.
+
+The reward cards must never determine the height of the page.
+
+⸻
+
+REQUIRED FIX
+
+The Daily Rewards cards must use a fixed intrinsic height.
+
+They should size to their content—not to the remaining viewport.
+
+The cards should never expand simply because extra vertical space exists.
+
+⸻
+
+DAILY REWARDS SECTION
+
+Treat Daily Rewards as a normal dashboard section.
+
+Layout:
+
+Header
+↓
+Two fixed-height cards
+↓
+Trending
+↓
+Daily Missions
+↓
+Quick Play
+
+The cards should not stretch vertically.
+
+⸻
+
+CARD HEIGHT
+
+Use a fixed responsive height.
+
+Approximately:
+
+200–240px
+
+depending on screen size.
+
+Do not exceed this range.
+
+The height should remain visually consistent across devices.
+
+⸻
+
+CARD WIDTH
+
+Maintain the existing two-column layout.
+
+Cards may expand horizontally.
+
+They must never expand vertically.
+
+⸻
+
+SCROLL VIEW
+
+The Home page should be one continuous vertically scrolling page.
+
+The scroll view should size itself based on the combined height of:
+
+* Header
+* Daily Rewards
+* Trending
+* Daily Missions
+* Quick Play
+* Remaining sections
+
+The Daily Rewards cards must not consume the remaining scroll height.
+
+⸻
+
+CONTENT SIZING
+
+The progress ring,
+
+title,
+
+status,
+
+claim button,
+
+and spacing
+
+should determine the card height naturally.
+
+The card should wrap its content.
+
+Never fill unused vertical space.
+
+⸻
+
+RESPONSIVE RULES
+
+Regardless of device:
+
+* iPhone SE
+* iPhone 16
+* iPhone 16 Pro Max
+* Android phones
+* Tablets
+
+The Daily Rewards cards should remain proportional.
+
+Only width may scale.
+
+Height should remain nearly constant.
+
+⸻
+
+VERIFY THE ENTIRE HOME SCREEN
+
+After fixing the layout, confirm the following are visible during normal scrolling:
+
+✅ Header
+
+✅ Daily Rewards
+
+✅ Trending Now
+
+✅ Daily Missions
+
+✅ Quick Play
+
+✅ Remaining Home sections
+
+Everything must scroll naturally.
+
+Nothing should be pushed off-screen because another widget expanded unexpectedly.
+
+⸻
+
+FINAL VALIDATION CHECKLIST
+
+Confirm all of the following:
+
+✅ Daily Rewards cards no longer stretch vertically.
+
+✅ Cards have a fixed height.
+
+✅ Home page scrolls normally.
+
+✅ Trending Now appears immediately below Daily Rewards.
+
+✅ Daily Missions appear below Trending.
+
+✅ Quick Play appears below Daily Missions.
+
+✅ No widget fills the remaining screen height.
+
+✅ No use of Expanded/Flexible/fillMaxHeight on the reward cards.
+
+✅ The Home screen behaves identically on desktop preview and physical mobile devices.
+
+⸻
+
+IMPORTANT
+
+This is a layout constraint issue, not a styling issue.
+
+Do not redesign any visuals.
+
+Keep the current colors, glass effects, spacing, typography, icons, and animations exactly as they are.
+
+Only correct the layout constraints so every section sizes to its content and the Home screen functions as a proper scrolling dashboard.

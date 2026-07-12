@@ -1129,13 +1129,13 @@ const qp = StyleSheet.create({
 const rr = StyleSheet.create({
   glassCard: {
     borderRadius: 24, borderWidth: 1, overflow: 'hidden',
-    height: '100%',
+    height: 220,
     shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 5 }, elevation: 8,
   },
   floatArea: {
-    alignItems: 'center', flex: 1,
+    flex: 1, alignItems: 'center',
     justifyContent: 'space-evenly',
-    paddingVertical: 10, paddingHorizontal: 8,
+    paddingHorizontal: 8,
   },
   spotlight: {
     position: 'absolute', width: 62, height: 62, borderRadius: 31,
