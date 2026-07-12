@@ -1,0 +1,111 @@
+You’re right. The bottom lighting is forming a concave crescent, which makes the card look pinched inward instead of like a clean floating rounded rectangle.
+
+Use this stricter prompt:
+
+# TRENDING SOCIAL CARD — REMOVE INWARD-BENDING BOTTOM LIGHTING
+The current Trending social card has an incorrect lighting effect along the bottom edge.
+The purple glow is curving upward toward the center, creating the illusion that the bottom of the card bends inward or is concave.
+REMOVE THIS EFFECT COMPLETELY.
+This is a lighting correction only.
+Do NOT redesign the card.
+Do NOT change its size.
+Do NOT change the content layout.
+Do NOT change the corner radius.
+Do NOT change the carousel behavior.
+━━━━━━━━━━━━━━━━━━━━━━
+# REMOVE THE CONCAVE GLOW
+Delete any bottom glow, shadow, gradient, mask, or highlight that:
+• Curves upward toward the center
+• Creates a crescent shape
+• Makes the bottom edge look pinched
+• Makes the card appear bowed inward
+• Produces brighter corners and a darker middle
+• Follows an elliptical or radial path beneath the card
+The bottom edge must not resemble a smile, arc, bowl, lens, or inward bend.
+━━━━━━━━━━━━━━━━━━━━━━
+# KEEP THE CARD GEOMETRY FLAT
+The bottom edge must read as one clean horizontal line between the two rounded bottom corners.
+The card should appear physically flat and rectangular.
+Use:
+• Equal bottom-left and bottom-right corner radius
+• Straight horizontal bottom edge
+• No perspective distortion
+• No curved mask
+• No fisheye effect
+• No barrel distortion
+━━━━━━━━━━━━━━━━━━━━━━
+# REPLACE WITH A UNIFORM SHADOW
+Use one soft, even drop shadow beneath the entire card.
+The shadow must:
+• Run uniformly across the full card width
+• Be centered directly below the card
+• Use a large blur radius
+• Use low opacity
+• Fade evenly from left to right
+• Never curve upward into the card
+Recommended appearance:
+A broad, soft purple ambient shadow extending 8–14px below the card.
+No visible arc.
+No bright corner pools.
+No dark center notch.
+━━━━━━━━━━━━━━━━━━━━━━
+# EDGE LIGHTING
+Keep only a subtle top-edge accent.
+For the bottom edge:
+• No bright neon line
+• No gradient sweep
+• No elliptical glow
+• No reflective crescent
+At most, use an extremely faint 1px inner highlight with equal intensity across the full bottom edge.
+The bottom should remain visually quieter than the top.
+━━━━━━━━━━━━━━━━━━━━━━
+# CARD BACKGROUND
+The glass fill must remain even.
+Do not make the lower center darker than the lower corners.
+Use a simple vertical gradient:
+Top:
+Slightly lighter
+Bottom:
+Slightly darker
+The gradient must remain linear and uniform across the full width.
+Do not use radial gradients inside the card.
+━━━━━━━━━━━━━━━━━━━━━━
+# CORNER LIGHTING
+Do not place stronger purple light under the bottom corners.
+Both bottom corners should have the same subtle edge treatment as the rest of the card.
+The corners must not glow inward.
+━━━━━━━━━━━━━━━━━━━━━━
+# CAROUSEL WRAPPER
+Confirm the carousel wrapper is not adding a curved shadow plate underneath the card.
+The wrapper must have:
+• Transparent background
+• No oval glow
+• No elliptical gradient
+• No bottom mask
+• No purple pedestal
+• No reflected floor effect
+The social card itself must be the only visible surface.
+━━━━━━━━━━━━━━━━━━━━━━
+# REQUIRED FINAL APPEARANCE
+The card should look like:
+• A flat premium rounded glass rectangle
+• A subtle thin accent along the top
+• A soft, even shadow directly beneath it
+• Fully rounded bottom corners
+• A perfectly straight bottom edge
+• No visual bending or distortion
+━━━━━━━━━━━━━━━━━━━━━━
+# VALIDATION
+Confirm:
+✅ Bottom edge appears straight.
+✅ Bottom corners are equally rounded.
+✅ No crescent-shaped glow remains.
+✅ No inward-bending lighting remains.
+✅ Shadow is evenly distributed across the full width.
+✅ No purple oval or pedestal exists beneath the card.
+✅ Card does not look concave, pinched, bowed, or warped.
+✅ Top accent remains subtle and premium.
+FINAL GOAL:
+The Trending social card must look like a clean floating slab of smoked glass. The lighting should support the card’s flat geometry, not distort it.
+
+I’d keep the top accent glow and make the bottom almost completely neutral. That will preserve depth while removing the “bending inward” illusion.
