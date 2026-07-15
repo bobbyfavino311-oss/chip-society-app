@@ -1,0 +1,270 @@
+Exactly. Royal Flush and Four of a Kind should not be in the random 24-hour Daily Mission pool. The screenshot is mixing achievement-level rarity with daily mission difficulty.
+
+A daily mission system should be designed so an active player can reasonably complete all five in one day. The Legendary Fortune Cookie is already the reward for completing the entire set—the difficulty should come from completing five varied objectives, not from hoping for an astronomically rare hand.
+
+I would give your AI this:
+
+# CRITICAL DAILY MISSION BALANCE OVERHAUL
+The Daily Mission system is currently generating missions that are far too rare and difficult to complete within a 24-hour reset period.
+EXAMPLES OF UNACCEPTABLE DAILY MISSIONS:
+• Win with a Royal Flush
+• Win with Four of a Kind
+• Win with a Straight Flush
+• Hit any extremely rare hand that depends primarily on statistical luck
+• Any objective that a normal active player could play for hours and still have almost no realistic opportunity to complete
+A ROYAL FLUSH IS ONE OF THE RAREST POSSIBLE HANDS IN POKER.
+IT MUST NEVER BE USED AS A 24-HOUR DAILY MISSION.
+These types of objectives belong in the permanent ACHIEVEMENT system, not the DAILY MISSION system.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CORE DESIGN RULE
+DAILY MISSIONS MUST BE REALISTICALLY COMPLETABLE WITHIN 24 HOURS.
+The system generates 5 Daily Missions per day.
+A reasonably active player should have a realistic opportunity to complete all 5 missions during a normal play session.
+The challenge should come from:
+• Playing different game modes
+• Making strategic decisions
+• Winning achievable hands
+• Completing measurable gameplay actions
+• Playing consistently
+The challenge must NOT depend on hitting extremely rare statistical events.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# REMOVE THESE FROM THE DAILY MISSION POOL
+PERMANENTLY EXCLUDE:
+❌ Royal Flush
+❌ Straight Flush
+❌ Four of a Kind / Quads
+❌ Any jackpot-level hand
+❌ Any extremely rare bonus combination
+❌ Any objective requiring a statistically extraordinary event
+❌ Any mission whose completion is primarily dependent on extreme luck
+These can remain as:
+• Permanent Achievements
+• Lifetime Milestones
+• Special Event Challenges
+• Casino Passport milestones
+They must NOT appear as normal 24-hour Daily Missions.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# DAILY MISSION DIFFICULTY STRUCTURE
+Every daily set must contain exactly 5 missions.
+Use this difficulty distribution:
+MISSION 1 — EASY
+MISSION 2 — EASY
+MISSION 3 — MEDIUM
+MISSION 4 — MEDIUM
+MISSION 5 — HARD BUT REALISTIC
+Do not randomly generate five missions without considering difficulty.
+The system must deliberately build a balanced daily set.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# EASY MISSION EXAMPLES
+These should take approximately 5–15 minutes.
+TRADITIONAL HOLD'EM
+• Play 3 hands
+• Play 5 hands
+• Win 1 hand
+• See 3 flops
+• Reach the river once
+• Win a pot of at least 10K
+• Win with One Pair or better
+OMAHA
+• Play 3 Omaha hands
+• Win 1 Omaha hand
+• Reach the river in Omaha
+• Win a pot in Omaha
+SHORT DECK
+• Play 3 Short Deck hands
+• Win 1 Short Deck hand
+• Reach showdown once
+JOKER HOLD'EM
+• Play 3 Joker Hold'em hands
+• Win 1 Joker Hold'em hand
+BLACKJACK
+• Win 2 Blackjack hands
+• Win 3 Blackjack hands
+• Get a Blackjack
+• Win after hitting
+• Win after standing
+THREE CARD POKER
+• Play 3 hands
+• Beat the dealer once
+• Win a Pair Plus bet
+• Win any 6 Card Bonus
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MEDIUM MISSION EXAMPLES
+These should require intentional play but remain reasonably achievable.
+TRADITIONAL HOLD'EM
+• Win 3 hands
+• Win with Two Pair
+• Win with Three of a Kind
+• Win with a Straight
+• Win with a Flush
+• Win 2 hands at showdown
+• Win a pot of at least 50K
+• Win a hand from the big blind
+• Win a hand after calling a raise
+OMAHA
+• Win 2 Omaha hands
+• Win with Two Pair or better
+• Win with a Straight
+• Win a pot of at least 50K
+• Reach showdown 3 times
+SHORT DECK
+• Win 2 Short Deck hands
+• Win with Two Pair or better
+• Win a pot of at least 50K
+JOKER HOLD'EM
+• Win 2 Joker Hold'em hands
+• Win using the Joker
+• Win with Two Pair or better
+BLACKJACK
+• Win after doubling down
+• Win 3 hands
+• Win 2 consecutive hands
+• Get 21 without a natural Blackjack
+THREE CARD POKER
+• Win with a Pair or better
+• Win a Pair Plus wager
+• Win a 6 Card Bonus
+• Beat the dealer 2 times
+ULTIMATE TEXAS HOLD'EM
+• Beat the dealer twice
+• Win a Trips Bonus
+• Win after making a 3x Play bet
+• Win after making a 4x Play bet
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# HARD DAILY MISSIONS
+Hard missions must still be realistic within one day.
+GOOD HARD MISSIONS:
+• Win 5 poker hands across any multiplayer mode
+• Win with a Flush in Traditional Hold'em
+• Win with a Straight in Traditional Hold'em
+• Win 3 hands in Omaha
+• Win after doubling down in Blackjack
+• Win 3 consecutive casino-game hands
+• Win a 6 Card Bonus with a Straight or better
+• Win 100K total chips from gameplay
+• Play 15 total hands
+• Win in 3 different game modes
+• Complete 2 casino-game victories and 2 poker victories
+BAD HARD MISSIONS:
+❌ Royal Flush
+❌ Straight Flush
+❌ Four of a Kind
+❌ Extremely rare jackpot outcomes
+Hard means:
+CHALLENGING BUT ACHIEVABLE.
+Hard does NOT mean:
+STATISTICALLY IMPROBABLE.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# IMPORTANT — GAME-SPECIFIC HAND PROBABILITY
+DO NOT treat the same poker hand as equally difficult across every game.
+Mission difficulty must account for:
+• Number of cards available
+• Wild cards
+• Short Deck rules
+• Community cards
+• Bonus-hand construction
+• Game-specific hand probabilities
+For example:
+A Flush in one game may be significantly easier or harder than a Flush in another game.
+The mission system must use GAME-SPECIFIC difficulty definitions.
+Do not assign difficulty based only on the name of the poker hand.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# NO IMPOSSIBLE OR CONFLICTING MISSIONS
+Before selecting a mission, validate:
+1. The required game is currently available.
+2. The gameplay engine tracks the required event.
+3. The mission can actually be completed.
+4. The mission condition is correctly wired to the correct game mode.
+5. The mission is appropriate for a 24-hour period.
+6. The player has access to the required game.
+7. The mission does not require an unavailable feature.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# AVOID DUPLICATE DAILY OBJECTIVES
+Do not generate redundant sets such as:
+• Win 1 Hold'em hand
+• Win 3 Hold'em hands
+• Win 5 Hold'em hands
+in the same daily set.
+Also avoid giving multiple missions that all require the same rare outcome.
+The five missions should feel varied.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# DAILY SET VARIETY
+A daily set should ideally include a mixture of:
+• General gameplay
+• Poker
+• Casino game
+• Skill/action-based objective
+• One harder challenge
+Do not force players to play every game every day.
+Do not generate five missions from one game unless intentionally configured.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# RECOMMENDED DAILY SET EXAMPLE
+1. Play 5 hands of Traditional Hold'em
+EASY
+2. Win 2 Blackjack hands
+EASY
+3. Win a hand with Two Pair or better
+MEDIUM
+4. Win after doubling down in Blackjack
+MEDIUM
+5. Win a Straight or better in any eligible poker mode
+HARD
+COMPLETE ALL FIVE:
+LEGENDARY FORTUNE COOKIE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CRITICAL REWARD RULE
+The existing final reward rule remains unchanged:
+COMPLETE ALL 5 DAILY MISSIONS WITHIN THE SAME DAILY RESET PERIOD
+→ AWARD EXACTLY 1 LEGENDARY FORTUNE COOKIE
+The reward must be:
+LEGENDARY
+NOT COMMON
+NOT RARE
+NOT EPIC
+NOT MULTIPLE COMMON COOKIES
+The Legendary Fortune Cookie is awarded only after all five unique daily missions are successfully passed.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MIGRATION / CURRENT ACTIVE MISSIONS
+IMPORTANT:
+After implementing this update, inspect all currently active Daily Missions.
+If a player currently has an excluded impossible or extreme-rarity mission such as:
+• Royal Flush
+• Straight Flush
+• Four of a Kind
+replace that mission with a valid mission of approximately equivalent difficulty.
+Do not require the player to wait until the next daily reset.
+Do not reset progress on their other valid Daily Missions.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# KEEP PERMANENT ACHIEVEMENTS SEPARATE
+DO NOT DELETE:
+• Royal Flush achievement
+• Quads achievement
+• Straight Flush achievement
+• Other rare permanent achievements
+Those are appropriate for the permanent Achievement system.
+The systems must remain separate:
+DAILY MISSIONS
+= achievable within 24 hours
+ACHIEVEMENTS
+= rare lifetime accomplishments
+This distinction is mandatory.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# FINAL VALIDATION
+Before releasing the update, test the mission generator across at least 100 simulated daily mission sets.
+Verify:
+✅ Zero Royal Flush daily missions
+✅ Zero Straight Flush daily missions
+✅ Zero Four of a Kind daily missions
+✅ Every set contains exactly 5 missions
+✅ Every set has a controlled difficulty distribution
+✅ No impossible mission combinations
+✅ No duplicate or redundant objectives
+✅ Every mission is connected to the correct gameplay event
+✅ Progress only increases when the exact mission condition is satisfied
+✅ A normal active player has a realistic opportunity to complete all five within 24 hours
+FINAL DESIGN PRINCIPLE:
+DAILY MISSIONS SHOULD ENCOURAGE PLAY.
+ACHIEVEMENTS SHOULD CELEBRATE RARITY.
+DO NOT CONFUSE THE TWO SYSTEMS.
+
+One change I’d make from the original mission concept: even “win with a flush” can be frustrating as a mandatory daily depending on the game and how many hands a player plays. I’d keep Straight/Flush in the hard pool, but make sure only one outcome-dependent hard mission can appear per day. The rest should be progress or decision-based tasks so the Legendary Cookie feels challenging but genuinely attainable.

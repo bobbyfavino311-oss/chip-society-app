@@ -62,71 +62,82 @@ function hContains(desc: string | undefined, name: string): boolean {
 
 export const MISSION_POOL: MissionDef[] = [
   // ── TEXAS HOLD'EM ──────────────────────────────────────────────────────────
-  { id: 'txh_win_3',        category: "Texas Hold'em", title: 'On a Roll',       description: "Win 3 hands of Traditional Hold'em",                        target: 3,  rarity: 'common',    chipReward: 7500,   xpReward: 50,  icon: 'card-outline',          iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' },
-  { id: 'txh_win_pair',     category: "Texas Hold'em", title: 'Keep it Simple',  description: "Win 5 hands with One Pair in Traditional Hold'em",           target: 5,  rarity: 'common',    chipReward: 10000,  xpReward: 60,  icon: 'copy-outline',          iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Pair of') },
-  { id: 'txh_win_two_pair', category: "Texas Hold'em", title: 'Two Pair',        description: "Win 3 hands with Two Pair in Traditional Hold'em",           target: 3,  rarity: 'common',    chipReward: 12000,  xpReward: 65,  icon: 'layers-outline',        iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Two Pair') },
-  { id: 'txh_win_trips',    category: "Texas Hold'em", title: "Three's Company", description: "Win 2 hands with Three of a Kind in Traditional Hold'em",    target: 2,  rarity: 'rare',      chipReward: 22000,  xpReward: 115, icon: 'triangle-outline',      iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Three of a Kind') },
-  { id: 'txh_win_straight', category: "Texas Hold'em", title: 'Straight Shooter',description: "Win 2 hands with a Straight in Traditional Hold'em",         target: 2,  rarity: 'rare',      chipReward: 20000,  xpReward: 110, icon: 'trending-up-outline',   iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Straight') && !e.handDesc?.includes('Straight Flush') },
-  { id: 'txh_win_flush',    category: "Texas Hold'em", title: 'Flush Master',    description: "Win 3 hands with a Flush in Traditional Hold'em",            target: 3,  rarity: 'rare',      chipReward: 25000,  xpReward: 120, icon: 'water-outline',         iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') && !e.handDesc?.includes('Straight Flush') && e.handDesc !== 'Royal Flush' },
-  { id: 'txh_win_full',     category: "Texas Hold'em", title: 'Full House',      description: "Win 2 hands with a Full House in Traditional Hold'em",       target: 2,  rarity: 'epic',      chipReward: 80000,  xpReward: 200, icon: 'home-outline',          iconColor: '#bf5fff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
-  { id: 'txh_win_quads',    category: "Texas Hold'em", title: 'Quads!',          description: "Win with Four of a Kind in Traditional Hold'em",             target: 1,  rarity: 'epic',      chipReward: 120000, xpReward: 200, icon: 'grid-outline',          iconColor: '#bf5fff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Four of a Kind') },
-  { id: 'txh_win_sf',       category: "Texas Hold'em", title: 'Straight Flush',  description: "Win with a Straight Flush in Traditional Hold'em",           target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'sparkles-outline',      iconColor: '#ffd700', check: e => e.game === 'texas_holdem' && e.action === 'win' && !!e.handDesc?.includes('Straight Flush') && !e.handDesc?.startsWith('Royal') },
-  { id: 'txh_win_royal',    category: "Texas Hold'em", title: 'Royal Flush',     description: "Win with a Royal Flush in Traditional Hold'em",              target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'trophy-outline',        iconColor: '#ffd700', check: e => e.game === 'texas_holdem' && e.action === 'win' && e.handDesc === 'Royal Flush' },
-  { id: 'txh_allin',        category: "Texas Hold'em", title: 'All-In Hero',     description: "Win 2 hands after going All-In in Traditional Hold'em",      target: 2,  rarity: 'rare',      chipReward: 30000,  xpReward: 130, icon: 'flash-outline',         iconColor: '#ff0090', check: e => e.game === 'texas_holdem' && e.action === 'win' && !!e.wasAllIn },
-  { id: 'txh_aces',         category: "Texas Hold'em", title: 'Pocket Rockets',  description: "Win with Pocket Aces in Traditional Hold'em",                target: 1,  rarity: 'rare',      chipReward: 35000,  xpReward: 130, icon: 'diamond-outline',       iconColor: '#ff0090', check: e => e.game === 'texas_holdem' && e.action === 'win' && hasPocketPair(e.holeCards, 14) },
-  { id: 'txh_kings',        category: "Texas Hold'em", title: 'Cowboys',         description: "Win with Pocket Kings in Traditional Hold'em",               target: 1,  rarity: 'rare',      chipReward: 30000,  xpReward: 120, icon: 'shield-outline',        iconColor: '#ff0090', check: e => e.game === 'texas_holdem' && e.action === 'win' && hasPocketPair(e.holeCards, 13) },
-  { id: 'txh_suited',       category: "Texas Hold'em", title: 'Suited Up',       description: "Win with suited connectors in Traditional Hold'em",          target: 1,  rarity: 'rare',      chipReward: 28000,  xpReward: 120, icon: 'link-outline',          iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && isSuitedConnectors(e.holeCards) },
-  { id: 'txh_play_10',      category: "Texas Hold'em", title: 'At the Table',    description: "Play 10 hands of Traditional Hold'em",                       target: 10, rarity: 'common',    chipReward: 5000,   xpReward: 40,  icon: 'repeat-outline',        iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && (e.action === 'win' || e.action === 'play') },
-  { id: 'txh_play_25',      category: "Texas Hold'em", title: 'The Grind',       description: "Play 25 hands of Traditional Hold'em",                       target: 25, rarity: 'common',    chipReward: 8000,   xpReward: 45,  icon: 'repeat-outline',        iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'txh_win_1',        category: "Texas Hold'em", title: 'First Blood',     description: "Win 1 hand of Traditional Hold'em",                          target: 1,  rarity: 'common', chipReward: 4000,   xpReward: 30,  icon: 'card-outline',          iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' },
+  { id: 'txh_win_3',        category: "Texas Hold'em", title: 'On a Roll',       description: "Win 3 hands of Traditional Hold'em",                          target: 3,  rarity: 'common', chipReward: 7500,   xpReward: 50,  icon: 'card-outline',          iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' },
+  { id: 'txh_play_5',       category: "Texas Hold'em", title: 'Show Up',         description: "Play 5 hands of Traditional Hold'em",                         target: 5,  rarity: 'common', chipReward: 3500,   xpReward: 30,  icon: 'repeat-outline',        iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'txh_play_10',      category: "Texas Hold'em", title: 'At the Table',    description: "Play 10 hands of Traditional Hold'em",                         target: 10, rarity: 'common', chipReward: 5000,   xpReward: 40,  icon: 'repeat-outline',        iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'txh_play_25',      category: "Texas Hold'em", title: 'The Grind',       description: "Play 25 hands of Traditional Hold'em",                         target: 25, rarity: 'rare',   chipReward: 8000,   xpReward: 45,  icon: 'repeat-outline',        iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'txh_win_pair',     category: "Texas Hold'em", title: 'Keep it Simple',  description: "Win 3 hands with One Pair in Traditional Hold'em",             target: 3,  rarity: 'common', chipReward: 8000,   xpReward: 50,  icon: 'copy-outline',          iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Pair of') },
+  { id: 'txh_win_two_pair', category: "Texas Hold'em", title: 'Two Pair',        description: "Win 2 hands with Two Pair in Traditional Hold'em",             target: 2,  rarity: 'common', chipReward: 10000,  xpReward: 55,  icon: 'layers-outline',        iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Two Pair') },
+  { id: 'txh_win_trips',    category: "Texas Hold'em", title: "Three's Company", description: "Win with Three of a Kind in Traditional Hold'em",              target: 1,  rarity: 'rare',   chipReward: 16000,  xpReward: 90,  icon: 'triangle-outline',      iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Three of a Kind') },
+  { id: 'txh_win_straight', category: "Texas Hold'em", title: 'Straight Shooter',description: "Win with a Straight in Traditional Hold'em",                   target: 1,  rarity: 'rare',   chipReward: 18000,  xpReward: 95,  icon: 'trending-up-outline',   iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Straight') && !e.handDesc?.includes('Straight Flush') },
+  { id: 'txh_win_flush',    category: "Texas Hold'em", title: 'Flush Master',    description: "Win with a Flush in Traditional Hold'em",                      target: 1,  rarity: 'rare',   chipReward: 22000,  xpReward: 110, icon: 'water-outline',         iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') && !e.handDesc?.includes('Straight Flush') && e.handDesc !== 'Royal Flush' },
+  { id: 'txh_win_full',     category: "Texas Hold'em", title: 'Full House',      description: "Win with a Full House in Traditional Hold'em",                 target: 1,  rarity: 'rare',   chipReward: 35000,  xpReward: 140, icon: 'home-outline',          iconColor: '#bf5fff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
+  { id: 'txh_allin',        category: "Texas Hold'em", title: 'All-In Hero',     description: "Win a hand after going All-In in Traditional Hold'em",         target: 1,  rarity: 'rare',   chipReward: 22000,  xpReward: 110, icon: 'flash-outline',         iconColor: '#ff0090', check: e => e.game === 'texas_holdem' && e.action === 'win' && !!e.wasAllIn },
+  { id: 'txh_aces',         category: "Texas Hold'em", title: 'Pocket Rockets',  description: "Win with Pocket Aces in Traditional Hold'em",                  target: 1,  rarity: 'rare',   chipReward: 30000,  xpReward: 120, icon: 'diamond-outline',       iconColor: '#ff0090', check: e => e.game === 'texas_holdem' && e.action === 'win' && hasPocketPair(e.holeCards, 14) },
+  { id: 'txh_kings',        category: "Texas Hold'em", title: 'Cowboys',         description: "Win with Pocket Kings in Traditional Hold'em",                 target: 1,  rarity: 'rare',   chipReward: 26000,  xpReward: 110, icon: 'shield-outline',        iconColor: '#ff0090', check: e => e.game === 'texas_holdem' && e.action === 'win' && hasPocketPair(e.holeCards, 13) },
+  { id: 'txh_suited',       category: "Texas Hold'em", title: 'Suited Up',       description: "Win with suited connectors in Traditional Hold'em",            target: 1,  rarity: 'rare',   chipReward: 24000,  xpReward: 105, icon: 'link-outline',          iconColor: '#00d4ff', check: e => e.game === 'texas_holdem' && e.action === 'win' && isSuitedConnectors(e.holeCards) },
+  // ACHIEVEMENT-ONLY — excluded from daily pool:
+  { id: 'txh_win_quads',    category: "Texas Hold'em", title: 'Quads!',          description: "Win with Four of a Kind in Traditional Hold'em",               target: 1,  rarity: 'epic',      chipReward: 120000, xpReward: 200, icon: 'grid-outline',          iconColor: '#bf5fff', check: e => e.game === 'texas_holdem' && e.action === 'win' && hContains(e.handDesc, 'Four of a Kind') },
+  { id: 'txh_win_sf',       category: "Texas Hold'em", title: 'Straight Flush',  description: "Win with a Straight Flush in Traditional Hold'em",             target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'sparkles-outline',      iconColor: '#ffd700', check: e => e.game === 'texas_holdem' && e.action === 'win' && !!e.handDesc?.includes('Straight Flush') && !e.handDesc?.startsWith('Royal') },
+  { id: 'txh_win_royal',    category: "Texas Hold'em", title: 'Royal Flush',     description: "Win with a Royal Flush in Traditional Hold'em",                target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'trophy-outline',        iconColor: '#ffd700', check: e => e.game === 'texas_holdem' && e.action === 'win' && e.handDesc === 'Royal Flush' },
 
   // ── SHORT DECK ─────────────────────────────────────────────────────────────
-  { id: 'sd_win_3',    category: 'Short Deck', title: 'Short Stack',      description: "Win 3 hands of Short Deck Hold'em",                   target: 3,  rarity: 'common', chipReward: 8000,  xpReward: 50,  icon: 'albums-outline',      iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' },
-  { id: 'sd_flush',    category: 'Short Deck', title: 'Short Flush',      description: 'Win 2 hands with a Flush in Short Deck',              target: 2,  rarity: 'rare',   chipReward: 22000, xpReward: 115, icon: 'water-outline',       iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') },
-  { id: 'sd_full',     category: 'Short Deck', title: 'Short Full House', description: 'Win 2 hands with a Full House in Short Deck',         target: 2,  rarity: 'epic',   chipReward: 75000, xpReward: 200, icon: 'home-outline',        iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
-  { id: 'sd_trips',    category: 'Short Deck', title: 'Short Trips',      description: 'Win 2 hands with Three of a Kind in Short Deck',      target: 2,  rarity: 'rare',   chipReward: 25000, xpReward: 110, icon: 'triangle-outline',    iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && hContains(e.handDesc, 'Three of a Kind') },
-  { id: 'sd_allin',    category: 'Short Deck', title: 'Short All-In',     description: 'Win after going All-In in Short Deck',                target: 1,  rarity: 'rare',   chipReward: 28000, xpReward: 120, icon: 'flash-outline',       iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && !!e.wasAllIn },
-  { id: 'sd_play_5',   category: 'Short Deck', title: 'Short Session',    description: "Play 5 hands of Short Deck Hold'em",                  target: 5,  rarity: 'common', chipReward: 6000,  xpReward: 40,  icon: 'repeat-outline',      iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'sd_win_1',    category: 'Short Deck', title: 'Short Win',        description: "Win 1 hand of Short Deck Hold'em",                     target: 1,  rarity: 'common', chipReward: 5000,  xpReward: 35,  icon: 'albums-outline',      iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' },
+  { id: 'sd_win_3',    category: 'Short Deck', title: 'Short Stack',      description: "Win 3 hands of Short Deck Hold'em",                     target: 3,  rarity: 'common', chipReward: 8000,  xpReward: 50,  icon: 'albums-outline',      iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' },
+  { id: 'sd_play_5',   category: 'Short Deck', title: 'Short Session',    description: "Play 5 hands of Short Deck Hold'em",                    target: 5,  rarity: 'common', chipReward: 4500,  xpReward: 35,  icon: 'repeat-outline',      iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'sd_trips',    category: 'Short Deck', title: 'Short Trips',      description: 'Win with Three of a Kind in Short Deck',                target: 1,  rarity: 'rare',   chipReward: 18000, xpReward: 95,  icon: 'triangle-outline',    iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && hContains(e.handDesc, 'Three of a Kind') },
+  { id: 'sd_flush',    category: 'Short Deck', title: 'Short Flush',      description: 'Win with a Flush in Short Deck',                        target: 1,  rarity: 'rare',   chipReward: 20000, xpReward: 100, icon: 'water-outline',       iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') },
+  { id: 'sd_full',     category: 'Short Deck', title: 'Short Full House', description: 'Win with a Full House in Short Deck',                   target: 1,  rarity: 'rare',   chipReward: 32000, xpReward: 135, icon: 'home-outline',        iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
+  { id: 'sd_allin',    category: 'Short Deck', title: 'Short All-In',     description: 'Win after going All-In in Short Deck',                  target: 1,  rarity: 'rare',   chipReward: 22000, xpReward: 105, icon: 'flash-outline',       iconColor: '#ff0090', check: e => e.game === 'short_deck_holdem' && e.action === 'win' && !!e.wasAllIn },
 
   // ── OMAHA ──────────────────────────────────────────────────────────────────
-  { id: 'omaha_win_3',   category: 'Omaha', title: 'Omaha Opener',     description: "Win 3 hands of Omaha Hold'em",                  target: 3,  rarity: 'common', chipReward: 8000,  xpReward: 50,  icon: 'grid-outline',        iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' },
-  { id: 'omaha_flush',   category: 'Omaha', title: 'Omaha Flush',      description: 'Win 2 hands with a Flush in Omaha',             target: 2,  rarity: 'rare',   chipReward: 22000, xpReward: 110, icon: 'water-outline',       iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') },
-  { id: 'omaha_straight',category: 'Omaha', title: 'Omaha Straight',   description: 'Win 2 hands with a Straight in Omaha',          target: 2,  rarity: 'rare',   chipReward: 22000, xpReward: 110, icon: 'trending-up-outline', iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && hContains(e.handDesc, 'Straight') && !e.handDesc?.includes('Straight Flush') },
-  { id: 'omaha_full',    category: 'Omaha', title: 'Omaha Full House', description: 'Win with a Full House in Omaha',                target: 1,  rarity: 'epic',   chipReward: 80000, xpReward: 200, icon: 'home-outline',        iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
-  { id: 'omaha_allin',   category: 'Omaha', title: 'Omaha All-In',    description: 'Win after going All-In in Omaha',               target: 1,  rarity: 'rare',   chipReward: 30000, xpReward: 120, icon: 'flash-outline',       iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && !!e.wasAllIn },
-  { id: 'omaha_play_5',  category: 'Omaha', title: 'Omaha Session',   description: "Play 5 hands of Omaha Hold'em",                 target: 5,  rarity: 'common', chipReward: 6000,  xpReward: 40,  icon: 'repeat-outline',      iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'omaha_win_1',   category: 'Omaha', title: 'Omaha Debut',      description: "Win 1 hand of Omaha Hold'em",                    target: 1,  rarity: 'common', chipReward: 5000,  xpReward: 35,  icon: 'grid-outline',        iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' },
+  { id: 'omaha_win_3',   category: 'Omaha', title: 'Omaha Opener',     description: "Win 3 hands of Omaha Hold'em",                   target: 3,  rarity: 'common', chipReward: 8000,  xpReward: 50,  icon: 'grid-outline',        iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' },
+  { id: 'omaha_play_5',  category: 'Omaha', title: 'Omaha Session',    description: "Play 5 hands of Omaha Hold'em",                  target: 5,  rarity: 'common', chipReward: 4500,  xpReward: 35,  icon: 'repeat-outline',      iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'omaha_straight',category: 'Omaha', title: 'Omaha Straight',   description: 'Win with a Straight in Omaha',                   target: 1,  rarity: 'rare',   chipReward: 18000, xpReward: 95,  icon: 'trending-up-outline', iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && hContains(e.handDesc, 'Straight') && !e.handDesc?.includes('Straight Flush') },
+  { id: 'omaha_flush',   category: 'Omaha', title: 'Omaha Flush',      description: 'Win with a Flush in Omaha',                      target: 1,  rarity: 'rare',   chipReward: 20000, xpReward: 100, icon: 'water-outline',       iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') },
+  { id: 'omaha_full',    category: 'Omaha', title: 'Omaha Full House', description: 'Win with a Full House in Omaha',                 target: 1,  rarity: 'rare',   chipReward: 32000, xpReward: 135, icon: 'home-outline',        iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
+  { id: 'omaha_allin',   category: 'Omaha', title: 'Omaha All-In',    description: 'Win after going All-In in Omaha',                target: 1,  rarity: 'rare',   chipReward: 24000, xpReward: 110, icon: 'flash-outline',       iconColor: '#00ff88', check: e => e.game === 'omaha_holdem' && e.action === 'win' && !!e.wasAllIn },
 
   // ── JOKER HOLD'EM ──────────────────────────────────────────────────────────
-  { id: 'joker_win_3',  category: "Joker Hold'em", title: 'Wild Card',       description: "Win 3 hands of Joker Hold'em",                 target: 3,  rarity: 'common',    chipReward: 8000,   xpReward: 50,  icon: 'sparkles-outline',  iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' },
-  { id: 'joker_flush',  category: "Joker Hold'em", title: 'Joker Flush',     description: "Win 2 hands with a Flush in Joker Hold'em",   target: 2,  rarity: 'rare',      chipReward: 22000,  xpReward: 115, icon: 'water-outline',     iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') },
-  { id: 'joker_full',   category: "Joker Hold'em", title: 'Joker Full House',description: "Win 2 hands with a Full House in Joker Hold'em", target: 2, rarity: 'epic',     chipReward: 80000,  xpReward: 200, icon: 'home-outline',      iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
-  { id: 'joker_five',   category: "Joker Hold'em", title: 'Five of a Kind!', description: "Win with Five of a Kind in Joker Hold'em",     target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'star-outline',      iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && hContains(e.handDesc, 'Five of a Kind') },
-  { id: 'joker_royal',  category: "Joker Hold'em", title: 'Joker Royal',     description: "Win with a Royal Flush in Joker Hold'em",      target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'trophy-outline',    iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && e.handDesc === 'Royal Flush' },
-  { id: 'joker_allin',  category: "Joker Hold'em", title: 'Joker All-In',    description: "Win after going All-In in Joker Hold'em",      target: 1,  rarity: 'rare',      chipReward: 28000,  xpReward: 120, icon: 'flash-outline',     iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && !!e.wasAllIn },
-  { id: 'joker_play_5', category: "Joker Hold'em", title: 'Joker Session',   description: "Play 5 hands of Joker Hold'em",                target: 5,  rarity: 'common',    chipReward: 6000,   xpReward: 40,  icon: 'repeat-outline',    iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'joker_win_1',  category: "Joker Hold'em", title: 'Wild Start',      description: "Win 1 hand of Joker Hold'em",                    target: 1,  rarity: 'common', chipReward: 5000,   xpReward: 35,  icon: 'sparkles-outline',  iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' },
+  { id: 'joker_win_3',  category: "Joker Hold'em", title: 'Wild Card',       description: "Win 3 hands of Joker Hold'em",                   target: 3,  rarity: 'common', chipReward: 8000,   xpReward: 50,  icon: 'sparkles-outline',  iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' },
+  { id: 'joker_play_5', category: "Joker Hold'em", title: 'Joker Session',   description: "Play 5 hands of Joker Hold'em",                  target: 5,  rarity: 'common', chipReward: 4500,   xpReward: 35,  icon: 'repeat-outline',    iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && (e.action === 'win' || e.action === 'play') },
+  { id: 'joker_flush',  category: "Joker Hold'em", title: 'Joker Flush',     description: "Win with a Flush in Joker Hold'em",              target: 1,  rarity: 'rare',   chipReward: 20000,  xpReward: 100, icon: 'water-outline',     iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && hContains(e.handDesc, 'Flush') },
+  { id: 'joker_full',   category: "Joker Hold'em", title: 'Joker Full House',description: "Win with a Full House in Joker Hold'em",          target: 1,  rarity: 'rare',   chipReward: 32000,  xpReward: 135, icon: 'home-outline',      iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && hContains(e.handDesc, 'Full House') },
+  { id: 'joker_allin',  category: "Joker Hold'em", title: 'Joker All-In',    description: "Win after going All-In in Joker Hold'em",        target: 1,  rarity: 'rare',   chipReward: 22000,  xpReward: 105, icon: 'flash-outline',     iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && !!e.wasAllIn },
+  // ACHIEVEMENT-ONLY — excluded from daily pool:
+  { id: 'joker_five',   category: "Joker Hold'em", title: 'Five of a Kind!', description: "Win with Five of a Kind in Joker Hold'em",        target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'star-outline',      iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && hContains(e.handDesc, 'Five of a Kind') },
+  { id: 'joker_royal',  category: "Joker Hold'em", title: 'Joker Royal',     description: "Win with a Royal Flush in Joker Hold'em",         target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'trophy-outline',    iconColor: '#ffd700', check: e => e.game === 'joker_holdem' && e.action === 'win' && e.handDesc === 'Royal Flush' },
 
   // ── BLACKJACK ──────────────────────────────────────────────────────────────
-  { id: 'bj_win_5',     category: 'Blackjack', title: 'Beat the House',  description: 'Win 5 Blackjack hands',                      target: 5,  rarity: 'common', chipReward: 8000,  xpReward: 50,  icon: 'calculator-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' },
-  { id: 'bj_win_10',    category: 'Blackjack', title: 'Card Counter',    description: 'Win 10 Blackjack hands',                     target: 10, rarity: 'rare',   chipReward: 20000, xpReward: 100, icon: 'calculator-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' },
-  { id: 'bj_natural',   category: 'Blackjack', title: 'Blackjack!',      description: 'Hit a natural Blackjack',                    target: 1,  rarity: 'rare',   chipReward: 25000, xpReward: 120, icon: 'star-outline',          iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.isNaturalBlackjack },
-  { id: 'bj_double',    category: 'Blackjack', title: 'Double Trouble',  description: 'Win 2 hands after a Double Down in Blackjack',target: 2,  rarity: 'rare',   chipReward: 28000, xpReward: 120, icon: 'add-circle-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.wasDoubleDown },
-  { id: 'bj_split',     category: 'Blackjack', title: 'Split Decision',  description: 'Win after a Split in Blackjack',             target: 1,  rarity: 'rare',   chipReward: 25000, xpReward: 115, icon: 'git-branch-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.wasSplit },
-  { id: 'bj_bust',      category: 'Blackjack', title: 'Dealer Busted',   description: 'Win when the Dealer Busts 3 times',          target: 3,  rarity: 'common', chipReward: 10000, xpReward: 60,  icon: 'alert-circle-outline',  iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.dealerBusted },
-  { id: 'bj_21',        category: 'Blackjack', title: 'Twenty-One',      description: 'Win Blackjack with exactly 21',              target: 1,  rarity: 'rare',   chipReward: 22000, xpReward: 110, icon: 'ribbon-outline',        iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && e.playerTotal === 21 && !e.isNaturalBlackjack },
+  { id: 'bj_win_2',     category: 'Blackjack', title: 'Warm Up',         description: 'Win 2 Blackjack hands',                       target: 2,  rarity: 'common', chipReward: 5000,  xpReward: 35,  icon: 'calculator-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' },
+  { id: 'bj_win_3',     category: 'Blackjack', title: 'On a Streak',     description: 'Win 3 Blackjack hands',                       target: 3,  rarity: 'common', chipReward: 7000,  xpReward: 45,  icon: 'calculator-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' },
+  { id: 'bj_win_5',     category: 'Blackjack', title: 'Beat the House',  description: 'Win 5 Blackjack hands',                       target: 5,  rarity: 'common', chipReward: 9000,  xpReward: 55,  icon: 'calculator-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' },
+  { id: 'bj_bust',      category: 'Blackjack', title: 'Dealer Busted',   description: 'Win 2 hands when the Dealer Busts',           target: 2,  rarity: 'common', chipReward: 8000,  xpReward: 50,  icon: 'alert-circle-outline',  iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.dealerBusted },
+  { id: 'bj_win_10',    category: 'Blackjack', title: 'Card Counter',    description: 'Win 10 Blackjack hands',                      target: 10, rarity: 'rare',   chipReward: 20000, xpReward: 100, icon: 'calculator-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' },
+  { id: 'bj_natural',   category: 'Blackjack', title: 'Blackjack!',      description: 'Hit a natural Blackjack',                     target: 1,  rarity: 'rare',   chipReward: 22000, xpReward: 110, icon: 'star-outline',          iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.isNaturalBlackjack },
+  { id: 'bj_double',    category: 'Blackjack', title: 'Double Trouble',  description: 'Win a hand after a Double Down in Blackjack',  target: 1,  rarity: 'rare',   chipReward: 20000, xpReward: 100, icon: 'add-circle-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.wasDoubleDown },
+  { id: 'bj_split',     category: 'Blackjack', title: 'Split Decision',  description: 'Win after a Split in Blackjack',              target: 1,  rarity: 'rare',   chipReward: 18000, xpReward: 95,  icon: 'git-branch-outline',    iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && !!e.wasSplit },
+  { id: 'bj_21',        category: 'Blackjack', title: 'Twenty-One',      description: 'Win Blackjack with exactly 21',               target: 1,  rarity: 'rare',   chipReward: 18000, xpReward: 95,  icon: 'ribbon-outline',        iconColor: '#00e887', check: e => e.game === 'blackjack' && e.action === 'win' && e.playerTotal === 21 && !e.isNaturalBlackjack },
 
   // ── SOCIAL ─────────────────────────────────────────────────────────────────
-  { id: 'social_post',    category: 'Social', title: 'Share the Action', description: 'Create 1 post in the Social Feed',      target: 1, rarity: 'common', chipReward: 5000,  xpReward: 40, icon: 'create-outline',    iconColor: '#bf5fff', check: e => e.game === 'social' && e.action === 'post' },
-  { id: 'social_like_5',  category: 'Social', title: 'Fan Club',         description: 'Like 5 posts in the Social Feed',        target: 5, rarity: 'common', chipReward: 4000,  xpReward: 35, icon: 'heart-outline',     iconColor: '#ff0090', check: e => e.game === 'social' && e.action === 'like' },
+  { id: 'social_post',    category: 'Social', title: 'Share the Action', description: 'Create 1 post in the Social Feed',      target: 1, rarity: 'common', chipReward: 5000,  xpReward: 40, icon: 'create-outline',     iconColor: '#bf5fff', check: e => e.game === 'social' && e.action === 'post' },
+  { id: 'social_like_5',  category: 'Social', title: 'Fan Club',         description: 'Like 5 posts in the Social Feed',        target: 5, rarity: 'common', chipReward: 4000,  xpReward: 35, icon: 'heart-outline',      iconColor: '#ff0090', check: e => e.game === 'social' && e.action === 'like' },
   { id: 'social_comment', category: 'Social', title: 'Commentator',      description: 'Comment on 2 posts in the Social Feed',  target: 2, rarity: 'common', chipReward: 5000,  xpReward: 40, icon: 'chatbubble-outline', iconColor: '#bf5fff', check: e => e.game === 'social' && e.action === 'comment' },
 
   // ── GENERAL ────────────────────────────────────────────────────────────────
-  { id: 'gen_spin',     category: 'General', title: 'Spin to Win',       description: 'Claim your Daily Spin reward',                     target: 1,  rarity: 'common',    chipReward: 5000,   xpReward: 40,  icon: 'reload-circle-outline',    iconColor: '#9955ee', check: e => e.game === 'general' && e.action === 'daily_spin' },
-  { id: 'gen_earn_250', category: 'General', title: 'Quarter Million',   description: 'Earn 250,000+ chips in a single pot win',          target: 1,  rarity: 'epic',      chipReward: 100000, xpReward: 200, icon: 'cash-outline',             iconColor: '#ffd700', check: e => e.action === 'chip_earn' && (e.chipsEarned ?? 0) >= 250000 },
-  { id: 'gen_earn_500', category: 'General', title: 'Half a Mil',        description: 'Earn 500,000+ chips in a single pot win',          target: 1,  rarity: 'legendary', chipReward: 150000, xpReward: 300, icon: 'cash',                     iconColor: '#ffd700', check: e => e.action === 'chip_earn' && (e.chipsEarned ?? 0) >= 500000 },
-  { id: 'any_allin_3',  category: 'General', title: 'All-In Survivor',   description: 'Win 3 hands after going All-In in any game',       target: 3,  rarity: 'rare',      chipReward: 25000,  xpReward: 120, icon: 'flash-outline',            iconColor: '#ff0090', check: e => e.action === 'win' && !!e.wasAllIn },
-  { id: 'any_royal',    category: 'General', title: 'Royal Treatment',   description: 'Win with a Royal Flush in any game mode',          target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'trophy',                   iconColor: '#ffd700', check: e => e.action === 'win' && e.handDesc === 'Royal Flush' },
-  { id: 'any_play_20',  category: 'General', title: 'Dedicated Player',  description: 'Play 20 hands across any game mode',               target: 20, rarity: 'common',    chipReward: 7000,   xpReward: 45,  icon: 'game-controller-outline',  iconColor: '#00d4ff', check: e => ['win', 'play'].includes(e.action) && ['texas_holdem', 'short_deck_holdem', 'omaha_holdem', 'joker_holdem', 'blackjack'].includes(e.game) },
-  { id: 'any_quads',    category: 'General', title: 'Quads Anywhere',    description: 'Win with Four of a Kind in any poker variant',     target: 1,  rarity: 'epic',      chipReward: 110000, xpReward: 200, icon: 'grid',                     iconColor: '#bf5fff', check: e => e.action === 'win' && hContains(e.handDesc, 'Four of a Kind') },
-  { id: 'any_aces_2',   category: 'General', title: 'Aces High',         description: "Win 2 hands with Pocket Aces in any Hold'em variant", target: 2, rarity: 'epic',    chipReward: 90000,  xpReward: 200, icon: 'diamond-outline',          iconColor: '#ffd700', check: e => ['texas_holdem', 'short_deck_holdem', 'omaha_holdem', 'joker_holdem'].includes(e.game) && e.action === 'win' && hasPocketPair(e.holeCards, 14) },
+  { id: 'gen_spin',     category: 'General', title: 'Spin to Win',      description: 'Claim your Daily Spin reward',                        target: 1,  rarity: 'common', chipReward: 5000,  xpReward: 40,  icon: 'reload-circle-outline',   iconColor: '#9955ee', check: e => e.game === 'general' && e.action === 'daily_spin' },
+  { id: 'any_play_15',  category: 'General', title: 'Showing Up',       description: 'Play 15 hands across any game mode',                  target: 15, rarity: 'common', chipReward: 6000,  xpReward: 40,  icon: 'game-controller-outline', iconColor: '#00d4ff', check: e => ['win', 'play'].includes(e.action) && ['texas_holdem', 'short_deck_holdem', 'omaha_holdem', 'joker_holdem', 'blackjack'].includes(e.game) },
+  { id: 'any_play_20',  category: 'General', title: 'Dedicated Player', description: 'Play 20 hands across any game mode',                  target: 20, rarity: 'rare',   chipReward: 8000,  xpReward: 50,  icon: 'game-controller-outline', iconColor: '#00d4ff', check: e => ['win', 'play'].includes(e.action) && ['texas_holdem', 'short_deck_holdem', 'omaha_holdem', 'joker_holdem', 'blackjack'].includes(e.game) },
+  { id: 'any_allin_3',  category: 'General', title: 'All-In Survivor',  description: 'Win 3 hands after going All-In in any game',          target: 3,  rarity: 'rare',   chipReward: 25000, xpReward: 120, icon: 'flash-outline',           iconColor: '#ff0090', check: e => e.action === 'win' && !!e.wasAllIn },
+  { id: 'any_aces_2',   category: 'General', title: 'Aces High',        description: "Win 2 hands with Pocket Aces in any Hold'em variant", target: 2,  rarity: 'rare',   chipReward: 38000, xpReward: 150, icon: 'diamond-outline',         iconColor: '#ffd700', check: e => ['texas_holdem', 'short_deck_holdem', 'omaha_holdem', 'joker_holdem'].includes(e.game) && e.action === 'win' && hasPocketPair(e.holeCards, 14) },
+  { id: 'gen_earn_250', category: 'General', title: 'Quarter Million',  description: 'Earn 250,000+ chips in a single pot win',             target: 1,  rarity: 'rare',   chipReward: 50000, xpReward: 160, icon: 'cash-outline',            iconColor: '#ffd700', check: e => e.action === 'chip_earn' && (e.chipsEarned ?? 0) >= 250000 },
+  // ACHIEVEMENT-ONLY — excluded from daily pool:
+  { id: 'any_royal',    category: 'General', title: 'Royal Treatment',  description: 'Win with a Royal Flush in any game mode',             target: 1,  rarity: 'legendary', chipReward: 250000, xpReward: 300, icon: 'trophy',                  iconColor: '#ffd700', check: e => e.action === 'win' && e.handDesc === 'Royal Flush' },
+  { id: 'any_quads',    category: 'General', title: 'Quads Anywhere',   description: 'Win with Four of a Kind in any poker variant',        target: 1,  rarity: 'legendary', chipReward: 150000, xpReward: 250, icon: 'grid',                    iconColor: '#bf5fff', check: e => e.action === 'win' && hContains(e.handDesc, 'Four of a Kind') },
+  { id: 'gen_earn_500', category: 'General', title: 'Half a Mil',       description: 'Earn 500,000+ chips in a single pot win',             target: 1,  rarity: 'legendary', chipReward: 150000, xpReward: 300, icon: 'cash',                    iconColor: '#ffd700', check: e => e.action === 'chip_earn' && (e.chipsEarned ?? 0) >= 500000 },
 ];
 
 // ── Seeded daily selection ─────────────────────────────────────────────────────
@@ -155,9 +166,88 @@ function getTodayKey(): string {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
+// ── Daily-eligible tier sets ───────────────────────────────────────────────────
+// Achievement-only IDs are EXCLUDED: Royal Flush, Straight Flush, Four of a Kind,
+// Five of a Kind, any_royal, any_quads, gen_earn_500, joker_five, joker_royal.
+
+const EASY_IDS = new Set([
+  'txh_win_1', 'txh_win_3', 'txh_play_5', 'txh_play_10',
+  'txh_win_pair', 'txh_win_two_pair',
+  'sd_win_1', 'sd_play_5',
+  'omaha_win_1', 'omaha_play_5',
+  'joker_win_1', 'joker_play_5',
+  'bj_win_2', 'bj_win_3', 'bj_win_5', 'bj_bust',
+  'social_post', 'social_like_5', 'social_comment',
+  'gen_spin', 'any_play_15',
+]);
+
+const MEDIUM_IDS = new Set([
+  'txh_win_trips', 'txh_win_straight', 'txh_allin',
+  'txh_aces', 'txh_kings', 'txh_suited', 'txh_play_25',
+  'sd_win_3', 'sd_trips', 'sd_allin',
+  'omaha_win_3', 'omaha_straight', 'omaha_allin',
+  'joker_win_3', 'joker_allin',
+  'bj_win_10', 'bj_natural', 'bj_double', 'bj_split', 'bj_21',
+  'any_allin_3', 'any_play_20',
+]);
+
+const HARD_IDS = new Set([
+  'txh_win_flush', 'txh_win_full',
+  'sd_flush', 'sd_full',
+  'omaha_flush', 'omaha_full',
+  'joker_flush', 'joker_full',
+  'any_aces_2', 'gen_earn_250',
+]);
+
+function pickFromTier(
+  pool: MissionDef[],
+  ids: Set<string>,
+  seed: number,
+  exclude: Set<string>,
+  avoidCategories: Set<string>,
+): MissionDef | null {
+  const candidates = seededShuffle(pool.filter(m => ids.has(m.id) && !exclude.has(m.id)), seed);
+  return candidates.find(m => !avoidCategories.has(m.category)) ?? candidates[0] ?? null;
+}
+
 function selectDailyMissions(): MissionDef[] {
-  const key = getTodayKey();
-  return seededShuffle(MISSION_POOL, dateToSeed(key)).slice(0, 5);
+  const key   = getTodayKey();
+  const seed  = dateToSeed(key);
+  const selected: MissionDef[] = [];
+  const usedIds        = new Set<string>();
+  const usedCategories = new Set<string>();
+
+  // Difficulty plan: 2 EASY · 2 MEDIUM · 1 HARD
+  const plan: Array<[Set<string>, number]> = [
+    [EASY_IDS,   seed],
+    [EASY_IDS,   seed + 1],
+    [MEDIUM_IDS, seed + 2],
+    [MEDIUM_IDS, seed + 3],
+    [HARD_IDS,   seed + 4],
+  ];
+
+  for (const [tier, s] of plan) {
+    const pick = pickFromTier(MISSION_POOL, tier, s, usedIds, usedCategories);
+    if (pick) {
+      selected.push(pick);
+      usedIds.add(pick.id);
+      usedCategories.add(pick.category);
+    }
+  }
+
+  // Safety: if we somehow got fewer than 5, top-up from any eligible non-picked mission
+  if (selected.length < 5) {
+    const allEligible = seededShuffle(
+      MISSION_POOL.filter(m => (EASY_IDS.has(m.id) || MEDIUM_IDS.has(m.id) || HARD_IDS.has(m.id)) && !usedIds.has(m.id)),
+      seed + 99,
+    );
+    for (const m of allEligible) {
+      if (selected.length >= 5) break;
+      selected.push(m);
+    }
+  }
+
+  return selected;
 }
 
 // ── Storage ────────────────────────────────────────────────────────────────────
