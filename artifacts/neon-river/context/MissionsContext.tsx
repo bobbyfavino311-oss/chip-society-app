@@ -166,32 +166,33 @@ function getTodayKey(): string {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
-// ── Daily-eligible tier sets ───────────────────────────────────────────────────
-// Achievement-only IDs are EXCLUDED: Royal Flush, Straight Flush, Four of a Kind,
-// Five of a Kind, any_royal, any_quads, gen_earn_500, joker_five, joker_royal.
+// ── Daily-eligible mission pools ───────────────────────────────────────────────
+// Achievement-only IDs are EXCLUDED from both pools:
+//   txh_win_quads, txh_win_sf, txh_win_royal, joker_five, joker_royal
 
-const EASY_IDS = new Set([
-  'txh_win_1', 'txh_win_3', 'txh_play_5', 'txh_play_10',
-  'txh_win_pair', 'txh_win_two_pair',
-  'sd_win_1', 'sd_play_5',
-  'omaha_win_1', 'omaha_play_5',
-  'joker_win_1', 'joker_play_5',
-  'bj_win_2', 'bj_win_3', 'bj_win_5', 'bj_bust',
+// Generic / achievable missions (play-count, win-count, all-in, social)
+const GENERIC_IDS = new Set([
+  'txh_win_1', 'txh_win_3', 'txh_play_5', 'txh_play_10', 'txh_play_25', 'txh_allin',
+  'sd_win_1', 'sd_win_3', 'sd_play_5', 'sd_allin',
+  'omaha_win_1', 'omaha_win_3', 'omaha_play_5', 'omaha_allin',
+  'joker_win_1', 'joker_win_3', 'joker_play_5', 'joker_allin',
+  'bj_win_2', 'bj_win_3', 'bj_win_5', 'bj_win_10', 'bj_bust',
   'social_post', 'social_like_5', 'social_comment',
-  'gen_spin', 'any_play_15',
+  'gen_spin', 'any_play_15', 'any_play_20', 'any_allin_3', 'any_aces_2',
 ]);
 
-const MEDIUM_IDS = new Set([
-  'txh_win_trips', 'txh_win_straight', 'txh_allin',
-  'txh_aces', 'txh_kings', 'txh_suited', 'txh_play_25',
-  'sd_win_3', 'sd_trips', 'sd_allin',
-  'omaha_win_3', 'omaha_straight', 'omaha_allin',
-  'joker_win_3', 'joker_allin',
-  'bj_win_10', 'bj_natural', 'bj_double', 'bj_split', 'bj_21',
-  'any_allin_3', 'any_play_20',
+// Hand-rank specific missions (require a specific hand — guaranteed slot each day)
+const HAND_RANK_IDS = new Set([
+  'txh_win_pair', 'txh_win_two_pair', 'txh_win_trips', 'txh_win_straight',
+  'txh_win_flush', 'txh_win_full', 'txh_aces', 'txh_kings', 'txh_suited',
+  'sd_trips', 'sd_flush', 'sd_full',
+  'omaha_straight', 'omaha_flush', 'omaha_full',
+  'joker_flush', 'joker_full',
+  'bj_natural', 'bj_double', 'bj_split', 'bj_21', 'gen_earn_250',
 ]);
 
-const HARD_IDS = new Set([
+// Hard-tier hand-rank missions (tougher to achieve)
+const HARD_HAND_IDS = new Set([
   'txh_win_flush', 'txh_win_full',
   'sd_flush', 'sd_full',
   'omaha_flush', 'omaha_full',
@@ -199,46 +200,60 @@ const HARD_IDS = new Set([
   'any_aces_2', 'gen_earn_250',
 ]);
 
-function pickFromTier(
-  pool: MissionDef[],
-  ids: Set<string>,
-  seed: number,
-  exclude: Set<string>,
-  avoidCategories: Set<string>,
+function pickBestMission(
+  candidates: MissionDef[],
+  usedIds: Set<string>,
+  categoryCounts: Map<string, number>,
+  maxPerCat: number,
 ): MissionDef | null {
-  const candidates = seededShuffle(pool.filter(m => ids.has(m.id) && !exclude.has(m.id)), seed);
-  return candidates.find(m => !avoidCategories.has(m.category)) ?? candidates[0] ?? null;
+  const available = candidates.filter(m => !usedIds.has(m.id));
+  return (
+    available.find(m => (categoryCounts.get(m.category) ?? 0) < maxPerCat) ??
+    available[0] ??
+    null
+  );
 }
 
 function selectDailyMissions(): MissionDef[] {
-  const key   = getTodayKey();
-  const seed  = dateToSeed(key);
+  const seed         = dateToSeed(getTodayKey());
+  const usedIds      = new Set<string>();
+  const catCounts    = new Map<string, number>();
   const selected: MissionDef[] = [];
-  const usedIds        = new Set<string>();
-  const usedCategories = new Set<string>();
 
-  // Difficulty plan: 2 EASY · 2 MEDIUM · 1 HARD
-  const plan: Array<[Set<string>, number]> = [
-    [EASY_IDS,   seed],
-    [EASY_IDS,   seed + 1],
-    [MEDIUM_IDS, seed + 2],
-    [MEDIUM_IDS, seed + 3],
-    [HARD_IDS,   seed + 4],
-  ];
+  const addMission = (m: MissionDef) => {
+    selected.push(m);
+    usedIds.add(m.id);
+    catCounts.set(m.category, (catCounts.get(m.category) ?? 0) + 1);
+  };
 
-  for (const [tier, s] of plan) {
-    const pick = pickFromTier(MISSION_POOL, tier, s, usedIds, usedCategories);
-    if (pick) {
-      selected.push(pick);
-      usedIds.add(pick.id);
-      usedCategories.add(pick.category);
-    }
-  }
+  // Slot 1 + 2 — generic/achievable missions; prefer different categories
+  const generic1 = seededShuffle(MISSION_POOL.filter(m => GENERIC_IDS.has(m.id)), seed);
+  const g1 = pickBestMission(generic1, usedIds, catCounts, 1);
+  if (g1) addMission(g1);
 
-  // Safety: if we somehow got fewer than 5, top-up from any eligible non-picked mission
+  const generic2 = seededShuffle(MISSION_POOL.filter(m => GENERIC_IDS.has(m.id)), seed + 1);
+  const g2 = pickBestMission(generic2, usedIds, catCounts, 1);
+  if (g2) addMission(g2);
+
+  // Slot 3 — guaranteed hand-rank specific mission (always present)
+  const handRank = seededShuffle(MISSION_POOL.filter(m => HAND_RANK_IDS.has(m.id) && !HARD_HAND_IDS.has(m.id)), seed + 2);
+  const h3 = pickBestMission(handRank, usedIds, catCounts, 2);
+  if (h3) addMission(h3);
+
+  // Slot 4 — any medium mission (generic or hand-rank, prefer new category)
+  const anyMed = seededShuffle(MISSION_POOL.filter(m => GENERIC_IDS.has(m.id) || HAND_RANK_IDS.has(m.id)), seed + 3);
+  const m4 = pickBestMission(anyMed, usedIds, catCounts, 2);
+  if (m4) addMission(m4);
+
+  // Slot 5 — hard hand-rank mission (flush / full house / big earn)
+  const hard = seededShuffle(MISSION_POOL.filter(m => HARD_HAND_IDS.has(m.id)), seed + 4);
+  const h5 = pickBestMission(hard, usedIds, catCounts, 3);
+  if (h5) addMission(h5);
+
+  // Safety top-up
   if (selected.length < 5) {
     const allEligible = seededShuffle(
-      MISSION_POOL.filter(m => (EASY_IDS.has(m.id) || MEDIUM_IDS.has(m.id) || HARD_IDS.has(m.id)) && !usedIds.has(m.id)),
+      MISSION_POOL.filter(m => (GENERIC_IDS.has(m.id) || HAND_RANK_IDS.has(m.id)) && !usedIds.has(m.id)),
       seed + 99,
     );
     for (const m of allEligible) {
@@ -252,7 +267,7 @@ function selectDailyMissions(): MissionDef[] {
 
 // ── Storage ────────────────────────────────────────────────────────────────────
 
-const STORAGE_PREFIX = '@missions_v1_';
+const STORAGE_PREFIX = '@missions_v2_';
 
 type StoredState = {
   progress: Record<string, number>;
