@@ -17,8 +17,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser, getApiBase } from '@/context/UserContext';
+import { useSoundSettings } from '@/context/SoundContext';
 import NeonAvatar from '@/components/NeonAvatar';
 import { NEON_AVATARS, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
+
+function MusicToggle() {
+  const { isMusicMuted, toggleMusicMute } = useSoundSettings();
+  return (
+    <TouchableOpacity style={mt.btn} onPress={toggleMusicMute} activeOpacity={0.75}>
+      <Ionicons
+        name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
+        size={14}
+        color={isMusicMuted ? 'rgba(255,255,255,0.35)' : colors.primary}
+      />
+    </TouchableOpacity>
+  );
+}
+const mt = StyleSheet.create({
+  btn: {
+    width: 36, height: 36, borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  },
+});
 
 const STARTER_AVATARS = NEON_AVATARS.filter(a => a.rarity === 'COMMON');
 const STEPS = ['USERNAME', 'PIN', 'AVATAR', 'WELCOME'];
@@ -247,7 +269,7 @@ export default function SignupScreen() {
                 <View key={i} style={[s.stepDot, i <= step && s.stepDotActive, i === step && s.stepDotCurrent]} />
               ))}
             </View>
-            <View style={{ width: 36 }} />
+            <MusicToggle />
           </View>
 
           <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">

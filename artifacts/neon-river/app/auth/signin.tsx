@@ -16,6 +16,28 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser, getApiBase } from '@/context/UserContext';
+import { useSoundSettings } from '@/context/SoundContext';
+
+function MusicToggle() {
+  const { isMusicMuted, toggleMusicMute } = useSoundSettings();
+  return (
+    <TouchableOpacity style={mt.btn} onPress={toggleMusicMute} activeOpacity={0.75}>
+      <Ionicons
+        name={isMusicMuted ? 'musical-notes-outline' : 'musical-notes'}
+        size={14}
+        color={isMusicMuted ? 'rgba(255,255,255,0.35)' : colors.primary}
+      />
+    </TouchableOpacity>
+  );
+}
+const mt = StyleSheet.create({
+  btn: {
+    width: 36, height: 36, borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  },
+});
 
 type Phase = 'username' | 'pin';
 type ServerStatus = 'checking' | 'ok' | 'fail';
@@ -139,6 +161,8 @@ export default function SignInScreen() {
             <Pressable style={s.backBtn} onPress={handleBack}>
               <Ionicons name="chevron-back" size={20} color="rgba(255,255,255,0.6)" />
             </Pressable>
+            <View style={{ flex: 1 }} />
+            <MusicToggle />
           </View>
 
           <View style={s.content}>
