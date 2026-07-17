@@ -172,10 +172,10 @@ function NotifCard({ notif, styles, colors }: {
   styles: ReturnType<typeof createStyles>;
   colors: Colors;
 }) {
-  const { markRead, dismiss } = useNotifications();
+  const { dismiss } = useNotifications();
 
   const handleAction = () => {
-    markRead(notif.id);
+    dismiss(notif.id);
     if (notif.actionRoute) router.push(notif.actionRoute as any);
   };
 

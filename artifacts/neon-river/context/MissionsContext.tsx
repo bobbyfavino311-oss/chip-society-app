@@ -412,17 +412,7 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
     setPendingCompletions(prev => prev.filter(x => x !== id));
     await addChips(m.chipReward);
     await addXP(m.xpReward);
-    addNotification({
-      category: 'reward',
-      priority: 'medium',
-      title: `Mission Complete: ${m.title}`,
-      message: `+${m.chipReward.toLocaleString()} chips · +${m.xpReward.toLocaleString()} XP`,
-      icon: m.icon,
-      iconColor: m.iconColor,
-      actionRoute: '/(tabs)/',
-      actionLabel: 'VIEW',
-    });
-  }, [missions, addChips, addXP, addNotification]);
+  }, [missions, addChips, addXP]);
 
   // ── Grand Reward ───────────────────────────────────────────────────────────
 
