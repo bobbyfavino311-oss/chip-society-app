@@ -45,6 +45,7 @@ export default function MissionCompleteToast() {
     clearPendingCompletion,
     pendingGrandReward,
     clearPendingGrandReward,
+    claimGrandReward,
   } = useMissions();
 
   const [currentId, setCurrentId] = useState<string | null>(null);
@@ -67,7 +68,7 @@ export default function MissionCompleteToast() {
     timers.current = [];
   };
 
-  // Hard-reset all anim values and state
+  // Hard-reset all anim values and state (auto-dismiss path)
   const fullReset = useCallback((id: string) => {
     clearTimers();
     pulseLoop.current?.stop();
@@ -78,20 +79,24 @@ export default function MissionCompleteToast() {
     iconOpacity.setValue(0);
     iconScale.setValue(1);
     if (isGrandRef.current) {
+      void claimGrandReward();
       clearPendingGrandReward();
     } else {
       clearPendingCompletion(id);
     }
     setCurrentId(null);
-  }, [clearPendingCompletion, clearPendingGrandReward, bannerY, bannerOpacity, iconOpacity, iconScale]);
+  }, [clearPendingCompletion, clearPendingGrandReward, claimGrandReward, bannerY, bannerOpacity, iconOpacity, iconScale]);
 
-  // Tap: fast-exit then navigate home (claim happens on the home panel)
+  // Tap: fast-exit, claim grand reward immediately, then navigate home
   const handleTap = useCallback(() => {
     if (!currentId || isTapping.current) return;
     isTapping.current = true;
     const id = currentId;
     clearTimers();
     pulseLoop.current?.stop();
+    if (isGrandRef.current) {
+      void claimGrandReward();
+    }
     Animated.parallel([
       Animated.timing(bannerOpacity, { toValue: 0, duration: 180, useNativeDriver: true }),
       Animated.timing(iconOpacity,   { toValue: 0, duration: 180, useNativeDriver: true }),
@@ -106,7 +111,7 @@ export default function MissionCompleteToast() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       router.push('/(tabs)/' as any);
     });
-  }, [currentId, bannerOpacity, iconOpacity, clearPendingCompletion, clearPendingGrandReward]);
+  }, [currentId, bannerOpacity, iconOpacity, clearPendingCompletion, clearPendingGrandReward, claimGrandReward]);
 
   // Pick next: regular missions first, grand reward last
   useEffect(() => {
