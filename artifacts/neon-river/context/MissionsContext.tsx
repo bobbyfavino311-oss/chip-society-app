@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useUser } from './UserContext';
+import { useNotifications } from './NotificationContext';
 
 // ── Event type ─────────────────────────────────────────────────────────────────
 
@@ -325,6 +326,7 @@ const MissionsContext = createContext<MissionsContextType>({
 
 export function MissionsProvider({ children }: { children: React.ReactNode }) {
   const { addChips, addXP, addFortuneCookies } = useUser();
+  const { addNotification } = useNotifications();
   const [dateKey] = useState(getTodayKey);
   const [missions] = useState<MissionDef[]>(selectDailyMissions);
   const [progress, setProgress] = useState<Record<string, number>>({});
@@ -410,7 +412,17 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
     setPendingCompletions(prev => prev.filter(x => x !== id));
     await addChips(m.chipReward);
     await addXP(m.xpReward);
-  }, [missions, addChips, addXP]);
+    addNotification({
+      category: 'reward',
+      priority: 'medium',
+      title: `Mission Complete: ${m.title}`,
+      message: `+${m.chipReward.toLocaleString()} chips · +${m.xpReward.toLocaleString()} XP`,
+      icon: m.icon,
+      iconColor: m.iconColor,
+      actionRoute: '/(tabs)/',
+      actionLabel: 'VIEW',
+    });
+  }, [missions, addChips, addXP, addNotification]);
 
   // ── Grand Reward ───────────────────────────────────────────────────────────
 
@@ -420,7 +432,17 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
     setPendingGrandReward(false);
     // Exactly 1 Legendary Fortune Cookie — hard-coded, bypasses all rarity rolls
     await addFortuneCookies(0, 0, 0, 1, 0, 'daily_missions_grand_reward');
-  }, [addFortuneCookies]);
+    addNotification({
+      category: 'reward',
+      priority: 'high',
+      title: 'Grand Reward Claimed!',
+      message: 'All 5 daily missions complete — you earned a Legendary Fortune Cookie.',
+      icon: 'trophy',
+      iconColor: '#ffd700',
+      actionRoute: '/(tabs)/profile',
+      actionLabel: 'VIEW',
+    });
+  }, [addFortuneCookies, addNotification]);
 
   const clearPendingGrandReward = useCallback(() => {
     setPendingGrandReward(false);
