@@ -706,6 +706,12 @@ export default function DailyMissionsPanel() {
               <Text style={panel.allDoneSub}>Claim rewards to unlock Grand Reward</Text>
             </View>
           )}
+
+          {/* ── Dev testing button ───────────────────────────────────────── */}
+          <TouchableOpacity style={panel.devBtn} onPress={debugFillAllComplete} activeOpacity={0.7}>
+            <Ionicons name="flash" size={11} color="#444466" />
+            <Text style={panel.devBtnText}>RESET ALL → READY TO CLAIM</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -781,4 +787,16 @@ const panel = StyleSheet.create({
     fontFamily: 'Orbitron_700Bold', letterSpacing: 0.8, textAlign: 'center',
   },
   allDoneSub: { color: colors.textMuted, fontSize: 10.5, textAlign: 'center' },
+
+  devBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
+    paddingVertical: 8, borderRadius: 8,
+    borderWidth: 1, borderColor: 'rgba(68,68,102,0.35)',
+    backgroundColor: 'rgba(68,68,102,0.10)',
+    marginTop: 4,
+  },
+  devBtnText: {
+    color: '#444466', fontSize: 9, fontWeight: '700',
+    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
+  },
 });

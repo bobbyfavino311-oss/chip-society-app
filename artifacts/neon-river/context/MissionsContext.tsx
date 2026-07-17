@@ -439,8 +439,8 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
       message: 'All 5 daily missions complete — you earned a Legendary Fortune Cookie.',
       icon: 'trophy',
       iconColor: '#ffd700',
-      actionRoute: '/(tabs)/profile',
-      actionLabel: 'VIEW',
+      actionRoute: '/rewards/cookie',
+      actionLabel: 'OPEN COOKIE',
     });
   }, [addFortuneCookies, addNotification]);
 
