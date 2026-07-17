@@ -553,6 +553,7 @@ export default function DailyMissionsPanel() {
     grandRewardAvailable,
     grandRewardClaimed,
     claimGrandReward,
+    debugFillAllComplete,
   } = useMissions();
 
   const [expanded, setExpanded] = useState(false);
@@ -602,8 +603,8 @@ export default function DailyMissionsPanel() {
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
 
-      {/* Header — always visible */}
-      <Pressable style={panel.header} onPress={toggle}>
+      {/* Header — always visible; long-press title to fill all missions (dev testing) */}
+      <Pressable style={panel.header} onPress={toggle} onLongPress={debugFillAllComplete}>
         <View style={panel.headerLeft}>
           <View style={panel.spadeWrap}>
             <SpadeIcon color="#bf5fff" size={16} />

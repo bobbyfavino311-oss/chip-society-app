@@ -304,6 +304,8 @@ type MissionsContextType = {
   pendingGrandReward: boolean;
   claimGrandReward: () => Promise<void>;
   clearPendingGrandReward: () => void;
+  // Dev testing only
+  debugFillAllComplete: () => void;
 };
 
 const MissionsContext = createContext<MissionsContextType>({
@@ -318,6 +320,7 @@ const MissionsContext = createContext<MissionsContextType>({
   pendingGrandReward: false,
   claimGrandReward: async () => {},
   clearPendingGrandReward: () => {},
+  debugFillAllComplete: () => {},
 });
 
 export function MissionsProvider({ children }: { children: React.ReactNode }) {
@@ -427,6 +430,21 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
     setPendingCompletions(prev => prev.filter(x => x !== id));
   }, []);
 
+  // ── Dev testing: reset today's missions so all are complete but unclaimed ──
+  const debugFillAllComplete = useCallback(() => {
+    const filled: Record<string, number> = {};
+    for (const m of missions) filled[m.id] = m.target;
+    setProgress(filled);
+    setClaimed([]);
+    setGrandRewardClaimed(false);
+    setPendingGrandReward(false);
+    setPendingCompletions([]);
+    grandRewardClaimedRef.current = false;
+    progressRef.current = filled;
+    claimedRef.current = [];
+    void saveState(dateKey, { progress: filled, claimed: [], grandRewardClaimed: false });
+  }, [missions, dateKey]);
+
   // ── Derived values ─────────────────────────────────────────────────────────
 
   const dailyMissions: ActiveMission[] = missions.map(m => ({
@@ -458,6 +476,7 @@ export function MissionsProvider({ children }: { children: React.ReactNode }) {
       pendingGrandReward,
       claimGrandReward,
       clearPendingGrandReward,
+      debugFillAllComplete,
     }}>
       {children}
     </MissionsContext.Provider>
