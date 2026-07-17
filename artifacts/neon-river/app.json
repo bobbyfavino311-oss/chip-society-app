@@ -2,7 +2,7 @@
   "expo": {
     "name": "Chip Society",
     "slug": "chip-society",
-    "owner": "REPLACE_WITH_YOUR_EXPO_USERNAME",
+    "owner": "bfexpo",
     "version": "1.0.0",
     "runtimeVersion": {
       "policy": "appVersion"
