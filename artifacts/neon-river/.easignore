@@ -1,0 +1,12 @@
+# EAS Build ignore — these files are not needed in the cloud build
+.git
+node_modules
+.env
+.env.*
+*.log
+server/
+scripts/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+attached_assets/
