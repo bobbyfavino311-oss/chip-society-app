@@ -696,6 +696,12 @@ uri = "file://attached_assets/casino-war-icon.png"
 type = "image"
 title = "casino war cannon icon"
 
+[[generated]]
+id = "FVJCXM9IG_v2AZmaypP6P"
+uri = "file://attached_assets/generated_images/chip-society-icon-v2.png"
+type = "image"
+title = "chip society poker app icon centered"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
@@ -719,3 +725,9 @@ id = "KZ4eyL3eObnUq8bX8lntn"
 uri = "file://attached_assets/casino-war-icon.png"
 type = "image"
 title = "Casino War Icon"
+
+[[outputs]]
+id = "BXhJyXMYBAiGNDDDZ7HVr"
+uri = "file://attached_assets/generated_images/chip-society-icon-v2.png"
+type = "image"
+title = "New Chip Society Icon — Centered Composition"
