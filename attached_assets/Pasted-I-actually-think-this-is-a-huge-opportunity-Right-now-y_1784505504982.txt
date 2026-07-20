@@ -1,0 +1,508 @@
+I actually think this is a huge opportunity. Right now your landing page sounds like a placeholder. It should feel like a premium gaming platform that convinces someone to download the app within 15–30 seconds.
+
+I’d have the AI completely overhaul it.
+
+⸻
+
+LANDING PAGE COMPLETE REDESIGN
+
+The current landing page feels unfinished and does not properly represent Chip Society.
+
+This page is the first impression for every new player.
+
+It should immediately communicate that Chip Society is a premium casino gaming platform—not simply a poker app.
+
+Everything should feel modern, cinematic, and interactive.
+
+⸻
+
+CRITICAL BUGS TO FIX
+
+The following links currently do not function correctly:
+
+• Privacy Policy
+• Terms of Service
+
+Instead of opening the proper pages they simply refresh the landing page.
+
+Fix this immediately.
+
+Both buttons must navigate to their correct pages without refreshing the website.
+
+Verify routing works on:
+
+• Desktop
+• Mobile
+• Safari
+• Chrome
+• Firefox
+• Edge
+
+⸻
+
+HERO SECTION
+
+The top of the page should immediately communicate what Chip Society is.
+
+Keep the large neon Chip Society logo.
+
+Behind it:
+
+• Miami skyline
+• subtle animated lighting
+• soft moving particles
+• premium neon atmosphere
+
+Add a headline underneath:
+
+The Ultimate Social Casino Network
+
+Subheading:
+
+Play Texas Hold’em, Omaha, Blackjack, Three Card Poker, Ultimate Texas Hold’em, Short Deck, Joker Hold’em, tournaments, achievements, daily missions, social feed and more.
+
+Primary CTA
+
+DOWNLOAD NOW
+
+Secondary CTA
+
+VIEW GAMES
+
+⸻
+
+APP SCREENSHOTS
+
+The website currently does not showcase the actual app.
+
+This is one of the biggest missed opportunities.
+
+Create a premium iPhone carousel showcasing the real application.
+
+Include:
+
+Home
+
+Feed
+
+Traditional Hold’em
+
+Blackjack
+
+Three Card Poker
+
+Ultimate Texas Hold’em
+
+Omaha
+
+Short Deck
+
+Joker Hold’em
+
+Daily Missions
+
+Profile
+
+Achievements
+
+Store
+
+Fortune Cookies
+
+Tournament Lobby
+
+Tournament Results
+
+The screenshots should animate horizontally as the visitor scrolls.
+
+⸻
+
+EVERY GAME SHOULD HAVE ITS OWN SECTION
+
+Instead of one generic feature section, create individual premium cards.
+
+Example:
+
+⸻
+
+Traditional Texas Hold’em
+
+Large artwork
+
+Description
+
+Features
+
+• Cash Games
+
+• Multiplayer
+
+• AI Bots
+
+• Achievements
+
+• Missions
+
+• Social Posting
+
+PLAY SMART.
+
+⸻
+
+Repeat this for every game.
+
+Include:
+
+Traditional Hold’em
+
+Ultimate Texas Hold’em
+
+Omaha
+
+Short Deck
+
+Joker Hold’em
+
+Blackjack
+
+Three Card Poker
+
+Live Tournaments
+
+Scratch Tickets
+
+Daily Fortune Cookies
+
+Each should have its own premium section.
+
+⸻
+
+GAME RULES
+
+Right now there are no explanations.
+
+Every casino game should include a short expandable section.
+
+Example:
+
+Traditional Hold’em
+
+How to Play
+
+Winning Hands
+
+Betting Structure
+
+Gameplay Length
+
+Difficulty
+
+Expand / Collapse
+
+Same for every game.
+
+Keep explanations concise and beginner-friendly.
+
+⸻
+
+FEATURE SHOWCASE
+
+Create an entire section dedicated to unique Chip Society systems.
+
+Feature Cards
+
+• Social Feed
+
+• AI Players
+
+• Daily Missions
+
+• Achievements
+
+• Fortune Cookies
+
+• Leaderboards
+
+• Profile Levels
+
+• Tournament System
+
+• Scratch Tickets
+
+• Multiple Themes
+
+• Daily Rewards
+
+• Custom Avatars
+
+• Statistics
+
+Each feature should include:
+
+Icon
+
+Screenshot
+
+Short description
+
+⸻
+
+SOCIAL FEED SHOWCASE
+
+This is one of Chip Society’s biggest differentiators.
+
+Show multiple premium feed cards exactly like the in-app experience.
+
+Demonstrate:
+
+Big Wins
+
+Bad Beats
+
+Royal Flush
+
+Jackpots
+
+Tournament Results
+
+Bluffs
+
+Players Following Each Other
+
+Likes
+
+Comments
+
+Reposts
+
+This section should immediately show that Chip Society is a social casino.
+
+⸻
+
+DAILY MISSIONS
+
+Create a section showing:
+
+Mission Progress
+
+Progress Bars
+
+Legendary Fortune Cookie reward
+
+Daily reset timer
+
+Mission examples
+
+Use actual UI from the app.
+
+⸻
+
+FORTUNE COOKIE SYSTEM
+
+Explain the entire Fortune Cookie progression.
+
+Show:
+
+Common
+
+Rare
+
+Epic
+
+Legendary
+
+Theme Cookies
+
+Cookie animations
+
+Prize examples
+
+Players should immediately understand why collecting them is exciting.
+
+⸻
+
+TOURNAMENTS
+
+Create a dedicated tournament showcase.
+
+Include screenshots of:
+
+Lobby
+
+Bracket
+
+Final Results
+
+Champion Screen
+
+Explain:
+
+Buy-ins
+
+Prize Pools
+
+Live Events
+
+Daily Tournaments
+
+⸻
+
+ACHIEVEMENTS
+
+Display achievement cards.
+
+Examples:
+
+Royal Flush
+
+Bluff Master
+
+100 Wins
+
+Tournament Champion
+
+Blackjack Expert
+
+Each should resemble the in-game achievement cards.
+
+⸻
+
+PREMIUM DESIGN
+
+Everything should feel like Apple meets Miami Vice.
+
+Dark luxury.
+
+Neon accents.
+
+Floating glass.
+
+Rounded corners.
+
+Soft shadows.
+
+No flat sections.
+
+Every section should slightly overlap into the next with smooth gradients.
+
+⸻
+
+MICRO ANIMATIONS
+
+Add tasteful animations.
+
+Examples:
+
+Buttons glow on hover.
+
+Cards lift slightly.
+
+Screenshots float.
+
+Background lighting slowly shifts.
+
+Particles drift.
+
+Neon glows softly pulse.
+
+Nothing should feel distracting.
+
+Everything should feel premium.
+
+⸻
+
+PERFORMANCE
+
+All animations must remain lightweight.
+
+Prioritize:
+
+Smooth scrolling.
+
+Fast page load.
+
+Responsive layout.
+
+No animation should noticeably reduce FPS on desktop or mobile.
+
+⸻
+
+TRUST SECTION
+
+Include credibility indicators such as:
+
+• Multiple casino games
+
+• Multiplayer
+
+• Daily tournaments
+
+• Social casino network
+
+• Frequent updates
+
+• Premium UI
+
+• Secure accounts
+
+• Fair gameplay
+
+⸻
+
+FAQ
+
+Add a professional FAQ covering:
+
+What is Chip Society?
+
+Is it free?
+
+What games are included?
+
+How do tournaments work?
+
+How do Fortune Cookies work?
+
+Can I play with friends?
+
+How do Daily Missions work?
+
+⸻
+
+FOOTER
+
+Professional footer with working links:
+
+Privacy Policy
+
+Terms of Service
+
+Support
+
+Contact
+
+Discord (if applicable)
+
+Version
+
+Copyright
+
+All links must navigate correctly.
+
+⸻
+
+FINAL GOAL
+
+The website should feel like the marketing site for a AAA mobile casino game.
+
+A visitor should immediately understand:
+
+• What Chip Society is
+
+• Every game included
+
+• Why it’s different from every other poker app
+
+• Why they should download it immediately
+
+Every section should build excitement and increase conversion. No placeholder content, broken links, or generic layouts should remain.
