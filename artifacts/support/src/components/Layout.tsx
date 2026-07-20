@@ -55,9 +55,9 @@ export function Layout({ children }: { children: ReactNode }) {
               <p className="text-muted-foreground text-sm max-w-sm mb-6">
                 The neon underground of Texas Hold'em. Premium poker experience with no real-money gambling.
               </p>
-              <a href="mailto:support@chipsociety.app" className="inline-flex items-center gap-2 text-primary hover:text-shadow-neon-pink transition-all text-sm font-medium">
+              <a href="mailto:realbobbyf@chipsocietyapp.com" className="inline-flex items-center gap-2 text-primary hover:text-shadow-neon-pink transition-all text-sm font-medium">
                 <Mail className="w-4 h-4" />
-                support@chipsociety.app
+                realbobbyf@chipsocietyapp.com
               </a>
             </div>
             

@@ -163,18 +163,18 @@ const FEATURES = [
 ];
 
 const FEED_POSTS = [
-  { user: 'NightShark99', tag: 'WIN', tagColor: '#00ff88', time: '2h ago', content: 'Royal Flush on the river. The whole table went silent. I just sat there and let it breathe.', pot: '42,400', hand: 'Royal Flush', likes: 1240, comments: 87 },
-  { user: 'VegasMirage', tag: 'BLUFF', tagColor: '#ff0090', time: '4h ago', content: 'Triple-barrel bluffed with 7-2 offsuit on a KQ4 paired board. They had a set and they folded. This is art.', pot: '18,200', hand: '7-2 Offsuit', likes: 887, comments: 142 },
-  { user: 'AceHunter', tag: 'ALL-IN', tagColor: '#ffd700', time: '1h ago', content: 'Shoved all-in with pocket aces pre-flop. Three callers. Board ran out J-J-J-J-2. Lost to quad jacks. I quit.', pot: '95,000', hand: 'Pocket Aces', likes: 3421, comments: 214 },
-  { user: 'ChipBaron', tag: 'JACKPOT', tagColor: '#bf5fff', time: '30m ago', content: 'Daily spin just hit 12.5K. Did not even see it coming. The neon gods smiled today.', pot: '12,500', hand: 'Daily Spin', likes: 3002, comments: 76 },
+  { user: 'NightShark99', avatar: `${BASE}av-royal.jpg`,  tag: 'WIN',    tagColor: '#00ff88', time: '2h ago',  content: 'Royal Flush on the river. The whole table went silent. I just sat there and let it breathe.',                        pot: '42,400', hand: 'Royal Flush',   likes: 1240, comments: 87  },
+  { user: 'VegasMirage',  avatar: `${BASE}av-dragon.jpg`, tag: 'BLUFF',  tagColor: '#ff0090', time: '4h ago',  content: 'Triple-barrel bluffed with 7-2 offsuit on a KQ4 paired board. They had a set and they folded. This is art.',  pot: '18,200', hand: '7-2 Offsuit',   likes: 887,  comments: 142 },
+  { user: 'AceHunter',    avatar: `${BASE}av-ace.jpg`,    tag: 'ALL-IN', tagColor: '#ffd700', time: '1h ago',  content: 'Shoved all-in with pocket aces pre-flop. Three callers. Board ran out J-J-J-J-2. Lost to quad jacks. I quit.',  pot: '95,000', hand: 'Pocket Aces',   likes: 3421, comments: 214 },
+  { user: 'ChipBaron',    avatar: `${BASE}av-chip.jpg`,   tag: 'JACKPOT',tagColor: '#bf5fff', time: '30m ago', content: 'Daily spin just hit 12.5K. Did not even see it coming. The neon gods smiled today.',                           pot: '12,500', hand: 'Daily Spin',    likes: 3002, comments: 76  },
 ];
 
 const COOKIE_TIERS = [
-  { label: 'Common', color: '#888aaa', range: '0–500 chips', desc: 'Small chip prizes, daily mission base reward.' },
-  { label: 'Rare', color: '#00d4ff', range: '1K–10K chips', desc: 'Bonus chips + XP boost.' },
-  { label: 'Epic', color: '#bf5fff', range: '10K–50K chips', desc: 'Big chip reward + cosmetic prizes.' },
-  { label: 'Legendary', color: '#ffd700', range: '50K–200K chips', desc: 'Massive reward + exclusive unlocks. Grand Reward for completing all 5 daily missions.' },
-  { label: 'Mythic', color: '#ff0090', range: 'Ultra Rare', desc: 'Rarest tier. Exclusive table themes, animated frames, and legendary chip prizes.' },
+  { label: 'Common',    color: '#9CA3AF', drop: '75%',   range: '5K–25K chips',       desc: 'Chip rewards + XP. The everyday cookie — always worth cracking.' },
+  { label: 'Rare',      color: '#60A5FA', drop: '15%',   range: '25K–150K chips',     desc: 'Better chips + scratch tickets. Unlocks at level 25.' },
+  { label: 'Epic',      color: '#A855F7', drop: '7%',    range: '150K–750K chips',    desc: 'Premium chip hauls + up to 5 scratch tickets. Unlocks at level 50.' },
+  { label: 'Legendary', color: '#F59E0B', drop: '2.5%',  range: '750K–2M chips',      desc: 'Massive rewards + up to 25 tickets. Daily missions grand prize.' },
+  { label: 'Mythic',    color: '#FF0090', drop: 'Wheel', range: '500K–10M chips',     desc: 'Daily Wheel jackpot only. Up to 50 tickets + 10 million chips.' },
 ];
 
 const MISSIONS_PREVIEW = [
@@ -358,7 +358,7 @@ function CasinoGameCard({ game, delay }: { game: typeof CASINO_GAMES[0]; delay: 
       <div className="flex-1 min-w-0">
         <p className="font-display font-black text-white text-sm uppercase tracking-wide">{game.label}</p>
         <p className="text-gray-500 text-xs mt-0.5">{game.desc}</p>
-        <p className="text-gray-600 text-xs mt-1 leading-snug line-clamp-1">{game.detail}</p>
+        <p className="text-gray-600 text-xs mt-1 leading-snug">{game.detail}</p>
       </div>
     </motion.div>
   );
@@ -551,8 +551,8 @@ export default function App() {
                 viewport={{ once: true, margin: '-20px' }} transition={{ duration: 0.4, delay: i * 0.08 }}
                 className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.05] transition-colors">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#bf5fff] to-[#00d4ff] flex items-center justify-center text-xs font-black text-black shrink-0">
-                    {post.user[0]}
+                  <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-white/20">
+                    <img src={post.avatar} alt={post.user} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -657,7 +657,10 @@ export default function App() {
                 style={{ borderColor: `${tier.color}35`, background: `linear-gradient(135deg, ${tier.color}08 0%, transparent 100%)` }}>
                 <div className="text-4xl">🥠</div>
                 <p className="font-display font-black text-sm uppercase tracking-wide" style={{ color: tier.color }}>{tier.label}</p>
-                <p className="text-[11px] font-bold" style={{ color: tier.color }}>{tier.range}</p>
+                <span className="text-[9px] font-display font-black px-2 py-0.5 rounded-full tracking-widest" style={{ color: tier.color, backgroundColor: `${tier.color}18`, border: `1px solid ${tier.color}30` }}>
+                  {tier.drop} drop rate
+                </span>
+                <p className="text-[11px] font-bold text-white/70">{tier.range}</p>
                 <p className="text-gray-600 text-[11px] leading-snug">{tier.desc}</p>
               </motion.div>
             ))}
