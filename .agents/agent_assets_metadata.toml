@@ -708,6 +708,12 @@ uri = "file://attached_assets/generated_images/chip-society-icon-v3.png"
 type = "image"
 title = "chip society icon perfectly centered symmetrical"
 
+[[generated]]
+id = "565TRkMhgpMUj4KfHJBul"
+uri = "file://attached_assets/generated_images/chip-society-icon-v4.png"
+type = "image"
+title = "chip society flat vector icon"
+
 [[outputs]]
 id = "xrX_1BGLTrQvJEdL8byJG"
 uri = "file://artifacts/neon-river/assets/avatars/preview_all.png"
@@ -761,3 +767,9 @@ id = "l6OPhAg4HYPn1ib5zQWUP"
 uri = "file://attached_assets/generated_images/chip-society-icon-v3.png"
 type = "image"
 title = "Chip Society Icon — Straight-on, Centered"
+
+[[outputs]]
+id = "vOs5Rw575MIG41DRlEWgZ"
+uri = "file://attached_assets/generated_images/chip-society-icon-v4.png"
+type = "image"
+title = "Chip Society Icon — Flat 2D"
