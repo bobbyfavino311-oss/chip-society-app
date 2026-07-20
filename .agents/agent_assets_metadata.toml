@@ -731,3 +731,21 @@ id = "BXhJyXMYBAiGNDDDZ7HVr"
 uri = "file://attached_assets/generated_images/chip-society-icon-v2.png"
 type = "image"
 title = "New Chip Society Icon — Centered Composition"
+
+[[outputs]]
+id = "fmfpgE-v02rvbZm-WZKXn"
+uri = "file://attached_assets/generated_images/icon-rotated-3deg.png"
+type = "image"
+title = "3° counter-clockwise"
+
+[[outputs]]
+id = "LxvH77pv0CXW9hHE_NWCH"
+uri = "file://attached_assets/generated_images/icon-rotated-5deg.png"
+type = "image"
+title = "5° counter-clockwise"
+
+[[outputs]]
+id = "06XivsZs_fsRB8N0ZFf3P"
+uri = "file://attached_assets/generated_images/icon-rotated-7deg.png"
+type = "image"
+title = "7° counter-clockwise"
