@@ -199,10 +199,11 @@ const FAQ_DATA = [
 
 /* ── App screenshots ───────────────────────────────────────────────────────── */
 const SCREENSHOTS = [
-  { src: `${BASE}screen-home.jpeg`,   label: 'Home',   sub: 'Daily rewards, trending feed, quick play' },
-  { src: `${BASE}screen-play.jpeg`,   label: 'Play',   sub: 'All poker variants in one place' },
-  { src: `${BASE}screen-casino.jpeg`, label: 'Casino', sub: '7 premium casino table games' },
-  { src: `${BASE}screen-feed.jpeg`,   label: 'Feed',   sub: 'Social network for poker players' },
+  { src: `${BASE}screen-home.jpeg`,     label: 'Home',      sub: 'Daily rewards, trending feed, quick play' },
+  { src: `${BASE}screen-gameplay.png`,  label: 'Gameplay',  sub: 'Sleek, focused table design' },
+  { src: `${BASE}screen-play.jpeg`,     label: 'Play',      sub: 'All poker variants in one place' },
+  { src: `${BASE}screen-casino.jpeg`,   label: 'Casino',    sub: '7 premium casino table games' },
+  { src: `${BASE}screen-feed.jpeg`,     label: 'Feed',      sub: 'Social network for poker players' },
 ];
 
 /* ── Screenshot carousel ───────────────────────────────────────────────────── */
