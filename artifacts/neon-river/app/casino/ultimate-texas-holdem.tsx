@@ -497,7 +497,6 @@ export default function UltimateTexasHoldemScreen() {
     setCommunityCount(0);
     setDealerRevealed(false);
     setPlayMult(0);
-    setTripsMult(0);
     setFolded(false);
     setResult(null);
     setBusy(false);
