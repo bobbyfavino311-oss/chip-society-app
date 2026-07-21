@@ -476,6 +476,7 @@ export default function BlackjackScreen() {
       if (hand.busted) {
         outcome = 'bust';
         losses++;
+        totalNet -= hand.bet;
       } else if (playerBJ && dealerBJ) {
         outcome = 'push';
         addChips(hand.bet);
