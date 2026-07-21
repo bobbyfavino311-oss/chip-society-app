@@ -5,7 +5,6 @@ import {
   Animated,
   Easing,
   Dimensions,
-  useWindowDimensions,
   Modal,
   Platform,
   ScrollView,
@@ -399,15 +398,11 @@ function QuickPlayCard() {
 
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
-const LOGO_IMG = require('@/assets/images/chip-society-logo.png') as number;
+const LOGO_IMG      = require('@/assets/images/chip-society-logo.png') as number;
+const LOGO_IMG_W    = width * 0.84;
+const LOGO_IMG_H    = LOGO_IMG_W * (576 / 1024); // native PNG aspect 1024×576
 
 function ChipSocietyLogo() {
-  const { width: w } = useWindowDimensions();
-  const imgW  = w * 0.84;
-  const imgH  = imgW * (576 / 1024);
-  const haloW1 = w * 0.86, haloH1 = 310, haloL1 = (w - w * 0.86) / 2;
-  const haloW2 = w * 0.68, haloH2 = 235, haloL2 = (w - w * 0.68) / 2;
-  const haloW3 = w * 0.76, haloH3 = 275, haloL3 = (w - w * 0.76) / 2;
   const brightness  = useRef(new Animated.Value(1)).current;
   const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -438,32 +433,24 @@ function ChipSocietyLogo() {
   }, []);
 
   return (
-    <View style={[logo.wrap, { width: w }]}>
-      {/* ── Layer 1 — Large Navy-Blue Halo (depth separation) ── */}
+    <View style={logo.wrap}>
+      {/* Cyan + pink bloom radiate behind the logo */}
       <LinearGradient
-        colors={['transparent', 'rgba(15,35,110,0.60)', 'rgba(10,25,80,0.48)', 'transparent']}
-        style={[logo.haloBase, { width: haloW1, height: haloH1, left: haloL1, borderRadius: haloH1 / 2 }]}
-        start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
+        colors={['rgba(0,212,255,0.14)', 'rgba(0,212,255,0.05)', 'transparent']}
+        style={logo.glowCyan}
+        start={{ x: 0.5, y: 0.3 }} end={{ x: 0.5, y: 1 }}
       />
-      {/* ── Layer 2 — Cyan-Blue Glow ── */}
       <LinearGradient
-        colors={['transparent', 'rgba(0,180,255,0.42)', 'rgba(0,160,230,0.22)', 'transparent']}
-        style={[logo.haloBase, { width: haloW2, height: haloH2, left: haloL2, borderRadius: haloH2 / 2 }]}
-        start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
+        colors={['rgba(191,95,255,0.10)', 'transparent']}
+        style={logo.glowPurple}
+        start={{ x: 0.5, y: 0.2 }} end={{ x: 0.5, y: 1 }}
       />
-      {/* ── Layer 3 — Purple Ambient Wash ── */}
-      <LinearGradient
-        colors={['transparent', 'rgba(120,50,220,0.34)', 'rgba(100,30,200,0.18)', 'transparent']}
-        style={[logo.haloBase, { width: haloW3, height: haloH3, left: haloL3, borderRadius: haloH3 / 2 }]}
-        start={{ x: 0.5, y: 0.05 }} end={{ x: 0.5, y: 1 }}
-      />
-      {/* Logo renders above all halo layers */}
       <Animated.Image
         source={LOGO_IMG}
-        style={[logo.img, { width: imgW, height: imgH, opacity: brightness }]}
+        style={[logo.img, { opacity: brightness }]}
         resizeMode="contain"
       />
-      <Text style={[logo.sub, { width: imgW }]} allowFontScaling={false}>SOCIAL POKER NETWORK</Text>
+      <Text style={logo.sub} allowFontScaling={false}>SOCIAL POKER NETWORK</Text>
     </View>
   );
 }
@@ -815,7 +802,7 @@ export default function HomeScreen() {
   ];
 
   // Hero height: covers status bar + logo section (logo image + subtitle + padding)
-  const HERO_H = insets.top + 8 + ((width || 375) * 0.84 * (576 / 1024)) + 52;
+  const HERO_H = insets.top + 8 + LOGO_IMG_H + 52;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -960,6 +947,8 @@ export default function HomeScreen() {
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingTop: 0, paddingBottom: 14 },
   img: {
+    width: LOGO_IMG_W,
+    height: LOGO_IMG_H,
     marginBottom: 6,
   },
   sub: {
@@ -968,14 +957,27 @@ const logo = StyleSheet.create({
     color: 'rgba(200,220,255,0.72)',
     letterSpacing: 7,
     marginTop: 4,
+    width: LOGO_IMG_W,
     textAlign: 'center',
     textShadowColor: 'rgba(0,212,255,0.45)',
     textShadowRadius: 8,
     textShadowOffset: { width: 0, height: 0 },
   },
-  haloBase: {
+  glowCyan: {
     position: 'absolute',
-    top: -10,
+    width: LOGO_IMG_W,
+    height: LOGO_IMG_H * 1.1,
+    borderRadius: LOGO_IMG_W / 2,
+    top: 0,
+    left: 0,
+  },
+  glowPurple: {
+    position: 'absolute',
+    width: LOGO_IMG_W * 0.8,
+    height: LOGO_IMG_H,
+    borderRadius: LOGO_IMG_W * 0.4,
+    top: 0,
+    left: LOGO_IMG_W * 0.1,
   },
 });
 
