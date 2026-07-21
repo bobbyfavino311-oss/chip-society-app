@@ -5,6 +5,7 @@ import {
   Animated,
   Easing,
   Dimensions,
+  useWindowDimensions,
   Modal,
   Platform,
   ScrollView,
@@ -398,22 +399,15 @@ function QuickPlayCard() {
 
 // ─── Animated logo ───────────────────────────────────────────────────────────
 
-const LOGO_IMG      = require('@/assets/images/chip-society-logo.png') as number;
-const LOGO_IMG_W    = width * 0.84;
-const LOGO_IMG_H    = LOGO_IMG_W * (576 / 1024); // native PNG aspect 1024×576
-
-// ─── Halo backdrop dimensions (all centered at exactly 50% viewport) ─────────
-const HALO_W1 = width * 0.86;   // Layer 1 — large navy halo
-const HALO_W2 = width * 0.68;   // Layer 2 — inner cyan-blue glow
-const HALO_W3 = width * 0.76;   // Layer 3 — purple ambient wash
-const HALO_H1 = 310;
-const HALO_H2 = 235;
-const HALO_H3 = 275;
-const HALO_L1 = (width - HALO_W1) / 2;
-const HALO_L2 = (width - HALO_W2) / 2;
-const HALO_L3 = (width - HALO_W3) / 2;
+const LOGO_IMG = require('@/assets/images/chip-society-logo.png') as number;
 
 function ChipSocietyLogo() {
+  const { width: w } = useWindowDimensions();
+  const imgW  = w * 0.84;
+  const imgH  = imgW * (576 / 1024);
+  const haloW1 = w * 0.86, haloH1 = 310, haloL1 = (w - w * 0.86) / 2;
+  const haloW2 = w * 0.68, haloH2 = 235, haloL2 = (w - w * 0.68) / 2;
+  const haloW3 = w * 0.76, haloH3 = 275, haloL3 = (w - w * 0.76) / 2;
   const brightness  = useRef(new Animated.Value(1)).current;
   const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -444,32 +438,32 @@ function ChipSocietyLogo() {
   }, []);
 
   return (
-    <View style={logo.wrap}>
+    <View style={[logo.wrap, { width: w }]}>
       {/* ── Layer 1 — Large Navy Halo ── */}
       <LinearGradient
         colors={['transparent', 'rgba(8,16,60,0.22)', 'rgba(8,16,60,0.12)', 'transparent']}
-        style={[logo.haloBase, { width: HALO_W1, height: HALO_H1, left: HALO_L1, borderRadius: HALO_H1 / 2 }]}
+        style={[logo.haloBase, { width: haloW1, height: haloH1, left: haloL1, borderRadius: haloH1 / 2 }]}
         start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
       />
       {/* ── Layer 2 — Inner Cyan-Blue Glow ── */}
       <LinearGradient
         colors={['transparent', 'rgba(0,180,255,0.14)', 'rgba(0,180,255,0.07)', 'transparent']}
-        style={[logo.haloBase, { width: HALO_W2, height: HALO_H2, left: HALO_L2, borderRadius: HALO_H2 / 2 }]}
+        style={[logo.haloBase, { width: haloW2, height: haloH2, left: haloL2, borderRadius: haloH2 / 2 }]}
         start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
       />
       {/* ── Layer 3 — Purple Ambient Wash ── */}
       <LinearGradient
         colors={['transparent', 'rgba(110,40,210,0.11)', 'rgba(100,30,200,0.05)', 'transparent']}
-        style={[logo.haloBase, { width: HALO_W3, height: HALO_H3, left: HALO_L3, borderRadius: HALO_H3 / 2 }]}
+        style={[logo.haloBase, { width: haloW3, height: haloH3, left: haloL3, borderRadius: haloH3 / 2 }]}
         start={{ x: 0.5, y: 0.1 }} end={{ x: 0.5, y: 1 }}
       />
       {/* Logo renders above all halo layers */}
       <Animated.Image
         source={LOGO_IMG}
-        style={[logo.img, { opacity: brightness }]}
+        style={[logo.img, { width: imgW, height: imgH, opacity: brightness }]}
         resizeMode="contain"
       />
-      <Text style={logo.sub} allowFontScaling={false}>SOCIAL POKER NETWORK</Text>
+      <Text style={[logo.sub, { width: imgW }]} allowFontScaling={false}>SOCIAL POKER NETWORK</Text>
     </View>
   );
 }
@@ -821,7 +815,7 @@ export default function HomeScreen() {
   ];
 
   // Hero height: covers status bar + logo section (logo image + subtitle + padding)
-  const HERO_H = insets.top + 8 + LOGO_IMG_H + 52;
+  const HERO_H = insets.top + 8 + ((width || 375) * 0.84 * (576 / 1024)) + 52;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -966,8 +960,6 @@ export default function HomeScreen() {
 const logo = StyleSheet.create({
   wrap: { alignItems: 'center', paddingTop: 0, paddingBottom: 14 },
   img: {
-    width: LOGO_IMG_W,
-    height: LOGO_IMG_H,
     marginBottom: 6,
   },
   sub: {
@@ -976,7 +968,6 @@ const logo = StyleSheet.create({
     color: 'rgba(200,220,255,0.72)',
     letterSpacing: 7,
     marginTop: 4,
-    width: LOGO_IMG_W,
     textAlign: 'center',
     textShadowColor: 'rgba(0,212,255,0.45)',
     textShadowRadius: 8,
