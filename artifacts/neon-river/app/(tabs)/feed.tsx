@@ -337,7 +337,11 @@ function LivePostCard({ post }: { post: FeedPost }) {
       {/* Header */}
       <View style={cd.header}>
         <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-          <NeonAvatar avatarId={isOwn && profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : post.authorAvatarIndex} size={44} />
+          {isOwn && profile.profileImageType === 'custom' && profile.avatarUri ? (
+            <Image source={{ uri: profile.avatarUri }} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }} />
+          ) : (
+            <NeonAvatar avatarId={isOwn && profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (post.authorAvatarIndex ?? 1)} size={44} />
+          )}
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>

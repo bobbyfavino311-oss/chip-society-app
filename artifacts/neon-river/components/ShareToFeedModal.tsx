@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Keyboard,
   Modal,
   Platform,
@@ -21,6 +22,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useLiveFeed } from '@/context/LiveFeedContext';
+import { useUser } from '@/context/UserContext';
+import NeonAvatar from '@/components/NeonAvatar';
 import type { PostTag } from '@/lib/socialData';
 
 const TAGS: Array<{ id: PostTag; label: string; icon: string; color: string }> = [
@@ -45,6 +48,7 @@ interface Props {
 
 export default function ShareToFeedModal({ visible, onClose, defaultContent, defaultTag, pot, handRank }: Props) {
   const { publishPost } = useLiveFeed();
+  const { profile } = useUser();
   const [text, setText] = useState('');
   const [tag, setTag]   = useState<PostTag>(defaultTag);
   const [posting, setPosting] = useState(false);
@@ -124,6 +128,16 @@ export default function ShareToFeedModal({ visible, onClose, defaultContent, def
                 );
               })}
             </ScrollView>
+
+            {/* Composing as — avatar + username */}
+            <View style={st.composeAs}>
+              {profile.profileImageType === 'custom' && profile.avatarUri ? (
+                <Image source={{ uri: profile.avatarUri }} style={st.composeAvatar} />
+              ) : (
+                <NeonAvatar avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1} size={36} />
+              )}
+              <Text style={st.composeUsername}>{profile.username ?? 'You'}</Text>
+            </View>
 
             {/* Text area */}
             <View style={st.inputWrap}>
@@ -270,6 +284,18 @@ const st = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   metaText: { color: colors.textDim, fontSize: 11 },
+  composeAs: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    marginBottom: 10,
+  },
+  composeAvatar: {
+    width: 36, height: 36, borderRadius: 18,
+    borderWidth: 1.5, borderColor: colors.primary,
+  },
+  composeUsername: {
+    color: colors.text, fontSize: 14,
+    fontWeight: '700', fontFamily: 'Orbitron_700Bold',
+  },
   footer: {
     flexDirection: 'row', alignItems: 'center',
     justifyContent: 'space-between',
