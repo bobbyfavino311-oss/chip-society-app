@@ -434,17 +434,6 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
-      {/* Cyan + pink bloom radiate behind the logo */}
-      <LinearGradient
-        colors={['rgba(0,212,255,0.14)', 'rgba(0,212,255,0.05)', 'transparent']}
-        style={logo.glowCyan}
-        start={{ x: 0.5, y: 0.3 }} end={{ x: 0.5, y: 1 }}
-      />
-      <LinearGradient
-        colors={['rgba(191,95,255,0.10)', 'transparent']}
-        style={logo.glowPurple}
-        start={{ x: 0.5, y: 0.2 }} end={{ x: 0.5, y: 1 }}
-      />
       <Animated.Image
         source={LOGO_IMG}
         style={[logo.img, { opacity: brightness }]}
@@ -962,22 +951,6 @@ const logo = StyleSheet.create({
     textShadowColor: 'rgba(0,212,255,0.45)',
     textShadowRadius: 8,
     textShadowOffset: { width: 0, height: 0 },
-  },
-  glowCyan: {
-    position: 'absolute',
-    width: LOGO_IMG_W,
-    height: LOGO_IMG_H * 1.1,
-    borderRadius: LOGO_IMG_W / 2,
-    top: 0,
-    left: 0,
-  },
-  glowPurple: {
-    position: 'absolute',
-    width: LOGO_IMG_W * 0.8,
-    height: LOGO_IMG_H,
-    borderRadius: LOGO_IMG_W * 0.4,
-    top: 0,
-    left: LOGO_IMG_W * 0.1,
   },
 });
 
