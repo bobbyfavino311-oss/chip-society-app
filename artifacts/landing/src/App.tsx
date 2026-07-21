@@ -421,12 +421,6 @@ export default function App() {
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 pb-20">
         <AmbientOrbs />
         <Particles />
-        {/* Miami skyline gradient horizon */}
-        <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none"
-          style={{ background: 'linear-gradient(to top, rgba(5,0,16,1) 0%, rgba(30,0,60,0.4) 50%, transparent 100%)' }} />
-        {/* Horizontal neon horizon line */}
-        <div className="absolute bottom-32 left-0 right-0 h-px pointer-events-none"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, #bf5fff44 30%, #ff009044 50%, #00d4ff44 70%, transparent 100%)' }} />
 
         <motion.div style={{ y: heroY }} className="relative z-10 text-center px-6 max-w-5xl mx-auto">
           {/* Logo */}
