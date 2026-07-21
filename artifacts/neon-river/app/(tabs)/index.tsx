@@ -439,23 +439,23 @@ function ChipSocietyLogo() {
 
   return (
     <View style={[logo.wrap, { width: w }]}>
-      {/* ── Layer 1 — Large Navy Halo ── */}
+      {/* ── Layer 1 — Large Navy-Blue Halo (depth separation) ── */}
       <LinearGradient
-        colors={['transparent', 'rgba(8,16,60,0.22)', 'rgba(8,16,60,0.12)', 'transparent']}
+        colors={['transparent', 'rgba(15,35,110,0.60)', 'rgba(10,25,80,0.48)', 'transparent']}
         style={[logo.haloBase, { width: haloW1, height: haloH1, left: haloL1, borderRadius: haloH1 / 2 }]}
         start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
       />
-      {/* ── Layer 2 — Inner Cyan-Blue Glow ── */}
+      {/* ── Layer 2 — Cyan-Blue Glow ── */}
       <LinearGradient
-        colors={['transparent', 'rgba(0,180,255,0.14)', 'rgba(0,180,255,0.07)', 'transparent']}
+        colors={['transparent', 'rgba(0,180,255,0.42)', 'rgba(0,160,230,0.22)', 'transparent']}
         style={[logo.haloBase, { width: haloW2, height: haloH2, left: haloL2, borderRadius: haloH2 / 2 }]}
         start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
       />
       {/* ── Layer 3 — Purple Ambient Wash ── */}
       <LinearGradient
-        colors={['transparent', 'rgba(110,40,210,0.11)', 'rgba(100,30,200,0.05)', 'transparent']}
+        colors={['transparent', 'rgba(120,50,220,0.34)', 'rgba(100,30,200,0.18)', 'transparent']}
         style={[logo.haloBase, { width: haloW3, height: haloH3, left: haloL3, borderRadius: haloH3 / 2 }]}
-        start={{ x: 0.5, y: 0.1 }} end={{ x: 0.5, y: 1 }}
+        start={{ x: 0.5, y: 0.05 }} end={{ x: 0.5, y: 1 }}
       />
       {/* Logo renders above all halo layers */}
       <Animated.Image
