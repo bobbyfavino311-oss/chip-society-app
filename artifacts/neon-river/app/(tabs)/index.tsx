@@ -402,6 +402,17 @@ const LOGO_IMG      = require('@/assets/images/chip-society-logo.png') as number
 const LOGO_IMG_W    = width * 0.84;
 const LOGO_IMG_H    = LOGO_IMG_W * (576 / 1024); // native PNG aspect 1024×576
 
+// ─── Halo backdrop dimensions (all centered at exactly 50% viewport) ─────────
+const HALO_W1 = width * 0.86;   // Layer 1 — large navy halo
+const HALO_W2 = width * 0.68;   // Layer 2 — inner cyan-blue glow
+const HALO_W3 = width * 0.76;   // Layer 3 — purple ambient wash
+const HALO_H1 = 310;
+const HALO_H2 = 235;
+const HALO_H3 = 275;
+const HALO_L1 = (width - HALO_W1) / 2;
+const HALO_L2 = (width - HALO_W2) / 2;
+const HALO_L3 = (width - HALO_W3) / 2;
+
 function ChipSocietyLogo() {
   const brightness  = useRef(new Animated.Value(1)).current;
   const timeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -434,17 +445,25 @@ function ChipSocietyLogo() {
 
   return (
     <View style={logo.wrap}>
-      {/* Cyan + pink bloom radiate behind the logo */}
+      {/* ── Layer 1 — Large Navy Halo ── */}
       <LinearGradient
-        colors={['rgba(0,212,255,0.14)', 'rgba(0,212,255,0.05)', 'transparent']}
-        style={logo.glowCyan}
-        start={{ x: 0.5, y: 0.3 }} end={{ x: 0.5, y: 1 }}
+        colors={['transparent', 'rgba(8,16,60,0.22)', 'rgba(8,16,60,0.12)', 'transparent']}
+        style={[logo.haloBase, { width: HALO_W1, height: HALO_H1, left: HALO_L1, borderRadius: HALO_H1 / 2 }]}
+        start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
       />
+      {/* ── Layer 2 — Inner Cyan-Blue Glow ── */}
       <LinearGradient
-        colors={['rgba(191,95,255,0.10)', 'transparent']}
-        style={logo.glowPurple}
-        start={{ x: 0.5, y: 0.2 }} end={{ x: 0.5, y: 1 }}
+        colors={['transparent', 'rgba(0,180,255,0.14)', 'rgba(0,180,255,0.07)', 'transparent']}
+        style={[logo.haloBase, { width: HALO_W2, height: HALO_H2, left: HALO_L2, borderRadius: HALO_H2 / 2 }]}
+        start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}
       />
+      {/* ── Layer 3 — Purple Ambient Wash ── */}
+      <LinearGradient
+        colors={['transparent', 'rgba(110,40,210,0.11)', 'rgba(100,30,200,0.05)', 'transparent']}
+        style={[logo.haloBase, { width: HALO_W3, height: HALO_H3, left: HALO_L3, borderRadius: HALO_H3 / 2 }]}
+        start={{ x: 0.5, y: 0.1 }} end={{ x: 0.5, y: 1 }}
+      />
+      {/* Logo renders above all halo layers */}
       <Animated.Image
         source={LOGO_IMG}
         style={[logo.img, { opacity: brightness }]}
@@ -963,21 +982,9 @@ const logo = StyleSheet.create({
     textShadowRadius: 8,
     textShadowOffset: { width: 0, height: 0 },
   },
-  glowCyan: {
+  haloBase: {
     position: 'absolute',
-    width: LOGO_IMG_W,
-    height: LOGO_IMG_H * 1.1,
-    borderRadius: LOGO_IMG_W / 2,
-    top: 0,
-    left: 0,
-  },
-  glowPurple: {
-    position: 'absolute',
-    width: LOGO_IMG_W * 0.8,
-    height: LOGO_IMG_H,
-    borderRadius: LOGO_IMG_W * 0.4,
-    top: 0,
-    left: LOGO_IMG_W * 0.1,
+    top: -10,
   },
 });
 
