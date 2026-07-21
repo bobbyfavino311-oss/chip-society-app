@@ -72,8 +72,9 @@ const TRIPS_TABLE = [
 function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableOpacity style={pm.overlay} activeOpacity={1} onPress={onClose}>
-        <View style={pm.sheet}>
+      <View style={pm.overlay}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
+        <TouchableOpacity style={pm.sheet} activeOpacity={1} onPress={() => {}}>
           <LinearGradient colors={['#0e002a', '#050010']} style={StyleSheet.absoluteFill} />
           <View style={pm.header}>
             <Text style={pm.title}>PAYTABLE</Text>
@@ -81,7 +82,7 @@ function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => 
               <Ionicons name="close" size={20} color="rgba(255,255,255,0.6)" />
             </TouchableOpacity>
           </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
             <Text style={pm.sectionTitle}>BLIND PAY TABLE</Text>
             <Text style={pm.sectionNote}>Pays when Player beats Dealer with Straight or better</Text>
             {BLIND_TABLE.map(r => (
@@ -111,8 +112,8 @@ function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => 
             <View style={pm.row}><Text style={pm.handName}>River</Text><Text style={pm.handPays}>1× or FOLD</Text></View>
             <View style={{ height: 30 }} />
           </ScrollView>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
