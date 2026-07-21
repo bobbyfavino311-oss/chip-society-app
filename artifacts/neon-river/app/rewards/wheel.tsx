@@ -204,7 +204,6 @@ const RARITY_COLOR: Record<string, string> = {
 export default function WheelScreen() {
   const insets = useSafeAreaInsets();
   const { canClaimWheel, nextWheelIn, claimWheelSpin, addFortuneCookies, profile, updateProfile } = useUser();
-  const resetCooldown = useCallback(() => updateProfile({ lastWheelSpin: undefined as unknown as string }), [updateProfile]);
 
   const rotAnim       = useRef(new Animated.Value(0)).current;
   const totalRot      = useRef(0);
@@ -556,13 +555,6 @@ export default function WheelScreen() {
           />
         ))}
 
-        {/* Reset cooldown (dev shortcut — only visible when on cooldown) */}
-        {!canClaimWheel && !spinning && (
-          <TouchableOpacity onPress={resetCooldown} style={s.resetBtn} activeOpacity={0.7}>
-            <Text style={s.resetBtnText}>↺  Reset cooldown</Text>
-          </TouchableOpacity>
-        )}
-
         {/* Spin button */}
         <TouchableOpacity
           style={[s.spinBtn, (!canClaimWheel || spinning) && s.spinBtnDis]}
@@ -702,6 +694,4 @@ const s = StyleSheet.create({
   legendText:      { fontSize: 11, fontWeight: '700' },
   mythicHint:      { fontSize: 10, color: 'rgba(191,95,255,0.55)', textAlign: 'center', marginTop: 6, letterSpacing: 0.5, fontStyle: 'italic' },
 
-  resetBtn:     { alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 14, marginBottom: 4 },
-  resetBtnText: { fontSize: 11, color: 'rgba(255,255,255,0.22)', letterSpacing: 1 },
 });

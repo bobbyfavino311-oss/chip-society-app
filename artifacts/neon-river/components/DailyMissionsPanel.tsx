@@ -553,7 +553,6 @@ export default function DailyMissionsPanel() {
     grandRewardAvailable,
     grandRewardClaimed,
     claimGrandReward,
-    debugFillAllComplete,
   } = useMissions();
 
   const [expanded, setExpanded] = useState(false);
@@ -603,8 +602,7 @@ export default function DailyMissionsPanel() {
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
 
-      {/* Header — always visible; long-press title to fill all missions (dev testing) */}
-      <Pressable style={panel.header} onPress={toggle} onLongPress={debugFillAllComplete}>
+      <Pressable style={panel.header} onPress={toggle}>
         <View style={panel.headerLeft}>
           <View style={panel.spadeWrap}>
             <SpadeIcon color="#bf5fff" size={16} />
@@ -707,11 +705,6 @@ export default function DailyMissionsPanel() {
             </View>
           )}
 
-          {/* ── Dev testing button ───────────────────────────────────────── */}
-          <TouchableOpacity style={panel.devBtn} onPress={debugFillAllComplete} activeOpacity={0.7}>
-            <Ionicons name="flash" size={11} color="#444466" />
-            <Text style={panel.devBtnText}>RESET ALL → READY TO CLAIM</Text>
-          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -788,15 +781,4 @@ const panel = StyleSheet.create({
   },
   allDoneSub: { color: colors.textMuted, fontSize: 10.5, textAlign: 'center' },
 
-  devBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
-    paddingVertical: 8, borderRadius: 8,
-    borderWidth: 1, borderColor: 'rgba(68,68,102,0.35)',
-    backgroundColor: 'rgba(68,68,102,0.10)',
-    marginTop: 4,
-  },
-  devBtnText: {
-    color: '#444466', fontSize: 9, fontWeight: '700',
-    fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
-  },
 });
