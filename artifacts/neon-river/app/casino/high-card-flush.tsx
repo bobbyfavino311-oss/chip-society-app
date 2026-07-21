@@ -442,8 +442,21 @@ export default function HighCardFlushScreen() {
     setFolded(false);       foldedRef.current = false;
     setResult(null);
     setBusy(false);
-    setFlushBonusIdx(0); setFlushBonusBet(0);    flushBonusBetRef.current = 0;
-    setSfBonusIdx(0);    setSfBonusBet(0);       sfBonusBetRef.current = 0;
+
+    // Keep bonus bets from the previous hand — only zero out what the
+    // player can no longer afford (ante is the minimum required in all cases).
+    const chips = profile.chips;
+    const canKeepFlush = chips >= ante + flushBonusBetRef.current;
+    const canKeepBoth  = canKeepFlush && chips >= ante + flushBonusBetRef.current + sfBonusBetRef.current;
+    if (!canKeepBoth) {
+      if (canKeepFlush) {
+        setSfBonusIdx(0); setSfBonusBet(0); sfBonusBetRef.current = 0;
+      } else {
+        setFlushBonusIdx(0); setFlushBonusBet(0); flushBonusBetRef.current = 0;
+        setSfBonusIdx(0);    setSfBonusBet(0);    sfBonusBetRef.current = 0;
+      }
+    }
+
     setPhase('betting');
   }
 
