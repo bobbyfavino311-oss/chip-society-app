@@ -1,12 +1,62 @@
-# EAS Build ignore — these files are not needed in the cloud build
+# EAS Build ignore — strip everything not needed for the Expo cloud build
+
+# Version control
 .git
+.gitignore
+
+# All node_modules (EAS installs fresh in the cloud)
 node_modules
+**/node_modules
+
+# Other artifacts — not needed for Expo build
+artifacts/admin
+artifacts/api-server
+artifacts/landing
+artifacts/support
+artifacts/mockup-sandbox
+
+# Shared libs build outputs
+lib/*/dist
+lib/*/*.tsbuildinfo
+lib/api-spec/src/generated
+
+# Scripts
+scripts
+
+# Attached/dev assets
+attached_assets
+screenshots
+
+# Logs and temp files
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+
+# Environment
 .env
 .env.*
-*.log
-server/
-scripts/
+
+# Editor / IDE
+.vscode
+.idea
+
+# Test files
 **/*.test.ts
 **/*.test.tsx
 **/*.spec.ts
-attached_assets/
+**/*.spec.tsx
+
+# Agent memory / Replit internals
+.agents
+.local
+.replit-audit
+.config
+
+# TypeScript build info
+**/*.tsbuildinfo
+
+# iOS / Android generated (EAS generates these fresh)
+artifacts/neon-river/ios
+artifacts/neon-river/android
