@@ -27,20 +27,21 @@
       "ios": {
         "resourceClass": "m-medium"
       },
-      "android": {
-        "buildType": "apk"
-      },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api-server-production-bbc2.up.railway.app"
+        "EXPO_PUBLIC_API_URL": "https://api-server-production-bbc2.up.railway.app",
+        "EXPO_PUBLIC_SENTRY_DSN": "$EXPO_PUBLIC_SENTRY_DSN",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "$EXPO_PUBLIC_REVENUECAT_IOS_API_KEY",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "$EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY",
+        "EXPO_PUBLIC_REVENUECAT_TEST_API_KEY": "$EXPO_PUBLIC_REVENUECAT_TEST_API_KEY"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "REPLACE_WITH_YOUR_APPLE_ID",
+        "appleId": "realbobbyf@chipsocietyapp.com",
         "ascAppId": "REPLACE_WITH_ASC_APP_ID",
-        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+        "appleTeamId": "8L8CB866ZT"
       }
     }
   }
