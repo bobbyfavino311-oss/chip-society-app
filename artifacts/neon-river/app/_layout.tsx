@@ -9,7 +9,6 @@ import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
-import { Asset } from 'expo-asset';
 import type * as NotificationsType from 'expo-notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack, useSegments } from 'expo-router';
@@ -21,7 +20,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 
-import AVATAR_IMAGES from '@/constants/avatarImages';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { UserProvider, useUser } from '@/context/UserContext';
@@ -73,6 +71,9 @@ if (Platform.OS !== 'web' && Notifications) {
 }
 
 SplashScreen.preventAutoHideAsync();
+// Hard failsafe: if JS crashes or fonts hang, splash hides after 5s so the
+// user sees the error instead of an infinite frozen splash screen.
+setTimeout(() => { SplashScreen.hideAsync().catch(() => {}); }, 5000);
 
 initializeSentry();
 
@@ -345,13 +346,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsReady) SplashScreen.hideAsync();
   }, [fontsReady]);
-
-  useEffect(() => {
-    // Preload avatar PNGs into the native image cache in the background after
-    // the splash hides — first render of any NeonAvatar will still be instant
-    // on subsequent frames. Never blocks the splash screen.
-    Asset.loadAsync(Object.values(AVATAR_IMAGES)).catch(() => {});
-  }, []);
 
   if (!fontsReady) return null;
 
