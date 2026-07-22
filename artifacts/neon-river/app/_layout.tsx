@@ -1,4 +1,3 @@
-import './global.css';
 import {
   Orbitron_400Regular,
   Orbitron_700Bold,
