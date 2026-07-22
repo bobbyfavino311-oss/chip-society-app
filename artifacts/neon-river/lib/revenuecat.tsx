@@ -47,20 +47,21 @@ export const TICKET_BUNDLE_MAP: Record<string, TicketBundle> = {
 
 // ─── Initialization ───────────────────────────────────────────────────────────
 
-function getRevenueCatApiKey(): string {
-  if (!REVENUECAT_TEST_API_KEY || !REVENUECAT_IOS_API_KEY || !REVENUECAT_ANDROID_API_KEY) {
-    throw new Error("RevenueCat API keys not configured");
-  }
+function getRevenueCatApiKey(): string | null {
   if (__DEV__ || Platform.OS === "web" || Constants.executionEnvironment === "storeClient") {
-    return REVENUECAT_TEST_API_KEY;
+    return REVENUECAT_TEST_API_KEY ?? null;
   }
-  if (Platform.OS === "ios")     return REVENUECAT_IOS_API_KEY;
-  if (Platform.OS === "android") return REVENUECAT_ANDROID_API_KEY;
-  return REVENUECAT_TEST_API_KEY;
+  if (Platform.OS === "ios")     return REVENUECAT_IOS_API_KEY ?? null;
+  if (Platform.OS === "android") return REVENUECAT_ANDROID_API_KEY ?? null;
+  return REVENUECAT_TEST_API_KEY ?? null;
 }
 
 export function initializeRevenueCat() {
   const apiKey = getRevenueCatApiKey();
+  if (!apiKey) {
+    console.warn("[RevenueCat] API key not configured — in-app purchases disabled");
+    return;
+  }
   Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
   Purchases.configure({ apiKey });
   console.log("[RevenueCat] configured");

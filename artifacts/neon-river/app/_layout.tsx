@@ -44,7 +44,7 @@ import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 import { initializeRevenueCat, SubscriptionProvider } from '@/lib/revenuecat';
 import { initializeSentry, reportError } from '@/lib/sentry';
-import { Alert } from 'react-native';
+
 
 // expo-notifications removed Android support in Expo Go SDK 53+.
 // Use a safe runtime require so the module doesn't crash on Android Expo Go.
@@ -76,11 +76,7 @@ SplashScreen.preventAutoHideAsync();
 
 initializeSentry();
 
-try {
-  initializeRevenueCat();
-} catch (err: any) {
-  Alert.alert('Store Unavailable', err?.message ?? 'Could not load the chip shop.');
-}
+initializeRevenueCat();
 
 const queryClient = new QueryClient();
 
