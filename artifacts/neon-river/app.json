@@ -49,13 +49,6 @@
       "expo-font",
       "expo-web-browser",
       [
-        "@sentry/react-native/expo",
-        {
-          "organization": "chip-society",
-          "project": "chip-society"
-        }
-      ],
-      [
         "expo-image-picker",
         {
           "photosPermission": "Chip Society accesses your photo library so you can choose a profile photo.",
