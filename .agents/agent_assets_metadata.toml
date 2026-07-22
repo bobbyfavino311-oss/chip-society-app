@@ -773,3 +773,33 @@ id = "vOs5Rw575MIG41DRlEWgZ"
 uri = "file://attached_assets/generated_images/chip-society-icon-v4.png"
 type = "image"
 title = "Chip Society Icon — Flat 2D"
+
+[[outputs]]
+id = "WyLlPpG549PLuBVm_Z0Bi"
+uri = "file://attached_assets/app_store_screenshots/screenshot_1_home.png"
+type = "image"
+title = "Screenshot 1 — Home (Daily Rewards)"
+
+[[outputs]]
+id = "yZjXZwDTgDPyd9Kva60_w"
+uri = "file://attached_assets/app_store_screenshots/screenshot_2_play.png"
+type = "image"
+title = "Screenshot 2 — Play (Game Modes)"
+
+[[outputs]]
+id = "LPOeu4FZ1HEi6iPC76ZOK"
+uri = "file://attached_assets/app_store_screenshots/screenshot_3_casino.png"
+type = "image"
+title = "Screenshot 3 — Casino"
+
+[[outputs]]
+id = "Hrl5PVGob9OEWi8WNfi75"
+uri = "file://attached_assets/app_store_screenshots/screenshot_4_feed.png"
+type = "image"
+title = "Screenshot 4 — Social Feed"
+
+[[outputs]]
+id = "-Kr8tPGhdsGFdGbWvUFG2"
+uri = "file://attached_assets/app_store_screenshots/screenshot_5_avatar.png"
+type = "image"
+title = "Screenshot 5 — Avatar"
