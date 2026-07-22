@@ -45,14 +45,16 @@
       "favicon": "./assets/images/icon.png"
     },
     "plugins": [
-      [
-        "expo-router",
-        {
-          "origin": "https://replit.com/"
-        }
-      ],
+      "expo-router",
       "expo-font",
       "expo-web-browser",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "chip-society",
+          "project": "chip-society"
+        }
+      ],
       [
         "expo-image-picker",
         {
