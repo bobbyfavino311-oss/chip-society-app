@@ -128,8 +128,11 @@ function PushSetup() {
         if (!granted || cancelled) return;
 
         // Get Expo push token — works on physical devices; silently fails on simulators
+        const projectId =
+          Constants.expoConfig?.extra?.eas?.projectId ??
+          '032b69e0-c9ad-4a63-a6c2-045e621a99c6';
         const tokenData = await Notifications.getExpoPushTokenAsync({
-          projectId: 'chip-society',
+          projectId,
         }).catch(() => null);
 
         if (tokenData && !cancelled) {
