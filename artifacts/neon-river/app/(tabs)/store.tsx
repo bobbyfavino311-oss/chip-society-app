@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import type { PurchasesPackage } from 'react-native-purchases';
 import { useColors } from '@/hooks/useColors';
 import { useTheme } from '@/context/ThemeContext';
 import type { Colors } from '@/constants/colors';
