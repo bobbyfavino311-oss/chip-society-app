@@ -1,0 +1,51 @@
+# Root-level EAS ignore for pnpm monorepo
+# EAS packs from the repo root — exclude everything not needed for the Expo build
+
+# Root node_modules (EAS installs fresh in the cloud)
+node_modules
+
+# Other artifacts — only neon-river is the Expo app
+artifacts/admin
+artifacts/api-server
+artifacts/landing
+artifacts/support
+artifacts/mockup-sandbox
+
+# Dev/attached assets
+attached_assets
+screenshots
+
+# Agent memory and Replit internals
+.agents
+.local
+.config
+.replit-audit
+
+# Version control
+.git
+
+# Logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+
+# Environment files
+.env
+.env.*
+
+# TypeScript build outputs
+**/*.tsbuildinfo
+lib/*/dist
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# iOS/Android generated dirs (EAS generates fresh)
+artifacts/neon-river/ios
+artifacts/neon-river/android
+artifacts/neon-river/node_modules
