@@ -66,8 +66,7 @@
           "icon": "./assets/images/icon.png",
           "color": "#050010"
         }
-      ],
-      "./plugins/withPrivacyManifest"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
