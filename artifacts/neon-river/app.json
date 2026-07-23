@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.chipsociety.app",
-      "buildNumber": "1",
+      "buildNumber": "12",
       "minimumOsVersion": "16.0",
       "infoPlist": {
         "UIBackgroundModes": ["remote-notification"],
