@@ -803,3 +803,9 @@ id = "-Kr8tPGhdsGFdGbWvUFG2"
 uri = "file://attached_assets/app_store_screenshots/screenshot_5_avatar.png"
 type = "image"
 title = "Screenshot 5 — Avatar"
+
+[[outputs]]
+id = "uFJFGpgOpbPDuGQUAFqHZ"
+uri = "file://chip-society-arch.svg"
+type = "image"
+title = "Chip Society — System Architecture"

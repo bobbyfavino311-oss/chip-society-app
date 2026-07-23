@@ -1,0 +1,338 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="960" viewBox="0 0 1500 960">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;display=swap');
+      text { font-family: "Orbitron", "Courier New", monospace; }
+    </style>
+    <!-- Glow filters -->
+    <filter id="glow-blue" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-pink" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-purple" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-gold" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-green" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1a0050" stroke-width="0.5"/>
+    </pattern>
+    <!-- Arrow markers -->
+    <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#00d4ff"/>
+    </marker>
+    <marker id="arrow-pink" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ff0090"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#bf5fff"/>
+    </marker>
+    <marker id="arrow-gold" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ffd700"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#00ff88"/>
+    </marker>
+    <marker id="arrow-blue-rev" markerWidth="8" markerHeight="8" refX="2" refY="3" orient="auto">
+      <path d="M8,0 L8,6 L0,3 z" fill="#00d4ff"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1500" height="960" fill="#050010"/>
+  <rect width="1500" height="960" fill="url(#grid)"/>
+
+  <!-- Horizon glow at bottom -->
+  <ellipse cx="750" cy="960" rx="900" ry="120" fill="#3a0080" opacity="0.3"/>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TITLE -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <text x="750" y="44" text-anchor="middle" font-size="22" font-weight="900" fill="#bf5fff" filter="url(#glow-purple)" letter-spacing="8">CHIP SOCIETY — SYSTEM ARCHITECTURE</text>
+  <line x1="200" y1="54" x2="1300" y2="54" stroke="#bf5fff" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION LABELS -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <text x="90" y="86" font-size="9" fill="#00d4ff" letter-spacing="3" opacity="0.8">BUILD PIPELINE</text>
+  <text x="530" y="86" font-size="9" fill="#bf5fff" letter-spacing="3" opacity="0.8">MOBILE APP</text>
+  <text x="960" y="86" font-size="9" fill="#ff0090" letter-spacing="3" opacity="0.8">EXTERNAL SERVICES</text>
+  <text x="560" y="858" font-size="9" fill="#ffd700" letter-spacing="3" opacity="0.8">WEB PROPERTIES</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- BUILD PIPELINE — Left column (x: 60–340) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <!-- Developer / Replit -->
+  <rect x="62" y="96" width="216" height="68" rx="10" fill="#0a0030" stroke="#00d4ff" stroke-width="1.5" filter="url(#glow-blue)"/>
+  <rect x="62" y="96" width="216" height="68" rx="10" fill="#00d4ff" opacity="0.06"/>
+  <text x="170" y="120" text-anchor="middle" font-size="10" fill="#00d4ff" font-weight="700" letter-spacing="1">DEVELOPER</text>
+  <text x="170" y="138" text-anchor="middle" font-size="9" fill="#8899cc">Replit Workspace</text>
+  <text x="170" y="154" text-anchor="middle" font-size="9" fill="#8899cc">TypeScript + pnpm</text>
+
+  <!-- Arrow: Developer → GitHub -->
+  <line x1="170" y1="164" x2="170" y2="198" stroke="#00d4ff" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="4,3"/>
+  <text x="176" y="184" font-size="8" fill="#00d4ff" opacity="0.7">git push (API)</text>
+
+  <!-- GitHub -->
+  <rect x="62" y="200" width="216" height="68" rx="10" fill="#0a0030" stroke="#00d4ff" stroke-width="1.5" filter="url(#glow-blue)"/>
+  <rect x="62" y="200" width="216" height="68" rx="10" fill="#00d4ff" opacity="0.06"/>
+  <text x="170" y="224" text-anchor="middle" font-size="10" fill="#00d4ff" font-weight="700" letter-spacing="1">GITHUB</text>
+  <text x="170" y="242" text-anchor="middle" font-size="9" fill="#8899cc">bobbyfavino311-oss/</text>
+  <text x="170" y="258" text-anchor="middle" font-size="9" fill="#8899cc">chip-society-app</text>
+
+  <!-- Arrow: GitHub → EAS -->
+  <line x1="170" y1="268" x2="170" y2="302" stroke="#00d4ff" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="4,3"/>
+  <text x="176" y="287" font-size="8" fill="#00d4ff" opacity="0.7">eas build</text>
+
+  <!-- EAS Build -->
+  <rect x="62" y="304" width="216" height="68" rx="10" fill="#0a0030" stroke="#00d4ff" stroke-width="1.5" filter="url(#glow-blue)"/>
+  <rect x="62" y="304" width="216" height="68" rx="10" fill="#00d4ff" opacity="0.06"/>
+  <text x="170" y="328" text-anchor="middle" font-size="10" fill="#00d4ff" font-weight="700" letter-spacing="1">EAS BUILD</text>
+  <text x="170" y="346" text-anchor="middle" font-size="9" fill="#8899cc">Expo Application Services</text>
+  <text x="170" y="362" text-anchor="middle" font-size="9" fill="#8899cc">iOS Native Binary (.ipa)</text>
+
+  <!-- Arrow: EAS → TestFlight -->
+  <line x1="170" y1="372" x2="170" y2="406" stroke="#00d4ff" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="4,3"/>
+  <text x="176" y="391" font-size="8" fill="#00d4ff" opacity="0.7">submit</text>
+
+  <!-- TestFlight / App Store -->
+  <rect x="62" y="408" width="216" height="68" rx="10" fill="#0a0030" stroke="#00d4ff" stroke-width="1.5" filter="url(#glow-blue)"/>
+  <rect x="62" y="408" width="216" height="68" rx="10" fill="#00d4ff" opacity="0.08"/>
+  <text x="170" y="432" text-anchor="middle" font-size="10" fill="#00d4ff" font-weight="700" letter-spacing="1">TESTFLIGHT</text>
+  <text x="170" y="450" text-anchor="middle" font-size="9" fill="#8899cc">+ App Store</text>
+  <text x="170" y="466" text-anchor="middle" font-size="9" fill="#8899cc">Apple (Bundle: com.chipsociety.app)</text>
+
+  <!-- Arrow: TestFlight → iPhone (right) -->
+  <path d="M278 442 Q 360 442 415 442" stroke="#00d4ff" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+  <text x="298" y="435" font-size="8" fill="#00d4ff" opacity="0.7">install</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- MOBILE APP — Center (x: 415–815) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <!-- Phone outline -->
+  <rect x="415" y="96" width="270" height="720" rx="28" fill="#0c0028" stroke="#bf5fff" stroke-width="2.5" filter="url(#glow-purple)"/>
+  <!-- Phone screen -->
+  <rect x="428" y="130" width="244" height="648" rx="8" fill="#07001a"/>
+  <!-- Notch -->
+  <rect x="505" y="104" width="90" height="18" rx="9" fill="#0c0028"/>
+  <!-- Home bar -->
+  <rect x="515" y="794" width="70" height="5" rx="3" fill="#bf5fff" opacity="0.5"/>
+
+  <!-- App logo area -->
+  <rect x="428" y="130" width="244" height="56" rx="0" fill="#0a0030"/>
+  <text x="550" y="158" text-anchor="middle" font-size="13" fill="#bf5fff" font-weight="900" filter="url(#glow-purple)" letter-spacing="3">CHIP SOCIETY</text>
+  <text x="550" y="176" text-anchor="middle" font-size="8" fill="#7055aa" letter-spacing="2">TEXAS HOLD'EM POKER</text>
+
+  <!-- Expo / RN badge -->
+  <rect x="436" y="195" width="228" height="24" rx="6" fill="#130040"/>
+  <text x="550" y="211" text-anchor="middle" font-size="8" fill="#6644bb" letter-spacing="1">Expo SDK 54 · React Native 0.81 · iOS</text>
+
+  <!-- Feature rows inside phone -->
+  <line x1="428" y1="228" x2="672" y2="228" stroke="#1a0050" stroke-width="1"/>
+
+  <!-- Features list -->
+  <text x="444" y="252" font-size="9" fill="#bf5fff" letter-spacing="1">TABS</text>
+  <text x="444" y="270" font-size="8" fill="#aabbcc">Home · Play · Feed · Tournaments · Profile · Store</text>
+
+  <line x1="428" y1="282" x2="672" y2="282" stroke="#1a0050" stroke-width="1"/>
+
+  <text x="444" y="302" font-size="9" fill="#bf5fff" letter-spacing="1">POKER ENGINE</text>
+  <text x="444" y="320" font-size="8" fill="#aabbcc">Texas Hold'em · Short Deck · Omaha · Blackjack</text>
+  <text x="444" y="336" font-size="8" fill="#aabbcc">5 AI difficulty levels · Up to 5 players</text>
+
+  <line x1="428" y1="348" x2="672" y2="348" stroke="#1a0050" stroke-width="1"/>
+
+  <text x="444" y="368" font-size="9" fill="#bf5fff" letter-spacing="1">MULTIPLAYER</text>
+  <text x="444" y="386" font-size="8" fill="#aabbcc">Socket.IO · Live matchmaking · Bot fill</text>
+  <text x="444" y="402" font-size="8" fill="#aabbcc">Social feed · Live posts · Comments</text>
+
+  <line x1="428" y1="414" x2="672" y2="414" stroke="#1a0050" stroke-width="1"/>
+
+  <text x="444" y="434" font-size="9" fill="#bf5fff" letter-spacing="1">PROGRESSION</text>
+  <text x="444" y="452" font-size="8" fill="#aabbcc">XP · 7 Ranks · Daily Missions · Achievements</text>
+  <text x="444" y="468" font-size="8" fill="#aabbcc">80 Characters · Fortune Cookies · Scratch Tickets</text>
+
+  <line x1="428" y1="480" x2="672" y2="480" stroke="#1a0050" stroke-width="1"/>
+
+  <text x="444" y="500" font-size="9" fill="#bf5fff" letter-spacing="1">CHIP STORE  💰</text>
+  <text x="444" y="518" font-size="8" fill="#aabbcc">6 chip bundles · 3 ticket packs</text>
+  <text x="444" y="534" font-size="8" fill="#aabbcc">react-native-purchases · RevenueCat</text>
+
+  <line x1="428" y1="546" x2="672" y2="546" stroke="#1a0050" stroke-width="1"/>
+
+  <text x="444" y="566" font-size="9" fill="#bf5fff" letter-spacing="1">ACCOUNTS</text>
+  <text x="444" y="584" font-size="8" fill="#aabbcc">Username + PIN · AsyncStorage · Railway DB</text>
+  <text x="444" y="600" font-size="8" fill="#aabbcc">Founder badge · Moderation system</text>
+
+  <line x1="428" y1="612" x2="672" y2="612" stroke="#1a0050" stroke-width="1"/>
+
+  <text x="444" y="632" font-size="9" fill="#bf5fff" letter-spacing="1">AUDIO / UI</text>
+  <text x="444" y="650" font-size="8" fill="#aabbcc">19 SFX (expo-av) · Music engine</text>
+  <text x="444" y="666" font-size="8" fill="#aabbcc">Orbitron + Inter · Neon synthwave theme</text>
+
+  <line x1="428" y1="678" x2="672" y2="678" stroke="#1a0050" stroke-width="1"/>
+
+  <text x="444" y="698" font-size="9" fill="#bf5fff" letter-spacing="1">OBSERVABILITY</text>
+  <text x="444" y="716" font-size="8" fill="#aabbcc">Sentry crash reporting · Push notifications</text>
+  <text x="444" y="732" font-size="8" fill="#aabbcc">APNs · Expo push tokens</text>
+
+  <!-- Tab bar at bottom of phone -->
+  <rect x="428" y="750" width="244" height="28" rx="0" fill="#0a0020"/>
+  <text x="461" y="768" text-anchor="middle" font-size="7" fill="#664488">Home</text>
+  <text x="503" y="768" text-anchor="middle" font-size="7" fill="#664488">Play</text>
+  <text x="550" y="768" text-anchor="middle" font-size="7" fill="#664488">Feed</text>
+  <text x="597" y="768" text-anchor="middle" font-size="7" fill="#664488">Tour.</text>
+  <text x="640" y="768" text-anchor="middle" font-size="7" fill="#664488">Profile</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- EXTERNAL SERVICES — Right column (x: 870–1440) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <!-- RevenueCat -->
+  <rect x="870" y="96" width="258" height="90" rx="10" fill="#0a0030" stroke="#ffd700" stroke-width="1.5" filter="url(#glow-gold)"/>
+  <rect x="870" y="96" width="258" height="90" rx="10" fill="#ffd700" opacity="0.05"/>
+  <text x="999" y="120" text-anchor="middle" font-size="10" fill="#ffd700" font-weight="700" letter-spacing="1">REVENUECAT</text>
+  <text x="999" y="140" text-anchor="middle" font-size="8" fill="#aa9933">In-App Purchase Validation</text>
+  <text x="999" y="156" text-anchor="middle" font-size="8" fill="#aa9933">Project: proj4cc86fa1</text>
+  <text x="999" y="172" text-anchor="middle" font-size="8" fill="#aa9933">Offering: chip_shop · 9 consumables</text>
+
+  <!-- Arrow: iPhone → RevenueCat -->
+  <path d="M685 200 Q 780 200 862 155" stroke="#ffd700" stroke-width="1.5" fill="none" marker-end="url(#arrow-gold)" stroke-dasharray="5,3"/>
+  <text x="740" y="188" font-size="8" fill="#ffd700" opacity="0.8">purchase / validate</text>
+
+  <!-- RevenueCat ↔ App Store Connect -->
+  <rect x="1160" y="96" width="258" height="90" rx="10" fill="#0a0030" stroke="#ffd700" stroke-width="1" opacity="0.7"/>
+  <text x="1289" y="120" text-anchor="middle" font-size="10" fill="#ffd700" font-weight="700" letter-spacing="1" opacity="0.8">APP STORE CONNECT</text>
+  <text x="1289" y="140" text-anchor="middle" font-size="8" fill="#aa9933">9 IAP Products (Consumable)</text>
+  <text x="1289" y="156" text-anchor="middle" font-size="8" fill="#aa9933">chips_100k → chips_50m</text>
+  <text x="1289" y="172" text-anchor="middle" font-size="8" fill="#aa9933">tickets_3 / tickets_10 / tickets_25</text>
+  <path d="M1128 141 L1152 141" stroke="#ffd700" stroke-width="1.5" fill="none" marker-end="url(#arrow-gold)" opacity="0.7"/>
+  <text x="1134" y="135" font-size="7" fill="#ffd700" opacity="0.6">receipt</text>
+
+  <!-- Sentry -->
+  <rect x="870" y="210" width="258" height="80" rx="10" fill="#0a0030" stroke="#ff0090" stroke-width="1.5" filter="url(#glow-pink)"/>
+  <rect x="870" y="210" width="258" height="80" rx="10" fill="#ff0090" opacity="0.05"/>
+  <text x="999" y="234" text-anchor="middle" font-size="10" fill="#ff0090" font-weight="700" letter-spacing="1">SENTRY</text>
+  <text x="999" y="253" text-anchor="middle" font-size="8" fill="#993366">Crash Reporting &amp; Error Tracking</text>
+  <text x="999" y="270" text-anchor="middle" font-size="8" fill="#993366">@sentry/react-native · EXPO_PUBLIC_SENTRY_DSN</text>
+  <text x="999" y="282" text-anchor="middle" font-size="8" fill="#993366">Source maps via EAS build</text>
+
+  <!-- Arrow: iPhone → Sentry -->
+  <path d="M685 310 Q 780 310 862 263" stroke="#ff0090" stroke-width="1.5" fill="none" marker-end="url(#arrow-pink)" stroke-dasharray="5,3"/>
+  <text x="740" y="300" font-size="8" fill="#ff0090" opacity="0.8">crash events</text>
+
+  <!-- Railway API Server -->
+  <rect x="870" y="314" width="258" height="90" rx="10" fill="#0a0030" stroke="#00ff88" stroke-width="1.5" filter="url(#glow-green)"/>
+  <rect x="870" y="314" width="258" height="90" rx="10" fill="#00ff88" opacity="0.04"/>
+  <text x="999" y="338" text-anchor="middle" font-size="10" fill="#00ff88" font-weight="700" letter-spacing="1">RAILWAY — API SERVER</text>
+  <text x="999" y="357" text-anchor="middle" font-size="8" fill="#338855">Express 5 + Socket.IO</text>
+  <text x="999" y="373" text-anchor="middle" font-size="8" fill="#338855">api-server-production-bbc2.up.railway.app</text>
+  <text x="999" y="389" text-anchor="middle" font-size="8" fill="#338855">Auth · Multiplayer · Social · Admin · Moderation</text>
+
+  <!-- Arrow: iPhone ↔ API Server -->
+  <path d="M685 442 Q 780 442 862 385" stroke="#00ff88" stroke-width="1.5" fill="none" marker-end="url(#arrow-green)" stroke-dasharray="5,3"/>
+  <text x="738" y="432" font-size="8" fill="#00ff88" opacity="0.8">REST + Socket.IO</text>
+
+  <!-- Railway PostgreSQL -->
+  <rect x="870" y="428" width="258" height="80" rx="10" fill="#0a0030" stroke="#00ff88" stroke-width="1" opacity="0.7"/>
+  <text x="999" y="452" text-anchor="middle" font-size="10" fill="#00ff88" font-weight="700" letter-spacing="1" opacity="0.8">RAILWAY — POSTGRESQL</text>
+  <text x="999" y="471" text-anchor="middle" font-size="8" fill="#338855">Drizzle ORM</text>
+  <text x="999" y="488" text-anchor="middle" font-size="8" fill="#338855">Users · Feed posts · Likes · Comments</text>
+  <text x="999" y="500" text-anchor="middle" font-size="8" fill="#338855">Moderation · Notifications</text>
+
+  <!-- Arrow: API → DB -->
+  <line x1="999" y1="404" x2="999" y2="420" stroke="#00ff88" stroke-width="1.5" marker-end="url(#arrow-green)" opacity="0.7"/>
+
+  <!-- APNs -->
+  <rect x="870" y="532" width="258" height="70" rx="10" fill="#0a0030" stroke="#00d4ff" stroke-width="1" opacity="0.6"/>
+  <text x="999" y="556" text-anchor="middle" font-size="10" fill="#00d4ff" font-weight="700" letter-spacing="1" opacity="0.8">APPLE PUSH (APNs)</text>
+  <text x="999" y="575" text-anchor="middle" font-size="8" fill="#336688">expo-notifications · Expo Push Service</text>
+  <text x="999" y="591" text-anchor="middle" font-size="8" fill="#336688">Push tokens stored in Railway DB</text>
+
+  <!-- Arrow: API → APNs -->
+  <line x1="999" y1="508" x2="999" y2="524" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arrow-blue)" opacity="0.6"/>
+
+  <!-- Arrow: APNs → iPhone -->
+  <path d="M870 567 Q 780 567 690 640" stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)" stroke-dasharray="5,3" opacity="0.5"/>
+
+  <!-- AsyncStorage note on phone -->
+  <rect x="870" y="626" width="258" height="60" rx="10" fill="#0a0030" stroke="#bf5fff" stroke-width="1" opacity="0.6"/>
+  <text x="999" y="650" text-anchor="middle" font-size="10" fill="#bf5fff" font-weight="700" letter-spacing="1" opacity="0.8">ASYNC STORAGE</text>
+  <text x="999" y="669" text-anchor="middle" font-size="8" fill="#6644aa">On-device: profile, chips, missions</text>
+  <text x="999" y="681" text-anchor="middle" font-size="8" fill="#6644aa">cookies, tickets, game state</text>
+
+  <!-- Arrow: iPhone ↔ AsyncStorage -->
+  <path d="M685 550 Q 780 600 862 650" stroke="#bf5fff" stroke-width="1.5" fill="none" marker-end="url(#arrow-purple)" stroke-dasharray="5,3" opacity="0.5"/>
+  <text x="735" y="585" font-size="8" fill="#bf5fff" opacity="0.6">local persist</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- WEB PROPERTIES — Bottom row -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <!-- Admin Dashboard -->
+  <rect x="200" y="870" width="240" height="68" rx="10" fill="#0a0030" stroke="#ffd700" stroke-width="1.5" filter="url(#glow-gold)"/>
+  <rect x="200" y="870" width="240" height="68" rx="10" fill="#ffd700" opacity="0.05"/>
+  <text x="320" y="894" text-anchor="middle" font-size="10" fill="#ffd700" font-weight="700" letter-spacing="1">ADMIN DASHBOARD</text>
+  <text x="320" y="912" text-anchor="middle" font-size="8" fill="#aa9933">React + Vite · Replit hosted</text>
+  <text x="320" y="928" text-anchor="middle" font-size="8" fill="#aa9933">Player mgmt · Moderation · Founder badge</text>
+
+  <!-- Landing Page -->
+  <rect x="530" y="870" width="240" height="68" rx="10" fill="#0a0030" stroke="#ffd700" stroke-width="1.5"/>
+  <rect x="530" y="870" width="240" height="68" rx="10" fill="#ffd700" opacity="0.04"/>
+  <text x="650" y="894" text-anchor="middle" font-size="10" fill="#ffd700" font-weight="700" letter-spacing="1">LANDING PAGE</text>
+  <text x="650" y="912" text-anchor="middle" font-size="8" fill="#aa9933">React + Vite · Replit hosted</text>
+  <text x="650" y="928" text-anchor="middle" font-size="8" fill="#aa9933">Marketing · App Store link</text>
+
+  <!-- Support Page -->
+  <rect x="860" y="870" width="240" height="68" rx="10" fill="#0a0030" stroke="#ffd700" stroke-width="1.5"/>
+  <rect x="860" y="870" width="240" height="68" rx="10" fill="#ffd700" opacity="0.04"/>
+  <text x="980" y="894" text-anchor="middle" font-size="10" fill="#ffd700" font-weight="700" letter-spacing="1">SUPPORT PAGE</text>
+  <text x="980" y="912" text-anchor="middle" font-size="8" fill="#aa9933">React + Vite · Replit hosted</text>
+  <text x="980" y="928" text-anchor="middle" font-size="8" fill="#aa9933">FAQ · Contact · Privacy Policy</text>
+
+  <!-- Arrows: Web apps → API -->
+  <path d="M320 870 Q 320 820 870 380" stroke="#ffd700" stroke-width="1" fill="none" marker-end="url(#arrow-gold)" stroke-dasharray="4,4" opacity="0.35"/>
+  <path d="M650 870 Q 780 840 870 380" stroke="#ffd700" stroke-width="1" fill="none" marker-end="url(#arrow-gold)" stroke-dasharray="4,4" opacity="0.25"/>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- LEGEND -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="1200" y="700" width="270" height="190" rx="10" fill="#080020" stroke="#2a0060" stroke-width="1"/>
+  <text x="1335" y="722" text-anchor="middle" font-size="9" fill="#7755bb" letter-spacing="2">LEGEND</text>
+
+  <line x1="1218" y1="744" x2="1258" y2="744" stroke="#00d4ff" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-blue)"/>
+  <text x="1268" y="748" font-size="8" fill="#8899cc">Build / Deploy flow</text>
+
+  <line x1="1218" y1="770" x2="1258" y2="770" stroke="#ff0090" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-pink)"/>
+  <text x="1268" y="774" font-size="8" fill="#8899cc">Crash / error events</text>
+
+  <line x1="1218" y1="796" x2="1258" y2="796" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gold)"/>
+  <text x="1268" y="800" font-size="8" fill="#8899cc">Purchase / IAP</text>
+
+  <line x1="1218" y1="822" x2="1258" y2="822" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-green)"/>
+  <text x="1268" y="826" font-size="8" fill="#8899cc">API / WebSocket</text>
+
+  <line x1="1218" y1="848" x2="1258" y2="848" stroke="#bf5fff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-purple)"/>
+  <text x="1268" y="852" font-size="8" fill="#8899cc">Local storage</text>
+
+  <line x1="1218" y1="874" x2="1258" y2="874" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-blue)"/>
+  <text x="1268" y="878" font-size="8" fill="#8899cc">Push notifications</text>
+
+  <!-- Version watermark -->
+  <text x="1490" y="950" text-anchor="end" font-size="7" fill="#220044" letter-spacing="1">CHIP SOCIETY · SYSTEM MAP · 2026</text>
+
+</svg>
