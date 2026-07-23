@@ -11,6 +11,7 @@ import { Righteous_400Regular } from '@expo-google-fonts/righteous';
 import type * as NotificationsType from 'expo-notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack, useSegments } from 'expo-router';
+import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
@@ -76,7 +77,11 @@ setTimeout(() => { SplashScreen.hideAsync().catch(() => {}); }, 5000);
 
 initializeSentry();
 
-initializeRevenueCat();
+try {
+  initializeRevenueCat();
+} catch (err: unknown) {
+  console.warn("[RevenueCat] Init failed:", err instanceof Error ? err.message : String(err));
+}
 
 const queryClient = new QueryClient();
 

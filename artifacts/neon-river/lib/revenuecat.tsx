@@ -1,9 +1,11 @@
-// react-native-purchases is temporarily stubbed out.
-// The native RNPurchases module requires proper Expo plugin setup to register
-// in the iOS binary. Without it the app crashes at startup on import.
-// TODO: replace with expo-purchases or add proper plugin configuration.
-
 import React, { createContext, useContext } from "react";
+import { Platform } from "react-native";
+import Purchases from "react-native-purchases";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import Constants from "expo-constants";
+
+const REVENUECAT_TEST_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY;
+const REVENUECAT_IOS_API_KEY  = process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY;
 
 export type ChipBundle = {
   chips:   number;
@@ -34,32 +36,73 @@ export const TICKET_BUNDLE_MAP: Record<string, TicketBundle> = {
   tickets_25: { tickets: 25, label: "25 Tickets", color: "#ffd700" },
 };
 
-export function initializeRevenueCat() {
-  // no-op until native module is properly configured
+function getRevenueCatApiKey(): string {
+  const isTestEnv =
+    __DEV__ ||
+    Platform.OS === "web" ||
+    Constants.executionEnvironment === "storeClient";
+
+  if (isTestEnv) {
+    if (!REVENUECAT_TEST_API_KEY) throw new Error("EXPO_PUBLIC_REVENUECAT_TEST_API_KEY not set");
+    return REVENUECAT_TEST_API_KEY;
+  }
+
+  if (Platform.OS === "ios") {
+    if (!REVENUECAT_IOS_API_KEY) throw new Error("EXPO_PUBLIC_REVENUECAT_IOS_API_KEY not set");
+    return REVENUECAT_IOS_API_KEY;
+  }
+
+  if (!REVENUECAT_TEST_API_KEY) throw new Error("EXPO_PUBLIC_REVENUECAT_TEST_API_KEY not set");
+  return REVENUECAT_TEST_API_KEY;
 }
 
-type SubscriptionContextValue = {
-  offerings:     undefined;
-  isLoading:     boolean;
-  purchase:      (pkg: any) => Promise<never>;
-  isPurchasing:  boolean;
-  purchaseError: null;
-  restore:       () => Promise<never>;
-  isRestoring:   boolean;
-};
+export function initializeRevenueCat() {
+  const apiKey = getRevenueCatApiKey();
+  Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+  Purchases.configure({ apiKey });
+  console.log("[RevenueCat] Configured");
+}
 
+function useSubscriptionContext() {
+  const offeringsQuery = useQuery({
+    queryKey: ["revenuecat", "offerings"],
+    queryFn: async () => {
+      const offerings = await Purchases.getOfferings();
+      return offerings;
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+  });
+
+  const purchaseMutation = useMutation({
+    mutationFn: async (packageToPurchase: import("react-native-purchases").PurchasesPackage) => {
+      const { customerInfo } = await Purchases.purchasePackage(packageToPurchase);
+      return customerInfo;
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: async () => {
+      return Purchases.restorePurchases();
+    },
+  });
+
+  return {
+    offerings:     offeringsQuery.data,
+    isLoading:     offeringsQuery.isLoading,
+    purchase:      purchaseMutation.mutateAsync,
+    isPurchasing:  purchaseMutation.isPending,
+    purchaseError: purchaseMutation.error,
+    restore:       restoreMutation.mutateAsync,
+    isRestoring:   restoreMutation.isPending,
+  };
+}
+
+type SubscriptionContextValue = ReturnType<typeof useSubscriptionContext>;
 const Context = createContext<SubscriptionContextValue | null>(null);
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
-  const value: SubscriptionContextValue = {
-    offerings:    undefined,
-    isLoading:    false,
-    purchase:     async () => { throw new Error("Store not available"); },
-    isPurchasing: false,
-    purchaseError: null,
-    restore:      async () => { throw new Error("Store not available"); },
-    isRestoring:  false,
-  };
+  const value = useSubscriptionContext();
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 
