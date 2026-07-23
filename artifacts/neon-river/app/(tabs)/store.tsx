@@ -19,6 +19,7 @@ import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { formatChips, getChipColor } from '@/utils/chipColor';
 import ChipIcon from '@/components/ChipIcon';
+import type { PurchasesPackage } from 'react-native-purchases';
 import { useSubscription, CHIP_BUNDLE_MAP, TICKET_BUNDLE_MAP, type ChipBundle } from '@/lib/revenuecat';
 
 // ─── Shared styles factory ─────────────────────────────────────────────────────

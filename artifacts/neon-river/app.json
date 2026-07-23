@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.chipsociety.app",
-      "buildNumber": "12",
+      "buildNumber": "13",
       "minimumOsVersion": "16.0",
       "infoPlist": {
         "UIBackgroundModes": ["remote-notification"],
@@ -48,6 +48,7 @@
       "expo-router",
       "expo-font",
       "expo-web-browser",
+      "react-native-purchases",
       [
         "expo-image-picker",
         {
