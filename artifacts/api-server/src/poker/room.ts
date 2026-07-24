@@ -77,10 +77,14 @@ export class PokerRoom {
   addPlayer(socketId: string, userId: string, username: string, avatarId: number, chips: number): number {
     const emptyIdx = this.seats.findIndex(s => s === null);
     if (emptyIdx === -1) return -1;
+    // If a hand is already in progress, seat the player as sitting_out so they
+    // are not included in isBettingRoundComplete() or nextActiveSeatFrom() for
+    // the current hand. startHand() promotes them to 'active' for the next hand.
+    const initialStatus: Seat['status'] = this.phase !== 'waiting' ? 'sitting_out' : 'active';
     this.seats[emptyIdx] = {
       socketId, userId, username, avatarId,
       chips, startingChips: chips,
-      cards: [], currentBet: 0, totalBet: 0, status: 'active',
+      cards: [], currentBet: 0, totalBet: 0, status: initialStatus,
     };
     this.addMessage(`${username} joined the table`, 'info');
     this.broadcastState();

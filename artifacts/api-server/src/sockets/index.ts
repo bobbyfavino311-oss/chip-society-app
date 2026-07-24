@@ -197,9 +197,10 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        // Load authoritative chips from DB (fall back to client value for guest accounts)
+        // Load authoritative chips from DB (fall back to client value for guest accounts
+        // or when DB shows 0 — 0 means the record is stale/unsynced, not truly broke)
         const dbChips = await loadPlayerChips(payload.userId);
-        const chips = dbChips !== null ? dbChips : payload.chips;
+        const chips = (dbChips !== null && dbChips > 0) ? dbChips : payload.chips;
 
         const tier = payload.stakeTier as StakeTier;
         const variant = resolveVariant(payload.variant);
@@ -281,9 +282,9 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        // Fall back to client-supplied chips for guest accounts (same as create_table/join_table)
+        // Fall back to client-supplied chips for guest accounts or when DB shows 0
         const dbChips = await loadPlayerChips(payload.userId);
-        const chips = dbChips !== null ? dbChips : (payload.chips ?? 500_000);
+        const chips = (dbChips !== null && dbChips > 0) ? dbChips : (payload.chips ?? 500_000);
 
         const tier = payload.stakeTier as StakeTier;
         const variant = resolveVariant(payload.variant);
