@@ -863,3 +863,9 @@ id = "mrC8xE1nq-qC6AUzNlMun"
 uri = "file://screenshots2/05_profile.png"
 type = "image"
 title = "05 — Profile"
+
+[[outputs]]
+id = "tPGsh1DUuwkcNtKoBspC9"
+uri = "file://screenshots2/06_poker_table.png"
+type = "image"
+title = "06 — Poker Table"
