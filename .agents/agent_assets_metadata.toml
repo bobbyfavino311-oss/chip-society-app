@@ -833,3 +833,33 @@ id = "TofKpiA2ksNGHoz2rD6Xe"
 uri = "file://screenshots/04_avatars.png"
 type = "image"
 title = "Screenshot 4 — Avatars"
+
+[[outputs]]
+id = "yQHNCDWFehO9UjKVCk8np"
+uri = "file://screenshots2/01_home.png"
+type = "image"
+title = "01 — Home"
+
+[[outputs]]
+id = "6o0vBbArVJMhcWEwJcjUg"
+uri = "file://screenshots2/02_play.png"
+type = "image"
+title = "02 — Play"
+
+[[outputs]]
+id = "JyfBEXbgIlJ_IqmTBprww"
+uri = "file://screenshots2/03_three_card_poker.png"
+type = "image"
+title = "03 — Three Card Poker"
+
+[[outputs]]
+id = "U0-v1pMcjif_vndma1A4G"
+uri = "file://screenshots2/04_social_feed.png"
+type = "image"
+title = "04 — Social Feed"
+
+[[outputs]]
+id = "mrC8xE1nq-qC6AUzNlMun"
+uri = "file://screenshots2/05_profile.png"
+type = "image"
+title = "05 — Profile"
