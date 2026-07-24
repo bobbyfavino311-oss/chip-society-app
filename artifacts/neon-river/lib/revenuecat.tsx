@@ -16,12 +16,12 @@ export type ChipBundle = {
 };
 
 export const CHIP_BUNDLE_MAP: Record<string, ChipBundle> = {
-  chips_100k:  { chips: 100_000,    label: "Pocket Change", color: "#888",    glow: "#888" },
-  chips_500k:  { chips: 500_000,    label: "Stack",         color: "#00d4ff", glow: "#00d4ff" },
-  chips_1500k: { chips: 1_500_000,  label: "Buy-In",        bonus: "+10% XP", color: "#bf5fff", glow: "#bf5fff" },
-  chips_5m:    { chips: 5_000_000,  label: "High Roller",   bonus: "+15% XP", color: "#ff0090", glow: "#ff0090" },
-  chips_15m:   { chips: 15_000_000, label: "Whale",         bonus: "+20% XP", color: "#ffa500", glow: "#ffa500" },
-  chips_50m:   { chips: 50_000_000, label: "Shark",         bonus: "+25% XP", color: "#ffd700", glow: "#ffd700" },
+  chips_100k: { chips: 100_000,    label: "Pocket Change", color: "#888",    glow: "#888" },
+  chips_500k: { chips: 500_000,    label: "Stack",         color: "#00d4ff", glow: "#00d4ff" },
+  chips_1m:   { chips: 1_000_000,  label: "Buy-In",        bonus: "+10% XP", color: "#bf5fff", glow: "#bf5fff" },
+  chips_5m:   { chips: 5_000_000,  label: "High Roller",   bonus: "+15% XP", color: "#ff0090", glow: "#ff0090" },
+  chips_10m:  { chips: 10_000_000, label: "Whale",         bonus: "+20% XP", color: "#ffa500", glow: "#ffa500" },
+  chips_50m:  { chips: 50_000_000, label: "Shark",         bonus: "+25% XP", color: "#ffd700", glow: "#ffd700" },
 };
 
 export type TicketBundle = {
