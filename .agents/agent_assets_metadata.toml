@@ -809,3 +809,27 @@ id = "uFJFGpgOpbPDuGQUAFqHZ"
 uri = "file://chip-society-arch.svg"
 type = "image"
 title = "Chip Society — System Architecture"
+
+[[outputs]]
+id = "3J6_pXPlKuY-oup4CbYiI"
+uri = "file://screenshots/01_daily_wheel.png"
+type = "image"
+title = "Screenshot 1 — Daily Wheel"
+
+[[outputs]]
+id = "3u7Scvwio7Qk-z-gHSrYH"
+uri = "file://screenshots/02_casino_games.png"
+type = "image"
+title = "Screenshot 2 — Casino Games"
+
+[[outputs]]
+id = "VbZP58DxTKcOl0jUCvmrV"
+uri = "file://screenshots/03_social_feed.png"
+type = "image"
+title = "Screenshot 3 — Social Feed"
+
+[[outputs]]
+id = "TofKpiA2ksNGHoz2rD6Xe"
+uri = "file://screenshots/04_avatars.png"
+type = "image"
+title = "Screenshot 4 — Avatars"
