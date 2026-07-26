@@ -150,9 +150,12 @@ function TournamentInfoModal({ visible, onClose }: { visible: boolean; onClose: 
 
 const DISMISSED_KEY = '@chip_dismissed_announcements_v1';
 
+const LONG_BODY_THRESHOLD = 120; // chars — beyond this we offer expand/collapse
+
 function DevAnnouncementBanner() {
   const [announcement, setAnnouncement] = useState<{ id: string; title: string; body: string } | null>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible,   setVisible]   = useState(false);
+  const [expanded,  setExpanded]  = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -183,6 +186,8 @@ function DevAnnouncementBanner() {
 
   if (!visible || !announcement) return null;
 
+  const isLong = announcement.body.length > LONG_BODY_THRESHOLD;
+
   return (
     <View style={devAnn.wrap}>
       <LinearGradient
@@ -190,35 +195,56 @@ function DevAnnouncementBanner() {
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
-      <View style={devAnn.iconWrap}>
-        <Ionicons name="megaphone" size={15} color={colors.primary} />
+
+      {/* Top row: icon + title + dismiss */}
+      <View style={devAnn.topRow}>
+        <View style={devAnn.iconWrap}>
+          <Ionicons name="megaphone" size={15} color={colors.primary} />
+        </View>
+        <Text style={devAnn.title} numberOfLines={2}>{announcement.title}</Text>
+        <TouchableOpacity onPress={dismiss} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={{ marginLeft: 4 }}>
+          <Ionicons name="close-circle" size={20} color={colors.textMuted} />
+        </TouchableOpacity>
       </View>
-      <View style={{ flex: 1, gap: 2 }}>
-        <Text style={devAnn.title}>{announcement.title}</Text>
-        <Text style={devAnn.body} numberOfLines={3}>{announcement.body}</Text>
+
+      {/* Body — always fully shown when expanded, 2-line preview when collapsed */}
+      <Text style={devAnn.body} numberOfLines={expanded || !isLong ? undefined : 2}>
+        {announcement.body}
+      </Text>
+
+      {/* Footer row */}
+      <View style={devAnn.footer}>
         <Text style={devAnn.from}>📣 FROM DEV TEAM</Text>
+        {isLong && (
+          <TouchableOpacity onPress={() => setExpanded(e => !e)} style={devAnn.readMoreBtn} activeOpacity={0.7}>
+            <Text style={devAnn.readMoreText}>{expanded ? 'Show less' : 'Read more'}</Text>
+            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={11} color={colors.primary} />
+          </TouchableOpacity>
+        )}
       </View>
-      <TouchableOpacity onPress={dismiss} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-        <Ionicons name="close-circle" size={20} color={colors.textMuted} />
-      </TouchableOpacity>
     </View>
   );
 }
 
 const devAnn = StyleSheet.create({
   wrap: {
-    flexDirection: 'row', alignItems: 'flex-start', gap: 10,
     borderRadius: 14, borderWidth: 1, borderColor: `${colors.primary}35`,
-    padding: 13, marginBottom: 6, overflow: 'hidden',
+    padding: 13, marginBottom: 6, overflow: 'hidden', gap: 7,
+  },
+  topRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
   },
   iconWrap: {
-    width: 36, height: 36, borderRadius: 18, borderWidth: 1,
+    width: 32, height: 32, borderRadius: 16, borderWidth: 1, flexShrink: 0,
     borderColor: `${colors.primary}40`, backgroundColor: `${colors.primary}10`,
     alignItems: 'center', justifyContent: 'center',
   },
-  title:  { color: '#fff', fontSize: 13, fontWeight: '800', lineHeight: 18 },
-  body:   { color: 'rgba(255,255,255,0.60)', fontSize: 12, lineHeight: 17 },
-  from:   { color: colors.primary, fontSize: 9, fontWeight: '800', letterSpacing: 1, marginTop: 2 },
+  title:       { color: '#fff', fontSize: 13, fontWeight: '800', lineHeight: 18, flex: 1 },
+  body:        { color: 'rgba(255,255,255,0.65)', fontSize: 12, lineHeight: 18 },
+  footer:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  from:        { color: colors.primary, fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  readMoreBtn: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  readMoreText:{ color: colors.primary, fontSize: 11, fontWeight: '700' },
 });
 
 function EarlyAccessBanner() {
