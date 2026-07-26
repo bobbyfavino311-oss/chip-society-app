@@ -466,6 +466,16 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
 
     const rows = await query;
 
+    // Live-lookup author avatar index from player profiles so it always
+    // reflects the player's current avatar selection, even for old posts.
+    const uniqueAuthorIds = [...new Set(rows.map(r => r.authorId))];
+    const liveProfiles = uniqueAuthorIds.length > 0
+      ? await db.select({ playerId: playersTable.playerId, profileJson: playersTable.profileJson })
+          .from(playersTable)
+          .where(inArray(playersTable.playerId, uniqueAuthorIds))
+      : [];
+    const liveProfileMap = new Map(liveProfiles.map(p => [p.playerId, p.profileJson as any]));
+
     // Batch-check which posts the current player liked
     const postIds = rows.map(r => r.id);
     const likedRows = postIds.length > 0
@@ -479,7 +489,7 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
       id:              r.id,
       authorId:        r.authorId,
       authorUsername:  r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
-      authorAvatarIndex: r.authorAvatarIndex ?? 1,
+      authorAvatarIndex: (() => { const lp = liveProfileMap.get(r.authorId); return lp?.symbolIndex ?? lp?.avatarIndex ?? r.authorAvatarIndex ?? 1; })(),
       authorRank:      r.authorRank ?? 'Player',
       content:         r.content,
       tag:             r.tag,
@@ -525,7 +535,7 @@ router.post('/social/posts', requirePlayer, async (req: any, res) => {
     // Prefer the client-provided display name — the DB may have a stale
     // or auto-generated username that doesn't match what the user sees.
     const resolvedUsername    = authorUsername ?? author?.username ?? `player_${playerId.slice(0, 6)}`;
-    const resolvedAvatarIndex = authorAvatarIndex ?? (author?.profileJson as any)?.avatarIndex ?? 1;
+    const resolvedAvatarIndex = authorAvatarIndex ?? (author?.profileJson as any)?.symbolIndex ?? (author?.profileJson as any)?.avatarIndex ?? 1;
     const resolvedRank        = authorRank ?? (author?.profileJson as any)?.rank ?? 'Player';
 
     const id = randomUUID();

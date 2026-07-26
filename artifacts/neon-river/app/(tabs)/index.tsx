@@ -149,45 +149,14 @@ function TournamentInfoModal({ visible, onClose }: { visible: boolean; onClose: 
 // ─── Dev Team Announcement Banner ────────────────────────────────────────────
 
 const DISMISSED_KEY = '@chip_dismissed_announcements_v1';
+const LONG_BODY_THRESHOLD = 120;
 
-const LONG_BODY_THRESHOLD = 120; // chars — beyond this we offer expand/collapse
+type AnnItem = { id: string; title: string; body: string };
 
-function DevAnnouncementBanner() {
-  const [announcement, setAnnouncement] = useState<{ id: string; title: string; body: string } | null>(null);
-  const [visible,   setVisible]   = useState(false);
-  const [expanded,  setExpanded]  = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('https://api-server-production-bbc2.up.railway.app/api/announcements');
-        const data = await res.json() as { announcements: { id: string; title: string; body: string }[] };
-        const latest = data.announcements?.[0] ?? null;
-        if (!latest || cancelled) return;
-        const raw = await AsyncStorage.getItem(DISMISSED_KEY);
-        const dismissed: string[] = raw ? JSON.parse(raw) : [];
-        if (!dismissed.includes(latest.id)) {
-          setAnnouncement(latest);
-          setVisible(true);
-        }
-      } catch { /* non-fatal */ }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  const dismiss = async () => {
-    setVisible(false);
-    if (!announcement) return;
-    const raw = await AsyncStorage.getItem(DISMISSED_KEY);
-    const ids: string[] = raw ? JSON.parse(raw) : [];
-    await AsyncStorage.setItem(DISMISSED_KEY, JSON.stringify([...ids, announcement.id]));
-  };
-
-  if (!visible || !announcement) return null;
-
-  const isLong = announcement.body.length > LONG_BODY_THRESHOLD;
-
+// Single dismissible card for one announcement
+function AnnouncementCard({ ann, onDismiss }: { ann: AnnItem; onDismiss: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = ann.body.length > LONG_BODY_THRESHOLD;
   return (
     <View style={devAnn.wrap}>
       <LinearGradient
@@ -195,24 +164,21 @@ function DevAnnouncementBanner() {
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       />
-
-      {/* Top row: icon + title + dismiss */}
+      {/* Top row */}
       <View style={devAnn.topRow}>
         <View style={devAnn.iconWrap}>
           <Ionicons name="megaphone" size={15} color={colors.primary} />
         </View>
-        <Text style={devAnn.title} numberOfLines={2}>{announcement.title}</Text>
-        <TouchableOpacity onPress={dismiss} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={{ marginLeft: 4 }}>
+        <Text style={devAnn.title} numberOfLines={2}>{ann.title}</Text>
+        <TouchableOpacity onPress={onDismiss} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={{ marginLeft: 4 }}>
           <Ionicons name="close-circle" size={20} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
-
-      {/* Body — always fully shown when expanded, 2-line preview when collapsed */}
-      <Text style={devAnn.body} numberOfLines={expanded || !isLong ? undefined : 2}>
-        {announcement.body}
+      {/* Body */}
+      <Text style={devAnn.body} numberOfLines={expanded || !isLong ? undefined : 3}>
+        {ann.body}
       </Text>
-
-      {/* Footer row */}
+      {/* Footer */}
       <View style={devAnn.footer}>
         <Text style={devAnn.from}>📣 FROM DEV TEAM</Text>
         {isLong && (
@@ -226,14 +192,53 @@ function DevAnnouncementBanner() {
   );
 }
 
+function DevAnnouncementBanner() {
+  const [allAnnouncements, setAllAnnouncements] = useState<AnnItem[]>([]);
+  const [dismissed, setDismissed] = useState<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        // Load dismissed list first so we can filter immediately on render
+        const raw = await AsyncStorage.getItem(DISMISSED_KEY);
+        const ids: string[] = raw ? JSON.parse(raw) : [];
+        if (!cancelled) setDismissed(ids);
+
+        const res = await fetch('https://api-server-production-bbc2.up.railway.app/api/announcements');
+        const data = await res.json() as { announcements: AnnItem[] };
+        if (!cancelled && data.announcements?.length) {
+          setAllAnnouncements(data.announcements);
+        }
+      } catch { /* non-fatal */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const dismiss = async (id: string) => {
+    const next = [...dismissed, id];
+    setDismissed(next);
+    await AsyncStorage.setItem(DISMISSED_KEY, JSON.stringify(next));
+  };
+
+  const visible = allAnnouncements.filter(a => !dismissed.includes(a.id));
+  if (visible.length === 0) return null;
+
+  return (
+    <View style={{ gap: 8, marginBottom: 4 }}>
+      {visible.map(ann => (
+        <AnnouncementCard key={ann.id} ann={ann} onDismiss={() => dismiss(ann.id)} />
+      ))}
+    </View>
+  );
+}
+
 const devAnn = StyleSheet.create({
   wrap: {
     borderRadius: 14, borderWidth: 1, borderColor: `${colors.primary}35`,
-    padding: 13, marginBottom: 6, overflow: 'hidden', gap: 7,
+    padding: 13, overflow: 'hidden', gap: 7,
   },
-  topRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-  },
+  topRow:      { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
     width: 32, height: 32, borderRadius: 16, borderWidth: 1, flexShrink: 0,
     borderColor: `${colors.primary}40`, backgroundColor: `${colors.primary}10`,

@@ -349,7 +349,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
         {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
         <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={cd.username}>
+            <Text style={cd.username} numberOfLines={1}>
               {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
             </Text>
           </TouchableOpacity>
