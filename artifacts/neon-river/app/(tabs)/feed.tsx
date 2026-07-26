@@ -345,7 +345,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={cd.username}>{post.authorUsername}</Text>
+            <Text style={cd.username} numberOfLines={1} ellipsizeMode="tail">{post.authorUsername}</Text>
           </TouchableOpacity>
           <Text style={cd.handle}>{post.authorRank} · {timeSince(post.createdAt)}</Text>
         </View>
@@ -560,7 +560,10 @@ function PostCard({ post }: { post: SocialPost }) {
           if (post.playerId === 'me') { router.push('/(tabs)/profile'); return; }
           router.push(`/social/player-profile?id=${post.playerId}`);
         }}>
-          <NeonAvatar avatarId={player?.avatarId ?? 1} size={44} />
+          {post.playerId === 'me' && profile.profileImageType === 'custom' && profile.avatarUri
+            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }} />
+            : <NeonAvatar avatarId={player?.avatarId ?? 1} size={44} />
+          }
           {player?.status === 'online'  && <View style={cd.onlineDot} />}
           {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
         </TouchableOpacity>
@@ -571,7 +574,7 @@ function PostCard({ post }: { post: SocialPost }) {
             router.push(`/social/player-profile?id=${post.playerId}`);
           }}>
             <View style={cd.usernameRow}>
-              <Text style={cd.username}>{player?.username ?? 'Unknown'}</Text>
+              <Text style={cd.username} numberOfLines={1} ellipsizeMode="tail">{player?.username ?? 'Unknown'}</Text>
               {primaryBadge && <Text style={cd.badgeIcon}>{primaryBadge.icon}</Text>}
             </View>
           </TouchableOpacity>
@@ -583,10 +586,12 @@ function PostCard({ post }: { post: SocialPost }) {
           <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
         </View>
 
-        <TouchableOpacity style={[cd.followBtn, following && cd.followBtnActive]} onPress={handleFollow}>
-          {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
-          <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
-        </TouchableOpacity>
+        {post.playerId !== 'me' && (
+          <TouchableOpacity style={[cd.followBtn, following && cd.followBtnActive]} onPress={handleFollow}>
+            {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
+            <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity onPress={() => setShowMenu(true)} style={cd.moreBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="ellipsis-horizontal" size={16} color={colors.textMuted} />
@@ -788,8 +793,8 @@ const cd = StyleSheet.create({
     width: 10, height: 10, borderRadius: 5,
     backgroundColor: '#00ff88', borderWidth: 1.5, borderColor: '#070016',
   },
-  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  username:    { color: '#ffffff', fontSize: 14, fontWeight: '800' },
+  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4, overflow: 'hidden' },
+  username:    { color: '#ffffff', fontSize: 14, fontWeight: '800', flexShrink: 1 },
   badgeIcon:   { fontSize: 12 },
   handle:      { color: 'rgba(255,255,255,0.38)', fontSize: 10, marginTop: 2 },
 
@@ -1217,7 +1222,10 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
                   : <Text style={lb.rankNum}>{i + 1}</Text>
                 }
               </View>
-              <NeonAvatar avatarId={entry.player.avatarId ?? 1} size={34} />
+              {isMe && profile.profileImageType === 'custom' && profile.avatarUri
+                ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: colors.primary }} />
+                : <NeonAvatar avatarId={entry.player.avatarId ?? 1} size={34} />
+              }
               <View style={{ flex: 1 }}>
                 <Text style={lb.username}>{entry.player.username}</Text>
                 <Text style={lb.rankLabel}>{entry.player.rank}</Text>
@@ -1554,7 +1562,10 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
             </TouchableOpacity>
           </View>
           <View style={cmp.authorRow}>
-            <NeonAvatar avatarId={meAvatarId} size={36} />
+            {profile.profileImageType === 'custom' && profile.avatarUri
+            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.primary }} />
+            : <NeonAvatar avatarId={meAvatarId} size={36} />
+          }
             <View>
               <Text style={cmp.authorName}>{profile.username}</Text>
               <Text style={cmp.authorHandle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>

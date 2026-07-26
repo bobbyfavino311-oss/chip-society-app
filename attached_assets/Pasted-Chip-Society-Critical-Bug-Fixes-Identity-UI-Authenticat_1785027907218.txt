@@ -1,0 +1,320 @@
+Chip Society – Critical Bug Fixes (Identity, UI, Authentication & Gameplay)
+
+These issues are high priority because they affect the core player experience, identity consistency, authentication, and gameplay usability. Fix every item below completely.
+
+⸻
+
+1. Social Feed Username Formatting
+
+The social feed username layout is broken.
+
+Current issues:
+
+* Usernames run off the edge of the card.
+* Long usernames wrap awkwardly.
+* Sometimes a single word stacks vertically.
+
+Fix:
+
+* Auto-scale username text slightly for longer names.
+* Keep usernames on a single line whenever possible.
+* If the username exceeds the available width:
+    * truncate with “…”
+    * never wrap into multiple lines.
+* Preserve spacing between:
+    * avatar
+    * username
+    * badges
+    * status tags
+    * timestamp
+
+The layout should always remain clean regardless of username length.
+
+⸻
+
+2. Chip Count on Home Page
+
+The chip balance displayed on the Home page is stacking onto multiple lines.
+
+Fix:
+
+* Keep chip balance on one line.
+* Reduce font size automatically for larger balances.
+* Support millions and billions using abbreviated formatting.
+
+Examples:
+
+125,000
+
+↓
+
+125K
+
+1,250,000
+
+↓
+
+1.25M
+
+2,400,000,000
+
+↓
+
+2.4B
+
+Never allow the chip balance to wrap.
+
+⸻
+
+3. Avatar Consistency (Critical)
+
+There should only be ONE player avatar.
+
+Currently multiple systems are displaying different avatars.
+
+The following must ALL use the exact same avatar:
+
+* Player Profile
+* Home Page Trending Feed
+* Social Feed
+* Create Post dialog
+* Tournament Winner posts
+* Leaderboards
+* Followers
+* Following
+* Comments
+* Notifications
+* Tournament Results
+* Friend Requests
+* Everywhere else inside the app
+
+The player’s selected avatar (or uploaded profile picture) is the ONLY avatar source.
+
+No screen should generate or cache a different one.
+
+⸻
+
+4. Create Post Keyboard Bug
+
+When creating a post:
+
+The keyboard opens…
+
+…but the text field slides underneath the keyboard.
+
+The user cannot see what they’re typing.
+
+Fix:
+
+* Move the entire compose sheet upward when the keyboard appears.
+* Ensure the active text field always remains visible.
+* Respect iOS keyboard safe areas.
+* Auto-scroll the compose window as the user types.
+* Cursor should never disappear beneath the keyboard.
+
+This also applies when posting:
+
+* Tournament wins
+* Achievement shares
+* Jackpot wins
+* Daily Mission shares
+
+Every compose window should behave identically.
+
+⸻
+
+5. Leaderboard Avatar Bug
+
+Global Leaderboards currently display incorrect profile pictures.
+
+Fix:
+
+Leaderboard avatars must always display:
+
+Player Selected Avatar
+
+or
+
+Uploaded Profile Picture
+
+Never use placeholder avatars or cached avatars.
+
+⸻
+
+6. Forgot Password Contact
+
+Update the Login screen.
+
+Forgot Password requests should direct users to:
+
+realbobbyf@chipsocietyapp.com
+
+Ensure this email appears anywhere account recovery is referenced.
+
+⸻
+
+7. Username Change Security
+
+Username changes are currently unrestricted.
+
+This needs to be significantly more secure.
+
+Rules:
+
+• Username may only be changed once every 30 days.
+
+• Before accepting a new username:
+
+* Check database.
+* Verify uniqueness.
+* Reject duplicates.
+
+If taken:
+
+“This username is already in use.”
+
+Do NOT allow bypassing uniqueness by changing names after registration.
+
+⸻
+
+8. Username Registration Validation
+
+During account creation:
+
+Validate:
+
+* minimum length
+* maximum length
+* profanity filter
+* reserved names
+* uniqueness
+* illegal characters
+
+Usernames become globally reserved after registration.
+
+⸻
+
+9. PIN Security
+
+The four-digit PIN currently doesn’t appear to persist correctly.
+
+When changed:
+
+Immediately:
+
+* encrypt it
+* save it
+* update authentication records
+* sync cloud save
+
+Next login must require:
+
+New PIN
+
+—not the previous PIN.
+
+Never cache old PIN values.
+
+⸻
+
+10. Username Persistence
+
+When a username changes:
+
+Update everywhere immediately.
+
+Including:
+
+* Social Feed
+* Tournament Results
+* Leaderboards
+* Friends
+* Followers
+* Following
+* Notifications
+* Chat
+* Comments
+* Activity Feed
+* Profile
+
+There should never be old usernames cached anywhere.
+
+⸻
+
+11. Prevent Self Following
+
+Players can currently follow themselves.
+
+This should never be possible.
+
+If:
+
+CurrentPlayerID == TargetPlayerID
+
+Disable Follow button.
+
+Replace it with:
+
+“Your Profile”
+
+or simply hide the Follow button entirely.
+
+⸻
+
+12. Social Feed Identity
+
+The Social Feed should never create separate identities.
+
+One player.
+
+One account.
+
+One username.
+
+One avatar.
+
+Everything references the exact same player profile.
+
+There is no separate “social account.”
+
+⸻
+
+13. Ultimate Texas Hold’em Rules Overlay
+
+The rules page is currently hidden underneath the game UI.
+
+Fix:
+
+Rules should appear as a true modal overlay.
+
+Requirements:
+
+* Full-screen glass panel
+* Blur background
+* Highest z-index in the game
+* Scrollable content
+* Close button always visible
+* Safe-area aware
+* No gameplay controls visible behind the modal
+* Touches blocked behind the overlay until dismissed
+
+The rules should sit above the entire gameplay interface, not underneath it.
+
+⸻
+
+Final QA Requirements
+
+Before the next build, verify:
+
+* ✅ Username formatting never breaks layouts.
+* ✅ Chip balances never wrap.
+* ✅ One avatar is used consistently throughout the app.
+* ✅ All compose windows remain visible above the keyboard.
+* ✅ Leaderboards use the player’s selected avatar.
+* ✅ Forgot Password links point to realbobbyf@chipsocietyapp.com.
+* ✅ Username changes are limited to once every 30 days.
+* ✅ Duplicate usernames cannot be created or changed to.
+* ✅ Username and PIN changes persist securely across sessions.
+* ✅ Players cannot follow themselves.
+* ✅ Social Feed uses the same identity as the player profile.
+* ✅ Ultimate Texas Hold’em rules always appear above the game UI with proper modal behavior.

@@ -118,8 +118,8 @@ function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => 
   );
 }
 const pm = StyleSheet.create({
-  overlay:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
-  sheet:       { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', maxHeight: '80%', padding: 20, gap: 10 },
+  overlay:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'center', padding: 24, paddingTop: 60 },
+  sheet:       { flex: 1, borderRadius: 24, overflow: 'hidden', maxHeight: '90%', padding: 20, gap: 10 },
   header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title:       { fontSize: 15, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: '#00d4ff', letterSpacing: 3 },
   closeBtn:    { padding: 4 },

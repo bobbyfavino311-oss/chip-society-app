@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
@@ -85,6 +86,10 @@ export default function ShareToFeedModal({ visible, onClose, defaultContent, def
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={st.overlay}>
           <TouchableOpacity style={st.backdrop} activeOpacity={1} onPress={onClose} />
@@ -217,6 +222,7 @@ export default function ShareToFeedModal({ visible, onClose, defaultContent, def
           </View>
         </View>
       </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

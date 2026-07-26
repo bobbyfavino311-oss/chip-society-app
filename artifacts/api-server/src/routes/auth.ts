@@ -48,6 +48,29 @@ router.post('/auth/register', async (req, res) => {
       return;
     }
 
+    // Server-side username validation
+    if (username.length < 3 || username.length > 20) {
+      res.status(400).json({ error: 'Username must be 3–20 characters.' });
+      return;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      res.status(400).json({ error: 'Username may only contain letters, numbers, and underscores.' });
+      return;
+    }
+    const RESERVED_NAMES = new Set([
+      'admin','support','system','moderator','staff','chipsociety','official',
+      'owner','replit','null','undefined','delete','root','api','bot','test',
+      'guest','user','player','help','info','contact','abuse','security',
+    ]);
+    if (RESERVED_NAMES.has(username.toLowerCase())) {
+      res.status(400).json({ error: 'That username is reserved.' });
+      return;
+    }
+    if (!/^\d{4}$/.test(pin)) {
+      res.status(400).json({ error: 'PIN must be exactly 4 digits.' });
+      return;
+    }
+
     const lower = username.toLowerCase();
     const existing = await db
       .select({ playerId: playersTable.playerId })
@@ -285,6 +308,81 @@ router.post('/auth/forgot-pin', async (req, res) => {
     res.json({ success: true });
   } catch (e) {
     req.log.error(e, 'forgot-pin error');
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ── PUT /api/auth/change-username ─────────────────────────────────────────────
+router.put('/auth/change-username', async (req, res) => {
+  try {
+    const { playerId, newUsername } = req.body as { playerId: string; newUsername: string };
+    if (!playerId || !newUsername) {
+      res.status(400).json({ error: 'playerId and newUsername are required.' });
+      return;
+    }
+
+    // Validate format
+    if (newUsername.length < 3 || newUsername.length > 20) {
+      res.status(400).json({ error: 'Username must be 3–20 characters.' });
+      return;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
+      res.status(400).json({ error: 'Username may only contain letters, numbers, and underscores.' });
+      return;
+    }
+    const RESERVED_NAMES = new Set([
+      'admin','support','system','moderator','staff','chipsociety','official',
+      'owner','replit','null','undefined','delete','root','api','bot','test',
+      'guest','user','player','help','info','contact','abuse','security',
+    ]);
+    if (RESERVED_NAMES.has(newUsername.toLowerCase())) {
+      res.status(400).json({ error: 'That username is reserved.' });
+      return;
+    }
+
+    // Get player
+    const rows = await db.select().from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
+    if (rows.length === 0) { res.status(404).json({ error: 'Account not found.' }); return; }
+    const player = rows[0]!;
+    const currentProfile = (player.profileJson ?? {}) as Record<string, unknown>;
+
+    // 30-day cooldown
+    const lastChanged = currentProfile['usernameChangedAt'] as string | undefined;
+    if (lastChanged) {
+      const daysSince = (Date.now() - new Date(lastChanged).getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 30) {
+        const daysLeft = Math.ceil(30 - daysSince);
+        res.status(429).json({ error: `You can change your username again in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.` });
+        return;
+      }
+    }
+
+    // Uniqueness check
+    const lower = newUsername.toLowerCase();
+    const taken = await db
+      .select({ playerId: playersTable.playerId })
+      .from(playersTable)
+      .where(eq(playersTable.usernameLower, lower))
+      .limit(1);
+    if (taken.length > 0 && taken[0]!.playerId !== playerId) {
+      res.status(409).json({ error: 'This username is already in use.' });
+      return;
+    }
+
+    const updatedProfile = {
+      ...currentProfile,
+      username: newUsername,
+      usernameChangedAt: new Date().toISOString(),
+    };
+
+    await db.update(playersTable)
+      .set({ username: newUsername, usernameLower: lower, profileJson: updatedProfile, updatedAt: new Date() })
+      .where(eq(playersTable.playerId, playerId));
+
+    req.log.info({ playerId, newUsername }, 'Username changed');
+    res.json({ success: true, username: newUsername });
+  } catch (e) {
+    req.log.error(e, 'change-username error');
     res.status(500).json({ error: 'Server error.' });
   }
 });

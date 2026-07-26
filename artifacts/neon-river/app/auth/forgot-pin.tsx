@@ -136,7 +136,9 @@ export default function ForgotPinScreen() {
                 </View>
                 <Text style={s.title}>FORGOT{'\n'}YOUR PIN?</Text>
                 <Text style={s.subtitle}>
-                  Enter your username to start the PIN reset process.
+                  Enter your username to start the PIN reset process.{'\n\n'}
+                  For additional help, contact{' '}
+                  <Text style={{ color: colors.primary }}>realbobbyf@chipsocietyapp.com</Text>
                 </Text>
 
                 <Animated.View style={[s.inputWrap, { transform: [{ translateX: shake }] }]}>

@@ -916,7 +916,7 @@ export default function HomeScreen() {
             <Text style={styles.statLbl}>HANDS</Text>
           </View>
           <View style={[styles.statCard, { borderColor: `${colors.gold}30` }]}>
-            <Text style={[styles.statVal, { color: colors.gold }]}>{formatChips(profile.chips)}</Text>
+            <Text style={[styles.statVal, { color: colors.gold }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>{formatChips(profile.chips)}</Text>
             <Text style={styles.statLbl}>CHIPS</Text>
           </View>
           <View style={[styles.statCard, { borderColor: `${rankColor}30` }]}>

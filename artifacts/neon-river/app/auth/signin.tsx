@@ -237,6 +237,7 @@ export default function SignInScreen() {
                 <Pressable style={s.forgotBtn} onPress={() => router.push('/auth/forgot-pin' as any)}>
                   <Text style={s.forgotText}>Forgot PIN?</Text>
                 </Pressable>
+                <Text style={s.supportHint}>Need help? realbobbyf@chipsocietyapp.com</Text>
               </>
             )}
 
@@ -348,6 +349,7 @@ const s = StyleSheet.create({
 
   forgotBtn: { alignItems: 'center', paddingVertical: 6 },
   forgotText: { fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecorationLine: 'underline' },
+  supportHint: { fontSize: 10, color: 'rgba(255,255,255,0.2)', textAlign: 'center', marginTop: 4 },
 
   // PIN
   pinDots: { flexDirection: 'row', justifyContent: 'center', gap: 20, marginVertical: 4 },
