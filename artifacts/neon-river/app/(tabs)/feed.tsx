@@ -29,7 +29,6 @@ import { useColors } from '@/hooks/useColors';
 import { useSocial } from '@/context/SocialContext';
 import { useAISocial } from '@/context/AISocialContext';
 import { useLiveFeed } from '@/context/LiveFeedContext';
-import type { AIPost } from '@/lib/aiSocialEngine';
 import type { FeedPost, FeedComment } from '@/lib/socialApi';
 import {
   SOCIAL_POSTS, MOCK_PLAYERS, POKER_REACTIONS, POST_TAG_COLORS,
@@ -349,7 +348,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
         {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
         <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={cd.username} numberOfLines={1}>
+            <Text style={cd.username} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
               {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
             </Text>
           </TouchableOpacity>
@@ -2055,102 +2054,6 @@ const me = StyleSheet.create({
   deleteBtn: { padding: 3 },
 });
 
-// ─── Main Screen ─────────────────────────────────────────────────────────────
-
-// ─── AI Post Mini-Card (for trending header strip) ────────────────────────────
-
-function AIPostMiniCard({ post }: { post: AIPost }) {
-  return (
-    <View style={aiCardStyle.card}>
-      <LinearGradient
-        colors={['rgba(16,5,34,0.97)', 'rgba(5,2,14,0.99)']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-      />
-      <View style={[aiCardStyle.accentLine, { backgroundColor: post.tagColor }]} />
-      {/* Header row */}
-      <View style={aiCardStyle.header}>
-        <NeonAvatar avatarId={post.personality.avatarId} size={32} />
-        <View style={{ flex: 1 }}>
-          <Text style={aiCardStyle.username} numberOfLines={1}>{post.personality.username}</Text>
-          <Text style={aiCardStyle.timeAgo}>{post.timeAgo}</Text>
-        </View>
-        <View style={[aiCardStyle.tag, { backgroundColor: `${post.tagColor}20`, borderColor: `${post.tagColor}55` }]}>
-          <Text style={[aiCardStyle.tagText, { color: post.tagColor }]}>{post.tag}</Text>
-        </View>
-      </View>
-      {/* Content */}
-      <Text style={aiCardStyle.content} numberOfLines={3}>{post.content}</Text>
-      {/* Footer */}
-      <View style={aiCardStyle.footer}>
-        <Ionicons name="heart" size={11} color="rgba(255,0,144,0.7)" />
-        <Text style={aiCardStyle.footerNum}>{post.likes >= 1000 ? `${(post.likes / 1000).toFixed(1)}K` : post.likes}</Text>
-        {post.pot && (
-          <>
-            <Ionicons name="cash-outline" size={11} color="rgba(0,212,255,0.6)" style={{ marginLeft: 6 }} />
-            <Text style={[aiCardStyle.footerNum, { color: 'rgba(0,212,255,0.7)' }]}>{post.pot}</Text>
-          </>
-        )}
-      </View>
-    </View>
-  );
-}
-
-const aiCardStyle = StyleSheet.create({
-  card: {
-    width: 220, borderRadius: 16, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(0,212,255,0.14)',
-    padding: 14, gap: 8,
-    shadowColor: '#00d4ff', shadowOpacity: 0.1, shadowRadius: 14,
-    shadowOffset: { width: 0, height: 3 }, elevation: 5,
-  },
-  accentLine: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  avatar: {
-    width: 30, height: 30, borderRadius: 15,
-    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { fontSize: 10, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
-  username: { color: '#e0d4ff', fontSize: 11, fontWeight: '700', fontFamily: 'Inter_700Bold' },
-  timeAgo: { color: 'rgba(255,255,255,0.3)', fontSize: 9, marginTop: 1 },
-  tag: { borderRadius: 5, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1 },
-  tagText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.6, fontFamily: 'Orbitron_700Bold' },
-  content: { color: 'rgba(255,255,255,0.7)', fontSize: 11, lineHeight: 16 },
-  footer: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
-  footerNum: { color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: '600' },
-});
-
-// ─── AI Posts header strip (shown on Trending tab) ────────────────────────────
-
-function AIPostsStrip({ posts }: { posts: AIPost[] }) {
-  if (posts.length === 0) return null;
-  return (
-    <View style={stripStyle.wrap}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={stripStyle.scroll}
-      >
-        {posts.map(p => <AIPostMiniCard key={p.id} post={p} />)}
-      </ScrollView>
-    </View>
-  );
-}
-
-const stripStyle = StyleSheet.create({
-  wrap: { paddingTop: 10, paddingBottom: 4 },
-  label: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 14, marginBottom: 8,
-  },
-  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#00ff88' },
-  labelText: {
-    color: 'rgba(255,255,255,0.35)', fontSize: 9, fontWeight: '800',
-    letterSpacing: 1.5, fontFamily: 'Orbitron_400Regular',
-  },
-  scroll: { gap: 10, paddingHorizontal: 14 },
-});
-
 // ─── Main Feed Screen ─────────────────────────────────────────────────────────
 
 export default function FeedScreen() {
@@ -2163,7 +2066,7 @@ export default function FeedScreen() {
   const [notifVisible, setNotifVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { profile } = useUser();
-  const { posts: aiPosts, refresh: refreshAIPosts } = useAISocial();
+  const { refresh: refreshAIPosts } = useAISocial();
   const { isMuted, isBlocked, following } = useSocial();
   const {
     allPosts: livePosts,
@@ -2370,11 +2273,6 @@ export default function FeedScreen() {
           renderItem={({ item }) => item._k === 'live'
             ? <LivePostCard post={item.post} />
             : <PostCard post={item.post as SocialPost} />
-          }
-          ListHeaderComponent={
-            activeTab === 'all'
-              ? <AIPostsStrip posts={aiPosts.slice(0, 6)} />
-              : null
           }
           ListEmptyComponent={
             activeTab === 'following' ? (
