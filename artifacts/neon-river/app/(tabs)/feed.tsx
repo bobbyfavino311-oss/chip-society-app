@@ -588,7 +588,7 @@ function PostCard({ post }: { post: SocialPost }) {
           <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
         </View>
 
-        {post.playerId !== 'me' && (
+        {post.playerId !== 'me' && post.playerId !== profile.playerId && (
           <TouchableOpacity style={[cd.followBtn, following && cd.followBtnActive]} onPress={handleFollow}>
             {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
             <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
@@ -1431,8 +1431,9 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                   <Text style={srch.handle}>{p.rank} · {formatChips(p.chips)} chips · Lv.{p.level}</Text>
                 </View>
               </TouchableOpacity>
-              {/* Action buttons — separate touchables, don't interfere with nav */}
+              {/* Action buttons — hide both for own profile */}
               <View style={{ flexDirection: 'row', gap: 6 }}>
+                {p.playerId !== profile.playerId && (
                 <TouchableOpacity
                   style={[srch.followBtn, isFollowed && { backgroundColor: `${colors.primary}15`, borderColor: `${colors.primary}40` }]}
                   onPress={() => !isFollowed && handleFollow(p.playerId, p.username)}
@@ -1441,17 +1442,20 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                     {isFollowed ? '✓ Following' : '+ Follow'}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={srch.msgBtn}
-                  onPress={() => handleMessage(p.playerId)}
-                  disabled={messagingId === p.playerId}
-                >
-                  <Ionicons
-                    name={messagingId === p.playerId ? 'time-outline' : 'chatbubble-outline'}
-                    size={14}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
+                )}
+                {p.playerId !== profile.playerId && (
+                  <TouchableOpacity
+                    style={srch.msgBtn}
+                    onPress={() => handleMessage(p.playerId)}
+                    disabled={messagingId === p.playerId}
+                  >
+                    <Ionicons
+                      name={messagingId === p.playerId ? 'time-outline' : 'chatbubble-outline'}
+                      size={14}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           );
