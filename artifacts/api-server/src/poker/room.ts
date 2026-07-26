@@ -358,6 +358,11 @@ export class PokerRoom {
       x => !this.requestedSitOut.has(x.s!.socketId) && !x.s!.isDisconnected
     );
 
+    // DIAGNOSTIC: log chip state at hand start
+    console.log('[startHand] seats:', JSON.stringify(allSeated.map(({ s, i }) => ({
+      i, username: s!.username, chips: s!.chips, startingChips: s!.startingChips, status: s!.status,
+    }))));
+
     if (activePlayers.length < 2) {
       this.phase = 'waiting';
       this.broadcastState();
@@ -412,6 +417,8 @@ export class PokerRoom {
   private postBlind(seatIdx: number, amount: number): void {
     const seat = this.seats[seatIdx];
     if (!seat) return;
+    // DIAGNOSTIC
+    console.log(`[postBlind] ${seat.username} chips=${seat.chips} amount=${amount}`);
     const actual = Math.min(amount, seat.chips);
     seat.chips -= actual;
     seat.currentBet = actual;

@@ -281,6 +281,8 @@ export function setupSocketIO(httpServer: HttpServer): void {
         const variant = resolveVariant(payload.variant);
         const room = manager.findOrCreateRoom(tier, 5, variant);
         const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
+        // DIAGNOSTIC
+        console.log('[quick_join] payload.chips=', payload.chips, 'room.config.minBuyIn=', room.config.minBuyIn, 'sanitized chips=', chips, 'tier=', tier, 'userId=', payload.userId);
         const ok = manager.joinRoom(
           socket.id, room.id,
           payload.userId, payload.username, payload.avatarId, chips,
