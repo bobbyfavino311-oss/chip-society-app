@@ -141,6 +141,7 @@ export interface UserProfile {
   handsPlayed: number;
   avatarIndex: number;
   avatarUri?: string;
+  serverAvatarUrl?: string;   // GCS-hosted photo visible to all users in the feed
   profileImageType?: 'character' | 'custom' | 'symbol';
   symbolIndex?: number;
   lastDailyReward: string | null;

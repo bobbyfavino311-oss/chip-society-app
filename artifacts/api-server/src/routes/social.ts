@@ -497,6 +497,7 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
         if (lp) return lp.symbolIndex || lp.avatarIndex || 1;
         return r.authorAvatarIndex || 1;
       })(),
+      authorAvatarUrl: (liveProfileMap.get(r.authorId) as any)?.serverAvatarUrl ?? null,
       authorRank:      r.authorRank ?? 'Player',
       content:         r.content,
       tag:             r.tag,

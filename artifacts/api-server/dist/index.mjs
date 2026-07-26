@@ -20603,27 +20603,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module.exports = Router8;
+    module.exports = Router9;
     module.exports.Route = Route;
-    function Router8(options) {
-      if (!(this instanceof Router8)) {
-        return new Router8(options);
+    function Router9(options) {
+      if (!(this instanceof Router9)) {
+        return new Router9(options);
       }
       const opts = options || {};
-      function router8(req, res, next) {
-        router8.handle(req, res, next);
+      function router9(req, res, next) {
+        router9.handle(req, res, next);
       }
-      Object.setPrototypeOf(router8, this);
-      router8.caseSensitive = opts.caseSensitive;
-      router8.mergeParams = opts.mergeParams;
-      router8.params = {};
-      router8.strict = opts.strict;
-      router8.stack = [];
-      return router8;
+      Object.setPrototypeOf(router9, this);
+      router9.caseSensitive = opts.caseSensitive;
+      router9.mergeParams = opts.mergeParams;
+      router9.params = {};
+      router9.strict = opts.strict;
+      router9.stack = [];
+      return router9;
     }
-    Router8.prototype = function() {
+    Router9.prototype = function() {
     };
-    Router8.prototype.param = function param(name, fn) {
+    Router9.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -20643,7 +20643,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router8.prototype.handle = function handle(req, res, callback) {
+    Router9.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -20770,7 +20770,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router8.prototype.use = function use(handler) {
+    Router9.prototype.use = function use(handler) {
       let offset = 0;
       let path = "/";
       if (typeof handler !== "function") {
@@ -20803,7 +20803,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router8.prototype.route = function route(path) {
+    Router9.prototype.route = function route(path) {
       const route2 = new Route(path);
       const layer = new Layer(path, {
         sensitive: this.caseSensitive,
@@ -20818,7 +20818,7 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      Router8.prototype[method] = function(path) {
+      Router9.prototype[method] = function(path) {
         const route = this.route(path);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
@@ -21001,13 +21001,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils3().compileTrust;
     var resolve = __require("node:path").resolve;
     var once = require_once();
-    var Router8 = require_router();
+    var Router9 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app2 = exports = module.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app2.init = function init() {
-      var router8 = null;
+      var router9 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -21016,13 +21016,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router8 === null) {
-            router8 = new Router8({
+          if (router9 === null) {
+            router9 = new Router9({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router8;
+          return router9;
         }
       });
     };
@@ -21093,15 +21093,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router8 = this.router;
+      var router9 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router8.use(path, fn2);
+          return router9.use(path, fn2);
         }
         debug(".use app under %s", path);
         fn2.mountpath = path;
         fn2.parent = this;
-        router8.use(path, function mounted_app(req, res, next) {
+        router9.use(path, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -23628,7 +23628,7 @@ var require_express = __commonJS({
     var EventEmitter = __require("node:events").EventEmitter;
     var mixin = require_merge_descriptors();
     var proto = require_application();
-    var Router8 = require_router();
+    var Router9 = require_router();
     var req = require_request();
     var res = require_response();
     exports = module.exports = createApplication;
@@ -23650,8 +23650,8 @@ var require_express = __commonJS({
     exports.application = proto;
     exports.request = req;
     exports.response = res;
-    exports.Route = Router8.Route;
-    exports.Router = Router8;
+    exports.Route = Router9.Route;
+    exports.Router = Router9;
     exports.json = bodyParser.json;
     exports.raw = bodyParser.raw;
     exports.static = require_serve_static();
@@ -70788,7 +70788,7 @@ var require_lib7 = __commonJS({
 import { createServer } from "http";
 
 // src/app.ts
-var import_express8 = __toESM(require_express2(), 1);
+var import_express9 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 var import_pino_http = __toESM(require_logger(), 1);
 
@@ -71746,7 +71746,7 @@ var rateLimit = (passedOptions) => {
 var rate_limit_default = rateLimit;
 
 // src/routes/index.ts
-var import_express7 = __toESM(require_express2(), 1);
+var import_express8 = __toESM(require_express2(), 1);
 
 // src/routes/health.ts
 var import_express = __toESM(require_express2(), 1);
@@ -84101,6 +84101,7 @@ router4.get("/social/feed", requirePlayer, async (req, res) => {
         if (lp) return lp.symbolIndex || lp.avatarIndex || 1;
         return r.authorAvatarIndex || 1;
       })(),
+      authorAvatarUrl: liveProfileMap.get(r.authorId)?.serverAvatarUrl ?? null,
       authorRank: r.authorRank ?? "Player",
       content: r.content,
       tag: r.tag,
@@ -84559,19 +84560,101 @@ router6.get("/referrals/stats", async (req, res) => {
 });
 var referrals_default = router6;
 
-// src/routes/index.ts
+// src/routes/avatars.ts
+var import_express7 = __toESM(require_express2(), 1);
+
+// src/lib/objectStorage.ts
+import { Storage } from "@google-cloud/storage";
+var REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+var objectStorageClient = new Storage({
+  credentials: {
+    audience: "replit",
+    subject_token_type: "access_token",
+    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+    type: "external_account",
+    credential_source: {
+      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+      format: {
+        type: "json",
+        subject_token_field_name: "access_token"
+      }
+    },
+    universe_domain: "googleapis.com"
+  },
+  projectId: ""
+});
+
+// src/routes/avatars.ts
 var router7 = (0, import_express7.Router)();
-router7.use(health_default);
-router7.use(auth_default);
-router7.use(admin_default);
-router7.use(social_default);
-router7.use(bugs_default);
-router7.use(referrals_default);
-var routes_default = router7;
+var BUCKET = () => {
+  const id = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  if (!id) throw new Error("DEFAULT_OBJECT_STORAGE_BUCKET_ID not set");
+  return objectStorageClient.bucket(id);
+};
+var RAILWAY_API = "https://api-server-production-bbc2.up.railway.app/api";
+router7.post("/avatars/upload-url", async (req, res) => {
+  const playerId = req.headers["x-player-id"];
+  if (!playerId) {
+    res.status(401).json({ error: "x-player-id header required" });
+    return;
+  }
+  try {
+    const objectId = `${playerId}-${Date.now()}.jpg`;
+    const file = BUCKET().file(`avatars/${objectId}`);
+    const [uploadUrl] = await file.getSignedUrl({
+      version: "v4",
+      action: "write",
+      expires: Date.now() + 15 * 60 * 1e3,
+      // 15 min
+      contentType: "image/jpeg"
+    });
+    const serveUrl = `${RAILWAY_API}/avatars/${objectId}`;
+    const rows = await db.select({ profileJson: playersTable.profileJson }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
+    if (rows[0]) {
+      const current = rows[0].profileJson ?? {};
+      await db.update(playersTable).set({ profileJson: { ...current, serverAvatarUrl: serveUrl }, updatedAt: /* @__PURE__ */ new Date() }).where(eq(playersTable.playerId, playerId));
+    }
+    res.json({ uploadUrl, serveUrl, objectId });
+  } catch (err) {
+    res.status(500).json({ error: err?.message ?? "Failed to generate upload URL" });
+  }
+});
+router7.get("/avatars/:objectId", async (req, res) => {
+  const { objectId } = req.params;
+  if (!objectId || objectId.includes("/") || objectId.includes("..")) {
+    res.status(400).json({ error: "Invalid object ID" });
+    return;
+  }
+  try {
+    const file = BUCKET().file(`avatars/${objectId}`);
+    const [exists2] = await file.exists();
+    if (!exists2) {
+      res.status(404).json({ error: "Avatar not found" });
+      return;
+    }
+    res.setHeader("Content-Type", "image/jpeg");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    file.createReadStream().pipe(res);
+  } catch (err) {
+    res.status(500).json({ error: err?.message ?? "Failed to serve avatar" });
+  }
+});
+var avatars_default = router7;
+
+// src/routes/index.ts
+var router8 = (0, import_express8.Router)();
+router8.use(health_default);
+router8.use(auth_default);
+router8.use(admin_default);
+router8.use(social_default);
+router8.use(bugs_default);
+router8.use(referrals_default);
+router8.use(avatars_default);
+var routes_default = router8;
 
 // src/app.ts
 init_logger();
-var app = (0, import_express8.default)();
+var app = (0, import_express9.default)();
 app.set("trust proxy", 1);
 app.use(
   (0, import_pino_http.default)({
@@ -84593,8 +84676,8 @@ app.use(
   })
 );
 app.use((0, import_cors.default)());
-app.use(import_express8.default.json());
-app.use(import_express8.default.urlencoded({ extended: true }));
+app.use(import_express9.default.json());
+app.use(import_express9.default.urlencoded({ extended: true }));
 var authLimiter = rate_limit_default({
   windowMs: 15 * 60 * 1e3,
   max: 20,

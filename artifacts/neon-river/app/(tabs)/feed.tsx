@@ -349,16 +349,23 @@ function LivePostCard({ post }: { post: FeedPost }) {
       {/* Header */}
       <View style={cd.header}>
         <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-          {isOwn && profile.profileImageType === 'custom' && profile.avatarUri && !avatarImgFailed ? (
-            <Image
-              source={{ uri: profile.avatarUri }}
-              style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
-              onLoad={() => setAvatarLoaded(true)}
-              onError={() => setAvatarImgFailed(true)}
-            />
-          ) : (
-            <NeonAvatar avatarId={isOwn ? (profile.symbolIndex || profile.avatarIndex || post.authorAvatarIndex || 1) : (post.authorAvatarIndex || 1)} size={44} />
-          )}
+          {/* For own posts: prefer local avatarUri (instant after pick); for others: use server-hosted authorAvatarUrl */}
+          {(() => {
+            const photoUrl = isOwn
+              ? (profile.profileImageType === 'custom' ? (profile.avatarUri ?? profile.serverAvatarUrl ?? null) : null)
+              : (post.authorAvatarUrl ?? null);
+            if (photoUrl && !avatarImgFailed) {
+              return (
+                <Image
+                  source={{ uri: photoUrl }}
+                  style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
+                  onLoad={() => setAvatarLoaded(true)}
+                  onError={() => setAvatarImgFailed(true)}
+                />
+              );
+            }
+            return <NeonAvatar avatarId={isOwn ? (profile.symbolIndex || profile.avatarIndex || post.authorAvatarIndex || 1) : (post.authorAvatarIndex || 1)} size={44} />;
+          })()}
         </TouchableOpacity>
 
         {/* Name col — takes all remaining width; type badge lives here so name never squishes */}

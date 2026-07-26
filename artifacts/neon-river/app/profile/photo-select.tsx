@@ -22,6 +22,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '@/context/UserContext';
 import { getNeonAvatar, NEON_AVATARS, NEON_RARITY_COLORS } from '@/constants/neonAvatars';
 import NeonAvatarView from '@/components/NeonAvatar';
+import { uploadAvatarPhoto } from '@/lib/socialApi';
 
 export default function PhotoSelectScreen() {
   const insets = useSafeAreaInsets();
@@ -64,22 +65,36 @@ export default function PhotoSelectScreen() {
 
       if (!result.canceled && result.assets[0]) {
         const srcUri = result.assets[0].uri;
-        // Always copy to the permanent document directory so the URI survives
-        // app restarts, iOS cache eviction, and ph:// PHAsset URI expiry.
-        let finalUri = srcUri;
+
+        // Step 1 — copy to permanent local path (persists across restarts)
+        let localUri = srcUri;
         if (FileSystem.documentDirectory) {
           const fileName = `avatar_${Date.now()}.jpg`;
           const dest = FileSystem.documentDirectory + fileName;
           try {
             await FileSystem.copyAsync({ from: srcUri, to: dest });
-            finalUri = dest;
+            localUri = dest;
           } catch {
-            // copyAsync can fail for ph:// on some iOS versions; keep srcUri
-            // and let the 2-s timeout in the feed card handle graceful fallback.
-            finalUri = srcUri;
+            localUri = srcUri;
           }
         }
-        await updateProfile({ avatarUri: finalUri, profileImageType: 'custom' });
+
+        // Step 2 — upload to GCS so other users can see it.
+        // Save local uri immediately so the user sees their photo right away;
+        // update serverAvatarUrl once the upload finishes.
+        await updateProfile({ avatarUri: localUri, profileImageType: 'custom' });
+
+        const playerId = profile.playerId;
+        if (playerId) {
+          try {
+            const serveUrl = await uploadAvatarPhoto(playerId, localUri);
+            await updateProfile({ serverAvatarUrl: serveUrl });
+          } catch {
+            // Upload failed — photo still shows locally for the owner; others
+            // will see the symbol avatar until a successful upload.
+          }
+        }
+
         router.back();
       }
     } catch {

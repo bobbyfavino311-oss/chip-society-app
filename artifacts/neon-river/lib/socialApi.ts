@@ -167,6 +167,37 @@ export async function getBlocks(playerId: string): Promise<string[]> {
   return d.blocks;
 }
 
+// ── Avatar upload ─────────────────────────────────────────────────────────────
+
+const RAILWAY_API = 'https://api-server-production-bbc2.up.railway.app/api';
+
+/** Request a presigned GCS upload URL, then PUT the image directly to GCS.
+ *  Returns the permanent serve URL (via our API proxy) on success. */
+export async function uploadAvatarPhoto(
+  playerId: string,
+  localUri: string,
+): Promise<string> {
+  // Step 1 — get presigned URL from our server
+  const r1 = await fetch(`${RAILWAY_API}/avatars/upload-url`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-player-id': playerId },
+  });
+  if (!r1.ok) throw new Error('Failed to get upload URL');
+  const { uploadUrl, serveUrl } = (await r1.json()) as { uploadUrl: string; serveUrl: string };
+
+  // Step 2 — read the local file as a blob and PUT it directly to GCS
+  const fileResp = await fetch(localUri);
+  const blob = await fileResp.blob();
+  const r2 = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'image/jpeg' },
+    body: blob,
+  });
+  if (!r2.ok) throw new Error('GCS upload failed');
+
+  return serveUrl;
+}
+
 // ── Live Feed ──────────────────────────────────────────────────────────────────
 
 export interface FeedPost {
@@ -174,6 +205,7 @@ export interface FeedPost {
   authorId:          string;
   authorUsername:    string;
   authorAvatarIndex: number;
+  authorAvatarUrl:   string | null;   // server-hosted photo visible to all users
   authorRank:        string;
   content:           string;
   tag:               string;
