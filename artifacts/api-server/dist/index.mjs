@@ -18,6 +18,9 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
   if (typeof require !== "undefined") return require.apply(this, arguments);
   throw Error('Dynamic require of "' + x + '" is not supported');
 });
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
 var __commonJS = (cb, mod) => function __require2() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -30424,6 +30427,38 @@ var require_ip_address = __commonJS({
   }
 });
 
+// src/lib/serverStats.ts
+var _connections, _rooms, _players, _startedAt, serverStats;
+var init_serverStats = __esm({
+  "src/lib/serverStats.ts"() {
+    "use strict";
+    _connections = 0;
+    _rooms = 0;
+    _players = 0;
+    _startedAt = Date.now();
+    serverStats = {
+      incConnections() {
+        _connections++;
+      },
+      decConnections() {
+        if (_connections > 0) _connections--;
+      },
+      setRoomStats(rooms, players) {
+        _rooms = rooms;
+        _players = players;
+      },
+      snapshot() {
+        return {
+          connections: _connections,
+          rooms: _rooms,
+          activePlayers: _players,
+          uptimeSeconds: Math.floor((Date.now() - _startedAt) / 1e3)
+        };
+      }
+    };
+  }
+});
+
 // ../../node_modules/.pnpm/negotiator@0.6.3/node_modules/negotiator/lib/charset.js
 var require_charset2 = __commonJS({
   "../../node_modules/.pnpm/negotiator@0.6.3/node_modules/negotiator/lib/charset.js"(exports, module) {
@@ -51802,6 +51837,1389 @@ var require_dist3 = __commonJS({
   }
 });
 
+// ../../node_modules/.pnpm/socket.io@4.8.3/node_modules/socket.io/wrapper.mjs
+var import_dist, Server, Namespace, Socket;
+var init_wrapper = __esm({
+  "../../node_modules/.pnpm/socket.io@4.8.3/node_modules/socket.io/wrapper.mjs"() {
+    import_dist = __toESM(require_dist3(), 1);
+    ({ Server, Namespace, Socket } = import_dist.default);
+  }
+});
+
+// src/poker/engine.ts
+function createDeck() {
+  const suits = ["S", "H", "D", "C"];
+  const deck = [];
+  for (const suit of suits) {
+    for (let v = 2; v <= 14; v++) deck.push({ suit, value: v });
+  }
+  return deck;
+}
+function createShortDeck() {
+  const suits = ["S", "H", "D", "C"];
+  const deck = [];
+  for (const suit of suits) {
+    for (let v = 6; v <= 14; v++) deck.push({ suit, value: v });
+  }
+  return deck;
+}
+function isJoker(card) {
+  return card.value === 0;
+}
+function createJokerDeck() {
+  const deck = createDeck();
+  deck.push({ suit: "S", value: 0 });
+  deck.push({ suit: "H", value: 0 });
+  return deck;
+}
+function createDeckForVariant(variant) {
+  if (variant === "short_deck_holdem") return createShortDeck();
+  if (variant === "joker_holdem") return createJokerDeck();
+  return createDeck();
+}
+function holeCardCountForVariant(variant) {
+  return variant === "omaha_holdem" ? 4 : 2;
+}
+function shuffleDeck(deck) {
+  const d = [...deck];
+  for (let i = d.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [d[i], d[j]] = [d[j], d[i]];
+  }
+  return d;
+}
+function evaluate5Cards(hand) {
+  const vals = hand.map((c) => c.value).sort((a, b) => b - a);
+  const suits = hand.map((c) => c.suit);
+  const counts = {};
+  for (const v of vals) counts[v] = (counts[v] || 0) + 1;
+  const countVals = Object.values(counts).sort((a, b) => b - a);
+  const uniqueVals = Object.keys(counts).map(Number).sort((a, b) => b - a);
+  const isFlush = suits.every((s) => s === suits[0]);
+  const isNormalStraight = vals[0] - vals[4] === 4 && new Set(vals).size === 5;
+  const isWheel = vals[0] === 14 && vals[1] === 5 && vals[2] === 4 && vals[3] === 3 && vals[4] === 2;
+  const isStraight = isNormalStraight || isWheel;
+  const straightHigh = isWheel ? 5 : vals[0];
+  if (isFlush && isStraight) {
+    if (straightHigh === 14) return { rank: 9, values: [14], name: "Royal Flush" };
+    return { rank: 8, values: [straightHigh], name: "Straight Flush" };
+  }
+  if (countVals[0] === 4) {
+    const quad = uniqueVals.find((v) => counts[v] === 4);
+    const kick = uniqueVals.find((v) => counts[v] !== 4);
+    return { rank: 7, values: [quad, kick], name: "Four of a Kind" };
+  }
+  if (countVals[0] === 3 && countVals[1] === 2) {
+    const trips = uniqueVals.find((v) => counts[v] === 3);
+    const pair = uniqueVals.find((v) => counts[v] === 2);
+    return { rank: 6, values: [trips, pair], name: "Full House" };
+  }
+  if (isFlush) return { rank: 5, values: vals, name: "Flush" };
+  if (isStraight) return { rank: 4, values: [straightHigh], name: "Straight" };
+  if (countVals[0] === 3) {
+    const trips = uniqueVals.find((v) => counts[v] === 3);
+    const kickers = uniqueVals.filter((v) => counts[v] !== 3);
+    return { rank: 3, values: [trips, ...kickers], name: "Three of a Kind" };
+  }
+  if (countVals[0] === 2 && countVals[1] === 2) {
+    const pairs = uniqueVals.filter((v) => counts[v] === 2).sort((a, b) => b - a);
+    const kick = uniqueVals.find((v) => counts[v] === 1);
+    return { rank: 2, values: [...pairs, kick], name: "Two Pair" };
+  }
+  if (countVals[0] === 2) {
+    const pairVal = uniqueVals.find((v) => counts[v] === 2);
+    const kickers = uniqueVals.filter((v) => counts[v] !== 2);
+    return { rank: 1, values: [pairVal, ...kickers], name: "One Pair" };
+  }
+  return { rank: 0, values: vals, name: "High Card" };
+}
+function compareHands(a, b) {
+  if (a.rank !== b.rank) return a.rank - b.rank;
+  for (let i = 0; i < Math.max(a.values.length, b.values.length); i++) {
+    const diff = (a.values[i] ?? 0) - (b.values[i] ?? 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
+function getBestHand(holeCards, communityCards) {
+  const all = [...holeCards, ...communityCards];
+  const n = all.length;
+  let best = null;
+  for (let i = 0; i < n - 4; i++)
+    for (let j = i + 1; j < n - 3; j++)
+      for (let k = j + 1; k < n - 2; k++)
+        for (let l = k + 1; l < n - 1; l++)
+          for (let m = l + 1; m < n; m++) {
+            const r = evaluate5Cards([all[i], all[j], all[k], all[l], all[m]]);
+            if (!best || compareHands(r, best) > 0) best = r;
+          }
+  return best ?? { rank: 0, values: [], name: "High Card" };
+}
+function evaluate5CardsShortDeck(hand) {
+  const vals = hand.map((c) => c.value).sort((a, b) => b - a);
+  const suits = hand.map((c) => c.suit);
+  const counts = {};
+  for (const v of vals) counts[v] = (counts[v] || 0) + 1;
+  const countVals = Object.values(counts).sort((a, b) => b - a);
+  const uniqueVals = Object.keys(counts).map(Number).sort((a, b) => b - a);
+  const isFlush = suits.every((s) => s === suits[0]);
+  const isStraight = vals[0] - vals[4] === 4 && new Set(vals).size === 5;
+  const straightHigh = vals[0];
+  if (isFlush && isStraight) {
+    if (straightHigh === 14) return { rank: 9, values: [14], name: "Royal Flush" };
+    return { rank: 8, values: [straightHigh], name: "Straight Flush" };
+  }
+  if (countVals[0] === 4) {
+    const quad = uniqueVals.find((v) => counts[v] === 4);
+    const kick = uniqueVals.find((v) => counts[v] !== 4);
+    return { rank: 7, values: [quad, kick], name: "Four of a Kind" };
+  }
+  if (isFlush) return { rank: 6, values: vals, name: "Flush" };
+  if (countVals[0] === 3 && countVals[1] === 2) {
+    const trips = uniqueVals.find((v) => counts[v] === 3);
+    const pair = uniqueVals.find((v) => counts[v] === 2);
+    return { rank: 5, values: [trips, pair], name: "Full House" };
+  }
+  if (isStraight) return { rank: 4, values: [straightHigh], name: "Straight" };
+  if (countVals[0] === 3) {
+    const trips = uniqueVals.find((v) => counts[v] === 3);
+    const kickers = uniqueVals.filter((v) => counts[v] !== 3);
+    return { rank: 3, values: [trips, ...kickers], name: "Three of a Kind" };
+  }
+  if (countVals[0] === 2 && countVals[1] === 2) {
+    const pairs = uniqueVals.filter((v) => counts[v] === 2).sort((a, b) => b - a);
+    const kick = uniqueVals.find((v) => counts[v] === 1);
+    return { rank: 2, values: [...pairs, kick], name: "Two Pair" };
+  }
+  if (countVals[0] === 2) {
+    const pairVal = uniqueVals.find((v) => counts[v] === 2);
+    const kickers = uniqueVals.filter((v) => counts[v] !== 2);
+    return { rank: 1, values: [pairVal, ...kickers], name: "One Pair" };
+  }
+  return { rank: 0, values: vals, name: "High Card" };
+}
+function getBestHandOmaha(holeCards, communityCards) {
+  let best = null;
+  for (let hi = 0; hi < holeCards.length - 1; hi++) {
+    for (let hj = hi + 1; hj < holeCards.length; hj++) {
+      for (let ci = 0; ci < communityCards.length - 2; ci++) {
+        for (let cj = ci + 1; cj < communityCards.length - 1; cj++) {
+          for (let ck = cj + 1; ck < communityCards.length; ck++) {
+            const hand = [holeCards[hi], holeCards[hj], communityCards[ci], communityCards[cj], communityCards[ck]];
+            const result = evaluate5Cards(hand);
+            if (!best || compareHands(result, best) > 0) best = result;
+          }
+        }
+      }
+    }
+  }
+  return best ?? { rank: 0, values: [holeCards[0]?.value ?? 7], name: "High Card" };
+}
+function evaluate5CardsWild(hand) {
+  const allVals = hand.map((c) => c.value);
+  if (new Set(allVals).size === 1) {
+    return { rank: 10, values: [allVals[0]], name: "Five of a Kind" };
+  }
+  return evaluate5Cards(hand);
+}
+function getBestFrom(cards, evalFn) {
+  const n = cards.length;
+  let best = null;
+  for (let a = 0; a < n - 4; a++)
+    for (let b = a + 1; b < n - 3; b++)
+      for (let c = b + 1; c < n - 2; c++)
+        for (let d = c + 1; d < n - 1; d++)
+          for (let e = d + 1; e < n; e++) {
+            const r = evalFn([cards[a], cards[b], cards[c], cards[d], cards[e]]);
+            if (!best || compareHands(r, best) > 0) best = r;
+          }
+  return best ?? { rank: 0, values: [], name: "High Card" };
+}
+function getBestHandJoker(holeCards, communityCards) {
+  const all = [...holeCards, ...communityCards];
+  const jokerCount = all.filter(isJoker).length;
+  const natural = all.filter((c) => !isJoker(c));
+  if (jokerCount === 0) return getBestHand(holeCards, communityCards);
+  if (all.length < 5) return { rank: 0, values: [], name: "High Card" };
+  const SUITS = ["S", "H", "D", "C"];
+  const inHand = new Set(natural.map((c) => `${c.suit}${c.value}`));
+  const reps = [];
+  for (const suit of SUITS) {
+    for (let v = 2; v <= 14; v++) {
+      if (!inHand.has(`${suit}${v}`)) reps.push({ suit, value: v });
+    }
+  }
+  let best = null;
+  const updateBest = (r) => {
+    if (!best || compareHands(r, best) > 0) best = r;
+  };
+  const evalCards = (cards) => cards.length === 5 ? evaluate5CardsWild(cards) : getBestFrom(cards, evaluate5CardsWild);
+  if (jokerCount === 1) {
+    for (const r1 of reps) updateBest(evalCards([...natural, r1]));
+  } else {
+    for (let i = 0; i < reps.length; i++) {
+      for (let j = i + 1; j < reps.length; j++) {
+        updateBest(evalCards([...natural, reps[i], reps[j]]));
+      }
+    }
+  }
+  return best ?? { rank: 0, values: [], name: "High Card" };
+}
+function getBestHandForVariant(variant, holeCards, communityCards) {
+  if (variant === "joker_holdem") return getBestHandJoker(holeCards, communityCards);
+  if (variant === "omaha_holdem") return getBestHandOmaha(holeCards, communityCards);
+  const all = [...holeCards, ...communityCards];
+  const n = all.length;
+  const eval5 = variant === "short_deck_holdem" ? evaluate5CardsShortDeck : evaluate5Cards;
+  let best = null;
+  for (let i = 0; i < n - 4; i++)
+    for (let j = i + 1; j < n - 3; j++)
+      for (let k = j + 1; k < n - 2; k++)
+        for (let l = k + 1; l < n - 1; l++)
+          for (let m = l + 1; m < n; m++) {
+            const r = eval5([all[i], all[j], all[k], all[l], all[m]]);
+            if (!best || compareHands(r, best) > 0) best = r;
+          }
+  return best ?? { rank: 0, values: [], name: "High Card" };
+}
+var init_engine = __esm({
+  "src/poker/engine.ts"() {
+    "use strict";
+  }
+});
+
+// src/poker/botEngine.ts
+function preflopStrength(cards) {
+  if (cards.length !== 2) return 0.2;
+  const [a, b] = cards;
+  const hi = Math.max(a.value, b.value);
+  const lo = Math.min(a.value, b.value);
+  const gap = hi - lo;
+  const paired = hi === lo;
+  const suited = a.suit === b.suit;
+  const conn = gap <= 2;
+  if (paired && hi >= 14) return 1;
+  if (paired && hi >= 12) return 0.92;
+  if (paired && hi >= 10) return 0.82;
+  if (paired && hi >= 7) return 0.65;
+  if (paired) return 0.5;
+  if (hi === 14 && lo >= 13) return suited ? 0.9 : 0.85;
+  if (hi === 14 && lo >= 12) return suited ? 0.8 : 0.72;
+  if (hi === 14 && lo >= 11) return suited ? 0.72 : 0.64;
+  if (hi === 14 && lo >= 10) return suited ? 0.67 : 0.58;
+  if (hi === 13 && lo >= 12) return suited ? 0.72 : 0.64;
+  if (hi >= 10 && lo >= 10) return suited ? 0.62 : 0.55;
+  if (suited && conn && hi >= 9) return 0.55;
+  if (suited && hi >= 12) return 0.48;
+  if (conn && hi >= 8) return 0.4;
+  if (suited) return 0.35;
+  return 0.2;
+}
+function postflopStrength(holeCards, community) {
+  const all = [...holeCards, ...community];
+  const vals = all.map((c) => c.value);
+  const suits = all.map((c) => c.suit);
+  const freq = {};
+  for (const v of vals) freq[v] = (freq[v] ?? 0) + 1;
+  const counts = Object.values(freq).sort((a, b) => b - a);
+  const suitFreq = {};
+  for (const s of suits) suitFreq[s] = (suitFreq[s] ?? 0) + 1;
+  const maxSuit = Math.max(...Object.values(suitFreq));
+  const hasFlush = maxSuit >= 5;
+  const hasFlushDraw = maxSuit >= 4 && community.length < 5;
+  const uniq = [...new Set(vals)].sort((a, b) => a - b);
+  let maxRun = 1, run = 1;
+  for (let i = 1; i < uniq.length; i++) {
+    run = uniq[i] - uniq[i - 1] === 1 ? run + 1 : 1;
+    if (run > maxRun) maxRun = run;
+  }
+  const hasStraight = maxRun >= 5;
+  const hasStraightDraw = maxRun >= 4 && community.length < 5;
+  if (hasFlush && hasStraight) return 0.98;
+  if (hasFlush) return 0.9;
+  if (hasStraight) return 0.85;
+  if (counts[0] >= 4) return 0.97;
+  if (counts[0] >= 3 && counts[1] >= 2) return 0.92;
+  if (counts[0] >= 3) return 0.75;
+  if (counts[0] >= 2 && counts[1] >= 2) return 0.6;
+  if (counts[0] >= 2) return 0.4;
+  if (hasFlushDraw || hasStraightDraw) return 0.35;
+  const base = preflopStrength(holeCards);
+  return base * 0.85;
+}
+function decideBotAction(params) {
+  const {
+    difficulty,
+    holeCards,
+    communityCards,
+    toCall,
+    chips,
+    minRaise,
+    bigBlind,
+    potSize,
+    isPreflop,
+    position
+  } = params;
+  const strength = isPreflop ? preflopStrength(holeCards) : postflopStrength(holeCards, communityCards);
+  const jitter = (Math.random() - 0.5) * 0.1;
+  const eff = Math.max(0, Math.min(1, strength + jitter));
+  const canCheck = toCall === 0;
+  const potOdds = toCall > 0 ? toCall / (potSize + toCall) : 0;
+  if (difficulty === "ROOKIE") {
+    if (eff > 0.78) {
+      const rAmt = Math.min(chips, minRaise + bigBlind * Math.floor(Math.random() * 3));
+      return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
+    }
+    if (eff > 0.45 || canCheck) {
+      return toCall === 0 ? { type: "check" } : { type: "call" };
+    }
+    return { type: "fold" };
+  }
+  if (difficulty === "SOLID") {
+    const posBonus2 = position === "late" ? 0.07 : position === "middle" ? 0.03 : 0;
+    const adjEff2 = eff + posBonus2;
+    if (adjEff2 > 0.85) {
+      const rAmt = Math.min(chips, minRaise + Math.floor(potSize * 0.6));
+      return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
+    }
+    if (adjEff2 > potOdds + 0.1 || canCheck && adjEff2 > 0.3) {
+      return toCall === 0 ? { type: "check" } : { type: "call" };
+    }
+    if (adjEff2 > 0.3 && canCheck) return { type: "check" };
+    return { type: "fold" };
+  }
+  const posBonus = position === "late" ? 0.12 : position === "middle" ? 0.06 : 0;
+  const adjEff = eff + posBonus;
+  if (position === "late" && !isPreflop && Math.random() < 0.18 && canCheck) {
+    const rAmt = Math.min(chips, minRaise + Math.floor(potSize * 0.5));
+    return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
+  }
+  if (adjEff > 0.8) {
+    const mult = adjEff > 0.92 ? 1 : 0.65;
+    const rAmt = Math.min(chips, minRaise + Math.floor(potSize * mult));
+    return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
+  }
+  if (adjEff > potOdds + 0.05 || canCheck && adjEff > 0.25) {
+    return toCall === 0 ? { type: "check" } : { type: "call" };
+  }
+  return { type: "fold" };
+}
+function pickBot(seated) {
+  const available = BOT_ROSTER.filter((b) => !seated.has(b.username));
+  const template = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : BOT_ROSTER[Math.floor(Math.random() * BOT_ROSTER.length)];
+  const suffix = Math.floor(Math.random() * 900 + 100);
+  return {
+    ...template,
+    userId: `bot_${template.username.toLowerCase()}_${suffix}`,
+    username: `${template.username}`
+  };
+}
+function botBuyIn(config) {
+  const bb = config.bigBlind;
+  const target = bb * (50 + Math.floor(Math.random() * 30));
+  return Math.min(Math.max(target, config.minBuyIn), config.maxBuyIn);
+}
+var BOT_ROSTER;
+var init_botEngine = __esm({
+  "src/poker/botEngine.ts"() {
+    "use strict";
+    BOT_ROSTER = [
+      { username: "RoboShark", avatarId: 11, difficulty: "SHARK" },
+      { username: "ChipBot_99", avatarId: 9, difficulty: "SOLID" },
+      { username: "FoldMaster", avatarId: 13, difficulty: "ROOKIE" },
+      { username: "VegasBot", avatarId: 7, difficulty: "SOLID" },
+      { username: "BluffAI", avatarId: 15, difficulty: "SHARK" },
+      { username: "SafePlay", avatarId: 12, difficulty: "ROOKIE" },
+      { username: "CardBot", avatarId: 6, difficulty: "SOLID" },
+      { username: "MidnightBot", avatarId: 10, difficulty: "SHARK" }
+    ];
+  }
+});
+
+// src/poker/room.ts
+var TURN_TIMEOUT_MS, SHOWDOWN_DELAY_MS, HAND_START_DELAY_MS, BOT_DELAY_MS, PokerRoom;
+var init_room = __esm({
+  "src/poker/room.ts"() {
+    "use strict";
+    init_engine();
+    init_botEngine();
+    TURN_TIMEOUT_MS = 3e4;
+    SHOWDOWN_DELAY_MS = 5e3;
+    HAND_START_DELAY_MS = 3e3;
+    BOT_DELAY_MS = {
+      ROOKIE: [1800, 3500],
+      SOLID: [1300, 2800],
+      SHARK: [1e3, 2200]
+    };
+    PokerRoom = class {
+      id;
+      config;
+      seats;
+      deck = [];
+      communityCards = [];
+      pot = 0;
+      phase = "waiting";
+      dealerSeat = -1;
+      activeSeat = -1;
+      currentBet = 0;
+      winners = [];
+      messages = [];
+      spectators = /* @__PURE__ */ new Set();
+      requestedSitOut = /* @__PURE__ */ new Set();
+      actedThisRound = /* @__PURE__ */ new Set();
+      turnTimer = null;
+      handTimer = null;
+      turnTimeoutAt = null;
+      emit;
+      broadcast;
+      onChipSync;
+      constructor(id, config, emit, broadcast, onChipSync) {
+        this.id = id;
+        this.config = config;
+        this.seats = new Array(config.maxPlayers).fill(null);
+        this.emit = emit;
+        this.broadcast = broadcast;
+        this.onChipSync = onChipSync ?? null;
+      }
+      // ─── Player management ────────────────────────────────────────────────────
+      findSeatBySocketId(socketId) {
+        return this.seats.findIndex((s) => s?.socketId === socketId);
+      }
+      findSeatByUserId(userId) {
+        return this.seats.findIndex((s) => s?.userId === userId);
+      }
+      addPlayer(socketId, userId, username, avatarId, chips) {
+        const emptyIdx = this.seats.findIndex((s) => s === null);
+        if (emptyIdx === -1) return -1;
+        const initialStatus = this.phase !== "waiting" ? "sitting_out" : "active";
+        this.seats[emptyIdx] = {
+          socketId,
+          userId,
+          username,
+          avatarId,
+          chips,
+          startingChips: chips,
+          cards: [],
+          currentBet: 0,
+          totalBet: 0,
+          status: initialStatus
+        };
+        this.addMessage(`${username} joined the table`, "info");
+        this.broadcastState();
+        this.maybeScheduleHandStart();
+        return emptyIdx;
+      }
+      // ─── Bot management ───────────────────────────────────────────────────────
+      /** Add a bot to an empty seat. Returns the seat index, or -1 if table is full. */
+      addBot(profile, chips) {
+        const emptyIdx = this.seats.findIndex((s) => s === null);
+        if (emptyIdx === -1) return -1;
+        const socketId = `bot_${profile.userId}`;
+        this.seats[emptyIdx] = {
+          socketId,
+          userId: profile.userId,
+          username: profile.username,
+          avatarId: profile.avatarId,
+          chips,
+          startingChips: chips,
+          cards: [],
+          currentBet: 0,
+          totalBet: 0,
+          status: "active"
+        };
+        this.addMessage(`${profile.username} joined the table`, "info");
+        this.broadcastState();
+        this.maybeScheduleHandStart();
+        return emptyIdx;
+      }
+      isBotSeat(seatIdx) {
+        const seat = this.seats[seatIdx];
+        return seat?.socketId.startsWith("bot_") ?? false;
+      }
+      getBotIds() {
+        return this.seats.filter((s) => s?.socketId.startsWith("bot_")).map((s) => s.userId);
+      }
+      /** Remove all bots. Called when enough real players have joined. */
+      removeBotsWhenFull() {
+      }
+      /**
+       * Fire bot decisions for the active seat if it belongs to a bot.
+       * Called by RoomManager after every broadcastState if activeSeat is a bot.
+       */
+      triggerBotTurn() {
+        if (this.phase === "waiting" || this.phase === "showdown") return;
+        const idx = this.activeSeat;
+        if (idx < 0 || !this.isBotSeat(idx)) return;
+        const seat = this.seats[idx];
+        if (!seat || seat.status !== "active") return;
+        const uid = seat.userId;
+        const diff = uid.includes("robo") || uid.includes("bluff") || uid.includes("midnight") ? "SHARK" : uid.includes("fold") || uid.includes("safe") ? "ROOKIE" : "SOLID";
+        const position = idx < this.config.maxPlayers / 3 ? "early" : idx < this.config.maxPlayers * 2 / 3 ? "middle" : "late";
+        const toCall = Math.min(
+          Math.max(0, this.currentBet - seat.currentBet),
+          seat.chips
+        );
+        const decision = decideBotAction({
+          difficulty: diff,
+          holeCards: seat.cards,
+          communityCards: this.communityCards,
+          toCall,
+          chips: seat.chips,
+          currentBet: this.currentBet,
+          minRaise: this.currentBet + this.config.bigBlind,
+          bigBlind: this.config.bigBlind,
+          potSize: this.pot,
+          isPreflop: this.phase === "preflop",
+          position
+        });
+        const [minDelay, maxDelay] = BOT_DELAY_MS[diff];
+        const delay = minDelay + Math.floor(Math.random() * (maxDelay - minDelay));
+        setTimeout(() => {
+          if (this.activeSeat !== idx || !this.isBotSeat(idx)) return;
+          const s = this.seats[idx];
+          if (!s || s.status !== "active") return;
+          this.clearTurnTimer();
+          this.handleAction(seat.socketId, decision);
+        }, delay);
+      }
+      // ─── Soft disconnect (60 s reconnect window, handled by RoomManager) ──────
+      /**
+       * Mark a player as disconnected. Auto-folds their turn if active.
+       * Returns the player's userId so the caller can schedule a hard-remove timer.
+       */
+      markDisconnected(socketId) {
+        const idx = this.findSeatBySocketId(socketId);
+        if (idx === -1) return null;
+        const seat = this.seats[idx];
+        seat.isDisconnected = true;
+        seat.disconnectedAt = Date.now();
+        this.addMessage(`${seat.username} disconnected \u2014 60s to rejoin`, "info");
+        if (this.phase !== "waiting" && this.phase !== "showdown" && idx === this.activeSeat && seat.status === "active") {
+          this.clearTurnTimer();
+          seat.status = "folded";
+          this.actedThisRound.add(idx);
+          this.broadcastState();
+          this.advanceAfterAction();
+        } else {
+          this.broadcastState();
+        }
+        return seat.userId;
+      }
+      /** Restore a player's socket after they reconnect. */
+      reconnectPlayer(userId, newSocketId) {
+        const idx = this.findSeatByUserId(userId);
+        if (idx === -1) return false;
+        const seat = this.seats[idx];
+        seat.socketId = newSocketId;
+        seat.isDisconnected = false;
+        delete seat.disconnectedAt;
+        this.addMessage(`${seat.username} reconnected`, "info");
+        this.broadcastState();
+        return true;
+      }
+      /** Hard-remove a player by userId (called after the 60 s grace period). */
+      removePlayerByUserId(userId) {
+        const idx = this.findSeatByUserId(userId);
+        if (idx === -1) return;
+        const seat = this.seats[idx];
+        this.addMessage(`${seat.username} removed (timed out)`, "info");
+        if (this.phase !== "waiting" && this.phase !== "showdown" && idx === this.activeSeat) {
+          this.seats[idx].status = "folded";
+          this.seats[idx] = null;
+          this.broadcastState();
+          this.advanceAfterAction();
+        } else {
+          this.seats[idx] = null;
+          this.broadcastState();
+        }
+        this.checkTableVacant();
+      }
+      // ─── Spectator management ─────────────────────────────────────────────────
+      addSpectator(socketId) {
+        this.spectators.add(socketId);
+        this.emit(socketId, "game_state", this.getClientStateFor(socketId));
+      }
+      removeSpectator(socketId) {
+        this.spectators.delete(socketId);
+      }
+      // ─── Sit-out toggle ───────────────────────────────────────────────────────
+      handleSitOut(socketId, wantsSitOut) {
+        const seat = this.seats[this.findSeatBySocketId(socketId)];
+        if (!seat) return;
+        if (wantsSitOut) {
+          this.requestedSitOut.add(socketId);
+          if (this.phase === "waiting") seat.status = "sitting_out";
+          this.addMessage(`${seat.username} is sitting out next hand`, "info");
+        } else {
+          this.requestedSitOut.delete(socketId);
+          if (seat.status === "sitting_out") seat.status = "active";
+          this.addMessage(`${seat.username} is back in`, "info");
+          if (this.phase === "waiting") this.maybeScheduleHandStart();
+        }
+        this.broadcastState();
+      }
+      // ─── Chat ─────────────────────────────────────────────────────────────────
+      handleChat(socketId, text2) {
+        const seat = this.seats[this.findSeatBySocketId(socketId)];
+        const spectator = this.spectators.has(socketId);
+        if (!seat && !spectator) return;
+        const username = seat?.username ?? "Spectator";
+        const userId = seat?.userId ?? socketId;
+        const ts = Date.now();
+        const cleaned = text2.replace(/\b(fuck|shit|bitch|cunt|cock|ass)\b/gi, (m) => "*".repeat(m.length)).trim().slice(0, 100);
+        if (!cleaned) return;
+        const payload = { playerId: userId, playerName: username, text: cleaned, ts };
+        for (const s of this.seats) {
+          if (s) this.emit(s.socketId, "chat_message", payload);
+        }
+        for (const sid of this.spectators) {
+          this.emit(sid, "chat_message", payload);
+        }
+      }
+      removePlayer(socketId) {
+        this.requestedSitOut.delete(socketId);
+        const idx = this.findSeatBySocketId(socketId);
+        if (idx === -1) return;
+        const seat = this.seats[idx];
+        this.addMessage(`${seat.username} left the table`, "info");
+        if (this.phase !== "waiting" && this.phase !== "showdown" && idx === this.activeSeat) {
+          this.seats[idx].status = "folded";
+          this.seats[idx] = null;
+          this.broadcastState();
+          this.advanceAfterAction();
+        } else {
+          this.seats[idx] = null;
+          this.broadcastState();
+        }
+        this.checkTableVacant();
+      }
+      get playerCount() {
+        return this.seats.filter((s) => s !== null).length;
+      }
+      isEmpty() {
+        return this.playerCount === 0;
+      }
+      // ─── Hand lifecycle ───────────────────────────────────────────────────────
+      readyCount() {
+        return this.seats.filter(
+          (s) => s !== null && !this.requestedSitOut.has(s.socketId) && !s.isDisconnected
+        ).length;
+      }
+      maybeScheduleHandStart() {
+        if (this.phase !== "waiting") return;
+        if (this.readyCount() < 2) return;
+        if (this.handTimer) return;
+        this.handTimer = setTimeout(() => {
+          this.handTimer = null;
+          this.startHand();
+        }, HAND_START_DELAY_MS);
+      }
+      startHand() {
+        const allSeated = this.seats.map((s, i) => ({ s, i })).filter((x) => x.s !== null);
+        const activePlayers = allSeated.filter(
+          (x) => !this.requestedSitOut.has(x.s.socketId) && !x.s.isDisconnected
+        );
+        console.log("[startHand] seats:", JSON.stringify(allSeated.map(({ s, i }) => ({
+          i,
+          username: s.username,
+          chips: s.chips,
+          startingChips: s.startingChips,
+          status: s.status
+        }))));
+        if (activePlayers.length < 2) {
+          this.phase = "waiting";
+          this.broadcastState();
+          return;
+        }
+        this.deck = shuffleDeck(createDeckForVariant(this.config.variant));
+        this.communityCards = [];
+        this.pot = 0;
+        this.currentBet = 0;
+        this.winners = [];
+        this.messages = [];
+        this.actedThisRound.clear();
+        for (const { s } of allSeated) {
+          if (!s) continue;
+          if (this.requestedSitOut.has(s.socketId) || s.isDisconnected) {
+            s.status = "sitting_out";
+          } else {
+            s.cards = [];
+            s.currentBet = 0;
+            s.totalBet = 0;
+            s.status = "active";
+            s.startingChips = s.chips;
+          }
+        }
+        this.dealerSeat = this.nextActiveSeatFrom(this.dealerSeat === -1 ? 0 : this.dealerSeat, true);
+        const numHoleCards = holeCardCountForVariant(this.config.variant);
+        for (const { s } of activePlayers) {
+          const cards = [];
+          for (let n = 0; n < numHoleCards; n++) cards.push(this.deck.pop());
+          s.cards = cards;
+        }
+        const isHeadsUp = activePlayers.length === 2;
+        const sbSeat = isHeadsUp ? this.dealerSeat : this.nextActiveSeatFrom(this.dealerSeat);
+        const bbSeat = this.nextActiveSeatFrom(sbSeat);
+        this.postBlind(sbSeat, this.config.smallBlind);
+        this.postBlind(bbSeat, this.config.bigBlind);
+        this.currentBet = this.config.bigBlind;
+        this.phase = "preflop";
+        this.addMessage("New hand started", "info");
+        const utg = this.nextActiveSeatFrom(bbSeat);
+        this.activeSeat = utg;
+        this.broadcastState();
+        this.startTurnTimer();
+      }
+      postBlind(seatIdx, amount) {
+        const seat = this.seats[seatIdx];
+        if (!seat) return;
+        console.log(`[postBlind] ${seat.username} chips=${seat.chips} amount=${amount}`);
+        const actual = Math.min(amount, seat.chips);
+        seat.chips -= actual;
+        seat.currentBet = actual;
+        seat.totalBet = actual;
+        this.pot += actual;
+        if (seat.chips === 0) seat.status = "allin";
+      }
+      // ─── Action handling ──────────────────────────────────────────────────────
+      handleAction(socketId, action) {
+        const seatIdx = this.findSeatBySocketId(socketId);
+        if (seatIdx === -1 || seatIdx !== this.activeSeat) return;
+        const seat = this.seats[seatIdx];
+        if (!seat || seat.status !== "active") return;
+        this.clearTurnTimer();
+        switch (action.type) {
+          case "fold":
+            this.doFold(seat, seatIdx);
+            break;
+          case "check":
+            this.doCheck(seat, seatIdx);
+            break;
+          case "call":
+            this.doCall(seat, seatIdx);
+            break;
+          case "raise":
+            this.doRaise(seat, seatIdx, action.amount);
+            break;
+          case "allin":
+            this.doAllin(seat, seatIdx);
+            break;
+        }
+      }
+      doFold(seat, seatIdx) {
+        seat.status = "folded";
+        this.addMessage(`${seat.username} folds`, "action");
+        this.actedThisRound.add(seatIdx);
+        this.advanceAfterAction();
+      }
+      doCheck(seat, seatIdx) {
+        if (seat.currentBet < this.currentBet) {
+          this.doCall(seat, seatIdx);
+          return;
+        }
+        this.addMessage(`${seat.username} checks`, "action");
+        this.actedThisRound.add(seatIdx);
+        this.advanceAfterAction();
+      }
+      doCall(seat, seatIdx) {
+        const toCall = Math.min(this.currentBet - seat.currentBet, seat.chips);
+        seat.chips -= toCall;
+        seat.currentBet += toCall;
+        seat.totalBet += toCall;
+        this.pot += toCall;
+        if (seat.chips === 0) {
+          seat.status = "allin";
+          this.addMessage(`${seat.username} calls ${toCall} and is all-in`, "action");
+        } else {
+          this.addMessage(`${seat.username} calls ${toCall}`, "action");
+        }
+        this.actedThisRound.add(seatIdx);
+        this.advanceAfterAction();
+      }
+      doRaise(seat, seatIdx, raiseToAmount) {
+        const minRaise = this.currentBet + this.config.bigBlind;
+        const target = Math.max(minRaise, Math.min(raiseToAmount ?? minRaise, seat.chips + seat.currentBet));
+        if (target >= seat.chips + seat.currentBet) {
+          this.doAllin(seat, seatIdx);
+          return;
+        }
+        const toAdd = target - seat.currentBet;
+        seat.chips -= toAdd;
+        seat.currentBet = target;
+        seat.totalBet += toAdd;
+        this.pot += toAdd;
+        this.currentBet = target;
+        this.actedThisRound.clear();
+        this.actedThisRound.add(seatIdx);
+        this.addMessage(`${seat.username} raises to ${target.toLocaleString()}`, "action");
+        this.advanceAfterAction();
+      }
+      doAllin(seat, seatIdx) {
+        const allIn = seat.chips;
+        seat.currentBet += allIn;
+        seat.totalBet += allIn;
+        this.pot += allIn;
+        seat.chips = 0;
+        seat.status = "allin";
+        if (seat.currentBet > this.currentBet) {
+          this.currentBet = seat.currentBet;
+          this.actedThisRound.clear();
+        }
+        this.actedThisRound.add(seatIdx);
+        this.addMessage(`${seat.username} is all-in for ${seat.currentBet.toLocaleString()}`, "action");
+        this.advanceAfterAction();
+      }
+      // ─── Betting round progression ────────────────────────────────────────────
+      advanceAfterAction() {
+        const nonFolded = this.seats.filter((s) => s !== null && s.status !== "folded");
+        if (nonFolded.length === 1) {
+          this.endHand();
+          return;
+        }
+        if (this.isBettingRoundComplete()) {
+          this.nextPhase();
+          return;
+        }
+        const next = this.nextActiveSeatFrom(this.activeSeat);
+        if (next === this.activeSeat) {
+          this.nextPhase();
+          return;
+        }
+        this.activeSeat = next;
+        this.broadcastState();
+        this.startTurnTimer();
+      }
+      isBettingRoundComplete() {
+        const activePlayers = this.seats.map((s, i) => ({ s, i })).filter(({ s }) => s?.status === "active");
+        if (activePlayers.length === 0) return true;
+        return activePlayers.every(
+          ({ s, i }) => this.actedThisRound.has(i) && s.currentBet === this.currentBet
+        );
+      }
+      nextPhase() {
+        for (const seat of this.seats) {
+          if (seat) seat.currentBet = 0;
+        }
+        this.currentBet = 0;
+        this.actedThisRound.clear();
+        const activePlayers = this.seats.filter((s) => s !== null && s.status !== "folded");
+        const canBetPlayers = activePlayers.filter((s) => s.status === "active");
+        switch (this.phase) {
+          case "preflop":
+            this.communityCards = [this.deck.pop(), this.deck.pop(), this.deck.pop()];
+            this.phase = "flop";
+            break;
+          case "flop":
+            this.communityCards.push(this.deck.pop());
+            this.phase = "turn";
+            break;
+          case "turn":
+            this.communityCards.push(this.deck.pop());
+            this.phase = "river";
+            break;
+          case "river":
+            this.endHand();
+            return;
+          default:
+            return;
+        }
+        if (canBetPlayers.length <= 1) {
+          while (this.communityCards.length < 5) this.communityCards.push(this.deck.pop());
+          this.endHand();
+          return;
+        }
+        this.activeSeat = this.nextActiveSeatFrom(this.dealerSeat);
+        this.broadcastState();
+        this.startTurnTimer();
+      }
+      // ─── Side pot calculation ─────────────────────────────────────────────────
+      awardSidePots() {
+        const contributors = this.seats.map((s, i) => ({ seat: s, idx: i })).filter((x) => x.seat !== null && x.seat.totalBet > 0);
+        if (contributors.length === 0) return;
+        const levels = [...new Set(contributors.map((c) => c.seat.totalBet))].sort((a, b) => a - b);
+        this.winners = [];
+        let prevLevel = 0;
+        for (const level of levels) {
+          const perPlayer = level - prevLevel;
+          let potAmount = 0;
+          for (const c of contributors) {
+            potAmount += Math.min(Math.max(0, c.seat.totalBet - prevLevel), perPlayer);
+          }
+          const eligible = contributors.filter(
+            (c) => c.seat.status !== "folded" && c.seat.totalBet >= level
+          );
+          if (potAmount > 0 && eligible.length === 1) {
+            eligible[0].seat.chips += potAmount;
+          } else if (potAmount > 0 && eligible.length > 1) {
+            const evaluated = eligible.map((e) => ({
+              idx: e.idx,
+              seat: e.seat,
+              hand: getBestHandForVariant(this.config.variant, e.seat.cards, this.communityCards)
+            }));
+            evaluated.sort((a, b) => compareHands(b.hand, a.hand));
+            const best = evaluated[0].hand;
+            const potWinners = evaluated.filter((e) => compareHands(e.hand, best) === 0);
+            const share = Math.floor(potAmount / potWinners.length);
+            for (const w of potWinners) {
+              w.seat.chips += share;
+              const existing = this.winners.find((x) => x.seatIndex === w.idx);
+              if (existing) {
+                existing.amount += share;
+              } else {
+                this.winners.push({
+                  seatIndex: w.idx,
+                  username: w.seat.username,
+                  amount: share,
+                  handRank: w.hand.name,
+                  cards: w.seat.cards
+                });
+              }
+            }
+          }
+          prevLevel = level;
+        }
+        for (const w of this.winners) {
+          this.addMessage(
+            `${w.username} wins ${w.amount.toLocaleString()}${w.handRank ? ` with ${w.handRank}` : ""}!`,
+            "result"
+          );
+        }
+        this.pot = 0;
+      }
+      endHand() {
+        this.clearTurnTimer();
+        this.phase = "showdown";
+        const nonFolded = this.seats.map((s, i) => ({ s, i })).filter(({ s }) => s !== null && s.status !== "folded");
+        if (nonFolded.length === 1) {
+          const { s, i } = nonFolded[0];
+          s.chips += this.pot;
+          this.winners = [{ seatIndex: i, username: s.username, amount: this.pot }];
+          this.addMessage(`${s.username} wins ${this.pot.toLocaleString()} (uncontested)`, "result");
+          this.pot = 0;
+        } else {
+          this.awardSidePots();
+        }
+        this.broadcastState();
+        this.fireChipSync();
+        this.handTimer = setTimeout(() => {
+          this.handTimer = null;
+          for (let i = 0; i < this.seats.length; i++) {
+            if (this.seats[i] && this.seats[i].chips <= 0) {
+              this.addMessage(`${this.seats[i].username} is out of chips and leaves`, "info");
+              this.seats[i] = null;
+            }
+          }
+          if (this.playerCount >= 2) {
+            this.startHand();
+          } else {
+            this.phase = "waiting";
+            this.broadcastState();
+          }
+        }, SHOWDOWN_DELAY_MS);
+      }
+      fireChipSync() {
+        if (!this.onChipSync) return;
+        const seated = this.seats.filter((s) => s !== null).map((s) => ({ userId: s.userId, chips: s.chips }));
+        this.onChipSync(seated);
+      }
+      // ─── Turn timer ───────────────────────────────────────────────────────────
+      startTurnTimer() {
+        this.clearTurnTimer();
+        this.turnTimeoutAt = Date.now() + TURN_TIMEOUT_MS;
+        this.turnTimer = setTimeout(() => {
+          const seat = this.seats[this.activeSeat];
+          if (seat) {
+            this.addMessage(`${seat.username} timed out \u2014 auto fold`, "action");
+            this.doFold(seat, this.activeSeat);
+          }
+        }, TURN_TIMEOUT_MS);
+      }
+      clearTurnTimer() {
+        if (this.turnTimer) {
+          clearTimeout(this.turnTimer);
+          this.turnTimer = null;
+        }
+        this.turnTimeoutAt = null;
+      }
+      // ─── Helpers ──────────────────────────────────────────────────────────────
+      nextActiveSeatFrom(fromSeat, skipSelf = false) {
+        const start = skipSelf ? (fromSeat + 1) % this.config.maxPlayers : (fromSeat + 1) % this.config.maxPlayers;
+        let cur = start;
+        for (let i = 0; i < this.config.maxPlayers; i++) {
+          const s = this.seats[cur];
+          if (s && s.status === "active") return cur;
+          cur = (cur + 1) % this.config.maxPlayers;
+        }
+        return fromSeat;
+      }
+      checkTableVacant() {
+        if (this.playerCount < 2 && this.phase !== "waiting") {
+          this.clearTurnTimer();
+          if (this.handTimer) {
+            clearTimeout(this.handTimer);
+            this.handTimer = null;
+          }
+          this.phase = "waiting";
+          this.broadcastState();
+        }
+        if (this.playerCount < 2 && this.handTimer) {
+          clearTimeout(this.handTimer);
+          this.handTimer = null;
+        }
+      }
+      addMessage(text2, type) {
+        this.messages = [{ text: text2, type, timestamp: Date.now() }, ...this.messages].slice(0, 20);
+      }
+      // ─── State serialization ──────────────────────────────────────────────────
+      getClientStateFor(socketId) {
+        const mySeat = this.findSeatBySocketId(socketId);
+        const mySeatData = mySeat !== -1 ? this.seats[mySeat] : null;
+        const isMyTurn = mySeat === this.activeSeat;
+        const callAmount = mySeatData ? Math.min(Math.max(0, this.currentBet - mySeatData.currentBet), mySeatData.chips) : 0;
+        const minRaise = this.currentBet + this.config.bigBlind;
+        const maxRaise = mySeatData ? mySeatData.chips + mySeatData.currentBet : 0;
+        const seats = this.seats.map((s, i) => {
+          if (!s) return null;
+          const isWinner = this.winners.some((w) => w.seatIndex === i);
+          return {
+            seatIndex: i,
+            userId: s.userId,
+            username: s.username,
+            avatarId: s.avatarId,
+            chips: s.chips,
+            currentBet: s.currentBet,
+            totalBet: s.totalBet,
+            status: s.status,
+            isDealer: i === this.dealerSeat,
+            isTurn: i === this.activeSeat,
+            cardCount: s.cards.length,
+            cards: s.socketId === socketId ? s.cards : void 0,
+            revealedCards: this.phase === "showdown" && s.status !== "folded" ? s.cards : void 0,
+            revealedHand: this.phase === "showdown" && isWinner ? this.winners.find((w) => w.seatIndex === i)?.handRank : void 0,
+            isDisconnected: s.isDisconnected
+          };
+        });
+        return {
+          tableId: this.id,
+          phase: this.phase,
+          seats,
+          communityCards: this.communityCards,
+          pot: this.pot,
+          currentBet: this.currentBet,
+          dealerSeat: this.dealerSeat,
+          activeSeat: this.activeSeat,
+          smallBlind: this.config.smallBlind,
+          bigBlind: this.config.bigBlind,
+          mySeat,
+          myCards: mySeatData?.cards ?? [],
+          isMyTurn,
+          callAmount,
+          minRaise,
+          maxRaise,
+          turnTimeoutAt: this.turnTimeoutAt,
+          messages: this.messages,
+          winners: this.phase === "showdown" ? this.winners : void 0,
+          variant: this.config.variant
+        };
+      }
+      getLobbyInfo() {
+        return {
+          id: this.id,
+          stakeTier: this.config.stakeTier,
+          smallBlind: this.config.smallBlind,
+          bigBlind: this.config.bigBlind,
+          playerCount: this.playerCount,
+          maxPlayers: this.config.maxPlayers,
+          phase: this.phase,
+          minBuyIn: this.config.minBuyIn,
+          variant: this.config.variant
+        };
+      }
+      broadcastState() {
+        for (const seat of this.seats) {
+          if (seat && !seat.isDisconnected && !seat.socketId.startsWith("bot_")) {
+            const state = this.getClientStateFor(seat.socketId);
+            this.emit(seat.socketId, "game_state", state);
+          }
+        }
+        for (const sid of this.spectators) {
+          this.emit(sid, "game_state", this.getClientStateFor(sid));
+        }
+        this.broadcast(this.id, "lobby_update", null);
+        if (this.activeSeat >= 0 && this.isBotSeat(this.activeSeat)) {
+          this.triggerBotTurn();
+        }
+      }
+    };
+  }
+});
+
+// src/poker/types.ts
+var STAKE_CONFIG;
+var init_types = __esm({
+  "src/poker/types.ts"() {
+    "use strict";
+    STAKE_CONFIG = {
+      STARTER: { stakeTier: "STARTER", maxPlayers: 5, smallBlind: 5, bigBlind: 10, minBuyIn: 200, maxBuyIn: 1e3 },
+      MICRO: { stakeTier: "MICRO", maxPlayers: 5, smallBlind: 25, bigBlind: 50, minBuyIn: 1e3, maxBuyIn: 5e3 },
+      LOW: { stakeTier: "LOW", maxPlayers: 5, smallBlind: 100, bigBlind: 200, minBuyIn: 4e3, maxBuyIn: 2e4 },
+      STANDARD: { stakeTier: "STANDARD", maxPlayers: 5, smallBlind: 500, bigBlind: 1e3, minBuyIn: 2e4, maxBuyIn: 1e5 },
+      HIGH_ROLLER: { stakeTier: "HIGH_ROLLER", maxPlayers: 5, smallBlind: 2500, bigBlind: 5e3, minBuyIn: 1e5, maxBuyIn: 5e5 },
+      VIP: { stakeTier: "VIP", maxPlayers: 5, smallBlind: 1e4, bigBlind: 2e4, minBuyIn: 4e5, maxBuyIn: 2e6 },
+      ELITE: { stakeTier: "ELITE", maxPlayers: 5, smallBlind: 5e4, bigBlind: 1e5, minBuyIn: 2e6, maxBuyIn: 1e7 },
+      ELITE_PLUS: { stakeTier: "ELITE_PLUS", maxPlayers: 5, smallBlind: 25e4, bigBlind: 5e5, minBuyIn: 1e7, maxBuyIn: 5e7 }
+    };
+  }
+});
+
+// src/poker/roomManager.ts
+var RoomManager;
+var init_roomManager = __esm({
+  "src/poker/roomManager.ts"() {
+    "use strict";
+    init_room();
+    init_types();
+    init_botEngine();
+    RoomManager = class {
+      // userId → timer
+      constructor(emit, broadcast, onChipSync) {
+        this.emit = emit;
+        this.broadcast = broadcast;
+        this.onChipSync = onChipSync;
+      }
+      rooms = /* @__PURE__ */ new Map();
+      socketRoom = /* @__PURE__ */ new Map();
+      // socketId → roomId (seated)
+      userIdRoom = /* @__PURE__ */ new Map();
+      // userId   → roomId (for reconnect)
+      spectatorRoom = /* @__PURE__ */ new Map();
+      // socketId → roomId (spectating)
+      disconnectTimers = /* @__PURE__ */ new Map();
+      generateCode() {
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let code = "";
+        for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+        return this.rooms.has(code) ? this.generateCode() : code;
+      }
+      createRoom(stakeTier, maxPlayers = 5, variant = "texas_holdem") {
+        const id = this.generateCode();
+        const config = { ...STAKE_CONFIG[stakeTier], maxPlayers, variant };
+        const room = new PokerRoom(id, config, this.emit, this.broadcast, this.onChipSync);
+        this.rooms.set(id, room);
+        return room;
+      }
+      getRoom(roomId) {
+        return this.rooms.get(roomId);
+      }
+      getRoomForSocket(socketId) {
+        const roomId = this.socketRoom.get(socketId);
+        return roomId ? this.rooms.get(roomId) : void 0;
+      }
+      getRoomForUser(userId) {
+        const roomId = this.userIdRoom.get(userId);
+        return roomId ? this.rooms.get(roomId) : void 0;
+      }
+      joinRoom(socketId, roomId, userId, username, avatarId, chips) {
+        const room = this.rooms.get(roomId);
+        if (!room) return false;
+        if (room.playerCount >= room.config.maxPlayers) return false;
+        if (chips < room.config.minBuyIn) return false;
+        const seatIdx = room.addPlayer(socketId, userId, username, avatarId, Math.min(chips, room.config.maxBuyIn));
+        if (seatIdx === -1) return false;
+        this.socketRoom.set(socketId, roomId);
+        this.userIdRoom.set(userId, roomId);
+        return true;
+      }
+      leaveRoom(socketId) {
+        const room = this.getRoomForSocket(socketId);
+        if (!room) return;
+        const seatIdx = room.findSeatBySocketId(socketId);
+        const userId = seatIdx !== -1 ? room.seats[seatIdx]?.userId : void 0;
+        room.removePlayer(socketId);
+        this.socketRoom.delete(socketId);
+        if (userId) {
+          this.userIdRoom.delete(userId);
+          const timer = this.disconnectTimers.get(userId);
+          if (timer) {
+            clearTimeout(timer);
+            this.disconnectTimers.delete(userId);
+          }
+        }
+        if (room.isEmpty()) {
+          this.rooms.delete(room.id);
+        }
+      }
+      /**
+       * Soft-disconnect: marks the seat as disconnected (auto-folds if their turn),
+       * removes the socket mapping, and schedules a 60 s hard-remove timer.
+       * The userId → roomId mapping is preserved so reconnectPlayer() can find the seat.
+       */
+      softDisconnect(socketId) {
+        const room = this.getRoomForSocket(socketId);
+        if (!room) return;
+        const userId = room.markDisconnected(socketId);
+        this.socketRoom.delete(socketId);
+        if (!userId) return;
+        const existing = this.disconnectTimers.get(userId);
+        if (existing) clearTimeout(existing);
+        const timer = setTimeout(() => {
+          this.disconnectTimers.delete(userId);
+          this.userIdRoom.delete(userId);
+          room.removePlayerByUserId(userId);
+          if (room.isEmpty()) this.rooms.delete(room.id);
+        }, 6e4);
+        this.disconnectTimers.set(userId, timer);
+      }
+      /**
+       * Reconnect a player who lost their socket connection.
+       * Cancels their disconnect timer, updates the seat's socketId, and
+       * re-registers the socket → room mapping.
+       */
+      reconnectPlayer(userId, newSocketId) {
+        const roomId = this.userIdRoom.get(userId);
+        if (!roomId) return null;
+        const room = this.rooms.get(roomId);
+        if (!room) {
+          this.userIdRoom.delete(userId);
+          return null;
+        }
+        const timer = this.disconnectTimers.get(userId);
+        if (timer) {
+          clearTimeout(timer);
+          this.disconnectTimers.delete(userId);
+        }
+        const ok = room.reconnectPlayer(userId, newSocketId);
+        if (!ok) return null;
+        this.socketRoom.set(newSocketId, roomId);
+        return room;
+      }
+      findOrCreateRoom(stakeTier, maxPlayers, variant = "texas_holdem") {
+        for (const room of this.rooms.values()) {
+          if (room.config.stakeTier === stakeTier && room.config.maxPlayers === maxPlayers && room.config.variant === variant && room.playerCount < room.config.maxPlayers) {
+            return room;
+          }
+        }
+        return this.createRoom(stakeTier, maxPlayers, variant);
+      }
+      /**
+       * Fill empty seats with bots after a delay.
+       * Called when a real player joins and the room still needs more players.
+       * Bots are added immediately (one bot) so the game starts quickly, then
+       * optionally more bots fill remaining empty seats.
+       *
+       * @param room        The room to fill
+       * @param targetCount Desired total player count (capped at maxPlayers)
+       * @param delayMs     How long to wait before adding the first bot (default 8 s)
+       */
+      scheduleBotFill(room, targetCount = 3, delayMs = 8e3) {
+        const roomId = room.id;
+        const doFill = () => {
+          const r = this.rooms.get(roomId);
+          if (!r) return;
+          const currentCount = r.playerCount;
+          if (currentCount >= targetCount) return;
+          const seated = new Set(
+            r.seats.filter(Boolean).map((s) => s.username)
+          );
+          const toAdd = Math.min(targetCount - currentCount, r.config.maxPlayers - currentCount);
+          for (let i = 0; i < toAdd; i++) {
+            const bot = pickBot(seated);
+            const chips = botBuyIn(r.config);
+            const idx = r.addBot(bot, chips);
+            if (idx === -1) break;
+            seated.add(bot.username);
+          }
+        };
+        setTimeout(doFill, delayMs);
+      }
+      getLobbyTables() {
+        return [...this.rooms.values()].map((r) => r.getLobbyInfo()).sort((a, b) => a.smallBlind - b.smallBlind);
+      }
+      // ─── Spectator tracking ───────────────────────────────────────────────────
+      registerSpectator(socketId, roomId) {
+        this.spectatorRoom.set(socketId, roomId);
+      }
+      unregisterSpectator(socketId) {
+        this.spectatorRoom.delete(socketId);
+      }
+      getSpectatingRoomId(socketId) {
+        return this.spectatorRoom.get(socketId);
+      }
+      getSpectatingRoom(socketId) {
+        const roomId = this.spectatorRoom.get(socketId);
+        return roomId ? this.rooms.get(roomId) : void 0;
+      }
+      cleanupEmpty() {
+        for (const [id, room] of this.rooms.entries()) {
+          if (room.isEmpty()) this.rooms.delete(id);
+        }
+      }
+      /**
+       * Reap rooms where every seat has been disconnected for longer than maxAgeMs.
+       * Called on a periodic interval (every 5 min) by the server process.
+       */
+      cleanupStale(maxAgeMs = 5 * 6e4) {
+        const now = Date.now();
+        for (const [id, room] of this.rooms.entries()) {
+          if (room.isEmpty()) {
+            this.rooms.delete(id);
+            continue;
+          }
+          const allStale = room.seats.every((seat) => {
+            if (seat === null) return true;
+            if (!seat.isDisconnected || seat.disconnectedAt === void 0) return false;
+            return now - seat.disconnectedAt > maxAgeMs;
+          });
+          if (allStale) {
+            for (const seat of room.seats) {
+              if (!seat) continue;
+              const timer = this.disconnectTimers.get(seat.userId);
+              if (timer) {
+                clearTimeout(timer);
+                this.disconnectTimers.delete(seat.userId);
+              }
+              this.userIdRoom.delete(seat.userId);
+            }
+            this.rooms.delete(id);
+          }
+        }
+      }
+      /** Live metrics for the /api/stats health endpoint. */
+      getStats() {
+        let players = 0;
+        for (const room of this.rooms.values()) {
+          players += room.seats.filter((s) => s !== null && !s.isDisconnected).length;
+        }
+        return { rooms: this.rooms.size, players };
+      }
+    };
+  }
+});
+
+// src/lib/logger.ts
+var import_pino, isProduction, logger;
+var init_logger = __esm({
+  "src/lib/logger.ts"() {
+    "use strict";
+    import_pino = __toESM(require_pino(), 1);
+    isProduction = process.env.NODE_ENV === "production";
+    logger = (0, import_pino.default)({
+      level: process.env.LOG_LEVEL ?? "info",
+      redact: [
+        "req.headers.authorization",
+        "req.headers.cookie",
+        "res.headers['set-cookie']"
+      ],
+      ...isProduction ? {} : {
+        transport: {
+          target: "pino-pretty",
+          options: { colorize: true }
+        }
+      }
+    });
+  }
+});
+
 // ../../node_modules/.pnpm/uid2@1.0.0/node_modules/uid2/index.js
 var require_uid2 = __commonJS({
   "../../node_modules/.pnpm/uid2@1.0.0/node_modules/uid2/index.js"(exports, module) {
@@ -63934,6 +65352,334 @@ var require_built3 = __commonJS({
   }
 });
 
+// src/sockets/index.ts
+var sockets_exports = {};
+__export(sockets_exports, {
+  emitToAll: () => emitToAll,
+  emitToPlayer: () => emitToPlayer,
+  getManager: () => getManager,
+  setupSocketIO: () => setupSocketIO
+});
+function resolveVariant(v) {
+  return typeof v === "string" && VALID_VARIANTS.has(v) ? v : "texas_holdem";
+}
+function resolveTier(v) {
+  if (typeof v === "string" && v in STAKE_CONFIG) return v;
+  return "ELITE";
+}
+function getManager() {
+  return _manager;
+}
+function emitToAll(event, data) {
+  if (!_io) return;
+  _io.emit(event, data);
+}
+function emitToPlayer(playerId, event, data) {
+  const socketId = playerSockets.get(playerId);
+  if (!socketId || !_io) {
+    logger.info({ playerId, event, socketFound: false }, "emitToPlayer: player offline");
+    return false;
+  }
+  _io.to(socketId).emit(event, data);
+  logger.info({ playerId, socketId, event }, "emitToPlayer: event emitted");
+  return true;
+}
+function sanitizeChips(value, fallback) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+function setupSocketIO(httpServer2) {
+  const io2 = new Server(httpServer2, {
+    path: "/api/socket.io",
+    cors: { origin: "*", methods: ["GET", "POST"] },
+    transports: ["websocket", "polling"]
+  });
+  const redisUrl = process.env.REDIS_URL;
+  if (redisUrl) {
+    try {
+      const pubClient = new import_ioredis.default(redisUrl, {
+        maxRetriesPerRequest: null,
+        // required by @socket.io/redis-adapter
+        enableReadyCheck: false,
+        lazyConnect: false
+      });
+      const subClient = pubClient.duplicate();
+      pubClient.on("error", (err) => logger.error({ err }, "Redis pub client error"));
+      subClient.on("error", (err) => logger.error({ err }, "Redis sub client error"));
+      io2.adapter((0, import_redis_adapter.createAdapter)(pubClient, subClient));
+      logger.info({ redisUrl: redisUrl.replace(/:\/\/.*@/, "://***@") }, "Socket.IO Redis adapter attached");
+    } catch (err) {
+      logger.error({ err }, "Failed to attach Redis adapter \u2014 falling back to in-memory");
+    }
+  } else {
+    logger.warn("REDIS_URL not set \u2014 Socket.IO running with single-process in-memory adapter");
+  }
+  _io = io2;
+  const emit = (socketId, event, data) => {
+    io2.to(socketId).emit(event, data);
+  };
+  const broadcast = (roomId, _event, _data) => {
+    io2.emit("lobby_state", { tables: manager.getLobbyTables() });
+  };
+  const manager = new RoomManager(emit, broadcast);
+  _manager = manager;
+  io2.on("connection", (socket) => {
+    const realIp = socket.handshake.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? socket.handshake.address;
+    const now = Date.now();
+    const times = _connTimes.get(realIp) ?? [];
+    const recent = times.filter((t) => now - t < 6e4);
+    recent.push(now);
+    _connTimes.set(realIp, recent);
+    if (recent.length > 30) {
+      logger.warn({ ip: realIp, count: recent.length }, "Socket rate limit: too many connections, disconnecting");
+      socket.emit("error", { message: "Too many connections from your address. Please wait a moment." });
+      socket.disconnect(true);
+      return;
+    }
+    serverStats.incConnections();
+    logger.info({ socketId: socket.id, transport: socket.conn.transport.name }, "Socket connected");
+    socket.conn.on("upgrade", (transport) => {
+      logger.info({ socketId: socket.id, transport: transport.name }, "Socket transport upgraded");
+    });
+    socket.on("disconnect", (reason) => {
+      serverStats.decConnections();
+      logger.info({ socketId: socket.id, reason, transport: socket.conn.transport.name }, "Socket disconnected (reason)");
+    });
+    socket.on("register_player", (payload) => {
+      const { playerId } = payload;
+      if (!playerId) return;
+      const oldSocketId = playerSockets.get(playerId);
+      if (oldSocketId && oldSocketId !== socket.id) {
+        socketPlayers.delete(oldSocketId);
+      }
+      playerSockets.set(playerId, socket.id);
+      socketPlayers.set(socket.id, playerId);
+      socket.join(`player:${playerId}`);
+      logger.info({ playerId, socketId: socket.id }, "Player registered");
+    });
+    socket.on("get_lobby", () => {
+      socket.emit("lobby_state", { tables: manager.getLobbyTables() });
+    });
+    socket.on("create_table", async (payload) => {
+      try {
+        const existing = manager.getRoomForSocket(socket.id);
+        if (existing) {
+          socket.emit("error", { message: "Already seated at a table. Leave first." });
+          return;
+        }
+        const tier = resolveTier(payload.stakeTier);
+        const variant = resolveVariant(payload.variant);
+        const room = manager.createRoom(tier, payload.maxPlayers ?? 5, variant);
+        const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
+        const ok = manager.joinRoom(
+          socket.id,
+          room.id,
+          payload.userId,
+          payload.username,
+          payload.avatarId,
+          chips
+        );
+        if (!ok) {
+          manager.getRoom(room.id) && manager.cleanupEmpty();
+          socket.emit("error", { message: "Insufficient chips for this stake level." });
+          return;
+        }
+        socket.join(room.id);
+        socket.emit("joined_table", { tableId: room.id, state: room.getClientStateFor(socket.id) });
+        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
+        logger.info({ roomId: room.id, socketId: socket.id, userId: payload.userId }, "Table created");
+        manager.scheduleBotFill(room, 3, 8e3);
+      } catch (e) {
+        logger.error({ err: e }, "create_table error");
+        socket.emit("error", { message: "Failed to create table." });
+      }
+    });
+    socket.on("join_table", async (payload) => {
+      try {
+        const existing = manager.getRoomForSocket(socket.id);
+        if (existing) {
+          socket.emit("error", { message: "Already seated at a table. Leave first." });
+          return;
+        }
+        const targetRoom = manager.getRoom(payload.tableId);
+        if (!targetRoom) {
+          socket.emit("error", { message: "Table not found." });
+          return;
+        }
+        const chips = sanitizeChips(payload.chips, targetRoom.config.minBuyIn);
+        const ok = manager.joinRoom(
+          socket.id,
+          payload.tableId,
+          payload.userId,
+          payload.username,
+          payload.avatarId,
+          chips
+        );
+        if (!ok) {
+          socket.emit("error", { message: "Cannot join table \u2014 full, closed, or insufficient chips." });
+          return;
+        }
+        const room = manager.getRoom(payload.tableId);
+        socket.join(payload.tableId);
+        socket.emit("joined_table", { tableId: payload.tableId, state: room.getClientStateFor(socket.id) });
+        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
+        logger.info({ roomId: payload.tableId, socketId: socket.id, userId: payload.userId }, "Joined table");
+      } catch (e) {
+        logger.error({ err: e }, "join_table error");
+        socket.emit("error", { message: "Failed to join table." });
+      }
+    });
+    socket.on("quick_join", async (payload) => {
+      try {
+        const existing = manager.getRoomForSocket(socket.id);
+        if (existing) {
+          socket.emit("error", { message: "Already seated at a table. Leave first." });
+          return;
+        }
+        const tier = resolveTier(payload.stakeTier);
+        const variant = resolveVariant(payload.variant);
+        const room = manager.findOrCreateRoom(tier, 5, variant);
+        const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
+        console.log("[quick_join] payload.stakeTier=", payload.stakeTier, "\u2192 resolved tier=", tier, "payload.chips=", payload.chips, "sanitized=", chips);
+        const ok = manager.joinRoom(
+          socket.id,
+          room.id,
+          payload.userId,
+          payload.username,
+          payload.avatarId,
+          chips
+        );
+        if (!ok) {
+          socket.emit("error", { message: "Could not find a suitable table. Try a different stake level." });
+          return;
+        }
+        socket.join(room.id);
+        socket.emit("joined_table", { tableId: room.id, state: room.getClientStateFor(socket.id) });
+        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
+        logger.info({ roomId: room.id, userId: payload.userId, tier }, "Quick join");
+        const realCount = room.seats.filter((s) => s && !s.socketId.startsWith("bot_")).length;
+        if (realCount < 2) manager.scheduleBotFill(room, 3, 8e3);
+      } catch (e) {
+        logger.error({ err: e }, "quick_join error");
+        socket.emit("error", { message: "Quick join failed. Please try again." });
+      }
+    });
+    socket.on("rejoin_table", (payload) => {
+      try {
+        const room = manager.reconnectPlayer(payload.userId, socket.id);
+        if (!room) {
+          socket.emit("rejoin_failed", { message: "Table no longer exists or seat expired." });
+          return;
+        }
+        playerSockets.set(payload.userId, socket.id);
+        socketPlayers.set(socket.id, payload.userId);
+        socket.join(`player:${payload.userId}`);
+        socket.join(room.id);
+        socket.emit("joined_table", { tableId: room.id, state: room.getClientStateFor(socket.id) });
+        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
+        logger.info({ roomId: room.id, userId: payload.userId, socketId: socket.id }, "Player reconnected");
+      } catch (e) {
+        logger.error({ err: e }, "rejoin_table error");
+        socket.emit("rejoin_failed", { message: "Reconnect failed. Please rejoin manually." });
+      }
+    });
+    socket.on("leave_table", () => {
+      const room = manager.getRoomForSocket(socket.id);
+      if (room) socket.leave(room.id);
+      manager.leaveRoom(socket.id);
+      socket.emit("left_table", {});
+      io2.emit("lobby_state", { tables: manager.getLobbyTables() });
+    });
+    socket.on("player_action", (payload) => {
+      const room = manager.getRoomForSocket(socket.id);
+      if (!room) return;
+      room.handleAction(socket.id, { type: payload.type, amount: payload.amount });
+    });
+    socket.on("send_chat", (payload) => {
+      const room = manager.getRoomForSocket(socket.id) ?? manager.getSpectatingRoom(socket.id);
+      if (!room || !payload.text) return;
+      room.handleChat(socket.id, payload.text);
+    });
+    socket.on("spectate_table", (payload) => {
+      const room = manager.getRoom(payload.tableId);
+      if (!room) {
+        socket.emit("error", { message: "Table not found." });
+        return;
+      }
+      socket.join(payload.tableId);
+      room.addSpectator(socket.id);
+      manager.registerSpectator(socket.id, payload.tableId);
+      logger.info({ roomId: payload.tableId, socketId: socket.id }, "Spectator joined");
+    });
+    socket.on("stop_spectating", () => {
+      const roomId = manager.getSpectatingRoomId(socket.id);
+      if (roomId) {
+        manager.getRoom(roomId)?.removeSpectator(socket.id);
+        manager.unregisterSpectator(socket.id);
+        socket.leave(roomId);
+      }
+      socket.emit("stopped_spectating", {});
+    });
+    socket.on("sit_out", (payload) => {
+      const room = manager.getRoomForSocket(socket.id);
+      if (!room) return;
+      room.handleSitOut(socket.id, payload.sitOut);
+    });
+    socket.on("disconnect", () => {
+      logger.info({ socketId: socket.id }, "Socket disconnected");
+      const pid = socketPlayers.get(socket.id);
+      if (pid) {
+        playerSockets.delete(pid);
+        socketPlayers.delete(socket.id);
+      }
+      const spectatingRoomId = manager.getSpectatingRoomId(socket.id);
+      if (spectatingRoomId) {
+        manager.getRoom(spectatingRoomId)?.removeSpectator(socket.id);
+        manager.unregisterSpectator(socket.id);
+      }
+      const room = manager.getRoomForSocket(socket.id);
+      if (room) {
+        socket.leave(room.id);
+        manager.softDisconnect(socket.id);
+      }
+      io2.emit("lobby_state", { tables: manager.getLobbyTables() });
+    });
+  });
+  logger.info("Socket.IO attached at /api/socket.io");
+}
+var import_redis_adapter, import_ioredis, VALID_VARIANTS, playerSockets, socketPlayers, _manager, _connTimes, _io;
+var init_sockets = __esm({
+  "src/sockets/index.ts"() {
+    "use strict";
+    init_wrapper();
+    init_roomManager();
+    init_logger();
+    init_types();
+    import_redis_adapter = __toESM(require_dist4(), 1);
+    import_ioredis = __toESM(require_built3(), 1);
+    init_serverStats();
+    VALID_VARIANTS = /* @__PURE__ */ new Set([
+      "texas_holdem",
+      "short_deck_holdem",
+      "joker_holdem",
+      "omaha_holdem"
+    ]);
+    playerSockets = /* @__PURE__ */ new Map();
+    socketPlayers = /* @__PURE__ */ new Map();
+    _manager = null;
+    _connTimes = /* @__PURE__ */ new Map();
+    setInterval(() => {
+      const cutoff = Date.now() - 6e4;
+      for (const [ip, times] of _connTimes.entries()) {
+        const trimmed = times.filter((t) => t > cutoff);
+        if (trimmed.length === 0) _connTimes.delete(ip);
+        else _connTimes.set(ip, trimmed);
+      }
+    }, 6e4).unref();
+    _io = null;
+  }
+});
+
 // ../../node_modules/.pnpm/postgres-array@2.0.0/node_modules/postgres-array/index.js
 var require_postgres_array = __commonJS({
   "../../node_modules/.pnpm/postgres-array@2.0.0/node_modules/postgres-array/index.js"(exports) {
@@ -73886,1681 +75632,9 @@ var HealthCheckResponse = objectType({
   status: stringType()
 });
 
-// src/lib/serverStats.ts
-var _connections = 0;
-var _rooms = 0;
-var _players = 0;
-var _startedAt = Date.now();
-var serverStats = {
-  incConnections() {
-    _connections++;
-  },
-  decConnections() {
-    if (_connections > 0) _connections--;
-  },
-  setRoomStats(rooms, players) {
-    _rooms = rooms;
-    _players = players;
-  },
-  snapshot() {
-    return {
-      connections: _connections,
-      rooms: _rooms,
-      activePlayers: _players,
-      uptimeSeconds: Math.floor((Date.now() - _startedAt) / 1e3)
-    };
-  }
-};
-
-// ../../node_modules/.pnpm/socket.io@4.8.3/node_modules/socket.io/wrapper.mjs
-var import_dist = __toESM(require_dist3(), 1);
-var { Server, Namespace, Socket } = import_dist.default;
-
-// src/poker/engine.ts
-function createDeck() {
-  const suits = ["S", "H", "D", "C"];
-  const deck = [];
-  for (const suit of suits) {
-    for (let v = 2; v <= 14; v++) deck.push({ suit, value: v });
-  }
-  return deck;
-}
-function createShortDeck() {
-  const suits = ["S", "H", "D", "C"];
-  const deck = [];
-  for (const suit of suits) {
-    for (let v = 6; v <= 14; v++) deck.push({ suit, value: v });
-  }
-  return deck;
-}
-function isJoker(card) {
-  return card.value === 0;
-}
-function createJokerDeck() {
-  const deck = createDeck();
-  deck.push({ suit: "S", value: 0 });
-  deck.push({ suit: "H", value: 0 });
-  return deck;
-}
-function createDeckForVariant(variant) {
-  if (variant === "short_deck_holdem") return createShortDeck();
-  if (variant === "joker_holdem") return createJokerDeck();
-  return createDeck();
-}
-function holeCardCountForVariant(variant) {
-  return variant === "omaha_holdem" ? 4 : 2;
-}
-function shuffleDeck(deck) {
-  const d = [...deck];
-  for (let i = d.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [d[i], d[j]] = [d[j], d[i]];
-  }
-  return d;
-}
-function evaluate5Cards(hand) {
-  const vals = hand.map((c) => c.value).sort((a, b) => b - a);
-  const suits = hand.map((c) => c.suit);
-  const counts = {};
-  for (const v of vals) counts[v] = (counts[v] || 0) + 1;
-  const countVals = Object.values(counts).sort((a, b) => b - a);
-  const uniqueVals = Object.keys(counts).map(Number).sort((a, b) => b - a);
-  const isFlush = suits.every((s) => s === suits[0]);
-  const isNormalStraight = vals[0] - vals[4] === 4 && new Set(vals).size === 5;
-  const isWheel = vals[0] === 14 && vals[1] === 5 && vals[2] === 4 && vals[3] === 3 && vals[4] === 2;
-  const isStraight = isNormalStraight || isWheel;
-  const straightHigh = isWheel ? 5 : vals[0];
-  if (isFlush && isStraight) {
-    if (straightHigh === 14) return { rank: 9, values: [14], name: "Royal Flush" };
-    return { rank: 8, values: [straightHigh], name: "Straight Flush" };
-  }
-  if (countVals[0] === 4) {
-    const quad = uniqueVals.find((v) => counts[v] === 4);
-    const kick = uniqueVals.find((v) => counts[v] !== 4);
-    return { rank: 7, values: [quad, kick], name: "Four of a Kind" };
-  }
-  if (countVals[0] === 3 && countVals[1] === 2) {
-    const trips = uniqueVals.find((v) => counts[v] === 3);
-    const pair = uniqueVals.find((v) => counts[v] === 2);
-    return { rank: 6, values: [trips, pair], name: "Full House" };
-  }
-  if (isFlush) return { rank: 5, values: vals, name: "Flush" };
-  if (isStraight) return { rank: 4, values: [straightHigh], name: "Straight" };
-  if (countVals[0] === 3) {
-    const trips = uniqueVals.find((v) => counts[v] === 3);
-    const kickers = uniqueVals.filter((v) => counts[v] !== 3);
-    return { rank: 3, values: [trips, ...kickers], name: "Three of a Kind" };
-  }
-  if (countVals[0] === 2 && countVals[1] === 2) {
-    const pairs = uniqueVals.filter((v) => counts[v] === 2).sort((a, b) => b - a);
-    const kick = uniqueVals.find((v) => counts[v] === 1);
-    return { rank: 2, values: [...pairs, kick], name: "Two Pair" };
-  }
-  if (countVals[0] === 2) {
-    const pairVal = uniqueVals.find((v) => counts[v] === 2);
-    const kickers = uniqueVals.filter((v) => counts[v] !== 2);
-    return { rank: 1, values: [pairVal, ...kickers], name: "One Pair" };
-  }
-  return { rank: 0, values: vals, name: "High Card" };
-}
-function compareHands(a, b) {
-  if (a.rank !== b.rank) return a.rank - b.rank;
-  for (let i = 0; i < Math.max(a.values.length, b.values.length); i++) {
-    const diff = (a.values[i] ?? 0) - (b.values[i] ?? 0);
-    if (diff !== 0) return diff;
-  }
-  return 0;
-}
-function getBestHand(holeCards, communityCards) {
-  const all = [...holeCards, ...communityCards];
-  const n = all.length;
-  let best = null;
-  for (let i = 0; i < n - 4; i++)
-    for (let j = i + 1; j < n - 3; j++)
-      for (let k = j + 1; k < n - 2; k++)
-        for (let l = k + 1; l < n - 1; l++)
-          for (let m = l + 1; m < n; m++) {
-            const r = evaluate5Cards([all[i], all[j], all[k], all[l], all[m]]);
-            if (!best || compareHands(r, best) > 0) best = r;
-          }
-  return best ?? { rank: 0, values: [], name: "High Card" };
-}
-function evaluate5CardsShortDeck(hand) {
-  const vals = hand.map((c) => c.value).sort((a, b) => b - a);
-  const suits = hand.map((c) => c.suit);
-  const counts = {};
-  for (const v of vals) counts[v] = (counts[v] || 0) + 1;
-  const countVals = Object.values(counts).sort((a, b) => b - a);
-  const uniqueVals = Object.keys(counts).map(Number).sort((a, b) => b - a);
-  const isFlush = suits.every((s) => s === suits[0]);
-  const isStraight = vals[0] - vals[4] === 4 && new Set(vals).size === 5;
-  const straightHigh = vals[0];
-  if (isFlush && isStraight) {
-    if (straightHigh === 14) return { rank: 9, values: [14], name: "Royal Flush" };
-    return { rank: 8, values: [straightHigh], name: "Straight Flush" };
-  }
-  if (countVals[0] === 4) {
-    const quad = uniqueVals.find((v) => counts[v] === 4);
-    const kick = uniqueVals.find((v) => counts[v] !== 4);
-    return { rank: 7, values: [quad, kick], name: "Four of a Kind" };
-  }
-  if (isFlush) return { rank: 6, values: vals, name: "Flush" };
-  if (countVals[0] === 3 && countVals[1] === 2) {
-    const trips = uniqueVals.find((v) => counts[v] === 3);
-    const pair = uniqueVals.find((v) => counts[v] === 2);
-    return { rank: 5, values: [trips, pair], name: "Full House" };
-  }
-  if (isStraight) return { rank: 4, values: [straightHigh], name: "Straight" };
-  if (countVals[0] === 3) {
-    const trips = uniqueVals.find((v) => counts[v] === 3);
-    const kickers = uniqueVals.filter((v) => counts[v] !== 3);
-    return { rank: 3, values: [trips, ...kickers], name: "Three of a Kind" };
-  }
-  if (countVals[0] === 2 && countVals[1] === 2) {
-    const pairs = uniqueVals.filter((v) => counts[v] === 2).sort((a, b) => b - a);
-    const kick = uniqueVals.find((v) => counts[v] === 1);
-    return { rank: 2, values: [...pairs, kick], name: "Two Pair" };
-  }
-  if (countVals[0] === 2) {
-    const pairVal = uniqueVals.find((v) => counts[v] === 2);
-    const kickers = uniqueVals.filter((v) => counts[v] !== 2);
-    return { rank: 1, values: [pairVal, ...kickers], name: "One Pair" };
-  }
-  return { rank: 0, values: vals, name: "High Card" };
-}
-function getBestHandOmaha(holeCards, communityCards) {
-  let best = null;
-  for (let hi = 0; hi < holeCards.length - 1; hi++) {
-    for (let hj = hi + 1; hj < holeCards.length; hj++) {
-      for (let ci = 0; ci < communityCards.length - 2; ci++) {
-        for (let cj = ci + 1; cj < communityCards.length - 1; cj++) {
-          for (let ck = cj + 1; ck < communityCards.length; ck++) {
-            const hand = [holeCards[hi], holeCards[hj], communityCards[ci], communityCards[cj], communityCards[ck]];
-            const result = evaluate5Cards(hand);
-            if (!best || compareHands(result, best) > 0) best = result;
-          }
-        }
-      }
-    }
-  }
-  return best ?? { rank: 0, values: [holeCards[0]?.value ?? 7], name: "High Card" };
-}
-function evaluate5CardsWild(hand) {
-  const allVals = hand.map((c) => c.value);
-  if (new Set(allVals).size === 1) {
-    return { rank: 10, values: [allVals[0]], name: "Five of a Kind" };
-  }
-  return evaluate5Cards(hand);
-}
-function getBestFrom(cards, evalFn) {
-  const n = cards.length;
-  let best = null;
-  for (let a = 0; a < n - 4; a++)
-    for (let b = a + 1; b < n - 3; b++)
-      for (let c = b + 1; c < n - 2; c++)
-        for (let d = c + 1; d < n - 1; d++)
-          for (let e = d + 1; e < n; e++) {
-            const r = evalFn([cards[a], cards[b], cards[c], cards[d], cards[e]]);
-            if (!best || compareHands(r, best) > 0) best = r;
-          }
-  return best ?? { rank: 0, values: [], name: "High Card" };
-}
-function getBestHandJoker(holeCards, communityCards) {
-  const all = [...holeCards, ...communityCards];
-  const jokerCount = all.filter(isJoker).length;
-  const natural = all.filter((c) => !isJoker(c));
-  if (jokerCount === 0) return getBestHand(holeCards, communityCards);
-  if (all.length < 5) return { rank: 0, values: [], name: "High Card" };
-  const SUITS = ["S", "H", "D", "C"];
-  const inHand = new Set(natural.map((c) => `${c.suit}${c.value}`));
-  const reps = [];
-  for (const suit of SUITS) {
-    for (let v = 2; v <= 14; v++) {
-      if (!inHand.has(`${suit}${v}`)) reps.push({ suit, value: v });
-    }
-  }
-  let best = null;
-  const updateBest = (r) => {
-    if (!best || compareHands(r, best) > 0) best = r;
-  };
-  const evalCards = (cards) => cards.length === 5 ? evaluate5CardsWild(cards) : getBestFrom(cards, evaluate5CardsWild);
-  if (jokerCount === 1) {
-    for (const r1 of reps) updateBest(evalCards([...natural, r1]));
-  } else {
-    for (let i = 0; i < reps.length; i++) {
-      for (let j = i + 1; j < reps.length; j++) {
-        updateBest(evalCards([...natural, reps[i], reps[j]]));
-      }
-    }
-  }
-  return best ?? { rank: 0, values: [], name: "High Card" };
-}
-function getBestHandForVariant(variant, holeCards, communityCards) {
-  if (variant === "joker_holdem") return getBestHandJoker(holeCards, communityCards);
-  if (variant === "omaha_holdem") return getBestHandOmaha(holeCards, communityCards);
-  const all = [...holeCards, ...communityCards];
-  const n = all.length;
-  const eval5 = variant === "short_deck_holdem" ? evaluate5CardsShortDeck : evaluate5Cards;
-  let best = null;
-  for (let i = 0; i < n - 4; i++)
-    for (let j = i + 1; j < n - 3; j++)
-      for (let k = j + 1; k < n - 2; k++)
-        for (let l = k + 1; l < n - 1; l++)
-          for (let m = l + 1; m < n; m++) {
-            const r = eval5([all[i], all[j], all[k], all[l], all[m]]);
-            if (!best || compareHands(r, best) > 0) best = r;
-          }
-  return best ?? { rank: 0, values: [], name: "High Card" };
-}
-
-// src/poker/botEngine.ts
-function preflopStrength(cards) {
-  if (cards.length !== 2) return 0.2;
-  const [a, b] = cards;
-  const hi = Math.max(a.value, b.value);
-  const lo = Math.min(a.value, b.value);
-  const gap = hi - lo;
-  const paired = hi === lo;
-  const suited = a.suit === b.suit;
-  const conn = gap <= 2;
-  if (paired && hi >= 14) return 1;
-  if (paired && hi >= 12) return 0.92;
-  if (paired && hi >= 10) return 0.82;
-  if (paired && hi >= 7) return 0.65;
-  if (paired) return 0.5;
-  if (hi === 14 && lo >= 13) return suited ? 0.9 : 0.85;
-  if (hi === 14 && lo >= 12) return suited ? 0.8 : 0.72;
-  if (hi === 14 && lo >= 11) return suited ? 0.72 : 0.64;
-  if (hi === 14 && lo >= 10) return suited ? 0.67 : 0.58;
-  if (hi === 13 && lo >= 12) return suited ? 0.72 : 0.64;
-  if (hi >= 10 && lo >= 10) return suited ? 0.62 : 0.55;
-  if (suited && conn && hi >= 9) return 0.55;
-  if (suited && hi >= 12) return 0.48;
-  if (conn && hi >= 8) return 0.4;
-  if (suited) return 0.35;
-  return 0.2;
-}
-function postflopStrength(holeCards, community) {
-  const all = [...holeCards, ...community];
-  const vals = all.map((c) => c.value);
-  const suits = all.map((c) => c.suit);
-  const freq = {};
-  for (const v of vals) freq[v] = (freq[v] ?? 0) + 1;
-  const counts = Object.values(freq).sort((a, b) => b - a);
-  const suitFreq = {};
-  for (const s of suits) suitFreq[s] = (suitFreq[s] ?? 0) + 1;
-  const maxSuit = Math.max(...Object.values(suitFreq));
-  const hasFlush = maxSuit >= 5;
-  const hasFlushDraw = maxSuit >= 4 && community.length < 5;
-  const uniq = [...new Set(vals)].sort((a, b) => a - b);
-  let maxRun = 1, run = 1;
-  for (let i = 1; i < uniq.length; i++) {
-    run = uniq[i] - uniq[i - 1] === 1 ? run + 1 : 1;
-    if (run > maxRun) maxRun = run;
-  }
-  const hasStraight = maxRun >= 5;
-  const hasStraightDraw = maxRun >= 4 && community.length < 5;
-  if (hasFlush && hasStraight) return 0.98;
-  if (hasFlush) return 0.9;
-  if (hasStraight) return 0.85;
-  if (counts[0] >= 4) return 0.97;
-  if (counts[0] >= 3 && counts[1] >= 2) return 0.92;
-  if (counts[0] >= 3) return 0.75;
-  if (counts[0] >= 2 && counts[1] >= 2) return 0.6;
-  if (counts[0] >= 2) return 0.4;
-  if (hasFlushDraw || hasStraightDraw) return 0.35;
-  const base = preflopStrength(holeCards);
-  return base * 0.85;
-}
-function decideBotAction(params) {
-  const {
-    difficulty,
-    holeCards,
-    communityCards,
-    toCall,
-    chips,
-    minRaise,
-    bigBlind,
-    potSize,
-    isPreflop,
-    position
-  } = params;
-  const strength = isPreflop ? preflopStrength(holeCards) : postflopStrength(holeCards, communityCards);
-  const jitter = (Math.random() - 0.5) * 0.1;
-  const eff = Math.max(0, Math.min(1, strength + jitter));
-  const canCheck = toCall === 0;
-  const potOdds = toCall > 0 ? toCall / (potSize + toCall) : 0;
-  if (difficulty === "ROOKIE") {
-    if (eff > 0.78) {
-      const rAmt = Math.min(chips, minRaise + bigBlind * Math.floor(Math.random() * 3));
-      return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
-    }
-    if (eff > 0.45 || canCheck) {
-      return toCall === 0 ? { type: "check" } : { type: "call" };
-    }
-    return { type: "fold" };
-  }
-  if (difficulty === "SOLID") {
-    const posBonus2 = position === "late" ? 0.07 : position === "middle" ? 0.03 : 0;
-    const adjEff2 = eff + posBonus2;
-    if (adjEff2 > 0.85) {
-      const rAmt = Math.min(chips, minRaise + Math.floor(potSize * 0.6));
-      return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
-    }
-    if (adjEff2 > potOdds + 0.1 || canCheck && adjEff2 > 0.3) {
-      return toCall === 0 ? { type: "check" } : { type: "call" };
-    }
-    if (adjEff2 > 0.3 && canCheck) return { type: "check" };
-    return { type: "fold" };
-  }
-  const posBonus = position === "late" ? 0.12 : position === "middle" ? 0.06 : 0;
-  const adjEff = eff + posBonus;
-  if (position === "late" && !isPreflop && Math.random() < 0.18 && canCheck) {
-    const rAmt = Math.min(chips, minRaise + Math.floor(potSize * 0.5));
-    return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
-  }
-  if (adjEff > 0.8) {
-    const mult = adjEff > 0.92 ? 1 : 0.65;
-    const rAmt = Math.min(chips, minRaise + Math.floor(potSize * mult));
-    return chips <= minRaise ? { type: "allin" } : { type: "raise", amount: rAmt };
-  }
-  if (adjEff > potOdds + 0.05 || canCheck && adjEff > 0.25) {
-    return toCall === 0 ? { type: "check" } : { type: "call" };
-  }
-  return { type: "fold" };
-}
-var BOT_ROSTER = [
-  { username: "RoboShark", avatarId: 11, difficulty: "SHARK" },
-  { username: "ChipBot_99", avatarId: 9, difficulty: "SOLID" },
-  { username: "FoldMaster", avatarId: 13, difficulty: "ROOKIE" },
-  { username: "VegasBot", avatarId: 7, difficulty: "SOLID" },
-  { username: "BluffAI", avatarId: 15, difficulty: "SHARK" },
-  { username: "SafePlay", avatarId: 12, difficulty: "ROOKIE" },
-  { username: "CardBot", avatarId: 6, difficulty: "SOLID" },
-  { username: "MidnightBot", avatarId: 10, difficulty: "SHARK" }
-];
-function pickBot(seated) {
-  const available = BOT_ROSTER.filter((b) => !seated.has(b.username));
-  const template = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : BOT_ROSTER[Math.floor(Math.random() * BOT_ROSTER.length)];
-  const suffix = Math.floor(Math.random() * 900 + 100);
-  return {
-    ...template,
-    userId: `bot_${template.username.toLowerCase()}_${suffix}`,
-    username: `${template.username}`
-  };
-}
-function botBuyIn(config) {
-  const bb = config.bigBlind;
-  const target = bb * (50 + Math.floor(Math.random() * 30));
-  return Math.min(Math.max(target, config.minBuyIn), config.maxBuyIn);
-}
-
-// src/poker/room.ts
-var TURN_TIMEOUT_MS = 3e4;
-var SHOWDOWN_DELAY_MS = 5e3;
-var HAND_START_DELAY_MS = 3e3;
-var BOT_DELAY_MS = {
-  ROOKIE: [1800, 3500],
-  SOLID: [1300, 2800],
-  SHARK: [1e3, 2200]
-};
-var PokerRoom = class {
-  id;
-  config;
-  seats;
-  deck = [];
-  communityCards = [];
-  pot = 0;
-  phase = "waiting";
-  dealerSeat = -1;
-  activeSeat = -1;
-  currentBet = 0;
-  winners = [];
-  messages = [];
-  spectators = /* @__PURE__ */ new Set();
-  requestedSitOut = /* @__PURE__ */ new Set();
-  actedThisRound = /* @__PURE__ */ new Set();
-  turnTimer = null;
-  handTimer = null;
-  turnTimeoutAt = null;
-  emit;
-  broadcast;
-  onChipSync;
-  constructor(id, config, emit, broadcast, onChipSync) {
-    this.id = id;
-    this.config = config;
-    this.seats = new Array(config.maxPlayers).fill(null);
-    this.emit = emit;
-    this.broadcast = broadcast;
-    this.onChipSync = onChipSync ?? null;
-  }
-  // ─── Player management ────────────────────────────────────────────────────
-  findSeatBySocketId(socketId) {
-    return this.seats.findIndex((s) => s?.socketId === socketId);
-  }
-  findSeatByUserId(userId) {
-    return this.seats.findIndex((s) => s?.userId === userId);
-  }
-  addPlayer(socketId, userId, username, avatarId, chips) {
-    const emptyIdx = this.seats.findIndex((s) => s === null);
-    if (emptyIdx === -1) return -1;
-    const initialStatus = this.phase !== "waiting" ? "sitting_out" : "active";
-    this.seats[emptyIdx] = {
-      socketId,
-      userId,
-      username,
-      avatarId,
-      chips,
-      startingChips: chips,
-      cards: [],
-      currentBet: 0,
-      totalBet: 0,
-      status: initialStatus
-    };
-    this.addMessage(`${username} joined the table`, "info");
-    this.broadcastState();
-    this.maybeScheduleHandStart();
-    return emptyIdx;
-  }
-  // ─── Bot management ───────────────────────────────────────────────────────
-  /** Add a bot to an empty seat. Returns the seat index, or -1 if table is full. */
-  addBot(profile, chips) {
-    const emptyIdx = this.seats.findIndex((s) => s === null);
-    if (emptyIdx === -1) return -1;
-    const socketId = `bot_${profile.userId}`;
-    this.seats[emptyIdx] = {
-      socketId,
-      userId: profile.userId,
-      username: profile.username,
-      avatarId: profile.avatarId,
-      chips,
-      startingChips: chips,
-      cards: [],
-      currentBet: 0,
-      totalBet: 0,
-      status: "active"
-    };
-    this.addMessage(`${profile.username} joined the table`, "info");
-    this.broadcastState();
-    this.maybeScheduleHandStart();
-    return emptyIdx;
-  }
-  isBotSeat(seatIdx) {
-    const seat = this.seats[seatIdx];
-    return seat?.socketId.startsWith("bot_") ?? false;
-  }
-  getBotIds() {
-    return this.seats.filter((s) => s?.socketId.startsWith("bot_")).map((s) => s.userId);
-  }
-  /** Remove all bots. Called when enough real players have joined. */
-  removeBotsWhenFull() {
-  }
-  /**
-   * Fire bot decisions for the active seat if it belongs to a bot.
-   * Called by RoomManager after every broadcastState if activeSeat is a bot.
-   */
-  triggerBotTurn() {
-    if (this.phase === "waiting" || this.phase === "showdown") return;
-    const idx = this.activeSeat;
-    if (idx < 0 || !this.isBotSeat(idx)) return;
-    const seat = this.seats[idx];
-    if (!seat || seat.status !== "active") return;
-    const uid = seat.userId;
-    const diff = uid.includes("robo") || uid.includes("bluff") || uid.includes("midnight") ? "SHARK" : uid.includes("fold") || uid.includes("safe") ? "ROOKIE" : "SOLID";
-    const position = idx < this.config.maxPlayers / 3 ? "early" : idx < this.config.maxPlayers * 2 / 3 ? "middle" : "late";
-    const toCall = Math.min(
-      Math.max(0, this.currentBet - seat.currentBet),
-      seat.chips
-    );
-    const decision = decideBotAction({
-      difficulty: diff,
-      holeCards: seat.cards,
-      communityCards: this.communityCards,
-      toCall,
-      chips: seat.chips,
-      currentBet: this.currentBet,
-      minRaise: this.currentBet + this.config.bigBlind,
-      bigBlind: this.config.bigBlind,
-      potSize: this.pot,
-      isPreflop: this.phase === "preflop",
-      position
-    });
-    const [minDelay, maxDelay] = BOT_DELAY_MS[diff];
-    const delay = minDelay + Math.floor(Math.random() * (maxDelay - minDelay));
-    setTimeout(() => {
-      if (this.activeSeat !== idx || !this.isBotSeat(idx)) return;
-      const s = this.seats[idx];
-      if (!s || s.status !== "active") return;
-      this.clearTurnTimer();
-      this.handleAction(seat.socketId, decision);
-    }, delay);
-  }
-  // ─── Soft disconnect (60 s reconnect window, handled by RoomManager) ──────
-  /**
-   * Mark a player as disconnected. Auto-folds their turn if active.
-   * Returns the player's userId so the caller can schedule a hard-remove timer.
-   */
-  markDisconnected(socketId) {
-    const idx = this.findSeatBySocketId(socketId);
-    if (idx === -1) return null;
-    const seat = this.seats[idx];
-    seat.isDisconnected = true;
-    seat.disconnectedAt = Date.now();
-    this.addMessage(`${seat.username} disconnected \u2014 60s to rejoin`, "info");
-    if (this.phase !== "waiting" && this.phase !== "showdown" && idx === this.activeSeat && seat.status === "active") {
-      this.clearTurnTimer();
-      seat.status = "folded";
-      this.actedThisRound.add(idx);
-      this.broadcastState();
-      this.advanceAfterAction();
-    } else {
-      this.broadcastState();
-    }
-    return seat.userId;
-  }
-  /** Restore a player's socket after they reconnect. */
-  reconnectPlayer(userId, newSocketId) {
-    const idx = this.findSeatByUserId(userId);
-    if (idx === -1) return false;
-    const seat = this.seats[idx];
-    seat.socketId = newSocketId;
-    seat.isDisconnected = false;
-    delete seat.disconnectedAt;
-    this.addMessage(`${seat.username} reconnected`, "info");
-    this.broadcastState();
-    return true;
-  }
-  /** Hard-remove a player by userId (called after the 60 s grace period). */
-  removePlayerByUserId(userId) {
-    const idx = this.findSeatByUserId(userId);
-    if (idx === -1) return;
-    const seat = this.seats[idx];
-    this.addMessage(`${seat.username} removed (timed out)`, "info");
-    if (this.phase !== "waiting" && this.phase !== "showdown" && idx === this.activeSeat) {
-      this.seats[idx].status = "folded";
-      this.seats[idx] = null;
-      this.broadcastState();
-      this.advanceAfterAction();
-    } else {
-      this.seats[idx] = null;
-      this.broadcastState();
-    }
-    this.checkTableVacant();
-  }
-  // ─── Spectator management ─────────────────────────────────────────────────
-  addSpectator(socketId) {
-    this.spectators.add(socketId);
-    this.emit(socketId, "game_state", this.getClientStateFor(socketId));
-  }
-  removeSpectator(socketId) {
-    this.spectators.delete(socketId);
-  }
-  // ─── Sit-out toggle ───────────────────────────────────────────────────────
-  handleSitOut(socketId, wantsSitOut) {
-    const seat = this.seats[this.findSeatBySocketId(socketId)];
-    if (!seat) return;
-    if (wantsSitOut) {
-      this.requestedSitOut.add(socketId);
-      if (this.phase === "waiting") seat.status = "sitting_out";
-      this.addMessage(`${seat.username} is sitting out next hand`, "info");
-    } else {
-      this.requestedSitOut.delete(socketId);
-      if (seat.status === "sitting_out") seat.status = "active";
-      this.addMessage(`${seat.username} is back in`, "info");
-      if (this.phase === "waiting") this.maybeScheduleHandStart();
-    }
-    this.broadcastState();
-  }
-  // ─── Chat ─────────────────────────────────────────────────────────────────
-  handleChat(socketId, text2) {
-    const seat = this.seats[this.findSeatBySocketId(socketId)];
-    const spectator = this.spectators.has(socketId);
-    if (!seat && !spectator) return;
-    const username = seat?.username ?? "Spectator";
-    const userId = seat?.userId ?? socketId;
-    const ts = Date.now();
-    const cleaned = text2.replace(/\b(fuck|shit|bitch|cunt|cock|ass)\b/gi, (m) => "*".repeat(m.length)).trim().slice(0, 100);
-    if (!cleaned) return;
-    const payload = { playerId: userId, playerName: username, text: cleaned, ts };
-    for (const s of this.seats) {
-      if (s) this.emit(s.socketId, "chat_message", payload);
-    }
-    for (const sid of this.spectators) {
-      this.emit(sid, "chat_message", payload);
-    }
-  }
-  removePlayer(socketId) {
-    this.requestedSitOut.delete(socketId);
-    const idx = this.findSeatBySocketId(socketId);
-    if (idx === -1) return;
-    const seat = this.seats[idx];
-    this.addMessage(`${seat.username} left the table`, "info");
-    if (this.phase !== "waiting" && this.phase !== "showdown" && idx === this.activeSeat) {
-      this.seats[idx].status = "folded";
-      this.seats[idx] = null;
-      this.broadcastState();
-      this.advanceAfterAction();
-    } else {
-      this.seats[idx] = null;
-      this.broadcastState();
-    }
-    this.checkTableVacant();
-  }
-  get playerCount() {
-    return this.seats.filter((s) => s !== null).length;
-  }
-  isEmpty() {
-    return this.playerCount === 0;
-  }
-  // ─── Hand lifecycle ───────────────────────────────────────────────────────
-  readyCount() {
-    return this.seats.filter(
-      (s) => s !== null && !this.requestedSitOut.has(s.socketId) && !s.isDisconnected
-    ).length;
-  }
-  maybeScheduleHandStart() {
-    if (this.phase !== "waiting") return;
-    if (this.readyCount() < 2) return;
-    if (this.handTimer) return;
-    this.handTimer = setTimeout(() => {
-      this.handTimer = null;
-      this.startHand();
-    }, HAND_START_DELAY_MS);
-  }
-  startHand() {
-    const allSeated = this.seats.map((s, i) => ({ s, i })).filter((x) => x.s !== null);
-    const activePlayers = allSeated.filter(
-      (x) => !this.requestedSitOut.has(x.s.socketId) && !x.s.isDisconnected
-    );
-    console.log("[startHand] seats:", JSON.stringify(allSeated.map(({ s, i }) => ({
-      i,
-      username: s.username,
-      chips: s.chips,
-      startingChips: s.startingChips,
-      status: s.status
-    }))));
-    if (activePlayers.length < 2) {
-      this.phase = "waiting";
-      this.broadcastState();
-      return;
-    }
-    this.deck = shuffleDeck(createDeckForVariant(this.config.variant));
-    this.communityCards = [];
-    this.pot = 0;
-    this.currentBet = 0;
-    this.winners = [];
-    this.messages = [];
-    this.actedThisRound.clear();
-    for (const { s } of allSeated) {
-      if (!s) continue;
-      if (this.requestedSitOut.has(s.socketId) || s.isDisconnected) {
-        s.status = "sitting_out";
-      } else {
-        s.cards = [];
-        s.currentBet = 0;
-        s.totalBet = 0;
-        s.status = "active";
-        s.startingChips = s.chips;
-      }
-    }
-    this.dealerSeat = this.nextActiveSeatFrom(this.dealerSeat === -1 ? 0 : this.dealerSeat, true);
-    const numHoleCards = holeCardCountForVariant(this.config.variant);
-    for (const { s } of activePlayers) {
-      const cards = [];
-      for (let n = 0; n < numHoleCards; n++) cards.push(this.deck.pop());
-      s.cards = cards;
-    }
-    const isHeadsUp = activePlayers.length === 2;
-    const sbSeat = isHeadsUp ? this.dealerSeat : this.nextActiveSeatFrom(this.dealerSeat);
-    const bbSeat = this.nextActiveSeatFrom(sbSeat);
-    this.postBlind(sbSeat, this.config.smallBlind);
-    this.postBlind(bbSeat, this.config.bigBlind);
-    this.currentBet = this.config.bigBlind;
-    this.phase = "preflop";
-    this.addMessage("New hand started", "info");
-    const utg = this.nextActiveSeatFrom(bbSeat);
-    this.activeSeat = utg;
-    this.broadcastState();
-    this.startTurnTimer();
-  }
-  postBlind(seatIdx, amount) {
-    const seat = this.seats[seatIdx];
-    if (!seat) return;
-    console.log(`[postBlind] ${seat.username} chips=${seat.chips} amount=${amount}`);
-    const actual = Math.min(amount, seat.chips);
-    seat.chips -= actual;
-    seat.currentBet = actual;
-    seat.totalBet = actual;
-    this.pot += actual;
-    if (seat.chips === 0) seat.status = "allin";
-  }
-  // ─── Action handling ──────────────────────────────────────────────────────
-  handleAction(socketId, action) {
-    const seatIdx = this.findSeatBySocketId(socketId);
-    if (seatIdx === -1 || seatIdx !== this.activeSeat) return;
-    const seat = this.seats[seatIdx];
-    if (!seat || seat.status !== "active") return;
-    this.clearTurnTimer();
-    switch (action.type) {
-      case "fold":
-        this.doFold(seat, seatIdx);
-        break;
-      case "check":
-        this.doCheck(seat, seatIdx);
-        break;
-      case "call":
-        this.doCall(seat, seatIdx);
-        break;
-      case "raise":
-        this.doRaise(seat, seatIdx, action.amount);
-        break;
-      case "allin":
-        this.doAllin(seat, seatIdx);
-        break;
-    }
-  }
-  doFold(seat, seatIdx) {
-    seat.status = "folded";
-    this.addMessage(`${seat.username} folds`, "action");
-    this.actedThisRound.add(seatIdx);
-    this.advanceAfterAction();
-  }
-  doCheck(seat, seatIdx) {
-    if (seat.currentBet < this.currentBet) {
-      this.doCall(seat, seatIdx);
-      return;
-    }
-    this.addMessage(`${seat.username} checks`, "action");
-    this.actedThisRound.add(seatIdx);
-    this.advanceAfterAction();
-  }
-  doCall(seat, seatIdx) {
-    const toCall = Math.min(this.currentBet - seat.currentBet, seat.chips);
-    seat.chips -= toCall;
-    seat.currentBet += toCall;
-    seat.totalBet += toCall;
-    this.pot += toCall;
-    if (seat.chips === 0) {
-      seat.status = "allin";
-      this.addMessage(`${seat.username} calls ${toCall} and is all-in`, "action");
-    } else {
-      this.addMessage(`${seat.username} calls ${toCall}`, "action");
-    }
-    this.actedThisRound.add(seatIdx);
-    this.advanceAfterAction();
-  }
-  doRaise(seat, seatIdx, raiseToAmount) {
-    const minRaise = this.currentBet + this.config.bigBlind;
-    const target = Math.max(minRaise, Math.min(raiseToAmount ?? minRaise, seat.chips + seat.currentBet));
-    if (target >= seat.chips + seat.currentBet) {
-      this.doAllin(seat, seatIdx);
-      return;
-    }
-    const toAdd = target - seat.currentBet;
-    seat.chips -= toAdd;
-    seat.currentBet = target;
-    seat.totalBet += toAdd;
-    this.pot += toAdd;
-    this.currentBet = target;
-    this.actedThisRound.clear();
-    this.actedThisRound.add(seatIdx);
-    this.addMessage(`${seat.username} raises to ${target.toLocaleString()}`, "action");
-    this.advanceAfterAction();
-  }
-  doAllin(seat, seatIdx) {
-    const allIn = seat.chips;
-    seat.currentBet += allIn;
-    seat.totalBet += allIn;
-    this.pot += allIn;
-    seat.chips = 0;
-    seat.status = "allin";
-    if (seat.currentBet > this.currentBet) {
-      this.currentBet = seat.currentBet;
-      this.actedThisRound.clear();
-    }
-    this.actedThisRound.add(seatIdx);
-    this.addMessage(`${seat.username} is all-in for ${seat.currentBet.toLocaleString()}`, "action");
-    this.advanceAfterAction();
-  }
-  // ─── Betting round progression ────────────────────────────────────────────
-  advanceAfterAction() {
-    const nonFolded = this.seats.filter((s) => s !== null && s.status !== "folded");
-    if (nonFolded.length === 1) {
-      this.endHand();
-      return;
-    }
-    if (this.isBettingRoundComplete()) {
-      this.nextPhase();
-      return;
-    }
-    const next = this.nextActiveSeatFrom(this.activeSeat);
-    if (next === this.activeSeat) {
-      this.nextPhase();
-      return;
-    }
-    this.activeSeat = next;
-    this.broadcastState();
-    this.startTurnTimer();
-  }
-  isBettingRoundComplete() {
-    const activePlayers = this.seats.map((s, i) => ({ s, i })).filter(({ s }) => s?.status === "active");
-    if (activePlayers.length === 0) return true;
-    return activePlayers.every(
-      ({ s, i }) => this.actedThisRound.has(i) && s.currentBet === this.currentBet
-    );
-  }
-  nextPhase() {
-    for (const seat of this.seats) {
-      if (seat) seat.currentBet = 0;
-    }
-    this.currentBet = 0;
-    this.actedThisRound.clear();
-    const activePlayers = this.seats.filter((s) => s !== null && s.status !== "folded");
-    const canBetPlayers = activePlayers.filter((s) => s.status === "active");
-    switch (this.phase) {
-      case "preflop":
-        this.communityCards = [this.deck.pop(), this.deck.pop(), this.deck.pop()];
-        this.phase = "flop";
-        break;
-      case "flop":
-        this.communityCards.push(this.deck.pop());
-        this.phase = "turn";
-        break;
-      case "turn":
-        this.communityCards.push(this.deck.pop());
-        this.phase = "river";
-        break;
-      case "river":
-        this.endHand();
-        return;
-      default:
-        return;
-    }
-    if (canBetPlayers.length <= 1) {
-      while (this.communityCards.length < 5) this.communityCards.push(this.deck.pop());
-      this.endHand();
-      return;
-    }
-    this.activeSeat = this.nextActiveSeatFrom(this.dealerSeat);
-    this.broadcastState();
-    this.startTurnTimer();
-  }
-  // ─── Side pot calculation ─────────────────────────────────────────────────
-  awardSidePots() {
-    const contributors = this.seats.map((s, i) => ({ seat: s, idx: i })).filter((x) => x.seat !== null && x.seat.totalBet > 0);
-    if (contributors.length === 0) return;
-    const levels = [...new Set(contributors.map((c) => c.seat.totalBet))].sort((a, b) => a - b);
-    this.winners = [];
-    let prevLevel = 0;
-    for (const level of levels) {
-      const perPlayer = level - prevLevel;
-      let potAmount = 0;
-      for (const c of contributors) {
-        potAmount += Math.min(Math.max(0, c.seat.totalBet - prevLevel), perPlayer);
-      }
-      const eligible = contributors.filter(
-        (c) => c.seat.status !== "folded" && c.seat.totalBet >= level
-      );
-      if (potAmount > 0 && eligible.length === 1) {
-        eligible[0].seat.chips += potAmount;
-      } else if (potAmount > 0 && eligible.length > 1) {
-        const evaluated = eligible.map((e) => ({
-          idx: e.idx,
-          seat: e.seat,
-          hand: getBestHandForVariant(this.config.variant, e.seat.cards, this.communityCards)
-        }));
-        evaluated.sort((a, b) => compareHands(b.hand, a.hand));
-        const best = evaluated[0].hand;
-        const potWinners = evaluated.filter((e) => compareHands(e.hand, best) === 0);
-        const share = Math.floor(potAmount / potWinners.length);
-        for (const w of potWinners) {
-          w.seat.chips += share;
-          const existing = this.winners.find((x) => x.seatIndex === w.idx);
-          if (existing) {
-            existing.amount += share;
-          } else {
-            this.winners.push({
-              seatIndex: w.idx,
-              username: w.seat.username,
-              amount: share,
-              handRank: w.hand.name,
-              cards: w.seat.cards
-            });
-          }
-        }
-      }
-      prevLevel = level;
-    }
-    for (const w of this.winners) {
-      this.addMessage(
-        `${w.username} wins ${w.amount.toLocaleString()}${w.handRank ? ` with ${w.handRank}` : ""}!`,
-        "result"
-      );
-    }
-    this.pot = 0;
-  }
-  endHand() {
-    this.clearTurnTimer();
-    this.phase = "showdown";
-    const nonFolded = this.seats.map((s, i) => ({ s, i })).filter(({ s }) => s !== null && s.status !== "folded");
-    if (nonFolded.length === 1) {
-      const { s, i } = nonFolded[0];
-      s.chips += this.pot;
-      this.winners = [{ seatIndex: i, username: s.username, amount: this.pot }];
-      this.addMessage(`${s.username} wins ${this.pot.toLocaleString()} (uncontested)`, "result");
-      this.pot = 0;
-    } else {
-      this.awardSidePots();
-    }
-    this.broadcastState();
-    this.fireChipSync();
-    this.handTimer = setTimeout(() => {
-      this.handTimer = null;
-      for (let i = 0; i < this.seats.length; i++) {
-        if (this.seats[i] && this.seats[i].chips <= 0) {
-          this.addMessage(`${this.seats[i].username} is out of chips and leaves`, "info");
-          this.seats[i] = null;
-        }
-      }
-      if (this.playerCount >= 2) {
-        this.startHand();
-      } else {
-        this.phase = "waiting";
-        this.broadcastState();
-      }
-    }, SHOWDOWN_DELAY_MS);
-  }
-  fireChipSync() {
-    if (!this.onChipSync) return;
-    const seated = this.seats.filter((s) => s !== null).map((s) => ({ userId: s.userId, chips: s.chips }));
-    this.onChipSync(seated);
-  }
-  // ─── Turn timer ───────────────────────────────────────────────────────────
-  startTurnTimer() {
-    this.clearTurnTimer();
-    this.turnTimeoutAt = Date.now() + TURN_TIMEOUT_MS;
-    this.turnTimer = setTimeout(() => {
-      const seat = this.seats[this.activeSeat];
-      if (seat) {
-        this.addMessage(`${seat.username} timed out \u2014 auto fold`, "action");
-        this.doFold(seat, this.activeSeat);
-      }
-    }, TURN_TIMEOUT_MS);
-  }
-  clearTurnTimer() {
-    if (this.turnTimer) {
-      clearTimeout(this.turnTimer);
-      this.turnTimer = null;
-    }
-    this.turnTimeoutAt = null;
-  }
-  // ─── Helpers ──────────────────────────────────────────────────────────────
-  nextActiveSeatFrom(fromSeat, skipSelf = false) {
-    const start = skipSelf ? (fromSeat + 1) % this.config.maxPlayers : (fromSeat + 1) % this.config.maxPlayers;
-    let cur = start;
-    for (let i = 0; i < this.config.maxPlayers; i++) {
-      const s = this.seats[cur];
-      if (s && s.status === "active") return cur;
-      cur = (cur + 1) % this.config.maxPlayers;
-    }
-    return fromSeat;
-  }
-  checkTableVacant() {
-    if (this.playerCount < 2 && this.phase !== "waiting") {
-      this.clearTurnTimer();
-      if (this.handTimer) {
-        clearTimeout(this.handTimer);
-        this.handTimer = null;
-      }
-      this.phase = "waiting";
-      this.broadcastState();
-    }
-    if (this.playerCount < 2 && this.handTimer) {
-      clearTimeout(this.handTimer);
-      this.handTimer = null;
-    }
-  }
-  addMessage(text2, type) {
-    this.messages = [{ text: text2, type, timestamp: Date.now() }, ...this.messages].slice(0, 20);
-  }
-  // ─── State serialization ──────────────────────────────────────────────────
-  getClientStateFor(socketId) {
-    const mySeat = this.findSeatBySocketId(socketId);
-    const mySeatData = mySeat !== -1 ? this.seats[mySeat] : null;
-    const isMyTurn = mySeat === this.activeSeat;
-    const callAmount = mySeatData ? Math.min(Math.max(0, this.currentBet - mySeatData.currentBet), mySeatData.chips) : 0;
-    const minRaise = this.currentBet + this.config.bigBlind;
-    const maxRaise = mySeatData ? mySeatData.chips + mySeatData.currentBet : 0;
-    const seats = this.seats.map((s, i) => {
-      if (!s) return null;
-      const isWinner = this.winners.some((w) => w.seatIndex === i);
-      return {
-        seatIndex: i,
-        userId: s.userId,
-        username: s.username,
-        avatarId: s.avatarId,
-        chips: s.chips,
-        currentBet: s.currentBet,
-        totalBet: s.totalBet,
-        status: s.status,
-        isDealer: i === this.dealerSeat,
-        isTurn: i === this.activeSeat,
-        cardCount: s.cards.length,
-        cards: s.socketId === socketId ? s.cards : void 0,
-        revealedCards: this.phase === "showdown" && s.status !== "folded" ? s.cards : void 0,
-        revealedHand: this.phase === "showdown" && isWinner ? this.winners.find((w) => w.seatIndex === i)?.handRank : void 0,
-        isDisconnected: s.isDisconnected
-      };
-    });
-    return {
-      tableId: this.id,
-      phase: this.phase,
-      seats,
-      communityCards: this.communityCards,
-      pot: this.pot,
-      currentBet: this.currentBet,
-      dealerSeat: this.dealerSeat,
-      activeSeat: this.activeSeat,
-      smallBlind: this.config.smallBlind,
-      bigBlind: this.config.bigBlind,
-      mySeat,
-      myCards: mySeatData?.cards ?? [],
-      isMyTurn,
-      callAmount,
-      minRaise,
-      maxRaise,
-      turnTimeoutAt: this.turnTimeoutAt,
-      messages: this.messages,
-      winners: this.phase === "showdown" ? this.winners : void 0,
-      variant: this.config.variant
-    };
-  }
-  getLobbyInfo() {
-    return {
-      id: this.id,
-      stakeTier: this.config.stakeTier,
-      smallBlind: this.config.smallBlind,
-      bigBlind: this.config.bigBlind,
-      playerCount: this.playerCount,
-      maxPlayers: this.config.maxPlayers,
-      phase: this.phase,
-      minBuyIn: this.config.minBuyIn,
-      variant: this.config.variant
-    };
-  }
-  broadcastState() {
-    for (const seat of this.seats) {
-      if (seat && !seat.isDisconnected && !seat.socketId.startsWith("bot_")) {
-        const state = this.getClientStateFor(seat.socketId);
-        this.emit(seat.socketId, "game_state", state);
-      }
-    }
-    for (const sid of this.spectators) {
-      this.emit(sid, "game_state", this.getClientStateFor(sid));
-    }
-    this.broadcast(this.id, "lobby_update", null);
-    if (this.activeSeat >= 0 && this.isBotSeat(this.activeSeat)) {
-      this.triggerBotTurn();
-    }
-  }
-};
-
-// src/poker/types.ts
-var STAKE_CONFIG = {
-  STARTER: { stakeTier: "STARTER", maxPlayers: 5, smallBlind: 5, bigBlind: 10, minBuyIn: 200, maxBuyIn: 1e3 },
-  MICRO: { stakeTier: "MICRO", maxPlayers: 5, smallBlind: 25, bigBlind: 50, minBuyIn: 1e3, maxBuyIn: 5e3 },
-  LOW: { stakeTier: "LOW", maxPlayers: 5, smallBlind: 100, bigBlind: 200, minBuyIn: 4e3, maxBuyIn: 2e4 },
-  STANDARD: { stakeTier: "STANDARD", maxPlayers: 5, smallBlind: 500, bigBlind: 1e3, minBuyIn: 2e4, maxBuyIn: 1e5 },
-  HIGH_ROLLER: { stakeTier: "HIGH_ROLLER", maxPlayers: 5, smallBlind: 2500, bigBlind: 5e3, minBuyIn: 1e5, maxBuyIn: 5e5 },
-  VIP: { stakeTier: "VIP", maxPlayers: 5, smallBlind: 1e4, bigBlind: 2e4, minBuyIn: 4e5, maxBuyIn: 2e6 },
-  ELITE: { stakeTier: "ELITE", maxPlayers: 5, smallBlind: 5e4, bigBlind: 1e5, minBuyIn: 2e6, maxBuyIn: 1e7 },
-  ELITE_PLUS: { stakeTier: "ELITE_PLUS", maxPlayers: 5, smallBlind: 25e4, bigBlind: 5e5, minBuyIn: 1e7, maxBuyIn: 5e7 }
-};
-
-// src/poker/roomManager.ts
-var RoomManager = class {
-  // userId → timer
-  constructor(emit, broadcast, onChipSync) {
-    this.emit = emit;
-    this.broadcast = broadcast;
-    this.onChipSync = onChipSync;
-  }
-  rooms = /* @__PURE__ */ new Map();
-  socketRoom = /* @__PURE__ */ new Map();
-  // socketId → roomId (seated)
-  userIdRoom = /* @__PURE__ */ new Map();
-  // userId   → roomId (for reconnect)
-  spectatorRoom = /* @__PURE__ */ new Map();
-  // socketId → roomId (spectating)
-  disconnectTimers = /* @__PURE__ */ new Map();
-  generateCode() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let code = "";
-    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    return this.rooms.has(code) ? this.generateCode() : code;
-  }
-  createRoom(stakeTier, maxPlayers = 5, variant = "texas_holdem") {
-    const id = this.generateCode();
-    const config = { ...STAKE_CONFIG[stakeTier], maxPlayers, variant };
-    const room = new PokerRoom(id, config, this.emit, this.broadcast, this.onChipSync);
-    this.rooms.set(id, room);
-    return room;
-  }
-  getRoom(roomId) {
-    return this.rooms.get(roomId);
-  }
-  getRoomForSocket(socketId) {
-    const roomId = this.socketRoom.get(socketId);
-    return roomId ? this.rooms.get(roomId) : void 0;
-  }
-  getRoomForUser(userId) {
-    const roomId = this.userIdRoom.get(userId);
-    return roomId ? this.rooms.get(roomId) : void 0;
-  }
-  joinRoom(socketId, roomId, userId, username, avatarId, chips) {
-    const room = this.rooms.get(roomId);
-    if (!room) return false;
-    if (room.playerCount >= room.config.maxPlayers) return false;
-    if (chips < room.config.minBuyIn) return false;
-    const seatIdx = room.addPlayer(socketId, userId, username, avatarId, Math.min(chips, room.config.maxBuyIn));
-    if (seatIdx === -1) return false;
-    this.socketRoom.set(socketId, roomId);
-    this.userIdRoom.set(userId, roomId);
-    return true;
-  }
-  leaveRoom(socketId) {
-    const room = this.getRoomForSocket(socketId);
-    if (!room) return;
-    const seatIdx = room.findSeatBySocketId(socketId);
-    const userId = seatIdx !== -1 ? room.seats[seatIdx]?.userId : void 0;
-    room.removePlayer(socketId);
-    this.socketRoom.delete(socketId);
-    if (userId) {
-      this.userIdRoom.delete(userId);
-      const timer = this.disconnectTimers.get(userId);
-      if (timer) {
-        clearTimeout(timer);
-        this.disconnectTimers.delete(userId);
-      }
-    }
-    if (room.isEmpty()) {
-      this.rooms.delete(room.id);
-    }
-  }
-  /**
-   * Soft-disconnect: marks the seat as disconnected (auto-folds if their turn),
-   * removes the socket mapping, and schedules a 60 s hard-remove timer.
-   * The userId → roomId mapping is preserved so reconnectPlayer() can find the seat.
-   */
-  softDisconnect(socketId) {
-    const room = this.getRoomForSocket(socketId);
-    if (!room) return;
-    const userId = room.markDisconnected(socketId);
-    this.socketRoom.delete(socketId);
-    if (!userId) return;
-    const existing = this.disconnectTimers.get(userId);
-    if (existing) clearTimeout(existing);
-    const timer = setTimeout(() => {
-      this.disconnectTimers.delete(userId);
-      this.userIdRoom.delete(userId);
-      room.removePlayerByUserId(userId);
-      if (room.isEmpty()) this.rooms.delete(room.id);
-    }, 6e4);
-    this.disconnectTimers.set(userId, timer);
-  }
-  /**
-   * Reconnect a player who lost their socket connection.
-   * Cancels their disconnect timer, updates the seat's socketId, and
-   * re-registers the socket → room mapping.
-   */
-  reconnectPlayer(userId, newSocketId) {
-    const roomId = this.userIdRoom.get(userId);
-    if (!roomId) return null;
-    const room = this.rooms.get(roomId);
-    if (!room) {
-      this.userIdRoom.delete(userId);
-      return null;
-    }
-    const timer = this.disconnectTimers.get(userId);
-    if (timer) {
-      clearTimeout(timer);
-      this.disconnectTimers.delete(userId);
-    }
-    const ok = room.reconnectPlayer(userId, newSocketId);
-    if (!ok) return null;
-    this.socketRoom.set(newSocketId, roomId);
-    return room;
-  }
-  findOrCreateRoom(stakeTier, maxPlayers, variant = "texas_holdem") {
-    for (const room of this.rooms.values()) {
-      if (room.config.stakeTier === stakeTier && room.config.maxPlayers === maxPlayers && room.config.variant === variant && room.playerCount < room.config.maxPlayers) {
-        return room;
-      }
-    }
-    return this.createRoom(stakeTier, maxPlayers, variant);
-  }
-  /**
-   * Fill empty seats with bots after a delay.
-   * Called when a real player joins and the room still needs more players.
-   * Bots are added immediately (one bot) so the game starts quickly, then
-   * optionally more bots fill remaining empty seats.
-   *
-   * @param room        The room to fill
-   * @param targetCount Desired total player count (capped at maxPlayers)
-   * @param delayMs     How long to wait before adding the first bot (default 8 s)
-   */
-  scheduleBotFill(room, targetCount = 3, delayMs = 8e3) {
-    const roomId = room.id;
-    const doFill = () => {
-      const r = this.rooms.get(roomId);
-      if (!r) return;
-      const currentCount = r.playerCount;
-      if (currentCount >= targetCount) return;
-      const seated = new Set(
-        r.seats.filter(Boolean).map((s) => s.username)
-      );
-      const toAdd = Math.min(targetCount - currentCount, r.config.maxPlayers - currentCount);
-      for (let i = 0; i < toAdd; i++) {
-        const bot = pickBot(seated);
-        const chips = botBuyIn(r.config);
-        const idx = r.addBot(bot, chips);
-        if (idx === -1) break;
-        seated.add(bot.username);
-      }
-    };
-    setTimeout(doFill, delayMs);
-  }
-  getLobbyTables() {
-    return [...this.rooms.values()].map((r) => r.getLobbyInfo()).sort((a, b) => a.smallBlind - b.smallBlind);
-  }
-  // ─── Spectator tracking ───────────────────────────────────────────────────
-  registerSpectator(socketId, roomId) {
-    this.spectatorRoom.set(socketId, roomId);
-  }
-  unregisterSpectator(socketId) {
-    this.spectatorRoom.delete(socketId);
-  }
-  getSpectatingRoomId(socketId) {
-    return this.spectatorRoom.get(socketId);
-  }
-  getSpectatingRoom(socketId) {
-    const roomId = this.spectatorRoom.get(socketId);
-    return roomId ? this.rooms.get(roomId) : void 0;
-  }
-  cleanupEmpty() {
-    for (const [id, room] of this.rooms.entries()) {
-      if (room.isEmpty()) this.rooms.delete(id);
-    }
-  }
-  /**
-   * Reap rooms where every seat has been disconnected for longer than maxAgeMs.
-   * Called on a periodic interval (every 5 min) by the server process.
-   */
-  cleanupStale(maxAgeMs = 5 * 6e4) {
-    const now = Date.now();
-    for (const [id, room] of this.rooms.entries()) {
-      if (room.isEmpty()) {
-        this.rooms.delete(id);
-        continue;
-      }
-      const allStale = room.seats.every((seat) => {
-        if (seat === null) return true;
-        if (!seat.isDisconnected || seat.disconnectedAt === void 0) return false;
-        return now - seat.disconnectedAt > maxAgeMs;
-      });
-      if (allStale) {
-        for (const seat of room.seats) {
-          if (!seat) continue;
-          const timer = this.disconnectTimers.get(seat.userId);
-          if (timer) {
-            clearTimeout(timer);
-            this.disconnectTimers.delete(seat.userId);
-          }
-          this.userIdRoom.delete(seat.userId);
-        }
-        this.rooms.delete(id);
-      }
-    }
-  }
-  /** Live metrics for the /api/stats health endpoint. */
-  getStats() {
-    let players = 0;
-    for (const room of this.rooms.values()) {
-      players += room.seats.filter((s) => s !== null && !s.isDisconnected).length;
-    }
-    return { rooms: this.rooms.size, players };
-  }
-};
-
-// src/lib/logger.ts
-var import_pino = __toESM(require_pino(), 1);
-var isProduction = process.env.NODE_ENV === "production";
-var logger = (0, import_pino.default)({
-  level: process.env.LOG_LEVEL ?? "info",
-  redact: [
-    "req.headers.authorization",
-    "req.headers.cookie",
-    "res.headers['set-cookie']"
-  ],
-  ...isProduction ? {} : {
-    transport: {
-      target: "pino-pretty",
-      options: { colorize: true }
-    }
-  }
-});
-
-// src/sockets/index.ts
-var import_redis_adapter = __toESM(require_dist4(), 1);
-var import_ioredis = __toESM(require_built3(), 1);
-var VALID_VARIANTS = /* @__PURE__ */ new Set([
-  "texas_holdem",
-  "short_deck_holdem",
-  "joker_holdem",
-  "omaha_holdem"
-]);
-function resolveVariant(v) {
-  return typeof v === "string" && VALID_VARIANTS.has(v) ? v : "texas_holdem";
-}
-function resolveTier(v) {
-  if (typeof v === "string" && v in STAKE_CONFIG) return v;
-  return "ELITE";
-}
-var playerSockets = /* @__PURE__ */ new Map();
-var socketPlayers = /* @__PURE__ */ new Map();
-var _manager = null;
-function getManager() {
-  return _manager;
-}
-var _connTimes = /* @__PURE__ */ new Map();
-setInterval(() => {
-  const cutoff = Date.now() - 6e4;
-  for (const [ip, times] of _connTimes.entries()) {
-    const trimmed = times.filter((t) => t > cutoff);
-    if (trimmed.length === 0) _connTimes.delete(ip);
-    else _connTimes.set(ip, trimmed);
-  }
-}, 6e4).unref();
-var _io = null;
-function emitToAll(event, data) {
-  if (!_io) return;
-  _io.emit(event, data);
-}
-function emitToPlayer(playerId, event, data) {
-  const socketId = playerSockets.get(playerId);
-  if (!socketId || !_io) {
-    logger.info({ playerId, event, socketFound: false }, "emitToPlayer: player offline");
-    return false;
-  }
-  _io.to(socketId).emit(event, data);
-  logger.info({ playerId, socketId, event }, "emitToPlayer: event emitted");
-  return true;
-}
-function sanitizeChips(value, fallback) {
-  const n = Number(value);
-  return Number.isFinite(n) && n > 0 ? n : fallback;
-}
-function setupSocketIO(httpServer2) {
-  const io2 = new Server(httpServer2, {
-    path: "/api/socket.io",
-    cors: { origin: "*", methods: ["GET", "POST"] },
-    transports: ["websocket", "polling"]
-  });
-  const redisUrl = process.env.REDIS_URL;
-  if (redisUrl) {
-    try {
-      const pubClient = new import_ioredis.default(redisUrl, {
-        maxRetriesPerRequest: null,
-        // required by @socket.io/redis-adapter
-        enableReadyCheck: false,
-        lazyConnect: false
-      });
-      const subClient = pubClient.duplicate();
-      pubClient.on("error", (err) => logger.error({ err }, "Redis pub client error"));
-      subClient.on("error", (err) => logger.error({ err }, "Redis sub client error"));
-      io2.adapter((0, import_redis_adapter.createAdapter)(pubClient, subClient));
-      logger.info({ redisUrl: redisUrl.replace(/:\/\/.*@/, "://***@") }, "Socket.IO Redis adapter attached");
-    } catch (err) {
-      logger.error({ err }, "Failed to attach Redis adapter \u2014 falling back to in-memory");
-    }
-  } else {
-    logger.warn("REDIS_URL not set \u2014 Socket.IO running with single-process in-memory adapter");
-  }
-  _io = io2;
-  const emit = (socketId, event, data) => {
-    io2.to(socketId).emit(event, data);
-  };
-  const broadcast = (roomId, _event, _data) => {
-    io2.emit("lobby_state", { tables: manager.getLobbyTables() });
-  };
-  const manager = new RoomManager(emit, broadcast);
-  _manager = manager;
-  io2.on("connection", (socket) => {
-    const realIp = socket.handshake.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? socket.handshake.address;
-    const now = Date.now();
-    const times = _connTimes.get(realIp) ?? [];
-    const recent = times.filter((t) => now - t < 6e4);
-    recent.push(now);
-    _connTimes.set(realIp, recent);
-    if (recent.length > 30) {
-      logger.warn({ ip: realIp, count: recent.length }, "Socket rate limit: too many connections, disconnecting");
-      socket.emit("error", { message: "Too many connections from your address. Please wait a moment." });
-      socket.disconnect(true);
-      return;
-    }
-    serverStats.incConnections();
-    logger.info({ socketId: socket.id, transport: socket.conn.transport.name }, "Socket connected");
-    socket.conn.on("upgrade", (transport) => {
-      logger.info({ socketId: socket.id, transport: transport.name }, "Socket transport upgraded");
-    });
-    socket.on("disconnect", (reason) => {
-      serverStats.decConnections();
-      logger.info({ socketId: socket.id, reason, transport: socket.conn.transport.name }, "Socket disconnected (reason)");
-    });
-    socket.on("register_player", (payload) => {
-      const { playerId } = payload;
-      if (!playerId) return;
-      const oldSocketId = playerSockets.get(playerId);
-      if (oldSocketId && oldSocketId !== socket.id) {
-        socketPlayers.delete(oldSocketId);
-      }
-      playerSockets.set(playerId, socket.id);
-      socketPlayers.set(socket.id, playerId);
-      socket.join(`player:${playerId}`);
-      logger.info({ playerId, socketId: socket.id }, "Player registered");
-    });
-    socket.on("get_lobby", () => {
-      socket.emit("lobby_state", { tables: manager.getLobbyTables() });
-    });
-    socket.on("create_table", async (payload) => {
-      try {
-        const existing = manager.getRoomForSocket(socket.id);
-        if (existing) {
-          socket.emit("error", { message: "Already seated at a table. Leave first." });
-          return;
-        }
-        const tier = resolveTier(payload.stakeTier);
-        const variant = resolveVariant(payload.variant);
-        const room = manager.createRoom(tier, payload.maxPlayers ?? 5, variant);
-        const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
-        const ok = manager.joinRoom(
-          socket.id,
-          room.id,
-          payload.userId,
-          payload.username,
-          payload.avatarId,
-          chips
-        );
-        if (!ok) {
-          manager.getRoom(room.id) && manager.cleanupEmpty();
-          socket.emit("error", { message: "Insufficient chips for this stake level." });
-          return;
-        }
-        socket.join(room.id);
-        socket.emit("joined_table", { tableId: room.id, state: room.getClientStateFor(socket.id) });
-        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
-        logger.info({ roomId: room.id, socketId: socket.id, userId: payload.userId }, "Table created");
-        manager.scheduleBotFill(room, 3, 8e3);
-      } catch (e) {
-        logger.error({ err: e }, "create_table error");
-        socket.emit("error", { message: "Failed to create table." });
-      }
-    });
-    socket.on("join_table", async (payload) => {
-      try {
-        const existing = manager.getRoomForSocket(socket.id);
-        if (existing) {
-          socket.emit("error", { message: "Already seated at a table. Leave first." });
-          return;
-        }
-        const targetRoom = manager.getRoom(payload.tableId);
-        if (!targetRoom) {
-          socket.emit("error", { message: "Table not found." });
-          return;
-        }
-        const chips = sanitizeChips(payload.chips, targetRoom.config.minBuyIn);
-        const ok = manager.joinRoom(
-          socket.id,
-          payload.tableId,
-          payload.userId,
-          payload.username,
-          payload.avatarId,
-          chips
-        );
-        if (!ok) {
-          socket.emit("error", { message: "Cannot join table \u2014 full, closed, or insufficient chips." });
-          return;
-        }
-        const room = manager.getRoom(payload.tableId);
-        socket.join(payload.tableId);
-        socket.emit("joined_table", { tableId: payload.tableId, state: room.getClientStateFor(socket.id) });
-        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
-        logger.info({ roomId: payload.tableId, socketId: socket.id, userId: payload.userId }, "Joined table");
-      } catch (e) {
-        logger.error({ err: e }, "join_table error");
-        socket.emit("error", { message: "Failed to join table." });
-      }
-    });
-    socket.on("quick_join", async (payload) => {
-      try {
-        const existing = manager.getRoomForSocket(socket.id);
-        if (existing) {
-          socket.emit("error", { message: "Already seated at a table. Leave first." });
-          return;
-        }
-        const tier = resolveTier(payload.stakeTier);
-        const variant = resolveVariant(payload.variant);
-        const room = manager.findOrCreateRoom(tier, 5, variant);
-        const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
-        console.log("[quick_join] payload.stakeTier=", payload.stakeTier, "\u2192 resolved tier=", tier, "payload.chips=", payload.chips, "sanitized=", chips);
-        const ok = manager.joinRoom(
-          socket.id,
-          room.id,
-          payload.userId,
-          payload.username,
-          payload.avatarId,
-          chips
-        );
-        if (!ok) {
-          socket.emit("error", { message: "Could not find a suitable table. Try a different stake level." });
-          return;
-        }
-        socket.join(room.id);
-        socket.emit("joined_table", { tableId: room.id, state: room.getClientStateFor(socket.id) });
-        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
-        logger.info({ roomId: room.id, userId: payload.userId, tier }, "Quick join");
-        const realCount = room.seats.filter((s) => s && !s.socketId.startsWith("bot_")).length;
-        if (realCount < 2) manager.scheduleBotFill(room, 3, 8e3);
-      } catch (e) {
-        logger.error({ err: e }, "quick_join error");
-        socket.emit("error", { message: "Quick join failed. Please try again." });
-      }
-    });
-    socket.on("rejoin_table", (payload) => {
-      try {
-        const room = manager.reconnectPlayer(payload.userId, socket.id);
-        if (!room) {
-          socket.emit("rejoin_failed", { message: "Table no longer exists or seat expired." });
-          return;
-        }
-        playerSockets.set(payload.userId, socket.id);
-        socketPlayers.set(socket.id, payload.userId);
-        socket.join(`player:${payload.userId}`);
-        socket.join(room.id);
-        socket.emit("joined_table", { tableId: room.id, state: room.getClientStateFor(socket.id) });
-        io2.emit("lobby_state", { tables: manager.getLobbyTables() });
-        logger.info({ roomId: room.id, userId: payload.userId, socketId: socket.id }, "Player reconnected");
-      } catch (e) {
-        logger.error({ err: e }, "rejoin_table error");
-        socket.emit("rejoin_failed", { message: "Reconnect failed. Please rejoin manually." });
-      }
-    });
-    socket.on("leave_table", () => {
-      const room = manager.getRoomForSocket(socket.id);
-      if (room) socket.leave(room.id);
-      manager.leaveRoom(socket.id);
-      socket.emit("left_table", {});
-      io2.emit("lobby_state", { tables: manager.getLobbyTables() });
-    });
-    socket.on("player_action", (payload) => {
-      const room = manager.getRoomForSocket(socket.id);
-      if (!room) return;
-      room.handleAction(socket.id, { type: payload.type, amount: payload.amount });
-    });
-    socket.on("send_chat", (payload) => {
-      const room = manager.getRoomForSocket(socket.id) ?? manager.getSpectatingRoom(socket.id);
-      if (!room || !payload.text) return;
-      room.handleChat(socket.id, payload.text);
-    });
-    socket.on("spectate_table", (payload) => {
-      const room = manager.getRoom(payload.tableId);
-      if (!room) {
-        socket.emit("error", { message: "Table not found." });
-        return;
-      }
-      socket.join(payload.tableId);
-      room.addSpectator(socket.id);
-      manager.registerSpectator(socket.id, payload.tableId);
-      logger.info({ roomId: payload.tableId, socketId: socket.id }, "Spectator joined");
-    });
-    socket.on("stop_spectating", () => {
-      const roomId = manager.getSpectatingRoomId(socket.id);
-      if (roomId) {
-        manager.getRoom(roomId)?.removeSpectator(socket.id);
-        manager.unregisterSpectator(socket.id);
-        socket.leave(roomId);
-      }
-      socket.emit("stopped_spectating", {});
-    });
-    socket.on("sit_out", (payload) => {
-      const room = manager.getRoomForSocket(socket.id);
-      if (!room) return;
-      room.handleSitOut(socket.id, payload.sitOut);
-    });
-    socket.on("disconnect", () => {
-      logger.info({ socketId: socket.id }, "Socket disconnected");
-      const pid = socketPlayers.get(socket.id);
-      if (pid) {
-        playerSockets.delete(pid);
-        socketPlayers.delete(socket.id);
-      }
-      const spectatingRoomId = manager.getSpectatingRoomId(socket.id);
-      if (spectatingRoomId) {
-        manager.getRoom(spectatingRoomId)?.removeSpectator(socket.id);
-        manager.unregisterSpectator(socket.id);
-      }
-      const room = manager.getRoomForSocket(socket.id);
-      if (room) {
-        socket.leave(room.id);
-        manager.softDisconnect(socket.id);
-      }
-      io2.emit("lobby_state", { tables: manager.getLobbyTables() });
-    });
-  });
-  logger.info("Socket.IO attached at /api/socket.io");
-}
-
 // src/routes/health.ts
+init_serverStats();
+init_sockets();
 var router = (0, import_express.Router)();
 router.get("/healthz", (_req, res) => {
   const data = HealthCheckResponse.parse({ status: "ok" });
@@ -82560,6 +82634,7 @@ __export(schema_exports, {
   followsTable: () => followsTable,
   moderationActionsTable: () => moderationActionsTable,
   playerNotificationsTable: () => playerNotificationsTable,
+  playerPushTokensTable: () => playerPushTokensTable,
   playerReportsTable: () => playerReportsTable,
   playersTable: () => playersTable,
   postCommentsTable: () => postCommentsTable,
@@ -82704,6 +82779,12 @@ var referralsTable = pgTable("referrals", {
   referrerBonus: integer("referrer_bonus").notNull(),
   refereeBonus: integer("referee_bonus").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+});
+var playerPushTokensTable = pgTable("player_push_tokens", {
+  playerId: text("player_id").primaryKey(),
+  token: text("token").notNull(),
+  platform: text("platform").notNull().default("ios"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
 });
 var announcementsTable = pgTable("announcements", {
   id: text("id").primaryKey(),
@@ -83112,6 +83193,7 @@ var auth_default = router2;
 
 // src/routes/admin.ts
 var import_express3 = __toESM(require_express2(), 1);
+init_sockets();
 import { randomUUID as randomUUID2 } from "crypto";
 var router3 = (0, import_express3.Router)();
 function requireAdmin(req, res, next) {
@@ -83510,6 +83592,96 @@ router3.put("/admin/players/:id/founder", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+router3.post("/players/:id/push-token", async (req, res) => {
+  try {
+    const { token, platform } = req.body;
+    if (!token?.trim()) {
+      res.status(400).json({ error: "token required" });
+      return;
+    }
+    await db.insert(playerPushTokensTable).values({ playerId: req.params["id"], token: token.trim(), platform: platform ?? "ios" }).onConflictDoUpdate({
+      target: playerPushTokensTable.playerId,
+      set: { token: token.trim(), platform: platform ?? "ios", updatedAt: sql`now()` }
+    });
+    res.json({ success: true });
+  } catch (e) {
+    req.log.error(e, "push-token upsert error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+router3.post("/admin/push-notification", async (req, res) => {
+  try {
+    const { title, body, data } = req.body;
+    if (!title?.trim() || !body?.trim()) {
+      res.status(400).json({ error: "title and body are required" });
+      return;
+    }
+    const rows = await db.select({ token: playerPushTokensTable.token }).from(playerPushTokensTable);
+    if (rows.length === 0) {
+      res.json({ success: true, sent: 0 });
+      return;
+    }
+    const messages = rows.map((r) => ({
+      to: r.token,
+      title: title.trim(),
+      body: body.trim(),
+      sound: "default",
+      data: { category: "system", priority: "high", icon: "megaphone", iconColor: "#00d4ff", ...data }
+    }));
+    const CHUNK = 100;
+    let sent = 0;
+    for (let i = 0; i < messages.length; i += CHUNK) {
+      await fetch("https://exp.host/--/api/v2/push/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "Accept-Encoding": "gzip, deflate" },
+        body: JSON.stringify(messages.slice(i, i + CHUNK))
+      }).catch((err) => req.log.warn(err, "expo push chunk error"));
+      sent += Math.min(CHUNK, messages.length - i);
+    }
+    res.json({ success: true, sent });
+  } catch (e) {
+    req.log.error(e, "push-notification error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+router3.post("/admin/announcements/post-to-feed", async (req, res) => {
+  try {
+    const { content, tag } = req.body;
+    if (!content?.trim()) {
+      res.status(400).json({ error: "content required" });
+      return;
+    }
+    const id = randomUUID2();
+    await db.insert(feedPostsTable).values({
+      id,
+      authorId: "chip_society_official",
+      authorUsername: "\u{1F4E3} Chip Society",
+      authorAvatarIndex: 1,
+      authorRank: "CHIP SOCIETY ELITE",
+      content: content.trim(),
+      tag: tag ?? "GENERAL"
+    });
+    const { emitToAll: emitToAll2 } = await Promise.resolve().then(() => (init_sockets(), sockets_exports));
+    const post = {
+      id,
+      authorId: "chip_society_official",
+      authorUsername: "\u{1F4E3} Chip Society",
+      authorAvatarIndex: 1,
+      authorRank: "CHIP SOCIETY ELITE",
+      content: content.trim(),
+      tag: tag ?? "GENERAL",
+      likeCount: 0,
+      commentCount: 0,
+      likedByMe: false,
+      createdAt: /* @__PURE__ */ new Date()
+    };
+    emitToAll2("new_feed_post", post);
+    res.json({ success: true, id });
+  } catch (e) {
+    req.log.error(e, "post-to-feed error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
 router3.get("/announcements", async (req, res) => {
   try {
     const rows = await db.select().from(announcementsTable).orderBy(desc(announcementsTable.createdAt));
@@ -83562,6 +83734,7 @@ var admin_default = router3;
 
 // src/routes/social.ts
 var import_express4 = __toESM(require_express2(), 1);
+init_sockets();
 import { randomUUID as randomUUID3 } from "crypto";
 var router4 = (0, import_express4.Router)();
 function requirePlayer(req, res, next) {
@@ -84387,6 +84560,7 @@ router7.use(referrals_default);
 var routes_default = router7;
 
 // src/app.ts
+init_logger();
 var app = (0, import_express8.default)();
 app.set("trust proxy", 1);
 app.use(
@@ -84431,6 +84605,8 @@ app.use("/api", routes_default);
 var app_default = app;
 
 // src/index.ts
+init_sockets();
+init_logger();
 var rawPort = process.env["PORT"];
 if (!rawPort) {
   throw new Error("PORT environment variable is required but was not provided.");
