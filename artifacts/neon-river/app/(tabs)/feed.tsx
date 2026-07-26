@@ -1695,94 +1695,125 @@ function SocialProfileEditorSheet({ visible, onClose }: { visible: boolean; onCl
     onClose();
   }
 
+  const previewAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={spe.overlay}>
-            <TouchableOpacity style={StyleSheet.absoluteFillObject as any} activeOpacity={1} onPress={onClose} />
-            <View style={spe.sheet}>
-              <LinearGradient colors={['#180035', '#090019']} style={StyleSheet.absoluteFill} />
-              <View style={spe.handle} />
-              {/* Top bar */}
-              <View style={spe.topBar}>
-                <TouchableOpacity onPress={onClose}>
-                  <Text style={spe.cancelText}>Cancel</Text>
-                </TouchableOpacity>
-                <Text style={spe.title}>Edit Profile</Text>
-                <TouchableOpacity onPress={handleSave} disabled={!canSave || saving}>
-                  <Text style={[spe.saveText, (!canSave || saving) && { opacity: 0.4 }]}>Save</Text>
-                </TouchableOpacity>
-              </View>
-              <ScrollView style={{ flex: 1 }} contentContainerStyle={[spe.body, { paddingBottom: bottomInset + 40 }]} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                {/* Display Name */}
-                <Text style={spe.label}>DISPLAY NAME</Text>
-                <View style={spe.inputWrap}>
-                  <TextInput
-                    style={spe.input}
-                    value={displayName}
-                    onChangeText={t => setDisplayName(t.replace(/[\n\r]/g, '').slice(0, 15))}
-                    placeholder="Your display name"
-                    placeholderTextColor={colors.textDim}
-                    maxLength={15}
-                    autoCapitalize="words"
-                    selectionColor={colors.primary}
-                    returnKeyType="done"
-                  />
-                  <Text style={spe.charCount}>{Math.max(0, 15 - displayName.trim().length)}</Text>
-                </View>
-                <Text style={spe.hint}>Shown on posts and your profile. 1–15 characters.</Text>
+        <View style={spe.overlay}>
+          <TouchableOpacity style={StyleSheet.absoluteFillObject as any} activeOpacity={1} onPress={onClose} />
+          <View style={spe.sheet}>
+            <LinearGradient colors={['#180035', '#090019']} style={StyleSheet.absoluteFill} />
+            <View style={spe.handle} />
 
-                {/* Bio */}
-                <Text style={[spe.label, { marginTop: 22 }]}>BIO</Text>
-                <View style={[spe.inputWrap, { minHeight: 80, alignItems: 'flex-start', paddingVertical: 10 }]}>
-                  <TextInput
-                    style={[spe.input, { textAlignVertical: 'top' }]}
-                    value={bio}
-                    onChangeText={t => setBio(t.slice(0, 120))}
-                    placeholder="Tell the table about yourself…"
-                    placeholderTextColor={colors.textDim}
-                    maxLength={120}
-                    multiline
-                    selectionColor={colors.primary}
-                  />
-                </View>
-                <Text style={spe.hint}>{120 - (bio?.length ?? 0)} characters remaining.</Text>
-
-                {/* @Username — read-only */}
-                <Text style={[spe.label, { marginTop: 22 }]}>@USERNAME (LOGIN)</Text>
-                <View style={[spe.inputWrap, spe.lockedWrap]}>
-                  <Ionicons name="lock-closed-outline" size={13} color={colors.textDim} style={{ marginRight: 2 }} />
-                  <Text style={spe.lockedText} numberOfLines={1} ellipsizeMode="tail">@{profile.username}</Text>
-                </View>
-                <Text style={spe.hint}>
-                  Your @username is your account login and cannot be changed here. To change it, go to Account Settings (30-day restriction applies).
+            {/* Top bar */}
+            <View style={spe.topBar}>
+              <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Text style={spe.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <Text style={spe.title}>Edit Profile</Text>
+              <TouchableOpacity onPress={handleSave} disabled={!canSave || saving} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Text style={[spe.saveText, (!canSave || saving) && { opacity: 0.4 }]}>
+                  {saving ? 'Saving…' : 'Save'}
                 </Text>
-              </ScrollView>
+              </TouchableOpacity>
             </View>
+
+            <ScrollView
+              style={spe.scroll}
+              contentContainerStyle={[spe.body, { paddingBottom: bottomInset + 40 }]}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {/* Live preview */}
+              <View style={spe.preview}>
+                <NeonAvatar avatarId={previewAvatarId} size={52} isEquipped />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={spe.previewName} numberOfLines={1} ellipsizeMode="tail">
+                    {displayName.trim() || profile.username}
+                  </Text>
+                  <Text style={spe.previewHandle} numberOfLines={1} ellipsizeMode="tail">
+                    @{profile.username}
+                  </Text>
+                </View>
+              </View>
+              <View style={spe.divider} />
+
+              {/* Display Name */}
+              <Text style={spe.label}>DISPLAY NAME</Text>
+              <View style={spe.inputWrap}>
+                <TextInput
+                  style={spe.input}
+                  value={displayName}
+                  onChangeText={t => setDisplayName(t.replace(/[\n\r]/g, '').slice(0, 15))}
+                  placeholder="Your display name"
+                  placeholderTextColor={colors.textDim}
+                  maxLength={15}
+                  autoCapitalize="words"
+                  selectionColor={colors.primary}
+                  returnKeyType="done"
+                />
+                <Text style={spe.charCount}>{Math.max(0, 15 - displayName.trim().length)}</Text>
+              </View>
+              <Text style={spe.hint}>Shown on posts and your profile. Can be changed anytime.</Text>
+
+              {/* Bio */}
+              <Text style={[spe.label, { marginTop: 22 }]}>BIO</Text>
+              <View style={[spe.inputWrap, { minHeight: 80, alignItems: 'flex-start', paddingVertical: 10 }]}>
+                <TextInput
+                  style={[spe.input, { textAlignVertical: 'top' }]}
+                  value={bio}
+                  onChangeText={t => setBio(t.slice(0, 120))}
+                  placeholder="Tell the table about yourself…"
+                  placeholderTextColor={colors.textDim}
+                  maxLength={120}
+                  multiline
+                  selectionColor={colors.primary}
+                />
+              </View>
+              <Text style={spe.hint}>{120 - (bio?.length ?? 0)} characters remaining.</Text>
+
+              {/* @Username — read-only */}
+              <Text style={[spe.label, { marginTop: 22 }]}>USERNAME</Text>
+              <View style={[spe.inputWrap, spe.lockedWrap]}>
+                <Ionicons name="at" size={14} color={colors.textDim} />
+                <Text style={spe.lockedText} numberOfLines={1} ellipsizeMode="tail">{profile.username}</Text>
+                <Ionicons name="lock-closed-outline" size={12} color="rgba(255,255,255,0.2)" />
+              </View>
+              <Text style={spe.hint}>
+                Your login credential — change it in Account Settings (Profile tab → Change Username).
+              </Text>
+            </ScrollView>
           </View>
-        </TouchableWithoutFeedback>
+        </View>
       </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 const spe = StyleSheet.create({
-  overlay:    { flex: 1, justifyContent: 'flex-end' },
-  sheet:      { borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden', maxHeight: '88%' },
-  handle:     { width: 36, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', alignSelf: 'center', marginTop: 10, marginBottom: 2 },
-  topBar:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  title:      { color: colors.text, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
-  cancelText: { color: colors.textDim, fontSize: 14, fontWeight: '600', minWidth: 56 },
-  saveText:   { color: colors.primary, fontSize: 14, fontWeight: '800', textAlign: 'right', minWidth: 56 },
-  body:       { padding: 20, paddingBottom: 40, gap: 0 },
-  label:      { color: colors.textDim, fontSize: 9, fontWeight: '800', letterSpacing: 1.5, marginBottom: 8 },
-  inputWrap:  { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', borderRadius: 14, paddingHorizontal: 14, paddingVertical: 13, backgroundColor: 'rgba(255,255,255,0.04)' },
-  input:      { flex: 1, color: colors.text, fontSize: 15, fontWeight: '500' },
-  charCount:  { color: colors.textDim, fontSize: 10, fontWeight: '600' },
-  hint:       { color: 'rgba(255,255,255,0.28)', fontSize: 10, marginTop: 7, lineHeight: 15 },
-  lockedWrap: { backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' },
-  lockedText: { flex: 1, color: colors.textDim, fontSize: 14, fontWeight: '600' },
+  overlay:     { flex: 1, justifyContent: 'flex-end' },
+  // height: '80%' (not maxHeight) gives the ScrollView a real parent dimension so flex:1 expands
+  sheet:       { height: '80%', borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' },
+  scroll:      { flex: 1 },
+  handle:      { width: 36, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', alignSelf: 'center', marginTop: 10, marginBottom: 2 },
+  topBar:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
+  title:       { color: colors.text, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+  cancelText:  { color: colors.textDim, fontSize: 14, fontWeight: '600', minWidth: 56 },
+  saveText:    { color: colors.primary, fontSize: 14, fontWeight: '800', textAlign: 'right', minWidth: 56 },
+  // Live preview row
+  preview:     { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 18, paddingHorizontal: 4 },
+  previewName: { color: colors.text, fontSize: 16, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
+  previewHandle:{ color: colors.textDim, fontSize: 12, fontFamily: 'Orbitron_400Regular' },
+  divider:     { height: 1, backgroundColor: 'rgba(255,255,255,0.07)', marginBottom: 20 },
+  body:        { padding: 20, paddingBottom: 40, gap: 0 },
+  label:       { color: colors.textDim, fontSize: 9, fontWeight: '800', letterSpacing: 1.5, marginBottom: 8 },
+  inputWrap:   { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', borderRadius: 14, paddingHorizontal: 14, paddingVertical: 13, backgroundColor: 'rgba(255,255,255,0.04)' },
+  input:       { flex: 1, color: colors.text, fontSize: 15, fontWeight: '500' },
+  charCount:   { color: colors.textDim, fontSize: 10, fontWeight: '600' },
+  hint:        { color: 'rgba(255,255,255,0.28)', fontSize: 10, marginTop: 7, lineHeight: 15 },
+  lockedWrap:  { backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' },
+  lockedText:  { flex: 1, color: colors.textDim, fontSize: 14, fontWeight: '600' },
 });
 
 // ─── Me Section ──────────────────────────────────────────────────────────────
