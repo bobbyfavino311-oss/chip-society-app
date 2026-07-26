@@ -1,0 +1,348 @@
+# SOCIAL PROFILE IDENTITY + USERNAME LAYOUT FIX
+
+There is an important distinction that must now be enforced across the Social Feed:
+
+1. DISPLAY NAME
+2. @USERNAME / LOGIN CREDENTIAL
+
+These are NOT the same field.
+
+The player should be able to edit their visible social display name, while their @username remains fixed as their unique login credential unless changed through the secure account settings flow.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 1. FIX THE EDIT PROFILE BUTTON
+
+Current bug:
+
+Tapping “Edit Profile” from the Social Feed profile sends the player directly to the main gameplay statistics profile page.
+
+This is incorrect.
+
+Required behavior:
+
+Tapping “Edit Profile” from the Social Feed profile must open a dedicated Social Profile Editor.
+
+Do not redirect to:
+
+• Main profile statistics
+• Gameplay stats
+• Achievements
+• Account overview
+
+Open a focused edit sheet or page for social identity only.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 2. SOCIAL PROFILE EDITOR
+
+The Social Profile Editor should allow the player to change:
+
+• Display Name
+• Profile biography, if supported
+• Selected avatar or uploaded profile picture
+• Social badge/title, if supported
+
+The player must NOT be able to casually edit their @username from this screen.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 3. DISPLAY NAME VS @USERNAME
+
+Display Name:
+
+Example:
+
+Bobby Favino
+
+This is the larger visible name shown on:
+
+• Social profile
+• Social posts
+• Comments
+• Followers and Following lists
+• Trending Now
+• Reposts
+• Tournament share posts
+• Leaderboards, where appropriate
+
+The display name may be edited from the Social Profile Editor.
+
+@Username:
+
+Example:
+
+@officialbobbyf
+
+This is the unique account handle and login credential.
+
+It must remain tied to the player’s single account.
+
+It should not change when the player edits their display name.
+
+The Social Feed must not create a separate username or separate account identity.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 4. DISPLAY NAME RULES
+
+Allow the player to update their display name without changing their login credential.
+
+Recommended validation:
+
+• Minimum: 1 visible character
+• Maximum: 24 characters
+• Trim leading and trailing spaces
+• Collapse repeated spaces
+• Allow normal letters, numbers, spaces and limited punctuation
+• Do not allow invisible-only names
+• Do not allow line breaks
+• Do not allow the name to break the layout
+
+Display names do not necessarily need to be globally unique.
+
+The unique identifier remains the @username.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 5. @USERNAME SECURITY
+
+The @username remains the player’s unique account credential.
+
+It must:
+
+• Stay globally unique
+• Remain connected to the same userId
+• Be checked against the account database
+• Never be duplicated
+• Never be replaced by the social display name
+• Never be generated separately for the Social Feed
+
+Any actual @username change must continue through the secure account settings process and remain subject to the existing 30-day restriction.
+
+Do not place @username editing inside the normal Social Profile Editor.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 6. FIX @USERNAME WRAPPING AND STACKING
+
+The @username is still breaking visually on social cards.
+
+Current issues:
+
+• Handle wraps onto several lines
+• Individual letters or parts of the username stack vertically
+• Handle runs underneath badges
+• Text disappears outside the card
+• Underscores create awkward line breaks
+
+This must be fixed globally.
+
+The @username must always render on exactly one horizontal line.
+
+Use:
+
+• white-space: nowrap
+• overflow: hidden
+• text-overflow: ellipsis
+• min-width: 0 on the surrounding flex child
+• flex-shrink: 1 on the username text container
+
+Do not allow the handle to wrap at:
+
+• Underscores
+• Hyphens
+• Numbers
+• Any internal character
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 7. SOCIAL POST HEADER LAYOUT
+
+Use a stable header structure:
+
+Avatar
+
+↓
+
+Identity content area:
+Display Name
+@username · timestamp
+
+↓
+
+Badge/status area
+
+The identity content area must be flexible and allowed to shrink.
+
+The badge area must remain fixed-size.
+
+Do not let the badge push the @username into a narrow vertical column.
+
+Recommended structure:
+
+[Avatar] [Flexible identity column] [Fixed badge/menu area]
+
+The identity column must use:
+
+min-width: 0
+
+The @username line must truncate with an ellipsis when necessary.
+
+Example:
+
+@officialbobbyf
+
+If space is limited:
+
+@officialbob…
+
+Never:
+
+@off
+icial
+bobb
+yf
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 8. DISPLAY NAME FORMATTING
+
+The display name should also remain on one line inside compact feed cards.
+
+For long display names:
+
+• Use a slight responsive font reduction within a safe range
+• Then truncate with an ellipsis
+• Never stack the name into multiple lines
+• Never let it overlap badges or icons
+
+Example:
+
+ExtremelyLongPlayerName
+
+becomes:
+
+ExtremelyLongPlay…
+
+Do not reduce the font until it becomes unreadable.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 9. SOCIAL PROFILE HEADER
+
+The player’s own Social Profile should display:
+
+Large display name:
+Bobby Favino
+
+Handle beneath:
+@officialbobbyf
+
+The Edit Profile button opens the Social Profile Editor.
+
+The handle remains read-only on this page.
+
+A smaller message may state:
+
+“Your @username is your account login and can only be changed in Account Settings.”
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 10. SINGLE SOURCE OF TRUTH
+
+Use these canonical fields:
+
+userId
+displayName
+username
+selectedAvatarId
+uploadedProfileImageUrl
+
+Definitions:
+
+userId:
+Permanent internal account ID.
+
+displayName:
+Editable social-facing name.
+
+username:
+Unique @handle and login credential.
+
+selectedAvatarId / uploadedProfileImageUrl:
+Current global player image.
+
+All Social Feed surfaces must pull from the same account record.
+
+Do not create duplicate social identity fields.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 11. UPDATE EVERYWHERE AFTER DISPLAY NAME CHANGE
+
+When the display name changes, update it immediately on:
+
+• Social profile
+• Existing posts
+• New posts
+• Comments
+• Reposts
+• Trending Now
+• Followers
+• Following
+• Search
+• Notifications
+• Tournament share posts
+• Achievement share posts
+
+Preferred behavior:
+
+Render the current display name from the user profile using userId rather than permanently copying stale text into every post.
+
+The @username remains unchanged.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# 12. AVATAR CONSISTENCY
+
+The Social Profile Editor must continue using the same globally selected avatar or uploaded image.
+
+After changing the avatar or profile picture, update:
+
+• Social profile
+• Feed posts
+• Trending Now
+• Create Post
+• Comments
+• Followers and Following
+• Leaderboards
+• Tournament share composer
+• All other player identity surfaces
+
+Do not create a separate Social Feed avatar.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+# FINAL QA
+
+Test the following:
+
+1. Open the player’s Social Feed profile.
+2. Tap Edit Profile.
+3. Confirm the Social Profile Editor opens instead of the gameplay statistics page.
+4. Change the display name.
+5. Confirm @username does not change.
+6. Confirm the new display name appears on the profile and feed.
+7. Use a long @username containing underscores.
+8. Confirm it stays on one line.
+9. Confirm it truncates with “…” when space is limited.
+10. Confirm it never stacks vertically.
+11. Confirm badges and menus do not crush the identity text.
+12. Confirm the same userId, avatar, display name and username appear everywhere.
+13. Confirm @username can only be changed through secure Account Settings.
+14. Confirm display-name edits persist after logout and login.
+
+FINAL GOAL:
+
+Players should have one account with one unique @username used for login, plus one editable social display name. The interface must clearly separate these fields, preserve account security, and render both cleanly without wrapping, stacking, clipping or creating duplicate social identities.

@@ -129,6 +129,8 @@ const REGISTERED_CHIPS      = 100_000;
 export interface UserProfile {
   playerId?: string;
   username: string;
+  displayName?: string;  // editable social-facing name; @username stays as login credential
+  bio?: string;          // optional social bio (max 120 chars)
   email: string;
   chips: number;
   xp: number;
