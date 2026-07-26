@@ -60,21 +60,6 @@ function createStyles(c: Colors) {
     packagePriceBtn: { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, minWidth: 64, alignItems: 'center' },
     packagePrice: { color: '#050010', fontSize: 14, fontWeight: '900' },
 
-    vipCard:      { borderRadius: 18, borderWidth: 1.5, borderColor: 'rgba(191,95,255,0.4)', overflow: 'hidden', position: 'relative', backgroundColor: c.surface },
-    vipBadge:     { position: 'absolute', top: 0, left: 0, backgroundColor: '#bf5fff', borderBottomRightRadius: 10, borderTopLeftRadius: 16, paddingHorizontal: 14, paddingVertical: 4 },
-    vipBadgeText: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 2 },
-    vipContent:   { padding: 20, paddingTop: 40, gap: 14 },
-    vipHeader:    { flexDirection: 'row', alignItems: 'center', gap: 10 },
-    vipTitle:     { color: c.text, fontSize: 16, fontWeight: '900', fontFamily: 'Orbitron_700Bold', flex: 1 },
-    vipPrice:     { alignItems: 'flex-end' },
-    vipPriceText: { color: '#bf5fff', fontSize: 20, fontWeight: '900', fontFamily: 'Inter_700Bold' },
-    vipPriceSub:  { color: c.textMuted, fontSize: 10 },
-    vipBenefits:  { gap: 8 },
-    vipBenefitRow:{ flexDirection: 'row', alignItems: 'center', gap: 8 },
-    vipBenefitText:{ color: c.textMuted, fontSize: 13 },
-    vipCta:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4, borderTopWidth: 1, borderTopColor: 'rgba(191,95,255,0.2)', paddingTop: 14 },
-    vipCtaText:   { color: '#bf5fff', fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1 },
-
     legal: { color: c.textDim, fontSize: 10, textAlign: 'center', lineHeight: 16 },
 
     scratchSection: { gap: 10 },
@@ -442,10 +427,6 @@ export default function StoreScreen() {
     }
   };
 
-  const handleVIP = () => {
-    Alert.alert('CHIP SOCIETY VIP', 'VIP membership will be available when the app launches on the App Store.\n\nBenefits include daily chip bonuses, exclusive tables, VIP badge, and more.', [{ text: 'Got it' }]);
-  };
-
   const bgGrad = isDark
     ? (['#0e0030', '#050010', '#000520'] as const)
     : ([colors.background, colors.surfaceElevated, colors.background] as const);
@@ -494,44 +475,6 @@ export default function StoreScreen() {
             );
           })}
         </View>
-
-        <TouchableOpacity style={styles.vipCard} onPress={handleVIP} activeOpacity={0.85}>
-          <LinearGradient
-            colors={['rgba(191,95,255,0.22)', 'rgba(255,0,144,0.12)', 'transparent']}
-            style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-          />
-          <View style={styles.vipBadge}>
-            <Text style={styles.vipBadgeText}>VIP</Text>
-          </View>
-          <View style={styles.vipContent}>
-            <View style={styles.vipHeader}>
-              <Ionicons name="diamond" size={22} color="#bf5fff" />
-              <Text style={styles.vipTitle}>CHIP SOCIETY VIP</Text>
-              <View style={styles.vipPrice}>
-                <Text style={styles.vipPriceText}>$9.99</Text>
-                <Text style={styles.vipPriceSub}>/mo</Text>
-              </View>
-            </View>
-            <View style={styles.vipBenefits}>
-              {[
-                'Daily streaks double',
-                '1 extra wheel spin per day',
-                '1 Mythic Fortune Cookie per month',
-                'Double XP on every hand',
-                'VIP Badge on your profile',
-              ].map((b, i) => (
-                <View key={i} style={styles.vipBenefitRow}>
-                  <Ionicons name="checkmark-circle" size={13} color="#bf5fff" />
-                  <Text style={styles.vipBenefitText}>{b}</Text>
-                </View>
-              ))}
-            </View>
-            <View style={styles.vipCta}>
-              <Ionicons name="time-outline" size={14} color="#bf5fff" />
-              <Text style={styles.vipCtaText}>COMING SOON</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
 
         <Text style={styles.legal}>
           CHIP SOCIETY is a social poker entertainment game. All chips are virtual and

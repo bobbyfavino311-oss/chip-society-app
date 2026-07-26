@@ -238,14 +238,6 @@ export default function StreakScreen() {
           ))}
         </View>
 
-        {/* VIP boost info */}
-        {!profile.vipMember && (
-          <View style={st.vipHint}>
-            <LinearGradient colors={['rgba(255,0,144,0.08)', 'transparent']} style={StyleSheet.absoluteFill} />
-            <Ionicons name="diamond" size={16} color="#ff0090" />
-            <Text style={st.vipHintText}>VIP members double their daily streaks, get an extra wheel spin every day, and earn Double XP</Text>
-          </View>
-        )}
       </ScrollView>
     </View>
   );
@@ -287,6 +279,4 @@ const st = StyleSheet.create({
   statIcon: { fontSize: 20 },
   statValue: { color: colors.text, fontSize: 11, fontWeight: '800', fontFamily: 'Inter_700Bold', textAlign: 'center' },
   statLabel: { color: colors.textDim, fontSize: 8, letterSpacing: 1, textAlign: 'center' },
-  vipHint: { flexDirection: 'row', gap: 10, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,0,144,0.25)', padding: 14, alignItems: 'flex-start', overflow: 'hidden' },
-  vipHintText: { color: colors.textMuted, fontSize: 11, lineHeight: 17, flex: 1 },
 });
