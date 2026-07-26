@@ -6,6 +6,7 @@ import {
   Animated,
   FlatList,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Alert,
   Modal,
@@ -16,6 +17,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Pressable,
   View,
 } from 'react-native';
@@ -27,7 +29,6 @@ import { useColors } from '@/hooks/useColors';
 import { useSocial } from '@/context/SocialContext';
 import { useAISocial } from '@/context/AISocialContext';
 import { useLiveFeed } from '@/context/LiveFeedContext';
-import type { AIPost } from '@/lib/aiSocialEngine';
 import type { FeedPost, FeedComment } from '@/lib/socialApi';
 import {
   SOCIAL_POSTS, MOCK_PLAYERS, POKER_REACTIONS, POST_TAG_COLORS,
@@ -343,23 +344,30 @@ function LivePostCard({ post }: { post: FeedPost }) {
             <NeonAvatar avatarId={isOwn && profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (post.authorAvatarIndex ?? 1)} size={44} />
           )}
         </TouchableOpacity>
-        <View style={{ flex: 1 }}>
+
+        {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
+        <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={cd.username}>{post.authorUsername}</Text>
+            <Text style={cd.username} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+              {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
+            </Text>
           </TouchableOpacity>
-          <Text style={cd.handle}>{post.authorRank} · {timeSince(post.createdAt)}</Text>
+          <View style={cd.handleRow}>
+            <Text style={cd.handle}>@{isOwn ? profile.username : post.authorUsername} · {timeSince(post.createdAt)}</Text>
+            <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
+              <Ionicons name={typeIcon} size={9} color={typeColor} />
+              <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+            </View>
+          </View>
         </View>
-        <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
-          <Ionicons name={typeIcon} size={9} color={typeColor} />
-          <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
-        </View>
+
         {!isOwn && (
           <TouchableOpacity
             style={[cd.followBtn, following && cd.followBtnActive]}
             onPress={() => following ? unfollow(post.authorId) : follow(post.authorId, post.authorUsername, post.authorAvatarIndex, post.authorRank ?? '')}
           >
             {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
-            <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
+            <Text style={[cd.followText, following && cd.followBtnActive && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity onPress={() => setShowMenu(true)} style={cd.moreBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -560,33 +568,51 @@ function PostCard({ post }: { post: SocialPost }) {
           if (post.playerId === 'me') { router.push('/(tabs)/profile'); return; }
           router.push(`/social/player-profile?id=${post.playerId}`);
         }}>
-          <NeonAvatar avatarId={player?.avatarId ?? 1} size={44} />
+          {post.playerId === 'me' && profile.profileImageType === 'custom' && profile.avatarUri
+            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }} />
+            : <NeonAvatar
+                avatarId={
+                  post.playerId === 'me'
+                    ? (profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1)
+                    : (player?.avatarId ?? 1)
+                }
+                size={44}
+              />
+          }
           {player?.status === 'online'  && <View style={cd.onlineDot} />}
           {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
         </TouchableOpacity>
 
-        <View style={{ flex: 1 }}>
+        {/* Name col — type badge moved inside handle row so name is never compressed */}
+        <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => {
             if (post.playerId === 'me') { router.push('/(tabs)/profile'); return; }
             router.push(`/social/player-profile?id=${post.playerId}`);
           }}>
             <View style={cd.usernameRow}>
-              <Text style={cd.username}>{player?.username ?? 'Unknown'}</Text>
+              <Text style={cd.username}>
+                {post.playerId === 'me'
+                  ? (profile.displayName || profile.username)
+                  : (player?.username ?? 'Unknown')}
+              </Text>
               {primaryBadge && <Text style={cd.badgeIcon}>{primaryBadge.icon}</Text>}
             </View>
           </TouchableOpacity>
-          <Text style={cd.handle}>{player?.handle ?? ''} · {post.timeAgo}</Text>
+          <View style={cd.handleRow}>
+            <Text style={cd.handle}>@{player?.username ?? ''} · {post.timeAgo}</Text>
+            <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
+              <Ionicons name={POST_TYPE_ICONS[post.tag]} size={9} color={typeColor} />
+              <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+            </View>
+          </View>
         </View>
 
-        <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
-          <Ionicons name={POST_TYPE_ICONS[post.tag]} size={9} color={typeColor} />
-          <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
-        </View>
-
-        <TouchableOpacity style={[cd.followBtn, following && cd.followBtnActive]} onPress={handleFollow}>
-          {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
-          <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
-        </TouchableOpacity>
+        {post.playerId !== 'me' && post.playerId !== profile.playerId && (
+          <TouchableOpacity style={[cd.followBtn, following && cd.followBtnActive]} onPress={handleFollow}>
+            {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
+            <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity onPress={() => setShowMenu(true)} style={cd.moreBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="ellipsis-horizontal" size={16} color={colors.textMuted} />
@@ -791,7 +817,9 @@ const cd = StyleSheet.create({
   usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   username:    { color: '#ffffff', fontSize: 14, fontWeight: '800' },
   badgeIcon:   { fontSize: 12 },
-  handle:      { color: 'rgba(255,255,255,0.38)', fontSize: 10, marginTop: 2 },
+  // handle + type badge sit together on one row; badge moved here from top-level header row
+  handleRow:   { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2, flexWrap: 'wrap' },
+  handle:      { color: 'rgba(255,255,255,0.38)', fontSize: 10 },
 
   // ── Type badge (WIN / BLUFF / etc.) ───────────────────────────────────────
   typeBadge: { borderRadius: 10, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 3 },
@@ -1217,7 +1245,10 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
                   : <Text style={lb.rankNum}>{i + 1}</Text>
                 }
               </View>
-              <NeonAvatar avatarId={entry.player.avatarId ?? 1} size={34} />
+              {isMe && profile.profileImageType === 'custom' && profile.avatarUri
+                ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: colors.primary }} />
+                : <NeonAvatar avatarId={entry.player.avatarId ?? 1} size={34} />
+              }
               <View style={{ flex: 1 }}>
                 <Text style={lb.username}>{entry.player.username}</Text>
                 <Text style={lb.rankLabel}>{entry.player.rank}</Text>
@@ -1421,8 +1452,9 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                   <Text style={srch.handle}>{p.rank} · {formatChips(p.chips)} chips · Lv.{p.level}</Text>
                 </View>
               </TouchableOpacity>
-              {/* Action buttons — separate touchables, don't interfere with nav */}
+              {/* Action buttons — hide both for own profile */}
               <View style={{ flexDirection: 'row', gap: 6 }}>
+                {p.playerId !== profile.playerId && (
                 <TouchableOpacity
                   style={[srch.followBtn, isFollowed && { backgroundColor: `${colors.primary}15`, borderColor: `${colors.primary}40` }]}
                   onPress={() => !isFollowed && handleFollow(p.playerId, p.username)}
@@ -1431,17 +1463,20 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                     {isFollowed ? '✓ Following' : '+ Follow'}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={srch.msgBtn}
-                  onPress={() => handleMessage(p.playerId)}
-                  disabled={messagingId === p.playerId}
-                >
-                  <Ionicons
-                    name={messagingId === p.playerId ? 'time-outline' : 'chatbubble-outline'}
-                    size={14}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
+                )}
+                {p.playerId !== profile.playerId && (
+                  <TouchableOpacity
+                    style={srch.msgBtn}
+                    onPress={() => handleMessage(p.playerId)}
+                    disabled={messagingId === p.playerId}
+                  >
+                    <Ionicons
+                      name={messagingId === p.playerId ? 'time-outline' : 'chatbubble-outline'}
+                      size={14}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           );
@@ -1554,9 +1589,12 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
             </TouchableOpacity>
           </View>
           <View style={cmp.authorRow}>
-            <NeonAvatar avatarId={meAvatarId} size={36} />
+            {profile.profileImageType === 'custom' && profile.avatarUri
+            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.primary }} />
+            : <NeonAvatar avatarId={meAvatarId} size={36} />
+          }
             <View>
-              <Text style={cmp.authorName}>{profile.username}</Text>
+              <Text style={cmp.authorName}>{profile.displayName || profile.username}</Text>
               <Text style={cmp.authorHandle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
             </View>
           </View>
@@ -1579,7 +1617,7 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
                 <TouchableOpacity
                   key={t}
                   style={[cmp.typeChip, { borderColor: active ? c : `${c}40`, backgroundColor: active ? `${c}22` : 'transparent' }]}
-                  onPress={() => setPostType(t)}
+                  onPress={() => { setPostType(t); setTimeout(() => inputRef.current?.focus(), 50); }}
                 >
                   <Ionicons name={POST_TYPE_ICONS[t]} size={11} color={active ? c : colors.textDim} />
                   <Text style={[cmp.typeChipText, { color: active ? c : colors.textDim }]}>{t}</Text>
@@ -1655,6 +1693,154 @@ const cmp = StyleSheet.create({
   counter: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
 });
 
+// ─── Social Profile Editor Sheet ─────────────────────────────────────────────
+
+function SocialProfileEditorSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { profile, updateProfile } = useUser();
+  const { bottom: bottomInset } = useSafeAreaInsets();
+  const [displayName, setDisplayName] = useState('');
+  const [bio, setBio] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      setDisplayName(profile.displayName || profile.username);
+      setBio(profile.bio || '');
+    }
+  }, [visible, profile.displayName, profile.username, profile.bio]);
+
+  const canSave = displayName.trim().length >= 1 && displayName.trim().length <= 15;
+
+  async function handleSave() {
+    const name = displayName.trim().replace(/\s+/g, ' ');
+    if (!name) return;
+    setSaving(true);
+    await updateProfile({ displayName: name, bio: bio.trim().slice(0, 120) });
+    setSaving(false);
+    onClose();
+  }
+
+  const previewAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <View style={spe.overlay}>
+          <TouchableOpacity style={StyleSheet.absoluteFillObject as any} activeOpacity={1} onPress={onClose} />
+          <View style={spe.sheet}>
+            <LinearGradient colors={['#180035', '#090019']} style={StyleSheet.absoluteFill} />
+            <View style={spe.handle} />
+
+            {/* Top bar */}
+            <View style={spe.topBar}>
+              <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Text style={spe.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <Text style={spe.title}>Edit Profile</Text>
+              <TouchableOpacity onPress={handleSave} disabled={!canSave || saving} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Text style={[spe.saveText, (!canSave || saving) && { opacity: 0.4 }]}>
+                  {saving ? 'Saving…' : 'Save'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={spe.scroll}
+              contentContainerStyle={[spe.body, { paddingBottom: bottomInset + 40 }]}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {/* Live preview */}
+              <View style={spe.preview}>
+                <NeonAvatar avatarId={previewAvatarId} size={52} isEquipped />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={spe.previewName} numberOfLines={1} ellipsizeMode="tail">
+                    {displayName.trim() || profile.username}
+                  </Text>
+                  <Text style={spe.previewHandle} numberOfLines={1} ellipsizeMode="tail">
+                    @{profile.username}
+                  </Text>
+                </View>
+              </View>
+              <View style={spe.divider} />
+
+              {/* Display Name */}
+              <Text style={spe.label}>DISPLAY NAME</Text>
+              <View style={spe.inputWrap}>
+                <TextInput
+                  style={spe.input}
+                  value={displayName}
+                  onChangeText={t => setDisplayName(t.replace(/[\n\r]/g, '').slice(0, 15))}
+                  placeholder="Your display name"
+                  placeholderTextColor={colors.textDim}
+                  maxLength={15}
+                  autoCapitalize="words"
+                  selectionColor={colors.primary}
+                  returnKeyType="done"
+                />
+                <Text style={spe.charCount}>{Math.max(0, 15 - displayName.trim().length)}</Text>
+              </View>
+              <Text style={spe.hint}>Shown on posts and your profile. Can be changed anytime.</Text>
+
+              {/* Bio */}
+              <Text style={[spe.label, { marginTop: 22 }]}>BIO</Text>
+              <View style={[spe.inputWrap, { minHeight: 80, alignItems: 'flex-start', paddingVertical: 10 }]}>
+                <TextInput
+                  style={[spe.input, { textAlignVertical: 'top' }]}
+                  value={bio}
+                  onChangeText={t => setBio(t.slice(0, 120))}
+                  placeholder="Tell the table about yourself…"
+                  placeholderTextColor={colors.textDim}
+                  maxLength={120}
+                  multiline
+                  selectionColor={colors.primary}
+                />
+              </View>
+              <Text style={spe.hint}>{120 - (bio?.length ?? 0)} characters remaining.</Text>
+
+              {/* @Username — read-only */}
+              <Text style={[spe.label, { marginTop: 22 }]}>USERNAME</Text>
+              <View style={[spe.inputWrap, spe.lockedWrap]}>
+                <Ionicons name="at" size={14} color={colors.textDim} />
+                <Text style={spe.lockedText} numberOfLines={1} ellipsizeMode="tail">{profile.username}</Text>
+                <Ionicons name="lock-closed-outline" size={12} color="rgba(255,255,255,0.2)" />
+              </View>
+              <Text style={spe.hint}>
+                Your login credential — change it in Account Settings (Profile tab → Change Username).
+              </Text>
+            </ScrollView>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+const spe = StyleSheet.create({
+  overlay:     { flex: 1, justifyContent: 'flex-end' },
+  // height: '80%' (not maxHeight) gives the ScrollView a real parent dimension so flex:1 expands
+  sheet:       { height: '80%', borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' },
+  scroll:      { flex: 1 },
+  handle:      { width: 36, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', alignSelf: 'center', marginTop: 10, marginBottom: 2 },
+  topBar:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
+  title:       { color: colors.text, fontSize: 13, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 0.5 },
+  cancelText:  { color: colors.textDim, fontSize: 14, fontWeight: '600', minWidth: 56 },
+  saveText:    { color: colors.primary, fontSize: 14, fontWeight: '800', textAlign: 'right', minWidth: 56 },
+  // Live preview row
+  preview:     { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 18, paddingHorizontal: 4 },
+  previewName: { color: colors.text, fontSize: 16, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
+  previewHandle:{ color: colors.textDim, fontSize: 12, fontFamily: 'Orbitron_400Regular' },
+  divider:     { height: 1, backgroundColor: 'rgba(255,255,255,0.07)', marginBottom: 20 },
+  body:        { padding: 20, paddingBottom: 40, gap: 0 },
+  label:       { color: colors.textDim, fontSize: 9, fontWeight: '800', letterSpacing: 1.5, marginBottom: 8 },
+  inputWrap:   { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', borderRadius: 14, paddingHorizontal: 14, paddingVertical: 13, backgroundColor: 'rgba(255,255,255,0.04)' },
+  input:       { flex: 1, color: colors.text, fontSize: 15, fontWeight: '500' },
+  charCount:   { color: colors.textDim, fontSize: 10, fontWeight: '600' },
+  hint:        { color: 'rgba(255,255,255,0.28)', fontSize: 10, marginTop: 7, lineHeight: 15 },
+  lockedWrap:  { backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' },
+  lockedText:  { flex: 1, color: colors.textDim, fontSize: 14, fontWeight: '600' },
+});
+
 // ─── Me Section ──────────────────────────────────────────────────────────────
 
 const INITIAL_MY_POSTS: MePost[] = [];
@@ -1664,6 +1850,7 @@ function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts:
   const { following, notifications, myReposts: socialMyReposts } = useSocial();
   const { allPosts: livePosts } = useLiveFeed();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
+  const [showEditor, setShowEditor] = useState(false);
 
   const meAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
   const neonCol = getNeonAvatar(meAvatarId).color;
@@ -1706,26 +1893,30 @@ function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts:
           )}
           <LinearGradient colors={[`${neonCol}40`, 'transparent']} style={me.glow} />
         </View>
-        <View style={me.profileInfo}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <Text style={me.username}>{profile.username}</Text>
+        <View style={[me.profileInfo, { minWidth: 0 }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+            <Text style={me.username} numberOfLines={1} ellipsizeMode="tail">{profile.displayName || profile.username}</Text>
             {profile.isFounder && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,215,0,0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,215,0,0.40)', paddingHorizontal: 5, paddingVertical: 2 }}>
+              <View style={{ flexShrink: 0, flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,215,0,0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,215,0,0.40)', paddingHorizontal: 5, paddingVertical: 2 }}>
                 <Text style={{ color: '#FFD700', fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 1 }}>👑 FOUNDER</Text>
               </View>
             )}
           </View>
-          <Text style={me.handle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
+          <Text style={me.handle} numberOfLines={1} ellipsizeMode="tail">@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
+          {profile.bio ? (
+            <Text style={me.bio} numberOfLines={2}>{profile.bio}</Text>
+          ) : null}
           <View style={[me.rankBadge, { borderColor: `${colors.accent}60` }]}>
             <Ionicons name="star" size={9} color={colors.accent} />
             <Text style={me.rankText}>{profile.rank}</Text>
           </View>
         </View>
-        <TouchableOpacity style={me.editBtn} onPress={() => router.push('/(tabs)/profile')}>
+        <TouchableOpacity style={me.editBtn} onPress={() => setShowEditor(true)}>
           <Ionicons name="pencil-outline" size={13} color={colors.primary} />
           <Text style={me.editText}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
+      <SocialProfileEditorSheet visible={showEditor} onClose={() => setShowEditor(false)} />
 
       {/* Stats strip */}
       <View style={me.statsStrip}>
@@ -1835,8 +2026,9 @@ const me = StyleSheet.create({
   bigAvatarText: { fontSize: 28, fontWeight: '700' },
   glow: { position: 'absolute', top: -4, left: -4, right: -4, bottom: -4, borderRadius: 34 },
   profileInfo: { flex: 1, gap: 4 },
-  username: { color: colors.text, fontSize: 16, fontWeight: '800' },
-  handle: { color: colors.textDim, fontSize: 11 },
+  username: { color: colors.text, fontSize: 16, fontWeight: '800', flexShrink: 1 },
+  handle: { color: colors.textDim, fontSize: 11, flexShrink: 1 },
+  bio: { color: 'rgba(255,255,255,0.45)', fontSize: 11, lineHeight: 16 },
   rankBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, alignSelf: 'flex-start', borderWidth: 1, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3, backgroundColor: `${colors.accent}10` },
   rankText: { color: colors.accent, fontSize: 9, fontWeight: '700' },
   editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: colors.primary, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 6 },
@@ -1862,102 +2054,6 @@ const me = StyleSheet.create({
   deleteBtn: { padding: 3 },
 });
 
-// ─── Main Screen ─────────────────────────────────────────────────────────────
-
-// ─── AI Post Mini-Card (for trending header strip) ────────────────────────────
-
-function AIPostMiniCard({ post }: { post: AIPost }) {
-  return (
-    <View style={aiCardStyle.card}>
-      <LinearGradient
-        colors={['rgba(16,5,34,0.97)', 'rgba(5,2,14,0.99)']}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-      />
-      <View style={[aiCardStyle.accentLine, { backgroundColor: post.tagColor }]} />
-      {/* Header row */}
-      <View style={aiCardStyle.header}>
-        <NeonAvatar avatarId={post.personality.avatarId} size={32} />
-        <View style={{ flex: 1 }}>
-          <Text style={aiCardStyle.username} numberOfLines={1}>{post.personality.username}</Text>
-          <Text style={aiCardStyle.timeAgo}>{post.timeAgo}</Text>
-        </View>
-        <View style={[aiCardStyle.tag, { backgroundColor: `${post.tagColor}20`, borderColor: `${post.tagColor}55` }]}>
-          <Text style={[aiCardStyle.tagText, { color: post.tagColor }]}>{post.tag}</Text>
-        </View>
-      </View>
-      {/* Content */}
-      <Text style={aiCardStyle.content} numberOfLines={3}>{post.content}</Text>
-      {/* Footer */}
-      <View style={aiCardStyle.footer}>
-        <Ionicons name="heart" size={11} color="rgba(255,0,144,0.7)" />
-        <Text style={aiCardStyle.footerNum}>{post.likes >= 1000 ? `${(post.likes / 1000).toFixed(1)}K` : post.likes}</Text>
-        {post.pot && (
-          <>
-            <Ionicons name="cash-outline" size={11} color="rgba(0,212,255,0.6)" style={{ marginLeft: 6 }} />
-            <Text style={[aiCardStyle.footerNum, { color: 'rgba(0,212,255,0.7)' }]}>{post.pot}</Text>
-          </>
-        )}
-      </View>
-    </View>
-  );
-}
-
-const aiCardStyle = StyleSheet.create({
-  card: {
-    width: 220, borderRadius: 16, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(0,212,255,0.14)',
-    padding: 14, gap: 8,
-    shadowColor: '#00d4ff', shadowOpacity: 0.1, shadowRadius: 14,
-    shadowOffset: { width: 0, height: 3 }, elevation: 5,
-  },
-  accentLine: { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  avatar: {
-    width: 30, height: 30, borderRadius: 15,
-    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { fontSize: 10, fontWeight: '800', fontFamily: 'Orbitron_700Bold' },
-  username: { color: '#e0d4ff', fontSize: 11, fontWeight: '700', fontFamily: 'Inter_700Bold' },
-  timeAgo: { color: 'rgba(255,255,255,0.3)', fontSize: 9, marginTop: 1 },
-  tag: { borderRadius: 5, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1 },
-  tagText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.6, fontFamily: 'Orbitron_700Bold' },
-  content: { color: 'rgba(255,255,255,0.7)', fontSize: 11, lineHeight: 16 },
-  footer: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
-  footerNum: { color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: '600' },
-});
-
-// ─── AI Posts header strip (shown on Trending tab) ────────────────────────────
-
-function AIPostsStrip({ posts }: { posts: AIPost[] }) {
-  if (posts.length === 0) return null;
-  return (
-    <View style={stripStyle.wrap}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={stripStyle.scroll}
-      >
-        {posts.map(p => <AIPostMiniCard key={p.id} post={p} />)}
-      </ScrollView>
-    </View>
-  );
-}
-
-const stripStyle = StyleSheet.create({
-  wrap: { paddingTop: 10, paddingBottom: 4 },
-  label: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 14, marginBottom: 8,
-  },
-  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#00ff88' },
-  labelText: {
-    color: 'rgba(255,255,255,0.35)', fontSize: 9, fontWeight: '800',
-    letterSpacing: 1.5, fontFamily: 'Orbitron_400Regular',
-  },
-  scroll: { gap: 10, paddingHorizontal: 14 },
-});
-
 // ─── Main Feed Screen ─────────────────────────────────────────────────────────
 
 export default function FeedScreen() {
@@ -1970,7 +2066,7 @@ export default function FeedScreen() {
   const [notifVisible, setNotifVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { profile } = useUser();
-  const { posts: aiPosts, refresh: refreshAIPosts } = useAISocial();
+  const { refresh: refreshAIPosts } = useAISocial();
   const { isMuted, isBlocked, following } = useSocial();
   const {
     allPosts: livePosts,
@@ -2177,11 +2273,6 @@ export default function FeedScreen() {
           renderItem={({ item }) => item._k === 'live'
             ? <LivePostCard post={item.post} />
             : <PostCard post={item.post as SocialPost} />
-          }
-          ListHeaderComponent={
-            activeTab === 'all'
-              ? <AIPostsStrip posts={aiPosts.slice(0, 6)} />
-              : null
           }
           ListEmptyComponent={
             activeTab === 'following' ? (
