@@ -84083,6 +84083,9 @@ router4.get("/social/feed", requirePlayer, async (req, res) => {
       ).orderBy(desc(feedPostsTable.createdAt)).limit(limit);
     }
     const rows = await query;
+    const uniqueAuthorIds = [...new Set(rows.map((r) => r.authorId))];
+    const liveProfiles = uniqueAuthorIds.length > 0 ? await db.select({ playerId: playersTable.playerId, profileJson: playersTable.profileJson }).from(playersTable).where(inArray(playersTable.playerId, uniqueAuthorIds)) : [];
+    const liveProfileMap = new Map(liveProfiles.map((p) => [p.playerId, p.profileJson]));
     const postIds = rows.map((r) => r.id);
     const likedRows = postIds.length > 0 ? await db.select({ postId: postLikesTable.postId }).from(postLikesTable).where(and(eq(postLikesTable.playerId, playerId), inArray(postLikesTable.postId, postIds))) : [];
     const likedSet = new Set(likedRows.map((r) => r.postId));
@@ -84090,7 +84093,10 @@ router4.get("/social/feed", requirePlayer, async (req, res) => {
       id: r.id,
       authorId: r.authorId,
       authorUsername: r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
-      authorAvatarIndex: r.authorAvatarIndex ?? 1,
+      authorAvatarIndex: (() => {
+        const lp = liveProfileMap.get(r.authorId);
+        return lp?.symbolIndex ?? lp?.avatarIndex ?? r.authorAvatarIndex ?? 1;
+      })(),
       authorRank: r.authorRank ?? "Player",
       content: r.content,
       tag: r.tag,
@@ -84122,7 +84128,7 @@ router4.post("/social/posts", requirePlayer, async (req, res) => {
     const authorRows = await db.select({ username: playersTable.username, profileJson: playersTable.profileJson }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
     const author = authorRows[0] ?? null;
     const resolvedUsername = authorUsername ?? author?.username ?? `player_${playerId.slice(0, 6)}`;
-    const resolvedAvatarIndex = authorAvatarIndex ?? author?.profileJson?.avatarIndex ?? 1;
+    const resolvedAvatarIndex = authorAvatarIndex ?? author?.profileJson?.symbolIndex ?? author?.profileJson?.avatarIndex ?? 1;
     const resolvedRank = authorRank ?? author?.profileJson?.rank ?? "Player";
     const id = randomUUID3();
     const [created] = await db.insert(feedPostsTable).values({
