@@ -154,7 +154,7 @@ export default function MultiplayerLobby() {
     const buyIn = Math.min(chips, minBuy * 5);
     setShowQuickJoin(false);
     removeChips(buyIn);
-    quickJoin(quickTier, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1, quickVariant);
+    quickJoin(quickTier, userId, profile.username, profile.symbolIndex ?? profile.avatarIndex ?? 1, quickVariant, buyIn);
   };
 
   const handleSpectate = (item: LobbyTable) => {
