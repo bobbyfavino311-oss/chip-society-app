@@ -1,0 +1,756 @@
+Copy and paste this entire prompt into your AI builder:
+
+# CHIP SOCIETY — CRITICAL ACCOUNT, LOGIN, USERNAME, DISPLAY NAME, AND PIN SYSTEM REBUILD
+The previous instructions relating to login credentials, username changes, display names, duplicate usernames, PIN persistence, and account identity were NOT implemented.
+Do not make another visual-only change.
+Do not simply change labels on the screen.
+Do not create separate values that only exist locally on the profile page.
+This requires a complete audit and correction of the account authentication and player-identity system at the database, backend, login, registration, profile, and social-feed levels.
+Every requirement in this prompt is mandatory.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. DEFINE THE ACCOUNT FIELDS CORRECTLY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Each player account must have one canonical account record containing separate fields for:
+userId
+username
+usernameNormalized
+displayName
+pinHash
+lastUsernameChangeAt
+selectedAvatarId
+uploadedProfileImageUrl
+createdAt
+updatedAt
+Definitions:
+userId:
+A permanent internal account identifier.
+username:
+The player’s unique public @handle and login credential.
+Example:
+officialbobbyf
+Displayed publicly as:
+@officialbobbyf
+usernameNormalized:
+A lowercase normalized copy used only for uniqueness checks and login lookup.
+Example:
+OfficialBobbyF
+must normalize to:
+officialbobbyf
+displayName:
+The editable public name shown prominently on social posts and profiles.
+Example:
+Bobby
+pinHash:
+A securely hashed representation of the player’s four-digit PIN.
+Never store the raw PIN as plain text.
+lastUsernameChangeAt:
+The server timestamp of the last successful username change.
+selectedAvatarId:
+The selected built-in avatar identifier.
+uploadedProfileImageUrl:
+The permanent hosted URL for an uploaded profile picture.
+Do not merge username and displayName into one field.
+Do not create separate “social usernames.”
+One account has one username and one display name.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. USERNAME IS THE LOGIN CREDENTIAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The @username must remain the player’s account login credential.
+The same username must be used for:
+Account registration
+Login
+Account recovery lookup
+Player search
+Social profile
+Social posts
+Comments
+Followers
+Following
+Leaderboards
+Tournament results
+Gameplay identity
+Notifications
+There must not be a different username for the Social Feed.
+There must not be a separate gameplay username.
+There must not be a locally generated username.
+Everything must resolve from the same canonical account record using userId.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. DISPLAY NAME IS SEPARATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The display name is not the login credential.
+The display name may be edited from the Social Profile editor.
+Display-name rules:
+Minimum length:
+1 visible character
+Maximum length:
+15 characters
+No line breaks
+Trim leading spaces
+Trim trailing spaces
+Collapse repeated internal spaces
+Reject invisible-only names
+Display names do not need to be globally unique.
+Changing the display name must not modify:
+username
+usernameNormalized
+PIN
+login credentials
+account ID
+The Social Profile must display:
+Display Name
+and underneath:
+@username
+Example:
+Bobby
+@officialbobbyf
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. REGISTRATION MUST BLOCK DUPLICATE USERNAMES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+During account registration, the requested username must be checked against the server database before account creation.
+Do not rely on a local list.
+Do not only check usernames currently visible in the app.
+Do not perform a case-sensitive uniqueness check.
+Before creating an account:
+1. Trim whitespace.
+2. Remove any leading @ symbol.
+3. Normalize the username to lowercase.
+4. Validate the format.
+5. Query the canonical account database using usernameNormalized.
+6. Reject the registration if a matching normalized username already exists.
+7. Reserve the username only as part of an atomic account-creation transaction.
+The following must be treated as the same username:
+OfficialBobbyF
+officialbobbyf
+OFFICIALBOBBYF
+@officialbobbyf
+Only one account may own that username.
+If the username is taken, show:
+“Username unavailable. Choose another username.”
+Do not create the account.
+Do not silently add numbers.
+Do not allow the duplicate.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. USERNAME FORMAT RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Enforce these rules during registration and username changes:
+Minimum:
+3 characters
+Maximum:
+15 characters
+Allowed:
+Letters A–Z
+Letters a–z
+Numbers 0–9
+Underscore
+Not allowed:
+Spaces
+Hyphens
+Periods
+Emoji
+Symbols
+Line breaks
+Invisible characters
+Leading @ symbol in stored data
+The @ symbol is visual only and should be added by the UI.
+The stored username must not include @.
+Reject usernames that begin or end with an underscore.
+Reject repeated underscores if desired by the existing design standard.
+Reject reserved system names, including at minimum:
+admin
+administrator
+moderator
+support
+chipsociety
+chip_society
+official
+system
+staff
+developer
+null
+undefined
+deleted
+guest
+Apply the existing profanity filter if one exists.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. USERNAME CHANGE MUST ONLY OCCUR IN ACCOUNT SETTINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Do not allow username editing from the normal Social Edit Profile screen.
+The Social Edit Profile screen may edit:
+Display name
+Avatar
+Profile picture
+Biography, if supported
+The username must remain read-only there.
+Add a separate secure option in:
+Account Settings
+→ Login & Security
+→ Change Username
+The username-change screen must clearly explain:
+“Your username is your unique login credential. You may change it once every 30 days.”
+Show:
+Current username
+Last changed date
+Next eligible change date
+New username field
+Current PIN verification field
+Confirm change button
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. ENFORCE THE 30-DAY USERNAME CHANGE LIMIT ON THE SERVER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A player may successfully change their username only once every 30 days.
+This restriction must be enforced by backend/server logic.
+Do not rely only on a disabled client button.
+Do not rely only on a locally saved date.
+Calculate eligibility using the server’s current timestamp and lastUsernameChangeAt.
+Required logic:
+If lastUsernameChangeAt is null:
+The player may perform their first username change.
+If lastUsernameChangeAt exists:
+nextEligibleAt = lastUsernameChangeAt + 30 days
+If serverNow is earlier than nextEligibleAt:
+Reject the change.
+Return the exact next eligible date.
+Display:
+“You can change your username again on [DATE].”
+The client must not be able to bypass this restriction by:
+Changing the device date
+Reinstalling the app
+Clearing local storage
+Logging into another device
+Editing local state
+Calling the update function repeatedly
+The server is the authority.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. USERNAME CHANGE MUST CHECK UNIQUENESS AGAIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+When changing a username, repeat the same full uniqueness validation used during registration.
+Required sequence:
+1. Authenticate the current user.
+2. Verify the current PIN.
+3. Confirm the 30-day requirement.
+4. Normalize the requested username.
+5. Validate allowed characters and length.
+6. Check usernameNormalized against every account.
+7. Confirm it is not already owned by another userId.
+8. Atomically reserve the new username.
+9. Update username and usernameNormalized.
+10. Set lastUsernameChangeAt using the server timestamp.
+11. Save the transaction.
+12. Invalidate stale identity caches.
+13. Return the updated account identity.
+Do not update the username if any step fails.
+Do not release the old username until the transaction succeeds.
+Do not permit two simultaneous requests to claim the same username.
+Use a unique database constraint or equivalent atomic transaction.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. VERIFY THE CURRENT PIN BEFORE USERNAME CHANGES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A username change affects the account login credential.
+Require the player to enter their current four-digit PIN before confirming the change.
+The entered PIN must be verified securely against pinHash.
+Do not compare against plain-text PIN data.
+Do not reveal whether individual PIN digits are correct.
+If incorrect, show:
+“Incorrect PIN. Username was not changed.”
+Do not perform a partial update.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. PIN REGISTRATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+During account creation, require the player to enter:
+Four-digit PIN
+Confirm four-digit PIN
+Validation:
+Exactly four numerical digits
+Both fields must match
+Do not allow blank PINs
+Do not allow fewer or more than four digits
+Do not allow letters or symbols
+Before saving:
+Hash the PIN using an appropriate secure password-hashing method supported by the backend.
+Store only pinHash.
+Never store the raw PIN in:
+Local storage
+Database fields
+Logs
+Analytics
+Crash reports
+Social profile
+Client-visible account objects
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. PIN CHANGE FLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Add or repair:
+Account Settings
+→ Login & Security
+→ Change PIN
+Required fields:
+Current PIN
+New four-digit PIN
+Confirm new PIN
+Required sequence:
+1. Authenticate the current account session.
+2. Verify the current PIN against the server.
+3. Validate that the new PIN contains exactly four digits.
+4. Confirm both new-PIN fields match.
+5. Generate a new secure hash.
+6. Atomically replace pinHash.
+7. Update updatedAt using a server timestamp.
+8. Invalidate old authentication state if required.
+9. Confirm success.
+Display:
+“PIN changed successfully. Use your new PIN the next time you log in.”
+The old PIN must immediately stop working.
+The new PIN must work after:
+Logout
+App restart
+App reinstall
+Login on a different device
+Expo restart
+Production build restart
+Do not save the change only to local React state.
+Do not keep accepting the old cached PIN.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. LOGIN FLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The login screen must accept:
+Username
+Four-digit PIN
+Username login behavior:
+Trim spaces
+Remove leading @ if the player enters it
+Normalize to lowercase for account lookup
+Find the account by usernameNormalized
+PIN behavior:
+Verify the entered four-digit PIN against pinHash
+On success:
+Create or restore the authenticated session associated with the permanent userId.
+On failure:
+Show a generic message:
+“Username or PIN is incorrect.”
+Do not reveal whether the username or PIN was the incorrect field.
+Do not create a new account automatically when login fails.
+Do not silently authenticate using stale local account state.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. USERNAME CHANGE MUST AFFECT THE NEXT LOGIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After a username change succeeds:
+The old username must stop working as a login credential.
+The new username must work immediately.
+Required test:
+Original username:
+officialbobbyf
+Changed to:
+realbobbyf
+After logout:
+Login using officialbobbyf:
+Must fail.
+Login using realbobbyf:
+Must succeed with the current PIN.
+The username update must persist after:
+App restart
+Logout
+Login
+New device
+Expo reload
+Production deployment
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+14. PIN CHANGE MUST AFFECT THE NEXT LOGIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After a PIN change succeeds:
+The old PIN must stop working immediately.
+The new PIN must authenticate the account.
+Required test:
+Old PIN:
+1234
+New PIN:
+5678
+After logout:
+Login with username + 1234:
+Must fail.
+Login with username + 5678:
+Must succeed.
+Do not retain old PIN access through:
+Cache
+Local session data
+Fallback code
+Previous account object
+Development seed data
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+15. ACCOUNT RECOVERY / FORGOTTEN PIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+All forgotten PIN and account-access requests must be directed to:
+realbobbyf@chipsocietyapp.com
+On the Login screen, add or repair:
+“Forgot username or PIN?”
+When selected, open an account recovery information screen or email action.
+Display:
+“For help recovering your Chip Society account, contact realbobbyf@chipsocietyapp.com.”
+The email link must use:
+mailto:realbobbyf@chipsocietyapp.com
+Suggested subject:
+Chip Society Account Recovery Request
+Suggested body fields:
+Username, if known:
+Display name, if known:
+Approximate account creation date:
+Description of the issue:
+Do not link to an incorrect support address.
+Do not refresh the login page when selected.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+16. DO NOT ALLOW THE USERNAME TO BE EDITED FROM SOCIAL PROFILE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The Social Edit Profile screen must show:
+Display Name
+Avatar
+Uploaded profile picture
+Biography, if enabled
+The username should appear only as read-only text.
+Example:
+Username
+@officialbobbyf
+Helper text:
+“Your username is your login credential. Change it through Account Settings.”
+Do not place an editable username text input in this screen.
+Do not allow Save Profile to overwrite username.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+17. UPDATE IDENTITY EVERYWHERE AFTER A USERNAME CHANGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After the username changes, the new username must appear everywhere the account is represented.
+This includes:
+Social Profile
+Existing social posts
+New social posts
+Comments
+Replies
+Reposts
+Trending Now
+Followers
+Following
+Leaderboards
+Tournament results
+Gameplay seats
+Friend lists
+Search results
+Notifications
+Achievement share posts
+Tournament share posts
+Create Post
+Global rankings
+Player detail popups
+Use userId as the reference.
+Do not permanently depend on copied username strings stored inside individual posts.
+Preferred structure:
+A post stores authorUserId.
+When rendered, resolve the current:
+displayName
+username
+avatar
+from the canonical profile.
+If denormalized display data is required for performance, update or invalidate it after a username change.
+Do not leave old usernames visible for weeks because of stale caches.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+18. UPDATE DISPLAY NAME EVERYWHERE AFTER EDITING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+When displayName changes:
+Update it across all social and gameplay identity surfaces.
+Do not change username.
+Example:
+Before:
+Display Name:
+Bobby
+Username:
+@officialbobbyf
+After display-name edit:
+Display Name:
+Robert
+Username:
+@officialbobbyf
+The login credential remains unchanged.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+19. PREVENT DUPLICATE SOCIAL AND GAMEPLAY IDENTITIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+There must not be separate account objects for:
+Main player profile
+Social profile
+Gameplay profile
+Tournament profile
+Leaderboard profile
+All of these must reference the same userId.
+One account must own:
+One username
+One displayName
+One avatar
+One bankroll
+One authentication record
+Do not create separate copies that become inconsistent.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+20. USERNAME AND DISPLAY-NAME UI FORMATTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The username and display name must never run off-screen, stack vertically, or overlap.
+Display name maximum stored length:
+15 characters
+Username maximum stored length:
+15 characters
+Both must render on a single line.
+Use this layout:
+[Avatar] [Flexible identity text] [Fixed badge/menu]
+The text container must be allowed to shrink.
+Apply platform-equivalent behavior for:
+min-width: 0
+flex-shrink: 1
+overflow: hidden
+numberOfLines: 1
+ellipsizeMode: tail
+adjustsFontSizeToFit: true
+Rendering priority:
+1. Normal readable font size
+2. Slightly reduce font size
+3. Apply ellipsis
+Never wrap.
+Never stack characters.
+Never overlap badges.
+Never push buttons off the screen.
+Never show a username in a narrow column like:
+@off
+icial
+bobb
+yf
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+21. MIGRATE EXISTING ACCOUNTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Audit all current accounts.
+Some accounts may currently have:
+Missing usernameNormalized
+Duplicate usernames differing only by capitalization
+Username stored with @
+Display name copied into username
+Missing lastUsernameChangeAt
+PIN stored only locally
+Missing pinHash
+Perform a safe migration.
+Migration requirements:
+1. Preserve the permanent userId.
+2. Remove leading @ from stored username.
+3. Generate usernameNormalized.
+4. Detect duplicate normalized usernames.
+5. Do not silently merge different accounts.
+6. Flag duplicate conflicts for controlled resolution.
+7. Preserve displayName separately.
+8. Convert or reset insecure PIN records through a secure recovery flow.
+9. Do not lock valid users out without a recovery path.
+10. Create missing timestamps where appropriate.
+Do not delete accounts during migration.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+22. DATABASE CONSTRAINTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Add a database-level uniqueness guarantee for usernameNormalized.
+Client-side checking alone is not sufficient.
+The database must reject duplicate normalized usernames even if two devices submit the same username simultaneously.
+Required invariant:
+No two different userIds may have the same usernameNormalized.
+Add server-side validation for all username writes.
+Do not allow direct client writes that bypass validation.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+23. SECURITY AND LOGGING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Log account-identity changes securely.
+For username changes, record:
+userId
+previous username
+new username
+timestamp
+success or failure
+reason for failure
+request identifier
+Do not log PIN values.
+For PIN changes, record:
+userId
+timestamp
+success or failure
+request identifier
+Never record:
+Raw PIN
+PIN hash in analytics
+Full recovery credentials
+Rate-limit repeated login and PIN verification attempts using the available backend security system.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+24. ERROR MESSAGES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Use clear user-facing errors.
+Registration duplicate:
+“Username unavailable. Choose another username.”
+Invalid username:
+“Use 3–15 letters, numbers, or underscores.”
+Username change too early:
+“You can change your username again on [DATE].”
+Incorrect current PIN:
+“Incorrect PIN. No changes were made.”
+PIN mismatch:
+“New PIN entries do not match.”
+Invalid PIN format:
+“PIN must contain exactly four numbers.”
+Username or PIN login failure:
+“Username or PIN is incorrect.”
+Network failure:
+“Unable to update your account. Check your connection and try again.”
+Do not expose database errors or internal stack traces.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+25. DISABLE SAVE WHILE REQUEST IS PROCESSING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+For registration, username change, and PIN change:
+Disable the confirmation button while the server request is processing.
+Show a loading state.
+Prevent multiple submissions.
+Only show success after the server confirms the write.
+Do not optimistically show a username or PIN change before the server commits it.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+26. REQUIRED REGISTRATION TESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Test all of the following:
+1. Register username:
+officialbobbyf
+Expected:
+Success if available.
+2. Attempt:
+OfficialBobbyF
+Expected:
+Rejected as duplicate.
+3. Attempt:
+@officialbobbyf
+Expected:
+Leading @ removed for validation, then rejected as duplicate.
+4. Attempt a username longer than 15 characters.
+Expected:
+Rejected.
+5. Attempt spaces.
+Expected:
+Rejected.
+6. Attempt emoji.
+Expected:
+Rejected.
+7. Enter different PIN and confirmation PIN.
+Expected:
+Rejected.
+8. Enter fewer than four PIN digits.
+Expected:
+Rejected.
+9. Complete registration.
+10. Restart the app.
+11. Log in using the registered username and PIN.
+Expected:
+Same account and userId load.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+27. REQUIRED USERNAME CHANGE TESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Open Social Edit Profile.
+Expected:
+Username is read-only.
+2. Open Account Settings → Login & Security → Change Username.
+Expected:
+Secure username-change page opens.
+3. Enter an already used username.
+Expected:
+Rejected.
+4. Enter a unique username with incorrect PIN.
+Expected:
+Rejected and no account data changes.
+5. Enter a unique username with correct PIN.
+Expected:
+Username changes successfully.
+6. Confirm lastUsernameChangeAt is set by the server.
+7. Attempt another username change immediately.
+Expected:
+Rejected with next eligible date.
+8. Change the device clock forward 30 days.
+Expected:
+Still rejected because server time is authoritative.
+9. Logout.
+10. Attempt login with old username.
+Expected:
+Failure.
+11. Login with new username and current PIN.
+Expected:
+Success.
+12. Restart app and confirm new username remains everywhere.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+28. REQUIRED PIN CHANGE TESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Open Change PIN.
+2. Enter incorrect current PIN.
+Expected:
+Rejected.
+3. Enter correct current PIN and mismatched new PIN confirmation.
+Expected:
+Rejected.
+4. Enter correct current PIN and matching valid new PIN.
+Expected:
+Success.
+5. Logout.
+6. Login with old PIN.
+Expected:
+Failure.
+7. Login with new PIN.
+Expected:
+Success.
+8. Restart app.
+9. Confirm new PIN still works.
+10. Test on another device or clean install.
+Expected:
+New PIN works because the server record was updated.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+29. REQUIRED IDENTITY CONSISTENCY TESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After changing the display name, username, or avatar, inspect:
+Home Trending feed
+Full Social Feed
+Player Social Profile
+Create Post
+Comments
+Followers
+Following
+Leaderboards
+Live gameplay seats
+AI gameplay identity where the player is shown
+Tournament lobby
+Tournament results
+Tournament-share composer
+Achievement-share composer
+Notifications
+Player search
+Expected:
+Same userId
+Current displayName
+Current username
+Current avatar
+No old identity data
+No separate social account
+No stacked or overflowing text
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+30. FINAL ACCEPTANCE CRITERIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Do not mark this task complete until all of the following are verified:
+✅ Registration checks username uniqueness against the backend.
+✅ Usernames are case-insensitively unique.
+✅ A database-level unique constraint prevents duplicate normalized usernames.
+✅ Usernames contain 3–15 valid characters.
+✅ Display names contain no more than 15 characters.
+✅ Username and display name are stored separately.
+✅ Username remains the login credential.
+✅ Social Edit Profile cannot directly change the username.
+✅ Username changes occur only through Account Settings.
+✅ Username changes require the current PIN.
+✅ Username changes are limited to once every 30 days using server time.
+✅ The old username stops working after a successful change.
+✅ The new username works immediately at the next login.
+✅ PIN changes require verification of the current PIN.
+✅ The old PIN stops working after a successful change.
+✅ The new PIN persists after logout, restart, reinstall, and another device login.
+✅ PINs are never stored as plain text.
+✅ Forgot PIN and account recovery directs users to realbobbyf@chipsocietyapp.com.
+✅ Social Feed, gameplay, leaderboards, tournaments, and profiles all use one canonical account identity.
+✅ Usernames and display names never wrap, stack, overlap, or run off the screen.
+✅ Existing accounts are migrated safely.
+✅ No client-only workaround is used for security-critical restrictions.
+FINAL GOAL:
+Rebuild the Chip Society identity and authentication system so each player has one secure account, one permanent userId, one globally unique username used for login, one editable display name, one persistent avatar, and one securely stored PIN.
+The system must remain consistent across every screen, survive logout and restart, prevent duplicate usernames, enforce the 30-day username-change restriction on the server, and never allow local profile editing to bypass account security.

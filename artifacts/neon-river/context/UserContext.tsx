@@ -286,6 +286,7 @@ interface UserContextValue {
   signOut: () => Promise<void>;
   changePin: (oldPin: string, newPin: string) => Promise<{ success: boolean; error?: string }>;
   forgotPin: (username: string, email: string, newPin: string) => Promise<{ success: boolean; error?: string }>;
+  changeUsername: (newUsername: string, pin: string) => Promise<{ success: boolean; error?: string; nextEligibleAt?: string }>;
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   canClaimWheel: boolean;
   nextWheelIn: number;
@@ -473,6 +474,26 @@ async function serverForgotPin(username: string, email: string, newPin: string):
     return { success: true };
   } catch {
     return { success: false, error: 'Could not reach server.' };
+  }
+}
+
+async function serverChangeUsername(
+  playerId: string, newUsername: string, pin: string,
+): Promise<{ success: boolean; username?: string; usernameChangedAt?: string; error?: string; nextEligibleAt?: string }> {
+  try {
+    const r = await fetch(`${getApiBase()}/auth/change-username`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerId, newUsername, pin }),
+    });
+    const d = await r.json() as {
+      success?: boolean; username?: string; usernameChangedAt?: string;
+      error?: string; nextEligibleAt?: string;
+    };
+    if (!r.ok) return { success: false, error: d.error, nextEligibleAt: d.nextEligibleAt };
+    return { success: true, username: d.username, usernameChangedAt: d.usernameChangedAt };
+  } catch {
+    return { success: false, error: 'Unable to update your account. Check your connection and try again.' };
   }
 }
 
@@ -881,8 +902,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     avatarIndex: number,
     referrerUsername?: string,
   ): Promise<{ success: boolean; error?: string }> => {
-    if (username.length < 3) return { success: false, error: 'Username must be at least 3 characters.' };
-    if (username.length > 20) return { success: false, error: 'Username must be under 20 characters.' };
+    if (username.length < 3) return { success: false, error: 'Use 3–15 letters, numbers, or underscores.' };
+    if (username.length > 15) return { success: false, error: 'Use 3–15 letters, numbers, or underscores.' };
     if (!/^[a-zA-Z0-9_]+$/.test(username)) return { success: false, error: 'Only letters, numbers, and underscores.' };
     if (hasProfanity(username)) return { success: false, error: 'That username is not allowed.' };
     if (isReserved(username)) return { success: false, error: 'That username is reserved.' };
@@ -1048,15 +1069,41 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const changePin = useCallback(async (oldPin: string, newPin: string): Promise<{ success: boolean; error?: string }> => {
-    if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'New PIN must be exactly 4 digits.' };
+    if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'PIN must contain exactly four numbers.' };
     if (!profile.playerId) return { success: false, error: 'Account not found. Please sign in again.' };
     return serverChangePin(profile.playerId, oldPin, newPin);
   }, [profile.playerId]);
 
   const forgotPin = useCallback(async (username: string, email: string, newPin: string): Promise<{ success: boolean; error?: string }> => {
-    if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'New PIN must be exactly 4 digits.' };
+    if (!/^\d{4}$/.test(newPin)) return { success: false, error: 'PIN must contain exactly four numbers.' };
     return serverForgotPin(username, email, newPin);
   }, []);
+
+  const changeUsername = useCallback(async (
+    newUsername: string,
+    pin: string,
+  ): Promise<{ success: boolean; error?: string; nextEligibleAt?: string }> => {
+    if (!profile.playerId) return { success: false, error: 'Account not found. Please sign in again.' };
+    const res = await serverChangeUsername(profile.playerId, newUsername, pin);
+    if (res.success && res.username) {
+      // Atomically update local profile and creds with new username
+      const updated = { ...profile, username: res.username, usernameChangedAt: res.usernameChangedAt };
+      setProfile(updated);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      // Update cached credentials so offline sign-in uses the new username
+      try {
+        const raw = await AsyncStorage.getItem(LOCAL_CREDS_KEY);
+        if (raw) {
+          const creds = JSON.parse(raw) as { username: string; pin?: string; playerId?: string };
+          await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({
+            ...creds,
+            username: res.username.toLowerCase(),
+          }));
+        }
+      } catch { /* ignore */ }
+    }
+    return { success: res.success, error: res.error, nextEligibleAt: res.nextEligibleAt };
+  }, [profile, save]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const signOut = useCallback(async () => {
     // Flush to server immediately before clearing session
@@ -1348,7 +1395,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
       awardRankedPoints, claimWheelSpin, useScratchTicket, consumeScratchTickets, addScratchTickets,
       completeTutorial, registerAccount, signIn, signOut,
-      changePin, forgotPin, checkUsernameAvailable,
+      changePin, forgotPin, changeUsername, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,
       canClaimFreeCookie, nextCookieIn,

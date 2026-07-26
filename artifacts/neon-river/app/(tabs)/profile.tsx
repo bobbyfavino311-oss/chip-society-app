@@ -12,7 +12,6 @@ import {
   Share,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -260,8 +259,6 @@ export default function ProfileScreen() {
   const { unlockedIds } = useAchievements();
   const { following } = useSocial();
   const socialFollowingCount = following.size;
-  const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(profile.username);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
 
@@ -286,12 +283,6 @@ export default function ProfileScreen() {
       ])
     ).start();
   }, []);
-
-  const saveName = async () => {
-    if (name.trim().length === 0) return;
-    await updateProfile({ username: name.trim() });
-    setEditing(false);
-  };
 
   const pickAvatar = async () => {
     if (Platform.OS !== 'web') {
@@ -366,34 +357,27 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {editing ? (
-            <View style={styles.editRow}>
-              <TextInput
-                style={styles.nameInput}
-                value={name}
-                onChangeText={setName}
-                maxLength={20}
-                autoFocus
-                placeholderTextColor={c.textDim}
-                selectionColor={c.primary}
-              />
-              <TouchableOpacity style={styles.saveBtn} onPress={saveName}>
-                <Ionicons name="checkmark" size={20} color={c.primary} />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity style={styles.nameRow} onPress={() => setEditing(true)}>
-              <Text style={[styles.username, { color: cardTheme.numColor, textShadowColor: cardTheme.glowColor, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10 }]}>
-                {profile.username}
+          {/* Display name + @username — read-only; username changes via Account Settings */}
+          <View style={{ alignItems: 'center', gap: 2 }}>
+            <View style={styles.nameRow}>
+              <Text
+                style={[styles.username, { color: cardTheme.numColor, textShadowColor: cardTheme.glowColor, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10 }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                adjustsFontSizeToFit
+              >
+                {profile.displayName || profile.username}
               </Text>
               {profile.isFounder && (
                 <View style={styles.founderBadge}>
                   <Text style={styles.founderBadgeText}>👑 FOUNDER</Text>
                 </View>
               )}
-              <Ionicons name="pencil" size={12} color={`${cardTheme.numColor}88`} style={{ marginLeft: 8 }} />
-            </TouchableOpacity>
-          )}
+            </View>
+            <Text style={{ color: `${cardTheme.numColor}70`, fontSize: 11, fontFamily: 'Orbitron_400Regular', letterSpacing: 1 }} numberOfLines={1} ellipsizeMode="tail">
+              @{profile.username}
+            </Text>
+          </View>
 
           <View style={[styles.rankBadge, { borderColor: cardTheme.cardBorder + '80', backgroundColor: cardTheme.cardBorder + '14' }]}>
             <Text style={[styles.rankText, { color: cardTheme.cardBorder, letterSpacing: 2.5 }]}>{profile.rank}</Text>
@@ -670,6 +654,27 @@ export default function ProfileScreen() {
             <Text style={achStyles.achSub}>{unlockedIds.size} / {ALL_ACHIEVEMENTS.length} unlocked · {claimedCount}% complete</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.7)" />
+        </TouchableOpacity>
+
+        {/* Login & Security — Change Username */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={() => router.push('/profile/change-username' as any)}
+        >
+          <LinearGradient
+            colors={['rgba(191,95,255,0.10)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={[achStyles.iconWrap, { backgroundColor: 'rgba(191,95,255,0.10)' }]}>
+            <Ionicons name="at-outline" size={20} color="rgba(191,95,255,0.85)" />
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>CHANGE USERNAME</Text>
+            <Text style={achStyles.achSub}>Login & Security · once every 30 days</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.5)" />
         </TouchableOpacity>
 
         {/* Change PIN */}
@@ -1022,25 +1027,6 @@ const styles = StyleSheet.create({
     color: '#FFD700', fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 1,
   },
   username: { color: colors.text, fontSize: 17, fontWeight: '700', fontFamily: 'Orbitron_700Bold' },
-  editRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  nameInput: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '700',
-    borderBottomWidth: 2,
-    borderBottomColor: colors.primary,
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-    minWidth: 150,
-  },
-  saveBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primaryDim,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   rankBadge: {
     borderWidth: 1,
     borderRadius: 20,
