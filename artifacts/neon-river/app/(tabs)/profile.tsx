@@ -261,6 +261,7 @@ export default function ProfileScreen() {
   const socialFollowingCount = following.size;
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
+  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
 
   const claimedCount = achievementCompletion(unlockedIds);
   const { theme: tableTheme } = useTableTheme();
@@ -340,9 +341,9 @@ export default function ProfileScreen() {
               onPress={() => router.push('/profile/photo-select')}
               activeOpacity={0.85}
             >
-              {profile.profileImageType === 'custom' && profile.avatarUri ? (
+              {profile.profileImageType === 'custom' && profile.avatarUri && !avatarImgFailed ? (
                 <View style={[styles.avatar, { borderColor: rankColor, shadowColor: rankColor }]}>
-                  <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} />
+                  <Image source={{ uri: profile.avatarUri }} style={styles.avatarImage} onError={() => setAvatarImgFailed(true)} />
                 </View>
               ) : (
                 <NeonAvatar

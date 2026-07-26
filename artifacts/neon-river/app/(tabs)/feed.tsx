@@ -271,6 +271,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
   const [loadingComments, setLoadingComments] = useState(false);
   const [myComment, setMyComment] = useState('');
   const [showMenu,  setShowMenu]  = useState(false);
+  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
 
   const isOwn      = post.authorId === profile.playerId ||
     (!!profile.username && profile.username !== 'CS_Player' && post.authorUsername === profile.username);
@@ -339,8 +340,12 @@ function LivePostCard({ post }: { post: FeedPost }) {
       {/* Header */}
       <View style={cd.header}>
         <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-          {isOwn && profile.profileImageType === 'custom' && profile.avatarUri ? (
-            <Image source={{ uri: profile.avatarUri }} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }} />
+          {isOwn && profile.profileImageType === 'custom' && profile.avatarUri && !avatarImgFailed ? (
+            <Image
+              source={{ uri: profile.avatarUri }}
+              style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
+              onError={() => setAvatarImgFailed(true)}
+            />
           ) : (
             <NeonAvatar avatarId={isOwn ? (profile.symbolIndex ?? profile.avatarIndex ?? post.authorAvatarIndex ?? 1) : (post.authorAvatarIndex ?? 1)} size={44} />
           )}
@@ -495,6 +500,7 @@ function PostCard({ post }: { post: SocialPost }) {
   const [showMenu, setShowMenu]           = useState(false);
   const [showReport, setShowReport]       = useState(false);
   const [showComments, setShowComments]   = useState(false);
+  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
   const [myComment, setMyComment]         = useState('');
   const [localComments, setLocalComments] = useState<LocalComment[]>([]);
 
@@ -569,12 +575,16 @@ function PostCard({ post }: { post: SocialPost }) {
           if (post.playerId === 'me') { router.push('/(tabs)/profile'); return; }
           router.push(`/social/player-profile?id=${post.playerId}`);
         }}>
-          {post.playerId === 'me' && profile.profileImageType === 'custom' && profile.avatarUri
-            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }} />
+          {post.playerId === 'me' && profile.profileImageType === 'custom' && profile.avatarUri && !avatarImgFailed
+            ? <Image
+                source={{ uri: profile.avatarUri }}
+                style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
+                onError={() => setAvatarImgFailed(true)}
+              />
             : <NeonAvatar
                 avatarId={
                   post.playerId === 'me'
-                    ? (profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1)
+                    ? (profile.symbolIndex ?? profile.avatarIndex ?? 1)
                     : (player?.avatarId ?? 1)
                 }
                 size={44}
@@ -1141,6 +1151,7 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
   const [cat, setCat] = useState<typeof LB_CATS[number]['id']>('chips');
   const { profile } = useUser();
   const [realPlayers, setRealPlayers] = useState<SearchPlayer[]>([]);
+  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
 
   useEffect(() => {
     searchPlayers('').then(setRealPlayers).catch(() => {});
@@ -1246,9 +1257,9 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
                   : <Text style={lb.rankNum}>{i + 1}</Text>
                 }
               </View>
-              {isMe && profile.profileImageType === 'custom' && profile.avatarUri
-                ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: colors.primary }} />
-                : <NeonAvatar avatarId={entry.player.avatarId ?? 1} size={34} />
+              {isMe && profile.profileImageType === 'custom' && profile.avatarUri && !avatarImgFailed
+                ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: colors.primary }} onError={() => setAvatarImgFailed(true)} />
+                : <NeonAvatar avatarId={isMe ? (profile.symbolIndex ?? profile.avatarIndex ?? 1) : (entry.player.avatarId ?? 1)} size={34} />
               }
               <View style={{ flex: 1 }}>
                 <Text style={lb.username}>{entry.player.username}</Text>
@@ -1546,6 +1557,7 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
   const [pot, setPot] = useState('');
   const [hand, setHand] = useState('');
   const [showOpts, setShowOpts] = useState(false);
+  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   const meAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
@@ -1590,8 +1602,8 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
             </TouchableOpacity>
           </View>
           <View style={cmp.authorRow}>
-            {profile.profileImageType === 'custom' && profile.avatarUri
-            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.primary }} />
+            {profile.profileImageType === 'custom' && profile.avatarUri && !avatarImgFailed
+            ? <Image source={{ uri: profile.avatarUri }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.primary }} onError={() => setAvatarImgFailed(true)} />
             : <NeonAvatar avatarId={meAvatarId} size={36} />
           }
             <View>
@@ -1852,6 +1864,7 @@ function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts:
   const { allPosts: livePosts } = useLiveFeed();
   const [subTab, setSubTab] = useState<'posts' | 'reposts' | 'likes'>('posts');
   const [showEditor, setShowEditor] = useState(false);
+  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
 
   const meAvatarId = profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1;
   const neonCol = getNeonAvatar(meAvatarId).color;
@@ -1883,8 +1896,8 @@ function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts:
       <View style={me.profileHeader}>
         <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />
         <View style={me.avatarWrap}>
-          {avatarType === 'custom' && profile.avatarUri ? (
-            <Image source={{ uri: profile.avatarUri }} style={[me.bigAvatar, { borderColor: colors.primary }]} />
+          {avatarType === 'custom' && profile.avatarUri && !avatarImgFailed ? (
+            <Image source={{ uri: profile.avatarUri }} style={[me.bigAvatar, { borderColor: colors.primary }]} onError={() => setAvatarImgFailed(true)} />
           ) : (
             <NeonAvatar
               avatarId={profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1}
