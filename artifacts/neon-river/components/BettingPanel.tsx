@@ -28,10 +28,11 @@ interface BettingPanelProps {
 
 const HANDLE_SIZE = 22;
 
-const fmt = (n: number) => {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
+const fmt = (n: number | null | undefined): string => {
+  const v = (typeof n === 'number' && isFinite(n)) ? n : 0;
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
+  return String(v);
 };
 
 // ─── Dragon raise label ornaments ─────────────────────────────────────────────

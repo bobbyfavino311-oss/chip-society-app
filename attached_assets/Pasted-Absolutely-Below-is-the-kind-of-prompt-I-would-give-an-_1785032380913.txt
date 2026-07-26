@@ -1,0 +1,744 @@
+Absolutely. Below is the kind of prompt I would give an AI developer. It is written as a build directive, not a simple bug list. It explains exactly what is wrong, what the expected behavior is, what systems need to be audited, and what constitutes a passing fix.
+
+⸻
+
+CHIP SOCIETY – BUILD BLOCKER BUG FIXES (DO NOT SKIP ANY ITEM)
+
+THIS IS A CRITICAL BUILD STABILIZATION UPDATE
+
+Do NOT redesign unrelated UI.
+
+Do NOT create temporary workarounds.
+
+Do NOT patch only the screen where the bug appears.
+
+Most of these issues indicate shared component, shared state, or shared data-binding problems. Fix the underlying architecture so these issues cannot reappear elsewhere.
+
+Every issue below must be individually verified on:
+
+* Expo
+* Physical iPhone
+* Physical Android
+* Fresh account
+* Existing account
+* Logout/Login
+* App restart
+* Slow network
+* Production build
+
+⸻
+
+1. LIVE POKER BANKROLL INITIALIZATION IS BROKEN (CRITICAL)
+
+The Live Poker system is currently unusable.
+
+When entering ANY Live Poker table, the player’s chip balance initializes as:
+
+0
+
+instead of their actual bankroll.
+
+The betting controls then display:
+
+CALL
+null
+
+which means the table is trying to render betting values before player financial data has been initialized.
+
+This affects:
+
+* Traditional Hold’em
+* Omaha
+* Short Deck
+* Joker Hold’em
+* Private Tables
+* Join Table
+* Create Table
+* Join By Code
+* Any future Live Poker variant
+
+⸻
+
+Required Fix
+
+Before a player is seated:
+
+Load:
+
+* userId
+* bankroll
+* selected buy-in
+* table stake
+* current stack
+
+from the authenticated player account.
+
+Never initialize stack using:
+
+0
+null
+undefined
+placeholder data
+AI table defaults
+cached values
+
+If bankroll cannot be retrieved:
+
+DO NOT seat the player.
+
+Instead display:
+
+Unable to load your bankroll.
+Please reconnect.
+
+⸻
+
+Validation
+
+Before gameplay begins:
+
+Confirm:
+
+playerStack > 0
+currentBet initialized
+callAmount initialized
+pot initialized
+
+If any value is missing:
+
+Abort table initialization.
+
+Never display:
+
+CALL null
+0 chips
+NaN
+undefined
+
+⸻
+
+2. PLAYER AVATAR SYSTEM IS BROKEN
+
+The avatar system is no longer using one source of truth.
+
+Current issues:
+
+Uploaded avatars fail.
+
+Some built-in avatars load.
+
+Others do not.
+
+Gameplay avatar differs from profile.
+
+Social Feed avatar differs.
+
+Trending differs.
+
+Leaderboards differ.
+
+Create Post differs.
+
+Tournament results differ.
+
+⸻
+
+Required Fix
+
+Create ONE global avatar resolver.
+
+Every screen must request:
+
+resolvePlayerAvatar(userId)
+
+Priority:
+
+1. Uploaded profile picture
+2. Selected built-in avatar
+3. Default avatar
+
+No screen may have separate avatar logic.
+
+Audit:
+
+* asset paths
+* Expo asset loading
+* cache invalidation
+* cloud image URLs
+* avatar IDs
+* production bundle imports
+
+Every built-in avatar must be tested individually.
+
+⸻
+
+3. EDIT PROFILE SCREEN IS BROKEN
+
+Current behavior:
+
+Tapping:
+
+Edit Profile
+
+does NOT open a usable editor.
+
+Instead:
+
+The editor becomes trapped at the bottom of the screen.
+
+It cannot be used.
+
+⸻
+
+Required Fix
+
+The Social Edit Profile screen must become a true modal or dedicated page.
+
+It must:
+
+Respect Safe Areas
+
+Be fully scrollable
+
+Support keyboard
+
+Never render beneath bottom navigation
+
+Never appear partially off-screen
+
+Must include:
+
+Display Name
+
+Avatar
+
+Biography (if enabled)
+
+Save
+
+Cancel
+
+⸻
+
+4. DISPLAY NAME CHARACTER LIMIT
+
+Reduce maximum display name length.
+
+Current:
+
+24
+
+New Maximum:
+
+15 characters
+
+This affects:
+
+Profile
+
+Social Feed
+
+Gameplay
+
+Comments
+
+Followers
+
+Following
+
+Leaderboard
+
+Tournament Results
+
+Chat
+
+Notifications
+
+Search
+
+Trending
+
+⸻
+
+5. DISPLAY NAME / USERNAME LAYOUT ENGINE
+
+The layout engine is still broken.
+
+Usernames continue to:
+
+Run off cards
+
+Wrap
+
+Stack vertically
+
+Disappear
+
+Overlap badges
+
+Push timestamps away
+
+This is NOT acceptable.
+
+⸻
+
+Required Behavior
+
+No identity text may EVER:
+
+Wrap
+
+Stack
+
+Leave container
+
+Overlap badge
+
+Overlap timestamp
+
+Overlap menu button
+
+Cover avatar
+
+Use adaptive sizing.
+
+Priority:
+
+Normal font
+
+↓
+
+Reduce font slightly
+
+↓
+
+Ellipsis
+
+Never wrap.
+
+Never stack.
+
+Examples:
+
+GOOD
+
+officialbobbyf
+
+↓
+
+officialbobb…
+
+BAD
+
+official
+
+bobby
+
+f
+
+⸻
+
+6. GLOBAL TEXT AUTO-SIZING
+
+Create a reusable component.
+
+All player names must dynamically measure available space.
+
+Use:
+
+Avatar
+
+↓
+
+Flexible Identity Column
+
+↓
+
+Fixed Badge Area
+
+Identity column:
+
+Shrinks
+
+Badge does NOT
+
+Text automatically scales.
+
+Apply everywhere.
+
+⸻
+
+7. CHAT / CREATE POST KEYBOARD BUG
+
+Still broken.
+
+Keyboard covers:
+
+Gameplay Chat
+
+Create Post
+
+Tournament Share
+
+Achievement Share
+
+Comment box
+
+User cannot see:
+
+Cursor
+
+Typed text
+
+Post button
+
+Bottom lines
+
+⸻
+
+Required Fix
+
+When keyboard appears:
+
+Move entire compose area upward.
+
+Maintain visibility.
+
+Auto-scroll while typing.
+
+Respect keyboard height.
+
+Respect safe area.
+
+Apply globally.
+
+⸻
+
+8. GO BACK BUTTON BROKEN
+
+Leaving Live Poker…
+
+↓
+
+Go Back
+
+↓
+
+Player becomes trapped at:
+
+Join Table
+
+Create Table
+
+Join By Code
+
+Instead of returning:
+
+Play Page
+
+⸻
+
+Required Fix
+
+Go Back should explicitly navigate to:
+
+Play
+
+NOT rely on navigation history.
+
+Before leaving:
+
+Disconnect table
+
+Leave room
+
+Clear listeners
+
+Clear subscriptions
+
+Clear matchmaking
+
+Clear session
+
+Preserve bankroll
+
+Navigate Play
+
+⸻
+
+9. ULTIMATE TEXAS HOLD’EM RULES
+
+Rules now appear.
+
+BUT:
+
+Cannot scroll.
+
+⸻
+
+Required Fix
+
+Rules modal:
+
+Scrollable
+
+Momentum scrolling
+
+Fixed header
+
+Fixed close button
+
+Gameplay blocked underneath
+
+Safe Area
+
+No clipping
+
+Entire rulebook accessible.
+
+⸻
+
+10. BLACKJACK HAS NO RULES
+
+Blackjack currently lacks an Information system.
+
+Create one.
+
+⸻
+
+Information Button
+
+Place beside:
+
+Shoe Count
+
+Upper-right corner.
+
+Use circular:
+
+i
+
+icon.
+
+⸻
+
+Blackjack Rules
+
+Include:
+
+Objective
+
+Card Values
+
+Dealer Rules
+
+Hit
+
+Stand
+
+Double
+
+Split
+
+Insurance (only if implemented)
+
+Surrender (only if implemented)
+
+Dealer Blackjack
+
+Soft 17
+
+Bust
+
+Winning
+
+Push
+
+Natural Blackjack
+
+Blackjack payout
+
+Current side bets
+
+Current paytables
+
+Current table limits
+
+Current betting rules
+
+These MUST reflect actual game logic.
+
+Do NOT invent rules.
+
+⸻
+
+11. NULL VALUES APPEARING
+
+Current screenshot shows:
+
+Player Stack
+
+↓
+
+0
+
+Opponent values
+
+↓
+
+null
+
+Call Button
+
+↓
+
+null
+
+This should NEVER happen.
+
+Search entire project.
+
+No UI may ever display:
+
+null
+
+undefined
+
+NaN
+
+Blank currency
+
+Blank chip values
+
+Placeholder financial data
+
+Validate every binding.
+
+⸻
+
+12. EDIT PROFILE DATA MODEL
+
+Display Name
+
+and
+
+@Username
+
+must remain separate.
+
+Display Name
+
+Editable
+
+15 characters
+
+Username
+
+Login credential
+
+Read-only
+
+Unique
+
+Cannot casually change.
+
+⸻
+
+13. SOCIAL FEED IDENTITY
+
+There should NEVER be separate identities.
+
+One account.
+
+One:
+
+userId
+
+One:
+
+username
+
+One:
+
+displayName
+
+One:
+
+avatar
+
+Every screen references the same player.
+
+⸻
+
+14. VERIFY BUILT-IN AVATARS
+
+Test:
+
+EVERY built-in avatar.
+
+One-by-one.
+
+Confirm:
+
+Correct asset
+
+Correct import
+
+Correct path
+
+Correct production bundle
+
+Correct Expo loading
+
+No missing IDs
+
+No duplicate IDs
+
+⸻
+
+15. VERIFY CUSTOM PROFILE PICTURES
+
+Upload image.
+
+Restart app.
+
+Logout.
+
+Login.
+
+Play game.
+
+Open Social Feed.
+
+Open Leaderboard.
+
+Create Post.
+
+Comment.
+
+Tournament Results.
+
+Avatar must remain identical everywhere.
+
+⸻
+
+FINAL ACCEPTANCE TEST
+
+This build is NOT COMPLETE until every item below passes on a physical mobile device:
+
+* ✅ Live Poker loads the correct bankroll and never shows 0 or CALL null.
+* ✅ Opponent stacks and betting values never render null, undefined, or NaN.
+* ✅ Uploaded avatars load consistently after restart, logout/login, and cloud sync.
+* ✅ Every built-in avatar loads correctly in Expo and production.
+* ✅ The Social Edit Profile screen opens as a full, usable editor.
+* ✅ Display names are limited to 15 characters.
+* ✅ Usernames and display names never wrap, stack, clip, or overlap on any screen.
+* ✅ Adaptive text sizing works across the entire app.
+* ✅ All chat and post composers stay above the keyboard while typing.
+* ✅ The Go Back button always returns the player to the main Play page after leaving a table.
+* ✅ Ultimate Texas Hold’em rules are fully scrollable.
+* ✅ Blackjack has a complete Information button and fully functional, scrollable rules screen.
+* ✅ One global identity model is used everywhere (userId, displayName, username, avatar).
+* ✅ Every gameplay, social, leaderboard, tournament, and profile screen reflects the same current player identity.
+
+Do not mark this build as complete until every issue above has been reproduced, fixed at the source, and verified on physical devices—not just the simulator.

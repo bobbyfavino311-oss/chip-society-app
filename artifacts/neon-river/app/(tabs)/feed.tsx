@@ -1672,6 +1672,7 @@ const cmp = StyleSheet.create({
 
 function SocialProfileEditorSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { profile, updateProfile } = useUser();
+  const { bottom: bottomInset } = useSafeAreaInsets();
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [saving, setSaving] = useState(false);
@@ -1683,7 +1684,7 @@ function SocialProfileEditorSheet({ visible, onClose }: { visible: boolean; onCl
     }
   }, [visible, profile.displayName, profile.username, profile.bio]);
 
-  const canSave = displayName.trim().length >= 1 && displayName.trim().length <= 24;
+  const canSave = displayName.trim().length >= 1 && displayName.trim().length <= 15;
 
   async function handleSave() {
     const name = displayName.trim().replace(/\s+/g, ' ');
@@ -1713,24 +1714,24 @@ function SocialProfileEditorSheet({ visible, onClose }: { visible: boolean; onCl
                   <Text style={[spe.saveText, (!canSave || saving) && { opacity: 0.4 }]}>Save</Text>
                 </TouchableOpacity>
               </View>
-              <ScrollView style={{ flex: 1 }} contentContainerStyle={spe.body} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              <ScrollView style={{ flex: 1 }} contentContainerStyle={[spe.body, { paddingBottom: bottomInset + 40 }]} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 {/* Display Name */}
                 <Text style={spe.label}>DISPLAY NAME</Text>
                 <View style={spe.inputWrap}>
                   <TextInput
                     style={spe.input}
                     value={displayName}
-                    onChangeText={t => setDisplayName(t.replace(/[\n\r]/g, '').slice(0, 24))}
+                    onChangeText={t => setDisplayName(t.replace(/[\n\r]/g, '').slice(0, 15))}
                     placeholder="Your display name"
                     placeholderTextColor={colors.textDim}
-                    maxLength={24}
+                    maxLength={15}
                     autoCapitalize="words"
                     selectionColor={colors.primary}
                     returnKeyType="done"
                   />
-                  <Text style={spe.charCount}>{Math.max(0, 24 - displayName.trim().length)}</Text>
+                  <Text style={spe.charCount}>{Math.max(0, 15 - displayName.trim().length)}</Text>
                 </View>
-                <Text style={spe.hint}>Shown on posts and your profile. 1–24 characters.</Text>
+                <Text style={spe.hint}>Shown on posts and your profile. 1–15 characters.</Text>
 
                 {/* Bio */}
                 <Text style={[spe.label, { marginTop: 22 }]}>BIO</Text>

@@ -38,12 +38,13 @@ export const HAND_COLORS: Record<string, string> = {
   'High Card':      '#666688',
 };
 
-export function formatChips(n: number): string {
+export function formatChips(n: number | null | undefined): string {
+  const num = (typeof n === 'number' && isFinite(n)) ? n : 0;
   const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${v(n / 1_000)}K`;
-  return String(n);
+  if (num >= 1_000_000_000) return `${v(num / 1_000_000_000)}B`;
+  if (num >= 1_000_000)     return `${v(num / 1_000_000)}M`;
+  if (num >= 1_000)         return `${v(num / 1_000)}K`;
+  return String(num);
 }
 
 // ─── Community cards ──────────────────────────────────────────────────────────

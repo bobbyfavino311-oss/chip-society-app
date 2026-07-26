@@ -359,6 +359,120 @@ const dll = StyleSheet.create({
   text: { fontSize: 10, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.55)', letterSpacing: 0.5, textAlign: 'center' },
 });
 
+// ─── Blackjack Rules Modal ────────────────────────────────────────────────────
+function BlackjackRulesModal({ visible, onClose, numDecks, minBet, maxBet }: {
+  visible: boolean; onClose: () => void;
+  numDecks: number; minBet: number; maxBet: number;
+}) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={bjr.overlay}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
+        <View style={bjr.sheet}>
+          <LinearGradient colors={['#050014', '#0a001e']} style={StyleSheet.absoluteFill} />
+          {/* Fixed header */}
+          <View style={bjr.header}>
+            <View>
+              <Text style={bjr.title}>BLACKJACK</Text>
+              <Text style={bjr.subtitle}>HOW TO PLAY</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} style={bjr.closeBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="close" size={22} color="rgba(255,255,255,0.6)" />
+            </TouchableOpacity>
+          </View>
+          <ScrollView showsVerticalScrollIndicator={false} bounces style={{ flex: 1 }} contentContainerStyle={bjr.body}>
+            {/* Objective */}
+            <Text style={bjr.sectionTitle}>OBJECTIVE</Text>
+            <Text style={bjr.bodyText}>
+              Beat the Dealer by getting a hand total closer to 21 without going over. If you bust (exceed 21) you lose instantly, even if the Dealer also busts.
+            </Text>
+
+            {/* Card Values */}
+            <Text style={bjr.sectionTitle}>CARD VALUES</Text>
+            {[
+              ['2 – 10', 'Face value'],
+              ['J, Q, K', '10'],
+              ['Ace', '1 or 11 (whichever benefits the hand)'],
+            ].map(([h, v]) => (
+              <View key={h} style={bjr.row}>
+                <Text style={bjr.rowLabel}>{h}</Text>
+                <Text style={bjr.rowValue}>{v}</Text>
+              </View>
+            ))}
+
+            {/* Table Rules */}
+            <Text style={bjr.sectionTitle}>TABLE RULES</Text>
+            {[
+              ['Decks', `${numDecks}`],
+              ['Blackjack pays', '3 : 2'],
+              ['Dealer', 'Stands on all 17s (including soft 17)'],
+              ['Double Down', 'First 2 cards only'],
+              ['Split', 'Matching rank, 2 cards only'],
+              ['Insurance', 'Not offered'],
+              ['Surrender', 'Not offered'],
+              ['Table Min', fmt(minBet)],
+              ['Table Max', fmt(maxBet)],
+            ].map(([h, v]) => (
+              <View key={h} style={bjr.row}>
+                <Text style={bjr.rowLabel}>{h}</Text>
+                <Text style={bjr.rowValue}>{v}</Text>
+              </View>
+            ))}
+
+            {/* Actions */}
+            <Text style={bjr.sectionTitle}>PLAYER ACTIONS</Text>
+            {[
+              ['HIT', 'Take another card.'],
+              ['STAND', 'End your turn with your current total.'],
+              ['DOUBLE', 'Double your bet and receive exactly one more card. Available on your first 2 cards only.'],
+              ['SPLIT', 'Split a matching pair into two separate hands, each requiring an equal bet. Available once per hand.'],
+            ].map(([h, v]) => (
+              <View key={h} style={bjr.actionRow}>
+                <Text style={bjr.actionLabel}>{h}</Text>
+                <Text style={bjr.actionDesc}>{v}</Text>
+              </View>
+            ))}
+
+            {/* Outcomes */}
+            <Text style={bjr.sectionTitle}>OUTCOMES</Text>
+            {[
+              ['Natural Blackjack', 'Ace + 10-value on first 2 cards. Pays 3:2. Dealer Blackjack = Push.'],
+              ['Win', 'Your total beats the Dealer. Pays 1:1.'],
+              ['Push', 'Tied total — your bet is returned.'],
+              ['Bust', 'Exceeding 21 — instant loss.'],
+              ['Dealer Bust', 'Dealer exceeds 21 — all active hands win 1:1.'],
+            ].map(([h, v]) => (
+              <View key={h} style={bjr.actionRow}>
+                <Text style={bjr.actionLabel}>{h}</Text>
+                <Text style={bjr.actionDesc}>{v}</Text>
+              </View>
+            ))}
+
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+const bjr = StyleSheet.create({
+  overlay:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 20, paddingTop: 56 },
+  sheet:       { flex: 1, borderRadius: 24, overflow: 'hidden', maxHeight: '92%' },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.07)' },
+  title:       { fontSize: 16, fontFamily: 'Orbitron_900Black', color: '#ffd700', letterSpacing: 2 },
+  subtitle:    { fontSize: 8, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.45)', letterSpacing: 2.5, marginTop: 2 },
+  closeBtn:    { padding: 4 },
+  body:        { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32, gap: 0 },
+  sectionTitle:{ fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 2.5, color: 'rgba(0,212,255,0.8)', marginTop: 18, marginBottom: 8 },
+  bodyText:    { fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 19 },
+  row:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  rowLabel:    { fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
+  rowValue:    { fontSize: 11, color: 'rgba(255,255,255,0.85)', fontWeight: '800', textAlign: 'right', flex: 1, paddingLeft: 12 },
+  actionRow:   { paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  actionLabel: { fontSize: 10, fontFamily: 'Orbitron_700Bold', color: '#ffd700', letterSpacing: 1, marginBottom: 3 },
+  actionDesc:  { fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 17 },
+});
+
 // ─── Main screen ──────────────────────────────────────────────────────────────
 export default function BlackjackScreen() {
   const insets = useSafeAreaInsets();
@@ -424,6 +538,7 @@ export default function BlackjackScreen() {
   const [result,       setResult]       = useState<BJResult | null>(null);
   const [dealerLog,    setDealerLog]    = useState<string[]>([]);
   const [exitConfirm,  setExitConfirm]  = useState(false);
+  const [showRules,    setShowRules]    = useState(false);
 
   // ── Stake tier ───────────────────────────────────────────────────────────────
   const [selectedTier, setSelectedTier] = useState<CasinoTableLimit | null>(null);
@@ -750,6 +865,7 @@ export default function BlackjackScreen() {
       <View style={[s.glowBottom, { backgroundColor: 'rgba(255,215,0,0.04)' }]} />
 
       <ShufflingOverlay visible={isShuffling} shuffleKey={shuffleKey} numDecks={TEST_DECKS} onComplete={handleShuffleComplete} />
+      <BlackjackRulesModal visible={showRules} onClose={() => setShowRules(false)} numDecks={TEST_DECKS} minBet={tierMinBet} maxBet={tierMaxBet} />
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <View style={[s.header, { paddingTop: insets.top + 10 }]}>
@@ -774,8 +890,11 @@ export default function BlackjackScreen() {
           <Text style={s.titleText}>BLACKJACK</Text>
         </View>
 
-        {/* Right: shoe indicator only */}
+        {/* Right: info button + shoe indicator */}
         <View style={s.headerRight}>
+          <TouchableOpacity style={s.infoBtn} onPress={() => setShowRules(true)} activeOpacity={0.75}>
+            <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.55)" />
+          </TouchableOpacity>
           <ShoeIndicator dealt={cardsDealt} total={TEST_SHOE_TOTAL} />
         </View>
       </View>
@@ -1048,7 +1167,8 @@ const s = StyleSheet.create({
 
   header:      { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingBottom: 10, zIndex: 10 },
   headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: 6, width: 72 },
-  headerRight: { width: 72, alignItems: 'flex-end' },
+  headerRight: { alignItems: 'flex-end', gap: 6, flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-end', minWidth: 72 },
+  infoBtn:     { width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center' },
   titleBlock:  { flex: 1, alignItems: 'center' },
   titleText:   { fontSize: 16, fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 2 },
   subtitleText:{ fontSize: 7, fontFamily: 'Orbitron_400Regular', color: 'rgba(255,215,0,0.55)', letterSpacing: 2, marginTop: 2 },

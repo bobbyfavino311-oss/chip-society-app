@@ -74,7 +74,7 @@ function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => 
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={pm.overlay}>
         <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
-        <TouchableOpacity style={pm.sheet} activeOpacity={1} onPress={() => {}}>
+        <View style={pm.sheet}>
           <LinearGradient colors={['#0e002a', '#050010']} style={StyleSheet.absoluteFill} />
           <View style={pm.header}>
             <Text style={pm.title}>PAYTABLE</Text>
@@ -112,7 +112,7 @@ function PaytableModal({ visible, onClose }: { visible: boolean; onClose: () => 
             <View style={pm.row}><Text style={pm.handName}>River</Text><Text style={pm.handPays}>1× or FOLD</Text></View>
             <View style={{ height: 30 }} />
           </ScrollView>
-        </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );

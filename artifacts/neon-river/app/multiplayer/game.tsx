@@ -54,8 +54,8 @@ function toChromePlayer(s: SeatView, gs: ClientGameState) {
   const revealed = gs.phase === 'showdown' && s.revealedCards?.length ? s.revealedCards : null;
   return {
     id: s.seatIndex,
-    name: s.username,
-    chips: s.chips,
+    name: s.username ?? '—',
+    chips: s.chips ?? 0,
     avatarIndex: s.avatarId,
     cardCount: s.cardCount,   // hole-card count for face-down display during hand
     status: s.status === 'allin' ? 'allIn' : s.status === 'sitting_out' ? 'folded' : s.status,
@@ -179,7 +179,7 @@ export default function MultiplayerGame() {
       });
     }
     leaveTable();
-    router.replace('/multiplayer/lobby' as any);
+    router.replace('/(tabs)/play' as any);
   };
 
   if (!gs) {
@@ -436,11 +436,11 @@ export default function MultiplayerGame() {
         <View style={[g.panelDock, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) }]}>
           <BettingPanel
             canCheck={canCheck}
-            callAmount={gs.callAmount}
+            callAmount={gs.callAmount ?? 0}
             myChips={mySeat?.chips ?? 0}
-            pot={gs.pot}
-            minRaise={gs.minRaise}
-            currentBet={gs.currentBet}
+            pot={gs.pot ?? 0}
+            minRaise={gs.minRaise ?? 0}
+            currentBet={gs.currentBet ?? 0}
             onFold={() => sendAction('fold')}
             onCheck={() => sendAction('check')}
             onCall={() => sendAction('call')}
