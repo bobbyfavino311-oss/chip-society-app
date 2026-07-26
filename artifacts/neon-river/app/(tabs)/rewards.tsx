@@ -18,13 +18,13 @@ import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 
 const DAILY_REWARDS = [
-  { day: 1, chips: 500,  label: 'Day 1' },
-  { day: 2, chips: 700,  label: 'Day 2' },
-  { day: 3, chips: 1000, label: 'Day 3' },
-  { day: 4, chips: 1200, label: 'Day 4' },
-  { day: 5, chips: 1500, label: 'Day 5' },
-  { day: 6, chips: 2000, label: 'Day 6' },
-  { day: 7, chips: 3000, label: 'Day 7 🎉', isBonus: true },
+  { day: 1, chips:  10_000, label: 'Day 1' },
+  { day: 2, chips:  20_000, label: 'Day 2' },
+  { day: 3, chips:  30_000, label: 'Day 3' },
+  { day: 4, chips:  40_000, label: 'Day 4' },
+  { day: 5, chips:  50_000, label: 'Day 5' },
+  { day: 6, chips:  75_000, label: 'Day 6' },
+  { day: 7, chips: 100_000, label: 'Day 7 🏆', isBonus: true },
 ];
 
 const MISSIONS = [

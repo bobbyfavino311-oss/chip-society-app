@@ -19,13 +19,13 @@ import { SoundEngine } from '@/lib/soundEngine';
 import ChipAmount from '@/components/ChipAmount';
 
 const STREAK_REWARDS = [
-  { day: 1, chips:  5_000, label:  '5K', color: '#00d4aa' },
-  { day: 2, chips: 10_000, label: '10K', color: '#00ccee' },
-  { day: 3, chips: 15_000, label: '15K', color: '#00aaff' },
-  { day: 4, chips: 20_000, label: '20K', color: '#5577ff' },
-  { day: 5, chips: 25_000, label: '25K', color: '#bf5fff' },
-  { day: 6, chips: 30_000, label: '30K', color: '#ff0090' },
-  { day: 7, chips: 35_000, label: '35K', color: '#ffd700', special: true },
+  { day: 1, chips:  10_000, label:  '10K', color: '#00d4aa' },
+  { day: 2, chips:  20_000, label:  '20K', color: '#00ccee' },
+  { day: 3, chips:  30_000, label:  '30K', color: '#00aaff' },
+  { day: 4, chips:  40_000, label:  '40K', color: '#5577ff' },
+  { day: 5, chips:  50_000, label:  '50K', color: '#bf5fff' },
+  { day: 6, chips:  75_000, label:  '75K', color: '#ff0090' },
+  { day: 7, chips: 100_000, label: '100K', color: '#ffd700', special: true },
 ];
 
 function formatCountdown(totalSeconds: number): string {
@@ -45,6 +45,7 @@ export default function StreakScreen() {
   const [claiming, setClaiming] = useState(false);
   const [justClaimed, setJustClaimed] = useState(false);
   const [claimedAmount, setClaimedAmount] = useState(0);
+  const [isDay7Complete, setIsDay7Complete] = useState(false);
   const [countdown, setCountdown] = useState('');
   const claimScale = useRef(new Animated.Value(1)).current;
   const resultAnim = useRef(new Animated.Value(0)).current;
@@ -76,6 +77,7 @@ export default function StreakScreen() {
   const claim = async () => {
     if (!canClaimDaily || claiming) return;
     setClaiming(true);
+    const wasDay7 = nextDay === 7;
     Animated.sequence([
       Animated.timing(claimScale, { toValue: 0.95, duration: 100, useNativeDriver: false }),
       Animated.timing(claimScale, { toValue: 1, duration: 100, useNativeDriver: false }),
@@ -83,6 +85,7 @@ export default function StreakScreen() {
     const amount = await claimDailyReward();
     SoundEngine.prizeCollect();
     setClaimedAmount(amount);
+    setIsDay7Complete(wasDay7);
     setJustClaimed(true);
     setClaiming(false);
     resultAnim.setValue(0);
@@ -166,11 +169,21 @@ export default function StreakScreen() {
 
         {/* Claim result */}
         {justClaimed && (
-          <Animated.View style={[st.claimResult, { transform: [{ scale: resultAnim }] }]}>
-            <LinearGradient colors={['rgba(255,215,0,0.15)', 'transparent']} style={StyleSheet.absoluteFill} />
-            <Text style={st.claimResultEmoji}>🎁</Text>
-            <Text style={st.claimResultTitle}>CLAIMED!</Text>
+          <Animated.View style={[st.claimResult, isDay7Complete && st.claimResultDay7, { transform: [{ scale: resultAnim }] }]}>
+            <LinearGradient
+              colors={isDay7Complete ? ['rgba(255,215,0,0.22)', 'rgba(255,136,0,0.10)', 'transparent'] : ['rgba(255,215,0,0.15)', 'transparent']}
+              style={StyleSheet.absoluteFill}
+            />
+            <Text style={st.claimResultEmoji}>{isDay7Complete ? '🏆' : '🎁'}</Text>
+            <Text style={[st.claimResultTitle, isDay7Complete && { color: '#ffd700', fontSize: 17 }]}>
+              {isDay7Complete ? '7-DAY STREAK COMPLETE!' : 'CLAIMED!'}
+            </Text>
             <ChipAmount amount={claimedAmount} variant="green" prefix="+" size="lg" />
+            {isDay7Complete && (
+              <Text style={{ color: 'rgba(255,215,0,0.70)', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginTop: 2 }}>
+                STREAK RESETS · NEXT CYCLE STARTS TOMORROW
+              </Text>
+            )}
           </Animated.View>
         )}
 
@@ -260,7 +273,8 @@ const st = StyleSheet.create({
   dayChips: { fontSize: 16, fontWeight: '900', fontFamily: 'Inter_700Bold' },
   dayStatus: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
   dayStatusText: { fontSize: 14 },
-  claimResult: { borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,215,0,0.4)', padding: 20, alignItems: 'center', gap: 6, overflow: 'hidden' },
+  claimResult:      { borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,215,0,0.4)', padding: 20, alignItems: 'center', gap: 6, overflow: 'hidden' },
+  claimResultDay7:  { borderColor: '#ffd700', borderWidth: 2, padding: 24 },
   claimResultEmoji: { fontSize: 40 },
   claimResultTitle: { color: '#ffd700', fontSize: 20, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 2 },
   claimResultAmount: { color: colors.success, fontSize: 22, fontWeight: '900', fontFamily: 'Inter_700Bold' },

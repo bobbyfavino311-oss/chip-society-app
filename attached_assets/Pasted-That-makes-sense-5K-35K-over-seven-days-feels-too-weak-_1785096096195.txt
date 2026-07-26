@@ -1,0 +1,129 @@
+That makes sense. 5K → 35K over seven days feels too weak now that your lowest poker buy-in starts at 25K and new accounts begin with 100K.
+
+I’d increase it without making the streak so generous that it distorts the chip economy.
+
+Recommended 7-Day Streak
+
+Day	Reward
+Day 1	10K chips
+Day 2	20K chips
+Day 3	30K chips
+Day 4	40K chips
+Day 5	50K chips
+Day 6	75K chips
+Day 7	100K chips
+
+Seven-day total: 325K chips
+
+This gives the player enough to feel rewarded and recover from a losing session, while still requiring them to build their bankroll through gameplay.
+
+I would also make Day 7 feel distinct, rather than treating it as one more incremental reward:
+
+DAY 7 STREAK COMPLETE
+100K CHIPS
+
+Then the streak restarts at Day 1 after collection.
+
+# DAILY LOGIN STREAK REBALANCE
+Update the Daily Streak reward amounts throughout Chip Society.
+The current progression of 5K, 10K, 15K, 20K, 25K, 30K and 35K is now too low for the current game economy.
+Replace the existing seven-day reward schedule with:
+Day 1:
+10,000 chips
+Day 2:
+20,000 chips
+Day 3:
+30,000 chips
+Day 4:
+40,000 chips
+Day 5:
+50,000 chips
+Day 6:
+75,000 chips
+Day 7:
+100,000 chips
+Total reward across one complete seven-day cycle:
+325,000 chips
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# REWARD RULES
+Each reward may be claimed only once during its eligible streak day.
+The player must claim the current reward before advancing to the next day.
+After claiming Day 7:
+• Mark the seven-day cycle complete.
+• Restart the streak at Day 1 for the next eligible daily claim.
+• Do not award Day 7 more than once in the same cycle.
+• Do not accidentally reset the player before the Day 7 reward is collected.
+Use server time for all streak calculations.
+Do not use the device clock as the source of truth.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# STREAK CONTINUITY
+A valid new streak day begins after the configured daily reset.
+The system must prevent:
+• Multiple claims in one reset period
+• Changing the device clock to claim early
+• Duplicate claims after restarting the app
+• Duplicate claims from multiple devices
+• Skipping directly to a later reward
+Save the following server-side:
+• Current streak day
+• Last successful claim timestamp
+• Current streak-cycle identifier
+• Whether today's reward was claimed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MISSED DAY BEHAVIOR
+If the player misses the permitted streak window, reset the streak to Day 1.
+Do not delete any previously awarded chips.
+The next available claim becomes:
+Day 1 — 10,000 chips
+If the game already supports a grace period, preserve that behavior and only update the reward amounts.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# DAY 7 PRESENTATION
+Day 7 must feel more valuable than the other days.
+When Day 7 becomes available, display:
+DAY 7 STREAK
+100K CHIPS
+When collected, display:
+7-DAY STREAK COMPLETE!
+100K CHIPS COLLECTED
+Keep the animation tasteful and brief.
+Do not use continuous movement or flashing.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# UI UPDATES
+Update the reward amount everywhere it appears:
+• Home page Streak card
+• Daily Streak details
+• Claim confirmation
+• Reward animation
+• Notification text
+• Account transaction history, if supported
+• Any onboarding explanation
+• Any landing-page description showing streak rewards
+The Home page must always show the correct amount for the player's current day.
+Do not display an old hardcoded value.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TRANSACTION REQUIREMENTS
+Every claim must create one server-side reward transaction containing:
+• userId
+• streak day
+• chip quantity
+• timestamp
+• streak-cycle identifier
+• unique transaction ID
+The transaction must be idempotent.
+Retrying the same claim request must not award the chips twice.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# FINAL VALIDATION
+Verify:
+✅ Day 1 awards exactly 10K.
+✅ Day 2 awards exactly 20K.
+✅ Day 3 awards exactly 30K.
+✅ Day 4 awards exactly 40K.
+✅ Day 5 awards exactly 50K.
+✅ Day 6 awards exactly 75K.
+✅ Day 7 awards exactly 100K.
+✅ One complete cycle awards exactly 325K.
+✅ Rewards persist after logout and app restart.
+✅ Device-clock changes cannot manipulate the streak.
+✅ The same reward cannot be claimed twice.
+✅ Day 7 resets to Day 1 only after the Day 7 reward is successfully claimed.
+✅ Every UI surface displays the new values.

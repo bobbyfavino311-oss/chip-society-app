@@ -115,9 +115,9 @@ function getRankFromLevel(level: number): Rank {
 }
 
 const DAILY_REWARDS: Record<number, number> = {
-  1:  5_000, 2: 10_000, 3: 15_000, 4: 20_000, 5: 25_000, 6: 30_000, 7: 35_000,
+  1: 10_000, 2: 20_000, 3: 30_000, 4: 40_000, 5: 50_000, 6: 75_000, 7: 100_000,
 };
-const DEFAULT_DAILY_REWARD  = 35_000;
+const DEFAULT_DAILY_REWARD  = 100_000;
 const HOURLY_BONUS          = 5_000;
 const HOURLY_INTERVAL_MS    = 24 * 60 * 60 * 1000;
 const COMEBACK_THRESHOLD    = 25_000;
