@@ -62,7 +62,7 @@ router.get('/social/search', async (req, res) => {
       username:    r.username,
       level:       (r.profileJson as any)?.level ?? 1,
       chips:       (r.profileJson as any)?.chips ?? 0,
-      avatarIndex: (r.profileJson as any)?.avatarIndex ?? 1,
+      avatarIndex: (r.profileJson as any)?.symbolIndex ?? (r.profileJson as any)?.avatarIndex ?? 1,
       rank:        (r.profileJson as any)?.rank ?? 'Player',
       status:      r.status,
     }));
@@ -103,7 +103,7 @@ router.get('/social/players/:id', async (req, res) => {
         username:      r.username,
         level:         pj?.level ?? 1,
         chips:         pj?.chips ?? 0,
-        avatarIndex:   pj?.avatarIndex ?? 1,
+        avatarIndex:   pj?.symbolIndex ?? pj?.avatarIndex ?? 1,
         rank:          pj?.rank ?? 'Player',
         winRate:       pj?.winRate ?? 0,
         handsPlayed:   pj?.handsPlayed ?? 0,
@@ -198,7 +198,7 @@ router.get('/social/conversations', requirePlayer, async (req: any, res) => {
         id:          r.id,
         otherId,
         otherUsername: other?.username ?? 'Unknown',
-        otherAvatarIndex: (other?.profileJson as any)?.avatarIndex ?? 1,
+        otherAvatarIndex: (other?.profileJson as any)?.symbolIndex ?? (other?.profileJson as any)?.avatarIndex ?? 1,
         lastPreview: r.lastPreview,
         lastAt:      r.lastAt,
         unread:      isP1 ? r.unread1 : r.unread2,
@@ -337,7 +337,7 @@ router.post('/social/conversations/:id/messages', requirePlayer, async (req: any
     const senderRow = await db.select({ username: playersTable.username, profileJson: playersTable.profileJson })
       .from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
     const senderName = senderRow[0]?.username ?? 'Someone';
-    const senderAvatar = (senderRow[0]?.profileJson as any)?.avatarIndex ?? 1;
+    const senderAvatar = (senderRow[0]?.profileJson as any)?.symbolIndex ?? (senderRow[0]?.profileJson as any)?.avatarIndex ?? 1;
 
     emitToPlayer(recipientId, 'dm_received', {
       conversationId: id,
@@ -466,6 +466,16 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
 
     const rows = await query;
 
+    // Live-lookup author avatar index from player profiles so it always
+    // reflects the player's current avatar selection, even for old posts.
+    const uniqueAuthorIds = [...new Set(rows.map(r => r.authorId))];
+    const liveProfiles = uniqueAuthorIds.length > 0
+      ? await db.select({ playerId: playersTable.playerId, profileJson: playersTable.profileJson })
+          .from(playersTable)
+          .where(inArray(playersTable.playerId, uniqueAuthorIds))
+      : [];
+    const liveProfileMap = new Map(liveProfiles.map(p => [p.playerId, p.profileJson as any]));
+
     // Batch-check which posts the current player liked
     const postIds = rows.map(r => r.id);
     const likedRows = postIds.length > 0
@@ -479,7 +489,7 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
       id:              r.id,
       authorId:        r.authorId,
       authorUsername:  r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
-      authorAvatarIndex: r.authorAvatarIndex ?? 1,
+      authorAvatarIndex: (() => { const lp = liveProfileMap.get(r.authorId); return lp?.symbolIndex ?? lp?.avatarIndex ?? r.authorAvatarIndex ?? 1; })(),
       authorRank:      r.authorRank ?? 'Player',
       content:         r.content,
       tag:             r.tag,
@@ -525,7 +535,7 @@ router.post('/social/posts', requirePlayer, async (req: any, res) => {
     // Prefer the client-provided display name — the DB may have a stale
     // or auto-generated username that doesn't match what the user sees.
     const resolvedUsername    = authorUsername ?? author?.username ?? `player_${playerId.slice(0, 6)}`;
-    const resolvedAvatarIndex = authorAvatarIndex ?? (author?.profileJson as any)?.avatarIndex ?? 1;
+    const resolvedAvatarIndex = authorAvatarIndex ?? (author?.profileJson as any)?.symbolIndex ?? (author?.profileJson as any)?.avatarIndex ?? 1;
     const resolvedRank        = authorRank ?? (author?.profileJson as any)?.rank ?? 'Player';
 
     const id = randomUUID();
@@ -640,7 +650,7 @@ router.get('/social/posts/:id/comments', requirePlayer, async (req: any, res) =>
       postId:             r.postId,
       authorId:           r.authorId,
       authorUsername:     r.authorUsername,
-      authorAvatarIndex:  (r.authorProfileJson as any)?.avatarIndex ?? 1,
+      authorAvatarIndex:  (r.authorProfileJson as any)?.symbolIndex ?? (r.authorProfileJson as any)?.avatarIndex ?? 1,
       text:               r.text,
       createdAt:          r.createdAt,
     }));
@@ -685,7 +695,7 @@ router.post('/social/posts/:id/comments', requirePlayer, async (req: any, res) =
       postId:            created!.postId,
       authorId:          playerId,
       authorUsername:    authorRow[0].username,
-      authorAvatarIndex: (authorRow[0].profileJson as any)?.avatarIndex ?? 1,
+      authorAvatarIndex: (authorRow[0].profileJson as any)?.symbolIndex ?? (authorRow[0].profileJson as any)?.avatarIndex ?? 1,
       text:              created!.text,
       createdAt:         created!.createdAt,
     };
@@ -716,7 +726,7 @@ router.get('/social/following-list', requirePlayer, async (req: any, res) => {
     const following = rows.map(r => ({
       id:       r.playerId,
       username: r.username,
-      avatarId: (r.profileJson as any)?.avatarIndex ?? 1,
+      avatarId: (r.profileJson as any)?.symbolIndex ?? (r.profileJson as any)?.avatarIndex ?? 1,
       rank:     (r.profileJson as any)?.rank ?? 'Player',
     }));
 
@@ -745,7 +755,7 @@ router.get('/social/followers', requirePlayer, async (req: any, res) => {
     const followers = rows.map(r => ({
       id:       r.playerId,
       username: r.username,
-      avatarId: (r.profileJson as any)?.avatarIndex ?? 1,
+      avatarId: (r.profileJson as any)?.symbolIndex ?? (r.profileJson as any)?.avatarIndex ?? 1,
       rank:     (r.profileJson as any)?.rank ?? 'Player',
     }));
 
