@@ -13,7 +13,7 @@ export interface HandResult {
 
 export type RoomPhase = 'waiting' | 'preflop' | 'flop' | 'turn' | 'river' | 'showdown';
 export type SeatStatus = 'active' | 'folded' | 'allin' | 'sitting_out';
-export type StakeTier = 'MICRO' | 'LOW' | 'STANDARD' | 'HIGH_ROLLER' | 'VIP' | 'ELITE';
+export type StakeTier = 'MICRO' | 'LOW' | 'STANDARD' | 'HIGH_ROLLER' | 'VIP' | 'ELITE' | 'ELITE_PLUS' | 'STARTER';
 export type PlayerActionType = 'fold' | 'check' | 'call' | 'raise' | 'allin';
 export type GameVariant = 'texas_holdem' | 'short_deck_holdem' | 'joker_holdem' | 'omaha_holdem';
 
@@ -115,12 +115,14 @@ export interface LobbyTable {
 }
 
 export const STAKE_CONFIG: Record<StakeTier, Omit<RoomConfig, 'variant'>> = {
+  STARTER:     { stakeTier: 'STARTER',     maxPlayers: 5, smallBlind: 5,     bigBlind: 10,    minBuyIn: 200,     maxBuyIn: 1_000    },
   MICRO:       { stakeTier: 'MICRO',       maxPlayers: 5, smallBlind: 25,    bigBlind: 50,    minBuyIn: 1_000,   maxBuyIn: 5_000    },
   LOW:         { stakeTier: 'LOW',         maxPlayers: 5, smallBlind: 100,   bigBlind: 200,   minBuyIn: 4_000,   maxBuyIn: 20_000   },
   STANDARD:    { stakeTier: 'STANDARD',    maxPlayers: 5, smallBlind: 500,   bigBlind: 1_000, minBuyIn: 20_000,  maxBuyIn: 100_000  },
   HIGH_ROLLER: { stakeTier: 'HIGH_ROLLER', maxPlayers: 5, smallBlind: 2_500, bigBlind: 5_000, minBuyIn: 100_000, maxBuyIn: 500_000  },
   VIP:         { stakeTier: 'VIP',         maxPlayers: 5, smallBlind: 10_000,bigBlind: 20_000,minBuyIn: 400_000, maxBuyIn: 2_000_000},
   ELITE:       { stakeTier: 'ELITE',       maxPlayers: 5, smallBlind: 50_000,bigBlind: 100_000,minBuyIn:2_000_000,maxBuyIn:10_000_000},
+  ELITE_PLUS:  { stakeTier: 'ELITE_PLUS',  maxPlayers: 5, smallBlind:250_000,bigBlind: 500_000,minBuyIn:10_000_000,maxBuyIn:50_000_000},
 };
 
 export type ChipSyncFn = (seats: Array<{ userId: string; chips: number }>) => void;

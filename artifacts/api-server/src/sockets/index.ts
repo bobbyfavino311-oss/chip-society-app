@@ -3,6 +3,7 @@ import type { Server as HttpServer } from 'http';
 import { RoomManager } from '../poker/roomManager.js';
 import { logger } from '../lib/logger.js';
 import type { StakeTier, GameVariant } from '../poker/types.js';
+import { STAKE_CONFIG } from '../poker/types.js';
 import { createAdapter } from '@socket.io/redis-adapter';
 import Redis from 'ioredis';
 import { serverStats } from '../lib/serverStats.js';
@@ -13,6 +14,16 @@ const VALID_VARIANTS: ReadonlySet<string> = new Set([
 
 function resolveVariant(v: unknown): GameVariant {
   return typeof v === 'string' && VALID_VARIANTS.has(v) ? (v as GameVariant) : 'texas_holdem';
+}
+
+// Map any unknown / legacy tier name to the nearest valid tier.
+// Old bundles may send 'ELITE_PLUS', 'STARTER', or other names that
+// predate the current STAKE_CONFIG. Never let an unknown tier produce
+// an undefined config (which causes NaN chips everywhere).
+function resolveTier(v: unknown): StakeTier {
+  if (typeof v === 'string' && v in STAKE_CONFIG) return v as StakeTier;
+  // Legacy / unknown → cap at ELITE to keep the game playable
+  return 'ELITE';
 }
 
 // ── Player presence registry ───────────────────────────────────────────────────
@@ -192,7 +203,7 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        const tier = payload.stakeTier as StakeTier;
+        const tier = resolveTier(payload.stakeTier);
         const variant = resolveVariant(payload.variant);
         const room = manager.createRoom(tier, payload.maxPlayers ?? 5, variant);
         const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
@@ -277,12 +288,12 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        const tier = payload.stakeTier as StakeTier;
+        const tier = resolveTier(payload.stakeTier);
         const variant = resolveVariant(payload.variant);
         const room = manager.findOrCreateRoom(tier, 5, variant);
         const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
         // DIAGNOSTIC
-        console.log('[quick_join] payload.chips=', payload.chips, 'room.config.minBuyIn=', room.config.minBuyIn, 'sanitized chips=', chips, 'tier=', tier, 'userId=', payload.userId);
+        console.log('[quick_join] payload.stakeTier=', payload.stakeTier, '→ resolved tier=', tier, 'payload.chips=', payload.chips, 'sanitized=', chips);
         const ok = manager.joinRoom(
           socket.id, room.id,
           payload.userId, payload.username, payload.avatarId, chips,

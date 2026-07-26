@@ -218,7 +218,11 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     variant: MultiplayerGameVariant = 'texas_holdem',
   ) => {
     userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
-    socketRef.current?.emit('create_table', { stakeTier, maxPlayers, variant, userId, username, avatarId, chips });
+    const VALID_SERVER_TIERS: ReadonlySet<string> = new Set([
+      'MICRO', 'LOW', 'STANDARD', 'HIGH_ROLLER', 'VIP', 'ELITE',
+    ]);
+    const safeTier: StakeTier = VALID_SERVER_TIERS.has(stakeTier) ? stakeTier : 'ELITE';
+    socketRef.current?.emit('create_table', { stakeTier: safeTier, maxPlayers, variant, userId, username, avatarId, chips });
   }, []);
 
   const joinTable = useCallback((
@@ -234,7 +238,14 @@ export function MultiplayerProvider({ children }: { children: React.ReactNode })
     chips?: number,
   ) => {
     userInfoRef.current = { ...userInfoRef.current, userId, username, avatarId };
-    socketRef.current?.emit('quick_join', { stakeTier, variant, userId, username, avatarId, chips });
+    // Guard: clamp to a tier the live server STAKE_CONFIG actually contains.
+    // Old bundles or stale component state may send 'ELITE_PLUS' or other
+    // legacy names that produce undefined config → NaN chips on the server.
+    const VALID_SERVER_TIERS: ReadonlySet<string> = new Set([
+      'MICRO', 'LOW', 'STANDARD', 'HIGH_ROLLER', 'VIP', 'ELITE',
+    ]);
+    const safeTier: StakeTier = VALID_SERVER_TIERS.has(stakeTier) ? stakeTier : 'ELITE';
+    socketRef.current?.emit('quick_join', { stakeTier: safeTier, variant, userId, username, avatarId, chips });
   }, []);
 
   const leaveTable = useCallback(() => {
