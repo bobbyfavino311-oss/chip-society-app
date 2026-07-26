@@ -84093,9 +84093,13 @@ router4.get("/social/feed", requirePlayer, async (req, res) => {
       id: r.id,
       authorId: r.authorId,
       authorUsername: r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
+      // When we have a live profile, use it exclusively so ALL posts by the
+      // same author show the same current avatar (not whatever was stored per-post
+      // at creation time, which can differ across old posts).
       authorAvatarIndex: (() => {
         const lp = liveProfileMap.get(r.authorId);
-        return lp?.symbolIndex || lp?.avatarIndex || r.authorAvatarIndex || 1;
+        if (lp) return lp.symbolIndex || lp.avatarIndex || 1;
+        return r.authorAvatarIndex || 1;
       })(),
       authorRank: r.authorRank ?? "Player",
       content: r.content,
