@@ -9,3 +9,5 @@ COPY artifacts/api-server/dist/pino-pretty.mjs ./dist/pino-pretty.mjs
 COPY artifacts/api-server/dist/thread-stream-worker.mjs ./dist/thread-stream-worker.mjs
 EXPOSE 8080
 CMD ["node", "--enable-source-maps", "dist/index.mjs"]
+
+# deploy trigger
