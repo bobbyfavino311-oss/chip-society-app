@@ -467,6 +467,7 @@ export default function MultiplayerGame() {
         sendMessage={handleSendChat}
         onClose={chat.closePanel}
         onOpen={chat.openPanel}
+        kbHeight={chat.kbHeight}
       />
 
       {/* Reconnecting overlay — socket dropped, seat held on server for 60 s */}

@@ -3,6 +3,7 @@
 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system/legacy';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -62,7 +63,16 @@ export default function PhotoSelectScreen() {
           });
 
       if (!result.canceled && result.assets[0]) {
-        await updateProfile({ avatarUri: result.assets[0].uri, profileImageType: 'custom' });
+        const srcUri = result.assets[0].uri;
+        // Copy to permanent document directory so the URI stays valid after app restarts.
+        let finalUri = srcUri;
+        if (FileSystem.documentDirectory && srcUri.startsWith('file://')) {
+          const fileName = `avatar_${Date.now()}.jpg`;
+          const dest = FileSystem.documentDirectory + fileName;
+          await FileSystem.copyAsync({ from: srcUri, to: dest });
+          finalUri = dest;
+        }
+        await updateProfile({ avatarUri: finalUri, profileImageType: 'custom' });
         router.back();
       }
     } catch {

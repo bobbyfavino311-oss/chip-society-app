@@ -4,7 +4,7 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Animated, FlatList, KeyboardAvoidingView, Platform,
+  Animated, FlatList, Keyboard, KeyboardAvoidingView, Platform,
   StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -48,6 +48,7 @@ export function useInGameChat() {
   const [input,        setInput]        = useState('');
   const [bubbles,      setBubbles]      = useState<Record<string, BubbleEntry>>({});
   const [latestToast,  setLatestToast]  = useState<TableToastEntry | undefined>(undefined);
+  const [kbHeight,     setKbHeight]     = useState(0);
 
   const lastSendMs = useRef(0);
   const lastText   = useRef('');
@@ -113,10 +114,19 @@ export function useInGameChat() {
     addMessage({ id: `${playerId}-${Date.now()}`, playerId, playerName, text, ts: Date.now() });
   }, [addMessage]);
 
+  // Track keyboard height so the panel slides up with the keyboard
+  useEffect(() => {
+    const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const onShow = Keyboard.addListener(showEvt, e => setKbHeight(e.endCoordinates.height));
+    const onHide = Keyboard.addListener(hideEvt, () => setKbHeight(0));
+    return () => { onShow.remove(); onHide.remove(); };
+  }, []);
+
   return {
     messages, panelOpen, unread, muted, presetsOnly,
     input, setInput, setMuted, setPresetsOnly,
-    openPanel, closePanel, slideAnim,
+    openPanel, closePanel, slideAnim, kbHeight,
     sendMessage, receiveBotMessage, bubbles, latestToast,
   };
 }
@@ -231,7 +241,7 @@ export function GameChatIcon({
 export function GameChatPanel({
   messages, panelOpen, slideAnim, unread,
   muted, setMuted, presetsOnly, setPresetsOnly,
-  input, setInput, sendMessage, onClose, onOpen,
+  input, setInput, sendMessage, onClose, onOpen, kbHeight = 0,
 }: {
   messages: ChatMessage[];
   panelOpen: boolean;
@@ -246,6 +256,7 @@ export function GameChatPanel({
   sendMessage: (text: string) => void;
   onClose: () => void;
   onOpen: () => void;
+  kbHeight?: number;
 }) {
   const listRef = useRef<FlatList>(null);
 
@@ -273,9 +284,9 @@ export function GameChatPanel({
         </View>
       )}
 
-      {/* Slide-up panel */}
+      {/* Slide-up panel — rises with keyboard on iOS */}
       <Animated.View
-        style={[chat.panel, { transform: [{ translateY: slideAnim }] }]}
+        style={[chat.panel, { transform: [{ translateY: slideAnim }], bottom: kbHeight }]}
         pointerEvents={panelOpen ? 'auto' : 'none'}
       >
         {/* Panel header */}
@@ -341,11 +352,9 @@ export function GameChatPanel({
           ))}
         </View>
 
-        {/* Input row */}
+        {/* Input row — keyboard is handled at the panel level via kbHeight */}
         {!presetsOnly && (
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          >
+          <View>
             <View style={chat.inputRow}>
               <TextInput
                 style={chat.input}
@@ -367,7 +376,7 @@ export function GameChatPanel({
                 <Ionicons name="send" size={15} color="#050010" />
               </TouchableOpacity>
             </View>
-          </KeyboardAvoidingView>
+          </View>
         )}
 
         {/* Presets-only toggle */}

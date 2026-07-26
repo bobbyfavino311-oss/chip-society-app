@@ -1592,7 +1592,7 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
                 <TouchableOpacity
                   key={t}
                   style={[cmp.typeChip, { borderColor: active ? c : `${c}40`, backgroundColor: active ? `${c}22` : 'transparent' }]}
-                  onPress={() => setPostType(t)}
+                  onPress={() => { setPostType(t); setTimeout(() => inputRef.current?.focus(), 50); }}
                 >
                   <Ionicons name={POST_TYPE_ICONS[t]} size={11} color={active ? c : colors.textDim} />
                   <Text style={[cmp.typeChipText, { color: active ? c : colors.textDim }]}>{t}</Text>

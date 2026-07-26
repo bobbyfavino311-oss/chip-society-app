@@ -5,6 +5,7 @@ import {
   Animated,
   Easing,
   Dimensions,
+  Image,
   Modal,
   Platform,
   ScrollView,
@@ -452,6 +453,7 @@ interface TrendPost {
   avatar: string;
   avatarColor: string;
   avatarId?: number;
+  photoUri?: string;
   type: string;
   typeColor: string;
   content: string;
@@ -667,7 +669,10 @@ function TrendCard({ post }: { post: TrendPost }) {
         start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       />
       <View style={trend.header}>
-        <NeonAvatar avatarId={post.avatarId ?? 1} size={40} />
+        {post.photoUri
+        ? <Image source={{ uri: post.photoUri }} style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 1.5, borderColor: '#ff0090' }} />
+        : <NeonAvatar avatarId={post.avatarId ?? 1} size={40} />
+      }
         <View style={{ flex: 1 }}>
           <Text style={trend.username}>{post.user}</Text>
           <View style={[trend.typeBadge, { backgroundColor: `${post.typeColor}22`, borderColor: `${post.typeColor}44` }]}>
@@ -761,6 +766,7 @@ export default function HomeScreen() {
       avatar: p.authorUsername[0]?.toUpperCase() ?? 'P',
       avatarColor: colors.primary,
       avatarId: p.authorAvatarIndex,
+      photoUri: (p as any).authorId === profile.playerId && profile.profileImageType === 'custom' ? profile.avatarUri : undefined,
       type: p.tag,
       typeColor: TREND_TYPE_COLORS[p.tag] ?? colors.primary,
       content: p.content,

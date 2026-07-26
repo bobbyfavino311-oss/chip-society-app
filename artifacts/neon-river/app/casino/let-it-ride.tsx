@@ -73,7 +73,8 @@ function InfoModal({ visible, onClose, accent }: { visible: boolean; onClose: ()
   ];
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableOpacity style={pt.overlay} activeOpacity={1} onPress={onClose}>
+      <View style={pt.overlay}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
         <View style={pt.sheet}>
           <LinearGradient colors={['#0a0020', '#050010']} style={StyleSheet.absoluteFill} />
           <View style={pt.hdr}>
@@ -82,7 +83,7 @@ function InfoModal({ visible, onClose, accent }: { visible: boolean; onClose: ()
               <Ionicons name="close" size={20} color="rgba(255,255,255,0.5)" />
             </TouchableOpacity>
           </View>
-          <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 520 }}>
+          <ScrollView showsVerticalScrollIndicator={false} bounces style={{ flex: 1 }}>
             {/* How to play */}
             <View style={pt.section}>
               <Text style={[pt.sectionTitle, { color: accent }]}>HOW TO PLAY</Text>
@@ -126,13 +127,13 @@ function InfoModal({ visible, onClose, accent }: { visible: boolean; onClose: ()
             </View>
           </ScrollView>
         </View>
-      </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
 const pt = StyleSheet.create({
   overlay:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' },
-  sheet:       { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', padding: 20, paddingBottom: 32 },
+  sheet:       { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', padding: 20, paddingBottom: 36, maxHeight: '88%' },
   hdr:         { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   title:       { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
   close:       { padding: 4 },

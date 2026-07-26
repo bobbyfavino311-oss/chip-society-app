@@ -50,7 +50,8 @@ function sleep(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
 function PaytableModal({ visible, onClose, accent }: { visible: boolean; onClose: () => void; accent: string }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableOpacity style={pm.overlay} activeOpacity={1} onPress={onClose}>
+      <View style={pm.overlay}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
         <View style={pm.sheet}>
           <LinearGradient colors={['#0e002a', '#050010']} style={StyleSheet.absoluteFill} />
           <View style={pm.header}>
@@ -59,7 +60,7 @@ function PaytableModal({ visible, onClose, accent }: { visible: boolean; onClose
               <Ionicons name="close" size={20} color="rgba(255,255,255,0.6)" />
             </TouchableOpacity>
           </View>
-          <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0 }}>
+          <ScrollView showsVerticalScrollIndicator={false} bounces style={{ flex: 1 }}>
             {[
               { h: 'PLAYER WINS',  d: "Your card beats Dealer's card — Ante pays 1:1" },
               { h: 'DEALER WINS',  d: "Dealer's card beats yours — Ante loses" },
@@ -77,13 +78,13 @@ function PaytableModal({ visible, onClose, accent }: { visible: boolean; onClose
             <View style={{ height: 16 }} />
           </ScrollView>
         </View>
-      </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
 const pm = StyleSheet.create({
   overlay:  { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)', justifyContent: 'flex-end' },
-  sheet:    { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', maxHeight: '85%', padding: 20, gap: 10 },
+  sheet:    { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', maxHeight: '85%', padding: 20, gap: 10, paddingBottom: 36 },
   header:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
   title:    { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
   closeBtn: { padding: 4 },
