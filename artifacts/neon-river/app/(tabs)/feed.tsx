@@ -590,7 +590,7 @@ function PostCard({ post }: { post: SocialPost }) {
             router.push(`/social/player-profile?id=${post.playerId}`);
           }}>
             <View style={cd.usernameRow}>
-              <Text style={cd.username}>
+              <Text style={[cd.username, { flex: 1 }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                 {post.playerId === 'me'
                   ? (profile.displayName || profile.username)
                   : (player?.username ?? 'Unknown')}
