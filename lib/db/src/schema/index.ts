@@ -160,6 +160,15 @@ export const referralsTable = pgTable('referrals', {
   createdAt:     timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
+// ── Player push tokens ────────────────────────────────────────────────────────
+
+export const playerPushTokensTable = pgTable('player_push_tokens', {
+  playerId:  text('player_id').primaryKey(),
+  token:     text('token').notNull(),
+  platform:  text('platform').notNull().default('ios'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
 // ── Announcements ─────────────────────────────────────────────────────────────
 
 export const announcementsTable = pgTable('announcements', {
@@ -190,3 +199,4 @@ export type PostLike              = typeof postLikesTable.$inferSelect;
 export type PostComment           = typeof postCommentsTable.$inferSelect;
 export type PostRepost            = typeof postRepostsTable.$inferSelect;
 export type Announcement          = typeof announcementsTable.$inferSelect;
+export type PlayerPushToken       = typeof playerPushTokensTable.$inferSelect;

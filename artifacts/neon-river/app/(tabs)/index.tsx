@@ -146,6 +146,81 @@ function TournamentInfoModal({ visible, onClose }: { visible: boolean; onClose: 
   );
 }
 
+// ─── Dev Team Announcement Banner ────────────────────────────────────────────
+
+const DISMISSED_KEY = '@chip_dismissed_announcements_v1';
+
+function DevAnnouncementBanner() {
+  const [announcement, setAnnouncement] = useState<{ id: string; title: string; body: string } | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('https://api-server-production-bbc2.up.railway.app/api/announcements');
+        const data = await res.json() as { announcements: { id: string; title: string; body: string }[] };
+        const latest = data.announcements?.[0] ?? null;
+        if (!latest || cancelled) return;
+        const raw = await AsyncStorage.getItem(DISMISSED_KEY);
+        const dismissed: string[] = raw ? JSON.parse(raw) : [];
+        if (!dismissed.includes(latest.id)) {
+          setAnnouncement(latest);
+          setVisible(true);
+        }
+      } catch { /* non-fatal */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const dismiss = async () => {
+    setVisible(false);
+    if (!announcement) return;
+    const raw = await AsyncStorage.getItem(DISMISSED_KEY);
+    const ids: string[] = raw ? JSON.parse(raw) : [];
+    await AsyncStorage.setItem(DISMISSED_KEY, JSON.stringify([...ids, announcement.id]));
+  };
+
+  if (!visible || !announcement) return null;
+
+  return (
+    <View style={devAnn.wrap}>
+      <LinearGradient
+        colors={['rgba(0,212,255,0.10)', 'rgba(191,95,255,0.07)']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      />
+      <View style={devAnn.iconWrap}>
+        <Ionicons name="megaphone" size={15} color={colors.primary} />
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={devAnn.title}>{announcement.title}</Text>
+        <Text style={devAnn.body} numberOfLines={3}>{announcement.body}</Text>
+        <Text style={devAnn.from}>📣 FROM DEV TEAM</Text>
+      </View>
+      <TouchableOpacity onPress={dismiss} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <Ionicons name="close-circle" size={20} color={colors.textMuted} />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const devAnn = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: 10,
+    borderRadius: 14, borderWidth: 1, borderColor: `${colors.primary}35`,
+    padding: 13, marginBottom: 6, overflow: 'hidden',
+  },
+  iconWrap: {
+    width: 36, height: 36, borderRadius: 18, borderWidth: 1,
+    borderColor: `${colors.primary}40`, backgroundColor: `${colors.primary}10`,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  title:  { color: '#fff', fontSize: 13, fontWeight: '800', lineHeight: 18 },
+  body:   { color: 'rgba(255,255,255,0.60)', fontSize: 12, lineHeight: 17 },
+  from:   { color: colors.primary, fontSize: 9, fontWeight: '800', letterSpacing: 1, marginTop: 2 },
+});
+
 function EarlyAccessBanner() {
   const [modalVisible, setModalVisible] = useState(false);
   return (
@@ -859,6 +934,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ChipSocietyLogo />
+        <DevAnnouncementBanner />
 
         {/* 1 ─── Daily Rewards ─── */}
         <View style={styles.sectionRow}>

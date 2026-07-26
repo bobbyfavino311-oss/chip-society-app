@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { db, playersTable, chipTransactionsTable, playerReportsTable, playerNotificationsTable, moderationActionsTable, announcementsTable } from '@workspace/db';
-import { eq, or, desc } from 'drizzle-orm';
+import { db, playersTable, chipTransactionsTable, playerReportsTable, playerNotificationsTable, moderationActionsTable, announcementsTable, playerPushTokensTable, feedPostsTable } from '@workspace/db';
+import { eq, or, desc, sql } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { emitToPlayer } from '../sockets/index.js';
 
@@ -539,6 +539,93 @@ router.put('/admin/players/:id/founder', async (req, res) => {
     res.json({ success: true, isFounder });
   } catch (e) {
     req.log.error(e, 'admin/founder error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── POST /api/players/:id/push-token (PUBLIC — app calls this after login) ────
+router.post('/players/:id/push-token', async (req, res) => {
+  try {
+    const { token, platform } = req.body as { token?: string; platform?: string };
+    if (!token?.trim()) { res.status(400).json({ error: 'token required' }); return; }
+    await db
+      .insert(playerPushTokensTable)
+      .values({ playerId: req.params['id']!, token: token.trim(), platform: platform ?? 'ios' })
+      .onConflictDoUpdate({
+        target: playerPushTokensTable.playerId,
+        set: { token: token.trim(), platform: platform ?? 'ios', updatedAt: sql`now()` },
+      });
+    res.json({ success: true });
+  } catch (e) {
+    req.log.error(e, 'push-token upsert error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── POST /api/admin/push-notification — send Expo push to all devices ─────────
+router.post('/admin/push-notification', async (req, res) => {
+  try {
+    const { title, body, data } = req.body as { title?: string; body?: string; data?: Record<string, unknown> };
+    if (!title?.trim() || !body?.trim()) {
+      res.status(400).json({ error: 'title and body are required' }); return;
+    }
+    const rows = await db.select({ token: playerPushTokensTable.token }).from(playerPushTokensTable);
+    if (rows.length === 0) { res.json({ success: true, sent: 0 }); return; }
+
+    const messages = rows.map(r => ({
+      to: r.token,
+      title: title.trim(),
+      body: body.trim(),
+      sound: 'default',
+      data: { category: 'system', priority: 'high', icon: 'megaphone', iconColor: '#00d4ff', ...data },
+    }));
+
+    // Expo Push limit: 100 messages per request
+    const CHUNK = 100;
+    let sent = 0;
+    for (let i = 0; i < messages.length; i += CHUNK) {
+      await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Accept-Encoding': 'gzip, deflate' },
+        body: JSON.stringify(messages.slice(i, i + CHUNK)),
+      }).catch(err => req.log.warn(err, 'expo push chunk error'));
+      sent += Math.min(CHUNK, messages.length - i);
+    }
+
+    res.json({ success: true, sent });
+  } catch (e) {
+    req.log.error(e, 'push-notification error');
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── POST /api/admin/announcements/post-to-feed — official Chip Society post ───
+router.post('/admin/announcements/post-to-feed', async (req, res) => {
+  try {
+    const { content, tag } = req.body as { content?: string; tag?: string };
+    if (!content?.trim()) { res.status(400).json({ error: 'content required' }); return; }
+    const id = randomUUID();
+    await db.insert(feedPostsTable).values({
+      id,
+      authorId:          'chip_society_official',
+      authorUsername:    '📣 Chip Society',
+      authorAvatarIndex: 1,
+      authorRank:        'CHIP SOCIETY ELITE',
+      content:           content.trim(),
+      tag:               tag ?? 'GENERAL',
+    });
+    // Broadcast so open feed screens see it immediately
+    const { emitToAll } = await import('../sockets/index.js');
+    const post = {
+      id, authorId: 'chip_society_official', authorUsername: '📣 Chip Society',
+      authorAvatarIndex: 1, authorRank: 'CHIP SOCIETY ELITE',
+      content: content.trim(), tag: tag ?? 'GENERAL',
+      likeCount: 0, commentCount: 0, likedByMe: false, createdAt: new Date(),
+    };
+    emitToAll('new_feed_post', post);
+    res.json({ success: true, id });
+  } catch (e) {
+    req.log.error(e, 'post-to-feed error');
     res.status(500).json({ error: 'Server error' });
   }
 });

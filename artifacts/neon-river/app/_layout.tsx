@@ -107,10 +107,23 @@ function SoundSyncer() {
 // Requests permission, registers the Expo push token, and wires up listeners
 // for foreground notifications and user taps on notification banners.
 
+const API_BASE = 'https://api-server-production-bbc2.up.railway.app/api';
+
 function PushSetup() {
-  const { addNotification, setPushToken } = useNotifications();
+  const { addNotification, setPushToken, pushToken } = useNotifications();
+  const { profile } = useUser();
   const notifListener = useRef<{ remove: () => void } | null>(null);
   const responseListener = useRef<{ remove: () => void } | null>(null);
+
+  // Register push token with the server whenever we have both token + playerId
+  useEffect(() => {
+    if (!pushToken || !profile.playerId || Platform.OS === 'web') return;
+    fetch(`${API_BASE}/players/${profile.playerId}/push-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: pushToken, platform: Platform.OS }),
+    }).catch(() => {});
+  }, [pushToken, profile.playerId]);
 
   useEffect(() => {
     // Bail out if expo-notifications is unavailable (Android Expo Go SDK 53+)
