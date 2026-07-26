@@ -1,7 +1,5 @@
 import { Server as SocketIOServer } from 'socket.io';
 import type { Server as HttpServer } from 'http';
-import { eq } from 'drizzle-orm';
-import { db, playersTable } from '@workspace/db';
 import { RoomManager } from '../poker/roomManager.js';
 import { logger } from '../lib/logger.js';
 import type { StakeTier, GameVariant } from '../poker/types.js';
@@ -67,22 +65,19 @@ export function emitToPlayer(playerId: string, event: string, data: unknown): bo
   return true;
 }
 
-// ── DB helpers ────────────────────────────────────────────────────────────────
-
-async function loadPlayerChips(userId: string): Promise<number | null> {
-  try {
-    const rows = await db
-      .select({ profileJson: playersTable.profileJson })
-      .from(playersTable)
-      .where(eq(playersTable.playerId, userId))
-      .limit(1);
-    if (!rows.length) return null;
-    const chips = (rows[0]!.profileJson as Record<string, unknown>)?.chips;
-    return typeof chips === 'number' ? chips : null;
-  } catch (e) {
-    logger.warn({ err: e, userId }, 'loadPlayerChips: DB error');
-    return null;
-  }
+// ── Chip helpers ──────────────────────────────────────────────────────────────
+//
+// Chip persistence is fully client-authoritative (same as AI Practice mode).
+// The client deducts the buy-in via removeChips() before emitting join events,
+// and credits the final stack back via addChips() on leave. We NEVER read chips
+// from the DB here — the DB value is always stale (3-second sync debounce) and
+// would override the correct buy-in the client already computed and deducted.
+//
+// sanitizeChips: reject impossible values (NaN, negative, non-number) so the
+// room never starts with a broken chip stack, falling back to the tier minimum.
+function sanitizeChips(value: unknown, fallback: number): number {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
 export function setupSocketIO(httpServer: HttpServer): void {
@@ -197,14 +192,10 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        // Load authoritative chips from DB (fall back to client value for guest accounts
-        // or when DB shows 0 — 0 means the record is stale/unsynced, not truly broke)
-        const dbChips = await loadPlayerChips(payload.userId);
-        const chips = (dbChips !== null && dbChips > 0) ? dbChips : payload.chips;
-
         const tier = payload.stakeTier as StakeTier;
         const variant = resolveVariant(payload.variant);
         const room = manager.createRoom(tier, payload.maxPlayers ?? 5, variant);
+        const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
         const ok = manager.joinRoom(
           socket.id, room.id,
           payload.userId, payload.username, payload.avatarId, chips,
@@ -243,8 +234,12 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        const dbChips = await loadPlayerChips(payload.userId);
-        const chips = dbChips !== null ? dbChips : payload.chips;
+        const targetRoom = manager.getRoom(payload.tableId);
+        if (!targetRoom) {
+          socket.emit('error', { message: 'Table not found.' });
+          return;
+        }
+        const chips = sanitizeChips(payload.chips, targetRoom.config.minBuyIn);
 
         const ok = manager.joinRoom(
           socket.id, payload.tableId,
@@ -282,13 +277,10 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
 
-        // Fall back to client-supplied chips for guest accounts or when DB shows 0
-        const dbChips = await loadPlayerChips(payload.userId);
-        const chips = (dbChips !== null && dbChips > 0) ? dbChips : (payload.chips ?? 500_000);
-
         const tier = payload.stakeTier as StakeTier;
         const variant = resolveVariant(payload.variant);
         const room = manager.findOrCreateRoom(tier, 5, variant);
+        const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
         const ok = manager.joinRoom(
           socket.id, room.id,
           payload.userId, payload.username, payload.avatarId, chips,
