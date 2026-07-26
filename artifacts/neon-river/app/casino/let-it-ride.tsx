@@ -133,7 +133,8 @@ function InfoModal({ visible, onClose, accent }: { visible: boolean; onClose: ()
 }
 const pt = StyleSheet.create({
   overlay:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' },
-  sheet:       { borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', padding: 20, paddingBottom: 36, maxHeight: '88%' },
+  // height (not maxHeight) gives the inner ScrollView a real parent dimension so flex:1 expands
+  sheet:       { height: '82%', borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden', padding: 20, paddingBottom: 36 },
   hdr:         { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   title:       { fontSize: 14, fontWeight: '900', fontFamily: 'Orbitron_900Black', letterSpacing: 3 },
   close:       { padding: 4 },

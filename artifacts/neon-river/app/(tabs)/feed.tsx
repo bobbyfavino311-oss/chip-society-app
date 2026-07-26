@@ -345,23 +345,30 @@ function LivePostCard({ post }: { post: FeedPost }) {
             <NeonAvatar avatarId={isOwn && profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (post.authorAvatarIndex ?? 1)} size={44} />
           )}
         </TouchableOpacity>
+
+        {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
         <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={cd.username} numberOfLines={1} ellipsizeMode="tail">{post.authorUsername}</Text>
+            <Text style={cd.username}>
+              {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
+            </Text>
           </TouchableOpacity>
-          <Text style={cd.handle} numberOfLines={1} ellipsizeMode="tail">@{post.authorUsername} · {timeSince(post.createdAt)}</Text>
+          <View style={cd.handleRow}>
+            <Text style={cd.handle}>@{isOwn ? profile.username : post.authorUsername} · {timeSince(post.createdAt)}</Text>
+            <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
+              <Ionicons name={typeIcon} size={9} color={typeColor} />
+              <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+            </View>
+          </View>
         </View>
-        <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
-          <Ionicons name={typeIcon} size={9} color={typeColor} />
-          <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
-        </View>
+
         {!isOwn && (
           <TouchableOpacity
             style={[cd.followBtn, following && cd.followBtnActive]}
             onPress={() => following ? unfollow(post.authorId) : follow(post.authorId, post.authorUsername, post.authorAvatarIndex, post.authorRank ?? '')}
           >
             {following && <Ionicons name="checkmark" size={9} color="#000f22" />}
-            <Text style={[cd.followText, following && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
+            <Text style={[cd.followText, following && cd.followBtnActive && cd.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity onPress={() => setShowMenu(true)} style={cd.moreBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -564,28 +571,41 @@ function PostCard({ post }: { post: SocialPost }) {
         }}>
           {post.playerId === 'me' && profile.profileImageType === 'custom' && profile.avatarUri
             ? <Image source={{ uri: profile.avatarUri }} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }} />
-            : <NeonAvatar avatarId={player?.avatarId ?? 1} size={44} />
+            : <NeonAvatar
+                avatarId={
+                  post.playerId === 'me'
+                    ? (profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : 1)
+                    : (player?.avatarId ?? 1)
+                }
+                size={44}
+              />
           }
           {player?.status === 'online'  && <View style={cd.onlineDot} />}
           {player?.status === 'in_game' && <View style={[cd.onlineDot, { backgroundColor: '#ffd700' }]} />}
         </TouchableOpacity>
 
+        {/* Name col — type badge moved inside handle row so name is never compressed */}
         <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => {
             if (post.playerId === 'me') { router.push('/(tabs)/profile'); return; }
             router.push(`/social/player-profile?id=${post.playerId}`);
           }}>
             <View style={cd.usernameRow}>
-              <Text style={cd.username} numberOfLines={1} ellipsizeMode="tail">{player?.username ?? 'Unknown'}</Text>
+              <Text style={cd.username}>
+                {post.playerId === 'me'
+                  ? (profile.displayName || profile.username)
+                  : (player?.username ?? 'Unknown')}
+              </Text>
               {primaryBadge && <Text style={cd.badgeIcon}>{primaryBadge.icon}</Text>}
             </View>
           </TouchableOpacity>
-          <Text style={cd.handle} numberOfLines={1} ellipsizeMode="tail">@{player?.username ?? ''} · {post.timeAgo}</Text>
-        </View>
-
-        <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
-          <Ionicons name={POST_TYPE_ICONS[post.tag]} size={9} color={typeColor} />
-          <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+          <View style={cd.handleRow}>
+            <Text style={cd.handle}>@{player?.username ?? ''} · {post.timeAgo}</Text>
+            <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
+              <Ionicons name={POST_TYPE_ICONS[post.tag]} size={9} color={typeColor} />
+              <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
+            </View>
+          </View>
         </View>
 
         {post.playerId !== 'me' && post.playerId !== profile.playerId && (
@@ -795,10 +815,12 @@ const cd = StyleSheet.create({
     width: 10, height: 10, borderRadius: 5,
     backgroundColor: '#00ff88', borderWidth: 1.5, borderColor: '#070016',
   },
-  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4, overflow: 'hidden' },
-  username:    { color: '#ffffff', fontSize: 14, fontWeight: '800', flexShrink: 1 },
+  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  username:    { color: '#ffffff', fontSize: 14, fontWeight: '800' },
   badgeIcon:   { fontSize: 12 },
-  handle:      { color: 'rgba(255,255,255,0.38)', fontSize: 10, marginTop: 2, flexShrink: 1 },
+  // handle + type badge sit together on one row; badge moved here from top-level header row
+  handleRow:   { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2, flexWrap: 'wrap' },
+  handle:      { color: 'rgba(255,255,255,0.38)', fontSize: 10 },
 
   // ── Type badge (WIN / BLUFF / etc.) ───────────────────────────────────────
   typeBadge: { borderRadius: 10, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 3 },

@@ -88,16 +88,26 @@ export default function MultiplayerGame() {
   const [tableLayout, setTableLayout] = useState({ w: 0, h: 0 });
 
   // Per-hand W/L tracking
-  const prevWinnersKeyRef = useRef<string>('');
-  const handsWonRef       = useRef(0);
-  const handsLostRef      = useRef(0);
-  const xpEarnedRef       = useRef(0);
+  const prevWinnersKeyRef  = useRef<string>('');
+  const handsWonRef        = useRef(0);
+  const handsLostRef       = useRef(0);
+  const xpEarnedRef        = useRef(0);
+  // Track most-recent non-zero chip count so doLeave() is safe even if gs goes stale on disconnect
+  const lastKnownChipsRef  = useRef<number>(buyIn ?? 0);
 
   const gs: ClientGameState | null = gameState;
 
   useEffect(() => {
     if (!tableId) router.replace('/multiplayer/lobby' as any);
   }, [tableId]);
+
+  // Keep a rolling snapshot of the player's chip count so doLeave() is safe
+  // even if gameState clears right as the socket disconnects
+  useEffect(() => {
+    if (!gs || gs.mySeat === undefined || gs.mySeat === -1) return;
+    const chips = gs.seats[gs.mySeat]?.chips;
+    if (chips != null && chips > 0) lastKnownChipsRef.current = chips;
+  }, [gs]);
 
   // Detect new showdown results each hand
   useEffect(() => {
@@ -162,9 +172,11 @@ export default function MultiplayerGame() {
   };
 
   const doLeave = async () => {
-    const finalChips = gs?.mySeat !== undefined && gs.mySeat !== -1
+    // Prefer live gs chips; fall back to last known non-zero value if gs went stale on disconnect
+    const gsChips = gs?.mySeat !== undefined && gs.mySeat !== -1
       ? (gs.seats[gs.mySeat]?.chips ?? 0)
       : 0;
+    const finalChips = gsChips > 0 ? gsChips : lastKnownChipsRef.current;
     if (finalChips > 0) {
       await addChips(finalChips);
     }
