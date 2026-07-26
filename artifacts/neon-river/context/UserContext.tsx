@@ -632,7 +632,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // save immediately so it can never be lost to a premature app close.
     // Same for terms acceptance — must not be lost to the debounce window,
     // since it's the source of truth for skipping the re-prompt next login.
-    if (updated.tutorialCompleted || updated.termsAcceptedVersion) {
+    if (updated.tutorialCompleted || updated.termsAcceptedVersion || updated.symbolIndex) {
       void serverSaveProfile(updated.playerId, updated);
       return;
     }

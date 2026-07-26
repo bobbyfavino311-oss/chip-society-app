@@ -272,7 +272,8 @@ function LivePostCard({ post }: { post: FeedPost }) {
   const [myComment, setMyComment] = useState('');
   const [showMenu,  setShowMenu]  = useState(false);
 
-  const isOwn      = post.authorId === profile.playerId;
+  const isOwn      = post.authorId === profile.playerId ||
+    (!!profile.username && profile.username !== 'CS_Player' && post.authorUsername === profile.username);
   const following  = isFollowing(post.authorId);
   const reposted   = isReposted(post.id);
   const typeColor  = POST_TAG_COLORS[post.tag as PostTag] ?? '#00d4ff';
@@ -341,7 +342,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
           {isOwn && profile.profileImageType === 'custom' && profile.avatarUri ? (
             <Image source={{ uri: profile.avatarUri }} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }} />
           ) : (
-            <NeonAvatar avatarId={isOwn && profile.symbolIndex && profile.symbolIndex > 0 ? profile.symbolIndex : (post.authorAvatarIndex ?? 1)} size={44} />
+            <NeonAvatar avatarId={isOwn ? (profile.symbolIndex ?? profile.avatarIndex ?? post.authorAvatarIndex ?? 1) : (post.authorAvatarIndex ?? 1)} size={44} />
           )}
         </TouchableOpacity>
 
