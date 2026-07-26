@@ -64,13 +64,20 @@ export default function PhotoSelectScreen() {
 
       if (!result.canceled && result.assets[0]) {
         const srcUri = result.assets[0].uri;
-        // Copy to permanent document directory so the URI stays valid after app restarts.
+        // Always copy to the permanent document directory so the URI survives
+        // app restarts, iOS cache eviction, and ph:// PHAsset URI expiry.
         let finalUri = srcUri;
-        if (FileSystem.documentDirectory && srcUri.startsWith('file://')) {
+        if (FileSystem.documentDirectory) {
           const fileName = `avatar_${Date.now()}.jpg`;
           const dest = FileSystem.documentDirectory + fileName;
-          await FileSystem.copyAsync({ from: srcUri, to: dest });
-          finalUri = dest;
+          try {
+            await FileSystem.copyAsync({ from: srcUri, to: dest });
+            finalUri = dest;
+          } catch {
+            // copyAsync can fail for ph:// on some iOS versions; keep srcUri
+            // and let the 2-s timeout in the feed card handle graceful fallback.
+            finalUri = srcUri;
+          }
         }
         await updateProfile({ avatarUri: finalUri, profileImageType: 'custom' });
         router.back();

@@ -272,6 +272,15 @@ function LivePostCard({ post }: { post: FeedPost }) {
   const [myComment, setMyComment] = useState('');
   const [showMenu,  setShowMenu]  = useState(false);
   const [avatarImgFailed, setAvatarImgFailed] = useState(false);
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+
+  // Timeout fallback: if the image neither loads nor errors within 2 s, treat as failed
+  React.useEffect(() => {
+    if (!avatarLoaded && profile.profileImageType === 'custom' && profile.avatarUri) {
+      const t = setTimeout(() => setAvatarImgFailed(f => f ? f : true), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [profile.avatarUri, profile.profileImageType, avatarLoaded]);
 
   const isOwn      = post.authorId === profile.playerId ||
     (!!profile.username && profile.username !== 'CS_Player' && post.authorUsername === profile.username);
@@ -344,17 +353,18 @@ function LivePostCard({ post }: { post: FeedPost }) {
             <Image
               source={{ uri: profile.avatarUri }}
               style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
+              onLoad={() => setAvatarLoaded(true)}
               onError={() => setAvatarImgFailed(true)}
             />
           ) : (
-            <NeonAvatar avatarId={isOwn ? (profile.symbolIndex ?? profile.avatarIndex ?? post.authorAvatarIndex ?? 1) : (post.authorAvatarIndex ?? 1)} size={44} />
+            <NeonAvatar avatarId={isOwn ? (profile.symbolIndex || profile.avatarIndex || post.authorAvatarIndex || 1) : (post.authorAvatarIndex || 1)} size={44} />
           )}
         </TouchableOpacity>
 
         {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
         <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={cd.username} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+            <Text style={[cd.username, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">
               {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
             </Text>
           </TouchableOpacity>
@@ -601,7 +611,7 @@ function PostCard({ post }: { post: SocialPost }) {
             router.push(`/social/player-profile?id=${post.playerId}`);
           }}>
             <View style={cd.usernameRow}>
-              <Text style={[cd.username, { flex: 1 }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+              <Text style={[cd.username, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">
                 {post.playerId === 'me'
                   ? (profile.displayName || profile.username)
                   : (player?.username ?? 'Unknown')}
@@ -2130,8 +2140,13 @@ export default function FeedScreen() {
 
   type FeedItem = { _k: 'live'; post: FeedPost } | { _k: 'mock'; post: SocialPost };
 
+  // AI personality accounts that may exist as seeded DB records — exclude from live feed
+  const AI_USERNAMES = new Set(['RoyalRiver','RiverRat','ChipBandit','BluffMachine','TiltDealer']);
+
   const feedItems = useCallback((): FeedItem[] => {
-    const liveFiltered = livePosts.filter(p => !isMuted(p.authorId) && !isBlocked(p.authorId));
+    const liveFiltered = livePosts.filter(p =>
+      !isMuted(p.authorId) && !isBlocked(p.authorId) && !AI_USERNAMES.has(p.authorUsername),
+    );
     const liveItems: FeedItem[] = liveFiltered.map(p => ({ _k: 'live' as const, post: p }));
 
     const useFiller = liveItems.length < 8;

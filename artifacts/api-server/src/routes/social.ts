@@ -489,7 +489,7 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
       id:              r.id,
       authorId:        r.authorId,
       authorUsername:  r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
-      authorAvatarIndex: (() => { const lp = liveProfileMap.get(r.authorId); return lp?.symbolIndex ?? lp?.avatarIndex ?? r.authorAvatarIndex ?? 1; })(),
+      authorAvatarIndex: (() => { const lp = liveProfileMap.get(r.authorId); return lp?.symbolIndex || lp?.avatarIndex || r.authorAvatarIndex || 1; })(),
       authorRank:      r.authorRank ?? 'Player',
       content:         r.content,
       tag:             r.tag,
