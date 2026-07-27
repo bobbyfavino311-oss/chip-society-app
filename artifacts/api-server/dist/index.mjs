@@ -84577,8 +84577,8 @@ router7.post("/avatars", async (req, res) => {
     res.status(400).json({ error: "imageBase64 is required" });
     return;
   }
-  if (imageBase64.length > 21e5) {
-    res.status(413).json({ error: "Image too large (max ~1.5 MB)" });
+  if (imageBase64.length > 84e5) {
+    res.status(413).json({ error: "Image too large (max ~6 MB)" });
     return;
   }
   try {
@@ -84653,7 +84653,7 @@ app.use(
   })
 );
 app.use((0, import_cors.default)());
-app.use(import_express9.default.json());
+app.use(import_express9.default.json({ limit: "10mb" }));
 app.use(import_express9.default.urlencoded({ extended: true }));
 var authLimiter = rate_limit_default({
   windowMs: 15 * 60 * 1e3,
@@ -84743,7 +84743,8 @@ async function runMigrations() {
     await client.query(`
       ALTER TABLE players
         ADD COLUMN IF NOT EXISTS suspension_expires_at TIMESTAMPTZ,
-        ADD COLUMN IF NOT EXISTS ban_reason TEXT;
+        ADD COLUMN IF NOT EXISTS ban_reason TEXT,
+        ADD COLUMN IF NOT EXISTS avatar_data TEXT;
     `);
     await client.query(`
       ALTER TABLE player_notifications

@@ -28,9 +28,9 @@ router.post('/avatars', async (req: any, res: any) => {
     return;
   }
 
-  // Sanity-check size: reject anything over 2 MB of base64 (~1.5 MB image)
-  if (imageBase64.length > 2_100_000) {
-    res.status(413).json({ error: 'Image too large (max ~1.5 MB)' });
+  // Sanity-check size: reject anything over 8 MB of base64 (~6 MB image)
+  if (imageBase64.length > 8_400_000) {
+    res.status(413).json({ error: 'Image too large (max ~6 MB)' });
     return;
   }
 
