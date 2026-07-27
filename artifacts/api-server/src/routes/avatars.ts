@@ -9,7 +9,6 @@
 import { Router } from 'express';
 import { db, playersTable } from '@workspace/db';
 import { eq } from 'drizzle-orm';
-import sharp from 'sharp';
 
 const router = Router();
 
@@ -38,15 +37,6 @@ router.post('/avatars', async (req: any, res: any) => {
   try {
     const serveUrl = `${RAILWAY_API}/avatars/${playerId}`;
 
-    // Resize to 400×400 max, re-compress to JPEG quality 80 before storing.
-    // This keeps the stored blob small (~20-40 KB) regardless of source size.
-    const inputBuf = Buffer.from(imageBase64, 'base64');
-    const resizedBuf = await sharp(inputBuf)
-      .resize(400, 400, { fit: 'cover', position: 'centre' })
-      .jpeg({ quality: 80 })
-      .toBuffer();
-    const storedBase64 = resizedBuf.toString('base64');
-
     // Store the base64 image and save the serve URL into profileJson
     const rows = await db
       .select({ profileJson: playersTable.profileJson })
@@ -63,7 +53,7 @@ router.post('/avatars', async (req: any, res: any) => {
     await db
       .update(playersTable)
       .set({
-        avatarData: storedBase64,
+        avatarData: imageBase64,
         profileJson: { ...current, serverAvatarUrl: serveUrl },
         updatedAt: new Date(),
       })
