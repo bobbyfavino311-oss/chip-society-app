@@ -1,3 +1,4 @@
+import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -366,14 +367,15 @@ function LivePostCard({ post }: { post: FeedPost }) {
               : (post.authorAvatarUrl ?? null);
             if (photoUrl && !avatarImgFailed) {
               return (
-                <Image
+                <ExpoImage
                   source={{ uri: photoUrl }}
                   style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
                   onLoad={() => setAvatarLoaded(true)}
                   onError={(e) => {
-                    console.warn('[LivePostCard] image onError', post.authorUsername, JSON.stringify(e.nativeEvent));
+                    console.warn('[LivePostCard] ExpoImage onError', post.authorUsername, JSON.stringify(e));
                     setAvatarImgFailed(true);
                   }}
+                  cachePolicy="memory-disk"
                 />
               );
             }
