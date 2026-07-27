@@ -1,0 +1,431 @@
+# CHIP SOCIETY — CRITICAL PROFILE IDENTITY ARCHITECTURE FIX
+
+The profile that a player sees when viewing their own account is NOT the same profile that other players see.
+
+This is a critical architecture issue.
+
+Do NOT patch this by copying a few missing values.
+
+Do NOT manually synchronize individual fields.
+
+The root problem must be fixed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT BEHAVIOR
+
+"My Profile"
+
+shows:
+
+• correct uploaded avatar
+• correct biography
+• Founder badge
+• correct statistics
+• correct profile information
+
+However...
+
+When another player opens that exact same account...
+
+they see an entirely different profile.
+
+Different avatar.
+
+Different bio.
+
+Different statistics.
+
+Different achievements.
+
+Missing Founder badge.
+
+Different follower counts.
+
+Different profile state.
+
+This means the application is rendering two completely different profile objects.
+
+That architecture is incorrect.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REQUIRED ARCHITECTURE
+
+Every player account must have ONE canonical profile.
+
+Not two.
+
+Not one for social.
+
+Not one for gameplay.
+
+Not one for "Me".
+
+Not one cached locally.
+
+Exactly ONE.
+
+Example:
+
+userId
+
+↓
+
+Canonical Player Profile
+
+↓
+
+Every screen reads from THIS object.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ALL OF THESE MUST USE THE SAME PROFILE
+
+The following screens MUST render the exact same profile data:
+
+My Profile
+
+Public Player Profile
+
+Social Feed
+
+Comments
+
+Followers
+
+Following
+
+Leaderboard
+
+Tournament Results
+
+Gameplay Seats
+
+Friend Requests
+
+Player Search
+
+Notifications
+
+Chat
+
+Achievements
+
+Profile Popups
+
+Recent Winners
+
+Trending Feed
+
+Create Post
+
+Every one of these must request:
+
+getPlayerProfile(userId)
+
+There should not be different queries for:
+
+myProfile
+
+socialProfile
+
+publicProfile
+
+gameProfile
+
+If those objects currently exist separately...
+
+remove that architecture.
+
+Everything should resolve from one canonical player profile.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FIELDS THAT MUST MATCH
+
+The following fields must always be identical regardless of who is viewing the profile.
+
+Avatar
+
+Uploaded Profile Picture
+
+Selected Built-in Avatar
+
+Display Name
+
+Username
+
+Biography
+
+Founder Badge
+
+Moderator Badge
+
+VIP Badge
+
+Local Badge
+
+Player Level
+
+Experience
+
+Achievements
+
+Followers
+
+Following
+
+Win Rate
+
+Hands Played
+
+Tournament Wins
+
+Tournament Played
+
+ITM
+
+Final Tables
+
+Biggest Win
+
+Current Chip Balance (where appropriate)
+
+Every viewer must see the same values.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PROFILE UPDATES
+
+Whenever the player edits:
+
+Display Name
+
+Biography
+
+Avatar
+
+Uploaded Photo
+
+Badge
+
+Theme
+
+Banner
+
+Any editable profile field...
+
+Every public profile should immediately reflect those changes.
+
+Do NOT require:
+
+Logout
+
+Restart
+
+App reinstall
+
+Cache clearing
+
+Another login
+
+The update should propagate automatically.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOCIAL POSTS
+
+Every social post currently references an outdated profile.
+
+Instead of storing old profile information inside posts...
+
+Store:
+
+authorUserId
+
+When rendering the feed...
+
+resolve:
+
+Display Name
+
+Username
+
+Avatar
+
+Badges
+
+from the canonical player profile.
+
+That way...
+
+if the player changes their avatar...
+
+ALL old posts immediately show the new avatar.
+
+If they update their biography...
+
+their profile updates everywhere.
+
+If they earn Founder...
+
+everyone sees Founder.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REMOVE DUPLICATE PROFILE OBJECTS
+
+Search the project for duplicate profile models.
+
+Examples include:
+
+SocialProfile
+
+PublicProfile
+
+PlayerProfile
+
+UserProfile
+
+ProfileCache
+
+FeedProfile
+
+GameProfile
+
+MeProfile
+
+Audit every one.
+
+Determine which object is authoritative.
+
+Create ONE canonical Player Profile model.
+
+Everything else should reference it.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CACHE INVALIDATION
+
+If profile caching is used...
+
+Invalidate the cache whenever:
+
+Avatar changes
+
+Biography changes
+
+Username changes
+
+Display Name changes
+
+Badge changes
+
+Level changes
+
+Achievement unlocked
+
+Follower count changes
+
+Following count changes
+
+Immediately refresh every affected screen.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FOLLOWER COUNTS
+
+Follower counts should come from the same backend source.
+
+Do not calculate them differently between:
+
+My Profile
+
+Public Profile
+
+The values should always match.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACHIEVEMENTS
+
+Achievement progress shown publicly must be the same achievement data shown privately.
+
+Do not use placeholder values.
+
+Do not use cached defaults.
+
+If I have 8 achievements...
+
+both profiles should show 8.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WIN RATE
+
+There must be one calculation.
+
+Not:
+
+My Win Rate
+
+Public Win Rate
+
+The same player should never have:
+
+61%
+
+on one screen
+
+and
+
+0%
+
+on another.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FINAL VERIFICATION
+
+After completing this refactor:
+
+Open My Profile.
+
+Take note of:
+
+Avatar
+
+Display Name
+
+Username
+
+Biography
+
+Badges
+
+Followers
+
+Following
+
+Achievements
+
+Win Rate
+
+Tournament Stats
+
+Hands Played
+
+Then...
+
+Open that same account from another player.
+
+Every single value must be identical.
+
+There should be no difference whatsoever except for the available action buttons (Follow, Message, Edit Profile).
+
+The Edit Profile button should only appear when viewing your own account.
+
+The Follow and Message buttons should only appear when viewing someone else's account.
+
+Everything else should be the exact same profile rendered from the same canonical player data.

@@ -135,6 +135,7 @@ export async function getUnreadCount(playerId: string): Promise<number> {
 export interface PlayerProfile {
   playerId: string;
   username: string;
+  displayName?: string | null;
   level: number;
   chips: number;
   avatarIndex: number;
@@ -144,6 +145,16 @@ export interface PlayerProfile {
   status: string;
   followerCount?: number;
   followingCount?: number;
+  bio?: string | null;
+  serverAvatarUrl?: string | null;
+  founderBadge?: boolean;
+  tournamentWins?: number;
+  tournamentsPlayed?: number;
+  tournamentFinalTables?: number;
+  itmFinishes?: number;
+  biggestTournamentPrize?: number;
+  totalTournamentPrizesWon?: number;
+  tournamentBuyInsSpent?: number;
 }
 
 export async function getPlayerProfile(targetId: string): Promise<PlayerProfile | null> {

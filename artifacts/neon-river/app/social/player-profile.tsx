@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Image as ExpoImage } from 'expo-image';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -41,10 +42,12 @@ const STATUS_COLOR: Record<string, string> = { online: '#00ff88', in_game: '#ffd
 interface DisplayPlayer {
   id: string;
   username: string;
+  displayName?: string | null;
   handle: string;
   avatar?: string;
   avatarColor: string;
   avatarId: number;
+  serverAvatarUrl?: string | null;
   bannerColors: [string, string];
   rank: string;
   level: number;
@@ -53,6 +56,12 @@ interface DisplayPlayer {
   handsPlayed: number;
   biggestPot: number;
   tournamentWins: number;
+  tournamentsPlayed: number;
+  tournamentFinalTables: number;
+  itmFinishes: number;
+  biggestTournamentPrize: number;
+  totalTournamentPrizesWon: number;
+  tournamentBuyInsSpent: number;
   followers: number;
   following: number;
   achievementCount: number;
@@ -69,6 +78,8 @@ function mockToDisplay(p: MockPlayer): DisplayPlayer {
     bannerColors: p.bannerColors, rank: p.rank, level: p.level,
     chips: p.chips, winRate: p.winRate, handsPlayed: p.handsPlayed,
     biggestPot: p.biggestPot, tournamentWins: p.tournamentWins ?? 0,
+    tournamentsPlayed: 0, tournamentFinalTables: 0, itmFinishes: 0,
+    biggestTournamentPrize: 0, totalTournamentPrizesWon: 0, tournamentBuyInsSpent: 0,
     followers: p.followers, following: p.following,
     achievementCount: p.achievementCount, status: p.status,
     badges: p.badges, bio: p.bio, isMock: true,
@@ -76,17 +87,39 @@ function mockToDisplay(p: MockPlayer): DisplayPlayer {
 }
 
 function apiToDisplay(p: PlayerProfile): DisplayPlayer {
+  const badges: DisplayPlayer['badges'] = [];
+  if (p.founderBadge) {
+    badges.push({ id: 'founder', label: 'FOUNDER', icon: '👑', color: '#ffd700' });
+  }
   return {
-    id: p.playerId, username: p.username,
+    id: p.playerId,
+    username: p.username,
+    displayName: p.displayName,
     handle: `@${p.username.toLowerCase().replace(/\s+/g, '')}`,
-    avatarColor: '#00d4ff', avatarId: p.avatarIndex ?? 1,
+    avatarColor: '#00d4ff',
+    avatarId: p.avatarIndex ?? 1,
+    serverAvatarUrl: p.serverAvatarUrl ?? null,
     bannerColors: ['#001a40', '#000d20'],
-    rank: p.rank, level: p.level,
-    chips: p.chips, winRate: p.winRate, handsPlayed: p.handsPlayed,
-    biggestPot: 0, tournamentWins: 0,
-    followers: p.followerCount ?? 0, following: p.followingCount ?? 0,
-    achievementCount: 0, status: p.status,
-    badges: [], bio: 'Chip Society player.', isMock: false,
+    rank: p.rank,
+    level: p.level,
+    chips: p.chips,
+    winRate: p.winRate,
+    handsPlayed: p.handsPlayed,
+    biggestPot: 0,
+    tournamentWins:           p.tournamentWins ?? 0,
+    tournamentsPlayed:        p.tournamentsPlayed ?? 0,
+    tournamentFinalTables:    p.tournamentFinalTables ?? 0,
+    itmFinishes:              p.itmFinishes ?? 0,
+    biggestTournamentPrize:   p.biggestTournamentPrize ?? 0,
+    totalTournamentPrizesWon: p.totalTournamentPrizesWon ?? 0,
+    tournamentBuyInsSpent:    p.tournamentBuyInsSpent ?? 0,
+    followers: p.followerCount ?? 0,
+    following: p.followingCount ?? 0,
+    achievementCount: 0,
+    status: p.status,
+    badges,
+    bio: p.bio ?? 'Chip Society player.',
+    isMock: false,
   };
 }
 
@@ -301,6 +334,12 @@ export default function PlayerProfileScreen() {
       handsPlayed: 0,
       biggestPot: 0,
       tournamentWins: 0,
+      tournamentsPlayed: 0,
+      tournamentFinalTables: 0,
+      itmFinishes: 0,
+      biggestTournamentPrize: 0,
+      totalTournamentPrizesWon: 0,
+      tournamentBuyInsSpent: 0,
       followers: 0,
       following: 0,
       achievementCount: 0,
@@ -426,11 +465,19 @@ export default function PlayerProfileScreen() {
         </TouchableOpacity>
 
         <View style={s.avatarWrap}>
-          <NeonAvatar avatarId={player.avatarId} size={72} />
+          {player.serverAvatarUrl ? (
+            <ExpoImage
+              source={{ uri: player.serverAvatarUrl }}
+              style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: '#ff0090' }}
+              cachePolicy="none"
+            />
+          ) : (
+            <NeonAvatar avatarId={player.avatarId} size={72} />
+          )}
           <LinearGradient colors={[`${player.avatarColor}50`, 'transparent']} style={s.avatarGlow} />
         </View>
 
-        <Text style={s.username}>{player.username}</Text>
+        <Text style={s.username}>{player.displayName || player.username}</Text>
         <Text style={s.handle}>{player.handle}</Text>
         <Text style={s.bio}>{player.bio}</Text>
 
@@ -555,10 +602,33 @@ export default function PlayerProfileScreen() {
                 </>
               );
             })()
-          ) : (player.tournamentWins ?? 0) > 0 ? (
-            <View style={s.statsRow}>
-              <StatItem label="TOURNAMENT WINS" value={String(player.tournamentWins)} color={colors.gold} icon="trophy" />
-            </View>
+          ) : player.tournamentsPlayed > 0 ? (
+            (() => {
+              const profit = player.totalTournamentPrizesWon - player.tournamentBuyInsSpent;
+              return (
+                <>
+                  <View style={s.statsRow}>
+                    <StatItem label="WINS"   value={String(player.tournamentWins)}  color={colors.gold}    icon="trophy" />
+                    <StatItem label="PLAYED" value={String(player.tournamentsPlayed)} icon="card" />
+                  </View>
+                  <View style={s.statsRow}>
+                    <StatItem label="FINAL TABLES" value={String(player.tournamentFinalTables)} icon="podium" />
+                    <StatItem label="ITM"          value={String(player.itmFinishes)} color={colors.success} icon="cash" />
+                  </View>
+                  {player.biggestTournamentPrize > 0 && (
+                    <View style={s.statsRow}>
+                      <StatItem label="LARGEST CASH" value={formatBig(player.biggestTournamentPrize)} color={colors.gold} icon="diamond" />
+                      <StatItem
+                        label="PROFIT"
+                        value={`${profit >= 0 ? '+' : '-'}${formatBig(Math.abs(profit))}`}
+                        color={profit >= 0 ? colors.success : colors.error}
+                        icon="stats-chart"
+                      />
+                    </View>
+                  )}
+                </>
+              );
+            })()
           ) : (
             <View style={s.comingSoonBox}>
               <LinearGradient colors={['#1a0035', '#080018']} style={StyleSheet.absoluteFill} />

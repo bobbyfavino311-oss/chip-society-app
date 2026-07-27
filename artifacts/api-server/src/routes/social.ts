@@ -99,17 +99,36 @@ router.get('/social/players/:id', async (req, res) => {
 
     res.json({
       player: {
-        playerId:      r.playerId,
-        username:      r.username,
-        level:         pj?.level ?? 1,
-        chips:         pj?.chips ?? 0,
-        avatarIndex:   pj?.symbolIndex ?? pj?.avatarIndex ?? 1,
-        rank:          pj?.rank ?? 'Player',
-        winRate:       pj?.winRate ?? 0,
-        handsPlayed:   pj?.handsPlayed ?? 0,
-        status:        r.status,
-        followerCount: followerRow?.count ?? 0,
-        followingCount: followingRow?.count ?? 0,
+        playerId:               r.playerId,
+        username:               r.username,
+        level:                  pj?.level ?? 1,
+        chips:                  pj?.chips ?? 0,
+        avatarIndex:            pj?.symbolIndex ?? pj?.avatarIndex ?? 1,
+        rank:                   pj?.rank ?? 'Player',
+        handsPlayed:            pj?.handsPlayed ?? 0,
+        // winRate is a derived value — compute from stored wins/handsPlayed so it matches the client
+        winRate: (() => {
+          const wins = pj?.wins ?? 0;
+          const hands = pj?.handsPlayed ?? 0;
+          return hands > 0 ? Math.round((wins / hands) * 100) : 0;
+        })(),
+        status:                 r.status,
+        followerCount:          followerRow?.count ?? 0,
+        followingCount:         followingRow?.count ?? 0,
+        // Profile enrichment fields
+        bio:                    pj?.bio ?? null,
+        displayName:            pj?.displayName ?? null,
+        serverAvatarUrl:        pj?.serverAvatarUrl ?? null,
+        // Admin sets isFounder in profileJson; expose it as founderBadge for clients
+        founderBadge:           pj?.isFounder ?? pj?.founderBadge ?? false,
+        // Tournament stats
+        tournamentWins:         pj?.tournamentWins ?? 0,
+        tournamentsPlayed:      pj?.tournamentsPlayed ?? 0,
+        tournamentFinalTables:  pj?.tournamentFinalTables ?? 0,
+        itmFinishes:            pj?.itmFinishes ?? 0,
+        biggestTournamentPrize: pj?.biggestTournamentPrize ?? 0,
+        totalTournamentPrizesWon: pj?.totalTournamentPrizesWon ?? 0,
+        tournamentBuyInsSpent:  pj?.tournamentBuyInsSpent ?? 0,
       },
     });
   } catch (e) {

@@ -275,6 +275,9 @@ function LivePostCard({ post }: { post: FeedPost }) {
   const [avatarImgFailed, setAvatarImgFailed] = useState(false);
   const [avatarLoaded, setAvatarLoaded] = useState(false);
 
+  const isOwn      = post.authorId === profile.playerId ||
+    (!!profile.username && profile.username !== 'CS_Player' && post.authorUsername === profile.username);
+
   // Timeout fallback: only for own local-file avatars which can silently fail on iOS.
   // Server-hosted URLs (post.authorAvatarUrl) have proper onLoad/onError — no timeout needed.
   React.useEffect(() => {
@@ -284,9 +287,6 @@ function LivePostCard({ post }: { post: FeedPost }) {
       return () => clearTimeout(t);
     }
   }, [isOwn, profile.avatarUri, profile.profileImageType, avatarLoaded]);
-
-  const isOwn      = post.authorId === profile.playerId ||
-    (!!profile.username && profile.username !== 'CS_Player' && post.authorUsername === profile.username);
 
   const following  = isFollowing(post.authorId);
   const reposted   = isReposted(post.id);
@@ -370,7 +370,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
                   style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
                   onLoad={() => setAvatarLoaded(true)}
                   onError={() => setAvatarImgFailed(true)}
-                  cachePolicy="no-cache"
+                  cachePolicy="none"
                 />
               );
             }
