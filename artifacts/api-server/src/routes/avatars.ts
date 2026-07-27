@@ -35,7 +35,9 @@ router.post('/avatars', async (req: any, res: any) => {
   }
 
   try {
-    const serveUrl = `${RAILWAY_API}/avatars/${playerId}`;
+    // Append a version timestamp so each upload gets a unique URL, busting
+    // any CDN or client-side disk cache from a previous upload.
+    const serveUrl = `${RAILWAY_API}/avatars/${playerId}?v=${Date.now()}`;
 
     // Store the base64 image and save the serve URL into profileJson
     const rows = await db
@@ -83,7 +85,8 @@ router.get('/avatars/:playerId', async (req: any, res: any) => {
 
     const buf = Buffer.from(b64, 'base64');
     res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
+    // Short TTL — versioned URLs (?v=timestamp) handle cache busting per upload.
+    res.setHeader('Cache-Control', 'public, max-age=3600');
     res.end(buf);
   } catch (err: any) {
     res.status(500).json({ error: err?.message ?? 'Failed to serve avatar' });
