@@ -370,7 +370,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
                   style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
                   onLoad={() => setAvatarLoaded(true)}
                   onError={() => setAvatarImgFailed(true)}
-                  cachePolicy="memory-disk"
+                  cachePolicy="no-cache"
                 />
               );
             }
