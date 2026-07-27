@@ -559,11 +559,15 @@ router.post('/social/posts', requirePlayer, async (req: any, res) => {
       authorRank:        resolvedRank,
     }).returning();
 
+    // Include serverAvatarUrl so the optimistic insert shows the photo immediately
+    const authorAvatarUrl = (author?.profileJson as any)?.serverAvatarUrl ?? null;
+
     const post = {
       id:              created!.id,
       authorId:        playerId,
       authorUsername:  created!.authorUsername ?? resolvedUsername,
       authorAvatarIndex: created!.authorAvatarIndex ?? resolvedAvatarIndex,
+      authorAvatarUrl,
       authorRank:      created!.authorRank ?? resolvedRank,
       content:         created!.content,
       tag:             created!.tag,

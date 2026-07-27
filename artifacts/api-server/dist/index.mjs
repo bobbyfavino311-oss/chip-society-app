@@ -84149,11 +84149,13 @@ router4.post("/social/posts", requirePlayer, async (req, res) => {
       authorAvatarIndex: resolvedAvatarIndex,
       authorRank: resolvedRank
     }).returning();
+    const authorAvatarUrl = author?.profileJson?.serverAvatarUrl ?? null;
     const post = {
       id: created.id,
       authorId: playerId,
       authorUsername: created.authorUsername ?? resolvedUsername,
       authorAvatarIndex: created.authorAvatarIndex ?? resolvedAvatarIndex,
+      authorAvatarUrl,
       authorRank: created.authorRank ?? resolvedRank,
       content: created.content,
       tag: created.tag,

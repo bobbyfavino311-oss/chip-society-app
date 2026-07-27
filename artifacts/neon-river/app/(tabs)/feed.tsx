@@ -362,8 +362,13 @@ function LivePostCard({ post }: { post: FeedPost }) {
         <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
           {/* For own posts: prefer local avatarUri (instant after pick); for others: use server-hosted authorAvatarUrl */}
           {(() => {
+            // For own posts: prefer local avatarUri (instant after pick); fall back to any
+            // server-hosted URL from the post itself (covers photos uploaded server-side).
+            // For others: use the server-hosted authorAvatarUrl directly.
             const photoUrl = isOwn
-              ? (profile.profileImageType === 'custom' ? (profile.avatarUri ?? profile.serverAvatarUrl ?? null) : null)
+              ? (profile.profileImageType === 'custom'
+                  ? (profile.avatarUri ?? profile.serverAvatarUrl ?? post.authorAvatarUrl ?? null)
+                  : (post.authorAvatarUrl ?? profile.serverAvatarUrl ?? null))
               : (post.authorAvatarUrl ?? null);
             if (photoUrl && !avatarImgFailed) {
               return (
