@@ -84564,6 +84564,7 @@ var referrals_default = router6;
 
 // src/routes/avatars.ts
 var import_express7 = __toESM(require_express2(), 1);
+import sharp from "sharp";
 var router7 = (0, import_express7.Router)();
 var RAILWAY_API = "https://api-server-production-bbc2.up.railway.app/api";
 router7.post("/avatars", async (req, res) => {
@@ -84583,6 +84584,9 @@ router7.post("/avatars", async (req, res) => {
   }
   try {
     const serveUrl = `${RAILWAY_API}/avatars/${playerId}`;
+    const inputBuf = Buffer.from(imageBase64, "base64");
+    const resizedBuf = await sharp(inputBuf).resize(400, 400, { fit: "cover", position: "centre" }).jpeg({ quality: 80 }).toBuffer();
+    const storedBase64 = resizedBuf.toString("base64");
     const rows = await db.select({ profileJson: playersTable.profileJson }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
     if (!rows[0]) {
       res.status(404).json({ error: "Player not found" });
@@ -84590,7 +84594,7 @@ router7.post("/avatars", async (req, res) => {
     }
     const current = rows[0].profileJson ?? {};
     await db.update(playersTable).set({
-      avatarData: imageBase64,
+      avatarData: storedBase64,
       profileJson: { ...current, serverAvatarUrl: serveUrl },
       updatedAt: /* @__PURE__ */ new Date()
     }).where(eq(playersTable.playerId, playerId));

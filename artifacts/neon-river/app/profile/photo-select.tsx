@@ -104,9 +104,14 @@ export default function PhotoSelectScreen() {
           try {
             const serveUrl = await uploadAvatarPhoto(playerId, localUri);
             await updateProfile({ serverAvatarUrl: serveUrl });
-          } catch {
-            // Upload failed — photo still shows locally for the owner; others
-            // will see the symbol avatar until a successful upload.
+          } catch (uploadErr: any) {
+            // Surface the real error so we can debug
+            const msg = uploadErr?.message ?? String(uploadErr);
+            console.error('[avatar upload error]', msg);
+            Alert.alert(
+              'Photo saved locally',
+              `Could not upload to server: ${msg}\n\nYour photo is saved on this device.`,
+            );
           }
         }
 
