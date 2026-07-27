@@ -370,7 +370,10 @@ function LivePostCard({ post }: { post: FeedPost }) {
                   source={{ uri: photoUrl }}
                   style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: colors.primary }}
                   onLoad={() => setAvatarLoaded(true)}
-                  onError={() => setAvatarImgFailed(true)}
+                  onError={(e) => {
+                    console.warn('[LivePostCard] image onError', post.authorUsername, JSON.stringify(e.nativeEvent));
+                    setAvatarImgFailed(true);
+                  }}
                 />
               );
             }
