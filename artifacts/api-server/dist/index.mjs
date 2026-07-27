@@ -83810,11 +83810,30 @@ router4.get("/social/players/:id", async (req, res) => {
         chips: pj?.chips ?? 0,
         avatarIndex: pj?.symbolIndex ?? pj?.avatarIndex ?? 1,
         rank: pj?.rank ?? "Player",
-        winRate: pj?.winRate ?? 0,
         handsPlayed: pj?.handsPlayed ?? 0,
+        // winRate is a derived value — compute from stored wins/handsPlayed so it matches the client
+        winRate: (() => {
+          const wins = pj?.wins ?? 0;
+          const hands = pj?.handsPlayed ?? 0;
+          return hands > 0 ? Math.round(wins / hands * 100) : 0;
+        })(),
         status: r.status,
         followerCount: followerRow?.count ?? 0,
-        followingCount: followingRow?.count ?? 0
+        followingCount: followingRow?.count ?? 0,
+        // Profile enrichment fields
+        bio: pj?.bio ?? null,
+        displayName: pj?.displayName ?? null,
+        serverAvatarUrl: pj?.serverAvatarUrl ?? null,
+        // Admin sets isFounder in profileJson; expose it as founderBadge for clients
+        founderBadge: pj?.isFounder ?? pj?.founderBadge ?? false,
+        // Tournament stats
+        tournamentWins: pj?.tournamentWins ?? 0,
+        tournamentsPlayed: pj?.tournamentsPlayed ?? 0,
+        tournamentFinalTables: pj?.tournamentFinalTables ?? 0,
+        itmFinishes: pj?.itmFinishes ?? 0,
+        biggestTournamentPrize: pj?.biggestTournamentPrize ?? 0,
+        totalTournamentPrizesWon: pj?.totalTournamentPrizesWon ?? 0,
+        tournamentBuyInsSpent: pj?.tournamentBuyInsSpent ?? 0
       }
     });
   } catch (e) {
@@ -84584,7 +84603,7 @@ router7.post("/avatars", async (req, res) => {
     return;
   }
   try {
-    const serveUrl = `${RAILWAY_API}/avatars/${playerId}`;
+    const serveUrl = `${RAILWAY_API}/avatars/${playerId}?v=${Date.now()}`;
     const rows = await db.select({ profileJson: playersTable.profileJson }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
     if (!rows[0]) {
       res.status(404).json({ error: "Player not found" });
@@ -84612,7 +84631,7 @@ router7.get("/avatars/:playerId", async (req, res) => {
     }
     const buf = Buffer.from(b64, "base64");
     res.setHeader("Content-Type", "image/jpeg");
-    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.setHeader("Cache-Control", "public, max-age=3600");
     res.end(buf);
   } catch (err) {
     res.status(500).json({ error: err?.message ?? "Failed to serve avatar" });
