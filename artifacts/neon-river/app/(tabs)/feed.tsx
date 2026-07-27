@@ -286,6 +286,14 @@ function LivePostCard({ post }: { post: FeedPost }) {
 
   const isOwn      = post.authorId === profile.playerId ||
     (!!profile.username && profile.username !== 'CS_Player' && post.authorUsername === profile.username);
+
+  // Debug: log first render for each post so we can trace the avatar URL in Expo logs
+  React.useEffect(() => {
+    if (post.authorAvatarUrl) {
+      console.log('[LivePostCard]', post.authorUsername, 'avatarUrl:', post.authorAvatarUrl?.slice(0, 60), 'isOwn:', isOwn, 'failed:', avatarImgFailed);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post.id, avatarImgFailed]);
   const following  = isFollowing(post.authorId);
   const reposted   = isReposted(post.id);
   const typeColor  = POST_TAG_COLORS[post.tag as PostTag] ?? '#00d4ff';
