@@ -31,3 +31,4 @@
 - [RevenueCat wiring — consumables](revenuecat-wiring.md) — react-native-purchases@10.4.4; offering id "chip_shop"; 9 consumable products; "react-native-purchases" plugin must NOT be in app.json plugins (crashes Expo Go with PluginError — no app.plugin.js in that package version).
 - [Server-hosted avatar photos](server-hosted-avatars.md) — GCS upload via presigned URL; serverAvatarUrl in profileJson; feed returns authorAvatarUrl; GET /api/avatars/:objectId serves publicly.
 - [Feed avatar display](feed-avatar-display.md) — own-post photoUrl must fall back to post.authorAvatarUrl; createPost must return authorAvatarUrl; use expo-image not RN Image for Railway URLs.
+- [Player profile architecture](player-profile-architecture.md) — winRate is a derived getter (never in profileJson); founderBadge stored as isFounder; lib/db dist .d.ts is hand-maintained; cachePolicy="none" not "no-cache".
