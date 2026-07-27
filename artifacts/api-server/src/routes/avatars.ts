@@ -1,83 +1,90 @@
 // ─── Avatar upload + serving ──────────────────────────────────────────────────
-// POST /api/avatars/upload-url  — returns a short-lived presigned PUT URL
-//                                 the mobile client uploads directly to GCS.
-// GET  /api/avatars/:objectId   — proxies the image from GCS, publicly (no auth).
+// POST /api/avatars   — accepts { imageBase64 } JSON, stores in DB.
+// GET  /api/avatars/:playerId — serves the stored image publicly (no auth).
+//
+// Intentionally uses DB storage (not GCS) so this works on Railway without
+// requiring the Replit sidecar auth endpoint that only exists in Replit's own
+// hosting environment.
 
 import { Router } from 'express';
 import { db, playersTable } from '@workspace/db';
 import { eq } from 'drizzle-orm';
-import { objectStorageClient } from '../lib/objectStorage.js';
 
 const router = Router();
 
-const BUCKET = () => {
-  const id = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  if (!id) throw new Error('DEFAULT_OBJECT_STORAGE_BUCKET_ID not set');
-  return objectStorageClient.bucket(id);
-};
-
 const RAILWAY_API = 'https://api-server-production-bbc2.up.railway.app/api';
 
-// ── POST /api/avatars/upload-url ──────────────────────────────────────────────
-router.post('/avatars/upload-url', async (req: any, res: any) => {
+// ── POST /api/avatars — upload avatar photo ───────────────────────────────────
+router.post('/avatars', async (req: any, res: any) => {
   const playerId = req.headers['x-player-id'] as string | undefined;
   if (!playerId) {
     res.status(401).json({ error: 'x-player-id header required' });
     return;
   }
 
+  const { imageBase64 } = req.body as { imageBase64?: string };
+  if (!imageBase64 || typeof imageBase64 !== 'string') {
+    res.status(400).json({ error: 'imageBase64 is required' });
+    return;
+  }
+
+  // Sanity-check size: reject anything over 2 MB of base64 (~1.5 MB image)
+  if (imageBase64.length > 2_100_000) {
+    res.status(413).json({ error: 'Image too large (max ~1.5 MB)' });
+    return;
+  }
+
   try {
-    const objectId = `${playerId}-${Date.now()}.jpg`;
-    const file = BUCKET().file(`avatars/${objectId}`);
+    const serveUrl = `${RAILWAY_API}/avatars/${playerId}`;
 
-    const [uploadUrl] = await file.getSignedUrl({
-      version: 'v4',
-      action: 'write',
-      expires: Date.now() + 15 * 60 * 1000, // 15 min
-      contentType: 'image/jpeg',
-    });
-
-    const serveUrl = `${RAILWAY_API}/avatars/${objectId}`;
-
-    // Optimistically save the serveUrl into the player's profileJson so the
-    // feed starts returning it immediately (upload happens client-side).
+    // Store the base64 image and save the serve URL into profileJson
     const rows = await db
       .select({ profileJson: playersTable.profileJson })
       .from(playersTable)
       .where(eq(playersTable.playerId, playerId))
       .limit(1);
-    if (rows[0]) {
-      const current = (rows[0].profileJson ?? {}) as Record<string, unknown>;
-      await db
-        .update(playersTable)
-        .set({ profileJson: { ...current, serverAvatarUrl: serveUrl }, updatedAt: new Date() })
-        .where(eq(playersTable.playerId, playerId));
+
+    if (!rows[0]) {
+      res.status(404).json({ error: 'Player not found' });
+      return;
     }
 
-    res.json({ uploadUrl, serveUrl, objectId });
+    const current = (rows[0].profileJson ?? {}) as Record<string, unknown>;
+    await db
+      .update(playersTable)
+      .set({
+        avatarData: imageBase64,
+        profileJson: { ...current, serverAvatarUrl: serveUrl },
+        updatedAt: new Date(),
+      })
+      .where(eq(playersTable.playerId, playerId));
+
+    res.json({ serveUrl });
   } catch (err: any) {
-    res.status(500).json({ error: err?.message ?? 'Failed to generate upload URL' });
+    res.status(500).json({ error: err?.message ?? 'Upload failed' });
   }
 });
 
-// ── GET /api/avatars/:objectId — public, no auth ──────────────────────────────
-router.get('/avatars/:objectId', async (req: any, res: any) => {
-  const { objectId } = req.params as { objectId: string };
-  // Reject path traversal attempts
-  if (!objectId || objectId.includes('/') || objectId.includes('..')) {
-    res.status(400).json({ error: 'Invalid object ID' });
-    return;
-  }
+// ── GET /api/avatars/:playerId — serve avatar publicly ────────────────────────
+router.get('/avatars/:playerId', async (req: any, res: any) => {
+  const { playerId } = req.params as { playerId: string };
   try {
-    const file = BUCKET().file(`avatars/${objectId}`);
-    const [exists] = await file.exists();
-    if (!exists) {
-      res.status(404).json({ error: 'Avatar not found' });
+    const rows = await db
+      .select({ avatarData: playersTable.avatarData })
+      .from(playersTable)
+      .where(eq(playersTable.playerId, playerId))
+      .limit(1);
+
+    const b64 = rows[0]?.avatarData;
+    if (!b64) {
+      res.status(404).json({ error: 'No avatar found' });
       return;
     }
+
+    const buf = Buffer.from(b64, 'base64');
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Cache-Control', 'public, max-age=86400');
-    file.createReadStream().pipe(res);
+    res.end(buf);
   } catch (err: any) {
     res.status(500).json({ error: err?.message ?? 'Failed to serve avatar' });
   }

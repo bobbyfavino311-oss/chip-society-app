@@ -171,30 +171,29 @@ export async function getBlocks(playerId: string): Promise<string[]> {
 
 const RAILWAY_API = 'https://api-server-production-bbc2.up.railway.app/api';
 
-/** Request a presigned GCS upload URL, then PUT the image directly to GCS.
- *  Returns the permanent serve URL (via our API proxy) on success. */
+/** Upload a local image file to the server as base64 and get back a permanent
+ *  public URL that all users can load in feed cards. */
 export async function uploadAvatarPhoto(
   playerId: string,
   localUri: string,
 ): Promise<string> {
-  // Step 1 — get presigned URL from our server
-  const r1 = await fetch(`${RAILWAY_API}/avatars/upload-url`, {
+  // Read the local file as base64 using the Expo FileSystem API (dynamic import
+  // keeps this module usable in non-Expo environments like tests).
+  const FileSystem = await import('expo-file-system/legacy');
+  const imageBase64 = await (FileSystem as any).readAsStringAsync(localUri, {
+    encoding: 'base64',
+  });
+
+  const r = await fetch(`${RAILWAY_API}/avatars`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-player-id': playerId },
+    body: JSON.stringify({ imageBase64 }),
   });
-  if (!r1.ok) throw new Error('Failed to get upload URL');
-  const { uploadUrl, serveUrl } = (await r1.json()) as { uploadUrl: string; serveUrl: string };
-
-  // Step 2 — read the local file as a blob and PUT it directly to GCS
-  const fileResp = await fetch(localUri);
-  const blob = await fileResp.blob();
-  const r2 = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'image/jpeg' },
-    body: blob,
-  });
-  if (!r2.ok) throw new Error('GCS upload failed');
-
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error((err as any).error ?? 'Avatar upload failed');
+  }
+  const { serveUrl } = (await r.json()) as { serveUrl: string };
   return serveUrl;
 }
 

@@ -82649,6 +82649,8 @@ var playersTable = pgTable("players", {
   email: text("email").notNull().default(""),
   pinHash: text("pin_hash").notNull(),
   profileJson: jsonb("profile_json").notNull().$type(),
+  avatarData: text("avatar_data"),
+  // base64-encoded JPEG for custom profile photo
   status: text("status").notNull().default("active"),
   banReason: text("ban_reason"),
   suspensionExpiresAt: timestamp("suspension_expires_at", { withTimezone: true }),
@@ -84562,79 +84564,54 @@ var referrals_default = router6;
 
 // src/routes/avatars.ts
 var import_express7 = __toESM(require_express2(), 1);
-
-// src/lib/objectStorage.ts
-import { Storage } from "@google-cloud/storage";
-var REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
-var objectStorageClient = new Storage({
-  credentials: {
-    audience: "replit",
-    subject_token_type: "access_token",
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: "external_account",
-    credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-      format: {
-        type: "json",
-        subject_token_field_name: "access_token"
-      }
-    },
-    universe_domain: "googleapis.com"
-  },
-  projectId: ""
-});
-
-// src/routes/avatars.ts
 var router7 = (0, import_express7.Router)();
-var BUCKET = () => {
-  const id = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  if (!id) throw new Error("DEFAULT_OBJECT_STORAGE_BUCKET_ID not set");
-  return objectStorageClient.bucket(id);
-};
 var RAILWAY_API = "https://api-server-production-bbc2.up.railway.app/api";
-router7.post("/avatars/upload-url", async (req, res) => {
+router7.post("/avatars", async (req, res) => {
   const playerId = req.headers["x-player-id"];
   if (!playerId) {
     res.status(401).json({ error: "x-player-id header required" });
     return;
   }
-  try {
-    const objectId = `${playerId}-${Date.now()}.jpg`;
-    const file = BUCKET().file(`avatars/${objectId}`);
-    const [uploadUrl] = await file.getSignedUrl({
-      version: "v4",
-      action: "write",
-      expires: Date.now() + 15 * 60 * 1e3,
-      // 15 min
-      contentType: "image/jpeg"
-    });
-    const serveUrl = `${RAILWAY_API}/avatars/${objectId}`;
-    const rows = await db.select({ profileJson: playersTable.profileJson }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
-    if (rows[0]) {
-      const current = rows[0].profileJson ?? {};
-      await db.update(playersTable).set({ profileJson: { ...current, serverAvatarUrl: serveUrl }, updatedAt: /* @__PURE__ */ new Date() }).where(eq(playersTable.playerId, playerId));
-    }
-    res.json({ uploadUrl, serveUrl, objectId });
-  } catch (err) {
-    res.status(500).json({ error: err?.message ?? "Failed to generate upload URL" });
+  const { imageBase64 } = req.body;
+  if (!imageBase64 || typeof imageBase64 !== "string") {
+    res.status(400).json({ error: "imageBase64 is required" });
+    return;
   }
-});
-router7.get("/avatars/:objectId", async (req, res) => {
-  const { objectId } = req.params;
-  if (!objectId || objectId.includes("/") || objectId.includes("..")) {
-    res.status(400).json({ error: "Invalid object ID" });
+  if (imageBase64.length > 21e5) {
+    res.status(413).json({ error: "Image too large (max ~1.5 MB)" });
     return;
   }
   try {
-    const file = BUCKET().file(`avatars/${objectId}`);
-    const [exists2] = await file.exists();
-    if (!exists2) {
-      res.status(404).json({ error: "Avatar not found" });
+    const serveUrl = `${RAILWAY_API}/avatars/${playerId}`;
+    const rows = await db.select({ profileJson: playersTable.profileJson }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
+    if (!rows[0]) {
+      res.status(404).json({ error: "Player not found" });
       return;
     }
+    const current = rows[0].profileJson ?? {};
+    await db.update(playersTable).set({
+      avatarData: imageBase64,
+      profileJson: { ...current, serverAvatarUrl: serveUrl },
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq(playersTable.playerId, playerId));
+    res.json({ serveUrl });
+  } catch (err) {
+    res.status(500).json({ error: err?.message ?? "Upload failed" });
+  }
+});
+router7.get("/avatars/:playerId", async (req, res) => {
+  const { playerId } = req.params;
+  try {
+    const rows = await db.select({ avatarData: playersTable.avatarData }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
+    const b64 = rows[0]?.avatarData;
+    if (!b64) {
+      res.status(404).json({ error: "No avatar found" });
+      return;
+    }
+    const buf = Buffer.from(b64, "base64");
     res.setHeader("Content-Type", "image/jpeg");
     res.setHeader("Cache-Control", "public, max-age=86400");
-    file.createReadStream().pipe(res);
+    res.end(buf);
   } catch (err) {
     res.status(500).json({ error: err?.message ?? "Failed to serve avatar" });
   }

@@ -7,6 +7,7 @@ export const playersTable = pgTable('players', {
   email:                text('email').notNull().default(''),
   pinHash:              text('pin_hash').notNull(),
   profileJson:          jsonb('profile_json').notNull().$type<Record<string, unknown>>(),
+  avatarData:           text('avatar_data'),   // base64-encoded JPEG for custom profile photo
   status:               text('status').notNull().default('active'),
   banReason:            text('ban_reason'),
   suspensionExpiresAt:  timestamp('suspension_expires_at', { withTimezone: true }),
