@@ -3,6 +3,7 @@
 // Auth: pass playerId via x-player-id header.
 
 import { Platform } from 'react-native';
+import * as FileSystem from 'expo-file-system/legacy';
 
 function getBase(): string {
   // Use dot notation — Metro's Babel transform only statically inlines EXPO_PUBLIC_*
@@ -177,11 +178,8 @@ export async function uploadAvatarPhoto(
   playerId: string,
   localUri: string,
 ): Promise<string> {
-  // Read the local file as base64 using the Expo FileSystem API (dynamic import
-  // keeps this module usable in non-Expo environments like tests).
-  const FileSystem = await import('expo-file-system/legacy');
-  const imageBase64 = await (FileSystem as any).readAsStringAsync(localUri, {
-    encoding: 'base64',
+  const imageBase64 = await FileSystem.readAsStringAsync(localUri, {
+    encoding: FileSystem.EncodingType.Base64,
   });
 
   const r = await fetch(`${RAILWAY_API}/avatars`, {
