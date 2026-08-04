@@ -970,6 +970,19 @@ export default function PlayScreen() {
         <Text style={s.pageTitle}>PLAY</Text>
         <Text style={s.pageSub}>Choose your game mode</Text>
 
+        {/* ── LIVE EARLY ACCESS NOTICE ─────────────────────────────────── */}
+        {playMode === 'live' && (
+          <View style={s.liveNotice}>
+            <Text style={s.liveNoticeIcon}>🌐</Text>
+            <View style={s.liveNoticeText}>
+              <Text style={s.liveNoticeTitle}>LIVE MATCHMAKING — EARLY ACCESS</Text>
+              <Text style={s.liveNoticeSub}>
+                Chip Society just launched! Live tables may take longer to fill while our community grows. Try AI mode for instant games, or invite friends to a Private Table.
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* ── TRADITIONAL HOLD'EM ─────────────────────────────────────── */}
         <VariantCard
           section="TRADITIONAL HOLD'EM"
@@ -1062,4 +1075,9 @@ const s = StyleSheet.create({
   scroll:    { paddingHorizontal: 16 },
   pageTitle: { fontSize: 26, fontWeight: '900', fontFamily: 'Orbitron_900Black', color: '#fff', letterSpacing: 3, marginBottom: 4 },
   pageSub:   { fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8 },
+  liveNotice:      { flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: 'rgba(0,212,255,0.07)', borderWidth: 1, borderColor: 'rgba(0,212,255,0.25)', borderRadius: 12, padding: 12, marginBottom: 12 },
+  liveNoticeIcon:  { fontSize: 18, marginTop: 1 },
+  liveNoticeText:  { flex: 1, gap: 3 },
+  liveNoticeTitle: { fontSize: 10, fontWeight: '900', fontFamily: 'Orbitron_700Bold', color: 'rgba(0,212,255,0.9)', letterSpacing: 1.2 },
+  liveNoticeSub:   { fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 17 },
 });
