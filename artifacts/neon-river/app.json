@@ -21,10 +21,11 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.chipsociety.app",
       "buildNumber": "14",
-      "jsEngine": "jsc",
       "minimumOsVersion": "16.0",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"],
+        "UIBackgroundModes": [
+          "remote-notification"
+        ],
         "NSCameraUsageDescription": "Chip Society uses your camera so you can take a profile photo.",
         "NSPhotoLibraryUsageDescription": "Chip Society accesses your photo library so you can choose a profile photo.",
         "NSPhotoLibraryAddUsageDescription": "Chip Society saves your edited profile photo to your library."
@@ -71,6 +72,7 @@
       "eas": {
         "projectId": "032b69e0-c9ad-4a63-a6c2-045e621a99c6"
       }
-    }
+    },
+    "jsEngine": "jsc"
   }
 }
