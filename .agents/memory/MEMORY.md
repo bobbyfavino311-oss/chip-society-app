@@ -1,3 +1,5 @@
+- [EAS build — Hermes/JSC fix](eas-build-hermes-fix.md) — `jsEngine:"jsc"` must be at top level of expo object (NOT expo.ios); clean metro.config.js required; broken plugin crashes expo config before build starts.
+- [EAS OTA vs compiled build](eas-ota-vs-build.md) — Expo Go hits live dev server; TestFlight has compiled bundle; use `eas update --channel production` for JS-only fixes without a new build.
 - [ELITE_PLUS tier bug](elite-plus-tier-bug.md) — Stale bundles sending unknown tier → STAKE_CONFIG[unknown]=undefined → all blinds/buyIn become NaN; safeTier guard in MultiplayerContext clamps to ELITE.
 - [Multiplayer architecture](multiplayer-architecture.md) — Socket.IO path must be /api/socket.io; chip persistence is client-authoritative (like practice mode), NOT synced from server per-hand — see file for why.
 - [Short Deck variant architecture](short-deck-variant.md) — GameVariant lives in pokerEngine.ts; GameState carries variant field so all pure functions see it without extra params.

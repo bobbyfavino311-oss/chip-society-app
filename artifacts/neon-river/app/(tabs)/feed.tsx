@@ -381,12 +381,12 @@ function LivePostCard({ post }: { post: FeedPost }) {
         {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
         <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={[cd.username, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">
+            <Text style={[cd.username, { flexShrink: 1 }]} numberOfLines={1} ellipsizeMode="tail">
               {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
             </Text>
           </TouchableOpacity>
           <View style={cd.handleRow}>
-            <Text style={cd.handle}>@{isOwn ? profile.username : post.authorUsername} · {timeSince(post.createdAt)}</Text>
+            <Text style={[cd.handle, { flexShrink: 1 }]} numberOfLines={1} ellipsizeMode="tail">@{isOwn ? profile.username : post.authorUsername} · {timeSince(post.createdAt)}</Text>
             <View style={[cd.typeBadge, { backgroundColor: `${typeColor}18`, borderColor: `${typeColor}40` }]}>
               <Ionicons name={typeIcon} size={9} color={typeColor} />
               <Text style={[cd.typeText, { color: typeColor }]}>{post.tag}</Text>
@@ -856,7 +856,7 @@ const cd = StyleSheet.create({
   username:    { color: '#ffffff', fontSize: 14, fontWeight: '800' },
   badgeIcon:   { fontSize: 12 },
   // handle + type badge sit together on one row; badge moved here from top-level header row
-  handleRow:   { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2, flexWrap: 'wrap' },
+  handleRow:   { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   handle:      { color: 'rgba(255,255,255,0.38)', fontSize: 10 },
 
   // ── Type badge (WIN / BLUFF / etc.) ───────────────────────────────────────
