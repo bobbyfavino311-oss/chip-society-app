@@ -42,6 +42,7 @@ import { SoundEngine, unlockAudio } from '@/lib/soundEngine';
 import { MusicEngine } from '@/lib/musicEngine';
 import { initializeRevenueCat, SubscriptionProvider } from '@/lib/revenuecat';
 import { initializeSentry, reportError } from '@/lib/sentry';
+import * as Updates from 'expo-updates';
 
 
 // expo-notifications removed Android support in Expo Go SDK 53+.
@@ -84,6 +85,25 @@ try {
 }
 
 const queryClient = new QueryClient();
+
+// ─── OTA update checker — checks on launch, reloads immediately if update ready ──
+function UpdateChecker() {
+  useEffect(() => {
+    if (Platform.OS === 'web' || __DEV__) return;
+    (async () => {
+      try {
+        const check = await Updates.checkForUpdateAsync();
+        if (check.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch {
+        // silently ignore — update check failure must never crash the app
+      }
+    })();
+  }, []);
+  return null;
+}
 
 // ─── Sound syncer — keeps SoundEngine in sync with SoundContext ───────────────
 
@@ -282,6 +302,7 @@ function NotificationBridge({ children }: { children: React.ReactNode }) {
 function RootLayoutNav() {
   return (
     <>
+      <UpdateChecker />
       <SoundSyncer />
       <PushSetup />
       <GateController />
