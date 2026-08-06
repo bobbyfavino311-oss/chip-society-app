@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.chipsociety.app",
-      "buildNumber": "14",
+      "buildNumber": "16",
       "minimumOsVersion": "16.0",
       "infoPlist": {
         "UIBackgroundModes": [
