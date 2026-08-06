@@ -63,7 +63,8 @@
           "icon": "./assets/images/icon.png",
           "color": "#050010"
         }
-      ]
+      ],
+      "./plugins/disable-hermes"
     ],
     "experiments": {
       "typedRoutes": true
