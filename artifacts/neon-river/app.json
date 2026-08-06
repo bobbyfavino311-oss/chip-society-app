@@ -24,6 +24,7 @@
       "minimumOsVersion": "16.0",
       "infoPlist": {
         "UIBackgroundModes": [
+          "remote-notification",
           "remote-notification"
         ],
         "NSCameraUsageDescription": "Chip Society uses your camera so you can take a profile photo.",
@@ -40,7 +41,11 @@
       },
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.READ_MEDIA_IMAGES"
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -63,7 +68,7 @@
           "icon": "./assets/images/icon.png",
           "color": "#050010"
         }
-      ],
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -73,6 +78,9 @@
         "projectId": "032b69e0-c9ad-4a63-a6c2-045e621a99c6"
       }
     },
-    "jsEngine": "jsc"
+    "jsEngine": "jsc",
+    "updates": {
+      "url": "https://u.expo.dev/032b69e0-c9ad-4a63-a6c2-045e621a99c6"
+    }
   }
 }
