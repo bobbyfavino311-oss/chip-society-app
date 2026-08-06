@@ -64,7 +64,6 @@
           "color": "#050010"
         }
       ],
-      "./plugins/disable-hermes"
     ],
     "experiments": {
       "typedRoutes": true
