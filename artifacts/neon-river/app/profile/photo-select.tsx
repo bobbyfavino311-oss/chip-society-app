@@ -4,7 +4,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
-import * as ImageManipulator from 'expo-image-manipulator';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -67,22 +66,8 @@ export default function PhotoSelectScreen() {
       if (!result.canceled && result.assets[0]) {
         const srcUri = result.assets[0].uri;
 
-        // Step 1 — resize + compress to ≤500×500 JPEG so the base64 upload
-        // stays well under the 10 MB server limit regardless of source resolution.
-        let processedUri = srcUri;
-        try {
-          const manip = await ImageManipulator.manipulateAsync(
-            srcUri,
-            [{ resize: { width: 500, height: 500 } }],
-            { compress: 0.75, format: ImageManipulator.SaveFormat.JPEG },
-          );
-          processedUri = manip.uri;
-        } catch {
-          // If manipulation fails, proceed with original
-        }
-
-        // Step 2 — copy resized image to permanent local path
-        let localUri = processedUri;
+        // Copy image to a permanent local path so it survives cache clears.
+        let localUri = srcUri;
         if (FileSystem.documentDirectory) {
           const fileName = `avatar_${Date.now()}.jpg`;
           const dest = FileSystem.documentDirectory + fileName;
