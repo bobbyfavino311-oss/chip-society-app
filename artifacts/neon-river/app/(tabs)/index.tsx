@@ -193,15 +193,21 @@ function AnnouncementCard({ ann, onDismiss }: { ann: AnnItem; onDismiss: () => v
 }
 
 function DevAnnouncementBanner() {
+  const { profile } = useUser();
   const [allAnnouncements, setAllAnnouncements] = useState<AnnItem[]>([]);
   const [dismissed, setDismissed] = useState<string[]>([]);
+
+  // Key is per-account so dismissals on one account never bleed into another.
+  const storageKey = profile.playerId
+    ? `${DISMISSED_KEY}_${profile.playerId}`
+    : DISMISSED_KEY;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         // Load dismissed list first so we can filter immediately on render
-        const raw = await AsyncStorage.getItem(DISMISSED_KEY);
+        const raw = await AsyncStorage.getItem(storageKey);
         const ids: string[] = raw ? JSON.parse(raw) : [];
         if (!cancelled) setDismissed(ids);
 
@@ -213,12 +219,12 @@ function DevAnnouncementBanner() {
       } catch { /* non-fatal */ }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [storageKey]);
 
   const dismiss = async (id: string) => {
     const next = [...dismissed, id];
     setDismissed(next);
-    await AsyncStorage.setItem(DISMISSED_KEY, JSON.stringify(next));
+    await AsyncStorage.setItem(storageKey, JSON.stringify(next));
   };
 
   const visible = allAnnouncements.filter(a => !dismissed.includes(a.id));
