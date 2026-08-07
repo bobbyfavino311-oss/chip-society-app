@@ -869,3 +869,10 @@ id = "tPGsh1DUuwkcNtKoBspC9"
 uri = "file://screenshots2/06_poker_table.png"
 type = "image"
 title = "06 — Poker Table"
+
+[[outputs]]
+id = "CbOVrkidHi9IBMcutpGMZ"
+uri = "file://attached_assets/iap_screenshot_1024.jpg"
+type = "image"
+title = "IAP Screenshot — 1024×1024"
+description = "Chip store screenshot resized for App Store Connect IAP review upload."
