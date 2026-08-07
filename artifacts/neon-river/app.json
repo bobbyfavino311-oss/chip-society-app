@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.chipsociety.app",
-      "buildNumber": "16",
+      "buildNumber": "24",
       "minimumOsVersion": "16.0",
       "infoPlist": {
         "UIBackgroundModes": [
@@ -29,7 +29,8 @@
         ],
         "NSCameraUsageDescription": "Chip Society uses your camera so you can take a profile photo.",
         "NSPhotoLibraryUsageDescription": "Chip Society accesses your photo library so you can choose a profile photo.",
-        "NSPhotoLibraryAddUsageDescription": "Chip Society saves your edited profile photo to your library."
+        "NSPhotoLibraryAddUsageDescription": "Chip Society saves your edited profile photo to your library.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
