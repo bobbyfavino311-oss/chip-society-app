@@ -3,7 +3,6 @@
 
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system/legacy';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -66,23 +65,10 @@ export default function PhotoSelectScreen() {
       if (!result.canceled && result.assets[0]) {
         const srcUri = result.assets[0].uri;
 
-        // Copy image to a permanent local path so it survives cache clears.
-        let localUri = srcUri;
-        if (FileSystem.documentDirectory) {
-          const fileName = `avatar_${Date.now()}.jpg`;
-          const dest = FileSystem.documentDirectory + fileName;
-          try {
-            await FileSystem.copyAsync({ from: processedUri, to: dest });
-            localUri = dest;
-          } catch {
-            localUri = processedUri;
-          }
-        }
-
-        // Step 2 — upload to GCS so other users can see it.
+        // Upload to server so other users can see it.
         // Save local uri immediately so the user sees their photo right away;
         // update serverAvatarUrl once the upload finishes.
-        await updateProfile({ avatarUri: localUri, profileImageType: 'custom' });
+        await updateProfile({ avatarUri: srcUri, profileImageType: 'custom' });
 
         const playerId = profile.playerId;
         if (playerId) {
