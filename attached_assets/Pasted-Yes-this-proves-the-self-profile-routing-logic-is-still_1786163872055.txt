@@ -1,0 +1,263 @@
+Yes — this proves the self-profile routing logic is still wrong. The app is treating your own post author profile as if it belongs to another user, instead of recognizing that the post’s authorUserId is the same as the currently authenticated userId.
+
+Use this exact prompt:
+
+# CRITICAL SOCIAL PROFILE ROUTING BUG — USER CAN STILL FOLLOW THEMSELVES
+There is still a major identity/routing bug in the Social Feed.
+CURRENT BEHAVIOR:
+When I open my profile through the “Me” tab, I correctly see my own editable profile.
+However, when I tap my own username/avatar from one of MY OWN POSTS, the app opens the PUBLIC PLAYER PROFILE version instead.
+That public profile incorrectly shows:
+• Follow button
+• Message button
+• Public profile layout
+• Different follower/following values
+• Different profile data in some areas
+This means the app is failing to recognize that:
+post.authorUserId == currentlyAuthenticatedUser.userId
+This must be fixed at the routing and identity level.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. SELF PROFILE DETECTION MUST USE USER ID
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Do NOT detect “self” based on:
+• username string
+• display name
+• avatar
+• email
+• post metadata text
+• profile route source
+• whether the user entered from the Me tab
+The only valid check is:
+targetUserId === currentAuthenticatedUserId
+If those IDs match:
+THIS IS THE PLAYER’S OWN PROFILE.
+Always.
+No exceptions.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. EVERY PROFILE ENTRY POINT MUST RUN THE SAME CHECK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Before rendering any player profile, resolve:
+currentUserId
+and
+targetUserId
+Then:
+if targetUserId === currentUserId:
+    render OwnProfileView
+else:
+    render PublicProfileView
+Apply this logic when opening a player through:
+• Social Feed post
+• Trending Now post
+• Comment
+• Repost
+• Follower list
+• Following list
+• Leaderboard
+• Tournament result
+• Search
+• Notification
+• Gameplay profile popup
+• Chat
+• Friend list
+• Anywhere else a player profile can be opened
+Do not have separate routing logic for each screen.
+Create one shared profile-opening function.
+Example concept:
+openPlayerProfile(targetUserId)
+That function determines whether to show self or public profile.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. OWN PROFILE MUST NEVER SHOW FOLLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If:
+targetUserId === currentUserId
+then NEVER render:
+• Follow
+• Unfollow
+• Message yourself
+• Add Friend
+• Block
+• Report
+Instead render:
+• Edit Profile
+or the same controls used in the “Me” tab.
+A player must never be able to follow themselves under any circumstances.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. BACKEND MUST ALSO BLOCK SELF-FOLLOWING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Do not rely only on hiding the Follow button.
+The backend follow action must also reject:
+followerUserId === targetUserId
+Required validation:
+if followerUserId == targetUserId:
+    reject request
+    do not create relationship
+This must apply even if:
+• a stale client still displays Follow
+• an API request is manually triggered
+• the app has old cached UI
+• another client version attempts it
+Self-following must be impossible at the data layer.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. CLEAN UP EXISTING SELF-FOLLOW RELATIONSHIPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Search existing follow records.
+If any record exists where:
+followerUserId == followedUserId
+delete it.
+Then recalculate:
+• Followers count
+• Following count
+This is likely one reason the counts differ between the two profile views.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. “ME” TAB AND OWN POST PROFILE MUST BE THE SAME PROFILE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The profile opened by tapping your own post must render the SAME canonical player profile as the “Me” tab.
+These two screens should show identical values for:
+• Avatar
+• Uploaded profile picture
+• Display name
+• @username
+• Bio
+• Founder badge
+• Local badge
+• Level
+• Followers
+• Following
+• Posts
+• Win rate
+• Achievements
+• Tournament stats
+• Player stats
+• Any other profile field
+The only difference should be navigation context.
+Do not maintain:
+MeProfile
+and
+PublicProfileCopy
+as separate datasets.
+Both must resolve from:
+getPlayerProfile(userId)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. USE ONE CANONICAL PROFILE COMPONENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Preferred architecture:
+PlayerProfileScreen(targetUserId)
+Then determine:
+isOwnProfile = targetUserId === currentUserId
+Use the same underlying profile data.
+Conditional UI:
+if isOwnProfile:
+    show Edit Profile
+else:
+    show Follow / Message
+Do NOT duplicate the entire profile page into two separate implementations if possible.
+This prevents statistics, avatars, badges, and follower counts from drifting apart.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. FIX FOLLOW COUNTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Current screenshots show inconsistent follower/following information between profile views.
+Counts must come from one backend relationship source.
+Do not cache separate counts in:
+• Social profile
+• Main profile
+• Feed profile
+• Public profile
+Calculate or retrieve:
+followersCount
+followingCount
+from the canonical follow relationships for that userId.
+After:
+Follow
+Unfollow
+Self-follow cleanup
+refresh both counts immediately.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. POST AUTHOR DATA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Every post must store:
+authorUserId
+Do NOT identify the post author only by:
+username
+displayName
+avatar URL
+When tapping a post author:
+openPlayerProfile(post.authorUserId)
+Then the app can correctly detect whether the author is the current player.
+This is essential.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. AVATAR / PROFILE DATA CONSISTENCY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The screenshots still show profile data discrepancies depending on entry point.
+The same targetUserId must always resolve:
+• current avatar
+• current displayName
+• current username
+• current bio
+• current badges
+• current level
+• current stats
+Do not read stale author snapshots from the post when opening a profile.
+The post can use cached author visuals for rendering if necessary, but tapping it must load the canonical current profile by userId.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. REQUIRED TEST CASE — OWN POST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Test exactly this flow:
+1. Login as User A.
+2. Create a post as User A.
+3. Open Social Feed.
+4. Tap User A’s avatar or name on that post.
+EXPECTED:
+• User A’s own profile opens.
+• Same data as Me tab.
+• Edit Profile visible.
+• Follow button NOT visible.
+• Message button NOT visible.
+• Founder badge matches.
+• Avatar matches.
+• Followers/Following match.
+• Win rate matches.
+• Stats match.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. REQUIRED TEST CASE — OTHER PLAYER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Login as User A.
+2. Tap User B’s post.
+EXPECTED:
+• User B public profile opens.
+• Follow button visible if not already following.
+• Message button visible if messaging is supported.
+• Edit Profile NOT visible.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. REQUIRED SELF-FOLLOW TEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Attempt every possible self-follow path:
+• Own post
+• Me tab
+• Search for own username
+• Leaderboard
+• Followers
+• Following
+• Direct route
+• Cached profile
+• API request
+EXPECTED:
+Self-follow is impossible.
+No Follow button.
+No relationship record created.
+Follower and following counts do not change.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL ACCEPTANCE CRITERIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Tapping your own post opens your own profile, not a public profile clone.
+✅ The “Me” tab and own-post profile show identical data.
+✅ Self profile detection uses permanent userId comparison only.
+✅ Follow button never appears on your own profile.
+✅ Message button never appears for yourself.
+✅ Backend rejects self-follow requests.
+✅ Existing self-follow records are removed.
+✅ Follower/following counts are recalculated correctly.
+✅ All profile entry points use one shared routing rule.
+✅ Posts store and route by authorUserId.
+✅ One canonical player profile supplies the data everywhere.
+FINAL GOAL:
+A player has ONE identity and ONE profile. No matter how they reach their own profile — Me tab, their own post, search, leaderboard, comments, tournament results, or any other path — the app must recognize their userId and show the exact same self-profile with Edit Profile controls. Self-following must be technically impossible.
