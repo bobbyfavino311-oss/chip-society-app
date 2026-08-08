@@ -352,7 +352,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
 
       {/* Header */}
       <View style={cd.header}>
-        <TouchableOpacity style={cd.avatarWrap} onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
+        <TouchableOpacity style={cd.avatarWrap} onPress={() => isOwn ? router.push('/(tabs)/profile') : router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
           {/* For own posts: prefer local avatarUri (instant after pick); for others: use server-hosted authorAvatarUrl */}
           {(() => {
             // For own posts: prefer local avatarUri (instant after pick); fall back to any
@@ -380,7 +380,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
 
         {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
         <View style={{ flex: 1, minWidth: 0 }}>
-          <TouchableOpacity onPress={() => router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
+          <TouchableOpacity onPress={() => isOwn ? router.push('/(tabs)/profile') : router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
             <Text style={[cd.username, { flexShrink: 1 }]} numberOfLines={1} ellipsizeMode="tail">
               {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
             </Text>

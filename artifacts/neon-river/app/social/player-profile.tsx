@@ -494,14 +494,23 @@ export default function PlayerProfileScreen() {
         </View>
 
         <View style={s.actionRow}>
-          <TouchableOpacity style={[s.followBtn, following && s.followBtnActive]} onPress={handleFollow}>
-            <Ionicons name={following ? 'checkmark-circle' : 'person-add'} size={14} color={following ? `${colors.primary}90` : colors.primary} />
-            <Text style={[s.followText, following && s.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={s.msgBtn} onPress={handleMessage}>
-            <Ionicons name="chatbubble-ellipses-outline" size={14} color={colors.textMuted} />
-            <Text style={s.msgText}>Message</Text>
-          </TouchableOpacity>
+          {isOwnProfile ? (
+            <TouchableOpacity style={s.msgBtn} onPress={() => router.push('/(tabs)/profile')}>
+              <Ionicons name="pencil-outline" size={14} color={colors.textMuted} />
+              <Text style={s.msgText}>Edit Profile</Text>
+            </TouchableOpacity>
+          ) : (
+            <>
+              <TouchableOpacity style={[s.followBtn, following && s.followBtnActive]} onPress={handleFollow}>
+                <Ionicons name={following ? 'checkmark-circle' : 'person-add'} size={14} color={following ? `${colors.primary}90` : colors.primary} />
+                <Text style={[s.followText, following && s.followTextActive]}>{following ? 'Following' : 'Follow'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={s.msgBtn} onPress={handleMessage}>
+                <Ionicons name="chatbubble-ellipses-outline" size={14} color={colors.textMuted} />
+                <Text style={s.msgText}>Message</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
 
         {player.badges.length > 0 && (
