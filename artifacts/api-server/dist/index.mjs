@@ -83025,13 +83025,6 @@ router2.put("/auth/profile", async (req, res) => {
       res.status(400).json({ error: "playerId and profile are required." });
       return;
     }
-    const existing = await db.select({ profileJson: playersTable.profileJson, username: playersTable.username }).from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
-    if (existing.length === 0) {
-      res.status(404).json({ error: "Player not found." });
-      return;
-    }
-    const current = existing[0]?.profileJson ?? {};
-    const dbUsername = existing[0].username;
     if (profile["displayName"] !== void 0) {
       const dn = profile["displayName"].trim().replace(/\s+/g, " ");
       if (dn.length === 0 || dn.length > 15) {
@@ -83039,16 +83032,34 @@ router2.put("/auth/profile", async (req, res) => {
         return;
       }
     }
-    const merged = {
-      ...profile,
-      // username must always match DB — client cannot change it via this endpoint
-      username: dbUsername,
-      // Preserve server-only flags — client cannot clear these
-      isFounder: current["isFounder"] ?? profile["isFounder"] ?? false,
-      // Preserve server-set usernameChangedAt (30-day cooldown clock)
-      usernameChangedAt: current["usernameChangedAt"] ?? profile["usernameChangedAt"]
-    };
-    await db.update(playersTable).set({ profileJson: merged, updatedAt: /* @__PURE__ */ new Date() }).where(eq(playersTable.playerId, playerId));
+    let notFound = false;
+    await db.transaction(async (tx) => {
+      const existing = await tx.select({ profileJson: playersTable.profileJson, username: playersTable.username }).from(playersTable).where(eq(playersTable.playerId, playerId)).for("update").limit(1);
+      if (existing.length === 0) {
+        notFound = true;
+        return;
+      }
+      const current = existing[0]?.profileJson ?? {};
+      const dbUsername = existing[0].username;
+      const merged = {
+        ...current,
+        ...profile,
+        // username must always match DB — client cannot change it via this endpoint
+        username: dbUsername,
+        // Never erase a server-set avatar URL — the client may sync before the upload finishes.
+        // The FOR UPDATE lock ensures current['serverAvatarUrl'] is the latest DB value.
+        serverAvatarUrl: profile["serverAvatarUrl"] ?? current["serverAvatarUrl"],
+        // Preserve server-only flags — client cannot clear these
+        isFounder: current["isFounder"] ?? profile["isFounder"] ?? false,
+        // Preserve server-set usernameChangedAt (30-day cooldown clock)
+        usernameChangedAt: current["usernameChangedAt"] ?? profile["usernameChangedAt"]
+      };
+      await tx.update(playersTable).set({ profileJson: merged, updatedAt: /* @__PURE__ */ new Date() }).where(eq(playersTable.playerId, playerId));
+    });
+    if (notFound) {
+      res.status(404).json({ error: "Player not found." });
+      return;
+    }
     res.json({ success: true });
   } catch (e) {
     req.log.error(e, "profile update error");
