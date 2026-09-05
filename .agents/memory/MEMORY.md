@@ -36,3 +36,4 @@
 - [Feed avatar display](feed-avatar-display.md) — own-post photoUrl must fall back to post.authorAvatarUrl; createPost must return authorAvatarUrl; use expo-image not RN Image for Railway URLs.
 - [Player profile architecture](player-profile-architecture.md) — winRate is a derived getter (never in profileJson); founderBadge stored as isFounder; lib/db dist .d.ts is hand-maintained; cachePolicy="none" not "no-cache".
 - [expo-image-manipulator native crash](expo-image-manipulator-crash.md) — crashes iOS compiled builds when it's the ONLY screen importing it; remove it or ensure it's imported elsewhere too.
+- [Apple iPad compatibility review](apple-ipad-compat-review.md) — iPhone-only builds may still be reviewed on iPad; critical actions must remain reachable and PIN entry auto-submits on digit four.
