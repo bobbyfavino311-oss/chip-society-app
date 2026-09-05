@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -86,6 +87,7 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const shake = useRef(new Animated.Value(0)).current;
+  const signingInRef = useRef(false);
   const { status: serverStatus, url: serverUrl, retry: retryPing } = useServerPing();
 
   const doShake = () => {
@@ -104,40 +106,55 @@ export default function SignInScreen() {
     setPhase('pin');
   };
 
-  const handlePinKey = (key: string) => {
-    setError('');
-    if (key === '⌫') { setPin(p => p.slice(0, -1)); return; }
-    if (pin.length < 4) setPin(p => p + key);
-  };
-
-  const handleSignIn = async () => {
-    if (pin.length !== 4 || loading) return;
+  const handleSignIn = async (pinToSubmit = pin) => {
+    if (pinToSubmit.length !== 4 || signingInRef.current) return;
+    signingInRef.current = true;
     setLoading(true);
     setError('');
-    const result = await signIn(username.trim(), pin);
-    setLoading(false);
-    if (result.success) {
-      router.replace('/(tabs)');
-    } else {
-      const raw = result.error ?? 'Sign in failed.';
-      if (raw.startsWith('ACCOUNT_BANNED::')) {
-        const reason = raw.slice('ACCOUNT_BANNED::'.length);
-        setError(`Account banned: ${reason}`);
-      } else if (raw.startsWith('ACCOUNT_SUSPENDED::')) {
-        const parts = raw.slice('ACCOUNT_SUSPENDED::'.length).split('::');
-        const reason = parts[0] ?? 'Policy violation';
-        const expiresAt = parts[1];
-        if (expiresAt) {
-          const exp = new Date(expiresAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-          setError(`Account suspended until ${exp}. Reason: ${reason}`);
-        } else {
-          setError(`Account suspended: ${reason}`);
-        }
+    try {
+      const result = await signIn(username.trim(), pinToSubmit);
+      if (result.success) {
+        router.replace('/(tabs)');
       } else {
-        setError(raw);
+        const raw = result.error ?? 'Sign in failed.';
+        if (raw.startsWith('ACCOUNT_BANNED::')) {
+          const reason = raw.slice('ACCOUNT_BANNED::'.length);
+          setError(`Account banned: ${reason}`);
+        } else if (raw.startsWith('ACCOUNT_SUSPENDED::')) {
+          const parts = raw.slice('ACCOUNT_SUSPENDED::'.length).split('::');
+          const reason = parts[0] ?? 'Policy violation';
+          const expiresAt = parts[1];
+          if (expiresAt) {
+            const exp = new Date(expiresAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            setError(`Account suspended until ${exp}. Reason: ${reason}`);
+          } else {
+            setError(`Account suspended: ${reason}`);
+          }
+        } else {
+          setError(raw);
+        }
+        doShake();
+        setPin('');
       }
-      doShake();
-      setPin('');
+    } finally {
+      signingInRef.current = false;
+      setLoading(false);
+    }
+  };
+
+  const handlePinKey = (key: string) => {
+    if (signingInRef.current) return;
+    setError('');
+    if (key === '⌫') {
+      setPin(p => p.slice(0, -1));
+      return;
+    }
+    if (pin.length < 4) {
+      const nextPin = pin + key;
+      setPin(nextPin);
+      if (nextPin.length === 4) {
+        void handleSignIn(nextPin);
+      }
     }
   };
 
@@ -165,7 +182,11 @@ export default function SignInScreen() {
             <MusicToggle />
           </View>
 
-          <View style={s.content}>
+          <ScrollView
+            contentContainerStyle={s.content}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
             {/* Server status pill — tap to retry when offline */}
             <TouchableOpacity
               style={s.serverPill}
@@ -281,7 +302,7 @@ export default function SignInScreen() {
 
                 <Pressable
                   style={({ pressed }) => [s.mainBtn, (pin.length !== 4 || loading) && s.mainBtnDisabled, pressed && { opacity: 0.8 }]}
-                  onPress={handleSignIn}
+                  onPress={() => void handleSignIn()}
                   disabled={pin.length !== 4 || loading}
                 >
                   <Text style={s.mainBtnText}>{loading ? 'SIGNING IN...' : 'SIGN IN'}</Text>
@@ -289,7 +310,7 @@ export default function SignInScreen() {
                 </Pressable>
               </>
             )}
-          </View>
+          </ScrollView>
 
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -302,7 +323,7 @@ const s = StyleSheet.create({
   safe:   { flex: 1 },
   header: { paddingHorizontal: 16, paddingTop: 8 },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  content: { flex: 1, paddingHorizontal: 28, paddingTop: 8, gap: 16 },
+  content: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 8, paddingBottom: 24, gap: 16 },
 
   logoMark: {
     width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center',

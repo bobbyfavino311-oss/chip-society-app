@@ -73,7 +73,7 @@ export default function PhotoSelectScreen() {
         const playerId = profile.playerId;
         if (playerId) {
           try {
-            const serveUrl = await uploadAvatarPhoto(playerId, localUri);
+            const serveUrl = await uploadAvatarPhoto(playerId, srcUri);
             await updateProfile({ serverAvatarUrl: serveUrl });
           } catch (uploadErr: any) {
             // Surface the real error so we can debug
