@@ -83220,55 +83220,97 @@ router2.delete("/auth/account", async (req, res) => {
       res.status(401).json({ error: "Incorrect PIN. Account was not deleted." });
       return;
     }
-    const optionalTables = await db.execute(
-      sql`select to_regclass('public.post_reposts')::text as post_reposts`
+    const tableRows = await db.execute(sql`
+      select table_name
+      from information_schema.tables
+      where table_schema = 'public'
+        and table_name in (
+          'feed_posts', 'post_likes', 'post_reposts', 'post_comments',
+          'player_reports', 'bug_reports', 'chip_transactions',
+          'player_notifications', 'moderation_actions', 'referrals',
+          'player_push_tokens', 'follows', 'blocks', 'conversations',
+          'direct_messages', 'players'
+        )
+    `);
+    const existingTables = new Set(
+      tableRows.rows.map((row) => String(row.table_name))
     );
-    const hasPostReposts = Boolean(
-      optionalTables.rows[0]?.post_reposts
-    );
+    const hasTable = (name) => existingTables.has(name);
     await db.transaction(async (tx) => {
-      const ownedPosts = await tx.select({ id: feedPostsTable.id }).from(feedPostsTable).where(eq(feedPostsTable.authorId, playerId));
+      const ownedPosts = hasTable("feed_posts") ? await tx.select({ id: feedPostsTable.id }).from(feedPostsTable).where(eq(feedPostsTable.authorId, playerId)) : [];
       const ownedPostIds = ownedPosts.map((post) => post.id);
       if (ownedPostIds.length > 0) {
-        await tx.delete(postLikesTable).where(inArray(postLikesTable.postId, ownedPostIds));
-        if (hasPostReposts) {
+        if (hasTable("post_likes")) {
+          await tx.delete(postLikesTable).where(inArray(postLikesTable.postId, ownedPostIds));
+        }
+        if (hasTable("post_reposts")) {
           await tx.delete(postRepostsTable).where(inArray(postRepostsTable.postId, ownedPostIds));
         }
-        await tx.delete(postCommentsTable).where(inArray(postCommentsTable.postId, ownedPostIds));
+        if (hasTable("post_comments")) {
+          await tx.delete(postCommentsTable).where(inArray(postCommentsTable.postId, ownedPostIds));
+        }
       }
-      await tx.delete(postLikesTable).where(eq(postLikesTable.playerId, playerId));
-      if (hasPostReposts) {
+      if (hasTable("post_likes")) {
+        await tx.delete(postLikesTable).where(eq(postLikesTable.playerId, playerId));
+      }
+      if (hasTable("post_reposts")) {
         await tx.delete(postRepostsTable).where(eq(postRepostsTable.playerId, playerId));
       }
-      await tx.delete(postCommentsTable).where(eq(postCommentsTable.authorId, playerId));
-      await tx.delete(feedPostsTable).where(eq(feedPostsTable.authorId, playerId));
-      await tx.delete(playerReportsTable).where(eq(playerReportsTable.reporterId, playerId));
-      await tx.delete(playerReportsTable).where(eq(playerReportsTable.reportedId, playerId));
-      await tx.delete(bugReportsTable).where(eq(bugReportsTable.playerId, playerId));
-      await tx.delete(chipTransactionsTable).where(eq(chipTransactionsTable.playerId, playerId));
-      await tx.delete(playerNotificationsTable).where(eq(playerNotificationsTable.playerId, playerId));
-      await tx.delete(moderationActionsTable).where(eq(moderationActionsTable.playerId, playerId));
-      await tx.delete(referralsTable).where(
-        or(eq(referralsTable.referrerId, playerId), eq(referralsTable.refereeId, playerId))
-      );
-      await tx.delete(playerPushTokensTable).where(eq(playerPushTokensTable.playerId, playerId));
-      await tx.delete(followsTable).where(
-        or(eq(followsTable.followerId, playerId), eq(followsTable.followingId, playerId))
-      );
-      await tx.delete(blocksTable).where(
-        or(eq(blocksTable.blockerId, playerId), eq(blocksTable.blockedId, playerId))
-      );
-      const conversations = await tx.select({ id: conversationsTable.id }).from(conversationsTable).where(or(eq(conversationsTable.p1Id, playerId), eq(conversationsTable.p2Id, playerId)));
-      const conversationIds = conversations.map((conversation) => conversation.id);
-      if (conversationIds.length > 0) {
-        await tx.delete(directMessagesTable).where(
-          inArray(directMessagesTable.conversationId, conversationIds)
+      if (hasTable("post_comments")) {
+        await tx.delete(postCommentsTable).where(eq(postCommentsTable.authorId, playerId));
+      }
+      if (hasTable("feed_posts")) {
+        await tx.delete(feedPostsTable).where(eq(feedPostsTable.authorId, playerId));
+      }
+      if (hasTable("player_reports")) {
+        await tx.delete(playerReportsTable).where(eq(playerReportsTable.reporterId, playerId));
+        await tx.delete(playerReportsTable).where(eq(playerReportsTable.reportedId, playerId));
+      }
+      if (hasTable("bug_reports")) {
+        await tx.delete(bugReportsTable).where(eq(bugReportsTable.playerId, playerId));
+      }
+      if (hasTable("chip_transactions")) {
+        await tx.delete(chipTransactionsTable).where(eq(chipTransactionsTable.playerId, playerId));
+      }
+      if (hasTable("player_notifications")) {
+        await tx.delete(playerNotificationsTable).where(eq(playerNotificationsTable.playerId, playerId));
+      }
+      if (hasTable("moderation_actions")) {
+        await tx.delete(moderationActionsTable).where(eq(moderationActionsTable.playerId, playerId));
+      }
+      if (hasTable("referrals")) {
+        await tx.delete(referralsTable).where(
+          or(eq(referralsTable.referrerId, playerId), eq(referralsTable.refereeId, playerId))
         );
       }
-      await tx.delete(directMessagesTable).where(eq(directMessagesTable.senderId, playerId));
-      await tx.delete(conversationsTable).where(
-        or(eq(conversationsTable.p1Id, playerId), eq(conversationsTable.p2Id, playerId))
-      );
+      if (hasTable("player_push_tokens")) {
+        await tx.delete(playerPushTokensTable).where(eq(playerPushTokensTable.playerId, playerId));
+      }
+      if (hasTable("follows")) {
+        await tx.delete(followsTable).where(
+          or(eq(followsTable.followerId, playerId), eq(followsTable.followingId, playerId))
+        );
+      }
+      if (hasTable("blocks")) {
+        await tx.delete(blocksTable).where(
+          or(eq(blocksTable.blockerId, playerId), eq(blocksTable.blockedId, playerId))
+        );
+      }
+      const conversations = hasTable("conversations") ? await tx.select({ id: conversationsTable.id }).from(conversationsTable).where(or(eq(conversationsTable.p1Id, playerId), eq(conversationsTable.p2Id, playerId))) : [];
+      const conversationIds = conversations.map((conversation) => conversation.id);
+      if (hasTable("direct_messages")) {
+        if (conversationIds.length > 0) {
+          await tx.delete(directMessagesTable).where(
+            inArray(directMessagesTable.conversationId, conversationIds)
+          );
+        }
+        await tx.delete(directMessagesTable).where(eq(directMessagesTable.senderId, playerId));
+      }
+      if (hasTable("conversations")) {
+        await tx.delete(conversationsTable).where(
+          or(eq(conversationsTable.p1Id, playerId), eq(conversationsTable.p2Id, playerId))
+        );
+      }
       await tx.delete(playersTable).where(eq(playersTable.playerId, playerId));
     });
     req.log.info({ playerId }, "Player account permanently deleted");
