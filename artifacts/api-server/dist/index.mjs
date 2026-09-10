@@ -83033,12 +83033,6 @@ router2.put("/auth/profile", async (req, res) => {
       }
     }
     let notFound = false;
-    const optionalTables = await db.execute(
-      sql`select to_regclass('public.post_reposts')::text as post_reposts`
-    );
-    const hasPostReposts2 = Boolean(
-      optionalTables.rows[0]?.post_reposts
-    );
     await db.transaction(async (tx) => {
       const existing = await tx.select({ profileJson: playersTable.profileJson, username: playersTable.username }).from(playersTable).where(eq(playersTable.playerId, playerId)).for("update").limit(1);
       if (existing.length === 0) {
@@ -83226,6 +83220,12 @@ router2.delete("/auth/account", async (req, res) => {
       res.status(401).json({ error: "Incorrect PIN. Account was not deleted." });
       return;
     }
+    const optionalTables = await db.execute(
+      sql`select to_regclass('public.post_reposts')::text as post_reposts`
+    );
+    const hasPostReposts = Boolean(
+      optionalTables.rows[0]?.post_reposts
+    );
     await db.transaction(async (tx) => {
       const ownedPosts = await tx.select({ id: feedPostsTable.id }).from(feedPostsTable).where(eq(feedPostsTable.authorId, playerId));
       const ownedPostIds = ownedPosts.map((post) => post.id);
