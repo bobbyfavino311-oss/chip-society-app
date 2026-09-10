@@ -83221,6 +83221,13 @@ router2.delete("/auth/account", async (req, res) => {
       return;
     }
     await db.transaction(async (tx) => {
+      const ownedPosts = await tx.select({ id: feedPostsTable.id }).from(feedPostsTable).where(eq(feedPostsTable.authorId, playerId));
+      const ownedPostIds = ownedPosts.map((post) => post.id);
+      if (ownedPostIds.length > 0) {
+        await tx.delete(postLikesTable).where(inArray(postLikesTable.postId, ownedPostIds));
+        await tx.delete(postRepostsTable).where(inArray(postRepostsTable.postId, ownedPostIds));
+        await tx.delete(postCommentsTable).where(inArray(postCommentsTable.postId, ownedPostIds));
+      }
       await tx.delete(postLikesTable).where(eq(postLikesTable.playerId, playerId));
       await tx.delete(postRepostsTable).where(eq(postRepostsTable.playerId, playerId));
       await tx.delete(postCommentsTable).where(eq(postCommentsTable.authorId, playerId));
@@ -83241,6 +83248,14 @@ router2.delete("/auth/account", async (req, res) => {
       await tx.delete(blocksTable).where(
         or(eq(blocksTable.blockerId, playerId), eq(blocksTable.blockedId, playerId))
       );
+      const conversations = await tx.select({ id: conversationsTable.id }).from(conversationsTable).where(or(eq(conversationsTable.p1Id, playerId), eq(conversationsTable.p2Id, playerId)));
+      const conversationIds = conversations.map((conversation) => conversation.id);
+      if (conversationIds.length > 0) {
+        await tx.delete(directMessagesTable).where(
+          inArray(directMessagesTable.conversationId, conversationIds)
+        );
+      }
+      await tx.delete(directMessagesTable).where(eq(directMessagesTable.senderId, playerId));
       await tx.delete(conversationsTable).where(
         or(eq(conversationsTable.p1Id, playerId), eq(conversationsTable.p2Id, playerId))
       );
