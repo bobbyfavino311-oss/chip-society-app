@@ -83033,6 +83033,12 @@ router2.put("/auth/profile", async (req, res) => {
       }
     }
     let notFound = false;
+    const optionalTables = await db.execute(
+      sql`select to_regclass('public.post_reposts')::text as post_reposts`
+    );
+    const hasPostReposts2 = Boolean(
+      optionalTables.rows[0]?.post_reposts
+    );
     await db.transaction(async (tx) => {
       const existing = await tx.select({ profileJson: playersTable.profileJson, username: playersTable.username }).from(playersTable).where(eq(playersTable.playerId, playerId)).for("update").limit(1);
       if (existing.length === 0) {
@@ -83225,11 +83231,15 @@ router2.delete("/auth/account", async (req, res) => {
       const ownedPostIds = ownedPosts.map((post) => post.id);
       if (ownedPostIds.length > 0) {
         await tx.delete(postLikesTable).where(inArray(postLikesTable.postId, ownedPostIds));
-        await tx.delete(postRepostsTable).where(inArray(postRepostsTable.postId, ownedPostIds));
+        if (hasPostReposts) {
+          await tx.delete(postRepostsTable).where(inArray(postRepostsTable.postId, ownedPostIds));
+        }
         await tx.delete(postCommentsTable).where(inArray(postCommentsTable.postId, ownedPostIds));
       }
       await tx.delete(postLikesTable).where(eq(postLikesTable.playerId, playerId));
-      await tx.delete(postRepostsTable).where(eq(postRepostsTable.playerId, playerId));
+      if (hasPostReposts) {
+        await tx.delete(postRepostsTable).where(eq(postRepostsTable.playerId, playerId));
+      }
       await tx.delete(postCommentsTable).where(eq(postCommentsTable.authorId, playerId));
       await tx.delete(feedPostsTable).where(eq(feedPostsTable.authorId, playerId));
       await tx.delete(playerReportsTable).where(eq(playerReportsTable.reporterId, playerId));
