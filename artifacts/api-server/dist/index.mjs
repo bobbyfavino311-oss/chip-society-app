@@ -83202,6 +83202,57 @@ router2.put("/auth/change-username", async (req, res) => {
     res.status(500).json({ error: "Unable to update your account. Check your connection and try again." });
   }
 });
+router2.delete("/auth/account", async (req, res) => {
+  try {
+    const headerPlayerId = req.headers["x-player-id"];
+    const { playerId, pin } = req.body;
+    if (!headerPlayerId || !playerId || headerPlayerId !== playerId || !pin) {
+      res.status(400).json({ error: "Authenticated playerId and PIN are required." });
+      return;
+    }
+    const rows = await db.select().from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
+    if (!rows[0]) {
+      res.status(404).json({ error: "Account not found." });
+      return;
+    }
+    const player = rows[0];
+    if (!/^\d{4}$/.test(pin) || player.pinHash !== hashPin(pin, player.username)) {
+      res.status(401).json({ error: "Incorrect PIN. Account was not deleted." });
+      return;
+    }
+    await db.transaction(async (tx) => {
+      await tx.delete(postLikesTable).where(eq(postLikesTable.playerId, playerId));
+      await tx.delete(postRepostsTable).where(eq(postRepostsTable.playerId, playerId));
+      await tx.delete(postCommentsTable).where(eq(postCommentsTable.authorId, playerId));
+      await tx.delete(feedPostsTable).where(eq(feedPostsTable.authorId, playerId));
+      await tx.delete(playerReportsTable).where(eq(playerReportsTable.reporterId, playerId));
+      await tx.delete(playerReportsTable).where(eq(playerReportsTable.reportedId, playerId));
+      await tx.delete(bugReportsTable).where(eq(bugReportsTable.playerId, playerId));
+      await tx.delete(chipTransactionsTable).where(eq(chipTransactionsTable.playerId, playerId));
+      await tx.delete(playerNotificationsTable).where(eq(playerNotificationsTable.playerId, playerId));
+      await tx.delete(moderationActionsTable).where(eq(moderationActionsTable.playerId, playerId));
+      await tx.delete(referralsTable).where(
+        or(eq(referralsTable.referrerId, playerId), eq(referralsTable.refereeId, playerId))
+      );
+      await tx.delete(playerPushTokensTable).where(eq(playerPushTokensTable.playerId, playerId));
+      await tx.delete(followsTable).where(
+        or(eq(followsTable.followerId, playerId), eq(followsTable.followingId, playerId))
+      );
+      await tx.delete(blocksTable).where(
+        or(eq(blocksTable.blockerId, playerId), eq(blocksTable.blockedId, playerId))
+      );
+      await tx.delete(conversationsTable).where(
+        or(eq(conversationsTable.p1Id, playerId), eq(conversationsTable.p2Id, playerId))
+      );
+      await tx.delete(playersTable).where(eq(playersTable.playerId, playerId));
+    });
+    req.log.info({ playerId }, "Player account permanently deleted");
+    res.json({ success: true });
+  } catch (e) {
+    req.log.error(e, "account deletion error");
+    res.status(500).json({ error: "Unable to delete account. No changes were made." });
+  }
+});
 var auth_default = router2;
 
 // src/routes/admin.ts
@@ -84083,12 +84134,41 @@ router4.get("/social/blocks", requirePlayer, async (req, res) => {
     res.status(500).json({ error: "Failed" });
   }
 });
+router4.post("/social/posts/:id/report", requirePlayer, async (req, res) => {
+  try {
+    const { playerId } = req;
+    const { id: postId } = req.params;
+    const { reason } = req.body;
+    if (!reason?.trim()) {
+      res.status(400).json({ error: "reason is required" });
+      return;
+    }
+    const post = await db.select({ authorId: feedPostsTable.authorId }).from(feedPostsTable).where(eq(feedPostsTable.id, postId)).limit(1);
+    if (!post[0]) {
+      res.status(404).json({ error: "Post not found" });
+      return;
+    }
+    await db.insert(playerReportsTable).values({
+      reportId: randomUUID3(),
+      reportedId: post[0].authorId,
+      reporterId: playerId,
+      reason: reason.trim(),
+      details: `Feed post ${postId}`
+    });
+    res.json({ ok: true });
+  } catch (e) {
+    req.log.error(e, "report feed post error");
+    res.status(500).json({ error: "Report failed" });
+  }
+});
 router4.get("/social/feed", requirePlayer, async (req, res) => {
   try {
     const { playerId } = req;
     const tab = req.query["tab"] ?? "all";
     const cursor = req.query["cursor"];
     const limit = 30;
+    const blockedRows = await db.select({ blockedId: blocksTable.blockedId }).from(blocksTable).where(eq(blocksTable.blockerId, playerId));
+    const blockedIds = blockedRows.map((r) => r.blockedId);
     let query = db.select({
       id: feedPostsTable.id,
       authorId: feedPostsTable.authorId,
@@ -84108,10 +84188,15 @@ router4.get("/social/feed", requirePlayer, async (req, res) => {
         cursor ? and(eq(feedPostsTable.authorId, playerId), lt(feedPostsTable.createdAt, new Date(cursor))) : eq(feedPostsTable.authorId, playerId)
       ).orderBy(desc(feedPostsTable.createdAt)).limit(limit);
     } else if (tab === "trending") {
-      query = query.orderBy(desc(sql`${feedPostsTable.likeCount} + ${feedPostsTable.commentCount} * 2`)).limit(limit);
+      query = query.where(
+        blockedIds.length > 0 ? notInArray(feedPostsTable.authorId, blockedIds) : sql`1=1`
+      ).orderBy(desc(sql`${feedPostsTable.likeCount} + ${feedPostsTable.commentCount} * 2`)).limit(limit);
     } else {
       query = query.where(
-        cursor ? lt(feedPostsTable.createdAt, new Date(cursor)) : sql`1=1`
+        and(
+          cursor ? lt(feedPostsTable.createdAt, new Date(cursor)) : sql`1=1`,
+          blockedIds.length > 0 ? notInArray(feedPostsTable.authorId, blockedIds) : sql`1=1`
+        )
       ).orderBy(desc(feedPostsTable.createdAt)).limit(limit);
     }
     const rows = await query;
