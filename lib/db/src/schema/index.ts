@@ -11,6 +11,12 @@ export const playersTable = pgTable('players', {
   status:               text('status').notNull().default('active'),
   banReason:            text('ban_reason'),
   suspensionExpiresAt:  timestamp('suspension_expires_at', { withTimezone: true }),
+  loginCount:           integer('login_count').notNull().default(0),
+  lastLoginAt:          timestamp('last_login_at', { withTimezone: true }),
+  sessionCount:         integer('session_count').notNull().default(0),
+  totalPlaySeconds:     integer('total_play_seconds').notNull().default(0),
+  lastSeenAt:           timestamp('last_seen_at', { withTimezone: true }),
+  lastSessionId:        text('last_session_id'),
   createdAt:            timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt:            timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });

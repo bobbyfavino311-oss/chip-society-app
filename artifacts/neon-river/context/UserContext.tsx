@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import type { GameVariant } from '../constants/gameVariants';
@@ -285,6 +285,7 @@ interface UserContextValue {
   registerAccount: (username: string, pin: string, email: string, avatarIndex: number, referrerUsername?: string) => Promise<{ success: boolean; error?: string }>;
   signIn: (username: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   changePin: (oldPin: string, newPin: string) => Promise<{ success: boolean; error?: string }>;
   forgotPin: (username: string, email: string, newPin: string) => Promise<{ success: boolean; error?: string }>;
   changeUsername: (newUsername: string, pin: string) => Promise<{ success: boolean; error?: string; nextEligibleAt?: string }>;
@@ -438,6 +439,23 @@ async function serverLogin(
   }
 }
 
+async function serverTrackActivity(
+  playerId: string,
+  sessionId: string,
+  event: 'start' | 'heartbeat',
+  elapsedSeconds = 0,
+): Promise<void> {
+  try {
+    await fetch(`${getApiBase()}/activity`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerId, sessionId, event, elapsedSeconds }),
+    });
+  } catch {
+    // Activity tracking must never interrupt gameplay.
+  }
+}
+
 async function serverSaveProfile(playerId: string, profile: UserProfile): Promise<void> {
   try {
     await fetch(`${getApiBase()}/auth/profile`, {
@@ -495,6 +513,21 @@ async function serverChangeUsername(
     return { success: true, username: d.username, usernameChangedAt: d.usernameChangedAt };
   } catch {
     return { success: false, error: 'Unable to update your account. Check your connection and try again.' };
+  }
+}
+
+async function serverDeleteAccount(playerId: string, pin: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const r = await fetch(`${getApiBase()}/auth/account`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'x-player-id': playerId },
+      body: JSON.stringify({ playerId, pin }),
+    });
+    const d = await r.json() as { success?: boolean; error?: string };
+    if (!r.ok) return { success: false, error: d.error ?? 'Unable to delete account.' };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Could not reach the server. Your account was not deleted.' };
   }
 }
 
@@ -590,6 +623,46 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const t = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(t);
   }, []);
+
+  // Track foreground app sessions and active play time for registered players.
+  // Heartbeats are bounded server-side, so a delayed timer cannot over-count.
+  useEffect(() => {
+    if (!isLoaded || !profile.playerId) return;
+
+    const playerId = profile.playerId;
+    const sessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    let activeSince = AppState.currentState === 'active' ? Date.now() : null;
+
+    const flushActiveTime = () => {
+      if (activeSince == null) return;
+      const elapsedSeconds = Math.floor((Date.now() - activeSince) / 1000);
+      activeSince = Date.now();
+      if (elapsedSeconds > 0) {
+        void serverTrackActivity(playerId, sessionId, 'heartbeat', elapsedSeconds);
+      }
+    };
+
+    void serverTrackActivity(playerId, sessionId, 'start');
+
+    const interval = setInterval(() => {
+      if (AppState.currentState === 'active') flushActiveTime();
+    }, 60_000);
+
+    const subscription = AppState.addEventListener('change', nextState => {
+      if (nextState === 'active') {
+        activeSince = Date.now();
+      } else {
+        flushActiveTime();
+        activeSince = null;
+      }
+    });
+
+    return () => {
+      flushActiveTime();
+      clearInterval(interval);
+      subscription.remove();
+    };
+  }, [isLoaded, profile.playerId]);
 
   useEffect(() => {
     (async () => {
@@ -1118,6 +1191,32 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...DEFAULT_PROFILE }));
   }, []);
 
+  const deleteAccount = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
+    const current = profile;
+    // Local/offline accounts have no server record; deleting their local data
+    // still fulfills the account deletion request without a misleading network call.
+    let result: { success: boolean; error?: string } = { success: false };
+    if (current.playerId?.startsWith('local_')) {
+      result = { success: true };
+    } else {
+      const raw = await AsyncStorage.getItem(LOCAL_CREDS_KEY);
+      const creds = raw ? JSON.parse(raw) as { pin?: string } : {};
+      if (!current.playerId || !creds.pin) {
+        return { success: false, error: 'Please sign in again before deleting your account.' };
+      }
+      result = await serverDeleteAccount(current.playerId, creds.pin);
+    }
+    if (!result.success) return result;
+    if (syncTimerRef.current) { clearTimeout(syncTimerRef.current); syncTimerRef.current = null; }
+    if (notifSocketRef.current) {
+      notifSocketRef.current.disconnect();
+      notifSocketRef.current = null;
+    }
+    setProfile({ ...DEFAULT_PROFILE });
+    await AsyncStorage.multiRemove([STORAGE_KEY, LOCAL_CREDS_KEY, LEGACY_KEY]);
+    return { success: true };
+  }, [profile]);
+
   // ── Persistent notification socket ───────────────────────────────────────────
   // Opens a Socket.IO connection as soon as the player logs in and registers
   // their playerId so the server can push casino_bonus_received in real time.
@@ -1395,7 +1494,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       recordTournamentResult, recordTournamentBuyIn,
       claimDailyReward, claimHourlyBonus, claimComebackBonus, completeOnboarding,
       awardRankedPoints, claimWheelSpin, useScratchTicket, consumeScratchTickets, addScratchTickets,
-      completeTutorial, registerAccount, signIn, signOut,
+      completeTutorial, registerAccount, signIn, signOut, deleteAccount,
       changePin, forgotPin, changeUsername, checkUsernameAvailable,
       canClaimWheel, nextWheelIn, canClaimFreeScratch, winRate, isLoaded,
       canClaimDaily, canClaimHourly, nextHourlyIn, dailyRewardAmount, nextDailyIn,

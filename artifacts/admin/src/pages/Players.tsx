@@ -25,6 +25,24 @@ function formatChips(p: any) {
   return Number(chips).toLocaleString();
 }
 
+function formatDuration(totalSeconds: number | null | undefined) {
+  const seconds = Math.max(0, Number(totalSeconds) || 0);
+  if (seconds < 60) return `${seconds}s`;
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+}
+
+function formatLastSeen(d: string | null) {
+  if (!d) return 'Never';
+  const date = new Date(d);
+  const diffMinutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60_000));
+  if (diffMinutes < 2) return 'Now';
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}h ago`;
+  return formatDate(d);
+}
+
 export default function Players() {
   const [players, setPlayers] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -43,7 +61,7 @@ export default function Players() {
   useEffect(() => { load(); }, [load]);
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-8 max-w-7xl">
       <div className="mb-6">
         <h1 className="text-xl font-bold text-foreground">Players</h1>
         <p className="text-sm text-muted-foreground mt-0.5">{total} account{total !== 1 ? 's' : ''}</p>
@@ -74,22 +92,24 @@ export default function Players() {
       </div>
 
       {/* Table */}
-      <div className="bg-card border border-card-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-card border border-card-border rounded-xl overflow-x-auto">
+        <table className="w-full min-w-[980px] text-sm">
           <thead>
             <tr className="border-b border-border">
               <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground tracking-wider uppercase">Player</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground tracking-wider uppercase">Chips</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground tracking-wider uppercase">Status</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground tracking-wider uppercase">Last Seen</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground tracking-wider uppercase">Play Time</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground tracking-wider uppercase">Joined</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground text-sm">Loading…</td></tr>
+              <tr><td colSpan={7} className="px-5 py-8 text-center text-muted-foreground text-sm">Loading…</td></tr>
             ) : players.length === 0 ? (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground text-sm">No players found.</td></tr>
+              <tr><td colSpan={7} className="px-5 py-8 text-center text-muted-foreground text-sm">No players found.</td></tr>
             ) : players.map((p, i) => (
               <tr key={p.playerId} className={`hover:bg-muted/40 transition-colors ${i < players.length - 1 ? 'border-b border-border/60' : ''}`}>
                 <td className="px-5 py-3.5">
@@ -110,6 +130,8 @@ export default function Players() {
                     {STATUS_LABELS[p.status] ?? p.status}
                   </span>
                 </td>
+                <td className="px-4 py-3.5 text-muted-foreground text-xs whitespace-nowrap">{formatLastSeen(p.lastSeenAt)}</td>
+                <td className="px-4 py-3.5 text-foreground text-xs font-mono whitespace-nowrap">{formatDuration(p.totalPlaySeconds)}</td>
                 <td className="px-4 py-3.5 text-muted-foreground text-xs">{formatDate(p.createdAt)}</td>
                 <td className="px-4 py-3.5 text-right">
                   <Link href={`/players/${p.playerId}`}>

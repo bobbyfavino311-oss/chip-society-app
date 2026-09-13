@@ -82654,6 +82654,12 @@ var playersTable = pgTable("players", {
   status: text("status").notNull().default("active"),
   banReason: text("ban_reason"),
   suspensionExpiresAt: timestamp("suspension_expires_at", { withTimezone: true }),
+  loginCount: integer("login_count").notNull().default(0),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  sessionCount: integer("session_count").notNull().default(0),
+  totalPlaySeconds: integer("total_play_seconds").notNull().default(0),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+  lastSessionId: text("last_session_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
 });
@@ -82979,11 +82985,59 @@ router2.post("/auth/login", async (req, res) => {
       }
       await db.update(playersTable).set({ status: "active", banReason: null, suspensionExpiresAt: null, updatedAt: /* @__PURE__ */ new Date() }).where(eq(playersTable.playerId, player.playerId));
     }
+    const loginAt = /* @__PURE__ */ new Date();
+    await db.update(playersTable).set({
+      loginCount: sql`${playersTable.loginCount} + 1`,
+      lastLoginAt: loginAt,
+      lastSeenAt: loginAt,
+      updatedAt: loginAt
+    }).where(eq(playersTable.playerId, player.playerId));
     req.log.info({ playerId: player.playerId, username: player.username }, "Player signed in");
     res.json({ success: true, playerId: player.playerId, profile: player.profileJson });
   } catch (e) {
     req.log.error(e, "login error");
     res.status(500).json({ error: "Server error during login." });
+  }
+});
+router2.post("/activity", async (req, res) => {
+  try {
+    const { playerId, sessionId, event, elapsedSeconds = 0 } = req.body;
+    if (!playerId || !sessionId || !["start", "heartbeat"].includes(event ?? "")) {
+      res.status(400).json({ error: "playerId, sessionId, and a valid event are required." });
+      return;
+    }
+    if (sessionId.length > 100) {
+      res.status(400).json({ error: "Invalid sessionId." });
+      return;
+    }
+    const now = /* @__PURE__ */ new Date();
+    if (event === "start") {
+      const result = await db.update(playersTable).set({
+        sessionCount: sql`${playersTable.sessionCount} + CASE WHEN ${playersTable.lastSessionId} IS DISTINCT FROM ${sessionId} THEN 1 ELSE 0 END`,
+        lastSessionId: sessionId,
+        lastSeenAt: now,
+        updatedAt: now
+      }).where(eq(playersTable.playerId, playerId)).returning({ playerId: playersTable.playerId });
+      if (!result.length) {
+        res.status(404).json({ error: "Player not found." });
+        return;
+      }
+    } else {
+      const seconds = Math.max(0, Math.min(120, Math.floor(Number(elapsedSeconds) || 0)));
+      const result = await db.update(playersTable).set({
+        totalPlaySeconds: sql`${playersTable.totalPlaySeconds} + ${seconds}`,
+        lastSeenAt: now,
+        updatedAt: now
+      }).where(eq(playersTable.playerId, playerId)).returning({ playerId: playersTable.playerId });
+      if (!result.length) {
+        res.status(404).json({ error: "Player not found." });
+        return;
+      }
+    }
+    res.json({ success: true });
+  } catch (e) {
+    req.log.error(e, "activity tracking error");
+    res.status(500).json({ error: "Server error." });
   }
 });
 router2.get("/auth/profile", async (req, res) => {
@@ -83347,6 +83401,11 @@ router3.get("/admin/players", async (req, res) => {
       status: playersTable.status,
       banReason: playersTable.banReason,
       profileJson: playersTable.profileJson,
+      loginCount: playersTable.loginCount,
+      lastLoginAt: playersTable.lastLoginAt,
+      sessionCount: playersTable.sessionCount,
+      totalPlaySeconds: playersTable.totalPlaySeconds,
+      lastSeenAt: playersTable.lastSeenAt,
       createdAt: playersTable.createdAt,
       updatedAt: playersTable.updatedAt
     }).from(playersTable).orderBy(desc(playersTable.createdAt));
@@ -84928,7 +84987,13 @@ async function runMigrations() {
       ALTER TABLE players
         ADD COLUMN IF NOT EXISTS suspension_expires_at TIMESTAMPTZ,
         ADD COLUMN IF NOT EXISTS ban_reason TEXT,
-        ADD COLUMN IF NOT EXISTS avatar_data TEXT;
+        ADD COLUMN IF NOT EXISTS avatar_data TEXT,
+        ADD COLUMN IF NOT EXISTS login_count INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS session_count INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS total_play_seconds INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS last_session_id TEXT;
     `);
     await client.query(`
       ALTER TABLE player_notifications

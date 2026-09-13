@@ -81,7 +81,13 @@ async function runMigrations() {
       ALTER TABLE players
         ADD COLUMN IF NOT EXISTS suspension_expires_at TIMESTAMPTZ,
         ADD COLUMN IF NOT EXISTS ban_reason TEXT,
-        ADD COLUMN IF NOT EXISTS avatar_data TEXT;
+        ADD COLUMN IF NOT EXISTS avatar_data TEXT,
+        ADD COLUMN IF NOT EXISTS login_count INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS session_count INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS total_play_seconds INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS last_session_id TEXT;
     `);
     // Backfill columns added after initial table creation
     await client.query(`

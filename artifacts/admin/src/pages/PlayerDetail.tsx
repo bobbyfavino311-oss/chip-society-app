@@ -42,6 +42,17 @@ function formatDate(d: string | null) {
   return new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+function formatDuration(totalSeconds: number | null | undefined) {
+  const seconds = Math.max(0, Number(totalSeconds) || 0);
+  const days = Math.floor(seconds / 86_400);
+  const hours = Math.floor((seconds % 86_400) / 3_600);
+  const minutes = Math.floor((seconds % 3_600) / 60);
+  if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  if (minutes > 0) return `${minutes}m`;
+  return `${seconds}s`;
+}
+
 function BonusModal({ playerId, username, currentBalance, onClose, onDone }: any) {
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState(BONUS_REASONS[0]!);
@@ -529,7 +540,7 @@ export default function PlayerDetail() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
           { label: 'Chips', value: chips.toLocaleString() },
           { label: 'XP',    value: (profile.xp as number ?? 0).toLocaleString() },
@@ -541,6 +552,29 @@ export default function PlayerDetail() {
             <p className="text-xl font-bold text-foreground">{s.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Activity */}
+      <div className="bg-card border border-card-border rounded-xl mb-6">
+        <div className="px-5 py-3.5 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Clock size={13} className="text-primary" />Player Activity
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border/40">
+          {[
+            { label: 'Sign-ins', value: Number(player.loginCount ?? 0).toLocaleString() },
+            { label: 'App Sessions', value: Number(player.sessionCount ?? 0).toLocaleString() },
+            { label: 'Total Active Time', value: formatDuration(player.totalPlaySeconds) },
+            { label: 'Last Seen', value: formatDate(player.lastSeenAt) },
+            { label: 'Last Sign-in', value: formatDate(player.lastLoginAt) },
+          ].map(item => (
+            <div key={item.label} className="bg-card px-5 py-4">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{item.label}</p>
+              <p className="text-sm font-semibold text-foreground">{item.value}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Moderation History */}

@@ -32,6 +32,11 @@ router.get('/admin/players', async (req, res) => {
         status:     playersTable.status,
         banReason:  playersTable.banReason,
         profileJson: playersTable.profileJson,
+        loginCount: playersTable.loginCount,
+        lastLoginAt: playersTable.lastLoginAt,
+        sessionCount: playersTable.sessionCount,
+        totalPlaySeconds: playersTable.totalPlaySeconds,
+        lastSeenAt: playersTable.lastSeenAt,
         createdAt:  playersTable.createdAt,
         updatedAt:  playersTable.updatedAt,
       })
