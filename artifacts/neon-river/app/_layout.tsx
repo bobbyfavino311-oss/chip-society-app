@@ -8,6 +8,7 @@ import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { Righteous_400Regular } from '@expo-google-fonts/righteous';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type * as NotificationsType from 'expo-notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack, useSegments } from 'expo-router';
@@ -128,10 +129,34 @@ function SoundSyncer() {
 // for foreground notifications and user taps on notification banners.
 
 const API_BASE = 'https://api-server-production-bbc2.up.railway.app/api';
+const REWARD_REMINDER_IDS_KEY = '@chipsociety_reward_reminder_ids_v1';
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function nextLocalTime(hour: number, minute = 0): Date {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  date.setHours(hour, minute, 0, 0);
+  return date;
+}
+
+function wheelReminderDate(lastWheelSpin: string | null): Date {
+  if (!lastWheelSpin) return nextLocalTime(10);
+  const due = new Date(new Date(lastWheelSpin).getTime() + DAY_MS);
+  if (due.getTime() <= Date.now()) return nextLocalTime(10);
+
+  // Do not send reward reminders during typical sleeping hours.
+  if (due.getHours() < 9) due.setHours(9, 0, 0, 0);
+  if (due.getHours() >= 22) {
+    due.setDate(due.getDate() + 1);
+    due.setHours(9, 0, 0, 0);
+  }
+  return due;
+}
 
 function PushSetup() {
   const { addNotification, setPushToken, pushToken } = useNotifications();
   const { profile } = useUser();
+  const [notificationsGranted, setNotificationsGranted] = useState(false);
   const notifListener = useRef<{ remove: () => void } | null>(null);
   const responseListener = useRef<{ remove: () => void } | null>(null);
 
@@ -164,6 +189,15 @@ function PushSetup() {
         }
 
         if (!granted || cancelled) return;
+        setNotificationsGranted(true);
+
+        if (Platform.OS === 'android') {
+          await Notifications.setNotificationChannelAsync('rewards', {
+            name: 'Daily Rewards',
+            importance: Notifications.AndroidImportance.HIGH,
+            sound: 'default',
+          });
+        }
 
         // Get Expo push token — works on physical devices; silently fails on simulators
         const projectId =
@@ -205,12 +239,118 @@ function PushSetup() {
       }
     });
 
+    // Handle a notification that launched the app from a fully closed state.
+    void Notifications.getLastNotificationResponseAsync().then((response: NotificationsType.NotificationResponse | null) => {
+      const actionRoute = response?.notification.request.content.data?.actionRoute;
+      if (typeof actionRoute === 'string') {
+        router.push(actionRoute as any);
+        void Notifications.clearLastNotificationResponseAsync();
+      }
+    }).catch(() => {});
+
     return () => {
       cancelled = true;
       notifListener.current?.remove();
       responseListener.current?.remove();
     };
   }, []);
+
+  // Keep exactly one scheduled reminder per daily reward. Whenever a reward is
+  // claimed, its profile timestamp changes and the next reminder is rescheduled.
+  useEffect(() => {
+    if (
+      Platform.OS === 'web' ||
+      !Notifications ||
+      !notificationsGranted ||
+      !profile.playerId
+    ) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const stored = await AsyncStorage.getItem(REWARD_REMINDER_IDS_KEY);
+        const previousIds = stored ? JSON.parse(stored) as string[] : [];
+        await Promise.all(previousIds.map(id =>
+          Notifications.cancelScheduledNotificationAsync(id).catch(() => {})
+        ));
+        if (cancelled) return;
+
+        const channelId = Platform.OS === 'android' ? 'rewards' : undefined;
+        const reminders = [
+          {
+            title: 'Your daily wheel spin is ready!',
+            body: 'Spin the wheel and collect your daily reward.',
+            route: '/rewards/wheel',
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.DATE,
+              date: wheelReminderDate(profile.lastWheelSpin),
+              channelId,
+            },
+          },
+          {
+            title: 'Your daily streak reward is ready!',
+            body: 'Keep your streak alive and claim today’s reward.',
+            route: '/rewards/streak',
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.DAILY,
+              hour: 9,
+              minute: 0,
+              channelId,
+            },
+          },
+          {
+            title: 'Your fortune cookie is ready to be cracked!',
+            body: 'Claim your free daily cookie and reveal your fortune.',
+            route: '/rewards/cookie',
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.DAILY,
+              hour: 12,
+              minute: 0,
+              channelId,
+            },
+          },
+        ];
+
+        const ids = await Promise.all(reminders.map(reminder =>
+          Notifications.scheduleNotificationAsync({
+            content: {
+              title: reminder.title,
+              body: reminder.body,
+              sound: 'default',
+              data: {
+                category: 'reward',
+                priority: 'high',
+                actionRoute: reminder.route,
+                actionLabel: 'CLAIM NOW',
+              },
+            },
+            trigger: reminder.trigger,
+          })
+        ));
+
+        if (cancelled) {
+          await Promise.all(ids.map(id =>
+            Notifications.cancelScheduledNotificationAsync(id).catch(() => {})
+          ));
+        } else {
+          await AsyncStorage.setItem(REWARD_REMINDER_IDS_KEY, JSON.stringify(ids));
+        }
+      } catch {
+        // Scheduling reminders must never block the app.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    notificationsGranted,
+    profile.playerId,
+    profile.lastWheelSpin,
+    profile.lastDailyReward,
+    profile.lastFreeCookie,
+  ]);
 
   return null;
 }

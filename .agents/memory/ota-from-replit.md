@@ -6,13 +6,13 @@ description: How to push EAS OTA updates directly from Replit without the user's
 # OTA Updates from Replit
 
 ## The rule
-`eas-cli` is already installed in the Replit environment (`eas-cli/21.6.0`). OTA updates can be pushed directly from here using `EXPO_TOKEN` for auth — no Mac needed.
+OTA updates can be pushed directly from Replit using `EXPO_TOKEN` for auth — no Mac needed. Do not assume a package-local `eas` binary exists.
 
 **Why:** The user's Mac often has stale code; pushing OTA from Mac = deploying old code. Replit always has the latest code, so pushing from here is safer and faster.
 
 **How to apply:**
 1. Ensure `babel-preset-expo` is installed as a devDep in `artifacts/neon-river` (required for `eas update` to bundle — it's missing from the default pnpm install).
-2. Run: `cd artifacts/neon-river && EXPO_TOKEN=<token> npx eas-cli update --channel production --message "..." --non-interactive`
+2. Run: `cd artifacts/neon-river && EXPO_TOKEN=<token> npx eas-cli update --channel production --message "..." --non-interactive`. `pnpm exec eas` is not available in this workspace.
 3. The EXPO_TOKEN should be stored in Replit Secrets as `EXPO_TOKEN` (account: bfexpo / bobbyfavino311@gmail.com).
 
 ## OTA apply sequence (on device)
