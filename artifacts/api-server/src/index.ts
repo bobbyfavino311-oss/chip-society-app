@@ -206,6 +206,27 @@ async function runMigrations() {
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS player_suggestions (
+        id              TEXT PRIMARY KEY,
+        player_id       TEXT,
+        username        TEXT NOT NULL DEFAULT 'Anonymous',
+        title           TEXT NOT NULL,
+        description     TEXT NOT NULL,
+        device_info     JSONB NOT NULL DEFAULT '{}',
+        status          TEXT NOT NULL DEFAULT 'open',
+        admin_notes     TEXT,
+        announcement_id TEXT REFERENCES announcements(id) ON DELETE SET NULL,
+        announced_at    TIMESTAMPTZ,
+        created_at      TIMESTAMPTZ DEFAULT NOW(),
+        updated_at      TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS player_suggestions_status_idx
+        ON player_suggestions(status, created_at DESC);
+      ALTER TABLE player_suggestions ADD COLUMN IF NOT EXISTS player_id TEXT;
+      ALTER TABLE player_suggestions ADD COLUMN IF NOT EXISTS username TEXT NOT NULL DEFAULT 'Anonymous';
+      ALTER TABLE player_suggestions ADD COLUMN IF NOT EXISTS device_info JSONB NOT NULL DEFAULT '{}';
+    `);
     logger.info('Startup migrations complete');
   } catch (err) {
     logger.error({ err }, 'Startup migration failed — continuing anyway');

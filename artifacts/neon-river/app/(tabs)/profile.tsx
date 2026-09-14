@@ -29,6 +29,7 @@ import { useAchievements, achievementCompletion } from '@/context/AchievementCon
 import { useSocial } from '@/context/SocialContext';
 import { useTableTheme } from '@/context/TableThemeContext';
 import { ALL_ACHIEVEMENTS } from '@/lib/achievements';
+import PlayerSuggestionModal from '@/components/PlayerSuggestionModal';
 
 const RANK_COLORS: Record<string, string> = {
   'LOCAL':              'rgba(255,255,255,0.45)',
@@ -258,6 +259,7 @@ export default function ProfileScreen() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [avatarImgFailed, setAvatarImgFailed] = useState(false);
 
   const claimedCount = achievementCompletion(unlockedIds);
@@ -761,6 +763,27 @@ export default function ProfileScreen() {
           <Ionicons name="chevron-forward" size={18} color="rgba(255,120,60,0.5)" />
         </TouchableOpacity>
 
+        {/* Share an improvement idea */}
+        <TouchableOpacity
+          style={achStyles.row}
+          activeOpacity={0.8}
+          onPress={() => setShowSuggestions(true)}
+        >
+          <LinearGradient
+            colors={['rgba(191,95,255,0.10)', 'transparent']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          />
+          <View style={[achStyles.iconWrap, { backgroundColor: 'rgba(191,95,255,0.10)' }]}>
+            <Ionicons name="bulb-outline" size={20} color="rgba(191,95,255,0.85)" />
+          </View>
+          <View style={achStyles.achInfo}>
+            <Text style={achStyles.achLabel}>SUGGESTIONS</Text>
+            <Text style={achStyles.achSub}>Share an idea to make the game better</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(191,95,255,0.5)" />
+        </TouchableOpacity>
+
         <NeonSectionTitle label="STREAK" color="rgba(255,150,50,0.8)" />
         <View style={styles.card}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -795,6 +818,7 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <BugReportModal visible={showBugReport} onClose={() => setShowBugReport(false)} />
+      <PlayerSuggestionModal visible={showSuggestions} onClose={() => setShowSuggestions(false)} />
 
       {/* Sign-out confirmation modal */}
       <Modal
@@ -1300,4 +1324,3 @@ const devStyles = StyleSheet.create({
     letterSpacing: 1.5,
   },
 });
-

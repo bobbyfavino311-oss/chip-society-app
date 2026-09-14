@@ -7,6 +7,8 @@ import { STAKE_CONFIG } from '../poker/types.js';
 import { createAdapter } from '@socket.io/redis-adapter';
 import Redis from 'ioredis';
 import { serverStats } from '../lib/serverStats.js';
+import { db, playersTable } from '@workspace/db';
+import { eq } from 'drizzle-orm';
 
 const VALID_VARIANTS: ReadonlySet<string> = new Set([
   'texas_holdem', 'short_deck_holdem', 'joker_holdem', 'omaha_holdem',
@@ -24,6 +26,22 @@ function resolveTier(v: unknown): StakeTier {
   if (typeof v === 'string' && v in STAKE_CONFIG) return v as StakeTier;
   // Legacy / unknown → cap at ELITE to keep the game playable
   return 'ELITE';
+}
+
+/**
+ * Founder status is identity data, so it must come from the server-side
+ * player record rather than from a socket payload. A missing player record is
+ * treated as a non-founder; query failures are allowed to reach the handler
+ * so a seat is never created without a verified lookup.
+ */
+async function resolveFounder(userId: string): Promise<boolean> {
+  const rows = await db
+    .select({ profileJson: playersTable.profileJson })
+    .from(playersTable)
+    .where(eq(playersTable.playerId, userId))
+    .limit(1);
+  const profile = rows[0]?.profileJson as Record<string, unknown> | undefined;
+  return profile?.isFounder === true;
 }
 
 // ── Player presence registry ───────────────────────────────────────────────────
@@ -205,11 +223,12 @@ export function setupSocketIO(httpServer: HttpServer): void {
 
         const tier = resolveTier(payload.stakeTier);
         const variant = resolveVariant(payload.variant);
+        const isFounder = await resolveFounder(payload.userId);
         const room = manager.createRoom(tier, payload.maxPlayers ?? 5, variant);
         const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
         const ok = manager.joinRoom(
           socket.id, room.id,
-          payload.userId, payload.username, payload.avatarId, chips,
+          payload.userId, payload.username, payload.avatarId, chips, isFounder,
         );
         if (!ok) {
           manager.getRoom(room.id) && manager.cleanupEmpty();
@@ -251,10 +270,11 @@ export function setupSocketIO(httpServer: HttpServer): void {
           return;
         }
         const chips = sanitizeChips(payload.chips, targetRoom.config.minBuyIn);
+        const isFounder = await resolveFounder(payload.userId);
 
         const ok = manager.joinRoom(
           socket.id, payload.tableId,
-          payload.userId, payload.username, payload.avatarId, chips,
+          payload.userId, payload.username, payload.avatarId, chips, isFounder,
         );
         if (!ok) {
           socket.emit('error', { message: 'Cannot join table — full, closed, or insufficient chips.' });
@@ -292,11 +312,12 @@ export function setupSocketIO(httpServer: HttpServer): void {
         const variant = resolveVariant(payload.variant);
         const room = manager.findOrCreateRoom(tier, 5, variant);
         const chips = sanitizeChips(payload.chips, room.config.minBuyIn);
+        const isFounder = await resolveFounder(payload.userId);
         // DIAGNOSTIC
         console.log('[quick_join] payload.stakeTier=', payload.stakeTier, '→ resolved tier=', tier, 'payload.chips=', payload.chips, 'sanitized=', chips);
         const ok = manager.joinRoom(
           socket.id, room.id,
-          payload.userId, payload.username, payload.avatarId, chips,
+          payload.userId, payload.username, payload.avatarId, chips, isFounder,
         );
         if (!ok) {
           socket.emit('error', { message: 'Could not find a suitable table. Try a different stake level.' });
@@ -318,14 +339,15 @@ export function setupSocketIO(httpServer: HttpServer): void {
     });
 
     // ─── Rejoin table (reconnect recovery) ────────────────────────────────
-    socket.on('rejoin_table', (payload: {
+    socket.on('rejoin_table', async (payload: {
       tableId: string;
       userId: string;
       username: string;
       avatarId: number;
     }) => {
       try {
-        const room = manager.reconnectPlayer(payload.userId, socket.id);
+        const isFounder = await resolveFounder(payload.userId);
+        const room = manager.reconnectPlayer(payload.userId, socket.id, isFounder);
         if (!room) {
           socket.emit('rejoin_failed', { message: 'Table no longer exists or seat expired.' });
           return;

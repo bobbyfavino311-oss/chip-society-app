@@ -53,7 +53,16 @@ const apiLimiter = rateLimit({
   message: { error: "Too many requests. Please slow down." },
 });
 
+const suggestionLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many suggestions submitted. Please try again later." },
+});
+
 app.use("/api/auth", authLimiter);
+app.use("/api/player-suggestions", suggestionLimiter);
 app.use("/api", apiLimiter);
 
 app.use("/api", router);

@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Megaphone, Trash2, Send, Pin, Bell, Share2 } from "lucide-react";
 
 export default function Announcements() {
-  const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [sendPush, setSendPush] = useState(true);
@@ -20,15 +19,16 @@ export default function Announcements() {
   const [sendingPush, setSendingPush] = useState(false);
   const [pushResult, setPushResult] = useState('');
 
-  function load() {
-    setLoading(true);
-    api.getAnnouncements()
-      .then((d: any) => setAnnouncements(d.announcements ?? []))
-      .catch(() => setAnnouncements([]))
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => { load(); }, []);
+  const queryClient = useQueryClient();
+  const {
+    data,
+    isLoading: loading,
+    refetch: load,
+  } = useQuery({
+    queryKey: ["announcements"],
+    queryFn: () => api.getAnnouncements(),
+  });
+  const announcements: any[] = data?.announcements ?? [];
 
   async function handlePost() {
     if (!title.trim() || !body.trim()) return;
@@ -68,7 +68,10 @@ export default function Announcements() {
     setDeleting(id);
     try {
       await api.deleteAnnouncement(id);
-      setAnnouncements(prev => prev.filter((a: any) => a.id !== id));
+      queryClient.setQueryData(["announcements"], (current: any) => ({
+        ...(current ?? {}),
+        announcements: (current?.announcements ?? []).filter((a: any) => a.id !== id),
+      }));
     } catch {
       alert('Failed to delete. Try again.');
     } finally {

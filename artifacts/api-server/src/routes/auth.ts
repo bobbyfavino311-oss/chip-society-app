@@ -8,6 +8,7 @@ import {
 } from '@workspace/db';
 import { eq, inArray, or, sql } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
+import { createPlayerSession } from '../lib/playerSession.js';
 
 const router = Router();
 
@@ -124,7 +125,7 @@ router.post('/auth/register', async (req, res) => {
     });
 
     req.log.info({ playerId, username }, 'Player registered');
-    res.json({ success: true, playerId, profile: fullProfile });
+    res.json({ success: true, playerId, profile: fullProfile, sessionToken: createPlayerSession(playerId) });
   } catch (e) {
     req.log.error(e, 'register error');
     res.status(500).json({ error: 'Server error during registration.' });
@@ -197,7 +198,12 @@ router.post('/auth/login', async (req, res) => {
       .where(eq(playersTable.playerId, player.playerId));
 
     req.log.info({ playerId: player.playerId, username: player.username }, 'Player signed in');
-    res.json({ success: true, playerId: player.playerId, profile: player.profileJson });
+    res.json({
+      success: true,
+      playerId: player.playerId,
+      profile: player.profileJson,
+      sessionToken: createPlayerSession(player.playerId),
+    });
   } catch (e) {
     req.log.error(e, 'login error');
     res.status(500).json({ error: 'Server error during login.' });

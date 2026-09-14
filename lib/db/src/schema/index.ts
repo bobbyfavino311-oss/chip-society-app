@@ -187,6 +187,23 @@ export const announcementsTable = pgTable('announcements', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
+// ── Player suggestions ────────────────────────────────────────────────────────
+// Keep this after announcementsTable because announcementId references it.
+export const playerSuggestionsTable = pgTable('player_suggestions', {
+  id:             text('id').primaryKey(),
+  playerId:       text('player_id'),
+  username:       text('username').notNull().default('Anonymous'),
+  title:          text('title').notNull(),
+  description:    text('description').notNull(),
+  deviceInfo:     jsonb('device_info').notNull().default({}),
+  status:         text('status').notNull().default('open'),
+  adminNotes:     text('admin_notes'),
+  announcementId: text('announcement_id').references(() => announcementsTable.id, { onDelete: 'set null' }),
+  announcedAt:    timestamp('announced_at', { withTimezone: true }),
+  createdAt:      timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt:      timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export type Player                = typeof playersTable.$inferSelect;
@@ -207,3 +224,4 @@ export type PostComment           = typeof postCommentsTable.$inferSelect;
 export type PostRepost            = typeof postRepostsTable.$inferSelect;
 export type Announcement          = typeof announcementsTable.$inferSelect;
 export type PlayerPushToken       = typeof playerPushTokensTable.$inferSelect;
+export type PlayerSuggestion      = typeof playerSuggestionsTable.$inferSelect;

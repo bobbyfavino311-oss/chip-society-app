@@ -14,6 +14,7 @@ import { getBestHandVariant } from '@/lib/pokerEngine';
 import type { GameVariant } from '@/constants/gameVariants';
 import { ChatBubble } from '@/components/InGameChat';
 import type { BubbleEntry } from '@/components/InGameChat';
+import FounderBadge from '@/components/FounderBadge';
 
 // ─── Shared constants ──────────────────────────────────────────────────────────
 
@@ -194,7 +195,7 @@ export function TimerRing({ timeoutAt, maxSeconds = 30, size = 44 }: {
 
 // ─── Compact seat (top row) ────────────────────────────────────────────────────
 // `player` is a normalized shape shared by AI bots and multiplayer opponents:
-// { id, name, chips, avatarIndex, status, isDealer, isSmallBlind, isBigBlind, holeCards }
+// { id, name, chips, avatarIndex, isFounder, status, isDealer, isSmallBlind, isBigBlind, holeCards }
 // `cardCount` — how many hole cards this seat holds (2 for most variants, 4 for Omaha).
 // When provided and showCards is false, renders face-down placeholder cards so the
 // player can see that an opponent is actively holding cards during the hand.
@@ -238,6 +239,7 @@ export function CompactAISeat({
         {showRing && <TimerRing timeoutAt={timeoutAt} maxSeconds={30} size={44} />}
       </View>
       <Text style={[seat.seatName, isWinner && seat.seatNameWinner]} numberOfLines={1}>{player.name}</Text>
+      {player.isFounder && <FounderBadge iconOnly />}
       <Text style={[seat.seatChips, folded && seat.dimText]}>{formatChips(player.chips)}</Text>
 
       {/* Face-down cards during active hand */}

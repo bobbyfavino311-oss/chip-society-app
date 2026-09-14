@@ -74,7 +74,14 @@ export class PokerRoom {
     return this.seats.findIndex(s => s?.userId === userId);
   }
 
-  addPlayer(socketId: string, userId: string, username: string, avatarId: number, chips: number): number {
+  addPlayer(
+    socketId: string,
+    userId: string,
+    username: string,
+    avatarId: number,
+    chips: number,
+    isFounder?: boolean,
+  ): number {
     const emptyIdx = this.seats.findIndex(s => s === null);
     if (emptyIdx === -1) return -1;
     // If a hand is already in progress, seat the player as sitting_out so they
@@ -83,6 +90,7 @@ export class PokerRoom {
     const initialStatus: Seat['status'] = this.phase !== 'waiting' ? 'sitting_out' : 'active';
     this.seats[emptyIdx] = {
       socketId, userId, username, avatarId,
+      ...(isFounder === undefined ? {} : { isFounder }),
       chips, startingChips: chips,
       cards: [], currentBet: 0, totalBet: 0, status: initialStatus,
     };
@@ -222,12 +230,17 @@ export class PokerRoom {
   }
 
   /** Restore a player's socket after they reconnect. */
-  reconnectPlayer(userId: string, newSocketId: string): boolean {
+  reconnectPlayer(userId: string, newSocketId: string, isFounder?: boolean): boolean {
     const idx = this.findSeatByUserId(userId);
     if (idx === -1) return false;
     const seat = this.seats[idx]!;
 
     seat.socketId = newSocketId;
+    // Keep the value already verified for this seat. A DB lookup is only a
+    // fallback for seats created before founder propagation was introduced.
+    if (seat.isFounder === undefined && isFounder !== undefined) {
+      seat.isFounder = isFounder;
+    }
     seat.isDisconnected = false;
     delete seat.disconnectedAt;
 
@@ -775,6 +788,7 @@ export class PokerRoom {
         userId: s.userId,
         username: s.username,
         avatarId: s.avatarId,
+        ...(s.isFounder === undefined ? {} : { isFounder: s.isFounder }),
         chips: s.chips,
         currentBet: s.currentBet,
         totalBet: s.totalBet,

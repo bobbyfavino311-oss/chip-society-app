@@ -345,6 +345,7 @@ const UserContext = createContext<UserContextValue | null>(null);
 
 const STORAGE_KEY       = '@chip_society_profile';
 const LOCAL_CREDS_KEY   = '@chip_society_local_creds';
+const PLAYER_SESSION_KEY = '@chip_society_player_session';
 const LEGACY_KEY   = '@neon_river_profile';
 
 // ─── Notification socket URL ──────────────────────────────────────────────────
@@ -401,16 +402,16 @@ async function serverCheckUsername(username: string): Promise<boolean> {
 async function serverRegister(
   username: string, pin: string, email: string,
   avatarIndex: number, profile: UserProfile,
-): Promise<{ success: boolean; playerId?: string; error?: string; isNetworkError?: boolean }> {
+): Promise<{ success: boolean; playerId?: string; sessionToken?: string; error?: string; isNetworkError?: boolean }> {
   try {
     const r = await fetch(`${getApiBase()}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, pin, email, avatarIndex, profile }),
     });
-    const d = await r.json() as { success?: boolean; playerId?: string; error?: string };
+    const d = await r.json() as { success?: boolean; playerId?: string; sessionToken?: string; error?: string };
     if (!r.ok) return { success: false, error: d.error ?? 'Registration failed.' };
-    return { success: true, playerId: d.playerId };
+    return { success: true, playerId: d.playerId, sessionToken: d.sessionToken };
   } catch {
     return { success: false, error: 'Could not reach server.', isNetworkError: true };
   }
@@ -418,14 +419,14 @@ async function serverRegister(
 
 async function serverLogin(
   username: string, pin: string,
-): Promise<{ success: boolean; profile?: UserProfile; error?: string; isNetworkError?: boolean; isBanned?: boolean; isSuspended?: boolean; banReason?: string; suspensionExpiresAt?: string }> {
+): Promise<{ success: boolean; profile?: UserProfile; sessionToken?: string; error?: string; isNetworkError?: boolean; isBanned?: boolean; isSuspended?: boolean; banReason?: string; suspensionExpiresAt?: string }> {
   try {
     const r = await fetch(`${getApiBase()}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, pin }),
     });
-    const d = await r.json() as { success?: boolean; profile?: UserProfile; error?: string; reason?: string; expiresAt?: string };
+    const d = await r.json() as { success?: boolean; profile?: UserProfile; sessionToken?: string; error?: string; reason?: string; expiresAt?: string };
     if (r.status === 403 && d.error === 'ACCOUNT_BANNED') {
       return { success: false, error: 'ACCOUNT_BANNED', isBanned: true, banReason: d.reason };
     }
@@ -433,10 +434,33 @@ async function serverLogin(
       return { success: false, error: 'ACCOUNT_SUSPENDED', isSuspended: true, banReason: d.reason, suspensionExpiresAt: d.expiresAt };
     }
     if (!r.ok) return { success: false, error: d.error ?? 'Login failed.' };
-    return { success: true, profile: d.profile };
+    return { success: true, profile: d.profile, sessionToken: d.sessionToken };
   } catch {
     return { success: false, error: 'Could not reach server.', isNetworkError: true };
   }
+}
+
+export async function getPlayerSessionToken(): Promise<string | null> {
+  const existing = await AsyncStorage.getItem(PLAYER_SESSION_KEY);
+  if (existing) return existing;
+
+  const rawCredentials = await AsyncStorage.getItem(LOCAL_CREDS_KEY);
+  if (!rawCredentials) return null;
+  try {
+    const credentials = JSON.parse(rawCredentials) as { username?: string; pin?: string };
+    if (!credentials.username || !credentials.pin) return null;
+    const login = await serverLogin(credentials.username, credentials.pin);
+    if (!login.success || !login.sessionToken) return null;
+    await AsyncStorage.setItem(PLAYER_SESSION_KEY, login.sessionToken);
+    return login.sessionToken;
+  } catch {
+    return null;
+  }
+}
+
+export async function refreshPlayerSessionToken(): Promise<string | null> {
+  await AsyncStorage.removeItem(PLAYER_SESSION_KEY);
+  return getPlayerSessionToken();
 }
 
 async function serverTrackActivity(
@@ -1001,6 +1025,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const res = await serverRegister(username, pin, email, avatarIndex, newProfile);
     if (!res.success) {
       if (res.isNetworkError) {
+        await AsyncStorage.removeItem(PLAYER_SESSION_KEY);
         // Server unreachable — create account locally so the user can play immediately.
         const localPlayerId = `local_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
         const fullProfile: UserProfile = { ...newProfile, playerId: localPlayerId };
@@ -1035,6 +1060,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
     // Also store local creds so sign-in works offline.
     await AsyncStorage.setItem(LOCAL_CREDS_KEY, JSON.stringify({ username: username.toLowerCase(), pin, playerId: res.playerId }));
+    if (res.sessionToken) await AsyncStorage.setItem(PLAYER_SESSION_KEY, res.sessionToken);
     return { success: true };
   }, []);
 
@@ -1049,6 +1075,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: `ACCOUNT_SUSPENDED::${res.banReason ?? 'Policy violation'}${exp}` };
       }
       if (res.isNetworkError) {
+        await AsyncStorage.removeItem(PLAYER_SESSION_KEY);
         // Server offline — verify against locally stored credentials.
         try {
           // Primary: check LOCAL_CREDS_KEY (saved since offline-auth was added).
@@ -1103,6 +1130,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // DEFAULT_PROFILE first (gives sane defaults for fields added after the account
     // was created), then the server profile on top so every saved value wins.
     const serverProf = res.profile as Partial<UserProfile>;
+    if (res.sessionToken) await AsyncStorage.setItem(PLAYER_SESSION_KEY, res.sessionToken);
 
     // Also check local storage: if the player completed the tutorial but the
     // debounced server sync hadn't fired yet before sign-out, the local profile
@@ -1188,6 +1216,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       return { ...DEFAULT_PROFILE };
     });
     if (syncTimerRef.current) { clearTimeout(syncTimerRef.current); syncTimerRef.current = null; }
+    await AsyncStorage.removeItem(PLAYER_SESSION_KEY);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...DEFAULT_PROFILE }));
   }, []);
 
@@ -1213,7 +1242,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       notifSocketRef.current = null;
     }
     setProfile({ ...DEFAULT_PROFILE });
-    await AsyncStorage.multiRemove([STORAGE_KEY, LOCAL_CREDS_KEY, LEGACY_KEY]);
+    await AsyncStorage.multiRemove([STORAGE_KEY, LOCAL_CREDS_KEY, PLAYER_SESSION_KEY, LEGACY_KEY]);
     return { success: true };
   }, [profile]);
 

@@ -41,4 +41,7 @@ export const api = {
   deleteAnnouncement:      (id: string)                                => req<any>('DELETE', `/admin/announcements/${id}`),
   sendPushNotification:    (b: { title: string; body: string })        => req<any>('POST',   '/admin/push-notification', b),
   postAnnouncementToFeed:  (b: { content: string; tag?: string })      => req<any>('POST',   '/admin/announcements/post-to-feed', b),
+  getSuggestions:          (status?: string)                            => req<any>('GET',    `/admin/player-suggestions?status=${encodeURIComponent(status ?? 'all')}`),
+  updateSuggestion:        (id: string, b: { status?: string; adminNotes?: string }) => req<any>('PATCH', `/admin/player-suggestions/${encodeURIComponent(id)}`, b),
+  announceSuggestion:      (id: string, b: { title: string; body: string }) => req<any>('POST', `/admin/player-suggestions/${encodeURIComponent(id)}/announce`, b),
 };

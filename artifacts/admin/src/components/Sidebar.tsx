@@ -1,11 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, Flag, Bug, LogOut, Spade, Megaphone } from "lucide-react";
+import { LayoutDashboard, Users, Flag, Bug, LogOut, Spade, Megaphone, Lightbulb } from "lucide-react";
 
 const nav = [
   { href: "/",             label: "Dashboard",     icon: LayoutDashboard },
   { href: "/players",      label: "Players",       icon: Users },
   { href: "/reports",      label: "Reports",       icon: Flag },
   { href: "/bugs",         label: "Bug Reports",   icon: Bug },
+  { href: "/suggestions",  label: "Suggestions",   icon: Lightbulb },
   { href: "/announcements",label: "Announcements", icon: Megaphone },
 ];
 

@@ -18,6 +18,7 @@ export interface SeatView {
   userId: string;
   username: string;
   avatarId: number;
+  isFounder?: boolean;
   chips: number;
   currentBet: number;
   totalBet: number;

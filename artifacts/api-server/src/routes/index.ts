@@ -6,6 +6,7 @@ import socialRouter from "./social";
 import bugsRouter from "./bugs";
 import referralsRouter from "./referrals";
 import avatarsRouter from "./avatars";
+import suggestionsRouter from "./suggestions";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(socialRouter);
 router.use(bugsRouter);
 router.use(referralsRouter);
 router.use(avatarsRouter);
+router.use(suggestionsRouter);
 
 export default router;

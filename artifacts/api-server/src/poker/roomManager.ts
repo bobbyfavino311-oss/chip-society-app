@@ -53,12 +53,16 @@ export class RoomManager {
     username: string,
     avatarId: number,
     chips: number,
+    isFounder?: boolean,
   ): boolean {
     const room = this.rooms.get(roomId);
     if (!room) return false;
     if (room.playerCount >= room.config.maxPlayers) return false;
     if (chips < room.config.minBuyIn) return false;
-    const seatIdx = room.addPlayer(socketId, userId, username, avatarId, Math.min(chips, room.config.maxBuyIn));
+    const seatIdx = room.addPlayer(
+      socketId, userId, username, avatarId,
+      Math.min(chips, room.config.maxBuyIn), isFounder,
+    );
     if (seatIdx === -1) return false;
     this.socketRoom.set(socketId, roomId);
     this.userIdRoom.set(userId, roomId);
@@ -115,7 +119,7 @@ export class RoomManager {
    * Cancels their disconnect timer, updates the seat's socketId, and
    * re-registers the socket → room mapping.
    */
-  reconnectPlayer(userId: string, newSocketId: string): PokerRoom | null {
+  reconnectPlayer(userId: string, newSocketId: string, isFounder?: boolean): PokerRoom | null {
     const roomId = this.userIdRoom.get(userId);
     if (!roomId) return null;
     const room = this.rooms.get(roomId);
@@ -125,7 +129,7 @@ export class RoomManager {
     const timer = this.disconnectTimers.get(userId);
     if (timer) { clearTimeout(timer); this.disconnectTimers.delete(userId); }
 
-    const ok = room.reconnectPlayer(userId, newSocketId);
+    const ok = room.reconnectPlayer(userId, newSocketId, isFounder);
     if (!ok) return null;
 
     this.socketRoom.set(newSocketId, roomId);

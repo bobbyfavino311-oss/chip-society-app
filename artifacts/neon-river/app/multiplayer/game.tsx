@@ -58,6 +58,7 @@ function toChromePlayer(s: SeatView, gs: ClientGameState) {
     name: s.username ?? '—',
     chips: s.chips ?? 0,
     avatarIndex: s.avatarId,
+    isFounder: s.isFounder,
     cardCount: s.cardCount,   // hole-card count for face-down display during hand
     status: s.status === 'allin' ? 'allIn' : s.status === 'sitting_out' ? 'folded' : s.status,
     isDealer: s.isDealer,

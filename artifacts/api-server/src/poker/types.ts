@@ -27,6 +27,7 @@ export interface Seat {
   userId: string;
   username: string;
   avatarId: number;
+  isFounder?: boolean;
   chips: number;
   startingChips: number;
   cards: Card[];
@@ -58,6 +59,7 @@ export interface SeatView {
   userId: string;
   username: string;
   avatarId: number;
+  isFounder?: boolean;
   chips: number;
   currentBet: number;
   totalBet: number;
