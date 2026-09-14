@@ -10,6 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Polygon } from 'react-native-svg';
 import colors from '../constants/colors';
 import { useTableTheme } from '../context/TableThemeContext';
+import { formatCompactChips } from '../utils/chipColor';
 
 interface BettingPanelProps {
   canCheck: boolean;
@@ -30,9 +31,7 @@ const HANDLE_SIZE = 22;
 
 const fmt = (n: number | null | undefined): string => {
   const v = (typeof n === 'number' && isFinite(n)) ? n : 0;
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
-  return String(v);
+  return formatCompactChips(v);
 };
 
 // ─── Dragon raise label ornaments ─────────────────────────────────────────────

@@ -6,6 +6,7 @@ import NeonAvatarView from './NeonAvatar';
 import { getNeonAvatar } from '../constants/neonAvatars';
 import { Card } from '../lib/pokerEngine';
 import colors from '../constants/colors';
+import { formatCompactChips } from '../utils/chipColor';
 
 export type SeatStatus = 'active' | 'folded' | 'allIn' | 'empty' | 'winner';
 
@@ -115,12 +116,6 @@ export default function PlayerSeat({
     }
   }, [lastAction]);
 
-  const formatChips = (n: number) => {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-    return String(n);
-  };
-
   return (
     <View style={[styles.container, isFolded && styles.foldedContainer]}>
       {/* Cards (face down for AI) */}
@@ -229,7 +224,7 @@ export default function PlayerSeat({
         <Text style={styles.winnerText}>WINNER!</Text>
       ) : (
         <Text style={[styles.chipsText, isFolded && styles.fadedText]}>
-          {formatChips(chips)}
+           {formatCompactChips(chips)}
         </Text>
       )}
 
@@ -243,7 +238,7 @@ export default function PlayerSeat({
       {/* Bet badge */}
       {betInRound > 0 && status !== 'folded' && (
         <View style={styles.betBadge}>
-          <Text style={styles.betText}>{formatChips(betInRound)}</Text>
+           <Text style={styles.betText}>{formatCompactChips(betInRound)}</Text>
         </View>
       )}
     </View>

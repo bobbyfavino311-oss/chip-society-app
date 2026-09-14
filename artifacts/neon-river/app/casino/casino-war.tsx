@@ -21,6 +21,7 @@ import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import { buildBonusSteps } from '@/lib/casinoTableLimits';
 import { type CasinoTableLimit } from '@/lib/casinoTableLimits';
+import { formatCompactChips } from '@/utils/chipColor';
 import {
   dealCasinoWar, dealWarCards, resolveCasinoWar,
   type CWCard, type CWOutcome, type CWWarOutcome, type CWResult,
@@ -37,13 +38,7 @@ type Phase =
   | 'war_result';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
-function fmt(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000_000) return `${(abs / 1_000_000_000 % 1 === 0 ? (abs / 1_000_000_000).toFixed(0) : (abs / 1_000_000_000).toFixed(1))}B`;
-  if (abs >= 1_000_000)     return `${(abs / 1_000_000 % 1 === 0 ? (abs / 1_000_000).toFixed(0) : (abs / 1_000_000).toFixed(1))}M`;
-  if (abs >= 1_000)         return `${(abs / 1_000 % 1 === 0 ? (abs / 1_000).toFixed(0) : (abs / 1_000).toFixed(1))}K`;
-  return String(abs);
-}
+const fmt = (n: number) => formatCompactChips(Math.abs(n));
 function sleep(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
 
 // ─── Paytable modal ────────────────────────────────────────────────────────────

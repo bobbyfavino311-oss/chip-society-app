@@ -21,6 +21,7 @@ import { useSoundSettings } from '@/context/SoundContext';
 import { MusicEngine } from '@/lib/musicEngine';
 import { buildBonusSteps } from '@/lib/casinoTableLimits';
 import type { CasinoTableLimit } from '@/lib/casinoTableLimits';
+import { formatCompactChips } from '@/utils/chipColor';
 import {
   dealHighCardFlush, getBestFlush, getRaiseMultiplier,
   resolveHighCardFlush,
@@ -29,13 +30,7 @@ import {
 } from '@/lib/highCardFlush';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function fmt(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000_000) { const v = abs / 1_000_000_000; return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}B`; }
-  if (abs >= 1_000_000)     { const v = abs / 1_000_000;     return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}M`; }
-  if (abs >= 1_000)         { const v = abs / 1_000;         return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}K`; }
-  return String(abs);
-}
+const fmt = (n: number) => formatCompactChips(Math.abs(n));
 function sleep(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
 const SUIT_NAMES: Record<string, string> = { S: 'SPADES', H: 'HEARTS', D: 'DIAMONDS', C: 'CLUBS' };
 const SUIT_COLOR: Record<string, string> = { H: '#ff4466', D: '#ff4466', S: '#00d4ff', C: '#00d4ff' };

@@ -23,6 +23,7 @@ import { useUser, getXPForLevel } from '@/context/UserContext';
 import { useColors } from '@/hooks/useColors';
 import NeonAvatar from '@/components/NeonAvatar';
 import BugReportModal from '@/components/BugReportModal';
+import { formatCompactChips } from '@/utils/chipColor';
 import { useSoundSettings } from '@/context/SoundContext';
 import { useAchievements, achievementCompletion } from '@/context/AchievementContext';
 import { useSocial } from '@/context/SocialContext';
@@ -82,12 +83,6 @@ function NeonSectionTitle({ label, color = '#00d4ff88' }: { label: string; color
 }
 
 // ─── Neon stat box ──────────────────────────────────────────────────────────
-function formatBigNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
-  return String(n);
-}
-
 function NeonStatBox({ label, value, accentColor }: { label: string; value: string | number; accentColor: string }) {
   return (
     <View style={[neonStat.box, { borderColor: accentColor + '35' }]}>
@@ -255,11 +250,13 @@ function SoundSettingsCard() {
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
-  const { profile, updateProfile, winRate, signOut } = useUser();
+  const { profile, updateProfile, winRate, signOut, deleteAccount } = useUser();
   const { unlockedIds } = useAchievements();
   const { following } = useSocial();
   const socialFollowingCount = following.size;
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
   const [avatarImgFailed, setAvatarImgFailed] = useState(false);
 
@@ -515,11 +512,7 @@ export default function ProfileScreen() {
             <View style={styles.tournamentStat}>
               <Text style={[styles.tournamentValue, { color: '#00ff88', fontSize: 16 }]}>
                 {profile.biggestTournamentPrize > 0
-                  ? profile.biggestTournamentPrize >= 1_000_000
-                    ? `${(profile.biggestTournamentPrize / 1_000_000).toFixed(1)}M`
-                    : profile.biggestTournamentPrize >= 1_000
-                      ? `${(profile.biggestTournamentPrize / 1_000).toFixed(0)}K`
-                      : `${profile.biggestTournamentPrize}`
+                  ? formatCompactChips(profile.biggestTournamentPrize)
                   : '--'}
               </Text>
               <Text style={styles.tournamentLabel}>BEST PRIZE</Text>
@@ -547,7 +540,7 @@ export default function ProfileScreen() {
               <Text style={[styles.tournamentValue, {
                 color: tournamentProfit >= 0 ? '#00ff88' : '#ff4466', fontSize: 16,
               }]}>
-                {tournamentProfit >= 0 ? '+' : '-'}{formatBigNumber(Math.abs(tournamentProfit))}
+                {tournamentProfit >= 0 ? '+' : '-'}{formatCompactChips(Math.abs(tournamentProfit))}
               </Text>
               <Text style={styles.tournamentLabel}>
                 PROFIT{profile.tournamentBuyInsSpent > 0 ? ` · ${tournamentRoi >= 0 ? '+' : ''}${tournamentRoi}% ROI` : ''}
@@ -781,6 +774,16 @@ export default function ProfileScreen() {
 
         {/* Sign out */}
         <TouchableOpacity
+          style={achStyles.deleteAccountBtn}
+          activeOpacity={0.8}
+          onPress={() => setShowDeleteModal(true)}
+          disabled={isDeleting}
+        >
+          <Ionicons name="trash-outline" size={18} color="#ff4466" />
+          <Text style={achStyles.deleteAccountText}>DELETE ACCOUNT</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={achStyles.signOutBtn}
           activeOpacity={0.8}
           onPress={() => setShowSignOutModal(true)}
@@ -819,6 +822,51 @@ export default function ProfileScreen() {
                 }}
               >
                 <Text style={achStyles.confirmText}>SIGN OUT</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Apple-required destructive account deletion confirmation */}
+      <Modal
+        visible={showDeleteModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => !isDeleting && setShowDeleteModal(false)}
+      >
+        <View style={achStyles.overlay}>
+          <View style={achStyles.modalCard}>
+            <Text style={[achStyles.modalTitle, { color: '#ff4466' }]}>DELETE ACCOUNT?</Text>
+            <Text style={achStyles.modalBody}>
+              This permanently deletes your profile, progress, social activity, messages, and virtual chips. This action cannot be undone.
+            </Text>
+            <View style={achStyles.modalBtns}>
+              <TouchableOpacity
+                style={achStyles.cancelBtn}
+                disabled={isDeleting}
+                onPress={() => setShowDeleteModal(false)}
+              >
+                <Text style={achStyles.cancelText}>CANCEL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[achStyles.confirmBtn, { backgroundColor: '#ff4466' }]}
+                disabled={isDeleting}
+                onPress={async () => {
+                  setIsDeleting(true);
+                  const result = await deleteAccount();
+                  setIsDeleting(false);
+                  if (!result.success) {
+                    Alert.alert('Account not deleted', result.error ?? 'Please try again.');
+                    return;
+                  }
+                  setShowDeleteModal(false);
+                  router.replace('/');
+                }}
+              >
+                <Text style={[achStyles.confirmText, { color: '#ffffff' }]}>
+                  {isDeleting ? 'DELETING…' : 'DELETE'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -888,6 +936,24 @@ const achStyles = StyleSheet.create({
     paddingVertical: 14,
     marginTop: 4,
     marginBottom: 8,
+  },
+  deleteAccountBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,68,102,0.5)',
+    backgroundColor: 'rgba(255,68,102,0.12)',
+    paddingVertical: 14,
+    marginTop: 18,
+  },
+  deleteAccountText: {
+    fontFamily: 'Orbitron_700Bold',
+    fontSize: 12,
+    color: '#ff4466',
+    letterSpacing: 2,
   },
   signOutText: {
     fontFamily: 'Orbitron_700Bold',

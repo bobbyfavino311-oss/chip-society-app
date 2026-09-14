@@ -173,8 +173,8 @@ function pick<T>(arr: T[]): T {
 
 function _fmtChip(n: number): string {
   const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000_000) return v(n / 1_000_000_000) + 'B';
-  if (n >= 1_000_000)     return v(n / 1_000_000) + 'M';
+  if (n >= 999_950_000) return v(n / 1_000_000_000) + 'B';
+  if (n >= 999_950)     return v(n / 1_000_000) + 'M';
   if (n >= 1_000)         return v(n / 1_000) + 'K';
   return String(n);
 }

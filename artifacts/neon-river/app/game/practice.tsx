@@ -20,6 +20,7 @@ import BettingPanel from '@/components/BettingPanel';
 import PlayingCard from '@/components/PlayingCard';
 import DotTimer from '@/components/DotTimer';
 import colors from '@/constants/colors';
+import { formatCompactChips } from '@/utils/chipColor';
 import { useUser } from '@/context/UserContext';
 import { useAchievements } from '@/context/AchievementContext';
 import { useMissions } from '@/context/MissionsContext';
@@ -40,6 +41,7 @@ import SakuraCardFrame from '@/components/SakuraCardFrame';
 import FrozenNeonBackground from '@/components/FrozenNeonBackground';
 import FrozenNeonCardFrame from '@/components/FrozenNeonCardFrame';
 import ShareToFeedModal from '@/components/ShareToFeedModal';
+import FounderBadge from '@/components/FounderBadge';
 import CrimsonNoirBackground from '@/components/CrimsonNoirBackground';
 import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
 import VercettiBackground from '@/components/VercettiBackground';
@@ -93,13 +95,7 @@ function getDiffDesc(d: AIDifficulty): string {
   }[d];
 }
 
-function formatChips(n: number): string {
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${v(n / 1_000)}K`;
-  return String(n);
-}
+const formatChips = formatCompactChips;
 
 // ─── Setup screen ─────────────────────────────────────────────────────────────
 
@@ -399,6 +395,7 @@ export default function PracticeScreen() {
   const barAnim            = useRef(new Animated.Value(1)).current;
   const betweenIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onHandOverRef      = useRef<() => Promise<void>>(() => Promise.resolve());
+  const skipFoldedHandRef  = useRef(false);
 
   useEffect(() => {
     AsyncStorage.getItem('musicEnabled').then(v => {
@@ -629,7 +626,7 @@ export default function PracticeScreen() {
         });
       }
       if (state.pot >= 2000) {
-        const potK = state.pot >= 1000 ? `${Math.floor(state.pot / 1000)}K` : String(state.pot);
+        const potK = formatCompactChips(state.pot);
         setPendingShare({
           content: wasAllIn
             ? `All-in and survived! Won a ${potK} chip pot${handDesc ? ` with ${handDesc}` : ''} in practice. 🙏`
@@ -680,6 +677,12 @@ export default function PracticeScreen() {
   // Always keep the ref current so the auto-timer calls the latest closure
   onHandOverRef.current = onHandOver;
 
+  const skipFoldedHand = useCallback(() => {
+    if (humanPlayer?.status !== 'folded' || isHandOver || state.phase === 'idle') return;
+    skipFoldedHandRef.current = true;
+    skipToShowdown();
+  }, [humanPlayer?.status, isHandOver, state.phase, skipToShowdown]);
+
   // 10-second neon countdown bar between hands; auto-advances when it reaches 0
   useEffect(() => {
     if (!isHandOver) {
@@ -688,6 +691,15 @@ export default function PracticeScreen() {
       setBetweenSecs(10);
       barAnim.setValue(1);
       return;
+    }
+    // The player explicitly skipped the AI run after folding. Settle through
+    // the normal hand-over path immediately and do not start a second timer.
+    if (skipFoldedHandRef.current) {
+      skipFoldedHandRef.current = false;
+      const timeout = setTimeout(() => {
+        onHandOverRef.current().catch(() => {});
+      }, 0);
+      return () => clearTimeout(timeout);
     }
     setBetweenSecs(10);
     barAnim.setValue(1);
@@ -964,11 +976,13 @@ export default function PracticeScreen() {
             ]} />
             <Text style={[
               styles.humanName,
+              { flexShrink: 1 },
               state.winnerIds.includes('human') && { color: '#ffd700' },
               humanPlayer.status === 'folded' && styles.dimText,
-            ]}>
+            ]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
               {humanPlayer.name}
             </Text>
+            {profile.isFounder && <FounderBadge iconOnly />}
             <Text style={[styles.humanChips, humanPlayer.status === 'folded' && styles.dimText]}>
               {formatChips(humanPlayer.chips)}
             </Text>
@@ -1231,6 +1245,22 @@ export default function PracticeScreen() {
       ) : (
         <View style={[styles.waitingPanel, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 8) }]}>
           <View style={styles.waitingActions}>
+              {humanPlayer?.status === 'folded'
+                && state.phase !== 'handover'
+                && state.phase !== 'showdown'
+                && state.phase !== 'idle' && (
+                <TouchableOpacity
+                  style={[styles.skipBtn, styles.nextAfterFoldBtn]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    skipFoldedHand();
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="play-skip-forward" size={13} color="#00d4ff" />
+                  <Text style={[styles.skipText, { color: '#00d4ff' }]}>NEXT HAND</Text>
+                </TouchableOpacity>
+              )}
             {!isHumanTurn && humanPlayer?.status === 'active'
               && state.phase !== 'handover' && state.phase !== 'showdown' && state.phase !== 'idle' && (
               <TouchableOpacity style={styles.skipBtn}
@@ -1659,6 +1689,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8,
   },
   runItOutBtn: { backgroundColor: 'rgba(255,215,0,0.06)' },
+  nextAfterFoldBtn: {
+    backgroundColor: 'rgba(0,180,255,0.08)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(0,212,255,0.28)',
+  },
   skipText: {
     color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: '600', letterSpacing: 1,
   },

@@ -16,6 +16,7 @@ import { useColors } from '@/hooks/useColors';
 import { useTheme } from '@/context/ThemeContext';
 import type { Colors } from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { formatCompactChips } from '@/utils/chipColor';
 
 const DAILY_REWARDS = [
   { day: 1, chips:  10_000, label: 'Day 1' },
@@ -157,7 +158,7 @@ export default function RewardsScreen() {
                     <MaterialCommunityIcons name="poker-chip" size={14} color={isCurrent ? colors.gold : colors.textDim} />
                   )}
                   <Text style={[styles.dayChips, isCurrent && { color: colors.gold }, isPast && { color: colors.success }]}>
-                    {r.chips >= 1000 ? `${r.chips / 1000}K` : r.chips}
+                    {formatCompactChips(r.chips)}
                   </Text>
                   <Text style={[styles.dayLabel, isCurrent && styles.dayLabelCurrent]}>D{r.day}</Text>
                 </View>

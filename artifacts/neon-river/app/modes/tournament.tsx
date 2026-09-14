@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
+import { formatCompactChips } from '@/utils/chipColor';
 import {
   TOURNAMENT_CONFIGS,
   TournamentConfig,
@@ -28,13 +29,7 @@ const TYPE_ORDER: TournamentType[] = [
   'joker_showdown', 'joker_jackpot',
 ];
 
-function formatChips(n: number): string {
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${v(n / 1_000)}K`;
-  return String(n);
-}
+const formatChips = formatCompactChips;
 
 function TournamentCard({ config, userChips }: { config: TournamentConfig; userChips: number }) {
   const prizePool = getPrizePool(config);

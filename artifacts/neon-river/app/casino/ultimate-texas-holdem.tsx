@@ -17,6 +17,7 @@ import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
 import { type CasinoTableLimit, buildBonusSteps } from '@/lib/casinoTableLimits';
 import CasinoBetAdjuster from '@/components/CasinoBetAdjuster';
+import { formatCompactChips } from '@/utils/chipColor';
 import {
   createUTHDeck, shuffleUTHDeck, dealUTHHands,
   resolveUTH, getLiveHandName,
@@ -31,13 +32,7 @@ const _BONUS_STEPS_FALLBACK: [0, number, number, number, number] = [0, 250_000, 
 type TripsMult = 0 | 1 | 2 | 3 | 4;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function fmt(n: number): string {
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${v(n / 1_000)}K`;
-  return String(n);
-}
+const fmt = formatCompactChips;
 function fmtNet(n: number): string {
   if (n === 0) return 'PUSH';
   return (n > 0 ? '+' : '') + fmt(n);

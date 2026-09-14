@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable, postRepostsTable, playerNotificationsTable } from '@workspace/db';
-import { eq, or, and, ilike, ne, desc, sql, lt, inArray } from 'drizzle-orm';
+import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable, postRepostsTable, playerNotificationsTable, playerReportsTable } from '@workspace/db';
+import { eq, or, and, ilike, ne, desc, sql, lt, inArray, notInArray } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { emitToPlayer, emitToAll } from '../sockets/index.js';
 
@@ -36,7 +36,7 @@ function checkMessageRate(playerId: string): boolean {
 router.get('/social/search', async (req, res) => {
   try {
     const q = ((req.query['q'] as string) ?? '').trim();
-    if (!q || q.length < 2) {
+    if (q.length === 1) {
       res.json({ players: [] });
       return;
     }
@@ -49,22 +49,25 @@ router.get('/social/search', async (req, res) => {
         status:      playersTable.status,
       })
       .from(playersTable)
-      .where(
-        and(
-          ilike(playersTable.username, `%${q}%`),
-          ne(playersTable.status, 'banned'),
-        )
+      .where(q
+        ? and(
+            ilike(playersTable.username, `%${q}%`),
+            ne(playersTable.status, 'banned'),
+          )
+        : ne(playersTable.status, 'banned')
       )
-      .limit(20);
+      .limit(q ? 20 : 100);
 
     const players = rows.map(r => ({
       playerId:    r.playerId,
       username:    r.username,
+      displayName: (r.profileJson as any)?.displayName ?? null,
       level:       (r.profileJson as any)?.level ?? 1,
       chips:       (r.profileJson as any)?.chips ?? 0,
       avatarIndex: (r.profileJson as any)?.symbolIndex ?? (r.profileJson as any)?.avatarIndex ?? 1,
       rank:        (r.profileJson as any)?.rank ?? 'Player',
       status:      r.status,
+      founderBadge: Boolean((r.profileJson as any)?.isFounder || (r.profileJson as any)?.founderBadge),
     }));
 
     res.json({ players });
@@ -120,7 +123,7 @@ router.get('/social/players/:id', async (req, res) => {
         displayName:            pj?.displayName ?? null,
         serverAvatarUrl:        pj?.serverAvatarUrl ?? null,
         // Admin sets isFounder in profileJson; expose it as founderBadge for clients
-        founderBadge:           pj?.isFounder ?? pj?.founderBadge ?? false,
+        founderBadge:           Boolean(pj?.isFounder || pj?.founderBadge),
         // Tournament stats
         tournamentWins:         pj?.tournamentWins ?? 0,
         tournamentsPlayed:      pj?.tournamentsPlayed ?? 0,
@@ -442,6 +445,38 @@ router.get('/social/blocks', requirePlayer, async (req: any, res) => {
   }
 });
 
+// ── POST /api/social/posts/:id/report — Apple Guideline 1.2 moderation report
+router.post('/social/posts/:id/report', requirePlayer, async (req: any, res) => {
+  try {
+    const { playerId } = req;
+    const { id: postId } = req.params;
+    const { reason } = req.body as { reason?: string };
+    if (!reason?.trim()) {
+      res.status(400).json({ error: 'reason is required' });
+      return;
+    }
+    const post = await db.select({ authorId: feedPostsTable.authorId })
+      .from(feedPostsTable)
+      .where(eq(feedPostsTable.id, postId))
+      .limit(1);
+    if (!post[0]) {
+      res.status(404).json({ error: 'Post not found' });
+      return;
+    }
+    await db.insert(playerReportsTable).values({
+      reportId: randomUUID(),
+      reportedId: post[0].authorId,
+      reporterId: playerId,
+      reason: reason.trim(),
+      details: `Feed post ${postId}`,
+    });
+    res.json({ ok: true });
+  } catch (e) {
+    req.log.error(e, 'report feed post error');
+    res.status(500).json({ error: 'Report failed' });
+  }
+});
+
 // ── GET /api/social/feed?tab=all|trending|me&cursor= ──────────────────────────
 
 router.get('/social/feed', requirePlayer, async (req: any, res) => {
@@ -450,6 +485,10 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
     const tab    = (req.query['tab'] as string) ?? 'all';
     const cursor = req.query['cursor'] as string | undefined;
     const limit  = 30;
+    const blockedRows = await db.select({ blockedId: blocksTable.blockedId })
+      .from(blocksTable)
+      .where(eq(blocksTable.blockerId, playerId));
+    const blockedIds = blockedRows.map(r => r.blockedId);
 
     let query = db
       .select({
@@ -476,10 +515,15 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
           : eq(feedPostsTable.authorId, playerId),
       ).orderBy(desc(feedPostsTable.createdAt)).limit(limit) as typeof query;
     } else if (tab === 'trending') {
-      query = query.orderBy(desc(sql`${feedPostsTable.likeCount} + ${feedPostsTable.commentCount} * 2`)).limit(limit) as typeof query;
+      query = query.where(
+        blockedIds.length > 0 ? notInArray(feedPostsTable.authorId, blockedIds) : sql`1=1`,
+      ).orderBy(desc(sql`${feedPostsTable.likeCount} + ${feedPostsTable.commentCount} * 2`)).limit(limit) as typeof query;
     } else {
       query = query.where(
-        cursor ? lt(feedPostsTable.createdAt, new Date(cursor)) : sql`1=1`,
+        and(
+          cursor ? lt(feedPostsTable.createdAt, new Date(cursor)) : sql`1=1`,
+          blockedIds.length > 0 ? notInArray(feedPostsTable.authorId, blockedIds) : sql`1=1`,
+        ),
       ).orderBy(desc(feedPostsTable.createdAt)).limit(limit) as typeof query;
     }
 
@@ -508,6 +552,7 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
       id:              r.id,
       authorId:        r.authorId,
       authorUsername:  r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
+      authorDisplayName: (liveProfileMap.get(r.authorId) as any)?.displayName ?? null,
       // When we have a live profile, use it exclusively so ALL posts by the
       // same author show the same current avatar (not whatever was stored per-post
       // at creation time, which can differ across old posts).
@@ -517,6 +562,10 @@ router.get('/social/feed', requirePlayer, async (req: any, res) => {
         return r.authorAvatarIndex || 1;
       })(),
       authorAvatarUrl: (liveProfileMap.get(r.authorId) as any)?.serverAvatarUrl ?? null,
+      founderBadge:    Boolean(
+        (liveProfileMap.get(r.authorId) as any)?.isFounder
+          || (liveProfileMap.get(r.authorId) as any)?.founderBadge,
+      ),
       authorRank:      r.authorRank ?? 'Player',
       content:         r.content,
       tag:             r.tag,
@@ -580,13 +629,20 @@ router.post('/social/posts', requirePlayer, async (req: any, res) => {
 
     // Include serverAvatarUrl so the optimistic insert shows the photo immediately
     const authorAvatarUrl = (author?.profileJson as any)?.serverAvatarUrl ?? null;
+    const founderBadge = Boolean(
+      (author?.profileJson as any)?.isFounder
+        || (author?.profileJson as any)?.founderBadge,
+    );
+    const authorDisplayName = (author?.profileJson as any)?.displayName ?? null;
 
     const post = {
       id:              created!.id,
       authorId:        playerId,
       authorUsername:  created!.authorUsername ?? resolvedUsername,
+      authorDisplayName,
       authorAvatarIndex: created!.authorAvatarIndex ?? resolvedAvatarIndex,
       authorAvatarUrl,
+      founderBadge,
       authorRank:      created!.authorRank ?? resolvedRank,
       content:         created!.content,
       tag:             created!.tag,
@@ -681,7 +737,12 @@ router.get('/social/posts/:id/comments', requirePlayer, async (req: any, res) =>
       postId:             r.postId,
       authorId:           r.authorId,
       authorUsername:     r.authorUsername,
+      authorDisplayName:  (r.authorProfileJson as any)?.displayName ?? null,
       authorAvatarIndex:  (r.authorProfileJson as any)?.symbolIndex ?? (r.authorProfileJson as any)?.avatarIndex ?? 1,
+      founderBadge:       Boolean(
+        (r.authorProfileJson as any)?.isFounder
+          || (r.authorProfileJson as any)?.founderBadge,
+      ),
       text:               r.text,
       createdAt:          r.createdAt,
     }));
@@ -726,7 +787,12 @@ router.post('/social/posts/:id/comments', requirePlayer, async (req: any, res) =
       postId:            created!.postId,
       authorId:          playerId,
       authorUsername:    authorRow[0].username,
+      authorDisplayName: (authorRow[0].profileJson as any)?.displayName ?? null,
       authorAvatarIndex: (authorRow[0].profileJson as any)?.symbolIndex ?? (authorRow[0].profileJson as any)?.avatarIndex ?? 1,
+      founderBadge:      Boolean(
+        (authorRow[0].profileJson as any)?.isFounder
+          || (authorRow[0].profileJson as any)?.founderBadge,
+      ),
       text:              created!.text,
       createdAt:         created!.createdAt,
     };

@@ -1,3 +1,5 @@
+import { formatCompactChips } from '@/utils/chipColor';
+
 export type Suit = 'S' | 'H' | 'D' | 'C';
 
 export interface Card {
@@ -109,14 +111,8 @@ export const VALUE_LABELS: Record<number, string> = {
   10:'10',11:'J',12:'Q',13:'K',14:'A',
 };
 
-function _fmtVal(v: number): string {
-  return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1);
-}
 export function formatChips(n: number): string {
-  if (n >= 1_000_000_000) return `${_fmtVal(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${_fmtVal(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${_fmtVal(n / 1_000)}K`;
-  return String(n);
+  return formatCompactChips(n);
 }
 
 export function cardLabel(card: Card): string {

@@ -23,6 +23,7 @@ import colors from '@/constants/colors';
 import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
 import { useSoundSettings } from '@/context/SoundContext';
+import { formatCompactChips } from '@/utils/chipColor';
 import { useColors } from '@/hooks/useColors';
 import { useNotifications } from '@/context/NotificationContext';
 import { MusicEngine } from '@/lib/musicEngine';
@@ -856,14 +857,6 @@ export default function HomeScreen() {
 
   // ─── Derived values (must be before effects that reference them) ──────────
   const rankColor = RANK_COLORS[profile.rank] ?? colors.primary;
-  const formatChips = (n: number): string => {
-    const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-    if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-    if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-    if (n >= 1_000)         return `${v(n / 1_000)}K`;
-    return String(n);
-  };
-
   const TREND_TYPE_COLORS: Record<string, string> = {
     WIN: '#00ff88', BAD_BEAT: '#ff3355', 'BAD BEAT': '#ff3355', BLUFF: '#ffd700',
     JACKPOT: '#bf5fff', MILESTONE: '#00d4ff', TOURNEY: '#ff9900', GENERAL: colors.textMuted,
@@ -1035,7 +1028,7 @@ export default function HomeScreen() {
             <Text style={styles.statLbl}>HANDS</Text>
           </View>
           <View style={[styles.statCard, { borderColor: `${colors.gold}30` }]}>
-            <Text style={[styles.statVal, { color: colors.gold }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>{formatChips(profile.chips)}</Text>
+            <Text style={[styles.statVal, { color: colors.gold }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>{formatCompactChips(profile.chips)}</Text>
             <Text style={styles.statLbl}>CHIPS</Text>
           </View>
           <View style={[styles.statCard, { borderColor: `${rankColor}30` }]}>

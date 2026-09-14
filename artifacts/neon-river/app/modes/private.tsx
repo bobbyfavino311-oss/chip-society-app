@@ -16,16 +16,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { STAKE_TIERS, StakeTierKey } from '@/lib/stakeConfig';
+import { formatCompactChips } from '@/utils/chipColor';
 
 type Tab = 'create' | 'join';
 
 const WORDS = ['VICE', 'ROOK', 'ECHO', 'FLUX', 'NOVA', 'HAZE', 'GRID', 'VOLT', 'APEX', 'CYAN', 'DUSK', 'GLOW'];
 
-function fmt(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}K`;
-  return n.toLocaleString();
-}
+const fmt = formatCompactChips;
 
 function generateCode(): string {
   const word = WORDS[Math.floor(Math.random() * WORDS.length)];

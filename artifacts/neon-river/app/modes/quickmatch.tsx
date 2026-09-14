@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { STAKE_TIERS, StakeTierKey } from '@/lib/stakeConfig';
 import { useUser } from '@/context/UserContext';
+import { formatCompactChips } from '@/utils/chipColor';
 
 type Phase = 'idle' | 'searching' | 'found';
 
@@ -26,11 +27,7 @@ const SEARCH_MESSAGES = [
   'Match ready!',
 ];
 
-function fmt(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}K`;
-  return n.toLocaleString();
-}
+const fmt = formatCompactChips;
 
 function getAutoTierKey(chips: number): StakeTierKey {
   if (chips >= 10_000_000) return 'elite_plus';

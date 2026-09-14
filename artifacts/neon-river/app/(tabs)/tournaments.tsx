@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/constants/colors';
 import { useColors } from '@/hooks/useColors';
 import { useUser } from '@/context/UserContext';
+import { formatCompactChips } from '@/utils/chipColor';
 import {
   TOURNAMENT_CONFIGS,
   TournamentType,
@@ -102,11 +103,7 @@ export default function TournamentsScreen() {
           <View style={st.balanceBadge}>
             <Ionicons name="wallet-outline" size={12} color={colors.gold} />
             <Text style={st.balanceText}>
-              {profile.chips >= 1_000_000
-                ? `${(profile.chips / 1_000_000).toFixed(1)}M`
-                : profile.chips >= 1_000
-                ? `${Math.floor(profile.chips / 1_000)}K`
-                : String(profile.chips)}
+              {formatCompactChips(profile.chips)}
             </Text>
           </View>
         </View>

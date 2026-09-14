@@ -1,6 +1,7 @@
 // ─── Casino Table Limits ───────────────────────────────────────────────────────
 // Separate from poker stake tiers. Casino games never use blinds.
 // All casino games read minBet / maxBet / minBuyIn from this config only.
+import { formatCompactChips } from '@/utils/chipColor';
 
 export type CasinoTableKey =
   | 'starter_casino'
@@ -61,9 +62,7 @@ export const CASINO_TABLE_LIMITS: CasinoTableLimit[] = [
 ];
 
 export function fmtCasino(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
-  return String(n);
+  return formatCompactChips(n);
 }
 
 /**

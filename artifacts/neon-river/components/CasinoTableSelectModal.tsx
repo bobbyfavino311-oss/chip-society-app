@@ -6,12 +6,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CASINO_TABLE_LIMITS, fmtCasino, type CasinoTableLimit } from '@/lib/casinoTableLimits';
-
-function fmtBalance(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${Math.floor(n / 1_000)}K`;
-  return n.toLocaleString();
-}
+import { formatCompactChips } from '@/utils/chipColor';
 
 interface Props {
   visible:  boolean;
@@ -46,7 +41,7 @@ export default function CasinoTableSelectModal({
               <Text style={s.title}>{title}</Text>
               <View style={s.balRow}>
                 <Ionicons name="wallet-outline" size={11} color="rgba(255,215,0,0.55)" />
-                <Text style={s.balText}>{fmtBalance(chips)}</Text>
+                <Text style={s.balText}>{formatCompactChips(chips)}</Text>
               </View>
             </View>
 
@@ -104,7 +99,7 @@ export default function CasinoTableSelectModal({
                       <Text style={s.statLabel}>{locked ? 'NEED' : 'BUY-IN'}</Text>
                       <Text style={[s.statValueSm, locked && s.needText]}>
                         {locked
-                          ? fmtBalance(shortfall) + ' MORE'
+                          ? formatCompactChips(shortfall) + ' MORE'
                           : `${fmtCasino(limit.minBuyIn)}–${fmtCasino(limit.maxBuyIn)}`
                         }
                       </Text>

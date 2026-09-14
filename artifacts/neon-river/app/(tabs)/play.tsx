@@ -352,12 +352,6 @@ const CONFIG_KEY_TO_GAME: Record<string, string> = {
   highroller: 'highroller', vip: 'vip', elite: 'elite', elite_plus: 'elite_plus',
 };
 
-function formatChips(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}K`;
-  return n.toLocaleString();
-}
-
 function getAutoTier(chips: number): StakeTier {
   if (chips >= 10_000_000) return 'ELITE_PLUS';
   if (chips >=  5_000_000) return 'ELITE';

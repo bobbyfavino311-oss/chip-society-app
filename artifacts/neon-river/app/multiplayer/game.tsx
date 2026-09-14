@@ -32,6 +32,7 @@ import CrimsonNoirCardFrame from '@/components/CrimsonNoirCardFrame';
 import VercettiBackground from '@/components/VercettiBackground';
 import VercettiCardFrame from '@/components/VercettiCardFrame';
 import { chrome, seat as seatStyles, table, CompactAISeat, CommunityCards, ActionFeed, PHASE_LABELS, TimerRing } from '@/components/PokerChrome';
+import FounderBadge from '@/components/FounderBadge';
 
 
 function BotCountdown() {
@@ -431,9 +432,15 @@ export default function MultiplayerGame() {
               <TimerRing timeoutAt={gs.turnTimeoutAt} maxSeconds={30} size={26} />
             )}
           </View>
-          <Text style={[chrome.humanName, !!myWin && { color: '#ffd700' }]} numberOfLines={1}>
+          <Text
+            style={[chrome.humanName, { flexShrink: 1 }, !!myWin && { color: '#ffd700' }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+          >
             {mySeat?.username ?? 'YOU'}
           </Text>
+          {profile.isFounder && <FounderBadge iconOnly />}
           <Text style={chrome.humanChips}>{formatChips(mySeat?.chips ?? 0)}</Text>
           {mySeat?.isDealer && (
             <View style={chrome.dealerBadge}><Text style={chrome.dealerBadgeText}>D</Text></View>

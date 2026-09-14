@@ -16,6 +16,7 @@ import { MusicEngine } from '@/lib/musicEngine';
 import colors from '@/constants/colors';
 import { type CasinoTableLimit, buildBonusSteps } from '@/lib/casinoTableLimits';
 import CasinoBetAdjuster from '@/components/CasinoBetAdjuster';
+import { formatCompactChips } from '@/utils/chipColor';
 import {
   createTCPDeck, shuffleTCPDeck, dealBiasedHands,
   evaluateThreeCardHand, tcpDealerQualifies, compareThreeCardHands,
@@ -69,13 +70,7 @@ const PAYTABLE = {
   ],
 } as const;
 
-function fmt(n: number): string {
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${v(n / 1_000)}K`;
-  return String(n);
-}
+const fmt = formatCompactChips;
 function fmtNet(n: number): string {
   if (n === 0) return 'PUSH';
   return (n > 0 ? '+' : '-') + fmt(Math.abs(n));

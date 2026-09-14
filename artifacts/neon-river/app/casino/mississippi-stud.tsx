@@ -22,6 +22,7 @@ import { useSoundSettings } from '@/context/SoundContext';
 import { buildBonusSteps } from '@/lib/casinoTableLimits';
 import { MusicEngine } from '@/lib/musicEngine';
 import type { CasinoTableLimit } from '@/lib/casinoTableLimits';
+import { formatCompactChips } from '@/utils/chipColor';
 import {
   dealMississippiStud, resolveMississippiStud,
   MS_PAYOUTS, TCB_PAYOUTS,
@@ -29,13 +30,7 @@ import {
 } from '@/lib/mississippiStud';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function fmt(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000_000) { const v = abs / 1_000_000_000; return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}B`; }
-  if (abs >= 1_000_000)     { const v = abs / 1_000_000;     return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}M`; }
-  if (abs >= 1_000)         { const v = abs / 1_000;         return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}K`; }
-  return String(abs);
-}
+const fmt = (n: number) => formatCompactChips(Math.abs(n));
 function sleep(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
 
 // ─── Info Modal ───────────────────────────────────────────────────────────────

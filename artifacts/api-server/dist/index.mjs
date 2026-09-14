@@ -83948,7 +83948,7 @@ function checkMessageRate(playerId) {
 router4.get("/social/search", async (req, res) => {
   try {
     const q = (req.query["q"] ?? "").trim();
-    if (!q || q.length < 2) {
+    if (q.length === 1) {
       res.json({ players: [] });
       return;
     }
@@ -83958,19 +83958,21 @@ router4.get("/social/search", async (req, res) => {
       profileJson: playersTable.profileJson,
       status: playersTable.status
     }).from(playersTable).where(
-      and(
+      q ? and(
         ilike(playersTable.username, `%${q}%`),
         ne(playersTable.status, "banned")
-      )
-    ).limit(20);
+      ) : ne(playersTable.status, "banned")
+    ).limit(q ? 20 : 100);
     const players = rows.map((r) => ({
       playerId: r.playerId,
       username: r.username,
+      displayName: r.profileJson?.displayName ?? null,
       level: r.profileJson?.level ?? 1,
       chips: r.profileJson?.chips ?? 0,
       avatarIndex: r.profileJson?.symbolIndex ?? r.profileJson?.avatarIndex ?? 1,
       rank: r.profileJson?.rank ?? "Player",
-      status: r.status
+      status: r.status,
+      founderBadge: Boolean(r.profileJson?.isFounder || r.profileJson?.founderBadge)
     }));
     res.json({ players });
   } catch (e) {
@@ -84013,7 +84015,7 @@ router4.get("/social/players/:id", async (req, res) => {
         displayName: pj?.displayName ?? null,
         serverAvatarUrl: pj?.serverAvatarUrl ?? null,
         // Admin sets isFounder in profileJson; expose it as founderBadge for clients
-        founderBadge: pj?.isFounder ?? pj?.founderBadge ?? false,
+        founderBadge: Boolean(pj?.isFounder || pj?.founderBadge),
         // Tournament stats
         tournamentWins: pj?.tournamentWins ?? 0,
         tournamentsPlayed: pj?.tournamentsPlayed ?? 0,
@@ -84336,6 +84338,7 @@ router4.get("/social/feed", requirePlayer, async (req, res) => {
       id: r.id,
       authorId: r.authorId,
       authorUsername: r.authorUsername ?? `player_${r.authorId.slice(0, 6)}`,
+      authorDisplayName: liveProfileMap.get(r.authorId)?.displayName ?? null,
       // When we have a live profile, use it exclusively so ALL posts by the
       // same author show the same current avatar (not whatever was stored per-post
       // at creation time, which can differ across old posts).
@@ -84345,6 +84348,9 @@ router4.get("/social/feed", requirePlayer, async (req, res) => {
         return r.authorAvatarIndex || 1;
       })(),
       authorAvatarUrl: liveProfileMap.get(r.authorId)?.serverAvatarUrl ?? null,
+      founderBadge: Boolean(
+        liveProfileMap.get(r.authorId)?.isFounder || liveProfileMap.get(r.authorId)?.founderBadge
+      ),
       authorRank: r.authorRank ?? "Player",
       content: r.content,
       tag: r.tag,
@@ -84391,12 +84397,18 @@ router4.post("/social/posts", requirePlayer, async (req, res) => {
       authorRank: resolvedRank
     }).returning();
     const authorAvatarUrl = author?.profileJson?.serverAvatarUrl ?? null;
+    const founderBadge = Boolean(
+      author?.profileJson?.isFounder || author?.profileJson?.founderBadge
+    );
+    const authorDisplayName = author?.profileJson?.displayName ?? null;
     const post = {
       id: created.id,
       authorId: playerId,
       authorUsername: created.authorUsername ?? resolvedUsername,
+      authorDisplayName,
       authorAvatarIndex: created.authorAvatarIndex ?? resolvedAvatarIndex,
       authorAvatarUrl,
+      founderBadge,
       authorRank: created.authorRank ?? resolvedRank,
       content: created.content,
       tag: created.tag,
@@ -84464,7 +84476,11 @@ router4.get("/social/posts/:id/comments", requirePlayer, async (req, res) => {
       postId: r.postId,
       authorId: r.authorId,
       authorUsername: r.authorUsername,
+      authorDisplayName: r.authorProfileJson?.displayName ?? null,
       authorAvatarIndex: r.authorProfileJson?.symbolIndex ?? r.authorProfileJson?.avatarIndex ?? 1,
+      founderBadge: Boolean(
+        r.authorProfileJson?.isFounder || r.authorProfileJson?.founderBadge
+      ),
       text: r.text,
       createdAt: r.createdAt
     }));
@@ -84505,7 +84521,11 @@ router4.post("/social/posts/:id/comments", requirePlayer, async (req, res) => {
       postId: created.postId,
       authorId: playerId,
       authorUsername: authorRow[0].username,
+      authorDisplayName: authorRow[0].profileJson?.displayName ?? null,
       authorAvatarIndex: authorRow[0].profileJson?.symbolIndex ?? authorRow[0].profileJson?.avatarIndex ?? 1,
+      founderBadge: Boolean(
+        authorRow[0].profileJson?.isFounder || authorRow[0].profileJson?.founderBadge
+      ),
       text: created.text,
       createdAt: created.createdAt
     };

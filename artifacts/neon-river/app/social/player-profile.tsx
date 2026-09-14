@@ -18,20 +18,19 @@ import colors from '@/constants/colors';
 import { useSocial, type FollowingUser } from '@/context/SocialContext';
 import { useUser } from '@/context/UserContext';
 import NeonAvatar from '@/components/NeonAvatar';
+import FounderBadge from '@/components/FounderBadge';
 import {
   MOCK_PLAYERS, SOCIAL_POSTS, POST_TAG_COLORS, POKER_REACTIONS,
   type MockPlayer, type SocialPost,
 } from '@/lib/socialData';
 import { getPlayerProfile, followPlayer, unfollowPlayer, startConversation, getFollowers, type PlayerProfile, type FeedPost, type FollowProfile } from '@/lib/socialApi';
 import { useLiveFeed } from '@/context/LiveFeedContext';
+import { formatCompactChips } from '@/utils/chipColor';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatBig(n: number): string {
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000) return v(n / 1_000_000) + 'M';
-  if (n >= 1_000) return v(n / 1_000) + 'K';
-  return String(n);
+  return formatCompactChips(n);
 }
 
 const STATUS_LABEL: Record<string, string> = { online: 'Online', in_game: 'In Game', offline: 'Offline' };
@@ -67,6 +66,7 @@ interface DisplayPlayer {
   achievementCount: number;
   status: string;
   badges: Array<{ id: string; label: string; icon: string; color: string }>;
+  isFounder: boolean;
   bio: string;
   isMock: boolean;
 }
@@ -82,7 +82,8 @@ function mockToDisplay(p: MockPlayer): DisplayPlayer {
     biggestTournamentPrize: 0, totalTournamentPrizesWon: 0, tournamentBuyInsSpent: 0,
     followers: p.followers, following: p.following,
     achievementCount: p.achievementCount, status: p.status,
-    badges: p.badges, bio: p.bio, isMock: true,
+    badges: p.badges.filter(b => b.id !== 'founder'), bio: p.bio,
+    isFounder: p.badges.some(b => b.id === 'founder'), isMock: true,
   };
 }
 
@@ -117,7 +118,8 @@ function apiToDisplay(p: PlayerProfile): DisplayPlayer {
     following: p.followingCount ?? 0,
     achievementCount: 0,
     status: p.status,
-    badges,
+    badges: badges.filter(b => b.id !== 'founder'),
+    isFounder: !!p.founderBadge,
     bio: p.bio ?? 'Chip Society player.',
     isMock: false,
   };
@@ -345,6 +347,7 @@ export default function PlayerProfileScreen() {
       achievementCount: 0,
       status: 'offline',
       badges: [],
+      isFounder: false,
       bio: 'Chip Society player.',
       isMock: false,
     };
@@ -477,7 +480,17 @@ export default function PlayerProfileScreen() {
           <LinearGradient colors={[`${player.avatarColor}50`, 'transparent']} style={s.avatarGlow} />
         </View>
 
-        <Text style={s.username}>{player.displayName || player.username}</Text>
+        <View style={s.nameRow}>
+          <Text
+            style={[s.username, { flex: 1, minWidth: 0 }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.68}
+          >
+            {player.displayName || player.username}
+          </Text>
+          {player.isFounder && <FounderBadge />}
+        </View>
         <Text style={s.handle}>{player.handle}</Text>
         <Text style={s.bio}>{player.bio}</Text>
 
@@ -716,6 +729,7 @@ const s = StyleSheet.create({
   avatarWrap: { position: 'relative', marginTop: 8 },
   avatarGlow: { position: 'absolute', top: -6, left: -6, right: -6, bottom: -6, borderRadius: 46 },
   username: { color: '#fff', fontSize: 22, fontWeight: '800', fontFamily: 'Orbitron_700Bold', letterSpacing: 1, marginTop: 4 },
+  nameRow: { width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 4 },
   handle: { color: 'rgba(255,255,255,0.5)', fontSize: 12 },
   bio: { color: 'rgba(255,255,255,0.6)', fontSize: 12, textAlign: 'center', lineHeight: 17, paddingHorizontal: 10 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },

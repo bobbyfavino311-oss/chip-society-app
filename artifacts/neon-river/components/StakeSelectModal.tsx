@@ -5,13 +5,8 @@ import {
   TouchableOpacity, View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { STAKE_TIERS, fmtBankroll, type StakeTier } from '@/lib/stakeConfig';
-
-function fmtK(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`;
-  return String(n);
-}
+import { STAKE_TIERS, type StakeTier } from '@/lib/stakeConfig';
+import { formatCompactChips } from '@/utils/chipColor';
 
 interface Props {
   visible:  boolean;
@@ -44,7 +39,7 @@ export default function StakeSelectModal({ visible, chips, onSelect, onBack, tit
               <Text style={s.title}>{title}</Text>
               <View style={s.balRow}>
                 <Ionicons name="wallet-outline" size={11} color="rgba(255,215,0,0.55)" />
-                <Text style={s.balText}>{fmtBankroll(chips)}</Text>
+                <Text style={s.balText}>{formatCompactChips(chips)}</Text>
               </View>
             </View>
 
@@ -95,15 +90,15 @@ export default function StakeSelectModal({ visible, chips, onSelect, onBack, tit
                     <View style={s.statRow}>
                       <Text style={s.statLabel}>BLINDS</Text>
                       <Text style={[s.statValue, locked ? s.statValueLocked : { color: tier.color }]}>
-                        {fmtK(tier.smallBlind)}/{fmtK(tier.bigBlind)}
+                        {formatCompactChips(tier.smallBlind)}/{formatCompactChips(tier.bigBlind)}
                       </Text>
                     </View>
                     <View style={s.statRow}>
                       <Text style={s.statLabel}>{locked ? 'NEED' : 'BUY-IN'}</Text>
                       <Text style={[s.statValueSm, locked && s.needText]}>
                         {locked
-                          ? fmtBankroll(shortfall) + ' MORE'
-                          : `${fmtK(tier.minBuyIn)}–${fmtK(tier.maxBuyIn)}`
+                          ? formatCompactChips(shortfall) + ' MORE'
+                          : `${formatCompactChips(tier.minBuyIn)}–${formatCompactChips(tier.maxBuyIn)}`
                         }
                       </Text>
                     </View>

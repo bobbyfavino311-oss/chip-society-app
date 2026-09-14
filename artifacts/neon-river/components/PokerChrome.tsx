@@ -9,6 +9,7 @@ import Svg, { Circle } from 'react-native-svg';
 import PlayingCard from '@/components/PlayingCard';
 import NeonAvatarSeat from '@/components/NeonAvatar';
 import colors from '@/constants/colors';
+import { formatCompactChips } from '@/utils/chipColor';
 import { getBestHandVariant } from '@/lib/pokerEngine';
 import type { GameVariant } from '@/constants/gameVariants';
 import { ChatBubble } from '@/components/InGameChat';
@@ -39,12 +40,7 @@ export const HAND_COLORS: Record<string, string> = {
 };
 
 export function formatChips(n: number | null | undefined): string {
-  const num = (typeof n === 'number' && isFinite(n)) ? n : 0;
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (num >= 1_000_000_000) return `${v(num / 1_000_000_000)}B`;
-  if (num >= 1_000_000)     return `${v(num / 1_000_000)}M`;
-  if (num >= 1_000)         return `${v(num / 1_000)}K`;
-  return String(num);
+  return formatCompactChips(typeof n === 'number' && isFinite(n) ? n : 0);
 }
 
 // ─── Community cards ──────────────────────────────────────────────────────────

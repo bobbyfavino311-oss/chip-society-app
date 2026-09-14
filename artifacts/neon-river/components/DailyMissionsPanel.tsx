@@ -15,6 +15,7 @@ import {
 import Svg, { Path } from 'react-native-svg';
 import colors from '@/constants/colors';
 import { type ActiveMission, type MissionRarity, useMissions } from '@/context/MissionsContext';
+import { formatCompactChips } from '@/utils/chipColor';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -45,12 +46,6 @@ const RARITY: Record<MissionRarity, { color: string; label: string; glow: string
 const GOLD = '#ffd700';
 
 // ── Chip amount formatter ──────────────────────────────────────────────────────
-
-function fmtChips(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000)     return `${Math.round(n / 1_000)}K`;
-  return String(n);
-}
 
 // ── Mission card ───────────────────────────────────────────────────────────────
 
@@ -127,7 +122,7 @@ function MissionCard({ mission, onClaim }: { mission: ActiveMission; onClaim: ()
         </Text>
         <View style={card.rewardRow}>
           <MaterialCommunityIcons name="poker-chip" size={11} color={colors.gold ?? '#ffd700'} />
-          <Text style={card.rewardChips}>{fmtChips(mission.chipReward)}</Text>
+          <Text style={card.rewardChips}>{formatCompactChips(mission.chipReward)}</Text>
           <Text style={card.rewardSep}>·</Text>
           <Text style={card.rewardXP}>{mission.xpReward} XP</Text>
         </View>

@@ -26,14 +26,9 @@ import colors from '@/constants/colors';
 import { TournamentConfig, getPrizePool, getVariantBadge } from '@/constants/tournaments';
 import FourCardIcon from '@/components/FourCardIcon';
 import AscendingBarsIcon from '@/components/AscendingBarsIcon';
+import { formatCompactChips } from '@/utils/chipColor';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatChips(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${Math.floor(n / 1_000)}K`;
-  return String(n);
-}
 
 function getPaysTop(config: TournamentConfig): string {
   return config.prizeLabel.includes('3rd') ? 'PAYS TOP 3' : 'PAYS TOP 2';
@@ -114,7 +109,7 @@ function RulesModal({ visible, config, onClose }: {
             {/* Prize pool */}
             <View style={rm.section}>
               <Text style={rm.secLabel}>PRIZE POOL</Text>
-              <Text style={[rm.prizeTotal, { color: colors.gold }]}>{formatChips(prizePool)} chips</Text>
+              <Text style={[rm.prizeTotal, { color: colors.gold }]}>{formatCompactChips(prizePool)} chips</Text>
               <View style={rm.payoutRow}>
                 {payouts.map((p, i) => (
                   <View key={i} style={[rm.payoutChip, { borderColor: `${config.color}40`, backgroundColor: `${config.color}10` }]}>
@@ -127,8 +122,8 @@ function RulesModal({ visible, config, onClose }: {
             {/* Structure */}
             <View style={rm.section}>
               <Text style={rm.secLabel}>STRUCTURE</Text>
-              <InfoRow icon="wallet-outline"     label="Buy-in"         value={`${formatChips(config.buyIn)} chips`} />
-              <InfoRow icon="layers-outline"     label="Starting Stack" value={`${formatChips(config.startingChips)} chips`} />
+              <InfoRow icon="wallet-outline"     label="Buy-in"         value={`${formatCompactChips(config.buyIn)} chips`} />
+              <InfoRow icon="layers-outline"     label="Starting Stack" value={`${formatCompactChips(config.startingChips)} chips`} />
               <InfoRow icon="people-outline"     label="Players"        value={`${config.numPlayers} (AI-filled)`} />
               <InfoRow icon="flash-outline"      label="Blind Levels"   value={`Every ${config.handsPerLevel} hands`} />
               <InfoRow
@@ -280,7 +275,7 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
     if (!canAfford) {
       Alert.alert(
         'Insufficient Chips',
-        `You need ${formatChips(config.buyIn)} chips to enter this tournament.\n\nYour balance: ${formatChips(userChips)} chips`,
+        `You need ${formatCompactChips(config.buyIn)} chips to enter this tournament.\n\nYour balance: ${formatCompactChips(userChips)} chips`,
         [{ text: 'OK' }],
       );
       return;
@@ -371,13 +366,13 @@ export default function TournamentLiveCard({ config, userChips, cardWidth }: Pro
             <View style={st.stat}>
               <Text style={st.statLabel}>BUY-IN</Text>
               <Text style={[st.statValue, { color: canAfford ? config.color : colors.error }]}>
-                {formatChips(config.buyIn)}
+                {formatCompactChips(config.buyIn)}
               </Text>
             </View>
             <View style={[st.statSep, { backgroundColor: `${config.color}22` }]} />
             <View style={st.stat}>
               <Text style={st.statLabel}>PRIZE</Text>
-              <Text style={[st.statValue, { color: colors.gold }]}>{formatChips(prizePool)}</Text>
+              <Text style={[st.statValue, { color: colors.gold }]}>{formatCompactChips(prizePool)}</Text>
             </View>
             <View style={[st.statSep, { backgroundColor: `${config.color}22` }]} />
             <View style={st.stat}>

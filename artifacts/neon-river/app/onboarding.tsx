@@ -15,14 +15,9 @@ import Svg, { Circle, Line } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '@/context/UserContext';
+import { formatCompactChips } from '@/utils/chipColor';
 
 const WELCOME_CHIPS = 50_000;
-
-function formatChips(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${Math.floor(n / 1000)},${String(n % 1000).padStart(3, '0')}`;
-  return String(n);
-}
 
 function ChipIcon({ size = 56, color = '#00d4ff' }: { size?: number; color?: string }) {
   const r = size / 2;
@@ -145,7 +140,7 @@ export default function OnboardingScreen() {
               <View style={s.chipCardBorder} />
               <Text style={s.chipEyebrow}>WELCOME BONUS</Text>
               <ChipIcon size={52} color="#00d4ff" />
-              <Text style={s.chipAmount}>{formatChips(chipDisplay)}</Text>
+              <Text style={s.chipAmount}>{formatCompactChips(chipDisplay)}</Text>
               <Text style={s.chipSub}>FREE VIRTUAL CHIPS</Text>
             </LinearGradient>
           </Animated.View>

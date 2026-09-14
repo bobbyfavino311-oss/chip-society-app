@@ -38,7 +38,9 @@ import {
 } from '@/lib/socialData';
 import { searchPlayers, startConversation, followPlayer, type SearchPlayer } from '@/lib/socialApi';
 import NeonAvatar from '@/components/NeonAvatar';
+import FounderBadge from '@/components/FounderBadge';
 import { getNeonAvatar } from '@/constants/neonAvatars';
+import { formatCompactChips } from '@/utils/chipColor';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -264,7 +266,10 @@ function timeSince(dt: string | Date): string {
 }
 
 function LivePostCard({ post }: { post: FeedPost }) {
-  const { likePost, commentOnPost, getPostComments, deletePost } = useLiveFeed();
+  const {
+    likePost, commentOnPost, getPostComments, deletePost,
+    reportPost: reportLivePost, isReported: isLiveReported,
+  } = useLiveFeed();
   const { follow, unfollow, isFollowing, mute, block, addRepost, removeRepost, isReposted } = useSocial();
   const { profile } = useUser();
   const [showComments, setShowComments] = useState(false);
@@ -272,6 +277,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
   const [loadingComments, setLoadingComments] = useState(false);
   const [myComment, setMyComment] = useState('');
   const [showMenu,  setShowMenu]  = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const [avatarImgFailed, setAvatarImgFailed] = useState(false);
   const [avatarLoaded, setAvatarLoaded] = useState(false);
 
@@ -289,6 +295,7 @@ function LivePostCard({ post }: { post: FeedPost }) {
   }, [isOwn, profile.avatarUri, profile.profileImageType, avatarLoaded]);
 
   const following  = isFollowing(post.authorId);
+  const reported   = isLiveReported(post.id);
   const reposted   = isReposted(post.id);
   const typeColor  = POST_TAG_COLORS[post.tag as PostTag] ?? '#00d4ff';
   const typeIcon   = POST_TYPE_ICONS[post.tag as PostTag] ?? 'star-outline';
@@ -332,6 +339,13 @@ function LivePostCard({ post }: { post: FeedPost }) {
     setMyComment('');
     const c = await commentOnPost(post.id, t);
     if (c) setLiveComments(prev => [c, ...prev]);
+  }
+
+  async function handleReport(reason: string) {
+    const submitted = await reportLivePost(post.id, reason);
+    setShowReport(false);
+    if (submitted) Alert.alert('Report submitted', 'Thanks for helping keep Chip Society safe.');
+    else Alert.alert('Unable to report', 'Please try again when you are online.');
   }
 
   const pressAnim = useRef(new Animated.Value(0)).current;
@@ -380,10 +394,14 @@ function LivePostCard({ post }: { post: FeedPost }) {
 
         {/* Name col — takes all remaining width; type badge lives here so name never squishes */}
         <View style={{ flex: 1, minWidth: 0 }}>
-          <TouchableOpacity onPress={() => isOwn ? router.push('/(tabs)/profile') : router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}>
-            <Text style={[cd.username, { flexShrink: 1 }]} numberOfLines={1} ellipsizeMode="tail">
-              {isOwn ? (profile.displayName || profile.username) : post.authorUsername}
+          <TouchableOpacity
+            style={cd.usernameRow}
+            onPress={() => isOwn ? router.push('/(tabs)/profile') : router.push(`/social/player-profile?id=${post.authorId}&username=${encodeURIComponent(post.authorUsername)}&avatarIndex=${post.authorAvatarIndex}&rank=${encodeURIComponent(post.authorRank ?? '')}`)}
+          >
+            <Text style={[cd.username, { flex: 1, minWidth: 0 }]} numberOfLines={1} ellipsizeMode="tail">
+              {isOwn ? (profile.displayName || profile.username) : (post.authorDisplayName || post.authorUsername)}
             </Text>
+            {(isOwn ? profile.isFounder : post.founderBadge) && <FounderBadge />}
           </TouchableOpacity>
           <View style={cd.handleRow}>
             <Text style={[cd.handle, { flexShrink: 1 }]} numberOfLines={1} ellipsizeMode="tail">@{isOwn ? profile.username : post.authorUsername} · {timeSince(post.createdAt)}</Text>
@@ -463,7 +481,17 @@ function LivePostCard({ post }: { post: FeedPost }) {
             <View key={c.id} style={cd.commentRow}>
               <NeonAvatar avatarId={c.authorAvatarIndex} size={28} />
               <View style={cd.commentBubble}>
-                <Text style={cd.commentName}>{c.authorUsername}</Text>
+                <View style={cd.commentNameRow}>
+                  <Text
+                    style={[cd.commentName, { flex: 1, minWidth: 0 }]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                  >
+                    {c.authorDisplayName || c.authorUsername}
+                  </Text>
+                  {c.founderBadge && <FounderBadge />}
+                </View>
                 <Text style={cd.commentText}>{c.text}</Text>
               </View>
             </View>
@@ -494,6 +522,16 @@ function LivePostCard({ post }: { post: FeedPost }) {
               </TouchableOpacity>
             ) : (
               <>
+                 <TouchableOpacity
+                   style={mnu.option}
+                   onPress={() => { setShowMenu(false); setShowReport(true); }}
+                   disabled={reported}
+                 >
+                   <Ionicons name="flag-outline" size={18} color={reported ? colors.textDim : '#ff9900'} />
+                   <Text style={[mnu.optionText, reported && { color: colors.textDim }]}>
+                     {reported ? 'Already Reported' : 'Report Post'}
+                   </Text>
+                 </TouchableOpacity>
                 <TouchableOpacity style={mnu.option} onPress={() => { setShowMenu(false); mute(post.authorId, post.authorUsername); }}>
                   <Ionicons name="volume-mute-outline" size={18} color={colors.textMuted} />
                   <Text style={mnu.optionText}>Mute @{post.authorUsername}</Text>
@@ -504,6 +542,23 @@ function LivePostCard({ post }: { post: FeedPost }) {
                 </TouchableOpacity>
               </>
             )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+      <Modal transparent visible={showReport} animationType="slide" onRequestClose={() => setShowReport(false)}>
+        <TouchableOpacity style={mnu.overlay} activeOpacity={1} onPress={() => setShowReport(false)}>
+          <View style={mnu.sheet}>
+            <LinearGradient colors={['#1a002e', '#0a0018']} style={StyleSheet.absoluteFill} />
+            <View style={mnu.handle} />
+            <Text style={rp.title}>REPORT POST</Text>
+            <Text style={rp.subtitle}>Select a reason</Text>
+            {REPORT_REASONS.map(r => (
+              <TouchableOpacity key={r.id} style={rp.reason} onPress={() => { void handleReport(r.label); }}>
+                <Ionicons name={r.icon} size={16} color={r.color} />
+                <Text style={rp.reasonText}>{r.label}</Text>
+                <Ionicons name="chevron-forward" size={14} color={colors.textDim} style={{ marginLeft: 'auto' as unknown as number }} />
+              </TouchableOpacity>
+            ))}
           </View>
         </TouchableOpacity>
       </Modal>
@@ -633,7 +688,9 @@ function PostCard({ post }: { post: SocialPost }) {
                   ? (profile.displayName || profile.username)
                   : (player?.username ?? 'Unknown')}
               </Text>
-              {primaryBadge && <Text style={cd.badgeIcon}>{primaryBadge.icon}</Text>}
+              {(post.playerId === 'me' ? profile.isFounder : primaryBadge?.id === 'founder')
+                ? <FounderBadge />
+                : primaryBadge && <Text style={cd.badgeIcon}>{primaryBadge.icon}</Text>}
             </View>
           </TouchableOpacity>
           <View style={cd.handleRow}>
@@ -733,7 +790,10 @@ function PostCard({ post }: { post: SocialPost }) {
                 <Text style={cd.meAvatarText}>{(profile.username || 'ME').substring(0, 2).toUpperCase()}</Text>
               </View>
               <View style={cd.commentBubble}>
-                <Text style={cd.commentName}>{profile.username || 'You'}</Text>
+                <View style={cd.commentNameRow}>
+                  <Text style={[cd.commentName, { flex: 1, minWidth: 0 }]} numberOfLines={1} ellipsizeMode="tail">{profile.username || 'You'}</Text>
+                  {profile.isFounder && <FounderBadge />}
+                </View>
                 <Text style={cd.commentText}>{c.text}</Text>
               </View>
             </View>
@@ -742,7 +802,7 @@ function PostCard({ post }: { post: SocialPost }) {
             <View key={c.id} style={cd.commentRow}>
               <NeonAvatar avatarId={c.avatarId} size={28} />
               <View style={cd.commentBubble}>
-                <Text style={cd.commentName}>{c.username}</Text>
+                <Text style={cd.commentName} numberOfLines={1} ellipsizeMode="tail">{c.username}</Text>
                 <Text style={cd.commentText}>{c.text}</Text>
               </View>
             </View>
@@ -852,7 +912,7 @@ const cd = StyleSheet.create({
     width: 10, height: 10, borderRadius: 5,
     backgroundColor: '#00ff88', borderWidth: 1.5, borderColor: '#070016',
   },
-  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 4, minWidth: 0 },
   username:    { color: '#ffffff', fontSize: 14, fontWeight: '800' },
   badgeIcon:   { fontSize: 12 },
   // handle + type badge sit together on one row; badge moved here from top-level header row
@@ -914,6 +974,7 @@ const cd = StyleSheet.create({
     flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', borderRadius: 10,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', padding: 8, gap: 2,
   },
+  commentNameRow: { flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 0 },
   commentName:    { color: colors.primary, fontSize: 11, fontWeight: '700' },
   commentText:    { color: 'rgba(255,255,255,0.52)', fontSize: 12, lineHeight: 17 },
   commentCompose: {
@@ -1190,7 +1251,7 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
       ? Math.round((profile.wins / profile.handsPlayed) * 100) : 0;
     let myValue = 0;
     let myLabel = '';
-    if (cat === 'chips')   { myValue = profile.chips;  myLabel = profile.chips >= 1_000_000 ? `${(profile.chips / 1_000_000).toFixed(1)}M` : profile.chips >= 1_000 ? `${(profile.chips / 1_000).toFixed(0)}K` : String(profile.chips); }
+    if (cat === 'chips')   { myValue = profile.chips;  myLabel = formatCompactChips(profile.chips); }
     if (cat === 'winrate') { myValue = myWinRate;       myLabel = `${myWinRate}%`; }
     if (cat === 'pots')    { myValue = 0;               myLabel = '—'; }
     if (cat === 'xp')      { myValue = profile.level;  myLabel = `Lv ${profile.level}`; }
@@ -1201,6 +1262,7 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
       winRate: myWinRate, handsPlayed: profile.handsPlayed,
       biggestPot: 0, tournamentWins: 0,
       avatarId: profile.symbolIndex ?? profile.avatarIndex, status: 'online' as const,
+      founderBadge: profile.isFounder ?? false,
       posts: [], isMock: false,
     };
 
@@ -1210,16 +1272,17 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
       .filter(p => p.playerId !== profile.playerId)
       .map(p => {
         let value = 0, label = '—';
-        if (cat === 'chips')   { value = p.chips;  label = p.chips >= 1_000_000 ? `${(p.chips / 1_000_000).toFixed(1)}M` : `${(p.chips / 1_000).toFixed(0)}K`; }
+        if (cat === 'chips')   { value = p.chips;  label = formatCompactChips(p.chips); }
         if (cat === 'xp')      { value = p.level;  label = `Lv ${p.level}`; }
         return {
           player: {
-            id: p.playerId, username: p.username,
+            id: p.playerId, username: p.displayName || p.username,
             rank: p.rank ?? 'Player',
             level: p.level, chips: p.chips,
             winRate: 0, handsPlayed: 0,
             biggestPot: 0, tournamentWins: 0,
             avatarId: p.avatarIndex, status: (p.status ?? 'offline') as 'online' | 'in_game' | 'offline',
+            founderBadge: p.founderBadge ?? false,
             posts: [], isMock: false,
           },
           value, label,
@@ -1267,6 +1330,9 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
         {entries.map((entry, i) => {
           const medal = i < 3 ? medalColors[i] : null;
           const isMe = entry.player.id === '__me__';
+          const founderBadge = 'founderBadge' in entry.player
+            ? entry.player.founderBadge
+            : entry.player.badges?.some((b: { id: string }) => b.id === 'founder');
           return (
             <TouchableOpacity
               key={entry.player.id}
@@ -1288,8 +1354,18 @@ function LeaderboardSection({ bottomInset }: { bottomInset: number }) {
                 ? <Image source={{ uri: profile.avatarUri }} style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: colors.primary }} onError={() => setAvatarImgFailed(true)} />
                 : <NeonAvatar avatarId={isMe ? (profile.symbolIndex ?? profile.avatarIndex ?? 1) : (entry.player.avatarId ?? 1)} size={34} />
               }
-              <View style={{ flex: 1 }}>
-                <Text style={lb.username}>{entry.player.username}</Text>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <View style={lb.usernameRow}>
+                  <Text
+                    style={[lb.username, { flex: 1, minWidth: 0 }]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                  >
+                    {entry.player.username}
+                  </Text>
+                  {founderBadge && <FounderBadge />}
+                </View>
                 <Text style={lb.rankLabel}>{entry.player.rank}</Text>
               </View>
               <View style={[lb.statusDot, {
@@ -1334,6 +1410,7 @@ const lb = StyleSheet.create({
   },
   avatarText: { fontSize: 15, fontWeight: '700' },
   username: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 0 },
   rankLabel: { color: colors.textDim, fontSize: 10, marginTop: 1 },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
   value: { color: colors.gold, fontSize: 12, fontWeight: '700', textAlign: 'right', maxWidth: 110 },
@@ -1350,13 +1427,6 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
   const { profile } = useUser();
   const { follow: socialFollow, isFollowing } = useSocial();
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const formatChips = (n: number) => {
-    const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-    return n >= 1_000_000_000 ? v(n / 1_000_000_000) + 'B'
-      : n >= 1_000_000 ? v(n / 1_000_000) + 'M'
-      : v(n / 1_000) + 'K';
-  };
 
   const STATUS_COLOR: Record<string, string> = {
     online: '#00ff88', in_game: '#ffd700', offline: colors.textDim, suspended: '#ff4466',
@@ -1385,6 +1455,7 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
           avatarIndex: p.avatarId ?? 1,
           rank: p.rank,
           status: p.status,
+          founderBadge: p.badges.some(b => b.id === 'founder'),
         }));
 
       try {
@@ -1476,9 +1547,17 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                 activeOpacity={0.75}
               >
                 <NeonAvatar avatarId={p.avatarIndex ?? 1} size={38} />
-                <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Text style={srch.username}>{p.username}</Text>
+                 <View style={{ flex: 1, minWidth: 0 }}>
+                   <View style={srch.usernameRow}>
+                     <Text
+                       style={[srch.username, { flex: 1, minWidth: 0 }]}
+                       numberOfLines={1}
+                       adjustsFontSizeToFit
+                       minimumFontScale={0.72}
+                     >
+                       {p.displayName || p.username}
+                     </Text>
+                     {p.founderBadge && <FounderBadge />}
                     {p.status in STATUS_COLOR && (
                       <>
                         <View style={[srch.statusDot, { backgroundColor: STATUS_COLOR[p.status] ?? colors.textDim }]} />
@@ -1488,7 +1567,7 @@ function SearchSection({ bottomInset }: { bottomInset: number }) {
                       </>
                     )}
                   </View>
-                  <Text style={srch.handle}>{p.rank} · {formatChips(p.chips)} chips · Lv.{p.level}</Text>
+                  <Text style={srch.handle}>{p.rank} · {formatCompactChips(p.chips)} chips · Lv.{p.level}</Text>
                 </View>
               </TouchableOpacity>
               {/* Action buttons — hide both for own profile */}
@@ -1544,6 +1623,7 @@ const srch = StyleSheet.create({
   },
   avatarText: { fontSize: 20, fontWeight: '700' },
   username: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  usernameRow: { flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 0 },
   handle: { color: colors.textDim, fontSize: 11, marginTop: 2 },
   chips: { color: colors.gold, fontSize: 11, marginTop: 1 },
   statusDot: { width: 7, height: 7, borderRadius: 3.5 },
@@ -1633,8 +1713,11 @@ function ComposeSheet({ visible, onClose, onPost, bottomInset }: {
             ? <Image source={{ uri: profile.avatarUri }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.primary }} onError={() => setAvatarImgFailed(true)} />
             : <NeonAvatar avatarId={meAvatarId} size={36} />
           }
-            <View>
-              <Text style={cmp.authorName}>{profile.displayName || profile.username}</Text>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <View style={cmp.authorNameRow}>
+                <Text style={[cmp.authorName, { flex: 1, minWidth: 0 }]} numberOfLines={1} ellipsizeMode="tail">{profile.displayName || profile.username}</Text>
+                {profile.isFounder && <FounderBadge />}
+              </View>
               <Text style={cmp.authorHandle}>@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
             </View>
           </View>
@@ -1716,6 +1799,7 @@ const cmp = StyleSheet.create({
   avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.surface, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   avatarText: { fontSize: 19, fontWeight: '700' },
   authorName: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  authorNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 0 },
   authorHandle: { color: colors.textDim, fontSize: 10 },
   input: { color: colors.text, fontSize: 15, lineHeight: 23, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 10, minHeight: 90, textAlignVertical: 'top' },
   sectionLabel: { color: colors.textDim, fontSize: 10, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 16, marginBottom: 8 },
@@ -1935,13 +2019,16 @@ function MeSection({ myPosts, onDeletePost, bottomInset, onCompose }: { myPosts:
           <LinearGradient colors={[`${neonCol}40`, 'transparent']} style={me.glow} />
         </View>
         <View style={[me.profileInfo, { minWidth: 0 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
-            <Text style={me.username} numberOfLines={1} ellipsizeMode="tail">{profile.displayName || profile.username}</Text>
-            {profile.isFounder && (
-              <View style={{ flexShrink: 0, flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,215,0,0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,215,0,0.40)', paddingHorizontal: 5, paddingVertical: 2 }}>
-                <Text style={{ color: '#FFD700', fontSize: 8, fontFamily: 'Orbitron_700Bold', letterSpacing: 1 }}>👑 FOUNDER</Text>
-              </View>
-            )}
+          <View style={me.profileNameRow}>
+            <Text
+              style={[me.username, { flex: 1, minWidth: 0 }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.68}
+            >
+              {profile.displayName || profile.username}
+            </Text>
+            {profile.isFounder && <FounderBadge />}
           </View>
           <Text style={me.handle} numberOfLines={1} ellipsizeMode="tail">@{profile.username.toLowerCase().replace(/\s/g, '')}</Text>
           {profile.bio ? (
@@ -2067,6 +2154,7 @@ const me = StyleSheet.create({
   bigAvatarText: { fontSize: 28, fontWeight: '700' },
   glow: { position: 'absolute', top: -4, left: -4, right: -4, bottom: -4, borderRadius: 34 },
   profileInfo: { flex: 1, gap: 4 },
+  profileNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 0 },
   username: { color: colors.text, fontSize: 16, fontWeight: '800', flexShrink: 1 },
   handle: { color: colors.textDim, fontSize: 11, flexShrink: 1 },
   bio: { color: 'rgba(255,255,255,0.45)', fontSize: 11, lineHeight: 16 },

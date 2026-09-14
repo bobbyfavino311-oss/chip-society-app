@@ -16,6 +16,7 @@ import colors from '@/constants/colors';
 import { useUser } from '@/context/UserContext';
 import { useAchievements } from '@/context/AchievementContext';
 import { SoundEngine } from '@/lib/soundEngine';
+import { formatCompactChips } from '@/utils/chipColor';
 import { MusicEngine } from '@/lib/musicEngine';
 import { getBestHandVariant, describeHand, type GameVariant } from '@/lib/pokerEngine';
 import { useLocalSearchParams } from 'expo-router';
@@ -26,6 +27,7 @@ import ShareToFeedModal from '@/components/ShareToFeedModal';
 import FourCardIcon from '@/components/FourCardIcon';
 import AscendingBarsIcon from '@/components/AscendingBarsIcon';
 import type { PostTag } from '@/lib/socialData';
+import FounderBadge from '@/components/FounderBadge';
 
 
 const HAND_COLORS: Record<string, string> = {
@@ -34,13 +36,7 @@ const HAND_COLORS: Record<string, string> = {
   'Three of a Kind': '#ffd700', 'Two Pair': '#ffd700', 'One Pair': '#aaaacc', 'High Card': '#666688',
 };
 
-function formatChips(n: number): string {
-  const v = (x: number) => x % 1 === 0 ? x.toFixed(0) : x.toFixed(1);
-  if (n >= 1_000_000_000) return `${v(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${v(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${v(n / 1_000)}K`;
-  return String(n);
-}
+const formatChips = formatCompactChips;
 
 // ─── Community cards ──────────────────────────────────────────────────────────
 
@@ -841,11 +837,13 @@ export default function TournamentScreen() {
             ]} />
             <Text style={[
               styles.humanName,
+              { flexShrink: 1 },
               state.winnerIds.includes('human') && { color: '#ffd700' },
               humanPlayer.status === 'folded' && styles.dimText,
-            ]}>
+            ]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
               {humanPlayer.name}
             </Text>
+            {profile.isFounder && <FounderBadge iconOnly />}
             <Text style={[styles.humanChips, humanPlayer.status === 'folded' && styles.dimText]}>
               {formatChips(humanPlayer.chips)}
             </Text>

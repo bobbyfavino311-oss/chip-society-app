@@ -1,4 +1,5 @@
 import { type Card, type Suit } from './pokerEngine';
+import { formatCompactChips } from '@/utils/chipColor';
 
 export type { Card };
 
@@ -95,12 +96,6 @@ export function canSplit(cards: Card[]): boolean {
 
 // ─── Display helpers ──────────────────────────────────────────────────────────
 
-function _fmtVal(v: number): string {
-  return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1);
-}
 export function fmt(n: number): string {
-  if (n >= 1_000_000_000) return `${_fmtVal(n / 1_000_000_000)}B`;
-  if (n >= 1_000_000)     return `${_fmtVal(n / 1_000_000)}M`;
-  if (n >= 1_000)         return `${_fmtVal(n / 1_000)}K`;
-  return String(n);
+  return formatCompactChips(n);
 }

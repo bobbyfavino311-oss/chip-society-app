@@ -43,11 +43,13 @@ async function req<T>(
 export interface SearchPlayer {
   playerId: string;
   username: string;
+  displayName?: string | null;
   level: number;
   chips: number;
   avatarIndex: number;
   rank: string;
   status: string;
+  founderBadge?: boolean;
 }
 
 export async function searchPlayers(q: string): Promise<SearchPlayer[]> {
@@ -178,6 +180,18 @@ export async function getBlocks(playerId: string): Promise<string[]> {
   return d.blocks;
 }
 
+/** Report a live feed post for moderation review. */
+export async function reportFeedPost(
+  playerId: string,
+  postId: string,
+  reason: string,
+): Promise<{ ok: boolean }> {
+  return req<{ ok: boolean }>(`/social/posts/${postId}/report`, playerId, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}
+
 // ── Avatar upload ─────────────────────────────────────────────────────────────
 
 const RAILWAY_API = 'https://api-server-production-bbc2.up.railway.app/api';
@@ -219,8 +233,10 @@ export interface FeedPost {
   id:                string;
   authorId:          string;
   authorUsername:    string;
+  authorDisplayName?: string | null;
   authorAvatarIndex: number;
   authorAvatarUrl:   string | null;   // server-hosted photo visible to all users
+  founderBadge?:     boolean;
   authorRank:        string;
   content:           string;
   tag:               string;
@@ -237,7 +253,9 @@ export interface FeedComment {
   postId:            string;
   authorId:          string;
   authorUsername:    string;
+  authorDisplayName?: string | null;
   authorAvatarIndex: number;
+  founderBadge?: boolean;
   text:              string;
   createdAt:         string | Date;
 }
