@@ -51,42 +51,50 @@ function createStyles(c: Colors) {
   return StyleSheet.create({
     screen:  { flex: 1, backgroundColor: c.background },
 
-    header:  { paddingHorizontal: 16, paddingBottom: 10 },
+    header:  { paddingHorizontal: 20, paddingBottom: 14 },
     headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     backBtn: {
-      width: 38, height: 38, borderRadius: 19,
+      width: 46, height: 46, borderRadius: 23,
       alignItems: 'center', justifyContent: 'center',
-      backgroundColor: c.surface, borderWidth: 1, borderColor: c.border,
+      backgroundColor: 'rgba(8,3,27,0.82)', borderWidth: 1, borderColor: c.accent,
+      shadowColor: c.accent, shadowOpacity: 0.55, shadowRadius: 12, shadowOffset: { width: 0, height: 0 },
+      elevation: 8,
     },
     headerCenter: { alignItems: 'center' },
-    headerTitle: { fontFamily: 'Orbitron_700Bold', fontSize: 16, color: c.primary, letterSpacing: 3 },
-    headerSub:   { color: c.textMuted, fontSize: 10, marginTop: 2, letterSpacing: 0.5 },
-    actionRow:   { flexDirection: 'row', gap: 8, marginTop: 10, justifyContent: 'flex-end' },
-    headerBtn: {
-      paddingHorizontal: 10, paddingVertical: 6,
-      borderRadius: 10, borderWidth: 1, borderColor: c.border,
-      backgroundColor: c.surface, flexDirection: 'row', alignItems: 'center', gap: 4,
+    headerTitle: {
+      fontFamily: 'Orbitron_700Bold', fontSize: 20, color: c.primary, letterSpacing: 3.4,
+      textShadowColor: c.primaryGlow, textShadowRadius: 12,
     },
-    headerBtnText: { color: c.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
+    headerSub:   { color: c.textMuted, fontSize: 12, marginTop: 4, letterSpacing: 0.6 },
+    actionRow:   { flexDirection: 'row', gap: 10, marginTop: 14, justifyContent: 'flex-end' },
+    headerBtn: {
+      paddingHorizontal: 14, paddingVertical: 9,
+      borderRadius: 12, borderWidth: 1, borderColor: c.borderBright,
+      backgroundColor: 'rgba(14,4,38,0.82)', flexDirection: 'row', alignItems: 'center', gap: 7,
+      shadowColor: c.accent, shadowOpacity: 0.22, shadowRadius: 8, shadowOffset: { width: 0, height: 0 },
+    },
+    headerBtnText: { color: c.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
 
-    divider: { height: 1, backgroundColor: c.border, marginBottom: 0 },
+    divider: { height: 1, backgroundColor: c.border, opacity: 0.7 },
 
     // Category tabs
     tabsWrap: {
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: c.border,
+      paddingHorizontal: 16,
+      paddingTop: 13,
+      paddingBottom: 8,
     },
-    tabsScroll: { gap: 6 },
+    tabsScroll: { gap: 9, flexGrow: 1 },
     tab: {
       flexDirection: 'row', alignItems: 'center', gap: 4,
-      paddingHorizontal: 11, paddingVertical: 7,
-      borderRadius: 20, borderWidth: 1, borderColor: c.border,
-      backgroundColor: c.surface,
+      paddingHorizontal: 10, paddingVertical: 10, flex: 1, justifyContent: 'center',
+      borderRadius: 18, borderWidth: 1, borderColor: c.borderBright,
+      backgroundColor: 'rgba(12,3,31,0.76)',
     },
-    tabActive: { borderColor: 'transparent' },
-    tabLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 1, fontFamily: 'Orbitron_700Bold', color: c.textMuted },
+    tabActive: {
+      borderColor: 'rgba(255,255,255,0.42)',
+      shadowOpacity: 0.5, shadowRadius: 10, shadowOffset: { width: 0, height: 0 }, elevation: 8,
+    },
+    tabLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 0.9, fontFamily: 'Orbitron_700Bold', color: c.textMuted },
     tabLabelActive: { color: '#050010' },
     tabBadge: {
       minWidth: 16, height: 16, borderRadius: 8,
@@ -96,7 +104,7 @@ function createStyles(c: Colors) {
     },
     tabBadgeText: { fontSize: 9, fontWeight: '900', color: 'rgba(255,255,255,0.6)' },
 
-    scroll: { paddingHorizontal: 14, paddingTop: 10, gap: 8 },
+    scroll: { paddingHorizontal: 18, paddingTop: 10, gap: 16 },
 
     emptyWrap: { paddingVertical: 72, alignItems: 'center', gap: 12 },
     emptyIcon: {
@@ -108,41 +116,52 @@ function createStyles(c: Colors) {
     emptySub:  { color: c.textMuted, fontSize: 12 },
 
     card: {
-      borderRadius: 14, borderWidth: 1, borderColor: c.border,
-      backgroundColor: c.surface, overflow: 'hidden',
+      borderRadius: 20, borderWidth: 1.25, borderColor: c.border,
+      backgroundColor: 'rgba(7,3,24,0.92)', overflow: 'hidden',
+      shadowOpacity: 0.4, shadowRadius: 15, shadowOffset: { width: 0, height: 5 },
+      elevation: 9,
     },
-    cardUnread: { borderColor: c.primaryDim },
-    cardInner: { flexDirection: 'row', padding: 13, gap: 11, alignItems: 'flex-start' },
+    cardUnread: { borderWidth: 1.5 },
+    cardInner: { flexDirection: 'row', padding: 16, paddingRight: 42, gap: 13, alignItems: 'flex-start' },
     iconWrap: {
-      width: 42, height: 42, borderRadius: 21,
+      width: 56, height: 56, borderRadius: 28,
       alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+      shadowOpacity: 0.72, shadowRadius: 12, shadowOffset: { width: 0, height: 0 },
+      elevation: 8,
     },
-    unreadBar: { width: 3, position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 2 },
-    cardBody: { flex: 1, gap: 3 },
+    unreadDot: {
+      width: 7, height: 7, borderRadius: 4, position: 'absolute', right: 1, top: 1,
+      borderWidth: 1, borderColor: '#ffffff',
+    },
+    cardBody: { flex: 1, gap: 5 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     cardTitle: {
-      fontFamily: 'Orbitron_700Bold', fontSize: 11,
-      color: c.text, letterSpacing: 0.3, lineHeight: 16,
+      fontSize: 15, fontWeight: '800',
+      color: c.text, letterSpacing: 0.05, lineHeight: 19, flexShrink: 1,
     },
-    cardMsg: { color: c.textMuted, fontSize: 12, lineHeight: 17 },
-    cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
-    timestamp: { color: c.textDim, fontSize: 10, letterSpacing: 0.2 },
+    cardMsg: { color: c.textMuted, fontSize: 12.5, lineHeight: 18 },
+    cardFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 1, gap: 5 },
+    timestamp: { color: c.textDim, fontSize: 10.5, letterSpacing: 0.2 },
     categoryBadge: {
-      paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6,
+      paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, borderWidth: 1,
     },
-    categoryText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.8 },
+    categoryText: { fontSize: 8, fontWeight: '900', letterSpacing: 0.8 },
 
-    cardActionRow: { borderTopWidth: 1, borderTopColor: c.border, flexDirection: 'row' },
+    cardActionRow: { flexDirection: 'row', paddingHorizontal: 14, paddingBottom: 13 },
     actionBtn: {
-      flex: 1, paddingVertical: 10,
+      flex: 1, paddingVertical: 11, borderRadius: 11, borderWidth: 1,
       alignItems: 'center', justifyContent: 'center',
+      overflow: 'hidden',
     },
     actionBtnText: {
-      fontSize: 10, fontWeight: '800', letterSpacing: 1,
+      fontSize: 11, fontWeight: '900', letterSpacing: 1.25,
       fontFamily: 'Orbitron_700Bold',
     },
     dismissBtn: {
-      borderLeftWidth: 1, borderLeftColor: c.border,
-      paddingHorizontal: 16, justifyContent: 'center', alignItems: 'center',
+      position: 'absolute', right: 12, top: 12,
+      width: 28, height: 28, borderRadius: 14, borderWidth: 1,
+      borderColor: c.borderBright, backgroundColor: 'rgba(5,0,16,0.72)',
+      justifyContent: 'center', alignItems: 'center',
     },
   });
 }
@@ -183,48 +202,79 @@ function NotifCard({ notif, styles, colors }: {
   const catLabel = CATEGORY_LABEL[notif.category] ?? notif.category.toUpperCase();
 
   return (
-    <View style={[styles.card, !notif.read && styles.cardUnread]}>
-      {!notif.read && (
-        <View style={[styles.unreadBar, { backgroundColor: notif.iconColor }]} />
-      )}
-      {!notif.read && (
-        <LinearGradient
-          colors={[`${notif.iconColor}07`, 'transparent']}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        />
-      )}
+    <View style={[
+      styles.card,
+      { borderColor: `${notif.iconColor}${notif.read ? '55' : 'CC'}`, shadowColor: notif.iconColor },
+      !notif.read && styles.cardUnread,
+    ]}>
+      <LinearGradient
+        colors={[`${notif.iconColor}18`, 'rgba(8,3,27,0.88)', `${notif.iconColor}08`]}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+      />
+      <TouchableOpacity style={styles.dismissBtn} onPress={() => dismiss(notif.id)} activeOpacity={0.7}>
+        <Ionicons name="close" size={16} color={colors.textMuted} />
+      </TouchableOpacity>
       <View style={styles.cardInner}>
-        <View style={[styles.iconWrap, { backgroundColor: `${notif.iconColor}18`, borderWidth: 1, borderColor: `${notif.iconColor}30` }]}>
-          <Ionicons name={notif.icon as any} size={20} color={notif.iconColor} />
+        <View style={[
+          styles.iconWrap,
+          {
+            backgroundColor: `${notif.iconColor}14`,
+            borderWidth: 1.5,
+            borderColor: notif.iconColor,
+            shadowColor: notif.iconColor,
+          },
+        ]}>
+          <LinearGradient
+            colors={[`${notif.iconColor}25`, 'transparent']}
+            style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+          />
+          <Ionicons name={notif.icon as any} size={27} color={notif.iconColor} />
+          {!notif.read && <View style={[styles.unreadDot, { backgroundColor: notif.iconColor }]} />}
         </View>
         <View style={styles.cardBody}>
-          <Text style={styles.cardTitle} numberOfLines={1}>{notif.title}</Text>
-          <Text style={styles.cardMsg} numberOfLines={2}>{notif.message}</Text>
-          <View style={styles.cardFooter}>
-            <Text style={styles.timestamp}>{timeAgo(notif.createdAt)}</Text>
-            <View style={[styles.categoryBadge, { backgroundColor: `${catColor}18` }]}>
+          <View style={styles.titleRow}>
+            <Text style={styles.cardTitle} numberOfLines={2}>{notif.title}</Text>
+            <View style={[
+              styles.categoryBadge,
+              { backgroundColor: `${catColor}12`, borderColor: `${catColor}88` },
+            ]}>
               <Text style={[styles.categoryText, { color: catColor }]}>{catLabel}</Text>
             </View>
+          </View>
+          <Text style={styles.cardMsg} numberOfLines={3}>{notif.message}</Text>
+          <View style={styles.cardFooter}>
+            <Ionicons name="time-outline" size={12} color={colors.textDim} />
+            <Text style={styles.timestamp}>{timeAgo(notif.createdAt)}</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.cardActionRow}>
         {(notif.actionRoute && notif.actionLabel) ? (
-          <>
-            <TouchableOpacity style={styles.actionBtn} onPress={handleAction} activeOpacity={0.7}>
+            <TouchableOpacity
+              style={[
+                styles.actionBtn,
+                { borderColor: notif.iconColor, shadowColor: notif.iconColor, shadowOpacity: 0.35, shadowRadius: 8 },
+              ]}
+              onPress={handleAction}
+              activeOpacity={0.72}
+            >
+              <LinearGradient
+                colors={[`${notif.iconColor}22`, `${notif.iconColor}08`]}
+                style={StyleSheet.absoluteFill}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <Text style={[styles.actionBtnText, { color: notif.iconColor }]}>
                 {notif.actionLabel}
               </Text>
+                <Ionicons name="arrow-forward" size={15} color={notif.iconColor} />
+              </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.dismissBtn} onPress={() => dismiss(notif.id)} activeOpacity={0.7}>
-              <Ionicons name="close" size={14} color={colors.textDim} />
-            </TouchableOpacity>
-          </>
         ) : (
           <TouchableOpacity
-            style={[styles.actionBtn, { flexDirection: 'row', gap: 6 }]}
+            style={[styles.actionBtn, { flexDirection: 'row', gap: 6, borderColor: colors.borderBright }]}
             onPress={() => dismiss(notif.id)}
             activeOpacity={0.7}
           >
@@ -298,7 +348,7 @@ export default function NotificationsScreen() {
             </Text>
           </View>
           {/* Spacer to balance back button */}
-          <View style={{ width: 38 }} />
+          <View style={{ width: 46 }} />
         </View>
 
         {/* Action buttons row */}
@@ -340,7 +390,10 @@ export default function NotificationsScreen() {
             return (
               <TouchableOpacity
                 key={tab.key}
-                style={[styles.tab, isActive && [styles.tabActive, { backgroundColor: accent }]]}
+                style={[
+                  styles.tab,
+                  isActive && [styles.tabActive, { backgroundColor: accent, shadowColor: accent }],
+                ]}
                 onPress={() => setActiveTab(tab.key)}
                 activeOpacity={0.8}
               >
