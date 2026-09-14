@@ -44,6 +44,7 @@ import { MusicEngine } from '@/lib/musicEngine';
 import { initializeRevenueCat, SubscriptionProvider } from '@/lib/revenuecat';
 import { initializeSentry, reportError } from '@/lib/sentry';
 import * as Updates from 'expo-updates';
+import { subscribeServerNotifications, type ServerAppNotification } from '@/lib/appNotificationBus';
 
 
 // expo-notifications removed Android support in Expo Go SDK 53+.
@@ -220,6 +221,8 @@ function PushSetup() {
       const { title, body, data } = notification.request.content;
       if (!title) return;
       addNotification({
+        id: notification.request.identifier,
+        dedupeKey: typeof data?.dedupeKey === 'string' ? data.dedupeKey : notification.request.identifier,
         category: (data?.category as any) ?? 'system',
         priority:  (data?.priority as any) ?? 'medium',
         title:     title,
@@ -355,6 +358,191 @@ function PushSetup() {
   return null;
 }
 
+// ─── In-app notification sync ─────────────────────────────────────────────────
+
+const LAST_LEVEL_KEY = '@chipsociety_notification_level_v1';
+
+function serverNotificationToInput(n: ServerAppNotification) {
+  const [kind, targetId] = n.reason.split(':');
+  const isFollow = n.type === 'follow' || kind === 'social_follow';
+  const isMessage = n.type === 'direct_message' || kind === 'direct_message';
+  return {
+    id: n.notificationId,
+    dedupeKey: `server:${n.notificationId}`,
+    category: 'social' as const,
+    priority: 'medium' as const,
+    title: n.title,
+    message: n.message ?? '',
+    createdAt: new Date(n.createdAt).getTime(),
+    actionRoute: isFollow && targetId
+      ? `/social/player-profile?id=${encodeURIComponent(targetId)}`
+      : isMessage && targetId
+        ? `/inbox/${encodeURIComponent(targetId)}`
+        : '/(tabs)/feed?tab=me',
+    actionLabel: isFollow ? 'VIEW PROFILE' : isMessage ? 'REPLY' : n.type === 'comment' ? 'VIEW COMMENT' : 'VIEW POST',
+    icon: isFollow ? 'person-add' : n.type === 'comment' || isMessage ? 'chatbubble' : 'heart',
+    iconColor: isFollow ? '#00d4ff' : n.type === 'comment' || isMessage ? '#bf5fff' : '#ff0090',
+  };
+}
+
+function NotificationSync() {
+  const {
+    profile, canClaimWheel, canClaimDaily, canClaimFreeCookie,
+  } = useUser();
+  const { unlockedIds, claimedIds } = useAchievements();
+  const {
+    ready, addNotification, dismissByDedupePrefix,
+  } = useNotifications();
+
+  const playerId = profile.playerId;
+  const pendingAchievementIds = [...unlockedIds].filter(id => !claimedIds.has(id)).sort();
+  const pendingAchievements = pendingAchievementIds.length;
+  const achievementCycle = pendingAchievementIds.join(',');
+  const today = new Date().toDateString();
+
+  // Reward notifications use one stable key per availability cycle. Clearing
+  // one suppresses that exact cycle permanently; the next cycle gets a new key.
+  useEffect(() => {
+    if (!ready || !playerId) return;
+
+    if (canClaimWheel) {
+      const cycle = profile.lastWheelSpin ?? 'first';
+      addNotification({
+        id: `reward:wheel:${cycle}`,
+        dedupeKey: `reward:wheel:${cycle}`,
+        category: 'reward',
+        priority: 'high',
+        title: 'Daily Spin Ready',
+        message: 'Your free spin is available. Spin to win up to 100K chips!',
+        actionRoute: '/rewards/wheel',
+        actionLabel: 'SPIN NOW',
+        icon: 'radio-button-on',
+        iconColor: '#bf5fff',
+      });
+    } else {
+      dismissByDedupePrefix('reward:wheel:');
+    }
+
+    if (canClaimDaily) {
+      addNotification({
+        id: `reward:streak:${today}`,
+        dedupeKey: `reward:streak:${today}`,
+        category: 'reward',
+        priority: 'high',
+        title: 'Daily Streak Reward',
+        message: `Day ${profile.streakDays + 1} bonus chips are waiting for you.`,
+        actionRoute: '/rewards/streak',
+        actionLabel: 'CLAIM',
+        icon: 'flame',
+        iconColor: '#ffd700',
+      });
+    } else {
+      dismissByDedupePrefix('reward:streak:');
+    }
+
+    if (canClaimFreeCookie) {
+      addNotification({
+        id: `reward:cookie:${today}`,
+        dedupeKey: `reward:cookie:${today}`,
+        category: 'reward',
+        priority: 'high',
+        title: 'Fortune Cookie Ready',
+        message: 'Your free daily fortune cookie is ready to be cracked.',
+        actionRoute: '/rewards/cookie',
+        actionLabel: 'CRACK NOW',
+        icon: 'sparkles',
+        iconColor: '#00d4ff',
+      });
+    } else {
+      dismissByDedupePrefix('reward:cookie:');
+    }
+
+    if (pendingAchievements > 0) {
+      addNotification({
+        id: `achievements:${achievementCycle}`,
+        dedupeKey: `achievements:${achievementCycle}`,
+        category: 'reward',
+        priority: 'high',
+        title: `${pendingAchievements} Achievement${pendingAchievements > 1 ? 's' : ''} Ready`,
+        message: 'You have unclaimed achievement rewards waiting.',
+        actionRoute: '/achievements',
+        actionLabel: 'CLAIM',
+        icon: 'trophy',
+        iconColor: '#ffd700',
+      });
+    } else {
+      dismissByDedupePrefix('achievements:');
+    }
+  }, [
+    ready, playerId, canClaimWheel, canClaimDaily, canClaimFreeCookie,
+    profile.lastWheelSpin, profile.streakDays, today, pendingAchievements, achievementCycle,
+    addNotification, dismissByDedupePrefix,
+  ]);
+
+  // Initialize the remembered level without notifying. Later increases create
+  // one permanent notification for the newly reached level.
+  useEffect(() => {
+    if (!ready || !playerId) return;
+    const key = `${LAST_LEVEL_KEY}_${playerId}`;
+    void AsyncStorage.getItem(key).then(raw => {
+      const previous = raw ? Number(raw) : profile.level;
+      if (profile.level > previous) {
+        addNotification({
+          id: `level:${profile.level}`,
+          dedupeKey: `level:${profile.level}`,
+          category: 'gameplay',
+          priority: 'high',
+          title: `Level ${profile.level} Reached`,
+          message: `You leveled up to ${profile.rank}. Keep playing to reach the next rank.`,
+          actionRoute: '/(tabs)/profile',
+          actionLabel: 'VIEW PROFILE',
+          icon: 'trending-up',
+          iconColor: '#00ff88',
+        });
+      }
+      if (!raw || profile.level > previous) {
+        return AsyncStorage.setItem(key, String(profile.level));
+      }
+    }).catch(() => {});
+  }, [ready, playerId, profile.level, profile.rank, addNotification]);
+
+  // Real-time social events arrive through the existing player socket. Polling
+  // also recovers events created while the app was closed or offline.
+  useEffect(() => {
+    if (!ready || !playerId) return;
+    const handle = (notification: ServerAppNotification) => {
+      addNotification(serverNotificationToInput(notification));
+      fetch(`${API_BASE}/players/${playerId}/notifications/read`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationIds: [notification.notificationId] }),
+      }).catch(() => {});
+    };
+    const unsubscribe = subscribeServerNotifications(handle);
+
+    const poll = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/players/${playerId}/notifications`);
+        if (!response.ok) return;
+        const data = await response.json() as { notifications: ServerAppNotification[] };
+        data.notifications
+          .filter(n => !('read' in n) || !(n as ServerAppNotification & { read: boolean }).read)
+          .filter(n => n.type === 'follow' || n.type === 'like' || n.type === 'comment')
+          .forEach(handle);
+      } catch {}
+    };
+
+    void poll();
+    const timer = setInterval(() => { void poll(); }, 30_000);
+    return () => {
+      unsubscribe();
+      clearInterval(timer);
+    };
+  }, [ready, playerId, addNotification]);
+
+  return null;
+}
+
 // ─── Auth gate — redirects new users to entry, and unaccepted terms to /terms ─
 
 const AUTH_SEGMENTS = new Set(['entry', 'auth', 'terms']);
@@ -421,16 +609,12 @@ function ModerationModalRenderer() {
 // ─── Notification bridge — connects UserContext → NotificationProvider ────────
 
 function NotificationBridge({ children }: { children: React.ReactNode }) {
-  const { canClaimWheel, canClaimDaily, profile } = useUser();
-  const { unlockedIds, claimedIds } = useAchievements();
-  const pendingAchievements = [...unlockedIds].filter(id => !claimedIds.has(id)).length;
-
+  const { profile } = useUser();
   return (
     <NotificationProvider
-      canClaimWheel={canClaimWheel}
-      canClaimDaily={canClaimDaily}
-      pendingAchievements={pendingAchievements}
-      streakDays={profile.streakDays}
+      key={profile.playerId || 'anonymous'}
+      playerId={profile.playerId || ''}
+      isNewUser={profile.isNewUser}
     >
       {children}
     </NotificationProvider>
@@ -444,6 +628,7 @@ function RootLayoutNav() {
     <>
       <UpdateChecker />
       <SoundSyncer />
+      <NotificationSync />
       <PushSetup />
       <GateController />
       <AchievementPopupRenderer />

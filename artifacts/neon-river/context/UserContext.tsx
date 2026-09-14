@@ -4,6 +4,7 @@ import { AppState, Platform } from 'react-native';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import type { GameVariant } from '../constants/gameVariants';
+import { publishServerNotification, type ServerAppNotification } from '@/lib/appNotificationBus';
 
 export type Rank =
   | 'LOCAL'
@@ -1357,6 +1358,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     socket.on('dm_received', (data: DmReceivedPayload) => {
       setUnreadDmCount(n => n + 1);
       dmListenersRef.current.forEach(cb => cb(data));
+      publishServerNotification({
+        notificationId: `dm:${data.messageId}`,
+        type: 'direct_message',
+        title: `New message from ${data.senderUsername}`,
+        message: data.text,
+        reason: `direct_message:${data.conversationId}`,
+        createdAt: data.createdAt,
+      });
+    });
+
+    socket.on('player_notification', (data: ServerAppNotification) => {
+      publishServerNotification(data);
     });
 
     notifSocketRef.current = socket;
@@ -1383,9 +1396,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const fresh = data.notifications.filter(
         n => !n.read && !checkedBonusIds.current.has(n.notificationId)
       );
-      if (!fresh.length) return;
+      const handled = fresh.filter(n => !['follow', 'like', 'comment'].includes(n.type));
+      if (!handled.length) return;
       // Mark all as read on server immediately so we don't re-show on next poll
-      const ids = fresh.map(n => n.notificationId);
+      const ids = handled.map(n => n.notificationId);
       ids.forEach(id => checkedBonusIds.current.add(id));
       fetch(`${getApiBase()}/players/${pid}/notifications/read`, {
         method: 'POST',
@@ -1394,8 +1408,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }).catch(() => {});
 
       // Split: moderation events → ModerationModal; bonuses → BonusNotificationModal
-      const moderationItems = fresh.filter(n => n.type === 'moderation');
-      const bonusItems      = fresh.filter(n => n.type !== 'moderation');
+      const moderationItems = handled.filter(n => n.type === 'moderation');
+      const bonusItems      = handled.filter(n => n.type !== 'moderation' && n.amount > 0);
 
       // Show the most recent unread moderation event (oldest first so last one wins)
       if (moderationItems.length > 0) {

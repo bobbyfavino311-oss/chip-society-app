@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable, postRepostsTable, playerNotificationsTable, playerReportsTable } from '@workspace/db';
+import { db, playersTable, followsTable, conversationsTable, directMessagesTable, blocksTable, feedPostsTable, postLikesTable, postCommentsTable, postRepostsTable, playerNotificationsTable, playerPushTokensTable, playerReportsTable } from '@workspace/db';
 import { eq, or, and, ilike, ne, desc, sql, lt, inArray, notInArray } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { emitToPlayer, emitToAll } from '../sockets/index.js';
@@ -29,6 +29,70 @@ function checkMessageRate(playerId: string): boolean {
   times.push(now);
   messageTimes.set(playerId, times);
   return true;
+}
+
+async function createSocialNotification(args: {
+  playerId: string;
+  type: 'follow' | 'like' | 'comment';
+  title: string;
+  message: string;
+  reason: string;
+  actionRoute: string;
+  actionLabel: string;
+  icon: string;
+  iconColor: string;
+}) {
+  const notificationId = randomUUID();
+  const createdAt = new Date();
+  await db.insert(playerNotificationsTable).values({
+    notificationId,
+    playerId: args.playerId,
+    type: args.type,
+    title: args.title,
+    message: args.message,
+    reason: args.reason,
+    amount: 0,
+  });
+
+  const payload = {
+    notificationId,
+    type: args.type,
+    title: args.title,
+    message: args.message,
+    reason: args.reason,
+    createdAt: createdAt.toISOString(),
+  };
+  emitToPlayer(args.playerId, 'player_notification', payload);
+
+  const tokenRow = await db.select({ token: playerPushTokensTable.token })
+    .from(playerPushTokensTable)
+    .where(eq(playerPushTokensTable.playerId, args.playerId))
+    .limit(1);
+  if (tokenRow[0]?.token) {
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Accept-Encoding': 'gzip, deflate',
+      },
+      body: JSON.stringify({
+        to: tokenRow[0].token,
+        title: args.title,
+        body: args.message,
+        sound: 'default',
+        data: {
+          category: 'social',
+          priority: 'medium',
+          actionRoute: args.actionRoute,
+          actionLabel: args.actionLabel,
+          icon: args.icon,
+          iconColor: args.iconColor,
+          dedupeKey: `server:${notificationId}`,
+        },
+      }),
+    });
+  }
 }
 
 // ── GET /api/social/search?q= ─────────────────────────────────────────────────
@@ -148,7 +212,28 @@ router.post('/social/follow/:targetId', requirePlayer, async (req: any, res) => 
     const { targetId } = req.params;
     if (playerId === targetId) { res.status(400).json({ error: 'Cannot follow yourself' }); return; }
 
-    await db.insert(followsTable).values({ followerId: playerId, followingId: targetId }).onConflictDoNothing();
+    const inserted = await db.insert(followsTable)
+      .values({ followerId: playerId, followingId: targetId })
+      .onConflictDoNothing()
+      .returning({ followerId: followsTable.followerId });
+    if (inserted.length > 0) {
+      const actor = await db.select({ username: playersTable.username, profileJson: playersTable.profileJson })
+        .from(playersTable)
+        .where(eq(playersTable.playerId, playerId))
+        .limit(1);
+      const actorName = (actor[0]?.profileJson as any)?.displayName || actor[0]?.username || 'A player';
+      void createSocialNotification({
+        playerId: targetId,
+        type: 'follow',
+        title: `${actorName} followed you`,
+        message: `${actorName} is now following your Chip Society profile.`,
+        reason: `social_follow:${playerId}`,
+        actionRoute: `/social/player-profile?id=${encodeURIComponent(playerId)}`,
+        actionLabel: 'VIEW PROFILE',
+        icon: 'person-add',
+        iconColor: '#00d4ff',
+      }).catch(() => {});
+    }
     res.json({ ok: true });
   } catch (e) {
     req.log.error(e, 'follow error');
@@ -696,10 +781,19 @@ router.post('/social/posts/:id/like', requirePlayer, async (req: any, res) => {
 
     // Notify the post author (fire-and-forget, never blocks the response)
     if (liked && updated?.authorId && updated.authorId !== playerId) {
-      db.insert(playerNotificationsTable).values({
-        notificationId: randomUUID(), playerId: updated.authorId,
-        type: 'like', title: 'Someone liked your post',
-        reason: 'post_like', amount: 0,
+      const actor = await db.select({ username: playersTable.username, profileJson: playersTable.profileJson })
+        .from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
+      const actorName = (actor[0]?.profileJson as any)?.displayName || actor[0]?.username || 'A player';
+      void createSocialNotification({
+        playerId: updated.authorId,
+        type: 'like',
+        title: `${actorName} liked your post`,
+        message: `${actorName} liked something you shared.`,
+        reason: `post_like:${postId}`,
+        actionRoute: '/(tabs)/feed?tab=me',
+        actionLabel: 'VIEW POST',
+        icon: 'heart',
+        iconColor: '#ff0090',
       }).catch(() => {});
     }
 
@@ -772,6 +866,9 @@ router.post('/social/posts/:id/comments', requirePlayer, async (req: any, res) =
     const authorRow = await db.select({ username: playersTable.username, profileJson: playersTable.profileJson })
       .from(playersTable).where(eq(playersTable.playerId, playerId)).limit(1);
     if (!authorRow[0]) { res.status(404).json({ error: 'Player not found' }); return; }
+    const postRow = await db.select({ authorId: feedPostsTable.authorId })
+      .from(feedPostsTable).where(eq(feedPostsTable.id, postId)).limit(1);
+    if (!postRow[0]) { res.status(404).json({ error: 'Post not found' }); return; }
 
     const id = randomUUID();
     const [created] = await db.insert(postCommentsTable).values({
@@ -797,7 +894,21 @@ router.post('/social/posts/:id/comments', requirePlayer, async (req: any, res) =
       createdAt:         created!.createdAt,
     };
 
-    emitToPlayer(postId, 'new_comment', comment);
+    emitToPlayer(postRow[0].authorId, 'new_comment', comment);
+    if (postRow[0].authorId !== playerId) {
+      const actorName = (authorRow[0].profileJson as any)?.displayName || authorRow[0].username;
+      void createSocialNotification({
+        playerId: postRow[0].authorId,
+        type: 'comment',
+        title: `${actorName} commented on your post`,
+        message: text.trim().length > 80 ? `${text.trim().slice(0, 77)}…` : text.trim(),
+        reason: `post_comment:${postId}`,
+        actionRoute: '/(tabs)/feed?tab=me',
+        actionLabel: 'VIEW COMMENT',
+        icon: 'chatbubble',
+        iconColor: '#bf5fff',
+      }).catch(() => {});
+    }
     res.status(201).json({ comment });
   } catch (e) {
     req.log.error(e, 'add comment error');

@@ -17,21 +17,30 @@ export interface AppNotification {
   createdAt: number;
   read: boolean;
   dismissed: boolean;
+  dedupeKey?: string;
   actionRoute?: string;
   actionLabel?: string;
   icon: string;
   iconColor: string;
 }
 
+export type AppNotificationInput =
+  Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'dismissed'> & {
+    id?: string;
+    createdAt?: number;
+  };
+
 interface NotifContextValue {
   notifications: AppNotification[];
   unreadCount: number;
+  ready: boolean;
   pushToken: string | null;
-  addNotification: (n: Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'dismissed'>) => void;
+  addNotification: (n: AppNotificationInput) => void;
   markRead: (id: string) => void;
   markAllRead: () => void;
   dismiss: (id: string) => void;
   clearAllRead: () => void;
+  dismissByDedupePrefix: (prefix: string) => void;
   setPushToken: (token: string | null) => void;
 }
 
@@ -40,214 +49,120 @@ interface NotifContextValue {
 const NotifContext = createContext<NotifContextValue>({
   notifications: [],
   unreadCount: 0,
+  ready: false,
   pushToken: null,
   addNotification: () => {},
   markRead: () => {},
   markAllRead: () => {},
   dismiss: () => {},
   clearAllRead: () => {},
+  dismissByDedupePrefix: () => {},
   setPushToken: () => {},
 });
 
-const STORAGE_KEY    = '@chipsociety_notifications_v1';
-const LAST_OPEN_KEY  = '@chipsociety_last_open';
+const STORAGE_KEY    = '@chipsociety_notifications_v2';
+const DISMISSED_KEY  = '@chipsociety_notification_dismissed_v2';
+const WELCOME_KEY    = '@chipsociety_notification_welcome_v2';
 const PUSH_TOKEN_KEY = '@chipsociety_push_token_v1';
-
-// ─── Returning-player auto-notifications ──────────────────────────────────────
-
-function buildReturningNotifications(
-  lastOpen: number,
-  canClaimWheel: boolean,
-  canClaimDaily: boolean,
-  pendingAchievements: number,
-  streakDays: number,
-): Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'dismissed'>[] {
-  const away = Date.now() - lastOpen;
-  const notifs: Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'dismissed'>[] = [];
-
-  if (canClaimWheel) {
-    notifs.push({
-      category: 'reward',
-      priority: 'high',
-      title: 'Daily Spin Ready',
-      message: 'Your free spin is available. Spin to win up to 100K chips!',
-      actionRoute: '/rewards/wheel',
-      actionLabel: 'SPIN NOW',
-      icon: 'radio-button-on',
-      iconColor: '#bf5fff',
-    });
-  }
-
-  if (canClaimDaily) {
-    notifs.push({
-      category: 'reward',
-      priority: 'high',
-      title: 'Daily Streak Reward',
-      message: `Day ${streakDays + 1} bonus chips are waiting for you.`,
-      actionRoute: '/rewards/streak',
-      actionLabel: 'CLAIM',
-      icon: 'flame',
-      iconColor: '#ffd700',
-    });
-  }
-
-  if (pendingAchievements > 0) {
-    notifs.push({
-      category: 'reward',
-      priority: 'high',
-      title: `${pendingAchievements} Achievement${pendingAchievements > 1 ? 's' : ''} Ready`,
-      message: 'You have unclaimed achievement rewards waiting.',
-      actionRoute: '/achievements',
-      actionLabel: 'CLAIM',
-      icon: 'trophy',
-      iconColor: '#ffd700',
-    });
-  }
-
-  if (away > 4 * 60 * 60 * 1000) {
-    notifs.push({
-      category: 'gameplay',
-      priority: 'medium',
-      title: 'Leaderboard Updated',
-      message: 'The weekly leaderboard rankings have shifted. See where you stand.',
-      actionRoute: '/(tabs)/play',
-      actionLabel: 'VIEW',
-      icon: 'podium',
-      iconColor: '#00d4ff',
-    });
-  }
-
-  return notifs;
-}
-
-// ─── Static seed notifications (shown on first install) ──────────────────────
-
-const SEED_NOTIFICATIONS: Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'dismissed'>[] = [
-  {
-    category: 'system',
-    priority: 'high',
-    title: 'Welcome to Chip Society',
-    message: 'You start with 50,000 virtual chips. Head to the Play tab to start your first game.',
-    actionRoute: '/(tabs)/play',
-    actionLabel: 'PLAY NOW',
-    icon: 'sparkles',
-    iconColor: '#00d4ff',
-  },
-  {
-    category: 'reward',
-    priority: 'high',
-    title: 'Daily Spin Ready',
-    message: 'Your first free daily spin is waiting. Spin for a chance to win up to 100K chips!',
-    actionRoute: '/rewards/wheel',
-    actionLabel: 'SPIN NOW',
-    icon: 'radio-button-on',
-    iconColor: '#bf5fff',
-  },
-  {
-    category: 'social',
-    priority: 'low',
-    title: 'Find Your Friends',
-    message: 'Invite friends to play and grow your follower list. Check the Feed tab.',
-    actionRoute: '/(tabs)/feed',
-    actionLabel: 'EXPLORE',
-    icon: 'people',
-    iconColor: '#00d4ff',
-  },
-];
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 interface ProviderProps {
   children: React.ReactNode;
-  canClaimWheel?: boolean;
-  canClaimDaily?: boolean;
-  pendingAchievements?: number;
-  streakDays?: number;
+  playerId: string;
+  isNewUser: boolean;
 }
 
 export function NotificationProvider({
   children,
-  canClaimWheel = false,
-  canClaimDaily = false,
-  pendingAchievements = 0,
-  streakDays = 0,
+  playerId,
+  isNewUser,
 }: ProviderProps) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [dismissedKeys, setDismissedKeys] = useState<Set<string>>(new Set());
+  const [ready, setReady] = useState(false);
   const [pushToken, setPushTokenState]    = useState<string | null>(null);
   const initialized = useRef(false);
+  const storageKey = `${STORAGE_KEY}_${playerId || 'anonymous'}`;
+  const dismissedStorageKey = `${DISMISSED_KEY}_${playerId || 'anonymous'}`;
+  const welcomeKey = `${WELCOME_KEY}_${playerId || 'anonymous'}`;
 
   // Load notifications + push token from storage
   useEffect(() => {
     (async () => {
       try {
-        const [raw, lastOpenRaw, savedToken] = await Promise.all([
-          AsyncStorage.getItem(STORAGE_KEY),
-          AsyncStorage.getItem(LAST_OPEN_KEY),
+        const [raw, dismissedRaw, welcomeSeen, savedToken] = await Promise.all([
+          AsyncStorage.getItem(storageKey),
+          AsyncStorage.getItem(dismissedStorageKey),
+          AsyncStorage.getItem(welcomeKey),
           AsyncStorage.getItem(PUSH_TOKEN_KEY),
         ]);
 
-        const lastOpen = lastOpenRaw ? parseInt(lastOpenRaw, 10) : 0;
         const now = Date.now();
 
         if (savedToken) setPushTokenState(savedToken);
 
         let saved: AppNotification[] = raw ? JSON.parse(raw) : [];
+        const removed = new Set<string>(dismissedRaw ? JSON.parse(dismissedRaw) : []);
 
-        if (saved.length === 0) {
-          const seeded = SEED_NOTIFICATIONS.map((n, i) => ({
-            ...n,
-            id: `seed_${i}_${now}`,
-            createdAt: now - i * 60_000,
+        if (playerId && isNewUser && !welcomeSeen) {
+          saved.unshift({
+            id: `welcome:${playerId}`,
+            dedupeKey: `welcome:${playerId}`,
+            category: 'system',
+            priority: 'high',
+            title: 'Welcome to Chip Society',
+            message: 'You start with 50,000 virtual chips. Head to the Play tab to start your first game.',
+            actionRoute: '/(tabs)/play',
+            actionLabel: 'PLAY NOW',
+            icon: 'sparkles',
+            iconColor: '#00d4ff',
+            createdAt: now,
             read: false,
             dismissed: false,
-          }));
-          saved = seeded;
-        } else if (lastOpen > 0) {
-          const returning = buildReturningNotifications(
-            lastOpen, canClaimWheel, canClaimDaily, pendingAchievements, streakDays,
-          );
-          const newNotifs: AppNotification[] = returning.map((n, i) => ({
-            ...n,
-            id: `ret_${now}_${i}`,
-            createdAt: now - i * 1000,
-            read: false,
-            dismissed: false,
-          }));
-          const existingTitles = new Set(saved.map(s => s.title));
-          const fresh = newNotifs.filter(n => !existingTitles.has(n.title));
-          saved = [...fresh, ...saved].slice(0, 80);
+          });
+          await AsyncStorage.setItem(welcomeKey, '1');
         }
 
-        // Prune dismissed older than 7 days
-        const cutoff = now - 7 * 24 * 60 * 60 * 1000;
-        saved = saved.filter(n => !n.dismissed || n.createdAt > cutoff);
-
-        setNotifications(saved);
-        await AsyncStorage.setItem(LAST_OPEN_KEY, String(now));
+        setDismissedKeys(removed);
+        setNotifications(saved.filter(n => !removed.has(n.dedupeKey ?? n.id)).slice(0, 80));
         initialized.current = true;
+        setReady(true);
       } catch {
         initialized.current = true;
+        setReady(true);
       }
     })();
-  }, []);
+  }, [storageKey, dismissedStorageKey, welcomeKey, playerId, isNewUser]);
 
   // Persist whenever notifications change (after init)
   useEffect(() => {
     if (!initialized.current) return;
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(notifications)).catch(() => {});
-  }, [notifications]);
+    AsyncStorage.setItem(storageKey, JSON.stringify(notifications)).catch(() => {});
+  }, [notifications, storageKey]);
+
+  useEffect(() => {
+    if (!initialized.current) return;
+    AsyncStorage.setItem(dismissedStorageKey, JSON.stringify([...dismissedKeys])).catch(() => {});
+  }, [dismissedKeys, dismissedStorageKey]);
 
   const addNotification = useCallback(
-    (n: Omit<AppNotification, 'id' | 'createdAt' | 'read' | 'dismissed'>) => {
-      setNotifications(prev => [{
-        ...n,
-        id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        createdAt: Date.now(),
-        read: false,
-        dismissed: false,
-      }, ...prev].slice(0, 80));
+    (n: AppNotificationInput) => {
+      const id = n.id ?? `notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const key = n.dedupeKey ?? id;
+      if (dismissedKeys.has(key)) return;
+      setNotifications(prev => {
+        if (prev.some(existing => (existing.dedupeKey ?? existing.id) === key)) return prev;
+        return [{
+          ...n,
+          id,
+          createdAt: n.createdAt ?? Date.now(),
+          read: false,
+          dismissed: false,
+        }, ...prev].slice(0, 80);
+      });
     },
-    [],
+    [dismissedKeys],
   );
 
   const markRead = useCallback((id: string) => {
@@ -259,11 +174,29 @@ export function NotificationProvider({
   }, []);
 
   const dismiss = useCallback((id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, dismissed: true, read: true } : n));
+    setNotifications(prev => {
+      const target = prev.find(n => n.id === id);
+      if (target) setDismissedKeys(keys => new Set(keys).add(target.dedupeKey ?? target.id));
+      return prev.filter(n => n.id !== id);
+    });
   }, []);
 
   const clearAllRead = useCallback(() => {
-    setNotifications(prev => prev.filter(n => !n.read));
+    setNotifications(prev => {
+      const removed = prev.filter(n => n.read).map(n => n.dedupeKey ?? n.id);
+      if (removed.length) setDismissedKeys(keys => new Set([...keys, ...removed]));
+      return prev.filter(n => !n.read);
+    });
+  }, []);
+
+  const dismissByDedupePrefix = useCallback((prefix: string) => {
+    setNotifications(prev => {
+      const removed = prev.filter(n => (n.dedupeKey ?? n.id).startsWith(prefix));
+      if (removed.length) {
+        setDismissedKeys(keys => new Set([...keys, ...removed.map(n => n.dedupeKey ?? n.id)]));
+      }
+      return prev.filter(n => !(n.dedupeKey ?? n.id).startsWith(prefix));
+    });
   }, []);
 
   const setPushToken = useCallback((token: string | null) => {
@@ -281,12 +214,14 @@ export function NotificationProvider({
     <NotifContext.Provider value={{
       notifications: notifications.filter(n => !n.dismissed),
       unreadCount,
+      ready,
       pushToken,
       addNotification,
       markRead,
       markAllRead,
       dismiss,
       clearAllRead,
+      dismissByDedupePrefix,
       setPushToken,
     }}>
       {children}
